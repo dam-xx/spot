@@ -60,7 +60,7 @@ namespace spot
   /// The DFS stacks store tgba_succ_iterators, so that only the
   /// iterators which really are explored are computed.
   ///
-  /// spot::emptiness_check_shy try to explore successors which are
+  /// spot::emptiness_check_shy tries to explore successors which are
   /// visited states first.  this helps to merge SCCs and generally
   /// helps to produce shorter counter-examples.  However this
   /// algorithm cannot stores unprocessed successors as
@@ -98,8 +98,8 @@ namespace spot
     void remove_component(const state* start_delete);
   };
 
-  /// \brief A version of spot::emptiness_check try to visit known
-  /// states first.
+  /// \brief A version of spot::emptiness_check that tries to visit
+  /// known states first.
   ///
   /// See the documentation for spot::emptiness_check
   class emptiness_check_shy : public emptiness_check

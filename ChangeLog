@@ -1,3 +1,7 @@
+2004-07-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/gtec.hh: Typos in comments.
+
 2004-07-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgba/state.hh (state_ptr_equal, state_ptr_hash): Fix Doxygen
