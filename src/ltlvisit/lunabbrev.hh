@@ -47,7 +47,6 @@ namespace spot
       virtual ~unabbreviate_logic_visitor();
 
       using super::visit;
-      //void visit(unop* uo);
       void visit(binop* bo);
 
       virtual formula* recurse(formula* f);

@@ -1,3 +1,8 @@
+2004-06-23  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/ltlvisit/lunabbrev.hh: Revert superfluous change from
+	2004-05-10.
+
 2004-06-22  Thomas Martinez  <martinez@src.lip6.fr>
 
 	* src/ltlvisit/reducform.cc, src/tgba/tgbareduc.cc,
