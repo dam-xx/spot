@@ -323,7 +323,6 @@ namespace spot
 			bdd old = acu;
 			acu = c_prime.get_acc();
 			condition_stack.push(cond_level(acu - old, depth));
-			inc_depth();
 		      }
 		    ++depth;
 		  }
@@ -348,7 +347,6 @@ namespace spot
 		      {
 			acu -= condition_stack.top().first;
 			condition_stack.pop();
-			dec_depth();
 		      }
 		  }
               }
