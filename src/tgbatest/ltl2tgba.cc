@@ -35,6 +35,7 @@
 #include "tgbaalgos/dotty.hh"
 #include "tgbaalgos/lbtt.hh"
 #include "tgba/tgbatba.hh"
+#include "tgbaalgos/gv04.hh"
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/se05.hh"
 #include "tgbaalgos/tau03.hh"
@@ -150,7 +151,7 @@ main(int argc, char** argv)
   int formula_index = 0;
   std::string echeck_algo;
   enum { None, Couvreur, Couvreur2, MagicSearch, Se05Search,
-              Tau03Search, Tau03OptSearch } echeck = None;
+	 Tau03Search, Tau03OptSearch, Gv04 } echeck = None;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
   bool search_many = false;
   bool bit_state_hashing = false;
@@ -421,6 +422,11 @@ main(int argc, char** argv)
 	{
 	  echeck = Tau03OptSearch;
 	}
+      else if (echeck_algo == "gv04")
+	{
+	  echeck = Gv04;
+	  degeneralize_maybe = true;
+	}
       else
 	{
 	  std::cerr << "unknown emptiness-check: " << echeck_algo << std::endl;
@@ -678,6 +684,9 @@ main(int argc, char** argv)
 
 	case Tau03OptSearch:
           ec = spot::explicit_tau03_opt_search(a);
+	  break;
+	case Gv04:
+	  ec = spot::explicit_gv04_check(a);
 	  break;
 	}
 

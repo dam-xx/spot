@@ -32,6 +32,7 @@ tgbaalgos_HEADERS = \
   dupexp.hh \
   emptiness.hh \
   emptiness_stats.hh \
+  gv04.hh \
   lbtt.hh \
   ltl2tgba_fm.hh \
   ltl2tgba_lacim.hh \
@@ -57,6 +58,7 @@ libtgbaalgos_la_SOURCES = \
   dottydec.cc \
   dupexp.cc \
   emptiness.cc \
+  gv04.cc \
   lbtt.cc \
   ltl2tgba_fm.cc \
   ltl2tgba_lacim.cc \

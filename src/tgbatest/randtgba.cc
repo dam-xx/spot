@@ -36,6 +36,7 @@
 #include "tgbaalgos/emptiness.hh"
 #include "tgbaalgos/emptiness_stats.hh"
 #include "tgbaalgos/gtec/gtec.hh"
+#include "tgbaalgos/gv04.hh"
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/se05.hh"
 #include "tgbaalgos/tau03.hh"
@@ -337,6 +338,10 @@ main(int argc, char** argv)
 	      ec_obj.push_back(spot::bit_state_hashing_se05_search(a, 4096));
 	      ec_name.push_back("bit_state_hashing_se05_search");
 	      ec_safe.push_back(false);
+
+	      ec_obj.push_back(spot::explicit_gv04_check(a));
+	      ec_name.push_back("explicit_gv04");
+	      ec_safe.push_back(true);
 	    }
 
 	  if (opt_n_acc >= 1)
