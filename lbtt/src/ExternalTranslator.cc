@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@
 #endif /* __GNUC__ */
 
 #include <config.h>
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <sys/stat.h>
@@ -125,10 +126,20 @@ void ExternalTranslator::translate
   input_file.close();
 
   string command_line = string(command_line_arguments[2])
-                        + commandLine(external_program_input_file.getName(),
+			+ commandLine(external_program_input_file.getName(),
 				      external_program_output_file.getName());
 
-  if (!execSuccess(system(command_line.c_str())))
+  int exitcode = system(command_line.c_str());
+
+  /*
+   * system() blocks SIGINT and SIGQUIT.  If the child was killed
+   * by such a signal, forward the signal to the current process.
+   */
+  if (WIFSIGNALED(exitcode) &&
+      (WTERMSIG(exitcode) == SIGINT || WTERMSIG(exitcode) == SIGQUIT))
+    raise(WTERMSIG(exitcode));
+
+  if (!execSuccess(exitcode))
     throw ExecFailedException(command_line_arguments[2]);
 
   parseAutomaton(external_program_output_file.getName(), filename);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -22,6 +22,7 @@
 #endif /* __GNUC__ */
 
 #include <config.h>
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <sys/times.h>
@@ -207,7 +208,7 @@ void printFileContents
 	first_line_printed = true;
 	estream << string(indent, ' ') + message + '\n';
       }
-                    
+
       estream << string(indent, ' ') + line_prefix + message_line + '\n';
     }
   }
@@ -245,8 +246,8 @@ void writeToTranscript(const string& message, bool show_formula_in_header)
     const string roundstring = "Round " + toString(round_info.current_round);
 
     round_info.transcript_file << roundstring + '\n'
-                                  + string(roundstring.length(), '-')
-                                  + "\n\n";
+				  + string(roundstring.length(), '-')
+				  + "\n\n";
 
     if (show_formula_in_header)
     {
@@ -291,7 +292,7 @@ void generateStateSpace()
   using ::Graph::StateSpace;
 
   if (configuration.global_options.statespace_generation_mode
-        == Configuration::ENUMERATEDPATH)
+	== Configuration::ENUMERATEDPATH)
   {
     StateSpace::size_type current_size
       = configuration.statespace_generator.min_size;
@@ -319,7 +320,7 @@ void generateStateSpace()
 		    2,
 		    6);
 	}
-	else 
+	else
 	{
 	  current_size = configuration.statespace_generator.min_size;
 	  printText("[All state spaces have been enumerated. Staring over]\n",
@@ -333,7 +334,7 @@ void generateStateSpace()
     {
       round_info.path_iterator
 	= new Graph::PathIterator
-  	        (configuration.statespace_generator.atoms_per_state,
+		(configuration.statespace_generator.atoms_per_state,
 		 current_size);
     }
 
@@ -367,16 +368,16 @@ void generateStateSpace()
     {
       switch (configuration.global_options.statespace_generation_mode)
       {
-        case Configuration::RANDOMGRAPH :
+	case Configuration::RANDOMGRAPH :
 	  statespace = configuration.statespace_generator.generateGraph();
 	  break;
 
-        case Configuration::RANDOMCONNECTEDGRAPH :
+	case Configuration::RANDOMCONNECTEDGRAPH :
 	  statespace = configuration.statespace_generator.
-	                 generateConnectedGraph();
+			 generateConnectedGraph();
 	  break;
 
-        default : /* Configuration::RANDOMPATH */
+	default : /* Configuration::RANDOMPATH */
 	  statespace = configuration.statespace_generator.generatePath();
 	  break;
       }
@@ -407,8 +408,8 @@ void generateStateSpace()
 
     printText(" ok\n", 4);
 
-    if (configuration.statespace_generator.max_size 
- 	  > configuration.statespace_generator.min_size)
+    if (configuration.statespace_generator.max_size
+	  > configuration.statespace_generator.min_size)
       printText("number of states: "
 		+ toString(round_info.statespace->size())
 		+ '\n',
@@ -572,7 +573,7 @@ void generateFormulae(istream* formula_input_stream)
 
   if (printText(" ok\n", 4))
     printText("<negating formula>", 4, 6);
-  
+
   round_info.formulae[3] = &(::Ltl::Not::construct(*round_info.formulae[2]));
 
   if (printText(" ok\n", 4))
@@ -587,7 +588,7 @@ void generateFormulae(istream* formula_input_stream)
     for (int f = 0; f <= 1; f++)
     {
       round_info.cout << string(6, ' ') + (f == 0 ? "" : "negated ")
-	                 + "formula:" + string(19 - 8 * f, ' ');
+			 + "formula:" + string(19 - 8 * f, ' ');
       round_info.formulae[f + 2]->print(round_info.cout);
       round_info.cout << '\n';
 
@@ -742,7 +743,7 @@ void writeFormulaeToFiles()
 void generateBuchiAutomaton
   (int f,
    vector<Configuration::AlgorithmInformation,
-          ALLOC(Configuration::AlgorithmInformation) >::size_type algorithm_id)
+	  ALLOC(Configuration::AlgorithmInformation) >::size_type algorithm_id)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Constructs a BuchiAutomaton by invoking an external program
@@ -811,9 +812,9 @@ void generateBuchiAutomaton
 	command_line += *(algorithm.extra_parameters) + ' ';
 
       command_line += string(round_info.formula_file_name[f])
-                      + ' ' + round_info.automaton_file_name
-                      + " 1>" + round_info.cout_capture_file
-                      + " 2>" + round_info.cerr_capture_file;
+		      + ' ' + round_info.automaton_file_name
+		      + " 1>" + round_info.cout_capture_file
+		      + " 2>" + round_info.cerr_capture_file;
 
       if (!printText("<executing `" + command_line + "'>", 5, 10))
 	printText("<computing Büchi automaton>", 4, 10);
@@ -836,11 +837,11 @@ void generateBuchiAutomaton
 	  && timing_information_begin.tms_cutime != static_cast<clock_t>(-1)
 	  && timing_information_end.tms_utime != static_cast<clock_t>(-1)
 	  && timing_information_end.tms_cutime != static_cast<clock_t>(-1))
-	automaton_stats.buchi_generation_time 
+	automaton_stats.buchi_generation_time
 	  = static_cast<double>(timing_information_end.tms_utime
-			        + timing_information_end.tms_cutime
-			        - timing_information_begin.tms_utime
-			        - timing_information_begin.tms_cutime)
+				+ timing_information_end.tms_cutime
+				- timing_information_begin.tms_utime
+				- timing_information_begin.tms_cutime)
 	    / sysconf(_SC_CLK_TCK);
 
       /*
@@ -851,6 +852,17 @@ void generateBuchiAutomaton
 
       if (exitcode != 0)
       {
+	/*
+	 * system() blocks SIGINT and SIGQUIT.  If the child was killed
+	 * by such a signal, forward the signal to the current process.
+	 * If lbtt is interactive, SIGINT will be handled as a user
+	 * break.  If lbtt is non-interactive, SIGINT will kill lbtt.
+	 * This is what we expect when hitting C-c while lbtt is running.
+	 */
+	if (WIFSIGNALED(exitcode) &&
+	    (WTERMSIG(exitcode) == SIGINT || WTERMSIG(exitcode) == SIGQUIT))
+	  raise(WTERMSIG(exitcode));
+
 	ExecFailedException e;
 	e.changeMessage("Execution of `" + *(algorithm.path_to_program)
 			+ "' failed"
@@ -860,7 +872,7 @@ void generateBuchiAutomaton
 					2)
 			     + " seconds elapsed)"
 			   : string(""))
-		        + " with exit status " + toString(exitcode));
+			+ " with exit status " + toString(exitcode));
 	throw e;
       }
 
@@ -893,17 +905,17 @@ void generateBuchiAutomaton
       if (round_info.transcript_file.is_open())
       {
 	writeToTranscript("Büchi automaton generation failed ("
-                          + configuration.algorithmString(algorithm_id)
-	                  + ", "
-		  	  + (f == 0 ? "posi" : "nega")
+			  + configuration.algorithmString(algorithm_id)
+			  + ", "
+			  + (f == 0 ? "posi" : "nega")
 			  + "tive formula)");
 
 	if (automaton_stats.buchi_generation_time >= 0.0)
 	  round_info.transcript_file << string(8, ' ') + "Elapsed time: "
-				        + toString(automaton_stats.
+					+ toString(automaton_stats.
 						     buchi_generation_time,
 						   2)
-				        + " seconds (user time)\n";
+					+ " seconds (user time)\n";
       }
 
       try
@@ -915,33 +927,33 @@ void generateBuchiAutomaton
 	printText(string(": ") + e.what(), 2);
 	if (round_info.transcript_file.is_open())
 	  round_info.transcript_file << string(8, ' ')
-                                        + "Program execution failed with exit "
-	                                  "status "
-                                        + toString(exitcode);
+					+ "Program execution failed with exit "
+					  "status "
+					+ toString(exitcode);
       }
       catch (const BuchiAutomaton::AutomatonParseException& e)
       {
 	printText(string(" parsing input: ") + e.what(), 2);
 	if (round_info.transcript_file.is_open())
 	  round_info.transcript_file << string(8, ' ')
-	                                + "Error reading automaton: "
-	                                + e.what();
+					+ "Error reading automaton: "
+					+ e.what();
       }
       catch (const Exception& e)
       {
 	printText(string(": ") + e.what(), 2);
 	if (round_info.transcript_file.is_open())
 	  round_info.transcript_file << string(8, ' ')
-                                        + "lbtt internal error: "
-	                                + e.what();
+					+ "lbtt internal error: "
+					+ e.what();
       }
       catch (const bad_alloc&)
       {
 	printText(": out of memory", 2);
 	if (round_info.transcript_file.is_open())
 	  round_info.transcript_file << string(8, ' ')
-	                                + "Out of memory while reading "
-	                                  "automaton";
+					+ "Out of memory while reading "
+					  "automaton";
       }
 
       printText("\n", 2);
@@ -1021,7 +1033,7 @@ void generateBuchiAutomaton
       += automaton_stats.number_of_buchi_transitions;
     final_statistics[algorithm_id].total_number_of_acceptance_sets[f]
       += automaton_stats.number_of_acceptance_sets;
-		  
+
     if (final_statistics[algorithm_id].total_buchi_generation_time[f] < 0.0
 	|| automaton_stats.buchi_generation_time < 0.0)
       final_statistics[algorithm_id].total_buchi_generation_time[f] = -1.0;
@@ -1040,7 +1052,7 @@ void generateBuchiAutomaton
 void generateProductAutomaton
   (int f,
    vector<Configuration::AlgorithmInformation,
-          ALLOC(Configuration::AlgorithmInformation) >::size_type algorithm_id)
+	  ALLOC(Configuration::AlgorithmInformation) >::size_type algorithm_id)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Computes the product of a Büchi automaton with a state
@@ -1098,7 +1110,7 @@ void generateProductAutomaton
     if (round_info.transcript_file.is_open())
       writeToTranscript("Product automaton generation aborted ("
 			+ configuration.algorithmString(algorithm_id)
-	                + ", "
+			+ ", "
 			+ (f == 0 ? "posi" : "nega") + "tive formula)"
 			+ ". Product may be too large.\n");
 
@@ -1110,7 +1122,7 @@ void generateProductAutomaton
   {
     if (!printText(" user break\n\n", 4))
       printText("[User break]\n\n", 2, 10);
-       
+
     if (round_info.transcript_file.is_open())
       writeToTranscript("User break while generating product automaton ("
 			+ configuration.algorithmString(algorithm_id)
@@ -1173,7 +1185,7 @@ void generateProductAutomaton
 void performEmptinessCheck
   (int f,
    vector<Configuration::AlgorithmInformation,
-          ALLOC(Configuration::AlgorithmInformation) >::size_type
+	  ALLOC(Configuration::AlgorithmInformation) >::size_type
      algorithm_id)
 /* ----------------------------------------------------------------------------
  *
@@ -1211,7 +1223,7 @@ void performEmptinessCheck
     {
       round_info.product_automaton->emptinessCheck
 	(automaton_stats.emptiness_check_result);
-								 
+
       automaton_stats.emptiness_check_performed = true;
     }
     catch (const UserBreakException&)
@@ -1221,7 +1233,7 @@ void performEmptinessCheck
 
       if (round_info.transcript_file.is_open())
 	writeToTranscript("User break while searching for accepting cycles ("
-		  	  + configuration.algorithmString(algorithm_id)
+			  + configuration.algorithmString(algorithm_id)
 			  + ", "
 			  + (f == 0 ? "posi" : "nega") + "tive formula)\n");
 
@@ -1252,7 +1264,7 @@ void performEmptinessCheck
 /* ========================================================================= */
 void performConsistencyCheck
   (vector<Configuration::AlgorithmInformation,
-          ALLOC(Configuration::AlgorithmInformation) >::size_type
+	  ALLOC(Configuration::AlgorithmInformation) >::size_type
      algorithm_id)
 /* ----------------------------------------------------------------------------
  *
@@ -1322,10 +1334,10 @@ void performConsistencyCheck
   }
 
   printText((result ? " ok\n" : " failed\n"), 4);
-  
+
   if (configuration.global_options.verbosity >= 3)
     printConsistencyCheckStats(cout, 8, algorithm_id);
-}      
+}
 
 /* ========================================================================= */
 void compareResults()
@@ -1378,7 +1390,7 @@ void compareResults()
 
 	    unsigned long int dist
 	      = alg_1_stats->emptiness_check_result.hammingDistance
-	          (alg_2_stats->emptiness_check_result);
+		  (alg_2_stats->emptiness_check_result);
 
 	    alg_1_stats->cross_comparison_stats[alg_2].first
 	      = alg_2_stats->cross_comparison_stats[alg_1].first
@@ -1397,9 +1409,9 @@ void compareResults()
 		  != alg_2_stats->emptiness_check_result[0])
 	      {
 		(final_statistics[alg_1].
-	           initial_cross_comparison_mismatches[alg_2])++;
+		   initial_cross_comparison_mismatches[alg_2])++;
 		(final_statistics[alg_2].
-	           initial_cross_comparison_mismatches[alg_1])++;
+		   initial_cross_comparison_mismatches[alg_1])++;
 	      }
 
 	      result = false;
@@ -1479,13 +1491,13 @@ void performBuchiIntersectionCheck()
 
 	  if (test_results[alg_1].automaton_stats[0].buchiAutomatonComputed()
 	      && test_results[alg_2].automaton_stats[1].
-	           buchiAutomatonComputed())
+		   buchiAutomatonComputed())
 	  {
 	    automaton_intersection = 0;
 
 	    automaton_intersection
 	      = BuchiAutomaton::intersect
-	          (*(test_results[alg_1].automaton_stats[0].buchi_automaton),
+		  (*(test_results[alg_1].automaton_stats[0].buchi_automaton),
 		   *(test_results[alg_2].automaton_stats[1].buchi_automaton));
 
 	    /*
@@ -1519,18 +1531,18 @@ void performBuchiIntersectionCheck()
 		unsigned long int acceptance_set_counter = 0;
 
 		for (set<GraphEdgeContainer::size_type,
-	                 less<GraphEdgeContainer::size_type>,
-	                 ALLOC(GraphEdgeContainer::size_type) >::const_iterator
+			 less<GraphEdgeContainer::size_type>,
+			 ALLOC(GraphEdgeContainer::size_type) >::const_iterator
 		       state = scc->begin();
 		     state != scc->end()
 		       && acceptance_set_counter < number_of_acceptance_sets;
 		     ++state)
-	        {
+		{
 		  accept_set = acceptance_set_counter;
 		  while (accept_set < number_of_acceptance_sets)
 		  {
 		    if ((*automaton_intersection)[*state].acceptanceSets().
-		          test(accept_set))
+			  test(accept_set))
 		    {
 		      acceptance_sets.setBit(accept_set);
 		      if (accept_set == acceptance_set_counter)
@@ -1538,7 +1550,7 @@ void performBuchiIntersectionCheck()
 			do
 			  acceptance_set_counter++;
 			while (acceptance_set_counter
-			         < number_of_acceptance_sets
+				 < number_of_acceptance_sets
 			       && acceptance_sets[acceptance_set_counter]);
 			accept_set = acceptance_set_counter;
 			continue;
@@ -1549,7 +1561,7 @@ void performBuchiIntersectionCheck()
 		}
 
 		if (acceptance_set_counter == number_of_acceptance_sets)
-	        {
+		{
 		  test_results[alg_1].automaton_stats[0].
 		    buchi_intersection_check_stats[alg_2] = 0;
 		  test_results[alg_2].automaton_stats[1].
@@ -1574,7 +1586,7 @@ void performBuchiIntersectionCheck()
 	    automaton_intersection = 0;
 
 	    if (test_results[alg_1].automaton_stats[0].
-	          buchi_intersection_check_stats[alg_2] == -1)
+		  buchi_intersection_check_stats[alg_2] == -1)
 	    {
 	      test_results[alg_1].automaton_stats[0].
 		buchi_intersection_check_stats[alg_2] = 1;
@@ -1606,10 +1618,10 @@ void performBuchiIntersectionCheck()
 	  writeToTranscript("User break during Büchi automata intersection "
 			    "emptiness check");
 	  round_info.transcript_file << string(8, ' ') + "(+) "
-	                                + configuration.algorithmString(alg_1)
-	                                + ", (-) "
-	                                + configuration.algorithmString(alg_2)
-	                                + "\n\n";
+					+ configuration.algorithmString(alg_1)
+					+ ", (-) "
+					+ configuration.algorithmString(alg_2)
+					+ "\n\n";
 
 	if (automaton_intersection != 0)
 	{
@@ -1640,10 +1652,10 @@ void performBuchiIntersectionCheck()
 	  writeToTranscript("Out of memory during Büchi automata "
 			    "intersection emptiness check");
 	  round_info.transcript_file << string(8, ' ') + "(+) "
-	                                + configuration.algorithmString(alg_1)
-	                                + ", (-) "
-	                                + configuration.algorithmString(alg_2)
-	                                + "\n\n";
+					+ configuration.algorithmString(alg_1)
+					+ ", (-) "
+					+ configuration.algorithmString(alg_2)
+					+ "\n\n";
       }
     }
   }

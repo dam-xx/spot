@@ -1,4 +1,12 @@
-2003-07-13  Alexandre Duret-Lutz  <adl@gnu.org>
+2003-07-29  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/TestOperations.cc (generateBuchiAutomaton): Forward SIGINT
+	and SIGQUIT.
+	* src/ExternalTranslator.cc (ExternalTranslator::translate): Likewise.
+	* src/main.cc (main): Do not intercept SIGINT in
+	non-interactive runs.
+
+2003-07-13  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* doc/lbtt.texi: Never use @-commands in @node names, recent Texinfo
 	versions are stricter on this.

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -55,22 +55,22 @@ public:
   ~Configuration();                                 /* Destructor. */
 
   void read(int argc, char* argv[]);                /* Reads the program
-                                                     * configuration.
+						     * configuration.
 						     */
 
   void print                                        /* Writes the current    */
     (ostream& stream = cout, int indent = 0) const; /* configuration (in a
-                                                     * textual form) to a
-                                                     * stream.
+						     * textual form) to a
+						     * stream.
 						     */
 
   struct AlgorithmInformation;                      /* See below. */
 
   string algorithmString                            /* Formats the the id  */
     (vector<AlgorithmInformation,                   /* of an algorithm and */
-            ALLOC(AlgorithmInformation) >::size_type/* the name of the     */
+	    ALLOC(AlgorithmInformation) >::size_type/* the name of the     */
      algorithm_id) const;                           /* algorithm into a
-                                                     * string.
+						     * string.
 						     */
 
   static void showCommandLineHelp                   /* Prints the list of    */
@@ -79,52 +79,52 @@ public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
   enum InteractionMode {NEVER, ALWAYS, ONERROR};    /* Enumeration constants
-                                                     * affecting the behaviour
-                                                     * of the program as
-                                                     * regards user control.
+						     * affecting the behaviour
+						     * of the program as
+						     * regards user control.
 						     */
 
   enum FormulaMode {NORMAL, NNF};                   /* Enumeration constants
-                                                     * affecting the generation
-                                                     * and output of random
-                                                     * formulae.
+						     * affecting the generation
+						     * and output of random
+						     * formulae.
 						     */
 
   enum StateSpaceMode {RANDOMGRAPH = 1,             /* Enumeration constants */
-                       RANDOMCONNECTEDGRAPH = 2,    /* affecting the         */
+		       RANDOMCONNECTEDGRAPH = 2,    /* affecting the         */
 		       GRAPH = 3,                   /* generation of random  */
-                       RANDOMPATH = 4,              /* state spaces.         */
-                       ENUMERATEDPATH = 8,
-                       PATH = 12};
+		       RANDOMPATH = 4,              /* state spaces.         */
+		       ENUMERATEDPATH = 8,
+		       PATH = 12};
 
   enum ProductMode {LOCAL, GLOBAL};                 /* Enumeration constants
-                                                     * for controlling the
-                                                     * scope of synchronous
-                                                     * products.
+						     * for controlling the
+						     * scope of synchronous
+						     * products.
 						     */
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
   struct AlgorithmInformation                       /* A structure for storing
-                                                     * information about a
-                                                     * particular algorithm
-                                                     * (name, path to
-                                                     * executable, command-line
-                                                     * parameters).
+						     * information about a
+						     * particular algorithm
+						     * (name, path to
+						     * executable, command-line
+						     * parameters).
 						     */
   {
     string* name;                                   /* Name of the algorithm.
-                                                     */
+						     */
 
     string* path_to_program;                        /* Path to the executable
-                                                     * required for running
-                                                     * the algorithm.
+						     * required for running
+						     * the algorithm.
 						     */
 
     string* extra_parameters;                       /* Additional command-line
-                                                     * parameters required for
-                                                     * running the executable.
-                                                     */
+						     * parameters required for
+						     * running the executable.
+						     */
 
     bool enabled;                                   /* Determines whether the
 						     * algorithm is enabled
@@ -136,42 +136,42 @@ public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
   struct GlobalConfiguration                        /* A structure for storing
-                                                     * all the information
-                                                     * affecting the general
-                                                     * behaviour of the
-                                                     * program.
+						     * all the information
+						     * affecting the general
+						     * behaviour of the
+						     * program.
 						     */
   {
     int verbosity;                                  /* Determines the verbosity
-                                                     * of program output (0-5,
-                                                     * the bigger the value,
-                                                     * the more information
-                                                     * will be shown).
+						     * of program output (0-5,
+						     * the bigger the value,
+						     * the more information
+						     * will be shown).
 						     */
 
     InteractionMode interactive;                    /* Controls the behaviour
-                                                     * of the program as
-                                                     * regards the ability of
-                                                     * the user to enter
-                                                     * commands between test
-                                                     * rounds. Possible values
-                                                     * and their meanings are:
-                                                     *
-                                                     * NEVER:
-                                                     *   Run all tests without
-                                                     *   interruption.
-                                                     * ALWAYS:
-                                                     *   Pause after each test
-                                                     *   round to wait for
-                                                     *   user commands.
-                                                     * ONERROR:
-                                                     *   Try to run the tests
-                                                     *   without interruption.
-                                                     *   However, in case of
-                                                     *   an error, pause and
-                                                     *   wait for user
-                                                     *   commands.
-                                                     */
+						     * of the program as
+						     * regards the ability of
+						     * the user to enter
+						     * commands between test
+						     * rounds. Possible values
+						     * and their meanings are:
+						     *
+						     * NEVER:
+						     *   Run all tests without
+						     *   interruption.
+						     * ALWAYS:
+						     *   Pause after each test
+						     *   round to wait for
+						     *   user commands.
+						     * ONERROR:
+						     *   Try to run the tests
+						     *   without interruption.
+						     *   However, in case of
+						     *   an error, pause and
+						     *   wait for user
+						     *   commands.
+						     */
 
     unsigned long int number_of_rounds;             /* Number of test rounds.
 						     */
@@ -181,22 +181,22 @@ public:
 						     */
 
     unsigned long int statespace_change_interval;   /* Determines the frequency
-                                                     * (in rounds) of how often
-                                                     * a new state space is
-                                                     * generated.
+						     * (in rounds) of how often
+						     * a new state space is
+						     * generated.
 						     */
-    
+
     StateSpaceMode statespace_generation_mode;      /* Random state space
 						     * generation mode.
 						     * Available options are:
-                                                     *
-                                                     * RANDOMGRAPH:    
-                                                     *   Generate random
-                                                     *   connected graphs as
-                                                     *   state spaces.
-                                                     * RANDOMPATH:
-                                                     *   Generate paths as
-                                                     *   state spaces, choose
+						     *
+						     * RANDOMGRAPH:
+						     *   Generate random
+						     *   connected graphs as
+						     *   state spaces.
+						     * RANDOMPATH:
+						     *   Generate paths as
+						     *   state spaces, choose
 						     *   the loop and the
 						     *   truth assignments for
 						     *   atomic propositions
@@ -207,47 +207,47 @@ public:
 						     *   enumerating all
 						     *   possible paths of a
 						     *   given length.
-                                                     */
+						     */
 
     unsigned long int formula_change_interval;      /* Determines the frequency
-                                                     * (in rounds) of how often
-                                                     * a new formula is
-                                                     * generated.
+						     * (in rounds) of how often
+						     * a new formula is
+						     * generated.
 						     */
 
     ProductMode product_mode;                       /* Determines the scope of
-                                                     * the synchronous products
-                                                     * computed by the program.
-                                                     * Possible values and
-                                                     * their meanings are:
-                                                     *
-                                                     * LOCAL:
-                                                     *   The synchronous
-                                                     *   products are computed
-                                                     *   only with respect to
-                                                     *   the initial state of
-                                                     *   the system. This will
-                                                     *   save memory but makes
-                                                     *   the algorithm cross-
-                                                     *   comparisons less
-                                                     *   powerful, possibly
-                                                     *   at the cost of
-                                                     *   chances for finding
-                                                     *   inconsistencies in the
-                                                     *   results.
-                                                     * GLOBAL:
-                                                     *   The synchronous
-                                                     *   products are computed
-                                                     *   with respect to each
-                                                     *   system state (i.e.
-                                                     *   the formula is model
-                                                     *   checked in each system
-                                                     *   state separately). 
-                                                     *   This will usually
+						     * the synchronous products
+						     * computed by the program.
+						     * Possible values and
+						     * their meanings are:
+						     *
+						     * LOCAL:
+						     *   The synchronous
+						     *   products are computed
+						     *   only with respect to
+						     *   the initial state of
+						     *   the system. This will
+						     *   save memory but makes
+						     *   the algorithm cross-
+						     *   comparisons less
+						     *   powerful, possibly
+						     *   at the cost of
+						     *   chances for finding
+						     *   inconsistencies in the
+						     *   results.
+						     * GLOBAL:
+						     *   The synchronous
+						     *   products are computed
+						     *   with respect to each
+						     *   system state (i.e.
+						     *   the formula is model
+						     *   checked in each system
+						     *   state separately).
+						     *   This will usually
 						     *   require more memory
-                                                     *   than the other
-                                                     *   alternative.
-                                                     */    
+						     *   than the other
+						     *   alternative.
+						     */
 
     string cfg_filename;                            /* Name for the
 						     * configuration file.
@@ -269,7 +269,7 @@ public:
 
     bool do_cons_test;                              /* Is the model checking
 						     * result consistency check
-						     * enabled?            
+						     * enabled?
 						     */
 
     bool do_intr_test;                              /* Is the automata
@@ -285,9 +285,9 @@ public:
   };
 
   struct FormulaConfiguration                       /* A structure for storing
-                                                     * specific information
-                                                     * affecting the generation
-                                                     * of random formulae.
+						     * specific information
+						     * affecting the generation
+						     * of random formulae.
 						     */
   {
     int default_operator_priority;                  /* Default priority for all
@@ -304,79 +304,79 @@ public:
 						     */
 
     bool allow_abbreviated_operators;               /* Determines whether the
-                                                     * operators ->, <->, xor,
+						     * operators ->, <->, xor,
 						     * <>, [], W and M should
 						     * be allowed when
-                                                     * generating random
-                                                     * formulae (these are
-                                                     * `abbreviated' operators
-                                                     * since they could be
-                                                     * written in an equivalent
-                                                     * form by using another
-                                                     * operators).
+						     * generating random
+						     * formulae (these are
+						     * `abbreviated' operators
+						     * since they could be
+						     * written in an equivalent
+						     * form by using another
+						     * operators).
 						     */
 
     Configuration::FormulaMode output_mode;         /* Determines whether the
-                                                     * generated formulae are
-                                                     * to be converted to
-                                                     * negation normal form
-                                                     * before passing them to
-                                                     * the different
-                                                     * algorithms. Possible
-                                                     * values are:
-                                                     *
-                                                     * NORMAL:
-                                                     *   No conversion.
-                                                     * NNF:
-                                                     *   Do the conversion
-                                                     *   (this may affect the
-                                                     *   size of the formulae!)
-                                                     */
+						     * generated formulae are
+						     * to be converted to
+						     * negation normal form
+						     * before passing them to
+						     * the different
+						     * algorithms. Possible
+						     * values are:
+						     *
+						     * NORMAL:
+						     *   No conversion.
+						     * NNF:
+						     *   Do the conversion
+						     *   (this may affect the
+						     *   size of the formulae!)
+						     */
 
     Configuration::FormulaMode generate_mode;       /* Determines whether the
-                                                     * formulae are to be
-                                                     * generated in negation
-                                                     * normal form (strict
-                                                     * size requirement for
-                                                     * formulae). Possible
-                                                     * values are:
-                                                     *
-                                                     * NORMAL:
-                                                     *   Allow more flexibility
-                                                     *   in the generation of
-                                                     *   formulae.
-                                                     * NNF:
-                                                     *   Force generation into
-                                                     *   negation normal form.
-                                                     */
+						     * formulae are to be
+						     * generated in negation
+						     * normal form (strict
+						     * size requirement for
+						     * formulae). Possible
+						     * values are:
+						     *
+						     * NORMAL:
+						     *   Allow more flexibility
+						     *   in the generation of
+						     *   formulae.
+						     * NNF:
+						     *   Force generation into
+						     *   negation normal form.
+						     */
 
     ::Ltl::FormulaRandomizer formula_generator;     /* Interface to the random
-                                                     * LTL formula generation
-                                                     * algorithm.
-                                                     */
+						     * LTL formula generation
+						     * algorithm.
+						     */
   };
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
   vector<AlgorithmInformation,                      /* A vector containing   */
-         ALLOC(AlgorithmInformation) > algorithms;  /* information about the
-                                                     * algorithms used in
-                                                     * the tests.
+	 ALLOC(AlgorithmInformation) > algorithms;  /* information about the
+						     * algorithms used in
+						     * the tests.
 						     */
 
   GlobalConfiguration global_options;               /* General configuration
-                                                     * information.
+						     * information.
 						     */
 
   FormulaConfiguration formula_options;             /* Configuration
-                                                     * information for
-                                                     * generating random
-                                                     * formulae.
+						     * information for
+						     * generating random
+						     * formulae.
 						     */
 
   Graph::StateSpaceRandomizer                       /* Interface to the   */
     statespace_generator;                           /* random state space
-                                                     * generation
+						     * generation
 						     * algorithms.
 						     */
 
@@ -392,10 +392,10 @@ public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
   class ConfigurationException : public Exception   /* A class for reporting
-                                                     * errors when reading
-                                                     * the configuration file.
-                                                     */
-  {                                                 
+						     * errors when reading
+						     * the configuration file.
+						     */
+  {
   public:
     ConfigurationException                          /* Constructors. */
       (const string& info = "",
@@ -458,7 +458,7 @@ private:
      OPT_CONSISTENCYTEST, OPT_DISABLE, OPT_ENABLE,
      OPT_FORMULACHANGEINTERVAL, OPT_FORMULAFILE,
      OPT_FORMULARANDOMSEED, OPT_HELP = 'h',
-     OPT_GLOBALPRODUCT = 20000, OPT_INTERACTIVE, 
+     OPT_GLOBALPRODUCT = 20000, OPT_INTERACTIVE,
      OPT_INTERSECTIONTEST, OPT_LOGFILE,
      OPT_MODELCHECK, OPT_NOCOMPARISONTEST,
      OPT_NOCONSISTENCYTEST, OPT_NOINTERSECTIONTEST,
@@ -497,12 +497,12 @@ private:
      OPT_STATESPACESIZE, OPT_TRUTHPROBABILITY};
 
   typedef map<pair<int, int>, double,               /* Type definitions for  */
-              less<pair<int, int> >,                /* the result cache used */
-                   ALLOC(double) >                  /* for computing the    */
+	      less<pair<int, int> >,                /* the result cache used */
+		   ALLOC(double) >                  /* for computing the    */
     ProbabilityMapElement;                          /* probability           */
   typedef map<int, ProbabilityMapElement,           /* distribution of LTL   */
-              less<int>,                            /* formula operators.    */
-              ALLOC(ProbabilityMapElement) >
+	      less<int>,                            /* formula operators.    */
+	      ALLOC(ProbabilityMapElement) >
     ProbabilityMap;
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -514,8 +514,8 @@ private:
 						     */
 
   void reset();                                     /* Initializes the
-                                                     * configuration data
-                                                     * to default values.
+						     * configuration data
+						     * to default values.
 						     */
 
   long int parseCommandLineInteger                  /* Converts an integer */

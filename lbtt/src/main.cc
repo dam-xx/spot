@@ -704,7 +704,8 @@ int main(int argc, char* argv[])
     configuration.print(cout);
 
   user_break = false;
-  signal(SIGINT, breakHandler);
+  if (configuration.global_options.interactive != Configuration::NEVER)
+    signal(SIGINT, breakHandler);
 
 #ifdef HAVE_OBSTACK_H
   obstack_alloc_failed_handler = &ObstackAllocator::failure;
