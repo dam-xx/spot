@@ -18,29 +18,36 @@ namespace spot
     public:
       enum type { Or, And };
 
-
-      /// \brief Build a spot::ltl::multop with no child.
-      ///
-      /// This has little value unless you call multop::add later.
-      static multop* instance(type op);
+      /// List of formulae.
+      typedef std::vector<formula*> vec;
 
       /// \brief Build a spot::ltl::multop with two children.
       ///
       /// If one of the children itself is a spot::ltl::multop
       /// with the same type, it will be merged.  I.e., children
       /// if that child will be added, and that child itself will
-      /// be destroyed.
-      static multop* instance(type op, formula* first, formula* second);
+      /// be destroyed.  This allows incremental building of
+      /// n-ary ltl::multop.
+      ///
+      /// This functions can perform slight optimizations and
+      /// may not return an ltl::multop objects.  For instance
+      /// if \c first and \c second are equal, that formula is
+      /// returned as-is.
+      static formula* instance(type op, formula* first, formula* second);
 
-      /// \brief Add another child to this operator.
+      /// \brief Build a spot::ltl::multop with many children.
       ///
-      /// If \a f itself is a spot::ltl::multop with the same type, it
-      /// will be merged.  I.e., children of \a f will be added, and
-      /// that \a f will will be destroyed.
+      /// Same as the other instance() function, but take a vector of
+      /// formula in argument.  This vector is acquired by the
+      /// spot::ltl::multop class, the caller should allocate it with
+      /// \c new, but not use it (especially not destroy it) after it
+      /// has been passed to spot::ltl::multop.
       ///
-      /// Note that this function overwrites the supplied ltl::multop pointer.
-      /// The old value is released and should not be used after this.
-      static void add(multop** m, formula* f);
+      /// This functions can perform slight optimizations and
+      /// may not return an ltl::multop objects.  For instance
+      /// if the vector contain only one unique element, this
+      /// this formula will be returned as-is.
+      static formula* instance(type op, vec* v);
 
       virtual void accept(visitor& v);
       virtual void accept(const_visitor& v) const;
@@ -65,10 +72,6 @@ namespace spot
       static unsigned instance_count();
 
     protected:
-      // Sorted list of formulae.  (Sorted by pointer comparison.)
-      typedef std::vector<formula*> vec;
-
-
       typedef std::pair<type, vec*> pair;
       /// Comparison functor used internally by ltl::multop.
       struct paircmp
@@ -85,10 +88,6 @@ namespace spot
       static map instances;
 
       multop(type op, vec* v);
-      static multop* instance(type op, vec* v);
-      static vec* add(type op, vec* v, formula* f);
-      static void add_sorted(vec* v, formula* f);
-
       virtual ~multop();
 
     private:

@@ -67,8 +67,9 @@ namespace spot
       {
 	// FIXME: Iterating on the successors this way (calling
 	// bdd_satone{,set} and NANDing out (-=) the result from a
-	// set) requires several descent of the BDD.  Maybe it would be
-	// faster to compute all satisfying formula in one operation.
+	// set) requires several descents of the BDD.  Maybe it would
+	// be faster to compute all satisfying formulae in one
+	// operation.
 
 	succ_set_left_ -= current_;
 	if (succ_set_left_ == bddfalse) // No more successors?

@@ -33,12 +33,12 @@ assert op2 == op3
 op4 = spot.multop.instance(spot.multop.Or, op2, op3)
 
 print 'op4 =', op4
-assert op4.nth(0) == op2
+assert op4 == op2
 
 del op2, op3
 
 assert spot.atomic_prop.instance_count() == 3
-assert spot.multop.instance_count() == 2
+assert spot.multop.instance_count() == 1
 
 spot.destroy(op4)
 del op4

@@ -1,5 +1,21 @@
 2003-08-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	Revamp the multop interface to allow some basic optimizations like
+	not constructing a single-child multop.
+	* src/ltlast/multop.hh (multop::instance(type)): Remove.
+	(multop::instance(type, formula*, formula*)): Return a formula*.
+	(multop::instance(type, vec*)): Make it public and return a formula*.
+	(multop::add_sorted, multop::add):
+	* src/ltlast/multop.cc (multop::instance(type, vec*)): Rewrite.
+	(multop::instance(type)): Delete.
+	(multop::instance(type, formula*, formula*)): Adjust.
+	(multop::add_sorted, multop::add): Remove.
+	* src/ltlvisit/clone.cc (clone_visitor::visit(multop*)) Adjust.
+	* src/ltlvisit/nenoform.cc
+	(negative_normal_form_visitor::::visit(multop*)) Adjust.
+	* src/ltltest/equals.test: Make sure `a & a' and `a' are equals.
+	* wrap/python/tests/ltlsimple.py: Adjust.
+
 	* src/tgba/succiterconcrete.cc, src/tgba/tgbaexplicit.cc,
 	src/tgba/tgbatba.cc, src/tgbaalgos/lbtt.cc: Use `-' instead of `& !'
 	between two BDDs.  That's one less call to BuDDy.

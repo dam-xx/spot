@@ -1,6 +1,8 @@
 #include <cassert>
 #include <utility>
+#include <algorithm>
 #include "multop.hh"
+#include "constant.hh"
 #include "visitor.hh"
 #include "ltlvisit/destroy.hh"
 
@@ -77,10 +79,78 @@ namespace spot
 
     multop::map multop::instances;
 
-    multop*
+    formula*
     multop::instance(type op, vec* v)
     {
       pair p(op, v);
+
+      // Inline children of same kind.
+      {
+	vec inlined;
+	vec::iterator i = v->begin();
+	while (i != v->end())
+	  {
+	    multop* p = dynamic_cast<multop*>(*i);
+	    if (p && p->op() == op)
+	      {
+		unsigned ps = p->size();
+		for (unsigned n = 0; n < ps; ++n)
+		  inlined.push_back(p->nth(n));
+		// That sub-formula is now useless, drop it.
+		// Note that we use unref(), not destroy(), because we've
+		// adopted its children and don't want to destroy these.
+		formula::unref(*i);
+		i = v->erase(i);
+	      }
+	    else
+	      {
+		++i;
+	      }
+	  }
+	v->insert(v->end(), inlined.begin(), inlined.end());
+      }
+
+      std::sort(v->begin(), v->end());
+
+      // Remove duplicates.  We can't use std::unique(), because we
+      // must destroy() any formula we drop.
+      {
+	formula* last = 0;
+	vec::iterator i = v->begin();
+	while (i != v->end())
+	  {
+	    if (*i == last)
+	      {
+		destroy(*i);
+		i = v->erase(i);
+	      }
+	    else
+	      {
+		last = *i++;
+	      }
+	  }
+	}
+
+      if (v->size() == 0)
+	{
+	  delete v;
+	  switch (op)
+	    {
+	    case And:
+	      return constant::true_instance();
+	    case Or:
+	      return constant::false_instance();
+	    }
+	  /* Unreachable code.  */
+	  assert(0);
+	}
+      if (v->size() == 1)
+	{
+	  formula* res = (*v)[0];
+	  delete v;
+	  return res;
+	}
+
       map::iterator i = instances.find(p);
       if (i != instances.end())
 	{
@@ -93,73 +163,13 @@ namespace spot
 
     }
 
-    multop*
-    multop::instance(type op)
-    {
-      return instance(op, new vec);
-    }
-
-    multop*
+    formula*
     multop::instance(type op, formula* first, formula* second)
     {
       vec* v = new vec;
-      multop::add(op, v, first);
-      multop::add(op, v, second);
+      v->push_back(first);
+      v->push_back(second);
       return instance(op, v);
-    }
-
-    void
-    multop::add_sorted(vec* v, formula* f)
-    {
-      // Keep V sorted.  When adding a new multop, iterate over all
-      // element until we find either an identical element, or the
-      // place where the new one should be inserted.
-      vec::iterator i;
-      for (i = v->begin(); i != v->end(); ++i)
-	{
-	  if (*i > f)
-	    break;
-	  if (*i == f)
-	    {
-	      // F is already a child.  Drop it.
-	      destroy(f);
-	      return;
-	    }
-	}
-      v->insert(i, f);
-    }
-
-    multop::vec*
-    multop::add(type op, vec* v, formula* f)
-    {
-      // If the formula we add is itself a multop for the same operator,
-      // merge its children.
-      multop* p = dynamic_cast<multop*>(f);
-      if (p && p->op() == op)
-	{
-	  unsigned ps = p->size();
-	  for (unsigned i = 0; i < ps; ++i)
-	    add_sorted(v, p->nth(i));
-	  // That sub-formula is now useless, drop it.
-	  // Note that we use unref(), not destroy(), because we've
-	  // adopted its children and don't want to destroy these.
-	  formula::unref(f);
-	}
-      else
-	{
-	  add_sorted(v, f);
-	}
-      return v;
-    }
-
-    void
-    multop::add(multop** m, formula* f)
-    {
-      vec* v = new vec(*(*m)->children_);
-      type op = (*m)->op();
-      multop::add(op, v, f);
-      formula::unref(*m);
-      *m = instance(op, v);
     }
 
     unsigned

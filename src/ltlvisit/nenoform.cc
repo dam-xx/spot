@@ -143,11 +143,11 @@ namespace spot
 	      op = multop::And;
 	      break;
 	    }
-	multop* res = multop::instance(op);
+	multop::vec* res = new multop::vec;
 	unsigned mos = mo->size();
 	for (unsigned i = 0; i < mos; ++i)
-	  multop::add(&res, recurse(mo->nth(i)));
-	result_ = res;
+	  res->push_back(recurse(mo->nth(i)));
+	result_ = multop::instance(op, res);
       }
 
       formula*

@@ -25,6 +25,7 @@ check 0 'a && b & a' 'b & a & b'
 check 0 'a & b' 'b & a & b'
 check 0 'a & b' 'b & a & a'
 check 0 'a & b & (c |(f U g)|| e)' 'b & a & a & (c | e |(f U g)| e | c) & b'
+check 0 'a & a' 'a'
 
 # other formulae which are not
 check 1 'a' 'b'
