@@ -1,3 +1,16 @@
+2005-01-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlast/formula.hh (hash, dump, dump_, hash_key_): New members.
+	(formula_ptr_less_than, formula_ptr_hash): New class.
+	* src/ltlast/atomic_prop.cc, src/ltlast/binop.cc,
+	src/ltlast/constant.cc, src/ltlast/formula.cc,
+	src/ltlast/multop.cc, src/ltlast/unop.cc: Adjust to handle dump_.
+	* src/ltlvisit/apcollect.cc, src/ltlvisit/apcollect.hh:
+	Sort the set using formula_ptr_less_than.
+	* src/ltlvisit/dump.cc: Simplify using ->dump().
+	* src/tgbaalgos/ltl2tgba_fm.cc: Sort all maps to get deterministic
+	results.
+
 2005-01-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/tau03opt.hh (explicit_tau03_opt_search): Doco.

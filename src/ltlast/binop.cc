@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -31,6 +31,10 @@ namespace spot
     binop::binop(type op, formula* first, formula* second)
       : op_(op), first_(first), second_(second)
     {
+      dump_ = "binop(";
+      dump_ += op_name();
+      dump_ += ", " + first->dump() + ", " + second->dump() + ")";
+      set_key_();
     }
 
     binop::~binop()

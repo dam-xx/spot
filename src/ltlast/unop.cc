@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -30,6 +30,10 @@ namespace spot
     unop::unop(type op, formula* child)
       : op_(op), child_(child)
     {
+      dump_ = "unop(";
+      dump_ += op_name();
+      dump_ += ", " + child->dump() + ")";
+      set_key_();
     }
 
     unop::~unop()

@@ -24,6 +24,8 @@
 #ifndef SPOT_LTLAST_FORMULA_HH
 # define SPOT_LTLAST_FORMULA_HH
 
+#include <string>
+#include <cassert>
 #include "predecl.hh"
 
 namespace spot
@@ -89,6 +91,15 @@ namespace spot
       /// want to release a whole formula, use spot::ltl::destroy() instead.
       static void unref(formula* f);
 
+      /// Return a canonic representation of the formula
+      const std::string& dump() const;
+
+      /// Return a hash_key for the formula.
+      const size_t
+      hash() const
+      {
+	return hash_key_;
+      }
     protected:
       virtual ~formula();
 
@@ -97,7 +108,69 @@ namespace spot
       /// \brief decrement reference counter if any, return true when
       /// the instance must be deleted (usually when the counter hits 0).
       virtual bool unref_();
+
+      /// \brief Compute key_ from dump_.
+      ///
+      /// Should be called once in each object, after dump_ has been set.
+      void set_key_();
+      /// The canonic representation of the formula
+      std::string dump_;
+      /// \brief The hash key of this formula.
+      ///
+      /// Initialized by set_key_().
+      size_t hash_key_;
     };
+
+    /// \brief Strict Weak Ordering for <code>const formula*</code>.
+    /// \ingroup ltl_essentials
+    ///
+    /// This is meant to be used as a comparison functor for
+    /// STL \c map whose key are of type <code>const formula*</code>.
+    ///
+    /// For instance here is how one could declare
+    /// a map of \c const::formula*.
+    /// \code
+    ///   // Remember how many times each formula has been seen.
+    ///   std::map<const spot::ltl::formula*, int,
+    ///            spot::formula_ptr_less_than> seen;
+    /// \endcode
+    struct formula_ptr_less_than:
+      public std::binary_function<const formula*, const formula*, bool>
+    {
+      bool
+      operator()(const formula* left, const formula* right) const
+      {
+	assert(left);
+	assert(right);
+	return left->hash() < right->hash();
+      }
+    };
+
+    /// \brief Hash Function for <code>const formula*</code>.
+    /// \ingroup ltl_essentials
+    /// \ingroup hash_funcs
+    ///
+    /// This is meant to be used as a hash functor for
+    /// Sgi's \c hash_map whose key are of type <code>const formula*</code>.
+    ///
+    /// For instance here is how one could declare
+    /// a map of \c const::formula*.
+    /// \code
+    ///   // Remember how many times each formula has been seen.
+    ///   Sgi::hash_map<const spot::ltl::formula*, int,
+    ///                 const spot::ltl::formula_ptr_hash> seen;
+    /// \endcode
+    struct formula_ptr_hash:
+      public std::unary_function<const formula*, size_t>
+    {
+      size_t
+      operator()(const formula* that) const
+      {
+	assert(that);
+	return that->hash();
+      }
+    };
+
 
   }
 }

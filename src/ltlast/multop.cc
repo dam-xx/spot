@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -34,6 +34,15 @@ namespace spot
     multop::multop(type op, vec* v)
       : op_(op), children_(v)
     {
+      dump_ = "multop(";
+      dump_ += op_name();
+      unsigned max = v->size();
+      for (unsigned n = 0; n < max; ++n)
+	{
+	  dump_ += ", " + (*v)[n]->dump();
+	}
+      dump_ += ")";
+      set_key_();
     }
 
     multop::~multop()
@@ -131,7 +140,7 @@ namespace spot
 	v->insert(v->end(), inlined.begin(), inlined.end());
       }
 
-      std::sort(v->begin(), v->end());
+      std::sort(v->begin(), v->end(), formula_ptr_less_than());
 
       // Remove duplicates.  We can't use std::unique(), because we
       // must destroy() any formula we drop.

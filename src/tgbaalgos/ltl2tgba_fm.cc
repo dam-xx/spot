@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -533,7 +533,7 @@ namespace spot
       }
 
     private:
-      typedef Sgi::hash_map<const formula*, bool, ptr_hash<formula> > pfl_map;
+      typedef Sgi::hash_map<const formula*, bool, formula_ptr_hash> pfl_map;
       pfl_map pfl_;
     };
 
@@ -613,7 +613,7 @@ namespace spot
   }
 
   typedef std::map<bdd, bdd, bdd_less_than> prom_map;
-  typedef Sgi::hash_map<const formula*, prom_map, ptr_hash<formula> > dest_map;
+  typedef Sgi::hash_map<const formula*, prom_map, formula_ptr_hash> dest_map;
 
   static void
   fill_dests(translate_dict& d, dest_map& dests, bdd label, const formula* dest)
@@ -649,8 +649,9 @@ namespace spot
     formula* f2 = negative_normal_form(f1);
     destroy(f1);
 
-    std::set<const formula*> formulae_seen;
-    std::set<const formula*> formulae_to_translate;
+    typedef std::set<const formula*, formula_ptr_less_than> set_type;
+    set_type formulae_seen;
+    set_type formulae_to_translate;
 
     translate_dict d(dict);
     formula_canonizer fc(d);

@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,7 +23,7 @@
 # define SPOT_LTLVISIT_APCOLLECT_HH
 
 #include <set>
-#include "ltlvisit/postfix.hh"
+#include "ltlast/atomic_prop.hh"
 
 namespace spot
 {
@@ -33,7 +33,7 @@ namespace spot
     /// @{
 
     /// Set of atomic propositions.
-    typedef std::set<spot::ltl::atomic_prop*> atomic_prop_set;
+    typedef std::set<atomic_prop*, formula_ptr_less_than> atomic_prop_set;
 
     /// \brief Return the set of atomic propositions occurring in a formula.
     ///

@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -28,74 +28,10 @@ namespace spot
 {
   namespace ltl
   {
-    namespace
-    {
-      class dump_visitor: public const_visitor
-      {
-      public:
-	dump_visitor(std::ostream& os)
-	  : os_(os)
-	{
-	}
-
-	virtual
-	~dump_visitor()
-	{
-	}
-
-	void
-	visit(const atomic_prop* ap)
-	{
-	  os_ << "AP(" << ap->name() << ")";
-	}
-
-	void
-	visit(const constant* c)
-	{
-	  os_ << "constant(" << c->val_name() << ")";
-	}
-
-	void
-	visit(const binop* bo)
-	{
-	  os_ << "binop(" << bo->op_name() << ", ";
-	  bo->first()->accept(*this);
-	  os_ << ", ";
-	  bo->second()->accept(*this);
-	  os_ << ")";
-	}
-
-	void
-	visit(const unop* uo)
-	{
-	  os_ << "unop(" << uo->op_name() << ", ";
-	  uo->child()->accept(*this);
-	  os_ << ")";
-	}
-
-	void
-	visit(const multop* mo)
-	{
-	  os_ << "multop(" << mo->op_name() << ", ";
-	  unsigned max = mo->size();
-	  mo->nth(0)->accept(*this);
-	  for (unsigned n = 1; n < max; ++n)
-	    {
-	      os_ << ", ";
-	      mo->nth(n)->accept(*this);
-	    }
-	  os_ << ")";
-	}
-      private:
-	std::ostream& os_;
-      };
-    }
-
     std::ostream&
     dump(std::ostream& os, const formula* f)
     {
-      dump_visitor v(os);
-      f->accept(v);
+      os << f->dump();
       return os;
     }
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -20,6 +20,7 @@
 // 02111-1307, USA.
 
 #include "apcollect.hh"
+#include "ltlvisit/postfix.hh"
 
 namespace spot
 {

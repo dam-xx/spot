@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -30,6 +30,19 @@ namespace spot
     constant::constant(type val)
       : val_(val)
     {
+      switch (val)
+	{
+	case True:
+	  dump_ = "constant(1)";
+	  set_key_();
+	  return;
+	case False:
+	  dump_ = "constant(0)";
+	  set_key_();
+	  return;
+	}
+      // Unreachable code.
+      assert(0);
     }
 
     constant::~constant()

@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -20,6 +20,7 @@
 // 02111-1307, USA.
 
 #include "formula.hh"
+#include "misc/hash.hh"
 
 namespace spot
 {
@@ -55,5 +56,19 @@ namespace spot
       // Not reference counted by default.
       return false;
     }
+
+    const std::string&
+    formula::dump() const
+    {
+      return dump_;
+    }
+
+    void
+    formula::set_key_()
+    {
+      string_hash sh;
+      hash_key_ = sh(dump_);
+    }
+
   }
 }
