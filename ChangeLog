@@ -1,5 +1,7 @@
 2004-11-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlvisit/reduce.hh (is_eventual, is_universal): More doc.
+
 	* src/tgbaalgos/projrun.hh, src/tgbaalgos/projrun.cc: New files.
 	* src/tgbaalgos/Makefile.am (tgbaalgos_HEADERS,
 	libtgbaalgos_la_SOURCES): Add them.
