@@ -1,5 +1,7 @@
 2003-04-17  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltltest/readltl.cc, src/ltltest/equals.cc: Cosmetics.
+
 	* src/ltlenv/environment.hh (require): Return a formula, not
 	an atomic_prop.
 	* src/ltlast/atomic_prop.hh (atomic_prop): New argument env.

@@ -4,14 +4,14 @@
 #include "ltlvisit/dotty.hh"
 
 void
-syntax(char *prog)
+syntax(char* prog)
 {
   std::cerr << prog << " [-d] formula" << std::endl;
   exit(2);
 }
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
   int exit_code = 0;
 
@@ -31,7 +31,7 @@ main(int argc, char **argv)
   
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::parse_error_list pel;
-  spot::ltl::formula *f = spot::ltl::parse(argv[formula_index], 
+  spot::ltl::formula* f = spot::ltl::parse(argv[formula_index], 
 					   pel, env, debug);
 
   spot::ltl::parse_error_list::iterator it;
