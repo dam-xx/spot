@@ -1,3 +1,7 @@
+2004-10-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* doc/Doxyfile.in: Upgrade to Doxygen 1.3.9.
+
 2004-09-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/sanity/style.test: Suggest using "x->y", not "(*x).y".

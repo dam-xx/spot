@@ -1,4 +1,4 @@
-# Doxyfile 1.3.8
+# Doxyfile 1.3.9
 
 # This file describes the settings to be used by the documentation system
 # doxygen (www.doxygen.org) for a project
@@ -116,7 +116,7 @@ FULL_PATH_NAMES        = YES
 
 STRIP_FROM_PATH        = @top_srcdir@/src/ \
                          @top_srcdir@/iface/ \
-			 @srcdir@
+                         @srcdir@
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of
 # the path mentioned in the documentation of a class, which tells
@@ -369,6 +369,12 @@ MAX_INITIALIZER_LINES  = 30
 # list will mention the files that were used to generate the documentation.
 
 SHOW_USED_FILES        = YES
+
+# If the sources in your project are distributed over multiple directories
+# then setting the SHOW_DIRECTORIES tag to YES will show the directory hierarchy
+# in the documentation.
+
+SHOW_DIRECTORIES       = YES
 
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages
@@ -958,7 +964,9 @@ INCLUDE_FILE_PATTERNS  =
 # are defined before the preprocessor is started (similar to the -D option of
 # gcc). The argument of the tag is a list of macros of the form: name
 # or name=definition (no spaces). If the definition and the = are
-# omitted =1 is assumed.
+# omitted =1 is assumed. To prevent a macro definition from being
+# undefined via #undef or recursively expanded use the := operator
+# instead of the = operator.
 
 PREDEFINED             =
 
