@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/pairs.c,v 1.4 2003/05/20 08:22:36 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/pairs.c,v 1.5 2003/05/20 10:42:19 aduret Exp $
   FILE:  pairs.c
   DESCR: Pair management for BDD package.
   AUTH:  Jorn Lind
@@ -36,6 +36,7 @@
 *************************************************************************/
 #include <stdlib.h>
 #include <limits.h>
+#include <assert.h>
 #include "kernel.h"
 
 /*======================================================================*/
@@ -158,7 +159,7 @@ PROTO   {* bddPair *bdd_newpair(void) *}
 DESCR   {* Variable pairs of the type {\tt bddPair} are used in
 	   {\tt bdd\_replace} to define which variables to replace with
 	   other variables. This function allocates such an empty table. The
-	   table can be freed by a call to {\em bdd\_freepair}. *}
+	   table can be freed by a call to {\tt bdd\_freepair}. *}
 RETURN  {* Returns a new table of pairs. *}
 ALSO    {* bdd\_freepair, bdd\_replace, bdd\_setpair, bdd\_setpairs *}
 */
@@ -189,7 +190,7 @@ SHORT   {* clone a pair table *}
 PROTO   {* bddPair *bdd_copypair(bddPair *from) *}
 DESCR   {* Duplicate the table of pairs {\tt from}.
 	   This function allocates the cloned table. The
-	   table can be freed by a call to {\em bdd\_freepair}. *}
+	   table can be freed by a call to {\tt bdd\_freepair}. *}
 RETURN  {* Returns a new table of pairs. *}
 ALSO    {* bdd\_newpair, bdd\_freepair, bdd\_replace, bdd\_setpair, bdd\_setpairs *}
 */
@@ -202,8 +203,7 @@ bddPair *bdd_copypair(bddPair *from)
    if (p == NULL)
      return NULL;
 
-   for (n=0 ; n<bddvarnum ; n++)
-      p->result[n] = from->result[n];
+   memcpy(p->result, from->result, bddvarnum * sizeof(*p->result));
 
    p->id = update_pairsid();
    p->last = -1;
