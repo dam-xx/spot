@@ -27,17 +27,17 @@ namespace spot
   namespace ltl
   {
 
-   class length_form_visitor : public const_visitor
+   class length_visitor : public const_visitor
     {
     public:
 
-      length_form_visitor()
+      length_visitor()
       {
 	result_ = 0;
       }
 
       virtual
-      ~length_form_visitor()
+      ~length_visitor()
       {
       }
 
@@ -62,13 +62,13 @@ namespace spot
       void
       visit(const unop* uo)
       {
-	result_ = 1 + form_length(uo->child());
+	result_ = 1 + length(uo->child());
       }
 
       void
       visit(const binop* bo)
       {
-	result_ = 1 + form_length(bo->first()) + form_length(bo->second());
+	result_ = 1 + length(bo->first()) + length(bo->second());
       }
 
       void
@@ -76,7 +76,7 @@ namespace spot
       {
 	unsigned mos = mo->size();
 	for (unsigned i = 0; i < mos; ++i)
-	  result_ += form_length(mo->nth(i));
+	  result_ += length(mo->nth(i));
       }
 
     protected:
@@ -84,9 +84,9 @@ namespace spot
     };
 
     int
-    form_length(const formula* f)
+    length(const formula* f)
     {
-      length_form_visitor v;
+      length_visitor v;
       const_cast<formula*>(f)->accept(v);
       return v.result();
     }

@@ -1,5 +1,13 @@
 2004-05-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlvisit/formlength.cc (length_form_vistor): Rename as ..
+	(length_visitor): ... this.
+	(form_length): Rename as ...
+	(length): ... this.
+	* src/ltlvisit/reducform.hh (form_length): Rename as ...
+	(length): ... this.
+	* src/ltltest/reduc.cc: Adjust.
+
 	* src/ltlvisit/basereduc.cc, src/ltlvisit/formlength.cc: Remove
 	useless includes.
 

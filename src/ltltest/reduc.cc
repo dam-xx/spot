@@ -103,7 +103,7 @@ main(int argc, char** argv)
   spot::ltl::destroy(ftmp2);
 
 
-  int length_f1_before = spot::ltl::form_length(f1);
+  int length_f1_before = spot::ltl::length(f1);
   std::string f1s_before = spot::ltl::to_string(f1);
 
   ftmp1 = f1;
@@ -113,7 +113,7 @@ main(int argc, char** argv)
   spot::ltl::destroy(ftmp1);
   spot::ltl::destroy(ftmp2);
 
-  int length_f1_after = spot::ltl::form_length(f1);
+  int length_f1_after = spot::ltl::length(f1);
   std::string f1s_after = spot::ltl::to_string(f1);
 
   bool red = (length_f1_after < length_f1_before);
