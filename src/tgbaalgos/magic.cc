@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -43,6 +43,12 @@ namespace spot
       }
     if (x)
       delete x;
+    // Release all iterators on the stack.
+    while (! stack.empty())
+      {
+	delete stack.front().second;
+	stack.pop_front();
+      }
   }
 
   void
@@ -124,6 +130,7 @@ namespace spot
 	  }
 
 	const state* s = p.first.s;
+	delete i;
 	stack.pop_front();
 
 	if (! magic && a->state_is_accepting(s))

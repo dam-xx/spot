@@ -1,5 +1,10 @@
 2004-01-26  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/magic.cc (magic_search::~magic_search): Release
+	all iterators on the stack.
+	(magic_search::check): Release iterators that are popped off the
+	stack.
+
 	* src/tgbatest/explpro2.test: Fix reordering regex.
 
 	* src/tgbatest/defs.in (run): Use libtool --mode=execute.
