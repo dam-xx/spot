@@ -1,6 +1,11 @@
 2005-01-29  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* bench/emptchk/README: Make clearer that spin is needed.
+
 	* src/tgbatest/randtgba.cc (syntax): Missing std::endl.
+
+2005-01-29  Alexandre Duret-Lutz  <adl@gnu.org>
+	    Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* bench/Makefile.am, bench/emptchk/Makefile.am,
 	bench/emptchk/README, bench/emptchk/algorithms,
