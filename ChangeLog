@@ -1,3 +1,17 @@
+2004-05-10  Thomas MARTINEZ  <martinez@abacus.lip6.fr>
+
+	* src/ltltest/formules.ltl: A pattern of 2000 formulas.
+	* src/ltltest/inf.test: Test some case of implies.
+	* src/ltltest/inf.cc: Test some case of implies.
+	* src/ltltest/reduc.test: Test reduction of a file of formula.
+	* src/ltltest/reduc.cc: Test reduction of a formula.
+
+	* src/ltlvisit/formlength.cc: Gives the lenght of a formula.
+	* src/ltlvisit/forminf.cc: To know if a formula implies an other.
+	* src/ltlvisit/basereduc.cc: Implement only basic reduction.
+	* src/ltlvisit/reducform.cc: Implement reduction.
+	* src/ltlvisit/reducform.hh: To reduce a formula.
+
 2004-05-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Refine

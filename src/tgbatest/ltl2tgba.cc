@@ -24,6 +24,7 @@
 #include <fstream>
 #include <string>
 #include "ltlvisit/destroy.hh"
+#include "ltlvisit/reducform.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
 #include "tgbaalgos/ltl2tgba_lacim.hh"
@@ -91,7 +92,9 @@ syntax(char* prog)
 	    << "  -X   do not compute an automaton, read it from a file"
 	    << std::endl
 	    << "  -y   do not merge states with same symbolic representation "
-	    << "(implies -f)" << std::endl;
+	    << "(implies -f)" << std::endl
+	    << "  -z   to reduce formula "
+	    << std::endl;
   exit(2);
 }
 
@@ -113,6 +116,7 @@ main(int argc, char** argv)
   bool magic_many = false;
   bool expect_counter_example = false;
   bool from_file = false;
+  bool reduc = false;
   bool post_branching = false;
   bool fair_loop_approx = false;
 
@@ -250,6 +254,10 @@ main(int argc, char** argv)
 	  fm_opt = true;
 	  fm_symb_merge_opt = false;
 	}
+      else if (!strcmp(argv[formula_index], "-z"))
+	{
+	  reduc = true;
+	}
       else
 	{
 	  break;
@@ -312,6 +320,9 @@ main(int argc, char** argv)
 	}
       else
 	{
+	  spot::ltl::formula* ftmp = f;
+	  if (reduc)
+	    f = spot::ltl::reduce(f);
 	  if (fm_opt)
 	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt,
 					       fm_symb_merge_opt,
@@ -319,6 +330,11 @@ main(int argc, char** argv)
 					       fair_loop_approx);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
+
+	  if (reduc)
+	    spot::ltl::destroy(ftmp);
+	  spot::ltl::destroy(f);
+
 	}
 
       spot::tgba_tba_proxy* degeneralized = 0;
