@@ -64,6 +64,7 @@ namespace spot
     /// This function returns true if the automata's language is empty,
     /// and builds a stack of SCC.
     bool check();
+    bool check2();
 
     /// Compute a counter example if tgba_emptiness_check() returned false.
     void counter_example();

@@ -32,8 +32,12 @@ syntax(char* prog)
 	    << "  -D   degeneralize the automaton" << std::endl
 	    << "  -e   emptiness-check (Couvreur), expect and compute "
 	    << "a counter-example" << std::endl
+	    << "  -e2  emptiness-check (Couvreur variant), expect and compute "
+	    << "a counter-example" << std::endl
 	    << "  -E   emptiness-check (Couvreur), expect no counter-example "
 	    << std::endl
+	    << "  -E2  emptiness-check (Couvreur variant), expect no "
+	    << "counter-example " << std::endl
             << "  -f   use Couvreur's FM algorithm for translation"
 	    << std::endl
             << "  -F   read the formula from the file" << std::endl
@@ -69,7 +73,7 @@ main(int argc, char** argv)
   bool file_opt = false;
   int output = 0;
   int formula_index = 0;
-  enum { None, Couvreur, MagicSearch } echeck = None;
+  enum { None, Couvreur, Couvreur2, MagicSearch } echeck = None;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
   bool magic_many = false;
   bool expect_counter_example = false;
@@ -104,9 +108,21 @@ main(int argc, char** argv)
 	  expect_counter_example = true;
 	  output = -1;
 	}
+      else if (!strcmp(argv[formula_index], "-e2"))
+	{
+	  echeck = Couvreur2;
+	  expect_counter_example = true;
+	  output = -1;
+	}
       else if (!strcmp(argv[formula_index], "-E"))
 	{
 	  echeck = Couvreur;
+	  expect_counter_example = false;
+	  output = -1;
+	}
+      else if (!strcmp(argv[formula_index], "-E2"))
+	{
+	  echeck = Couvreur2;
 	  expect_counter_example = false;
 	  output = -1;
 	}
@@ -290,9 +306,16 @@ main(int argc, char** argv)
 	case None:
 	  break;
 	case Couvreur:
+	case Couvreur2:
 	  {
 	    spot::emptiness_check ec = spot::emptiness_check(a);
-	    bool res = ec.check();
+	    bool res;
+
+	    if (echeck == Couvreur)
+	      res = ec.check();
+	    else
+	      res = ec.check2();
+
 	    if (expect_counter_example)
 	      {
 		if (res)

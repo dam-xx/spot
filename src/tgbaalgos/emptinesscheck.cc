@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <vector>
 #include <map>
+#include <list>
 
 namespace spot
 {
@@ -208,7 +209,7 @@ namespace spot
 	if (dest != i->first)
 	  delete dest;
 
-	// If we have reached a dead component.  Ignore it.
+	// If we have reached a dead component, ignore it.
 	if (i->second == -1)
 	  continue;
 
@@ -255,6 +256,171 @@ namespace spot
       }
     // This automaton recognizes no word.
     return true;
+  }
+
+  struct successor {
+    bdd acc;
+    const spot::state* s;
+    successor(bdd acc, const spot::state* s): acc(acc), s(s) {}
+  };
+
+  bool
+  emptiness_check::check2()
+  {
+    // We use five main data in this algorithm:
+    // * emptiness_check::root, a stack of strongly connected components (SCC),
+    // * emptiness_check::h, a hash of all visited nodes, with their order,
+    //   (it is called "Hash" in Couvreur's paper)
+    // * arc, a stack of acceptance conditions between each of these SCC,
+    std::stack<bdd> arc;
+    // * num, the number of visited nodes.  Used to set the order of each
+    //   visited node,
+    int num = 1;
+    // * todo, the depth-first search stack.  This holds pairs of the
+    //   form (STATE, SUCCESSORS) where SUCCESSORS is a list of
+    //   (ACCEPTANCE_CONDITIONS, STATE) pairs.
+    typedef std::list<successor> succ_queue;
+    typedef std::pair<const state*, succ_queue> pair_state_successors;
+    std::stack<pair_state_successors> todo;
+
+    // Setup depth-first search from the initial state.
+    todo.push(pair_state_successors(0, succ_queue()));
+    todo.top().second.push_front(successor(bddtrue, aut_->get_init_state()));
+
+    for (;;)
+      {
+	assert(root.size() == arc.size());
+
+	// Get the successors of the current state.
+	succ_queue& queue = todo.top().second;
+
+	// First, we process all successors that we have already seen.
+	// This is an idea from Soheib Baarir.  It helps to merge SCCs
+	// and get shorter traces faster.
+	succ_queue::iterator q = queue.begin();
+	while (q != queue.end())
+	  {
+	    hash_type::iterator i = h.find(q->s);
+	    if (i == h.end())
+	      {
+		// Skip unknown states.
+		++q;
+		continue;
+	      }
+
+	    // Skip states from dead SCCs.
+	    if (i->second != -1)
+	      {
+		// Now this is the most interesting case.  We have
+		// reached a state S1 which is already part of a
+		// non-dead SCC.  Any such non-dead SCC has
+		// necessarily been crossed by our path to this
+		// state: there is a state S2 in our path which
+		// belongs to this SCC too.  We are going to merge
+		// all states between this S1 and S2 into this
+		// SCC.
+		//
+		// This merge is easy to do because the order of
+		// the SCC in ROOT is ascending: we just have to
+		// merge all SCCs from the top of ROOT that have
+		// an index greater to the one of the SCC of S2
+		// (called the "threshold").
+		int threshold = i->second;
+		bdd acc = q->acc;
+		while (threshold < root.top().index)
+		  {
+		    assert(!root.empty());
+		    assert(!arc.empty());
+		    acc |= root.top().condition;
+		    acc |= arc.top();
+		    root.pop();
+		    arc.pop();
+		  }
+		// Note that we do not always have
+		//  threshold == root.top().index
+		// after this loop, the SCC whose index is threshold
+		// might have been merged with a lower SCC.
+
+		// Accumulate all acceptance conditions into the
+		// merged SCC.
+		root.top().condition |= acc;
+
+		if (root.top().condition == aut_->all_acceptance_conditions())
+		  {
+		    // We have found an accepting SCC.  Clean up TODO.
+		    // We must delete all states of apparing in TODO
+		    // unless they are used as keys in H.
+		    while (!todo.empty())
+		      {
+			succ_queue& queue = todo.top().second;
+			for (succ_queue::iterator q = queue.begin();
+			     q != queue.end(); ++q)
+			  {
+			    hash_type::iterator i = h.find(q->s);
+			    if (i == h.end() || i->first != q->s)
+			      delete q->s;
+			  }
+			todo.pop();
+		      }
+		    return false;
+		  }
+	      }
+	    // We know the state exists.  Since a state can have several
+	    // representations (i.e., objects), make sure we delete
+	    // anything but the first one seen (the one used as key in H).
+	    if (q->s != i->first)
+	      delete q->s;
+	    // Remove that state from the queue, so we do not
+	    // recurse into it.
+	    succ_queue::iterator old = q++;
+	    queue.erase(old);
+	  }
+
+	// If there is no more successor, backtrack.
+	if (queue.empty())
+	  {
+	    // We have explored all successors of state CURR.
+	    const state* curr = todo.top().first;
+	    // Backtrack TODO.
+	    todo.pop();
+	    if (todo.empty())
+	      // This automaton recognizes no word.
+	      return true;
+
+	    // When backtracking the root of an SCC, we must also
+	    // remove that SCC from the ARC/ROOT stacks.  We must
+	    // discard from H all reachable states from this SCC.
+	    hash_type::iterator i = h.find(curr);
+	    assert(i != h.end());
+	    assert(!root.empty());
+	    if (root.top().index == i->second)
+	      {
+		assert(!arc.empty());
+		arc.pop();
+		root.pop();
+		remove_component(curr);
+	      }
+	    continue;
+	  }
+
+	// Recurse.  (Finally!)
+
+	// Pick one successor off the list, and schedule its
+	// successors first on TODO.  Update the various hashes and
+	// stacks.
+	successor succ = queue.front();
+	queue.pop_front();
+	h[succ.s] = ++num;
+	root.push(connected_component(num));
+	arc.push(succ.acc);
+	todo.push(pair_state_successors(succ.s, succ_queue()));
+	succ_queue& new_queue = todo.top().second;
+	tgba_succ_iterator* iter = aut_->succ_iter(succ.s);
+	for (iter->first(); ! iter->done(); iter->next())
+	  new_queue.push_back(successor(iter->current_acceptance_conditions(),
+					iter->current_state()));
+	delete iter;
+      }
   }
 
 

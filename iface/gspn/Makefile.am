@@ -44,7 +44,7 @@ if WITH_GSPN_EESRG
 gspn_HEADERS += eesrg.hh
 check_PROGRAMS += \
   dottygspn-eesrg \
-  ltleesrg
+  ltlgspn-eesrg
 
 libspotgspneesrg_la_LIBADD = $(top_builddir)/src/libspot.la
 libspotgspneesrg_la_CPPFLAGS = -DESYMBOLIC $(AM_CPPFLAGS)
@@ -69,8 +69,9 @@ ltlgspn_rg_LDADD = libspotgspn.la $(LIBGSPNRG_LDFLAGS)
 ltlgspn_srg_SOURCES = ltlgspn.cc
 ltlgspn_srg_LDADD = libspotgspn.la $(LIBGSPNSRG_LDFLAGS)
 
-ltleesrg_SOURCES = ltleesrg.cc
-ltleesrg_LDADD = libspotgspneesrg.la $(LIBGSPNESRG_LDFLAGS)
+ltlgspn_eesrg_SOURCES = ltlgspn.cc
+ltlgspn_eesrg_LDADD = libspotgspneesrg.la $(LIBGSPNESRG_LDFLAGS)
+ltlgspn_eesrg_CPPFLAGS = -DEESRG=1 $(AM_CPPFLAGS)
 
 EXTRA_DIST = \
   examples/DCSwave/DCSWave.def \

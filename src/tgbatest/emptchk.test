@@ -31,6 +31,10 @@ expect_ce()
   run 0 ./ltl2tgba -e -D "$1"
   run 0 ./ltl2tgba -e -f "$1"
   run 0 ./ltl2tgba -e -f -D "$1"
+  run 0 ./ltl2tgba -e2 "$1"
+  run 0 ./ltl2tgba -e2 -D "$1"
+  run 0 ./ltl2tgba -e2 -f "$1"
+  run 0 ./ltl2tgba -e2 -f -D "$1"
   run 0 ./ltl2tgba -m "$1"
   run 0 ./ltl2tgba -m -f "$1"
 }
@@ -41,6 +45,10 @@ expect_no()
   run 0 ./ltl2tgba -E -D "$1"
   run 0 ./ltl2tgba -E -f "$1"
   run 0 ./ltl2tgba -E -f -D "$1"
+  run 0 ./ltl2tgba -E2 "$1"
+  run 0 ./ltl2tgba -E2 -D "$1"
+  run 0 ./ltl2tgba -E2 -f "$1"
+  run 0 ./ltl2tgba -E2 -f -D "$1"
   run 0 ./ltl2tgba -M "$1"
   run 0 ./ltl2tgba -M -f "$1"
 }

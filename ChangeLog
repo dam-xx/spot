@@ -1,5 +1,20 @@
 2004-01-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::check2):
+	New function, variant of emptiness_check::check().
+	* src/tgbaalgos/emptinesscheck.hh (emptiness_check::check2):
+	Likewise.
+	* src/tgbatest/emptchk.test, src/tgbatest/emptchke.test: Exercize -e2.
+	* src/tgbatest/ltl2tgba.cc: Support -e2, for emptiness_check::check2().
+	* iface/gspn/Makefile.am [WITH_GSPN_EESRG] (check_PROGRAMS):
+	Compile ltlgspn-eesrg instead of ltleesrg.
+	(ltleesrg_SOURCES, ltleesrg_LDADD): Replace by...
+	(ltlgspn_eesrg_SOURCES, ltlgspn_eesrg_LDADD, LIBGSPNESRG_LDFLAGS):
+	... these.
+	* iface/gspn/ltleesrg.cc: Delete.
+	* iface/gspn/ltlgspn.cc [EESRG]: Support EESRG conditionally.
+	Support -e2.
+
 	* src/tgbaalgos/ltl2tgba_lacim.cc: Typo in comment.
 
 	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::check): Typos

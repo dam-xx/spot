@@ -19,7 +19,15 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+#ifndef EESRG
 #include "gspn.hh"
+#define MIN_ARG 3
+#else
+#include "eesrg.hh"
+#define MIN_ARG 4
+#include "tgba/tgbaexplicit.hh"
+#include "tgbaparse/public.hh"
+#endif
 #include "ltlparse/public.hh"
 #include "ltlvisit/destroy.hh"
 #include "tgba/tgbatba.hh"
@@ -29,16 +37,22 @@
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/emptinesscheck.hh"
 
+
 void
 syntax(char* prog)
 {
   std::cerr << "Usage: "<< prog
+#ifndef EESRG
 	    << " [OPTIONS...] model formula props..."   << std::endl
+#else
+	    << " [OPTIONS...] model formula automata props..."   << std::endl
+#endif
 	    << std::endl
 	    << "  -c  compute an example" << std::endl
 	    << "      (instead of just checking for emptiness)" << std::endl
 	    << std::endl
 	    << "  -e  use Couvreur's emptiness-check (default)" << std::endl
+	    << "  -e2 use Couvreur's emptiness-check variant" << std::endl
 	    << "  -m  degeneralize and perform a magic-search" << std::endl
 	    << std::endl
             << "  -l  use Couvreur's LaCIM algorithm for translation (default)"
@@ -53,7 +67,7 @@ main(int argc, char **argv)
   try
     {
       int formula_index = 1;
-      enum { Couvreur, Magic } check = Couvreur;
+      enum { Couvreur, Couvreur2, Magic } check = Couvreur;
       enum { Lacim, Fm } trans = Lacim;
       bool compute_counter_example = false;
       bool proj = true;
@@ -69,6 +83,10 @@ main(int argc, char **argv)
 	  else if (!strcmp(argv[formula_index], "-e"))
 	    {
 	      check = Couvreur;
+	    }
+	  else if (!strcmp(argv[formula_index], "-e2"))
+	    {
+	      check = Couvreur2;
 	    }
 	  else if (!strcmp(argv[formula_index], "-m"))
 	    {
@@ -92,11 +110,11 @@ main(int argc, char **argv)
 	    }
 	  ++formula_index;
 	}
-      if (argc < formula_index + 3)
+      if (argc < formula_index + MIN_ARG)
 	syntax(argv[0]);
 
 
-      while (argc > formula_index + 2)
+      while (argc >= formula_index + 3)
 	{
 	  env.declare(argv[argc - 1]);
 	  --argc;
@@ -111,8 +129,19 @@ main(int argc, char **argv)
 	exit(2);
 
       argv[1] = argv[formula_index];
-      spot::gspn_interface gspn(2, argv);
       spot::bdd_dict* dict = new spot::bdd_dict();
+
+#if EESRG
+      spot::gspn_eesrg_interface gspn(2, argv);
+
+      spot::tgba_parse_error_list pel1;
+      spot::tgba_explicit* control = spot::tgba_parse(argv[formula_index + 2],
+						      pel1, dict, env);
+      if (spot::format_tgba_parse_errors(std::cerr, pel1))
+	return 2;
+#else
+      spot::gspn_interface gspn(2, argv);
+#endif
 
       spot::tgba* a_f = 0;
       switch (trans)
@@ -126,15 +155,26 @@ main(int argc, char **argv)
 	}
       spot::ltl::destroy(f);
 
+#ifndef EESRG
       spot::tgba* model        = new spot::tgba_gspn(dict, env);
       spot::tgba_product* prod = new spot::tgba_product(model, a_f);
+#else
+      spot::tgba_product* ca = new spot::tgba_product(control, a_f);
+      spot::tgba* model      = new spot::tgba_gspn_eesrg(dict, env, ca);
+      spot::tgba* prod = model;
+#endif
 
       switch (check)
 	{
 	case Couvreur:
+	case Couvreur2:
 	  {
 	    spot::emptiness_check ec(prod);
-	    bool res = ec.check();
+	    bool res;
+	    if (check == Couvreur)
+	      res = ec.check();
+	    else
+	      res = ec.check2();
 	    if (!res)
 	      {
 		if (compute_counter_example)
@@ -177,8 +217,13 @@ main(int argc, char **argv)
 	    delete d;
 	  }
 	}
+#ifndef EESRG
       delete prod;
       delete model;
+#else
+      delete model;
+      delete control;
+#endif
       delete a_f;
       delete dict;
     }
