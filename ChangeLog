@@ -1,5 +1,8 @@
 2004-10-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/misc/bareword.hh, src/misc/bareword.cc: New files.
+	* src/misc/Makefile.am (libmisc_la_SOURCES, misc_HEADERS): Add them.
+
 	* src/misc/modgray.hh, src/misc/modgray.cc: New files.
 	* src/misc/Makefile.am (libmisc_la_SOURCES, misc_HEADERS): Add them.
 	* wrap/python/spot.i: Activate directors, and interface modgray.hh.

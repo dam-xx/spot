@@ -25,6 +25,7 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 miscdir = $(pkgincludedir)/misc
 
 misc_HEADERS = \
+  bareword.hh \
   bddalloc.hh \
   bddlt.hh \
   escape.hh \
@@ -36,6 +37,7 @@ misc_HEADERS = \
 
 noinst_LTLIBRARIES = libmisc.la
 libmisc_la_SOURCES = \
+  bareword.cc \
   bddalloc.cc \
   escape.cc \
   freelist.cc \
