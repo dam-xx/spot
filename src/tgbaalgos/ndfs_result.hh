@@ -22,6 +22,15 @@
 #ifndef SPOT_TGBAALGOS_NDFS_RESULT_HH
 # define SPOT_TGBAALGOS_NDFS_RESULT_HH
 
+//#define TRACE
+
+#include <iostream>
+#ifdef TRACE
+#define trace std::cerr
+#else
+#define trace while (0) std::cerr
+#endif
+
 #include <cassert>
 #include <list>
 #include "tgba/tgba.hh"
