@@ -1,7 +1,11 @@
 2003-07-31  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* wrap/python/ltihooks.py: New file.
+	* wrap/python/Makefile.am (EXTRA_DIST): Add ltihooks.py.
+
 	* wrap/Makefile.am, wrap/spot.i: Move ...
 	* wrap/python/Makefile.am, wrap/python/spot.i: ... here.
+
 	* wrap/Makefile.am: New file.
 	* configure.ac: Output wrap/python/Makefile.
 
