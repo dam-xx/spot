@@ -166,7 +166,8 @@ letter operators are not assumed to be operators if they are part of
 an indentifier: <code>aUb</code> is an atomic proposition, unlike
 <code>a&nbsp;U&nbsp;b</code> and <code>(a)U(b)</code><br>
 
-<table border="1" rules="groups" frame="border" cellpadding="2">
+<table border="1"><tr><td>
+<table border="0" rules="groups" frame="void" cellpadding="3" cellspacing=0>
   <colgroup span=2>
   <colgroup span=2>
   <colgroup span=2>
@@ -217,7 +218,7 @@ an indentifier: <code>aUb</code> is an atomic proposition, unlike
     </tr>
 
   </tbody>
-</table></p>
+</table></td></tr></table></p>
 Translator:<TABLE><TR><TD>""" % (myself, cgi.escape(formula, True))
 
 
