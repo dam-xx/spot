@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -76,6 +76,19 @@ namespace spot
   (const couvreur99_check_status* ecs)
     : emptiness_check_result(ecs->aut), ecs_(ecs)
   {
+  }
+
+  int
+  couvreur99_check_result::acss_states() const
+  {
+    int count = 0;
+    int scc_root = ecs_->root.s.top().index;
+
+    numbered_state_heap_const_iterator* i = ecs_->h->iterator();
+    for (i->first(); !i->done(); i->next())
+      if (i->get_index() >= scc_root)
+	++count;
+    return count;
   }
 
   tgba_run*

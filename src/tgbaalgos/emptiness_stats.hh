@@ -33,48 +33,71 @@ namespace spot
   public :
     ec_statistics()
     : states_(0), transitions_(0), depth_(0), max_depth_(0)
-      {
-      }
-    void set_states(int n)
-      {
-        states_ = n;
-      }
-    void inc_states()
-      {
-        ++states_;
-      }
-    void inc_transitions()
-      {
-        ++transitions_;
-      }
-    void inc_depth()
-      {
-        ++depth_;
-        if (depth_ > max_depth_)
-          max_depth_ = depth_;
-      }
-    void dec_depth()
-      {
-        --depth_;
-      }
-    int states() const
-      {
-        return states_;
-      }
-    int transitions() const
-      {
-        return transitions_;
-      }
-    int max_depth() const
-      {
-        return max_depth_;
-      }
+    {
+    }
+
+    void
+    set_states(int n)
+    {
+      states_ = n;
+    }
+
+    void
+    inc_states()
+    {
+      ++states_;
+    }
+
+    void
+    inc_transitions()
+    {
+      ++transitions_;
+    }
+
+    void
+    inc_depth()
+    {
+      ++depth_;
+      if (depth_ > max_depth_)
+	max_depth_ = depth_;
+    }
+
+    void
+    dec_depth()
+    {
+      --depth_;
+    }
+
+    int
+    states() const
+    {
+      return states_;
+    }
+
+    int
+    transitions() const
+    {
+      return transitions_;
+    }
+
+    int
+    max_depth() const
+    {
+      return max_depth_;
+    }
 
   private :
     unsigned states_; /// number of disctint visited states
     unsigned transitions_; /// number of visited transitions
     unsigned depth_; /// maximal depth of the stack(s)
     unsigned max_depth_; /// maximal depth of the stack(s)
+  };
+
+  /// Accepting Cycle Search Space statistics
+  class acss_statistics
+  {
+  public:
+    virtual int acss_states() const = 0;
   };
 
   /// @}

@@ -1,5 +1,12 @@
 2005-01-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptiness_stats.hh (accs_statistics): New class.
+	* src/tgbaalgos/gtec/ce.cc, src/tgbaalgos/gtec/ce.hh
+	(couvreur99_check_result): Inherit from acss_statistics.
+	(couvreur99_check_result::acss_states): Implement it.
+	* src/tgbatest/randtgba.cc: Display statistics about accepting cycle
+	search space.
+
 	* src/tgbaalgos/ndfs_result.hh (construct_prefix): Do not call
 	erase() after splice(), splice() already removes the elements.
 

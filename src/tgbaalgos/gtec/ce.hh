@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -24,11 +24,14 @@
 
 #include "status.hh"
 #include "tgbaalgos/emptiness.hh"
+#include "tgbaalgos/emptiness_stats.hh"
 
 namespace spot
 {
   /// Compute a counter example from a spot::couvreur99_check_status
-  class couvreur99_check_result: public emptiness_check_result
+  class couvreur99_check_result:
+    public emptiness_check_result,
+    public acss_statistics
   {
   public:
     couvreur99_check_result(const couvreur99_check_status* ecs);
@@ -36,6 +39,8 @@ namespace spot
     virtual tgba_run* accepting_run();
 
     void print_stats(std::ostream& os) const;
+
+    virtual int acss_states() const;
 
   protected:
     /// Called by accepting_run() to find a cycle which traverses all
