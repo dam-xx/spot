@@ -1,5 +1,13 @@
 2004-11-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/randomgraph.cc, src/tgbaalgos/randomgraph.hh: New files.
+	* src/tgbaalgos/Makefile.am (tgbaalgos_HEADERS)
+	(libtgbaalgos_la_SOURCES): Add them.
+	* src/tgba/tgbaexplicit.hh (tgba_explicit::add_state): Make it public.
+	* src/tgbatest/randtgba.cc: New file.
+	* src/tgbatest/Makefile.am (noinst_PROGRAMS, readsave_SOURCES): Add it.
+	* src/tgbatest/readsave.test: Check a random graph.
+
 	* misc/random.cc, misc/random.hh: New files.
 	* src/misc/Makefile.am (misc_HEADERS, libmisc_la_SOURCES): Add them.
 

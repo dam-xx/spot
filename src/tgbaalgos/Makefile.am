@@ -38,6 +38,7 @@ tgbaalgos_HEADERS = \
   neverclaim.hh \
   powerset.hh \
   projrun.hh \
+  randomgraph.hh \
   reachiter.hh \
   replayrun.hh \
   rundotdec.hh \
@@ -58,6 +59,7 @@ libtgbaalgos_la_SOURCES = \
   neverclaim.cc \
   powerset.cc \
   projrun.cc \
+  randomgraph.cc \
   reachiter.cc \
   replayrun.cc \
   rundotdec.cc \

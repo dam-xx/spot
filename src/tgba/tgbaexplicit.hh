@@ -73,6 +73,10 @@ namespace spot
     void complement_all_acceptance_conditions();
     void merge_transitions();
 
+    /// Return the tgba_explicit::state for \a name, creating the state if
+    /// it does not exist.
+    state* add_state(const std::string& name);
+
     // tgba interface
     virtual ~tgba_explicit();
     virtual spot::state* get_init_state() const;
@@ -90,7 +94,6 @@ namespace spot
     virtual bdd compute_support_conditions(const spot::state* state) const;
     virtual bdd compute_support_variables(const spot::state* state) const;
 
-    state* add_state(const std::string& name);
     bdd get_acceptance_condition(const ltl::formula* f);
 
     typedef Sgi::hash_map<const std::string, tgba_explicit::state*,

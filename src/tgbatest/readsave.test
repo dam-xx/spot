@@ -56,4 +56,18 @@ sed 's/"d" "c"/"c" "d"/g;s/!b & a/a \& !b/g' stdout > tmp_ && mv tmp_ stdout
 
 diff input stdout
 
-rm input stdout expected
+rm -f input stdout expected
+
+
+# Likewise, with a randomly generated TGBA.
+run 0 ./randtgba -t 1 -n 20 -d 0.2 a b -a 2 0.1 >input
+sed 's/"b & a"/"a \& b"/g;s/"a1" "a0"/"a0" "a1"/g' input > tmp_ &&
+  mv tmp_ input
+cat input
+run 0 ./readsave input > stdout
+sed 's/"b & a"/"a \& b"/g;s/"a1" "a0"/"a0" "a1"/g' stdout > tmp_ &&
+  mv tmp_ stdout
+
+diff input stdout
+
+rm -f input stdout
