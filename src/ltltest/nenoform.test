@@ -4,46 +4,40 @@
 
 . ./defs || exit 1
 
-check()
-{
-  ./nenoform "$1" "$2" || exit 1
-}
+set -e
 
 # A few things that do not change
-check 'a' 'a'
-check '1' '1'
-check '0' '0'
-check '!a' '!a'
-check 'a U b' 'a U b'
-check 'a & b' 'a & b'
-check 'a & b' 'b & a'
-check 'a & !b & c' 'c & a & !b'
-check 'a & b & c' 'b & c & a'
-check 'Xa & b & Xa' 'b & Xa & b'
-check 'a & b' 'b & a & b'
-check 'a & !b' '!b & a & a'
-check 'a & b & (Xc |(f U !g)| e)' 'b & a & a & (Xc | e |(f U !g)| e | Xc) & b'
-check 'GFa => FGb' 'GFa => FGb'
+./nenoform 'a' 'a'
+./nenoform '1' '1'
+./nenoform '0' '0'
+./nenoform '!a' '!a'
+./nenoform 'a U b' 'a U b'
+./nenoform 'a & b' 'a & b'
+./nenoform 'a & b' 'b & a'
+./nenoform 'a & !b & c' 'c & a & !b'
+./nenoform 'a & b & c' 'b & c & a'
+./nenoform 'Xa & b & Xa' 'b & Xa & b'
+./nenoform 'a & b' 'b & a & b'
+./nenoform 'a & !b' '!b & a & a'
+./nenoform 'a & b & (Xc |(f U !g)| e)' 'b & a & a & (Xc | e |(f U !g)| e | Xc) & b'
+./nenoform 'GFa => FGb' 'GFa => FGb'
 
 # Basic rewritings
-check '!!a' 'a'
-check '!!!!!a' '!a'
-check '!Xa' 'X!a'
-check '!Fa' 'G!a'
-check '!Ga' 'F!a'
-check '!(a ^ b)' 'a <=> b'
-check '!(a <=> b)' '(((a) ^ (b)))'
-check '!(a => b)' 'a&!b'
-check '!(!a => !b)' '!a&b'
-check '!(a U b)' '!a R !b'
-check '!(a R b)' '!a U !b'
-check '!(!a R !b)' 'a U b'
-check '!(a & b & c & d & b)' '!a | !b | !c | !d'
-check '!(a | b | c | d)' '!a & !b & !c & !d'
+./nenoform '!!a' 'a'
+./nenoform '!!!!!a' '!a'
+./nenoform '!Xa' 'X!a'
+./nenoform '!Fa' 'G!a'
+./nenoform '!Ga' 'F!a'
+./nenoform '!(a ^ b)' 'a <=> b'
+./nenoform '!(a <=> b)' '(((a) ^ (b)))'
+./nenoform '!(a => b)' 'a&!b'
+./nenoform '!(!a => !b)' '!a&b'
+./nenoform '!(a U b)' '!a R !b'
+./nenoform '!(a R b)' '!a U !b'
+./nenoform '!(!a R !b)' 'a U b'
+./nenoform '!(a & b & c & d & b)' '!a | !b | !c | !d'
+./nenoform '!(a | b | c | d)' '!a & !b & !c & !d'
 
 # Nested rewritings
-check '!(a U (!b U ((a & b & c) R d)))' '!a R (b R ((!a | !b | !c) U !d))'
-check '!(GF a => FG b)' 'GFa & GF!b'
-
-# Success.
-:
+./nenoform '!(a U (!b U ((a & b & c) R d)))' '!a R (b R ((!a | !b | !c) U !d))'
+./nenoform '!(GF a => FG b)' 'GFa & GF!b'

@@ -4,18 +4,12 @@
 
 . ./defs || exit 1
 
-check()
-{
-  ./tunenoform "$1" "$2" || exit 1
-}
+set -e
 
-check '!(a ^ b)' '(a|!b) & (!a|b)'
-check '!(a <=> b)' '(a|b) & (!a|!b)'
-check '!(a => b)' 'a&!b'
-check '!(!a => !b)' '!a&b'
-check '!Fa' 'false R !a'
-check '!G!a' 'true U a'
-check '!(GF a => FG b)' '(0 R (1 U a)) & (0 R (1 U !b))'
-
-# Success.
-:
+./tunenoform '!(a ^ b)' '(a|!b) & (!a|b)'
+./tunenoform '!(a <=> b)' '(a|b) & (!a|!b)'
+./tunenoform '!(a => b)' 'a&!b'
+./tunenoform '!(!a => !b)' '!a&b'
+./tunenoform '!Fa' 'false R !a'
+./tunenoform '!G!a' 'true U a'
+./tunenoform '!(GF a => FG b)' '(0 R (1 U a)) & (0 R (1 U !b))'

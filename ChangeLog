@@ -1,5 +1,12 @@
 2003-04-29  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltltest/tostring.test: Simplify with set -e.  Move the
+	description of the test ...
+	* src/ltltest/tostring.cc: ... here, where it is actually coded.
+	* src/ltltest/lunabbrev.test, src/ltltest/tunabbrev.test, 
+	src/ltltest/nenoform.test,  src/ltltest/tunenoform.test: 
+	Simplify with set -e.
+
 	* configure.ac (AM_INIT_AUTOMAKE): Use nostdinc, to make
 	sure we always use paths relative to src/ in src/'s 
 	subdirectories.

@@ -16,12 +16,15 @@ main(int argc, char **argv)
 {
   if (argc != 2)
     syntax(argv[0]);
-  
+
   spot::ltl::parse_error_list p1;
   spot::ltl::formula* f1 = spot::ltl::parse(argv[1], p1);
 
   if (spot::ltl::format_parse_errors(std::cerr, argv[1], p1))
     return 2;
+
+  // The string generated from an abstract tree should be parsable
+  // again.
 
   std::ostringstream os;
   spot::ltl::to_string(*f1, os);
@@ -32,14 +35,18 @@ main(int argc, char **argv)
   if (spot::ltl::format_parse_errors(std::cerr, os.str(), p1))
     return 2;
 
+  // This second abstract tree should be equal to the first.
+
+  if (! equals(f1, f2))
+    return 1;
+
+  // It should also map to the same string.
+
   std::ostringstream os2;
   spot::ltl::to_string(*f2, os2);
   std::cout << os2.str() << std::endl;
 
   if (os2.str() != os.str())
-    return 1;
-
-  if (! equals(f1, f2))
     return 1;
 }
  

@@ -4,32 +4,25 @@
 
 . ./defs || exit 1
 
-check()
-{
-  ./lunabbrev "$1" "$2" || exit 1
-}
+set -e
 
 # A few things that do not change
-check 'a' 'a'
-check '1' '1'
-check '0' '0'
-check 'G a ' ' G a'
-check 'a U b' 'a U b'
-check 'a & b' 'a & b'
-check 'a & b' 'b & a'
-check 'a & b & c' 'c & a & b'
-check 'a & b & c' 'b & c & a'
-check 'a & b & a' 'b & a & b'
-check 'a & b' 'b & a & b'
-check 'a & b' 'b & a & a'
-check 'a & b & (c |(f U g)| e)' 'b & a & a & (c | e |(f U g)| e | c) & b'
-
+./lunabbrev 'a' 'a'
+./lunabbrev '1' '1'
+./lunabbrev '0' '0'
+./lunabbrev 'G a ' ' G a'
+./lunabbrev 'a U b' 'a U b'
+./lunabbrev 'a & b' 'a & b'
+./lunabbrev 'a & b' 'b & a'
+./lunabbrev 'a & b & c' 'c & a & b'
+./lunabbrev 'a & b & c' 'b & c & a'
+./lunabbrev 'a & b & a' 'b & a & b'
+./lunabbrev 'a & b' 'b & a & b'
+./lunabbrev 'a & b' 'b & a & a'
+./lunabbrev 'a & b & (c |(f U g)| e)' 'b & a & a & (c | e |(f U g)| e | c) & b'
 # other formulae that do change
-check 'a ^ b' '(a & !b) | (!a & b)'
-check 'a ^ Xb' '(!Xb & a) | (!a & Xb) | (Xb & !a)'
-check 'GF a => F G(b)' '!GFa | F Gb'
-check '!a <-> Xb' '(Xb & !a) | (!!a & !Xb)'
-check '(a ^ b) | (b ^ c)' '(c & !b) | (!c & b) | (a & !b) | (!a & b)'
-
-# Success.
-:
+./lunabbrev 'a ^ b' '(a & !b) | (!a & b)'
+./lunabbrev 'a ^ Xb' '(!Xb & a) | (!a & Xb) | (Xb & !a)'
+./lunabbrev 'GF a => F G(b)' '!GFa | F Gb'
+./lunabbrev '!a <-> Xb' '(Xb & !a) | (!!a & !Xb)'
+./lunabbrev '(a ^ b) | (b ^ c)' '(c & !b) | (!c & b) | (a & !b) | (!a & b)'
