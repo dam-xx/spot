@@ -1,5 +1,7 @@
 2004-10-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/gtec/ce.cc: Reinstall change from 2004-09-21.
+
 	Back out all Thomas's changes on emptiness checks since
 	2004-08-23.  Some of these will need to be reintegrated more
 	slowly and cleanly.
