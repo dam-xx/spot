@@ -1,5 +1,11 @@
 2003-06-06  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgbatest/bddprod.test: New file.
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Add bddprod.
+	(bddprod_SOURCES, bddprod_CXXFLAGS): New variables.
+	(TESTS): Add bddprod.test.
+	* src/tgbatest/ltlprod.c: Handle BDD_CONCRETE_PRODUCT.
+
 	* src/tgba/dictunion.cc (tgba_bdd_dict_union): Clone formulae
 	while building new dictionary.
 	* src/tgbatest/ltlprod.test, src/tgbatest/ltlprod.cc: New files.

@@ -8,8 +8,11 @@ check_PROGRAMS = \
   readsave \
   tgbaread \
   ltl2tgba \
-  ltlprod
+  ltlprod \
+  bddprod
 
+bddprod_SOURCES = ltlprod.cc
+bddprod_CXXFLAGS = -DBDD_CONCRETE_PRODUCT
 explicit_SOURCES = explicit.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
 ltlprod_SOURCES = ltlprod.cc
@@ -21,7 +24,8 @@ TESTS = \
   tgbaread.test \
   readsave.test \
   ltl2tgba.test \
-  ltlprod.test
+  ltlprod.test \
+  bddprod.test
 
 EXTRA_DIST = $(TESTS)
 
