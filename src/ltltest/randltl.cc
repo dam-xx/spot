@@ -20,11 +20,14 @@
 // 02111-1307, USA.
 
 #include <iostream>
+#include <set>
+#include <string>
 #include "ltlast/atomic_prop.hh"
 #include "ltlvisit/randomltl.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/length.hh"
+#include "ltlvisit/reduce.hh"
 #include "ltlenv/defaultenv.hh"
 #include "misc/random.hh"
 
@@ -39,6 +42,11 @@ syntax(char* prog)
 	    << "  -f N    the size of the formula [15]" << std::endl
 	    << "  -F N    number of formulae to generate [1]" << std::endl
 	    << "  -p S    priorities to use" << std::endl
+	    << "  -r N    simplify formulae using all available reductions"
+	    << " and reject those" << std::endl
+	    << "            strictly smaller than N" << std::endl
+	    << "  -u      generate unique formulae"
+	    << std::endl
 	    << "  -s N    seed for the random number generator" << std::endl
 	    << std::endl
 	    << "Where:" << std::endl
@@ -72,6 +80,8 @@ main(int argc, char** argv)
   int opt_f = 15;
   int opt_F = 1;
   char* opt_p = 0;
+  int opt_r = 0;
+  bool opt_u = false;
 
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* ap = new spot::ltl::atomic_prop_set;
@@ -105,11 +115,21 @@ main(int argc, char** argv)
 	    syntax(argv[0]);
 	  opt_p = argv[++argn];
 	}
+      else if (!strcmp(argv[argn], "-r"))
+	{
+	  if (argc < argn + 2)
+	    syntax(argv[0]);
+	  opt_r = to_int(argv[++argn]);
+	}
       else if (!strcmp(argv[argn], "-s"))
 	{
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
 	  opt_s = to_int(argv[++argn]);
+	}
+      else if (!strcmp(argv[argn], "-u"))
+	{
+	  opt_u = true;
 	}
       else
 	{
@@ -118,15 +138,19 @@ main(int argc, char** argv)
 	}
     }
 
-  spot::srand(opt_s);
-
   spot::ltl::random_ltl rl(ap);
-
   const char* tok = rl.parse_options(opt_p);
   if (tok)
     {
       std::cerr << "failed to parse probabilities near `"
 		<< tok << "'" << std::endl;
+      exit(2);
+    }
+
+  if (opt_r > opt_F)
+    {
+      std::cerr << "-r's argument (" << opt_r << ") should not be larger than "
+		<< "-F's (" << opt_F << ")" << std::endl;
       exit(2);
     }
 
@@ -136,12 +160,58 @@ main(int argc, char** argv)
     }
   else
     {
+      std::set<std::string> unique;
+
       while (opt_F--)
 	{
-	  spot::ltl::formula* f = rl.generate(opt_f);
-	  std::cout << spot::ltl::to_string(f) << std::endl;
-	  assert(spot::ltl::length(f) <= opt_f);
-	  spot::ltl::destroy(f);
+	  int max_tries_u = 1000;
+	  while (max_tries_u--)
+	    {
+	      spot::srand(opt_s++);
+	      spot::ltl::formula* f;
+	      int max_tries_r = 1000;
+	      while (max_tries_r--)
+		{
+		  f = rl.generate(opt_f);
+		  if (opt_r)
+		    {
+		      spot::ltl::formula* g = reduce(f);
+		      spot::ltl::destroy(f);
+		      if (spot::ltl::length(g) < opt_r)
+			{
+			  spot::ltl::destroy(g);
+			  continue;
+			}
+		      f = g;
+		    }
+		  else
+		    {
+		      assert(spot::ltl::length(f) <= opt_f);
+		    }
+		  break;
+		}
+	      if (max_tries_r < 0)
+		{
+		  assert(opt_r);
+		  std::cerr << "Failed to generate non-reducible formula "
+			    << "of size " << opt_r << " or more." << std::endl;
+		  exit(2);
+		}
+	      std::string txt = spot::ltl::to_string(f);
+	      spot::ltl::destroy(f);
+	      if (!opt_u || unique.insert(txt).second)
+		{
+		  std::cout << txt << std::endl;
+		  break;
+		}
+	    }
+	  if (max_tries_u < 0)
+	    {
+	      assert(opt_u);
+	      std::cerr << "Failed to generate another unique formula."
+			<< std::endl;
+	      exit(2);
+	    }
 	}
     }
   delete ap;
