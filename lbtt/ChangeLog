@@ -1,5 +1,7 @@
 2004-02-11  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ExternalTranslator.cc: Include sys/wait.h.
+
 	* src/SpotWrapper.cc (SpotWrapper::SPOT_AND, SpotWrapper::SPOT_OR):
 	Define as && and || as in Spin.
 	* src/SpotWrapper.hh: Update by email.
