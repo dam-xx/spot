@@ -23,7 +23,7 @@
 #include "emptiness.hh"
 #include "tgba/tgba.hh"
 #include "bfssteps.hh"
-#include "minimizerun.hh"
+#include "reducerun.hh"
 
 namespace spot
 {
@@ -89,7 +89,7 @@ namespace spot
   }
 
   tgba_run*
-  minimize_run(const tgba* a, const tgba_run* org)
+  reduce_run(const tgba* a, const tgba_run* org)
   {
     tgba_run* res = new tgba_run;
     state_set ss;

@@ -1,5 +1,12 @@
 2004-11-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/minimizerun.cc, src/tgbaalgos/minimizerun.hh
+	(minimize_run): Rename as ...
+	* src/tgbaalgos/reducerun.cc, src/tgbaalgos/reducerun.hh:
+	(reduce_run): ... this.
+	* src/tgbaalgos/Makefile.am, src/tgbatest/ltl2tgba.cc,
+	src/tgbatest/randtgba.cc: Adjust all references.
+
 	* src/tgbatest/emptchkr.test: Try degeneralized automata.
 	* src/tgbatest/randtgba.cc (main): Pass the correct automaton to
 	minimize_run().

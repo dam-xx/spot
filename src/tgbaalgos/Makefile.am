@@ -38,12 +38,12 @@ tgbaalgos_HEADERS = \
   ltl2tgba_fm.hh \
   ltl2tgba_lacim.hh \
   magic.hh \
-  minimizerun.hh \
   neverclaim.hh \
   powerset.hh \
   projrun.hh \
   randomgraph.hh \
   reachiter.hh \
+  reducerun.hh \
   replayrun.hh \
   rundotdec.hh \
   save.hh \
@@ -66,12 +66,12 @@ libtgbaalgos_la_SOURCES = \
   ltl2tgba_fm.cc \
   ltl2tgba_lacim.cc \
   magic.cc \
-  minimizerun.cc \
   neverclaim.cc \
   powerset.cc \
   projrun.cc \
   randomgraph.cc \
   reachiter.cc \
+  reducerun.cc \
   replayrun.cc \
   rundotdec.cc \
   save.cc \

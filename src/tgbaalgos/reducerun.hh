@@ -19,19 +19,20 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_TGBAALGOS_MINIMIZERUN_HH
-# define SPOT_TGBAALGOS_MINIMIZERUN_HH
+#ifndef SPOT_TGBAALGOS_REDUCERUN_HH
+# define SPOT_TGBAALGOS_REDUCERUN_HH
 
 namespace spot
 {
   class tgba;
   class tgba_run;
 
-  /// \brief Minimize an accepting run.
+  /// \brief Reduce an accepting run.
+  /// \ingroup tgba_run
   ///
   /// Return a run which is accepting for \a and that is no longer
   /// that \a org.
-  tgba_run* minimize_run(const tgba* a, const tgba_run* org);
+  tgba_run* reduce_run(const tgba* a, const tgba_run* org);
 }
 
-#endif // SPOT_TGBAALGOS_MINIMIZERUN_HH
+#endif // SPOT_TGBAALGOS_REDUCERUN_HH

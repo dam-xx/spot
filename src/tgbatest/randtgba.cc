@@ -39,7 +39,7 @@
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/gv04.hh"
 #include "tgbaalgos/magic.hh"
-#include "tgbaalgos/minimizerun.hh"
+#include "tgbaalgos/reducerun.hh"
 #include "tgbaalgos/se05.hh"
 #include "tgbaalgos/tau03.hh"
 #include "tgbaalgos/tau03opt.hh"
@@ -61,7 +61,7 @@ syntax(char* prog)
 	    << "  -e N    compare result of all "
 	    << "emptiness checks on N randomly generated graphs" << std::endl
 	    << "  -g      output in dot format" << std::endl
-	    << "  -m      try to minimize runs, in a second pass (implies -r)"
+	    << "  -m      try to reduce runs, in a second pass (implies -r)"
 	    << std::endl
 	    << "  -n N    number of nodes of the graph [20]" << std::endl
 	    << "  -r      compute and replay acceptance runs (implies -e)"
@@ -278,7 +278,7 @@ main(int argc, char** argv)
   bool opt_dot = false;
   int opt_ec = 0;
   int opt_ec_seed = 0;
-  bool opt_minim = false;
+  bool opt_reduce = false;
   bool opt_replay = false;
   bool opt_degen = false;
   int argn = 0;
@@ -324,7 +324,7 @@ main(int argc, char** argv)
 	}
       else if (!strcmp(argv[argn], "-m"))
 	{
-	  opt_minim = true;
+	  opt_reduce = true;
 	  opt_replay = true;
 	  if (!opt_ec)
 	    opt_ec = 1;
@@ -488,12 +488,12 @@ main(int argc, char** argv)
 				      << "+" << run->cycle.size()
 				      << "]";
 
-			  if (opt_minim)
+			  if (opt_reduce)
 			    {
-			      spot::tgba_run* minrun =
-				spot::minimize_run(res->automaton(), run);
+			      spot::tgba_run* redrun =
+				spot::reduce_run(res->automaton(), run);
 			      if (!spot::replay_tgba_run(s, res->automaton(),
-							 minrun))
+							 redrun))
 				{
 				  std::cout << ", but could not replay "
 					    << "its minimization (ERROR!)";
@@ -501,17 +501,17 @@ main(int argc, char** argv)
 				}
 			      else
 				{
-				  std::cout << ", minimized";
+				  std::cout << ", reduced";
 				  if (opt_z)
-				    mar_stats[algo].count(minrun);
+				    mar_stats[algo].count(redrun);
 				}
 			      if (opt_z)
 				{
-				  std::cout << " [" << minrun->prefix.size()
-					    << "+" << minrun->cycle.size()
+				  std::cout << " [" << redrun->prefix.size()
+					    << "+" << redrun->cycle.size()
 					    << "]";
 				}
-			      delete minrun;
+			      delete redrun;
 			    }
 			  delete run;
 			}
@@ -628,7 +628,7 @@ main(int argc, char** argv)
   if (!mar_stats.empty())
     {
       std::cout << std::endl
-		<< "Statistics about minimized accepting runs:" << std::endl;
+		<< "Statistics about reduced accepting runs:" << std::endl;
       print_ar_stats(mar_stats);
     }
 

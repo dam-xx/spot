@@ -37,7 +37,7 @@
 #include "tgba/tgbatba.hh"
 #include "tgbaalgos/gv04.hh"
 #include "tgbaalgos/magic.hh"
-#include "tgbaalgos/minimizerun.hh"
+#include "tgbaalgos/reducerun.hh"
 #include "tgbaalgos/se05.hh"
 #include "tgbaalgos/tau03.hh"
 #include "tgbaalgos/tau03opt.hh"
@@ -75,7 +75,7 @@ syntax(char* prog)
 	    << "  -g    graph the accepting run on the automaton (requires -e)"
 	    << std::endl
             << "  -L    fair-loop approximation (implies -f)" << std::endl
-	    << "  -m    try to minimize accepting runs, in a second pass"
+	    << "  -m    try to reduce accepting runs, in a second pass"
 	    << std::endl
 	    << "  -N    display the never clain for Spin "
 	    << "(implies -D)" << std::endl
@@ -170,7 +170,7 @@ main(int argc, char** argv)
   bool post_branching = false;
   bool fair_loop_approx = false;
   bool graph_run_opt = false;
-  bool opt_minim = false;
+  bool opt_reduce = false;
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* unobservables = 0;
 
@@ -248,7 +248,7 @@ main(int argc, char** argv)
 	}
       else if (!strcmp(argv[formula_index], "-m"))
 	{
-	  opt_minim = true;
+	  opt_reduce = true;
 	}
       else if (!strcmp(argv[formula_index], "-N"))
 	{
@@ -734,12 +734,12 @@ main(int argc, char** argv)
 		    }
 		  else
 		    {
-		      if (opt_minim)
+		      if (opt_reduce)
 			{
-			  spot::tgba_run* mini =
-			    spot::minimize_run(res->automaton(), run);
+			  spot::tgba_run* redrun =
+			    spot::reduce_run(res->automaton(), run);
 			  delete run;
-			  run = mini;
+			  run = redrun;
 			}
 		      if (graph_run_opt)
 			{
