@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -35,17 +35,17 @@ namespace spot
    class length_form_visitor : public const_visitor
     {
     public:
-      
+
       length_form_visitor()
       {
 	result_ = 0;
       }
-    
+
       virtual ~length_form_visitor()
       {
       }
 
-      int 
+      int
       result() const
       {
 	return result_;
@@ -53,32 +53,32 @@ namespace spot
 
       void
       visit(const atomic_prop* ap)
-      { 
+      {
 	if (ap);
 	result_ = 1;
       }
-      
+
       void
       visit(const constant* c)
       {
 	if (c);
 	result_ = 1;
       }
-      
+
       void
       visit(const unop* uo)
       {
 	if (uo);
 	result_ = 1 + form_length(uo->child());
       }
-      
+
       void
       visit(const binop* bo)
       {
 	if (bo);
 	result_ = 1 + form_length(bo->first()) + form_length(bo->second());
       }
-      
+
       void
       visit(const multop* mo)
       {
@@ -86,7 +86,7 @@ namespace spot
 	for (unsigned i = 0; i < mos; ++i)
 	  result_ += form_length(mo->nth(i));
       }
-      
+
     protected:
       int result_; // size of the formula
     };

@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -32,13 +32,13 @@ namespace spot
   namespace ltl
   {
 
-    
+
     //class unabbreviate_FG_visitor::unabbreviate_logic_visitor()
-    
+
     class reduce_form_visitor : public visitor
     {
     public:
-      
+
       reduce_form_visitor()
       {
 	/*
@@ -46,38 +46,38 @@ namespace spot
 	  universality_ = false;
 	*/
       }
-    
+
       virtual ~reduce_form_visitor()
       {
       }
 
-      formula* 
+      formula*
       result() const
       {
 	return result_;
       }
-      
+
       /*
 	bool
 	is_eventuality()
 	{
 	return eventuality_;
 	}
-	
+
 	bool
 	is_universality()
 	{
 	return universality_;
 	}
       */
-    
+
       void
       visit(atomic_prop* ap)
-      { 
+      {
 	formula* f = ap->ref();
 	result_ = f;
       }
-      
+
       void
       visit(constant* c)
       {
@@ -93,7 +93,7 @@ namespace spot
 	/* Unreachable code.  */
 	assert(0);
       }
-      
+
       void
       visit(unop* uo)
       {
@@ -109,7 +109,7 @@ namespace spot
 	    result_ = unop::instance(unop::X, result_);
 	    return;
 
-	  case unop::F: 
+	  case unop::F:
 	    /* if f is class of eventuality then F(f)=f */
 	    if (!is_eventual(result_)) {
 	      result_ = unop::instance(unop::F, result_);
@@ -126,21 +126,21 @@ namespace spot
 	/* Unreachable code.  */
 	assert(0);
       }
-      
+
       void
       visit(binop* bo)
       {
 	formula* f2 = recurse(bo->second());
-	
+
 	/* if b is of class eventuality then a U b = b
 	   if b is of class universality then a R b = b */
 	if ( ( is_eventual(f2) && ( (bo->op()) == binop::U )) ||
-	     ( is_universal(f2) && ( (bo->op()) == binop::R )) ) 
+	     ( is_universal(f2) && ( (bo->op()) == binop::R )) )
 	  {
-	    result_ = f2; 
+	    result_ = f2;
 	    return;
 	  }
-	
+
 	/* case of implies */
 	formula* f1 = recurse(bo->first());
 	bool inf = inf_form(f1,f2);
@@ -148,7 +148,7 @@ namespace spot
 	//binop* ftmp = NULL;
 	bool infnegleft = infneg_form(f2,f1,0);
 	bool infnegright = infneg_form(f2,f1,1);
-	
+
 	switch (bo->op())
 	  {
 	  case binop::Xor:
@@ -159,8 +159,8 @@ namespace spot
 
 	  case binop::U:
 	    /* a < b => a U b = b */
-	    if (inf) 
-	      { 
+	    if (inf)
+	      {
 		result_ = f2;
 		spot::ltl::destroy(f1);
 		return;
@@ -179,14 +179,14 @@ namespace spot
 		  result_ = f2;
 		  spot::ltl::destroy(f1);
 		  return;
-		} 
+		}
 	    result_ = binop::instance(binop::U,
 				      f1, f2);
 	    return;
 
 	  case binop::R:
 	    /* b < a => a R b = b */
-	    if (infinv) 
+	    if (infinv)
 	      {
 		result_ = f2;
 		spot::ltl::destroy(f1);
@@ -206,7 +206,7 @@ namespace spot
 		  result_ = f2;
 		  spot::ltl::destroy(f1);
 		  return;
-		}  
+		}
 
 	    result_ = binop::instance(binop::R,
 				      f1, f2);
@@ -215,7 +215,7 @@ namespace spot
 	/* Unreachable code.  */
 	assert(0);
       }
-      
+
       void
       visit(multop* mo)
       {
@@ -225,7 +225,7 @@ namespace spot
 	multop::vec* res = new multop::vec;
 	multop::vec::iterator index;
 	multop::vec::iterator indextmp;
-	
+
 	for (unsigned i = 0; i < mos; ++i)
 	  res->push_back(recurse(mo->nth(i)));
 
@@ -234,7 +234,7 @@ namespace spot
 
 	  case multop::Or:
 	    index = indextmp = res->begin();
-	    if (index != res->end()) 
+	    if (index != res->end())
 	      {
 		f1 = *index;
 		index++;
@@ -260,7 +260,7 @@ namespace spot
 	      }
 	    break;
 
-	  case multop::And: 
+	  case multop::And:
 	    index = indextmp = res->begin();
 	    if (mos)
 	      {
@@ -288,10 +288,10 @@ namespace spot
 	      }
 	    break;
 	  }
-	
-	/* f1 < !f2 => f1 & f2 = false 
+
+	/* f1 < !f2 => f1 & f2 = false
 	   !f1 < f2 => f1 | f2 = true */
-	
+
 	for (index = res->begin(); index != res->end(); index++){
 	  for (indextmp = res->begin(); indextmp != res->end(); indextmp++){
 	    if (index != indextmp){
@@ -301,16 +301,16 @@ namespace spot
 		}
 		if (mo->op() == multop::Or)
 		  result_ = constant::true_instance();
-		else 
+		else
 		  result_ = constant::false_instance();
 		return;
 	      }
-	
+
 	      /*
 	      if ((constant*)(*index) != NULL)
 		if (((((constant*)(*index))->val() == constant::True) &&
-		     (mo->op() == multop::Or)) || 
-		    (((((constant*)(*index))->val() == constant::False)) 
+		     (mo->op() == multop::Or)) ||
+		    (((((constant*)(*index))->val() == constant::False))
 		     && (mo->op() == multop::And))
 		    ) {
 		  //std::cout << "constant" << std::endl;
@@ -319,26 +319,26 @@ namespace spot
 		  }
 		  if (mo->op() == multop::Or)
 		    result_ = constant::true_instance();
-		  else 
+		  else
 		    result_ = constant::false_instance();
-		  
+
 		  std::cout << "2" << std::endl;
 		  spot::ltl::dump(std::cout,mo);
 		  return;
 		}
 	      */
-	
+
 	    }
 	  }
 	}
-	
+
 	if (res->size()) {
 	  result_ = multop::instance(mo->op(),res);
 	  return;
 	}
 	assert(0);
       }
-      
+
       formula*
       recurse(formula* f)
       {
@@ -355,18 +355,18 @@ namespace spot
 
     formula*
     reduce_form(const formula* f)
-    {      
+    {
       spot::ltl::formula* ftmp1;
       spot::ltl::formula* ftmp2;
       reduce_form_visitor v;
-      
+
       ftmp1 = spot::ltl::basic_reduce_form(f);
       const_cast<formula*>(ftmp1)->accept(v);
       ftmp2 = spot::ltl::basic_reduce_form(v.result());
-      
+
       spot::ltl::destroy(ftmp1);
       spot::ltl::destroy(v.result());
-      
+
       return ftmp2;
     }
 
@@ -378,12 +378,12 @@ namespace spot
       spot::ltl::formula* ftmp3;
 
       ftmp1 = spot::ltl::unabbreviate_logic(f);
-      ftmp2 = spot::ltl::negative_normal_form(ftmp1);      
+      ftmp2 = spot::ltl::negative_normal_form(ftmp1);
       ftmp3 = spot::ltl::reduce_form(ftmp2);
-      
+
       spot::ltl::destroy(ftmp1);
       spot::ltl::destroy(ftmp2);
-      
+
       return ftmp3;
 
     }

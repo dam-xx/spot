@@ -1,5 +1,10 @@
 2004-05-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltltest/inf.cc, src/ltltest/inf.test, src/ltltest/reduc.test,
+	src/ltlvisit/formlength.cc, src/ltlvisit/reducform.cc,
+	src/ltlvisit/reducform.hh: Fix copyright year, these files were
+	created in 2004.
+
 	* src/sanity/80columns.test: New file.
 	* src/sanity/Makefile.am (check-local): Run it.
 	* src/ltltest/equals.test, src/ltltest/lunabbrev.test,

@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -26,24 +26,24 @@
 #. ./defs || exit 1
 if [ $1 ]; then
     FICH=$1
-else 
+else
     FICH="formules.ltl"
 fi
 
 #####################################
 rm output? result_bri.test -f
-for opt in bri ##b r i br bi rb ri ib ir bri bir rbi rib ibr irb 
+for opt in bri ##b r i br bi rb ri ib ir bri bir rbi rib ibr irb
   do
   for f in `awk '{print $1}' $FICH`
     do
     if [ ! $f = "####" ]; then
 	#echo $f;
-	if ./reduc "$f" >> result_$opt.test; 
+	if ./reduc "$f" >> result_$opt.test;
 	    then
 	    #echo $f >> output1
 	#    if  ../tgbatest/ltl2tgba -f "$f" >> output1; then #automate FM
 	#	echo "" >> output1
-	#    else 
+	#    else
 	#	echo $f;
 	#    fi
 	  #echo "'$f' is reduce ($NB)"

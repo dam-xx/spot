@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -36,17 +36,17 @@ namespace spot
 
     /* Basic rewriting */
     formula* basic_reduce_form(const formula* f);
-    
-    /* formula rewriting using univerality, eventuality, 
+
+    /* formula rewriting using univerality, eventuality,
        implies and basic_reduce_form */
     formula* reduce_form(const formula* f);
 
     /* detect easy case of implies */
-    bool inf_form(const formula* f1, const formula* f2); 
+    bool inf_form(const formula* f1, const formula* f2);
     /* true if f1 < f2, false otherwise */
-    bool infneg_form(const formula* f1, const formula* f2, int n); 
+    bool infneg_form(const formula* f1, const formula* f2, int n);
     /* true if !f1 < f2, false otherwise */
-    
+
     /* detect if a formula is of class eventuality or universality */
     bool is_eventual(const formula* f);
     bool is_universal(const formula* f);
@@ -54,9 +54,9 @@ namespace spot
     /* detect if a formula is of form GF or FG */
     bool is_GF(const formula* f);
     bool is_FG(const formula* f);
-      
+
     /* To know the first node of a formula */
-    
+
     class node_type_form_visitor : public const_visitor
     {
     public:
@@ -72,14 +72,14 @@ namespace spot
     protected:
       type result_;
     };
-    
+
     node_type_form_visitor::type node_type(const formula* f);
 
     /* Obsolete */
     int nb_term_multop(const formula* f);
     formula* reduce_inf_form(const formula* f); /* Obsolete */
     int form_length(const formula* f); /* For test */
-    
+
   }
 }
 

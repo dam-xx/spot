@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -54,28 +54,28 @@ main(int argc, char** argv)
 
   spot::ltl::parse_error_list p2;
   f2 = spot::ltl::parse(argv[2], p2);
-  
+
   if (spot::ltl::format_parse_errors(std::cerr, argv[2], p2))
     return 2;
-  
+
   std::string f1s = spot::ltl::to_string(f1);
   std::string f2s = spot::ltl::to_string(f2);
 
   int exit_return = 0;
-  
+
   std::cout << "Test f1 < f2" << std::endl;
   if (spot::ltl::inf_form(f1,f2)) {
     std::cout << f1s << " < " << f2s << std::endl;
     exit_return = 1;
   }
-  
-  /*  
+
+  /*
   std::cout << "Test !f1 < f2" << std::endl;
   if (spot::ltl::infneg_form(f1,f2,0)) {
     std::cout << "!(" << f1s << ") < " << f2s << std::endl;
     exit_return = 2;
   }
-  
+
   std::cout << "Test f1 < !f2" << std::endl;
   if (spot::ltl::infneg_form(f1,f2,1)) {
     std::cout << f1s << " < !(" << f2s << ")" << std::endl;

@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -53,7 +53,7 @@ run 1 ./inf 'a R b' 'b'
 run 1 ./inf 'a R b' '1'
 
 run 1 ./inf 'a U b' '1 U b'
-run 1 ./inf 'a R b' '1 R b' 
+run 1 ./inf 'a R b' '1 R b'
 
 run 1 ./inf 'b * (a U b)' 'a U b'
 run 1 ./inf 'a U b' 'c + (a U b)'
