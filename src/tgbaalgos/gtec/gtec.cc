@@ -51,10 +51,10 @@ namespace spot
     // (FROM should be in H, otherwise it means all reachable
     // states from FROM have already been removed and there is no
     // point in calling remove_component.)
-    int* hi = ecs_->h->find(from);
-    assert(hi);
-    assert(*hi != -1);
-    *hi = -1;
+    numbered_state_heap::state_index_p spi = ecs_->h->index(from);
+    assert(spi.first);
+    assert(*spi.second != -1);
+    *spi.second = -1;
     tgba_succ_iterator* i = ecs_->aut->succ_iter(from);
 
     for (;;)
@@ -63,15 +63,13 @@ namespace spot
 	for (i->first(); !i->done(); i->next())
 	  {
 	    state* s = i->current_state();
-	    int *hi = ecs_->h->find(s);
-	    assert(hi);
-
-	    if (*hi != -1)
+	    numbered_state_heap::state_index_p spi = ecs_->h->index(s);
+	    assert(spi.second);
+	    if (*spi.second != -1)
 	      {
-		*hi = -1;
-		to_remove.push(ecs_->aut->succ_iter(s));
+		*spi.second = -1;
+		to_remove.push(ecs_->aut->succ_iter(spi.first));
 	      }
-	    delete s;
 	  }
 	delete i;
 	if (to_remove.empty())
@@ -130,10 +128,10 @@ namespace spot
 	    // When backtracking the root of an SCC, we must also
 	    // remove that SCC from the ARC/ROOT stacks.  We must
 	    // discard from H all reachable states from this SCC.
-	    int* i = ecs_->h->find(curr);
-	    assert(i);
+	    numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
+	    assert(spi.first);
 	    assert(!ecs_->root.empty());
-	    if (ecs_->root.top().index == *i)
+	    if (ecs_->root.top().index == *spi.second)
 	      {
 		assert(!arc.empty());
 		arc.pop();
@@ -157,8 +155,8 @@ namespace spot
 	// We do not need SUCC from now on.
 
 	// Are we going to a new state?
-	int* i = ecs_->h->find(dest);
-	if (!i)
+	numbered_state_heap::state_index_p spi = ecs_->h->find(dest);
+	if (!spi.first)
 	  {
 	    // Yes.  Number it, stack it, and register its successors
 	    // for later processing.
@@ -171,13 +169,8 @@ namespace spot
 	    continue;
 	  }
 
-	// We know the state exists.  Since a state can have several
-	// representations (i.e., objects), make sure we delete
-	// anything but the first one seen (the one used as key in H).
-	(void) ecs_->h->filter(dest);
-
 	// If we have reached a dead component, ignore it.
-	if (*i == -1)
+	if (*spi.second == -1)
 	  continue;
 
 	// Now this is the most interesting case.  We have reached a
@@ -191,7 +184,7 @@ namespace spot
 	// ROOT is ascending: we just have to merge all SCCs from the
 	// top of ROOT that have an index greater to the one of
 	// the SCC of S2 (called the "threshold").
-	int threshold = *i;
+	int threshold = *spi.second;
 	while (threshold < ecs_->root.top().index)
 	  {
 	    assert(!ecs_->root.empty());
@@ -314,6 +307,8 @@ namespace spot
 		if (ecs_->root.top().condition
 		    == ecs_->aut->all_acceptance_conditions())
 		  {
+		    /// q->s has already been freed by find_state().
+		    queue.erase(q);
 		    // We have found an accepting SCC.  Clean up TODO.
 		    // We must delete all states of apparing in TODO
 		    // unless they are used as keys in H.
@@ -323,23 +318,19 @@ namespace spot
 			for (succ_queue::iterator q = queue.begin();
 			     q != queue.end(); ++q)
 			  {
-			    int* i = ecs_->h->find(q->s);
-			    if (!i)
+			    // Delete the state if it is a clone of a
+			    // state in the heap...
+			    numbered_state_heap::state_index_p spi
+			      = ecs_->h->index(q->s);
+			    // ... or if it is an unknown state.
+			    if (spi.first == 0)
 			      delete q->s;
-			    else
-			      // Delete the state if it is a clone
-			      // of a state in the heap.
-			      (void) ecs_->h->filter(q->s);
 			  }
 			todo.pop();
 		      }
 		    return false;
 		  }
 	      }
-	    // We know the state exists.  Since a state can have several
-	    // representations (i.e., objects), make sure we delete
-	    // anything but the first one seen (the one used as key in H).
-	    (void) ecs_->h->filter(q->s);
 	    // Remove that state from the queue, so we do not
 	    // recurse into it.
 	    succ_queue::iterator old = q++;
@@ -360,10 +351,10 @@ namespace spot
 	    // When backtracking the root of an SCC, we must also
 	    // remove that SCC from the ARC/ROOT stacks.  We must
 	    // discard from H all reachable states from this SCC.
-	    int* i = ecs_->h->find(curr);
-	    assert(i);
+	    numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
+	    assert(spi.first);
 	    assert(!ecs_->root.empty());
-	    if (ecs_->root.top().index == *i)
+	    if (ecs_->root.top().index == *spi.second)
 	      {
 		assert(!arc.empty());
 		arc.pop();
@@ -396,7 +387,7 @@ namespace spot
   int*
   emptiness_check_shy::find_state(const state* s)
   {
-    return ecs_->h->find(s);
+    return ecs_->h->find(s).second;
   }
 
 }

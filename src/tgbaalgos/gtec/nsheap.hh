@@ -51,14 +51,39 @@ namespace spot
   class numbered_state_heap
   {
   public:
+    typedef std::pair<const state*, int*> state_index_p;
+    typedef std::pair<const state*, int> state_index;
+
     virtual ~numbered_state_heap() {}
     //@{
     /// \brief Is state in the heap?
     ///
-    /// Returns 0 if \a s is not in the heap. or a pointer to
-    /// its number if it is.
-    virtual const int* find(const state* s) const = 0;
-    virtual int* find(const state* s) = 0;
+    /// Returns a pair (0,0) if \a s is not in the heap.
+    /// or a pair (p, i) if there is a clone \a p of \a s \a i
+    /// in the heap with index.  \a s will be freed if it is
+    /// different of \a p.
+    ///
+    /// There are called by the algorithm to check whether a
+    /// successor is a new state to explore or an already visited
+    /// state.
+    ///
+    /// These functions can be redefined to search for more
+    /// than an equal match.  For example we could redefine
+    /// it to check state inclusion.
+    virtual state_index find(const state* s) const = 0;
+    virtual state_index_p find(const state* s) = 0;
+    //@}
+
+    //@{
+    /// \brief Return the index of an existing state.
+    ///
+    /// This is mostly similar to find(), except it will
+    /// be called for state which we know are already in
+    /// the heap, or for state which may not be in the
+    /// heap but for which it is always OK to do equality
+    /// checks.
+    virtual state_index index(const state* s) const = 0;
+    virtual state_index_p index(const state* s) = 0;
     //@}
 
     /// Add a new state \a s with index \a index
@@ -69,16 +94,6 @@ namespace spot
 
     /// Return an iterator on the states/indexes pairs.
     virtual numbered_state_heap_const_iterator* iterator() const = 0;
-
-    /// \brief Filter state clones.
-    ///
-    /// Return a state which is equal to \a s, but is an actual key in
-    /// the heap, and free \a s if it is a clone of that state.
-    ///
-    /// Doing so simplify memory management, because we don't have to
-    /// track which state need to be kept or deallocated: all key in
-    /// the heap should last for the whole life of the emptiness-check.
-    virtual const state* filter(const state* s) const = 0;
   };
 
   /// Abstract factory for numbered_state_heap
@@ -95,15 +110,15 @@ namespace spot
   public:
     virtual ~numbered_state_heap_hash_map();
 
-    virtual const int* find(const state* s) const;
-    virtual int* find(const state* s);
+    virtual state_index find(const state* s) const;
+    virtual state_index_p find(const state* s);
+    virtual state_index index(const state* s) const;
+    virtual state_index_p index(const state* s);
+
     virtual void insert(const state* s, int index);
     virtual int size() const;
 
     virtual numbered_state_heap_const_iterator* iterator() const;
-
-    virtual const state* filter(const state* s) const;
-
   protected:
     typedef Sgi::hash_map<const state*, int,
 			  state_ptr_hash, state_ptr_equal> hash_type;

@@ -650,9 +650,11 @@ namespace spot
 	}
     }
 
-    virtual const int*
+    virtual numbered_state_heap::state_index
     find(const state* s) const
     {
+      state_index res;
+
       hash_type::const_iterator i;
       for (i = h.begin(); i != h.end(); ++i)
 	{
@@ -674,16 +676,106 @@ namespace spot
 		break;
 	    }
 	}
+
       if (i == h.end())
-	return 0;
-      return &i->second;
+	{
+	  res.first = 0;
+	  res.second = 0;
+	}
+      else
+	{
+	  res.first = i->first;
+	  res.second = i->second;
+
+	  if (s != i->first)
+	    delete s;
+	}
+      return res;
     }
 
-    virtual int*
+    virtual numbered_state_heap::state_index_p
     find(const state* s)
     {
-      return const_cast<int*>
-	(const_cast<const numbered_state_heap_eesrg_semi*>(this)->find(s));
+      state_index_p res;
+
+      hash_type::iterator i;
+      for (i = h.begin(); i != h.end(); ++i)
+	{
+	  const state_gspn_eesrg* old_state =
+	    dynamic_cast<const state_gspn_eesrg*>(i->first);
+	  const state_gspn_eesrg* new_state =
+	    dynamic_cast<const state_gspn_eesrg*>(s);
+	  assert(old_state);
+	  assert(new_state);
+
+	  if ((old_state->right())->compare(new_state->right()) == 0)
+	    {
+	      if (old_state->left() == new_state->left())
+		break;
+
+	      if (old_state->left()
+		  && new_state->left()
+		  && spot_inclusion(new_state->left(),old_state->left()))
+		break;
+	    }
+	}
+
+      if (i == h.end())
+	{
+	  res.first = 0;
+	  res.second = 0;
+	}
+      else
+	{
+	  res.first = i->first;
+	  res.second = &i->second;
+
+	  if (s != i->first)
+	    delete s;
+	}
+      return res;
+    }
+
+    virtual numbered_state_heap::state_index
+    index(const state* s) const
+    {
+      state_index res;
+      hash_type::const_iterator i = h.find(s);
+      if (i == h.end())
+	{
+	  res.first = 0;
+	  res.second = 0;
+	}
+      else
+	{
+	  res.first = i->first;
+	  res.second = i->second;
+
+	  if (s != i->first)
+	    delete s;
+	}
+      return res;
+    }
+
+    virtual numbered_state_heap::state_index_p
+    index(const state* s)
+    {
+      state_index_p res;
+      hash_type::iterator i = h.find(s);
+      if (i == h.end())
+	{
+	  res.first = 0;
+	  res.second = 0;
+	}
+      else
+	{
+	  res.first = i->first;
+	  res.second = &i->second;
+
+	  if (s != i->first)
+	    delete s;
+	}
+      return res;
     }
 
     virtual void
@@ -699,36 +791,6 @@ namespace spot
     }
 
     virtual numbered_state_heap_const_iterator* iterator() const;
-
-    virtual const state*
-    filter(const state* s) const
-    {
-      hash_type::const_iterator i;
-      for (i = h.begin(); i != h.end(); ++i)
-	{
-	  const state_gspn_eesrg* old_state =
-	    dynamic_cast<const state_gspn_eesrg*>(i->first);
-	  const state_gspn_eesrg* new_state =
-	    dynamic_cast<const state_gspn_eesrg*>(s);
-	  assert(old_state);
-	  assert(new_state);
-
-	  if ((old_state->right())->compare(new_state->right()) == 0)
-	    {
-	      if (old_state->left() == new_state->left())
-		break;
-
-	      if (old_state->left()
-		  && new_state->left()
-		  && spot_inclusion(new_state->left(),old_state->left()))
-		break;
-	    }
-	}
-      assert(i != h.end());
-      if (s != i->first)
-	delete s;
-      return i->first;
-    }
 
   protected:
     typedef Sgi::hash_map<const state*, int,

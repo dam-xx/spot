@@ -71,7 +71,10 @@ namespace spot
       }
     delete i;
 
-    suffix.push_front(ecs_->h->filter(ecs_->aut->get_init_state()));
+    numbered_state_heap::state_index_p spi =
+      ecs_->h->index(ecs_->aut->get_init_state());
+    assert(spi.first);
+    suffix.push_front(spi.first);
 
     // We build a path trough each SCC in the stack.  For the
     // first SCC, the starting state is the initial state of the
@@ -134,6 +137,7 @@ namespace spot
 			break;
 		      }
 		    // Restrict the BFS to state inside the SCC.
+		    delete dest;
 		    continue;
 		  }
 

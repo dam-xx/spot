@@ -85,22 +85,60 @@ namespace spot
       }
   }
 
-  const int*
+  numbered_state_heap::state_index
   numbered_state_heap_hash_map::find(const state* s) const
   {
+    state_index res;
     hash_type::const_iterator i = h.find(s);
+
     if (i == h.end())
-      return 0;
-    return &i->second;
+      {
+	res.first = 0;
+	res.second = 0;
+      }
+    else
+      {
+	res.first = i->first;
+	res.second = i->second;
+
+	if (s != i->first)
+	  delete s;
+      }
+    return res;
   }
 
-  int*
+  numbered_state_heap::state_index_p
   numbered_state_heap_hash_map::find(const state* s)
   {
+    state_index_p res;
     hash_type::iterator i = h.find(s);
+
     if (i == h.end())
-      return 0;
-    return &i->second;
+      {
+	res.first = 0;
+	res.second = 0;
+      }
+    else
+      {
+	res.first = i->first;
+	res.second = &i->second;
+
+	if (s != i->first)
+	  delete s;
+      }
+    return res;
+  }
+
+  numbered_state_heap::state_index
+  numbered_state_heap_hash_map::index(const state* s) const
+  {
+    return this->numbered_state_heap_hash_map::find(s);
+  }
+
+  numbered_state_heap::state_index_p
+  numbered_state_heap_hash_map::index(const state* s)
+  {
+    return this->numbered_state_heap_hash_map::find(s);
   }
 
   void
@@ -119,16 +157,6 @@ namespace spot
   numbered_state_heap_hash_map::iterator() const
   {
     return new numbered_state_heap_hash_map_const_iterator(h);
-  }
-
-  const state*
-  numbered_state_heap_hash_map::filter(const state* s) const
-  {
-    hash_type::const_iterator i = h.find(s);
-    assert(i != h.end());
-    if (s != i->first)
-      delete s;
-    return i->first;
   }
 
   numbered_state_heap_hash_map_factory::numbered_state_heap_hash_map_factory()
