@@ -98,7 +98,8 @@ float
 to_float(const char* s)
 {
   char* endptr;
-  float res = strtof(s, &endptr);
+  // Do not use strtof(), it does not exist on Solaris 9.
+  float res = strtod(s, &endptr);
   if (*endptr)
     {
       std::cerr << "Failed to parse `" << s << "' as a float." << std::endl;
