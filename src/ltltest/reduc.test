@@ -21,114 +21,32 @@
 # 02111-1307, USA.
 
 
-# Check for the reduc visitor
+# Check for the reduc visitor.
 
-#. ./defs || exit 1
-if [ $1 ]; then
-    FICH=$1
-else
-    FICH="formules.ltl"
-fi
+. ./defs || exit 1
+
+set -e
+
+FICH=${1-$srcdir/formules.ltl}
 
 #####################################
-rm output? result_bri.test -f
-for opt in bri ##b r i br bi rb ri ib ir bri bir rbi rib ibr irb
-  do
-  for f in `awk '{print $1}' $FICH`
-    do
-    if [ ! $f = "####" ]; then
-	#echo $f;
-	if ./reduc "$f" >> result_$opt.test;
-	    then
-	    #echo $f >> output1
-	#    if  ../tgbatest/ltl2tgba -f "$f" >> output1; then #automate FM
-	#	echo "" >> output1
-	#    else
-	#	echo $f;
-	#    fi
-	  #echo "'$f' is reduce ($NB)"
-	    (( NB += 1 ));
-	else
-	    (( NB = NB ));
-	    #echo "reduc failed to reduce '$f'";
-	fi
-    fi
-  done
-  #echo "$NB formula reduce"
-  (( NB = 0 ));
+
+rm -f result.data
+
+cat $FICH |
+while read f; do
+  if [ -n "$f" ] && [ "$f" != "####" ]; then
+    ./reduc "$f" >> result.data
+  fi
 done
+
+test $? == 0 || exit 1
+
 #####################################
 
-#ftmp=""
-#for f in `sed -e "s/\(.* reduce to \)/'1'/" result_bri.test`
-#  do
-#  if [ $ftmp = "" ]; then
-#      echo $ftmp;
-#      ftmp="";
-#  else
-#      echo $f;
-#      ftmp="$ftmp $f";
-#      echo $ftmp;
-#  fi
-#  echo $f >> output2
-#  ../tgbatest/ltl2tgba -f "$f" >> output2 #automate FM
-#  echo "" >> output2
-#done
-
-##############################################
-#exit 0
-##############################################
-
-SUM1=0
-SUM2=0
-AVG=0
-for res in `awk '{print $1}' result_bri.test`
-do
-  SUM1=$(expr $res + $SUM1)
-done
-#echo $SUM1
-
-for res in `awk '{print $2}' result_bri.test`
-do
-  SUM2=$(expr $res + $SUM2)
-done
-(( SUM2 *= 100 ))
-#echo $SUM2
-
-if [ ! $SUM1 = 0 ]; then
-    AVG=$(expr $SUM2 / $SUM1)
-fi
-
-#AVG=$(expr $AVG / $NB)
-#AVG=$(expr $AVG)
-#echo "average reduce $AVG %"
-
-exit 0;
-
-### Formule qui ne passe pas !! => Segmentation fault !!
-#'(((p2)R((X(p2))U(X(1))))*(p0))*((p1)R((p2)R(p0)))'
-#'(((p2)R((X(p2))U(X(1))))*(p0))'
-#'((p1)R((p2)R(p0)))'
-
-#'(p0 R (Gp0 U (p0 U Xp1)))'
-
-
-#'(((!p)*(X(X(p))))*((p)R((q)+(!q))))+((!q)U(q))'
-#'X(((p1)R(1))*((0)R((p0)+(p1))))'
-#'((p0)U(0))U(((0)R(0))*(X(p2)))'
-#'(((X(1))R(1))U((0)R(1)))R(p0)'
-#'((X(p0))R(X(p2)))+((0)R((((p2)+(0))*(p0))R(0)))'
-#'((X(0))+((0)R(p2)))U(((p0)R((p2)*(p2)))R(X(p2)))'
-#'(p1)R(((p2)R(1))R(((p1)U((1)U(p0)))R((p2)U(0))))'
-#'(((X(p0))R(X(p0)))R((p0)R(1)))*((0)R((p1)R(0)))'
-#'(((p1)R(X(p2)))R((0)+((1)U(1))))U((X(1))R(p2))'
-
-(((!p)*(X(X(p))))*((p)R((q)+(!q))))+((!q)U(q))
-X(((p1)R(1))*((0)R((p0)+(p1))))
-((p0)U(0))U(((0)R(0))*(X(p2)))
-(((X(1))R(1))U((0)R(1)))R(p0)
-((X(p0))R(X(p2)))+((0)R((((p2)+(0))*(p0))R(0)))
-((X(0))+((0)R(p2)))U(((p0)R((p2)*(p2)))R(X(p2)))
-(p1)R(((p2)R(1))R(((p1)U((1)U(p0)))R((p2)U(0))))
-(((X(p0))R(X(p0)))R((p0)R(1)))*((0)R((p1)R(0)))
-(((p1)R(X(p2)))R((0)+((1)U(1))))U((X(1))R(p2))
+perl -ne 'BEGIN { $sum1 = 0; $sum2 = 0; }
+/^(\d+)\s+(\d+)/;
+$sum1 += $1;
+$sum2 += $2;
+END { print $sum2 * 100 / $sum1; print "\n"; }
+' < result.test

@@ -1,3 +1,7 @@
+2004-05-11  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltltest/reduc.test: POSIXify.
+
 2004-05-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/sanity/style.test: New file.
