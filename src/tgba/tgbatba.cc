@@ -153,16 +153,16 @@ namespace spot
       // to the next acceptance set.  If the current transition is also
       // in the next acceptance set, then go the one after, etc.
       //
-      // Jérôme Leroux's PhD thesis has a nice explanation of how it
-      // works, chapter 6.
-      //  @PhDThesis{	  leroux.03.phd,
-      //    author = {J{\'e}r{\^o}me Leroux},
-      //    title  = {Algorithmique de la v{\'e}rification des syst{\`e}mes
-      //              {\`a} compteurs. Approximation et acc{\'e}l{\'e}ration.
-      //              Impl{\'e}mentation de l'outil {\sc Fast}},
-      //    school = {{\'E}cole Normale Sup{\'e}rieure de Cachan},
-      //    year   = {2003},
-      //    month  = {December}
+      // See Denis Oddoux's PhD thesis for a nice explanation (in French).
+      //  @PhDThesis{	  oddoux.03.phd,
+      //    author	= {Denis Oddoux},
+      //    title	= {Utilisation des automates alternants pour un
+      //  		  model-checking efficace des logiques temporelles
+      //  		  lin{\'e}aires.},
+      //    school	= {Universit{\'e}e Paris 7},
+      //    year	= {2003},
+      //    address	= {Paris, France},
+      //    month	= {December}
       //  }
       //
       iterator next = expected_;

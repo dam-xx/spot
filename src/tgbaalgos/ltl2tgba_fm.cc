@@ -570,10 +570,6 @@ namespace spot
 	// way it will be explored before the other during the model
 	// checking.
 	dest_map::const_iterator i = dests.find(constant::true_instance());
-	// conditions of the True arc, so when can remove them from
-	// all other arcs.  This is not needed when exprop is used,
-	// but it does not hurt.
-	bdd cond_for_true = bddfalse;
 	if (i != dests.end())
 	  {
 	    // Transitions going to True are not expected to make any promises.
@@ -581,10 +577,9 @@ namespace spot
 	    prom_map::const_iterator j = i->second.find(bddtrue);
 	    assert(j != i->second.end());
 
-	    cond_for_true = j->second;
 	    tgba_explicit::transition* t =
 	      a->create_transition(now, constant::true_instance()->val_name());
-	    a->add_condition(t, d.bdd_to_formula(cond_for_true));
+	    a->add_condition(t, d.bdd_to_formula(j->second));
 	  }
 
 	// Register other transitions.
@@ -600,8 +595,7 @@ namespace spot
 		  {
 		    tgba_explicit::transition* t =
 		      a->create_transition(now, next);
-		    a->add_condition(t, d.bdd_to_formula(j->second
-							 - cond_for_true));
+		    a->add_condition(t, d.bdd_to_formula(j->second));
 		    d.conj_bdd_to_acc(a, j->first, t);
 		  }
 	      }
