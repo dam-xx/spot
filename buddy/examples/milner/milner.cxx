@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <math.h>
 #include "bdd.h"
 #include <iostream>
@@ -98,6 +97,7 @@ bdd reachable_states(bdd I, bdd T)
 
 int main(int argc, char** argv)
 {
+   using namespace std ;
    int n;
    if(argc < 2)
    {
@@ -112,8 +112,6 @@ int main(int argc, char** argv)
       cerr << "The number of cyclers must be more than zero\n";
       exit(2);
    }
-   
-   long clk1 = clock();
    
    bdd_init(500000, 50000);
    bdd_setvarnum(N*6);
@@ -164,8 +162,6 @@ int main(int argc, char** argv)
    bdd T = transitions(t,tp,h,hp,c,cp);
    bdd R = reachable_states(I,T);
    
-   long clk2 = clock();
-   
    bddStat s;
    bdd_stats(&s);
 
@@ -174,8 +170,6 @@ int main(int argc, char** argv)
    cout << "Nodes      = " << s.produced << endl;
    cout << endl << "Number of nodes in T is " << bdd_nodecount( T ) << endl;
    cout << "Number of nodes in R is " << bdd_nodecount( R ) << endl << endl;
-
-   cout << (float)(clk2 - clk1)/(float)(CLOCKS_PER_SEC) << " sec.\n";
 
    //bdd_printstat();
    cout << "Nodenum: " << bdd_getnodenum() << endl;

@@ -27,7 +27,7 @@ bdd *xout;
 void build_adder(void)
 {
    int n;
-   
+
    for (n=0 ; n<N ; n++)
    {
       if (n > 0)
@@ -48,9 +48,10 @@ void build_adder(void)
 
 int main(int argc, char **argv)
 {
+   using namespace std ;
    int method=BDD_REORDER_NONE;
    int n;
-   
+
    if(argc < 2 || argc > 3)
    {
       cout << "usage: adder N R\n";
@@ -59,7 +60,7 @@ int main(int argc, char **argv)
       cout << "            in this case 'adder' starts with a worst case ordering\n";
       exit(1);
    }
-   
+
    N = atoi(argv[1]);
    if (N <= 0)
    {
@@ -90,17 +91,15 @@ int main(int argc, char **argv)
       if (strcmp(argv[2], "rand") == 0)
 	 method = BDD_REORDER_RANDOM;
    }
-   
-   long c0 = clock();
-   
+
    bdd_init(500,1000);
    bdd_setvarnum(2*N);
-      
+
    ainp = new bdd[N];
    binp = new bdd[N];
    co = new bdd[N];
    xout = new bdd[N];
-   
+
    for (n=0 ; n<N ; n++)
    {
       if (method == BDD_REORDER_NONE)
@@ -124,28 +123,22 @@ int main(int argc, char **argv)
    //bdd_autoreorder(method);
    //bdd_reorder_verbose(2);
    build_adder();
-   
+
    if (method != BDD_REORDER_NONE)
    {
       cout << "Sizes before reordering:\n";
       for (n=0 ; n<N ; n++)
 	 cout << "Out[" << n << "]: " << bdd_nodecount(xout[n]) << " nodes\n";
 
-      long c1 = clock();
-      cout << (float)(c1-c0)/(float)(CLOCKS_PER_SEC) << " sec.\n";
-      
       bdd_reorder(method);
       cout << "Sizes after reordering:\n";
    }
    else
       cout << "Sizes:\n";
 
-   long c1 = clock();
-   
    for (n=0 ; n<N ; n++)
       cout << "Out[" << n << "]: " << bdd_nodecount(xout[n]) << " nodes\n";
-   
-   cout << (float)(c1-c0)/(float)(CLOCKS_PER_SEC) << " sec.\n";
+
 }
 
 
@@ -155,7 +148,7 @@ int main(int argc, char **argv)
 bdd setval(int val, int v)
 {
    bdd x = bddtrue;
-   
+
    for (int n=0 ; n<N ; n++)
    {
       if (val & 1)
@@ -187,7 +180,7 @@ int test_vector(bdd av, bdd bv, int a, int b)
    for (int n=0 ; n<N ; n++)
    {
       bdd resv = av & bv & xout[n];
-      
+
       if (resv == bddfalse && (res & 1) || resv != bddfalse && !(res & 1))
 	 return 0;
 
@@ -201,7 +194,7 @@ int test_vector(bdd av, bdd bv, int a, int b)
 int test_adder(void)
 {
    int m = 1 << N;
-   
+
    for (int a=0 ; a<m ; a++)
    {
       for (int b=0 ; b<m ; b++)

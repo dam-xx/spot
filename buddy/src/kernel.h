@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.h,v 1.4 2003/05/20 08:22:36 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.h,v 1.5 2004/06/28 15:22:13 adl Exp $
   FILE:  kernel.h
   DESCR: Kernel specific definitions for BDD package
   AUTH:  Jorn Lind
@@ -118,8 +118,6 @@ extern bddCacheStat bddcachestats;
 
 
 /*=== KERNEL DEFINITIONS ===============================================*/
-
-#define VERSION 22
 
 #define MAXVAR 0x1FFFFF
 #define MAXREF 0x3FF

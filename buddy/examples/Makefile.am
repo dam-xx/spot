@@ -1,11 +1,10 @@
 SUBDIRS = \
  adder \
- calculator \
+ bddcalc \
+ bddtest \
  cmilner \
  fdd \
- internal \
  milner \
  money \
  queen \
  solitare
-

@@ -1,3 +1,17 @@
+2004-06-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	Merge BuDDy 2.3.
+	* examples/calculator/, examples/internal/: Were renamed as ...
+	* examples/bddcalc/, examples/bddtest/: ... these.
+	* configure.ac: Adjust version and output Makefiles.
+	* examples/Makefile.am (SUBDIRS): Adjust subdir renaming.
+	* examples/cmilner/milner.c, examples/fdd/statespace.cxx: Were
+	renamed as ...
+	* examples/cmilner/cmilner.c, examples/fdd/fdd.cxx: ... these.
+	* examples/cmilner/Makefile.am, examples/fdd/Makefile.am: Adjust
+	accordingly.
+	* src/Makefile.am (AM_CPPFLAGS): Define VERSION.
+
 2004-01-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/bddop.c (bdd_support): Free supportSet if it needs to be

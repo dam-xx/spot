@@ -1,5 +1,5 @@
-# For 
-AM_CPPFLAGS = -I$(top_builddir) 
+# For
+AM_CPPFLAGS = -I$(top_builddir) -DVERSION=23
 
 include_HEADERS = bdd.h fdd.h bvec.h
 
