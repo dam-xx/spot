@@ -1,5 +1,11 @@
 2005-02-04  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/randtgba.cc (stat_collector): New class, replacing...
+	(ec_stat, acss_stat, ars_stat, print_ec_stats, print_acss_stats,
+	print_ars_stats): ... these.
+	* tgbaalgos/emptiness_stats.hh (unsigned_statistics): Make the
+	map public.
+
 	* src/tgbaalgos/emptiness_stats.hh (unsigned_statistics::stats_map_):
 	Use char_ptr_less_than.
 

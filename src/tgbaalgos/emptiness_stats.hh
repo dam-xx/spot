@@ -32,10 +32,8 @@ namespace spot
   /// \addtogroup emptiness_check_stats
   /// @{
 
-  class unsigned_statistics
+  struct unsigned_statistics
   {
-  public:
-
     virtual
     ~unsigned_statistics()
     {
@@ -44,16 +42,14 @@ namespace spot
     unsigned
     get(const char* str) const
     {
-      stats_map_::const_iterator i = stats_.find(str);
-      assert(i != stats_.end());
+      stats_map::const_iterator i = stats.find(str);
+      assert(i != stats.end());
       return (this->*i->second)();
     }
 
-  protected:
-    typedef unsigned (unsigned_statistics::*unsigned_fun_)() const;
-    typedef std::map<const char*, unsigned_fun_,
-		     char_ptr_less_than> stats_map_;
-    stats_map_ stats_;
+    typedef unsigned (unsigned_statistics::*unsigned_fun)() const;
+    typedef std::map<const char*, unsigned_fun, char_ptr_less_than> stats_map;
+    stats_map stats;
   };
 
   /// \brief Emptiness-check statistics
@@ -67,13 +63,13 @@ namespace spot
     ec_statistics()
     : states_(0), transitions_(0), depth_(0), max_depth_(0)
     {
-      stats_["states"] =
-	static_cast<unsigned_statistics::unsigned_fun_>(&ec_statistics::states);
-      stats_["transitions"] =
-	static_cast<unsigned_statistics::unsigned_fun_>
+      stats["states"] =
+	static_cast<unsigned_statistics::unsigned_fun>(&ec_statistics::states);
+      stats["transitions"] =
+	static_cast<unsigned_statistics::unsigned_fun>
 	  (&ec_statistics::transitions);
-      stats_["max. depth"] =
-	static_cast<unsigned_statistics::unsigned_fun_>
+      stats["max. depth"] =
+	static_cast<unsigned_statistics::unsigned_fun>
 	  (&ec_statistics::max_depth);
     }
 
@@ -152,11 +148,11 @@ namespace spot
     ars_statistics()
       : prefix_states_(0), cycle_states_(0)
     {
-      stats_["(non unique) states for prefix"] =
-	static_cast<unsigned_statistics::unsigned_fun_>
+      stats["(non unique) states for prefix"] =
+	static_cast<unsigned_statistics::unsigned_fun>
 	  (&ars_statistics::ars_prefix_states);
-      stats_["(non unique) states for cycle"] =
-	static_cast<unsigned_statistics::unsigned_fun_>
+      stats["(non unique) states for cycle"] =
+	static_cast<unsigned_statistics::unsigned_fun>
 	  (&ars_statistics::ars_cycle_states);
     }
 
@@ -199,8 +195,8 @@ namespace spot
   public:
     acss_statistics()
     {
-      stats_["search space states"] =
-	static_cast<unsigned_statistics::unsigned_fun_>
+      stats["search space states"] =
+	static_cast<unsigned_statistics::unsigned_fun>
 	  (&acss_statistics::acss_states);
     }
 
