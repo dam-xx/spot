@@ -131,6 +131,7 @@ syntax(char* prog)
 	    << "  -m      try to reduce runs, in a second pass (implies -r)"
 	    << std::endl
 	    << "  -n N    number of nodes of the graph [20]" << std::endl
+	    << "  -O ALGO run Only ALGO" << std::endl
 	    << "  -r      compute and replay acceptance runs (implies -e)"
 	    << std::endl
 	    << "  -R N    repeat each emptiness-check and accepting run "
@@ -354,6 +355,8 @@ main(int argc, char** argv)
 
   int opt_R = 0;
 
+  const char* opt_O = 0;
+
   bool opt_dot = false;
   int opt_ec = 0;
   int opt_ec_seed = 0;
@@ -417,6 +420,25 @@ main(int argc, char** argv)
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
 	  opt_n = to_int(argv[++argn]);
+	}
+      else if (!strcmp(argv[argn], "-O"))
+	{
+	  if (argc < argn + 2)
+	    syntax(argv[0]);
+	  opt_O = argv[++argn];
+	  int s = sizeof(ec_algos) / sizeof(*ec_algos);
+	  int i;
+	  for (i = 0; i < s; ++i)
+	    if (!strcmp(opt_O, ec_algos[i].name))
+	      break;
+	  if (i == s)
+	    {
+	      std::cerr << "Unknown algorithm.  Available algorithms are:"
+			<< std::endl;
+	      for (i = 0; i < s; ++i)
+		std::cerr << "  " << ec_algos[i].name << std::endl;
+	      exit(1);
+	    }
 	}
       else if (!strcmp(argv[argn], "-r"))
 	{
@@ -497,6 +519,8 @@ main(int argc, char** argv)
 	    {
 	      spot::emptiness_check* ec;
 	      spot::emptiness_check_result* res;
+	      if (opt_O && strcmp(opt_O, ec_algos[i].name))
+		continue;
 	      ec = cons_emptiness_check(i, a, degen, opt_n_acc);
 	      if (!ec)
 		continue;

@@ -1,5 +1,8 @@
 2004-12-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/randtgba.cc: Add option -O, so we can profile each
+	emptiness-check on its own.
+
 	* src/ltlparse/ltlscan.ll: Pass yyleng to the std::string constructor,
 	so it doesn't have to compute it.
 	* src/tgbaparse/tgbascan.ll: Likewise.
