@@ -146,10 +146,10 @@ namespace spot
       //  * If DEAD is any other string, this is the name a property
       //    that should be true when looping on a dead state, and false
       //    otherwise.
-      // We handle these three case by setting ALIVE_PROP and DEAD_PROP
+      // We handle these three cases by setting ALIVE_PROP and DEAD_PROP
       // appropriately.  ALIVE_PROP is the bdd that should be ANDed
       // to all transitions leaving a live state, while DEAD_PROP should
-      // bdd ANDed to all transitions leaving a dead state.
+      // be ANDed to all transitions leaving a dead state.
       if (!strcasecmp(dead.c_str(), "false"))
 	{
 	  alive_prop = bddtrue;
@@ -241,6 +241,9 @@ namespace spot
       // GreatSPN should return successors_ == 0 and size_ == 0 when a
       // state has no successors.
       assert((size_ <= 0) ^ (successors_ != 0));
+      // If we have to stutter on a dead state, we have one successor.
+      if (size_ <= 0 && data_->dead_prop != bddfalse)
+	size_ = 1;
     }
 
     virtual
