@@ -1,3 +1,22 @@
+2003-05-16  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	Check trivial multop equality at build time.  The makes the
+	equal visitor useless, since two equals formulae will now
+	share the same address.
+	
+	* src/ltlast/multop.hh (add_sorted): New function.
+	(paircmp): New comparison functor.
+	(map): Use paircmp, we want to compare the vectors' contents,
+	not their addresses.
+	* src/ltlast/multop.cc (add_sorted): New function.
+	(add): Use it.
+	* src/ltltest/equals.cc, src/ltltest/tostring.cc: Compare
+	pointers instead of calling equal.
+	* src/ltlvisit/equals.cc, src/ltlvisit/equals.hh: Delete.
+	* src/ltlvisit/Makefile.am (libltlvisit_la_SOURCES): Remove
+	equals.cc and equals.hh.
+	* wrap/spot.i: Do not include equals.hh.
+
 2003-05-15  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	Implements spot::ltl::destroy() and exercise it.

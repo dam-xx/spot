@@ -1,6 +1,5 @@
 #include <iostream>
 #include "ltlparse/public.hh"
-#include "ltlvisit/equals.hh"
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/tunabbrev.hh"
 #include "ltlvisit/dump.hh"
@@ -62,12 +61,10 @@ main(int argc, char** argv)
   std::cout << std::endl;
 #endif
 
-  int exit_code = !equals(f1, f2);
+  int exit_code = f1 != f2;
 
   spot::ltl::destroy(f1);
-  std::cout << spot::ltl::atomic_prop::instance_count() << std::endl;
   spot::ltl::destroy(f2);
-  std::cout << spot::ltl::atomic_prop::instance_count() << std::endl;
   assert(spot::ltl::atomic_prop::instance_count() == 0);
   assert(spot::ltl::unop::instance_count() == 0);
   assert(spot::ltl::binop::instance_count() == 0);

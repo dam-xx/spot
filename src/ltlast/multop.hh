@@ -65,14 +65,28 @@ namespace spot
       static unsigned instance_count();
 
     protected:
+      // Sorted list of formulae.  (Sorted by pointer comparison.)
       typedef std::vector<formula*> vec;
+
+
       typedef std::pair<type, vec*> pair;
-      typedef std::map<pair, formula*> map;
+      struct paircmp
+      {
+	bool
+	operator () (const pair& p1, const pair& p2) const
+	{
+	  if (p1.first != p2.first)
+	    return p1.first < p2.first;
+	  return *p1.second < *p2.second;
+	}
+      };
+      typedef std::map<pair, formula*, paircmp> map;
       static map instances;
 
       multop(type op, vec* v);
       static multop* instance(type op, vec* v);
       static vec* multop::add(type op, vec* v, formula* f);
+      static void multop::add_sorted(vec* v, formula* f);
 
       virtual ~multop();
 

@@ -1,7 +1,6 @@
 #include <iostream>
 #include "ltlparse/public.hh"
 #include "ltlvisit/tostring.hh"
-#include "ltlvisit/equals.hh"
 #include "ltlvisit/destroy.hh"
 #include "ltlast/allnodes.hh"
 
@@ -37,7 +36,7 @@ main(int argc, char **argv)
 
   // This second abstract tree should be equal to the first.
 
-  if (! equals(f1, f2))
+  if (f1 != f2)
     return 1;
 
   // It should also map to the same string.

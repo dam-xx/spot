@@ -13,8 +13,6 @@ libltlvisit_la_SOURCES = \
   dump.hh \
   tostring.cc \
   tostring.hh \
-  equals.cc \
-  equals.hh \
   lunabbrev.hh \
   lunabbrev.cc \
   nenoform.hh \

@@ -2,6 +2,7 @@
 #include <utility>
 #include "multop.hh"
 #include "visitor.hh"
+#include "ltlvisit/destroy.hh"
 
 namespace spot
 {
@@ -107,6 +108,27 @@ namespace spot
       return instance(op, v);
     }
 
+    void
+    multop::add_sorted(vec* v, formula* f)
+    {
+      // Keep V sorted.  When adding a new multop, iterate over all
+      // element until we find either an identicalle element, or the
+      // place where the new one should be inserted.
+      vec::iterator i;
+      for (i = v->begin(); i != v->end(); ++i)
+	{
+	  if (*i > f)
+	    break;
+	  if (*i == f)
+	    {
+	      // F is arleady a child.  Drop it.
+	      destroy(f);
+	      return;
+	    }
+	}
+      v->insert(i, f);
+    }
+
     multop::vec*
     multop::add(type op, vec* v, formula* f)
     {
@@ -117,13 +139,15 @@ namespace spot
 	{
 	  unsigned ps = p->size();
 	  for (unsigned i = 0; i < ps; ++i)
-	    v->push_back(p->nth(i));
-	  // that sub-formula is now useless
+	    add_sorted(v, p->nth(i));
+	  // That sub-formula is now useless, drop it.
+	  // Note that we use unref(), not destroy(), because we've
+	  // adopted its children and don't want to destroy these.
 	  formula::unref(f);
 	}
       else
 	{
-	  v->push_back(f);
+	  add_sorted(v, f);
 	}
       return v;
     }
