@@ -1,5 +1,7 @@
 2004-01-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/TestOperations.cc: Include sys/wait.h.
+
 	* src/Alloc.h: Rename as ...
 	* src/ObstackAlloc.h: ... this.  The problem is that alloc.h is a
 	system header in g++ < 3.0, and Darwin has a case-insensitive
