@@ -64,7 +64,7 @@ int initial_state (pState M0);
 
    NB : the vector "truth" is allocated in this function
 */
-int satisfy (const State s, const AtomicProp  props [],  
+int satisfy (const State s, const AtomicProp  props [],
 	     unsigned char ** truth, size_t props_size);
 
 /* free the "truth" vector allocated by satisfy
@@ -89,7 +89,7 @@ int satisfy_free (unsigned char * truth);
    NB : "succ" vector is allocated in the function, use succ_free for
    memory release
 */
-int succ (const State s, 
+int succ (const State s,
 	  const AtomicProp  enabled_events [], size_t enabled_events_size,
 	  EventPropSucc ** succ, size_t * succ_size);
 
