@@ -20,7 +20,7 @@
 # 02111-1307, USA.
 
 AC_PREREQ([2.59])
-AC_INIT([spot], [0.0w])
+AC_INIT([spot], [0.0x])
 AC_CONFIG_AUX_DIR([tools])
 AM_INIT_AUTOMAKE([gnits nostdinc 1.8])
 

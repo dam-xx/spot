@@ -1,4 +1,12 @@
-New in spot 0.0w:
+New in spot 0.0x (2004-08-13):
+
+  * New atomic_prop_collect() function: collect atomic propositions
+    in an LTL formula.
+  * Fix several typos in documentation, and some warnings in the code.
+  * Now compiles on Darwin and Cygwin.
+  * Upgrade to Automake 1.9.1, and lbtt 1.1.2.
+    (And drop support for older lbtt versions.)
+  * Support newer versions of Valgrind (>= 2.1.0).
 
 New in spot 0.0v (2004-06-29):
 
