@@ -1,3 +1,8 @@
+2004-04-21  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* wrap/python/spot.i: Process tgbaalgos/neverclaim.hh.
+	* wrap/python/cgi/ltl2tgba.in: Display the never claim on demand.
+
 2004-04-21  Denis Poitrenaud  <dp@src.lip6.fr>
 
 	* src/ltlvisit/tostring.hh (to_spin_string): New function.

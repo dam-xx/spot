@@ -78,6 +78,7 @@
 #include "tgbaalgos/dupexp.hh"
 #include "tgbaalgos/lbtt.hh"
 #include "tgbaalgos/magic.hh"
+#include "tgbaalgos/neverclaim.hh"
 #include "tgbaalgos/save.hh"
 #include "tgbaalgos/stats.hh"
 
@@ -141,6 +142,7 @@ using namespace spot;
 %include "tgbaalgos/dupexp.hh"
 %include "tgbaalgos/lbtt.hh"
 %include "tgbaalgos/magic.hh"
+%include "tgbaalgos/neverclaim.hh"
 %include "tgbaalgos/save.hh"
 %include "tgbaalgos/stats.hh"
 #undef ltl

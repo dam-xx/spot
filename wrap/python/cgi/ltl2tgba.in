@@ -199,6 +199,7 @@ options = [(
     ('show_formula_png',    'draw the formula',                            0),
     ('show_automaton_png',  'draw Büchi automaton',                        1),
     ('show_degen_png',      'draw degeneralized Büchi automaton',          0),
+    ('show_never_claim',    'output Spin never claim',                     0),
     ('show_lbtt',           'convert automaton for LBTT',                  0),
     ]), (
     'Debugging options', 0, '', [
@@ -411,13 +412,22 @@ dont_run_dot = print_stats(automaton)
 if show_automaton_png:
     render_automaton(imgprefix + '-a', automaton, dont_run_dot)
 
-if show_degen_png:
-    print '<H3>Degeneralized automaton</H3>'
+if show_degen_png or show_never_claim:
     degen = spot.tgba_tba_proxy(automaton)
-    dont_run_dot = print_stats(degen)
-    render_automaton(imgprefix + '-d', degen, dont_run_dot)
 else:
     degen = 0
+
+if show_degen_png:
+    print '<H3>Degeneralized automaton</H3>'
+    dont_run_dot = print_stats(degen)
+    render_automaton(imgprefix + '-d', degen, dont_run_dot)
+
+if show_never_claim:
+    print '<H3>Never claim (for degeneralized automaton)</H3>'
+    print '<PRE>'
+    spot.never_claim_reachable(spot.get_cout(), degen)
+    print '</PRE>'
+    sys.stdout.flush()
 
 if show_dictionnay:
     print '<H3>BDD dictionary</H3>'
