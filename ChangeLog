@@ -1,3 +1,21 @@
+2004-12-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlparse/ltlscan.ll: Pass yyleng to the std::string constructor,
+	so it doesn't have to compute it.
+	* src/tgbaparse/tgbascan.ll: Likewise.
+	(YY_USER_INIT, current_file): Remove, it is too costly to use
+	yy::Location::filename in the current implementation
+	of yy::Location (this attribute is duplicated for each token).
+	Leaving it empty divides the parsing time by 3.
+	* src/tgbaparse/fmterror.cc, src/tgbaparse/public.hh
+	(format_tgba_parse_errors): Take the filename as argument.
+	* src/tgbatest/explprod.cc, src/tgbatest/ltl2tgba.cc,
+	src/tgbatest/mixprod.cc, src/tgbatest/powerset.cc,
+	src/tgbatest/readsave.cc, src/tgbatest/reductgba.cc,
+	src/tgbatest/tgbaread.cc, src/tgbatest/tripprod.cc,
+	iface/gspn/dottyssp.cc, iface/gspn/ltlgspn.cc: Adjust calls
+	to format_tgba_parse_errors.
+
 2004-12-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaparse/tgbaparse.yy: Cache parsed formulae to speedup

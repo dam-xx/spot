@@ -106,7 +106,7 @@ main(int argc, char** argv)
 #ifdef REDUCCMP
   spot::tgba_parse_error_list pel;
   automata = spot::tgba_parse(argv[2], pel, dict, env, false);
-  if (spot::format_tgba_parse_errors(std::cerr, pel))
+  if (spot::format_tgba_parse_errors(std::cerr, argv[2], pel))
     return 2;
 #else
   spot::ltl::parse_error_list p1;

@@ -60,7 +60,7 @@ main(int argc, char** argv)
 					    pel, dict, env, debug);
 
   exit_code =
-    spot::format_tgba_parse_errors(std::cerr, pel);
+    spot::format_tgba_parse_errors(std::cerr, argv[filename_index], pel);
 
   if (a)
     {

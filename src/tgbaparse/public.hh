@@ -69,6 +69,7 @@ namespace spot
   ///        parsing \a ltl_string.
   /// \return \c true iff any diagnostic was output.
   bool format_tgba_parse_errors(std::ostream& os,
+				const std::string& filename,
 				tgba_parse_error_list& error_list);
 
   /// @}

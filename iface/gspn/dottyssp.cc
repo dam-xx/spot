@@ -46,7 +46,7 @@ main(int argc, char **argv)
       spot::tgba_parse_error_list pel1;
       spot::tgba_explicit* control = spot::tgba_parse(argv[--argc], pel1,
 						      dict, env);
-      if (spot::format_tgba_parse_errors(std::cerr, pel1))
+      if (spot::format_tgba_parse_errors(std::cerr, argv[argc], pel1))
 	return 2;
 
       spot::tgba* a = gspn.automaton(control);

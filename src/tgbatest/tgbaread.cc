@@ -57,7 +57,7 @@ main(int argc, char** argv)
   spot::tgba_explicit* a = spot::tgba_parse(argv[filename_index],
 					    pel, dict, env, debug);
 
-  if (spot::format_tgba_parse_errors(std::cerr, pel))
+  if (spot::format_tgba_parse_errors(std::cerr, argv[filename_index], pel))
     return 2;
 
   if (a)

@@ -280,7 +280,8 @@ main(int argc, char** argv)
 	  spot::tgba_parse_error_list pel;
 	  system = spot::tgba_parse(argv[formula_index] + 2,
 				     pel, dict, env, debug_opt);
-	  if (spot::format_tgba_parse_errors(std::cerr, pel))
+	  if (spot::format_tgba_parse_errors(std::cerr,
+					     argv[formula_index] + 2, pel))
 	    return 2;
 	  system->merge_transitions();
 	  std::clog << argv[formula_index] + 2 << " read" << std::endl;
@@ -528,7 +529,7 @@ main(int argc, char** argv)
 	  spot::tgba_parse_error_list pel;
 	  spot::tgba_explicit* e;
 	  to_free = a = e = spot::tgba_parse(input, pel, dict, env, debug_opt);
-	  if (spot::format_tgba_parse_errors(std::cerr, pel))
+	  if (spot::format_tgba_parse_errors(std::cerr, input, pel))
 	    {
 	      delete to_free;
 	      delete dict;

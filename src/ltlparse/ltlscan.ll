@@ -116,7 +116,7 @@ flex_set_buffer(const char* buf)
   */
 <not_prop>[a-zA-EH-QSTWYZ_][a-zA-EH-WYZ0-9_]* |
 <not_prop>[a-zA-EH-QSTWYZ_][a-zA-EH-WYZ0-9_][a-zA-Z0-9_]* {
-			  yylval->str = new std::string(yytext);
+			  yylval->str = new std::string(yytext, yyleng);
 			  BEGIN(not_prop);
 			  return ATOMIC_PROP;
 			}

@@ -1,4 +1,4 @@
-/* Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -31,15 +31,7 @@
 #define YY_USER_ACTION \
   yylloc->columns(yyleng);
 
-#define YY_USER_INIT                            \
-  do {                                          \
-    yylloc->begin.filename = current_file;      \
-    yylloc->end.filename = current_file;        \
-  } while (0)
-
 #define YY_NEVER_INTERACTIVE 1
-
-static std::string current_file;
 
 %}
 
@@ -54,7 +46,7 @@ eol      \n|\r|\n\r|\r\n
 acc[ \t]*=		return ACC_DEF;
 
 [a-zA-Z][a-zA-Z0-9_]*   {
-			  yylval->str = new std::string(yytext);
+			  yylval->str = new std::string(yytext, yyleng);
 	                  return IDENT;
 		        }
 
@@ -76,7 +68,7 @@ acc[ \t]*=		return ACC_DEF;
 			  return STRING;
                         }
   \\["\\]               yylval->str->append(1, yytext[1]);
-  [^"\\]+               yylval->str->append (yytext, yyleng);
+  [^"\\]+               yylval->str->append(yytext, yyleng);
   <<EOF>>		{
   			  BEGIN(INITIAL);
 			  return UNTERMINATED_STRING;
@@ -98,12 +90,10 @@ namespace spot
     if (name == "-")
       {
         yyin = stdin;
-        current_file = "standard input";
       }
     else
       {
-        yyin = fopen (name.c_str (), "r");
-        current_file = name;
+        yyin = fopen(name.c_str(), "r");
         if (!yyin)
 	  return 1;
       }
