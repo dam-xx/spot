@@ -77,14 +77,14 @@ namespace spot
   }
 
   /////////////////////////////////////////////////////////////////////////////
-  // The base interface for build a emptyness search algorithm
-  class emptyness_search
+  // The base interface to build an emptiness check algorithm
+  class emptiness_search
   {
   protected:
-    emptyness_search();
+    emptiness_search();
 
   public:
-    virtual ~emptyness_search();
+    virtual ~emptiness_search();
     virtual ce::counter_example* check() = 0;
     /// \brief Print Stat.
     virtual std::ostream& print_stat(std::ostream& os) const;
@@ -93,7 +93,7 @@ namespace spot
   /////////////////////////////////////////////////////////////////////////////
   // Perform a minimal search
 
-  class minimalce_search: public emptyness_search
+  class minimalce_search: public emptiness_search
   {
   public:
     //minimalce_search(const tgba_tba_proxy *a, bool mode = false);

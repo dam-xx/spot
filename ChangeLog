@@ -1,5 +1,10 @@
 2004-09-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/colordfs.hh, src/tgbaalgos/minimalce.cc,
+	src/tgbaalgos/minimalce.hh, src/tgbaalgos/nesteddfs.hh,
+	src/tgbaalgos/tarjan_on_fly.hh, src/tgbatest/ltl2tgba.cc: Rename
+	emptyness_search to emptiness_search.
+
 	* src/sanity/style.test: Warn about places where size() is used
 	instead of empty().
 	* src/misc/bddalloc.cc (bdd_allocator::extend): Use empty() rather

@@ -33,7 +33,7 @@
 namespace spot
 {
 
-  class tarjan_on_fly: public emptyness_search
+  class tarjan_on_fly: public emptiness_search
   {
 
   public:

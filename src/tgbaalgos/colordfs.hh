@@ -31,7 +31,7 @@
 
 namespace spot
 {
-  class colordfs_search: public emptyness_search
+  class colordfs_search: public emptiness_search
   {
   public:
     /// Initialize the Colordfs Search algorithm on the automaton \a a.

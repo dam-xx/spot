@@ -180,7 +180,7 @@ main(int argc, char** argv)
 	 NestedDFSSearch, NestedDFSSearchModify, ColorDFSSearch,
 	 TarjanOnFly, MinimalSearch, MinimalSearchIterative,
 	 NestedGeneSearch} echeck = None;
-  spot::emptyness_search* es = 0;
+  spot::emptiness_search* es = 0;
   spot::search_opt opt_nested_search = spot::magic;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
   bool magic_many = false;

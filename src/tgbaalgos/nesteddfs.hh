@@ -41,7 +41,7 @@ namespace spot
     };
   */
 
-  class nesteddfs_search: public emptyness_search
+  class nesteddfs_search: public emptiness_search
   {
 
   public:

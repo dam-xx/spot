@@ -191,12 +191,12 @@ namespace spot
   }
 
   /////////////////////////////////////////////////////////////////////////////
-  // The base interface for build a emptyness search algorithm
-  emptyness_search::emptyness_search()
+  // The base interface for build a emptiness search algorithm
+  emptiness_search::emptiness_search()
   {
   }
 
-  emptyness_search::~emptyness_search()
+  emptiness_search::~emptiness_search()
   {
   }
 
@@ -215,7 +215,7 @@ namespace spot
   */
 
   std::ostream&
-  emptyness_search::print_stat(std::ostream& os) const
+  emptiness_search::print_stat(std::ostream& os) const
   {
     return os;
   }
