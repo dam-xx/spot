@@ -253,63 +253,64 @@ namespace spot
   void
   emptiness_check::counter_example()
   {
-    std::deque <pair_state_iter> todo_trace;
-    typedef std::map<const state*, const state*,
-                     state_ptr_less_than> path_state;
-    path_state path_map;
-
     assert(!root.empty());
 
     int comp_size = root.size();
-    typedef std::vector<connected_component> vec_compo;
-    vec_compo vec_component(comp_size);
-    std::vector<state_sequence> vec_sequence(comp_size);
+    // Transform the stack of connected component into an array.
+    connected_component* scc = new connected_component[comp_size];
+    for (int j = comp_size - 1; 0 <= j; --j)
+      {
+	scc[j] = root.top();
+	root.pop();
+      }
+    assert(root.empty());
+
+    // Build the set of states for all SCCs.
+    for (hash_type::iterator i = h.begin(); i != h.end(); ++i)
+      {
+	int index = i->second;
+	// Skip states from dead SCCs.
+	if (index < 0)
+	  continue;
+	assert(index != 0);
+
+	// Find the SCC this state belongs to.
+	int j;
+	for (j = 1; j < comp_size; ++j)
+	  if (index < scc[j].index)
+	    break;
+	scc[j - 1].state_set.insert(i->first);
+      }
+
+    // seqs[i] is a sequence between SCC i and SCC i+1.
+    state_sequence* seqs = new state_sequence[comp_size - 1];
+    // FIFO for the breadth-first search.
+    std::deque<pair_state_iter> todo;
+
+    // Record the father of each state, while performing the BFS.
+    typedef std::map<const state*, const state*,
+                     state_ptr_less_than> father_map;
+    father_map father;
+
     state_sequence seq;
     state_sequence tmp_lst;
     state_sequence best_lst;
     bdd tmp_acc = bddfalse;
-    std::stack<pair_state_iter> todo_accept;
-
-    for (int j = comp_size - 1; j >= 0; j--)
-      {
-	vec_component[j] = root.top();
-	root.pop();
-      }
-
-    int q_index;
-    int tmp_int = 0;
-    // Fill the SCC in the stack root.
-    for (hash_type::iterator iter_map = h.begin();
-	 iter_map != h.end(); ++iter_map)
-      {
-	q_index = iter_map->second;
-	tmp_int = 0;
-	if (q_index > 0)
-	  {
-	    while ((tmp_int < comp_size)
-		   && (vec_component[tmp_int].index <= q_index))
-	      tmp_int = tmp_int+1;
-	    if (tmp_int < comp_size)
-	      vec_component[tmp_int - 1].state_set.insert(iter_map->first);
-	    else
-	      vec_component[comp_size - 1].state_set.insert(iter_map->first);
-	  }
-      }
 
     state* start_state = aut_->get_init_state();
     if (comp_size != 1)
       {
 	tgba_succ_iterator* i = aut_->succ_iter(start_state);
-	todo_trace.push_back(pair_state_iter(start_state, i));
+	todo.push_back(pair_state_iter(start_state, i));
 
 	for (int k = 0; k < comp_size - 1; ++k)
 	  {
 	    // We build a path trought all SCC in the stack: a
 	    // possible prefix for a counter example.
-	    while (!todo_trace.empty())
+	    while (!todo.empty())
 	      {
-		pair_state_iter started_from = todo_trace.front();
-		todo_trace.pop_front();
+		pair_state_iter started_from = todo.front();
+		todo.pop_front();
 
 		for (started_from.second->first();
 		     !started_from.second->done();
@@ -317,53 +318,53 @@ namespace spot
 		  {
 		    const state* curr_state =
 		      started_from.second->current_state();
-		    if (vec_component[k+1].has_state(curr_state))
+		    if (scc[k+1].has_state(curr_state))
 		      {
 			const state* curr_father = started_from.first;
 			seq.push_front(curr_state);
 			seq.push_front(curr_father);
 			hash_type::iterator i_2 = h.find(curr_father);
 			assert(i_2 != h.end());
-			while (vec_component[k].index < i_2->second)
+			while (scc[k].index < i_2->second)
 			  {
 			    assert(i_2->second != 1);
-			    assert(path_map.find(curr_father)
-				   != path_map.end());
-			    const state* f = path_map[curr_father];
+			    assert(father.find(curr_father) != father.end());
+			    const state* f = father[curr_father];
 			    seq.push_front(f);
 			    curr_father = f;
 			    i_2 = h.find(curr_father);
 			    assert(i_2 != h.end());
 			  }
-			vec_sequence[k] = seq;
+			seqs[k] = seq;
 			seq.clear();
-			todo_trace.clear();
+			todo.clear();
 			break;
 		      }
 		    else
 		      {
-			if (vec_component[k].has_state(curr_state))
+			if (scc[k].has_state(curr_state))
 			  {
-			    path_state::iterator i_path =
-			      path_map.find(curr_state);
+			    father_map::iterator i_path =
+			      father.find(curr_state);
 			    hash_type::iterator i_seen = h.find(curr_state);
 
 			    if (i_seen != h.end()
 				&& i_seen->second > 0
-				&& i_path == path_map.end())
+				&& i_path == father.end())
 			      {
-				todo_trace.
+				todo.
 				  push_back(pair_state_iter(curr_state,
 							    aut_->succ_iter(curr_state)));
-				path_map[curr_state] = started_from.first;
+				father[curr_state] = started_from.first;
 			      }
 			  }
 		      }
 		  }
 	      }
-	    todo_trace.
-	      push_back(pair_state_iter(vec_sequence[k].back(),
-					aut_->succ_iter(vec_sequence[k].back())));
+	    assert(!seqs[k].empty());
+	    todo.
+	      push_back(pair_state_iter(seqs[k].back(),
+					aut_->succ_iter(seqs[k].back())));
 	  }
       }
     else
@@ -371,12 +372,15 @@ namespace spot
 	suffix.push_front(start_state);
       }
     for (int n_ = 0; n_ < comp_size - 1; ++n_)
-      for (state_sequence::iterator it = vec_sequence[n_].begin();
-	   it != vec_sequence[n_].end(); ++it)
+      for (state_sequence::iterator it = seqs[n_].begin();
+	   it != seqs[n_].end(); ++it)
 	suffix.push_back(*it);
     suffix.unique();
-    accepting_path(vec_component[comp_size - 1], suffix.back(),
-		   vec_component[comp_size - 1].condition);
+    accepting_path(scc[comp_size - 1], suffix.back(),
+		   scc[comp_size - 1].condition);
+
+    delete[] scc;
+    delete[] seqs;
   }
 
   void
