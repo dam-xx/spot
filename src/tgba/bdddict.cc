@@ -19,10 +19,11 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+#include <ostream>
+#include <cassert>
 #include <ltlvisit/clone.hh>
 #include <ltlvisit/destroy.hh>
 #include <ltlvisit/tostring.hh>
-#include <cassert>
 #include "bdddict.hh"
 
 namespace spot

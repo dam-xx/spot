@@ -22,7 +22,7 @@
 #ifndef SPOT_TGBAALGOS_NEVERCLAIM_HH
 # define SPOT_TGBAALGOS_NEVERCLAIM_HH
 
-#include <iostream>
+#include <iosfwd>
 #include "ltlast/formula.hh"
 #include "tgba/tgbatba.hh"
 

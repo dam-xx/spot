@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -22,7 +22,7 @@
 #include "dump.hh"
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
-
+#include <ostream>
 
 namespace spot
 {
@@ -32,7 +32,7 @@ namespace spot
     class dump_visitor : public const_visitor
     {
     public:
-      dump_visitor(std::ostream& os = std::cout)
+      dump_visitor(std::ostream& os)
 	: os_(os)
       {
       }
@@ -80,7 +80,7 @@ namespace spot
 	mo->nth(0)->accept(*this);
 	for (unsigned n = 1; n < max; ++n)
 	  {
-	    std::cout << ", ";
+	    os_ << ", ";
 	    mo->nth(n)->accept(*this);
 	  }
 	os_ << ")";

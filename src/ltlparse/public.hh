@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -28,7 +28,7 @@
 # include <string>
 # include <list>
 # include <utility>
-# include <iostream>
+# include <iosfwd>
 
 namespace spot
 {
@@ -38,6 +38,7 @@ namespace spot
     typedef std::pair<yy::Location, std::string> parse_error;
     /// \brief A list of parser diagnostics, as filled by parse.
     typedef std::list<parse_error> parse_error_list;
+
 
     /// \brief Build a formula from an LTL string.
     /// \param ltl_string The string to parse.
@@ -58,7 +59,6 @@ namespace spot
 		   parse_error_list& error_list,
 		   environment& env = default_environment::instance(),
 		   bool debug = false);
-
 
     /// \brief Format diagnostics produced by spot::ltl::parse.
     /// \param os Where diagnostics should be output.

@@ -20,6 +20,7 @@
 // 02111-1307, USA.
 
 #include <sstream>
+#include <ostream>
 #include "escape.hh"
 
 namespace spot

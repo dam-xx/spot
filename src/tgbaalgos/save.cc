@@ -19,7 +19,7 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include "tgba/tgba.hh"
+#include <ostream>
 #include "save.hh"
 #include "tgba/bddprint.hh"
 #include "ltlvisit/tostring.hh"

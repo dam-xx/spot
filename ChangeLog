@@ -1,5 +1,22 @@
 2004-08-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/common.cc, iface/gspn/common.hh,
+	src/ltlast/atomic_prop.cc, src/ltlast/atomic_prop.hh,
+	src/ltlparse/fmterror.cc, src/ltlparse/public.hh,
+	src/ltlvisit/dotty.cc, src/ltlvisit/dotty.hh,
+	src/ltlvisit/dump.cc, src/ltlvisit/dump.hh,
+	src/ltlvisit/tostring.cc, src/ltlvisit/tostring.hh,
+	src/misc/escape.cc, src/misc/escape.hh, src/tgba/bdddict.cc,
+	src/tgba/bdddict.hh, src/tgba/bddprint.cc, src/tgba/bddprint.hh,
+	src/tgbaalgos/dotty.cc, src/tgbaalgos/dotty.hh,
+	src/tgbaalgos/lbtt.cc, src/tgbaalgos/lbtt.hh,
+	src/tgbaalgos/neverclaim.cc, src/tgbaalgos/neverclaim.hh,
+	src/tgbaalgos/save.cc, src/tgbaalgos/save.hh,
+	src/tgbaalgos/gtec/status.cc, src/tgbaalgos/gtec/status.hh,
+	src/tgbaparse/fmterror.cc, src/tgbaparse/public.hh: Include <iosfwd>
+	in headers, and prefer <ostream> in the body whenever possible.
+	* src/sanity/style.test, HACKING: Check and document this.
+
 	* src/ltlast/allnodes.hh, src/ltlast/atomic_prop.hh,
 	src/ltlast/binop.hh, src/ltlast/constant.hh,
 	src/ltlast/formula.hh, src/ltlast/multop.hh,

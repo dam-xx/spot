@@ -22,6 +22,7 @@
 #include <cassert>
 #include <sstream>
 #include <ctype.h>
+#include <ostream>
 #include "tostring.hh"
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
@@ -56,7 +57,7 @@ namespace spot
     class to_string_visitor : public const_visitor
     {
     public:
-      to_string_visitor(std::ostream& os = std::cout)
+      to_string_visitor(std::ostream& os)
 	: os_(os), top_level_(true)
       {
       }
@@ -203,7 +204,7 @@ namespace spot
     class to_spin_string_visitor : public to_string_visitor
     {
     public:
-    to_spin_string_visitor(std::ostream& os = std::cout)
+    to_spin_string_visitor(std::ostream& os)
       : to_string_visitor(os)
       {
       }

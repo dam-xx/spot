@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -20,13 +20,14 @@
 // 02111-1307, USA.
 
 #include "public.hh"
+#include <ostream>
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
 
-    bool 
+    bool
     format_parse_errors(std::ostream& os,
 			const std::string& ltl_string,
 			parse_error_list& error_list)

@@ -1,3 +1,4 @@
+
 #! /bin/sh
 
 # Ensure consistent style by catching common improper constructs.
@@ -113,8 +114,20 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
     grep -e 'return[	 ]*[(][^(]*[)];' $tmp &&
       diag 'No useless parentheses after return.'
 
-    grep  'NULL' $tmp &&
+    grep 'NULL' $tmp &&
       diag 'Use 0 instead of NULL.  NULL is not portable.'
+
+    case $file in
+      *.hh | *.hxx)
+        if grep -e '(cout|cerr|clog)' $tmp >/dev/null; then
+          :
+	else
+          grep '#.*include.*<iostream>' $tmp &&
+            diag 'Avoid <iostream> in headers, better use <iosfwd>.'
+        fi
+        ;;
+    esac
+
 
     $fail && echo "$file" >>failures
   done

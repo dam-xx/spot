@@ -23,7 +23,7 @@
 # define SPOT_TGBA_BDDPRINT_HH
 
 #include <string>
-#include <iostream>
+#include <iosfwd>
 #include "bdddict.hh"
 #include <bdd.h>
 

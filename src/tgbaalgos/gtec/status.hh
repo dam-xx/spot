@@ -25,7 +25,7 @@
 #include "sccstack.hh"
 #include "nsheap.hh"
 #include "tgba/tgba.hh"
-#include <iostream>
+#include <iosfwd>
 
 namespace spot
 {

@@ -25,7 +25,7 @@
 #include "misc/hash.hh"
 #include <list>
 #include <set>
-#include <iostream>
+#include <iosfwd>
 #include <bdd.h>
 #include "ltlast/formula.hh"
 #include "misc/bddalloc.hh"

@@ -22,7 +22,7 @@
 #ifndef SPOT_MISC_ESCAPE_HH
 # define SPOT_MISC_ESCAPE_HH
 
-# include <iostream>
+# include <iosfwd>
 # include <string>
 
 namespace spot

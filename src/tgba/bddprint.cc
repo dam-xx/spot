@@ -21,6 +21,7 @@
 
 #include <sstream>
 #include <cassert>
+#include <ostream>
 #include "bddprint.hh"
 #include "ltlvisit/tostring.hh"
 #include "formula2bdd.hh"

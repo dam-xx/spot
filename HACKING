@@ -243,3 +243,8 @@ Other style recommandations
 
   * Do not systematically initialise local variables with 0 or other
     meaningless values.  This hides errors to valgrind.
+
+  * Avoid <iostream>, <ostream>, etc. in headers whenever possible.
+    Prefer <iosfwd> when predeclarations are sufficient, and then
+    use for instance use just <ostream> in the corresponding .cc file.
+    (A plain <iostream> is needed when using std::cout, std::cerr, etc.)

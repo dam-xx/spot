@@ -22,8 +22,8 @@
 #include "lbtt.hh"
 #include <map>
 #include <string>
+#include <ostream>
 #include <sstream>
-#include <functional>
 #include "tgba/bddprint.hh"
 #include "reachiter.hh"
 #include "misc/bddlt.hh"

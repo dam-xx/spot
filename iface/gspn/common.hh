@@ -23,7 +23,7 @@
 # define SPOT_IFACE_GSPN_COMMON_HH
 
 # include <string>
-# include <iostream>
+# include <iosfwd>
 
 // Do not include gspnlib.h here, or it will polute the user's
 // namespace with internal C symbols.

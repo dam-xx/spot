@@ -25,7 +25,7 @@
 # define SPOT_LTLAST_ATOMIC_PROP_HH
 
 #include <string>
-#include <iostream>
+#include <iosfwd>
 #include <map>
 #include "refformula.hh"
 #include "ltlenv/environment.hh"

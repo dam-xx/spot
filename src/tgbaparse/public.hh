@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -28,7 +28,7 @@
 # include <string>
 # include <list>
 # include <utility>
-# include <iostream>
+# include <iosfwd>
 
 namespace spot
 {

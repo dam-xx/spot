@@ -23,7 +23,7 @@
 # define SPOT_TGBAALGOS_LBTT_HH
 
 #include "tgba/tgba.hh"
-#include <iostream>
+#include <iosfwd>
 
 namespace spot
 {

@@ -20,7 +20,7 @@
 // 02111-1307, USA.
 
 #include "common.hh"
-#include "ltlvisit/destroy.hh"
+#include <ostream>
 
 namespace spot
 {
