@@ -476,6 +476,7 @@ namespace spot
 	// Translate it into a BDD to simplify it.
 	f->accept(v);
 	bdd res = v.result();
+	canonical_succ[res] = f;
 
 	std::string now = to_string(f);
 
