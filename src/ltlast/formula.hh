@@ -22,9 +22,19 @@ namespace spot
       /// Entry point for vspot::ltl::const_visitor instances.
       virtual void accept(const_visitor& v) const = 0;
 
-      /// \brief clone this formula
+      /// \brief clone this node
+      ///
+      /// This increments the reference counter of this node (if one is
+      /// used).  You should almost never use this method directly as
+      /// it doesn't touch the children.  If you want to clone a
+      /// whole formula, use spot::ltl::clone() instead.
       formula* ref();
-      /// \brief release formula
+      /// \brief release this node
+      ///
+      /// This decrements the reference counter of this node (if one is
+      /// used) and can free the object.  You should almost never use
+      /// this method directly as it doesn't touch the children.  If you
+      /// want to release a whole formula, use spot::ltl::destroy() instead.
       static void unref(formula* f);
 
     protected:
