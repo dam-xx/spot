@@ -1,5 +1,8 @@
 2004-10-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/misc/bareword.hh, src/misc/bareword.cc (quote_unless_bare_word):
+	New function.
+
 	* src/ltlvisit/tostring.cc (to_spin_string_visitor): Move to
 	anonymous namespace.
 

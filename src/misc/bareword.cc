@@ -21,6 +21,7 @@
 
 #include "bareword.hh"
 #include <ctype.h>
+#include "escape.hh"
 
 namespace spot
 {
@@ -37,4 +38,14 @@ namespace spot
 	return false;
     return true;
   }
+
+  std::string
+  quote_unless_bare_word(const std::string& str)
+  {
+    if (is_bare_word(str.c_str()))
+      return str;
+    else
+      return "\"" + escape_str(str) + "\"";
+  }
+
 }

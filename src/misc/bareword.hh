@@ -19,7 +19,11 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+#include <string>
+
 namespace spot
 {
   bool is_bare_word(const char* str);
+
+  std::string quote_unless_bare_word(const std::string& str);
 }
