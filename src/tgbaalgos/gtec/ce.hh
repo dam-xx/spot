@@ -25,8 +25,6 @@
 #include "status.hh"
 #include "explscc.hh"
 
-#include "tgbaalgos/minimalce.hh"
-
 namespace spot
 {
   /// Compute a counter example from a spot::emptiness_check_status
@@ -53,8 +51,6 @@ namespace spot
     /// Output statistics about this object.
     void print_stats(std::ostream& os) const;
 
-    ce::counter_example* get_counter_example() const;
-
   protected:
     /// Called by counter_example to find a path which traverses all
     /// acceptance conditions in the accepted SCC.
@@ -68,7 +64,6 @@ namespace spot
 
   private:
     const emptiness_check_status* ecs_;
-    ce::counter_example* counter_;
   };
 }
 

@@ -64,8 +64,6 @@ tripprod_SOURCES = tripprod.cc
 # Keep this sorted by STRENGTH.  Test basic things first,
 # because such failures will be easier to diagnose and fix.
 TESTS = \
-  reduccmp.test \
-  reductgba.test \
   explicit.test \
   tgbaread.test \
   readsave.test \
@@ -79,6 +77,8 @@ TESTS = \
   tripprod.test \
   mixprod.test \
   dupexp.test \
+  reduccmp.test \
+  reductgba.test \
   emptchk.test \
   emptchke.test \
   spotlbtt.test

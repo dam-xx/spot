@@ -36,11 +36,6 @@
 #include "tgbaalgos/lbtt.hh"
 #include "tgba/tgbatba.hh"
 #include "tgbaalgos/magic.hh"
-#include "tgbaalgos/nesteddfs.hh"
-#include "tgbaalgos/nesteddfsgen.hh"
-#include "tgbaalgos/colordfs.hh"
-#include "tgbaalgos/tarjan_on_fly.hh"
-//#include "tgbaalgos/minimalce.hh"
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/gtec/ce.hh"
 #include "tgbaparse/public.hh"
@@ -60,10 +55,6 @@ syntax(char* prog)
 	    << "reachability graph"
 	    << std::endl
 	    << "  -A    same as -a, but as a set" << std::endl
-	    << "  -c    color-search (implies -D), expect a counter-example"
-	    << std::endl
-	    << "  -C    color-search (implies -D), expect no counter-example"
-	    << std::endl
 	    << "  -d    turn on traces during parsing" << std::endl
 	    << "  -D    degeneralize the automaton" << std::endl
 	    << "  -e    emptiness-check (Couvreur), expect and compute "
@@ -80,38 +71,12 @@ syntax(char* prog)
             << "  -L    fair-loop approximation (implies -f)" << std::endl
 	    << "  -m    magic-search (implies -D), expect a counter-example"
 	    << std::endl
-	    << "  -ms   minmimal-search (implies -D), expect a counter-example"
-	    << std::endl
-	    << "  -msit minmimal-search (implies -D), expect a counter-example"
-	    << std::endl
-	    << "  -mold magic-search (implies -D), expect a counter-example"
-	    << std::endl
 	    << "  -M    magic-search (implies -D), expect no counter-example"
-	    << std::endl
-	    << "  -Mold magic-search (implies -D), expect no counter-example"
 	    << std::endl
 	    << "  -n    same as -m, but display more counter-examples"
 	    << std::endl
 	    << "  -N    display the never clain for Spin "
 	    << "(implies -D)" << std::endl
-	    << "  -ndfs nesteddfs-search (implies -D), expect a "
-	    << "counter-example"
-	    << std::endl
-	    << "  -Ndfs nesteddfs-search (implies -D), expect no "
-	    << "counter-example"
-	    << std::endl
-	    << "  -ndfs2 modify-nesteddfs-search (implies -D), "
-	    << "expect a counter-example"
-	    << std::endl
-	    << "  -Ndfs2 modify-nesteddfs-search (implies -D), "
-	    << "expect no counter-example"
-	    << std::endl
-	    << "  -ng   nesteddfs-search generalized (implies -D), expect a "
-	    << "counter-example"
-	    << std::endl
-	    << "  -NG   nesteddfs-search generalized (implies -D), expect no "
-	    << "counter-example"
-	    << std::endl
             << "  -p    branching postponement (implies -f)" << std::endl
 	    << "  -r    display the relation BDD, not the reachability graph"
 	    << std::endl
@@ -146,12 +111,6 @@ syntax(char* prog)
 	    << "  -S    convert to explicit automata, and number states "
 	    << "in BFS order" << std::endl
 	    << "  -t    display reachable states in LBTT's format" << std::endl
-	    << "  -T    display reachable states in LBTT's format w/o "
-	    << "acceptance conditions" << std::endl
-	    << "  -tj   tarjan-on-fly (implies -D), expect a counter-example"
-	    << std::endl
-	    << "  -TJ   tarjan-on-fly (implies -D), expect no counter-example"
-	    << std::endl
             << "  -U[PROPS]  consider atomic properties PROPS as exclusive "
 	    << "events (implies -f)" << std::endl
 	    << "  -v    display the BDD variables used by the automaton"
@@ -178,12 +137,7 @@ main(int argc, char** argv)
   bool file_opt = false;
   int output = 0;
   int formula_index = 0;
-  enum { None, Couvreur, Couvreur2, MagicSearch, MagicSearchOld,
-	 NestedDFSSearch, NestedDFSSearchModify, ColorDFSSearch,
-	 TarjanOnFly, MinimalSearch, MinimalSearchIterative,
-	 NestedGeneSearch} echeck = None;
-  spot::emptiness_search* es = 0;
-  spot::search_opt opt_nested_search = spot::magic;
+  enum { None, Couvreur, Couvreur2, MagicSearch } echeck = None;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
   bool magic_many = false;
   bool expect_counter_example = false;
@@ -212,21 +166,6 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-A"))
 	{
 	  output = 4;
-	}
-      else if (!strcmp(argv[formula_index], "-c"))
-	{
-	  echeck = ColorDFSSearch;
-	  degeneralize_opt = true;
-	  expect_counter_example = true;
-	  output = -1;
-	  magic_many = false;
-	}
-      else if (!strcmp(argv[formula_index], "-C"))
-	{
-	  echeck = ColorDFSSearch;
-	  degeneralize_opt = true;
-	  expect_counter_example = false;
-	  output = -1;
 	}
       else if (!strcmp(argv[formula_index], "-d"))
 	{
@@ -275,61 +214,21 @@ main(int argc, char** argv)
 	}
       else if (!strcmp(argv[formula_index], "-m"))
 	{
-	  opt_nested_search = spot::magic;
 	  echeck = MagicSearch;
 	  degeneralize_opt = true;
 	  expect_counter_example = true;
 	  output = -1;
-	  magic_many = true;
 	}
       else if (!strcmp(argv[formula_index], "-M"))
 	{
-	  opt_nested_search = spot::magic;
 	  echeck = MagicSearch;
 	  degeneralize_opt = true;
 	  expect_counter_example = false;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-mold"))
-	{
-	  echeck = MagicSearchOld;
-	  degeneralize_opt = true;
-	  expect_counter_example = true;
-	  output = -1;
-	  magic_many = true;
-	}
-      else if (!strcmp(argv[formula_index], "-Mold"))
-	{
-	  echeck = MagicSearchOld;
-	  degeneralize_opt = true;
-	  expect_counter_example = false;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-ms"))
-	{
-	  echeck = MinimalSearch;
-	  degeneralize_opt = true;
-	  expect_counter_example = true;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-Ms"))
-	{
-	  echeck = MinimalSearch;
-	  degeneralize_opt = true;
-	  expect_counter_example = false;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-msit"))
-	{
-	  echeck = MinimalSearchIterative;
-	  degeneralize_opt = true;
-	  expect_counter_example = true;
-	  magic_many = true;
 	  output = -1;
 	}
       else if (!strcmp(argv[formula_index], "-n"))
 	{
-	  echeck = MagicSearchOld;
+	  echeck = MagicSearch;
 	  degeneralize_opt = true;
 	  expect_counter_example = true;
 	  output = -1;
@@ -339,53 +238,6 @@ main(int argc, char** argv)
 	{
 	  degeneralize_opt = true;
 	  output = 8;
-	}
-      else if (!strcmp(argv[formula_index], "-ndfs"))
-	{
-	  opt_nested_search = spot::nested;
-	  echeck = NestedDFSSearch;
-	  degeneralize_opt = true;
-	  expect_counter_example = true;
-	  output = -1;
-	  magic_many = true;
-	}
-      else if (!strcmp(argv[formula_index], "-Ndfs"))
-	{
-	  opt_nested_search = spot::nested;
-	  echeck = NestedDFSSearch;
-	  degeneralize_opt = true;
-	  expect_counter_example = false;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-ndfs2"))
-	{
-	  opt_nested_search = spot::my_nested;
-	  echeck = NestedDFSSearchModify;
-	  degeneralize_opt = true;
-	  expect_counter_example = true;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-Ndfs2"))
-	{
-	  opt_nested_search = spot::my_nested;
-	  echeck = NestedDFSSearchModify;
-	  degeneralize_opt = true;
-	  expect_counter_example = false;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-ng"))
-	{
-	  echeck = NestedGeneSearch;
-	  degeneralize_opt = true;
-	  expect_counter_example = true;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-NG"))
-	{
-	  echeck = NestedGeneSearch;
-	  degeneralize_opt = true;
-	  expect_counter_example = false;
-	  output = -1;
 	}
       else if (!strcmp(argv[formula_index], "-p"))
 	{
@@ -459,20 +311,6 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-t"))
 	{
 	  output = 6;
-	}
-      else if (!strcmp(argv[formula_index], "-tj"))
-	{
-	  echeck = TarjanOnFly;
-	  degeneralize_opt = true;
-	  expect_counter_example = true;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-TJ"))
-	{
-	  echeck = TarjanOnFly;
-	  degeneralize_opt = true;
-	  expect_counter_example = false;
-	  output = -1;
 	}
       else if (!strncmp(argv[formula_index], "-U", 2))
 	{
@@ -730,18 +568,7 @@ main(int argc, char** argv)
 	  }
 	  break;
 
-	case NestedGeneSearch:
-	  {
-	    std::cout << "Nested DFS generalized" << std::endl;
-	    spot::nesteddfsgen_search* ec = new spot::nesteddfsgen_search(a);
-	    bool res = ec->check();
-	    ec->print_stats(std::cout);
-	    exit_code = expect_counter_example ? !res : res;
-	    delete ec;
-	  }
-	  break;
-
-	case MagicSearchOld:
+	case MagicSearch:
 	  {
 	    std::cout << "Magic Search" << std::endl;
 	    spot::magic_search ms(degeneralized);
@@ -764,96 +591,10 @@ main(int argc, char** argv)
 	  }
 	  break;
 
-	case ColorDFSSearch:
-	  std::cout << "Colored Search" << std::endl;
-	  es = new spot::colordfs_search(degeneralized);
-	  break;
-
-	case TarjanOnFly:
-	  {
-	    std::cout << "Tarjan On Fly" << std::endl;
-	    spot::tarjan_on_fly* tof = new spot::tarjan_on_fly(degeneralized);
-	    bool res = tof->check();
-	    exit_code = expect_counter_example ? !res : res;
-	    delete tof;
-	    break;
-	  }
-
-	case MinimalSearch:
-	  {
-	    std::cout << "Recursive Minimal Search" << std::endl;
-	    es = new spot::colordfs_search(degeneralized);
-	    spot::ce::counter_example* res = es->check();
-	    res->print(std::cout);
-	    std::cout << "Minimisation:" << std::endl;
-	    es = new spot::minimalce_search(degeneralized, false);
-	    res = es->check();
-	    res->print(std::cout);
-	  }
-	  break;
-
-	case MinimalSearchIterative:
-	  std::cout << "Iterative Minimal Search" << std::endl;
-	  es = new spot::minimalce_search(degeneralized, true);
-	  break;
-
-	case MagicSearch:
-	  std::cout << "Magic Search" << std::endl;
-	  es = new spot::nesteddfs_search(degeneralized, opt_nested_search);
-	  break;
-
-	case NestedDFSSearch:
-	case NestedDFSSearchModify:
-	  std::cout << "Nested DFS" << std::endl;
-	  es = new spot::nesteddfs_search(degeneralized, opt_nested_search);
-	  break;
-
 	default:
 	  assert(0);
 	}
 
-      if (es)
-	{
-	  spot::ce::counter_example* res = es->check();
-	  if (expect_counter_example)
-	    {
-	      do
-		{
-		  if (!res)
-		    {
-		      exit_code = 1;
-		      break;
-		    }
-		  std::cout << "CE : " << std::endl
-			    << "     size : " << res->size()
-			    << std::endl;
-		  spot::tgba* aut = res->ce2tgba();
-		  //spot::dotty_reachable(std::cout, aut);
-		  res->print(std::cout);
-		  es->print_stat(std::cout);
-		  delete aut;
-		  delete res;
-		  res = 0;
-		}
-	      while (magic_many && (res = es->check()));
-	    }
-	  else if (res)
-	    {
-	      exit_code = res->size();
-	      std::cout << "res->size ?? : " << exit_code << std::endl;
-	    }
-	  else
-	    {
-	      exit_code = (res != 0);
-	      std::cout << "res != 0 ?? : " << exit_code << std::endl;
-	    }
-	  if (res)
-	    delete res;
-	}
-
-
-      if (es)
-	delete es;
       if (f)
         spot::ltl::destroy(f);
       if (expl)

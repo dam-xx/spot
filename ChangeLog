@@ -1,3 +1,19 @@
+2004-10-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	Back out all Thomas's changes on emptiness checks since
+	2004-08-23.  Some of these will need to be reintegrated more
+	slowly and cleanly.
+
+	* src/tgbaalgos/Makefile.am, src/tgbaalgos/gtec/ce.cc,
+	src/tgbaalgos/gtec/ce.hh, src/tgbatest/Makefile.am,
+	src/tgbatest/emptchk.test, src/tgbatest/ltl2tgba.cc: Revert.
+	* src/tgbaalgos/colordfs.cc, src/tgbaalgos/colordfs.hh,
+	src/tgbaalgos/minimalce.cc, src/tgbaalgos/minimalce.hh,
+	src/tgbaalgos/nesteddfs.cc, src/tgbaalgos/nesteddfs.hh,
+	src/tgbaalgos/nesteddfsgen.cc, src/tgbaalgos/nesteddfsgen.hh,
+	src/tgbaalgos/tarjan_on_fly.cc, src/tgbaalgos/tarjan_on_fly.hh:
+	Delete.
+
 2004-10-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltltest/reduc.test: Do source ./defs.  Revert mistaken

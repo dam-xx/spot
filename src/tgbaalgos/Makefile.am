@@ -27,43 +27,33 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 tgbaalgosdir = $(pkgincludedir)/tgbaalgos
 
 tgbaalgos_HEADERS = \
-  colordfs.hh \
   dotty.hh \
   dupexp.hh \
   lbtt.hh \
   ltl2tgba_fm.hh \
   ltl2tgba_lacim.hh \
   magic.hh \
-  minimalce.hh \
-  nesteddfs.hh \
-  nesteddfsgen.hh \
   neverclaim.hh \
   powerset.hh \
   reachiter.hh \
   save.hh \
   stats.hh \
-  reductgba_sim.hh \
-  tarjan_on_fly.hh
+  reductgba_sim.hh
 
 noinst_LTLIBRARIES = libtgbaalgos.la
 libtgbaalgos_la_SOURCES = \
-  colordfs.cc \
   dotty.cc \
   dupexp.cc \
   lbtt.cc \
   ltl2tgba_fm.cc \
   ltl2tgba_lacim.cc \
   magic.cc \
-  minimalce.cc \
-  nesteddfs.cc \
-  nesteddfsgen.cc \
   neverclaim.cc \
   powerset.cc \
   reachiter.cc \
   save.cc \
   stats.cc \
   reductgba_sim.cc \
-  reductgba_sim_del.cc \
-  tarjan_on_fly.cc
+  reductgba_sim_del.cc
 
 libtgbaalgos_la_LIBADD = gtec/libgtec.la
