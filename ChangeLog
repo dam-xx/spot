@@ -1,5 +1,8 @@
 2004-04-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* wrap/python/cgi/ltl2tgba.in (print_footer): Make ltl2tgba.py's
+	version a separate variable.
+
 	* wrap/python/cgi/ltl2tgba.in: Pass the formula to
 	never_claim_reachable, and cgi.escape its output.
 	Lighten the color a bit.

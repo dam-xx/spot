@@ -50,9 +50,11 @@ dot = 'dot' # in PATH.
 dot_bgcolor = '-Gbgcolor=#FFFFFF'
 # dot = '/usr/local/bin/dot'
 
+ltl2tgba_version = '@PACKAGE_VERSION@'
+
 def print_footer():
     print '<hr>'
-    print 'ltl2tgba.py @PACKAGE_VERSION@; Spot', spot.version()
+    print 'ltl2tgba.py ' + ltl2tgba_version + '; Spot', spot.version()
     print '</BODY></HTML>'
 
 try:
