@@ -1,5 +1,13 @@
 2003-06-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/ltl2tgba.hh, src/tgba/ltl2tgba.cc: Move ...
+	* src/tgbaalgos/ltl2tgba.hh, src/tgbaalgos/ltl2tgba.cc: ... here.
+	* src/tgba/Makefile.am, src/tgbaalgos/Makefile.am: Adjust.
+	* src/tgba/public.hh: Do not include ltl2tgba.hh.
+	* src/tgbatests/explprod.cc, src/tgbatests/ltl2tgba.cc, 
+	src/tgbatests/ltlprod.cc, src/tgbatests/mixprod.cc, 
+	src/tgbatests/reach.cc, src/tgbatests/tripprod.cc: Adjust inclusions.
+
 	* src/tgba/tgbabddcoredata.hh: Fix some Doxygen comments.
 	* src/ltlast/formula.hh: More Doxygen comments.
 	* src/tgba/tgba.hh: Use <tt> in Doxygen comments.

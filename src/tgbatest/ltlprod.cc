@@ -3,7 +3,7 @@
 #include "ltlvisit/destroy.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
-#include "tgba/ltl2tgba.hh"
+#include "tgbaalgos/ltl2tgba.hh"
 #include "tgba/tgbaproduct.hh"
 #include "tgba/tgbabddconcreteproduct.hh"
 #include "tgbaalgos/dotty.hh"

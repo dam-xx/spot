@@ -3,7 +3,7 @@
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/nenoform.hh"
 #include "ltlvisit/destroy.hh"
-#include "tgbabddconcretefactory.hh"
+#include "tgba/tgbabddconcretefactory.hh"
 #include <cassert>
 
 #include "ltl2tgba.hh"

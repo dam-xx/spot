@@ -7,7 +7,6 @@ tgba_HEADERS = \
   bddfactory.hh \
   bddprint.hh \
   dictunion.hh \
-  ltl2tgba.hh \
   public.hh \
   state.hh \
   statebdd.hh \
@@ -30,7 +29,6 @@ libtgba_la_SOURCES = \
   bddfactory.cc \
   bddprint.cc \
   dictunion.cc \
-  ltl2tgba.cc \
   statebdd.cc \
   succiterconcrete.cc \
   tgbabddconcrete.cc \

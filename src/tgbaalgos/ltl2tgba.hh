@@ -2,7 +2,7 @@
 # define SPOT_TGBA_LTL2TGBA_HH
 
 #include "ltlast/formula.hh"
-#include "tgbabddconcrete.hh"
+#include "tgba/tgbabddconcrete.hh"
 
 namespace spot
 {

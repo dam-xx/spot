@@ -5,9 +5,12 @@ tgbaalgosdir = $(pkgincludedir)/tgbaalgos
 
 tgbaalgos_HEADERS = \
   dotty.hh \
+  ltl2tgba.hh \
   save.hh
 
 noinst_LTLIBRARIES = libtgbaalgos.la
 libtgbaalgos_la_SOURCES = \
   dotty.cc \
+  ltl2tgba.cc \
   save.cc
+
