@@ -1,3 +1,13 @@
+2003-07-09  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/ExternalTranslator.h (class ExternalTranslator): 
+	Declare class SpotWrapper as a friend.
+	* src/SpotWrapper.h, src/SpotWrapper.cc: New files.
+	* src/Makefile.am (lbtt_translate_SOURCES): Add SpotWrapper.cc
+	and SpotWrapper.h.
+	* src/translate.cc (main): Add the --spot option, and build
+	a SpotWrapper of required.
+
 2003-07-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/Config-parse.yy: Remove stray `,' in %token arguments.

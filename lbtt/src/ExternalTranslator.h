@@ -210,8 +210,8 @@ private:
 						     */
 
   stack<TempFileObject*,                            /* Stack for storing */
-        deque<TempFileObject*,                      /* temporary file    */
-              ALLOC(TempFileObject*) > >            /* information.      */
+	deque<TempFileObject*,                      /* temporary file    */
+	      ALLOC(TempFileObject*) > >            /* information.      */
     temporary_file_objects;
 
   friend class KecWrapper;                          /* Friend declarations. */
@@ -219,6 +219,7 @@ private:
   friend class Ltl2BaWrapper;
   friend class ProdWrapper;
   friend class SpinWrapper;
+  friend class SpotWrapper;
   friend class WringWrapper;
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

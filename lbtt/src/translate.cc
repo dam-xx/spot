@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@
 #include "LbtWrapper.h"
 #include "LtlFormula.h"
 #include "SpinWrapper.h"
+#include "SpotWrapper.h"
 #ifdef HAVE_GETOPT_LONG
 #include <getopt.h>
 #define OPTIONSTRUCT struct option
@@ -52,7 +53,7 @@ char** command_line_arguments;
 /******************************************************************************
  *
  * A function for showing warnings to the user.
- * 
+ *
  *****************************************************************************/
 
 void printWarning(const string& msg)
@@ -87,7 +88,7 @@ RETSIGTYPE signalHandler(int signal_number)
 
 int main(int argc, char** argv)
 {
-  typedef enum {OPT_HELP = 'h', OPT_LBT, OPT_SPIN, OPT_VERSION = 'v'}
+  typedef enum {OPT_HELP = 'h', OPT_LBT, OPT_SPIN, OPT_SPOT, OPT_VERSION = 'v'}
     OptionType;
 
   static OPTIONSTRUCT command_line_options[] =
@@ -95,6 +96,7 @@ int main(int argc, char** argv)
     {"help",    no_argument, 0, OPT_HELP},
     {"lbt",     no_argument, 0, OPT_LBT},
     {"spin",    no_argument, 0, OPT_SPIN},
+    {"spot",    no_argument, 0, OPT_SPOT},
     {"version", no_argument, 0, OPT_VERSION},
     {0,         0,           0, 0}
   };
@@ -117,19 +119,20 @@ int main(int argc, char** argv)
       case OPT_HELP :
 	cout << string("Usage: ") << command_line_arguments[0]
 	     << " [translator] [command line for translator] [formula "
-	        "file] [automaton file]\n"
-	        "General options:\n"
-                "  --h, --help              Show this help\n"
-                "  --v, --version           Show version and exit\n\n"
-                "Translator options:\n"
-                "       --lbt               lbt\n"
-                "       --spin              Spin\n"
-                "The command line for these translators must be given as a "
-	        "single argument\n"
-                "including the name (and location) of an external program to "
-                "execute, together\n"
-                "with any optional parameters to be passed to the "
-	        "program.\n\n";
+		"file] [automaton file]\n"
+		"General options:\n"
+		"  --h, --help              Show this help\n"
+		"  --v, --version           Show version and exit\n\n"
+		"Translator options:\n"
+		"       --lbt               lbt\n"
+		"       --spin              Spin\n"
+		"       --spot              Spot\n"
+		"The command line for these translators must be given as a "
+		"single argument\n"
+		"including the name (and location) of an external program to "
+		"execute, together\n"
+		"with any optional parameters to be passed to the "
+		"program.\n\n";
 	exit(0);
 	break;
 
@@ -141,13 +144,17 @@ int main(int argc, char** argv)
 	translator = new SpinWrapper();
 	break;
 
+      case OPT_SPOT :
+	translator = new SpotWrapper();
+	break;
+
       case OPT_VERSION :
 	cout << "lbtt-translate " PACKAGE_VERSION "\n"
-	        "lbtt-translate is free software; you may change and "
-	        "redistribute it under the\n"
-	        "terms of the GNU General Public License. lbtt-translate "
-	        "comes with NO WARRANTY.\n"
-	        "See the file COPYING for details.\n";
+		"lbtt-translate is free software; you may change and "
+		"redistribute it under the\n"
+		"terms of the GNU General Public License. lbtt-translate "
+		"comes with NO WARRANTY.\n"
+		"See the file COPYING for details.\n";
 	exit(0);
 	break;
 
