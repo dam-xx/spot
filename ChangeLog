@@ -1,5 +1,18 @@
 2003-10-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	Merge emptiness-checks tests into ltl2tgba.
+	* src/tgbatest/Makefile (check_PRORGRAMS): Remove
+	emptinesscheck and ltlmagic.
+	(emptinesscheck_SOURCES, ltlmagic_SOURCES): Remove.
+	(TESTS): Replace emptinesscheck.test and ltlmagic.test by
+	emptchk.test.
+	* src/tgbatest/emptinesscheck.test, src/tgbatest/ltlmagic.test:
+	Delete.
+	* src/tgbatest/emptchk.test: New file.
+	* src/tgbatest/emptinesscheck.cc, src/tgbatest/ltlmagic.cc:
+	Delete.
+	* src/tgbatest/ltl2tgba.cc: Add support for -e, -E, -m, -M, and -n.
+
 	* src/tgbaalgos/emptinesscheck.cc
 	(emptiness_check::tgba_emptiness_check): Do not print anything.
 	(emptiness_check::counter_example): Assume that tgba_emptiness_check

@@ -1,0 +1,42 @@
+#!/bin/sh
+
+. ./defs
+
+set -e
+
+expect_ce()
+{
+  ./ltl2tgba -e "$1"
+  ./ltl2tgba -e -D "$1"
+  ./ltl2tgba -e -f "$1"
+  ./ltl2tgba -e -f -D "$1"
+  ./ltl2tgba -m "$1"
+  ./ltl2tgba -m -f "$1"
+}
+
+expect_no()
+{
+  ./ltl2tgba -E "$1"
+  ./ltl2tgba -E -D "$1"
+  ./ltl2tgba -E -f "$1"
+  ./ltl2tgba -E -f -D "$1"
+  ./ltl2tgba -M "$1"
+  ./ltl2tgba -M -f "$1"
+}
+
+expect_ce 'a'
+expect_ce 'a U b'
+expect_ce 'X a'
+expect_ce 'a & b & c'
+expect_ce 'a | b | (c U (d & (g U (h ^ i))))'
+expect_ce 'Xa & (b U !a) & (b U !a)'
+expect_ce 'Fa & Xb & GFc & Gd'
+expect_ce 'Fa & Xa & GFc & Gc'
+expect_ce 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+expect_ce '!((FF a) <=> (F x))'
+expect_no '!((FF a) <=> (F a))'
+expect_no 'Xa && (!a U b) && !b && X!b'
+expect_no '(a U !b) && Gb'
+
+# Expect four counter-examples..
+test `./ltl2tgba -n 'FFx <=> Fx' | grep Prefix: | wc -l` = 4

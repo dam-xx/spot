@@ -6,11 +6,9 @@ check_SCRIPTS = defs
 check_PROGRAMS = \
   bddprod \
   explicit \
-  emptinesscheck \
-emptinesscheckexplicit \
+  emptinesscheckexplicit \
   explprod \
   ltl2tgba \
-  ltlmagic \
   ltlprod \
   mixprod \
   readsave \
@@ -20,12 +18,10 @@ emptinesscheckexplicit \
 # Keep this sorted alphabetically.
 bddprod_SOURCES  = ltlprod.cc
 bddprod_CXXFLAGS = -DBDD_CONCRETE_PRODUCT
-emptinesscheck_SOURCES = emptinesscheck.cc
 emptinesscheckexplicit_SOURCES = emptinesscheckexplicit.cc
 explicit_SOURCES = explicit.cc
 explprod_SOURCES = explprod.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
-ltlmagic_SOURCES = ltlmagic.cc
 ltlprod_SOURCES  = ltlprod.cc
 mixprod_SOURCES  = mixprod.cc
 readsave_SOURCES = readsave.cc
@@ -46,9 +42,8 @@ TESTS = \
   explpro3.test \
   tripprod.test \
   mixprod.test \
-  emptinesscheck.test \
+  emptchk.test \
   emptinesscheckexplicit.test \
-  ltlmagic.test \
   spotlbtt.test
 
 EXTRA_DIST = $(TESTS)
