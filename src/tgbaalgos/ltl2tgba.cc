@@ -191,11 +191,17 @@ namespace spot
     visit(const multop* node)
     {
       int op = -1;
+      bool root = false;
       switch (node->op())
 	{
 	case multop::And:
 	  op = bddop_and;
 	  res_ = bddtrue;
+	  // When the root formula is a conjunction it's ok to
+	  // consider all children as root formulae.  This allows the
+	  // root-G trick to save many more variable.  (See the
+	  // translation of G.)
+	  root = root_;
 	  break;
 	case multop::Or:
 	  op = bddop_or;
@@ -206,14 +212,14 @@ namespace spot
       unsigned s = node->size();
       for (unsigned n = 0; n < s; ++n)
 	{
-	  res_ = bdd_apply(res_, recurse(node->nth(n)), op);
+	  res_ = bdd_apply(res_, recurse(node->nth(n), root), op);
 	}
     }
 
     bdd
-    recurse(const formula* f)
+    recurse(const formula* f, bool root = false)
     {
-      ltl_trad_visitor v(fact_);
+      ltl_trad_visitor v(fact_, root);
       f->accept(v);
       return v.result();
     }

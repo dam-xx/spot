@@ -1,5 +1,9 @@
 2003-07-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba.cc (ltl_trad_visitor::visit(multop)): 
+	Forward root_ to children of And.
+	(ltl_trad_visitor::recurse): Take a root argument.
+
 	* src/tgba/tgbabddconcretefactory.hh
 	(tgba_bdd_concrete_factory::add_relation): Rename as ...
 	(tgba_bdd_concrete_factory::constrain_relation): ... this.
