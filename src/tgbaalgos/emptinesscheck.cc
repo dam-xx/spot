@@ -8,13 +8,11 @@
 #include "bdd.h"
 #include <map>
 #include <list>
-#include <sstream>
 #include <stack>
 #include <queue>
 #include <stdio.h>
 #include <vector>
 #include <set>
-#include <iterator>
 #include <utility>
 #include <ostream>
 
@@ -23,34 +21,10 @@ namespace spot
   typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
   typedef std::pair<pair_state_iter, bdd> triplet;
 
-  connected_component::connected_component()
-  {
-    index = 0;
-    condition = bddfalse;
-    transition_acc = -1;
-    nb_transition = 0;
-    nb_state = 1;
-    not_null = false;
-  }
-
-  connected_component::connected_component(int i, bdd a)
+  connected_component::connected_component(int i)
   {
     index = i;
-    condition = a;
-    transition_acc = -1;
-    nb_transition = 0;
-    nb_state = 1;
-    not_null = false;
-  }
-
-  connected_component::~connected_component()
-  {
-  }
-
-  bool
-  connected_component::isAccepted(tgba* aut)
-  {
-    return aut->all_accepting_conditions() == condition;
+    condition = bddfalse;
   }
 
   /// \brief Remove all the nodes accessible from the given node start_delete.
@@ -98,7 +72,7 @@ namespace spot
     int nbstate = 1;
     state* init = aut_check->get_init_state();
     seen_state_num[init] = 1;
-    root_component.push(spot::connected_component(1,bddfalse));
+    root_component.push(spot::connected_component(1));
     arc_accepting.push(bddfalse);
     tgba_succ_iterator* iter_ = aut_check->succ_iter(init);
     iter_->first();
@@ -143,7 +117,7 @@ namespace spot
 		nbstate = nbstate + 1;
 		assert(nbstate != 0);
 		seen_state_num[current_state] = nbstate;
-		root_component.push(connected_component(nbstate, bddfalse));
+		root_component.push(connected_component(nbstate));
 		arc_accepting.push(current_accepting);
 		tgba_succ_iterator* iter2 = aut_check->succ_iter(current_state);
 		iter2->first();

@@ -20,10 +20,7 @@ namespace spot
   {
     // During the Depth path we keep the connected component that we met.
   public:
-    connected_component();
-    connected_component(int i, bdd a);
-    virtual ~connected_component();
-    bool isAccepted(tgba* aut);
+    connected_component(int index = -1);
 
   public:
     int index;
@@ -36,10 +33,6 @@ namespace spot
     /// for the counter example we need to know all the states of the
     /// component
     set_of_state state_set;
-    int transition_acc;
-    int nb_transition;
-    int nb_state;
-    bool not_null;
   };
 
   class emptiness_check

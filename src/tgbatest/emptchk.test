@@ -38,5 +38,5 @@ expect_no '!((FF a) <=> (F a))'
 expect_no 'Xa && (!a U b) && !b && X!b'
 expect_no '(a U !b) && Gb'
 
-# Expect four counter-examples..
-test `./ltl2tgba -n 'FFx <=> Fx' | grep Prefix: | wc -l` = 4
+# Expect five counter-examples..
+test `./ltl2tgba -n 'FFx <=> Fx' | grep Prefix: | wc -l` = 5

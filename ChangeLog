@@ -1,5 +1,21 @@
 2003-10-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.hh (connected_component::not_null,
+	connected_component::transition_acc,
+	connected_component::nb_transition,
+	connected_component::nb_state): Remove these unused attributes.
+	(connected_component::connected_component): Merge the two
+	definitions into one.
+	(connected_component::~connected_component): Remove.
+	(connected_component::isAccepted): Delete, unused.
+	* src/tgbaalgos/emptinesscheck.cc
+	(connected_component::connected_component,
+	connected_component::~connected_component): Adjust.
+	(connected_component::isAccepted): Delete.
+	(spot):
+
+	* src/tgbatest/emptchk.test: Typo.
+
 	* src/tgbaalgos/emptinesscheck.hh
 	(emptiness_check::remove_component, emptiness_check::root_component,
 	emptiness_check::seen_state_num, emptiness_check::suffix): Move in
