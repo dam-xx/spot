@@ -26,6 +26,7 @@
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/reduce.hh"
 #include "ltlvisit/tostring.hh"
+#include "ltlvisit/apcollect.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
 #include "tgbaalgos/ltl2tgba_lacim.hh"
@@ -45,7 +46,6 @@
 #include "tgbaparse/public.hh"
 #include "tgbaalgos/dupexp.hh"
 #include "tgbaalgos/neverclaim.hh"
-
 #include "tgbaalgos/reductgba_sim.hh"
 
 void
@@ -152,6 +152,8 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -TJ   tarjan-on-fly (implies -D), expect no counter-example"
 	    << std::endl
+            << "  -U[PROPS]  consider atomic properties PROPS as exclusive "
+	    << "events (implies -f)" << std::endl
 	    << "  -v    display the BDD variables used by the automaton"
 	    << std::endl
             << "  -x    try to produce a more deterministic automata "
@@ -193,6 +195,8 @@ main(int argc, char** argv)
   bool display_parity_game = false;
   bool post_branching = false;
   bool fair_loop_approx = false;
+  spot::ltl::environment& env(spot::ltl::default_environment::instance());
+  spot::ltl::atomic_prop_set* unobservables = 0;
 
   for (;;)
     {
@@ -470,6 +474,19 @@ main(int argc, char** argv)
 	  expect_counter_example = false;
 	  output = -1;
 	}
+      else if (!strncmp(argv[formula_index], "-U", 2))
+	{
+	  unobservables = new spot::ltl::atomic_prop_set;
+	  fm_opt = true;
+	  // Parse -U's argument.
+	  const char* tok = strtok(argv[formula_index] + 2, ",; \t");
+	  while (tok)
+	    {
+	      unobservables->insert
+		(static_cast<spot::ltl::atomic_prop*>(env.require(tok)));
+	      tok = strtok(0, ",; \t");
+	    }
+	}
       else if (!strcmp(argv[formula_index], "-v"))
 	{
 	  output = 5;
@@ -523,7 +540,6 @@ main(int argc, char** argv)
       input = argv[formula_index];
     }
 
-  spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::bdd_dict* dict = new spot::bdd_dict();
 
   spot::ltl::formula* f = 0;
@@ -563,7 +579,7 @@ main(int argc, char** argv)
 	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt,
 					       fm_symb_merge_opt,
 					       post_branching,
-					       fair_loop_approx);
+					       fair_loop_approx, unobservables);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 	}

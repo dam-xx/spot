@@ -30,8 +30,9 @@
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/postfix.hh"
+#include "ltlvisit/apcollect.hh"
 #include <cassert>
-
+#include <memory>
 #include "tgba/tgbabddconcretefactory.hh"
 #include "ltl2tgba_fm.hh"
 
@@ -639,7 +640,7 @@ namespace spot
   tgba_explicit*
   ltl_to_tgba_fm(const formula* f, bdd_dict* dict,
 		 bool exprop, bool symb_merge, bool branching_postponement,
-		 bool fair_loop_approx)
+		 bool fair_loop_approx, const ltl::atomic_prop_set* unobs)
   {
     possible_fair_loop_checker pflc;
 
@@ -659,12 +660,46 @@ namespace spot
 
     // Compute the set of all promises occurring inside the formula.
     bdd all_promises = bddtrue;
-    if (fair_loop_approx)
+    if (fair_loop_approx || unobs)
       {
 	ltl_promise_visitor pv(d);
 	f2->accept(pv);
 	all_promises = pv.result();
       }
+
+    // These are used when atomic propositions are interpreted as
+    // events.  There are two kinds of events: observable events are
+    // those used in the formula, and unobservable events or other
+    // events that can occur at anytime.  All events exclude each
+    // other.
+    bdd observable_events = bddfalse;
+    bdd unobservable_events = bddfalse;
+    if (unobs)
+      {
+	bdd neg_events = bddtrue;
+	std::auto_ptr<ltl::atomic_prop_set> aps(ltl::atomic_prop_collect(f));
+	for (ltl::atomic_prop_set::const_iterator i = aps->begin();
+	     i != aps->end(); ++i)
+	  {
+	    int p = d.register_proposition(*i);
+	    bdd pos = bdd_ithvar(p);
+	    bdd neg = bdd_nithvar(p);
+	    observable_events = (observable_events & neg) | (neg_events & pos);
+	    neg_events &= neg;
+	  }
+	for (ltl::atomic_prop_set::const_iterator i = unobs->begin();
+	     i != unobs->end(); ++i)
+	  {
+	    int p = d.register_proposition(*i);
+	    bdd pos = bdd_ithvar(p);
+	    bdd neg = bdd_nithvar(p);
+	    unobservable_events = ((unobservable_events & neg)
+				   | (neg_events & pos));
+	    observable_events &= neg;
+	    neg_events &= neg;
+	  }
+      }
+    bdd all_events = observable_events | unobservable_events;
 
     formulae_seen.insert(f2);
     formulae_to_translate.insert(f2);
@@ -681,6 +716,14 @@ namespace spot
 
 	// Translate it into a BDD to simplify it.
 	bdd res = fc.translate(f);
+
+	// Handle exclusive events.
+	if (unobs)
+	  {
+	    res &= observable_events;
+	    int n = d.register_next_variable(f);
+	    res |= unobservable_events & bdd_ithvar(n) & all_promises;
+	  }
 
 	std::string now = to_string(f);
 
@@ -818,6 +861,11 @@ namespace spot
 	    assert(j->first == bddtrue);
 
 	    cond_for_true = j->second;
+	    // When translating LTL for an event-based logic with
+	    // unobservable events, the 1 state should accept even
+	    // unobservable events.
+	    if (unobs && f == constant::true_instance())
+	      cond_for_true = all_events;
 	    tgba_explicit::transition* t =
 	      a->create_transition(now, constant::true_instance()->val_name());
 	    a->add_condition(t, d.bdd_to_formula(cond_for_true));

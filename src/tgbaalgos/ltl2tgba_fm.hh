@@ -24,6 +24,7 @@
 
 #include "ltlast/formula.hh"
 #include "tgba/tgbaexplicit.hh"
+#include "ltlvisit/apcollect.hh"
 
 namespace spot
 {
@@ -89,11 +90,16 @@ namespace spot
   /// unstable state is used to suppress all acceptance conditions from
   /// incoming transitions.
   ///
+  /// \param unobs When non-zero, the atomic propositions in the LTL formula
+  /// are interpreted as events that exclude each other.  The events in the
+  /// formula are observable events, and \c unobs can be filled with
+  /// additional unobservable events.
   /// \return A spot::tgba_explicit that recognizes the language of \a f.
   tgba_explicit* ltl_to_tgba_fm(const ltl::formula* f, bdd_dict* dict,
 				bool exprop = false, bool symb_merge = true,
 				bool branching_postponement = false,
-				bool fair_loop_approx = false);
+				bool fair_loop_approx = false,
+				const ltl::atomic_prop_set* unobs = 0);
 }
 
 #endif // SPOT_TGBA_LTL2TGBA_HH
