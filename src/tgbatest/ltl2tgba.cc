@@ -7,6 +7,7 @@
 #include "tgba/bddprint.hh"
 #include "tgbaalgos/dotty.hh"
 #include "tgbaalgos/lbtt.hh"
+#include "tgba/tgbatba.hh"
 
 void
 syntax(char* prog)
@@ -18,6 +19,7 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -A   same as -a, but as a set" << std::endl
 	    << "  -d   turn on traces during parsing" << std::endl
+	    << "  -D   degeneralize the automaton" << std::endl
 	    << "  -r   display the relation BDD, not the reachability graph"
 	    << std::endl
 	    << "  -R   same as -r, but as a set" << std::endl
@@ -33,6 +35,7 @@ main(int argc, char** argv)
   int exit_code = 0;
 
   bool debug_opt = false;
+  bool degeneralize_opt = false;
   int output = 0;
   int formula_index = 0;
 
@@ -54,6 +57,10 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-d"))
 	{
 	  debug_opt = true;
+	}
+      else if (!strcmp(argv[formula_index], "-D"))
+	{
+	  degeneralize_opt = true;
 	}
       else if (!strcmp(argv[formula_index], "-r"))
 	{
@@ -88,28 +95,34 @@ main(int argc, char** argv)
   spot::bdd_dict* dict = new spot::bdd_dict();
   if (f)
     {
-      spot::tgba_bdd_concrete* a = spot::ltl_to_tgba(f, dict);
+      spot::tgba_bdd_concrete* concrete = spot::ltl_to_tgba(f, dict);
+      spot::tgba* a = concrete;
       spot::ltl::destroy(f);
+
+      spot::tgba* degeneralized = 0;
+      if (degeneralize_opt)
+	a = degeneralized = new spot::tgba_tba_proxy(a);
+
       switch (output)
 	{
 	case 0:
 	  spot::dotty_reachable(std::cout, a);
 	  break;
 	case 1:
-	  spot::bdd_print_dot(std::cout, a->get_dict(),
-			      a->get_core_data().relation);
+	  spot::bdd_print_dot(std::cout, concrete->get_dict(),
+			      concrete->get_core_data().relation);
 	  break;
 	case 2:
-	  spot::bdd_print_dot(std::cout, a->get_dict(),
-			      a->get_core_data().accepting_conditions);
+	  spot::bdd_print_dot(std::cout, concrete->get_dict(),
+			      concrete->get_core_data().accepting_conditions);
 	  break;
 	case 3:
-	  spot::bdd_print_set(std::cout, a->get_dict(),
-			      a->get_core_data().relation);
+	  spot::bdd_print_set(std::cout, concrete->get_dict(),
+			      concrete->get_core_data().relation);
 	  break;
 	case 4:
-	  spot::bdd_print_set(std::cout, a->get_dict(),
-			      a->get_core_data().accepting_conditions);
+	  spot::bdd_print_set(std::cout, concrete->get_dict(),
+			      concrete->get_core_data().accepting_conditions);
 	  break;
 	case 5:
 	  a->get_dict()->dump(std::cout);
@@ -120,7 +133,11 @@ main(int argc, char** argv)
 	default:
 	  assert(!"unknown output option");
 	}
-      delete a;
+
+      if (degeneralize_opt)
+	delete degeneralized;
+
+      delete concrete;
     }
   else
     {

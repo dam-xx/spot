@@ -33,9 +33,10 @@ namespace spot
   {
   protected:
     tgba();
-    virtual ~tgba();
 
   public:
+    virtual ~tgba();
+
     /// \brief Get the initial state of the automaton.
     ///
     /// The state has been allocated with \c new.  It is the

@@ -1,5 +1,11 @@
 2003-07-25  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/tgba.hh (tgba::~tgba): Make it public.
+	* src/tgba/tgbatba.cc, src/tgba/tgbatba.hh: New files.
+	* src/tgba/Makefile.am (tgba_HEADERS): Add tgbatba.hh.
+	(libtgba_la_SOURCES): Add tgbatba.cc.
+	* src/tgbatest/ltl2tgba.cc: Add option -D.
+
 	* src/tgbaalgos/lbtt.cc (bdd_less_than): Move ...
 	* src/misc/bddlt.hh: ... in this new file.
 	* src/misc/Makefile.am (misc_HEADERS): Add bddlt.hh.
