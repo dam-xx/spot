@@ -1,5 +1,8 @@
 2004-07-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgba/state.hh (state_ptr_equal, state_ptr_hash): Fix Doxygen
+	example.
+
 	* src/tgbaalgos/reductgba_sim.hh (parity_game_graph_delayed,
 	reduc_tgba_sim): Fix warnings about Doxygen comment.
 	* src/ltlvisit/reduce.hh (reduce): Likewise.

@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -86,7 +86,7 @@ namespace spot
   ///   // Remember how many times each state has been visited.
   ///   std::map<spot::state*, int, spot::state_ptr_less_than> seen;
   /// \endcode
-  struct state_ptr_less_than :
+  struct state_ptr_less_than:
     public std::binary_function<const state*, const state*, bool>
   {
     bool
@@ -106,10 +106,10 @@ namespace spot
   /// a map of \c state*.
   /// \code
   ///   // Remember how many times each state has been visited.
-  ///   Sgi::hash_map<spot::state*, int, spot::state_ptr_less_than,
+  ///   Sgi::hash_map<spot::state*, int, spot::state_ptr_hash,
   ///                                    spot::state_ptr_equal> seen;
   /// \endcode
-  struct state_ptr_equal :
+  struct state_ptr_equal:
     public std::binary_function<const state*, const state*, bool>
   {
     bool
@@ -129,10 +129,10 @@ namespace spot
   /// a map of \c state*.
   /// \code
   ///   // Remember how many times each state has been visited.
-  ///   Sgi::hash_map<spot::state*, int, spot::state_ptr_less_than,
+  ///   Sgi::hash_map<spot::state*, int, spot::state_ptr_hash,
   ///                                    spot::state_ptr_equal> seen;
   /// \endcode
-  struct state_ptr_hash :
+  struct state_ptr_hash:
     public std::unary_function<const state*, size_t>
   {
     size_t
