@@ -96,6 +96,11 @@ else
     open(LTL2TGBA, "| ./ltl2tgba -T -X -");
   }
 
+END {
+  # This also waits for ltl2tgba's termination.
+  close(LTL2TGBA) || die "error closing pipe to ltl2tgba";
+}
+
 my @args = dquote @ARGV;
 open(LTL2BA, "ltl2ba -d @args |") || die "failed to run ltl2ba";
 
@@ -203,7 +208,6 @@ else
 	print_state($src);
       }
   }
-close(LTL2TGBA)
 
 ### Setup "GNU" style for perl-mode and cperl-mode.
 ## Local Variables:
