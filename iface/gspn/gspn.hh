@@ -28,6 +28,7 @@
 # include <string>
 # include "tgba/tgba.hh"
 # include "common.hh"
+# include "ltlenv/declenv.hh"
 
 namespace spot
 {
@@ -36,13 +37,13 @@ namespace spot
   {
   public:
     gspn_interface(int argc, char **argv,
-		   bdd_dict* dict, gspn_environment& env,
+		   bdd_dict* dict, ltl::declarative_environment& env,
 		   const std::string& dead = "true");
     ~gspn_interface();
     tgba* automaton() const;
   private:
     bdd_dict* dict_;
-    gspn_environment& env_;
+    ltl::declarative_environment& env_;
     const std::string dead_;
   };
 }

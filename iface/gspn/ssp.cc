@@ -122,19 +122,20 @@ namespace spot
     size_t prop_count;
     const tgba* operand;
 
-    tgba_gspn_ssp_private_(bdd_dict* dict, const gspn_environment& env,
-			     const tgba* operand)
+    tgba_gspn_ssp_private_(bdd_dict* dict,
+			   const ltl::declarative_environment& env,
+			   const tgba* operand)
       : refs(1), dict(dict), all_props(0),
 	operand(operand)
     {
-      const gspn_environment::prop_map& p = env.get_prop_map();
+      const ltl::declarative_environment::prop_map& p = env.get_prop_map();
 
       try
 	{
 	  AtomicProp max_prop = 0;
 
-	  for (gspn_environment::prop_map::const_iterator i = p.begin();
-	       i != p.end(); ++i)
+	  for (ltl::declarative_environment::prop_map::const_iterator i
+		 = p.begin(); i != p.end(); ++i)
 	    {
 	      int var = dict->register_proposition(i->second, this);
 	      AtomicProp index;
@@ -280,8 +281,8 @@ namespace spot
   class tgba_gspn_ssp: public tgba
   {
   public:
-    tgba_gspn_ssp(bdd_dict* dict, const gspn_environment& env,
-		    const tgba* operand);
+    tgba_gspn_ssp(bdd_dict* dict, const ltl::declarative_environment& env,
+		  const tgba* operand);
     tgba_gspn_ssp(const tgba_gspn_ssp& other);
     tgba_gspn_ssp& operator=(const tgba_gspn_ssp& other);
     virtual ~tgba_gspn_ssp();
@@ -302,8 +303,9 @@ namespace spot
     tgba_gspn_ssp_private_* data_;
   };
 
-  tgba_gspn_ssp::tgba_gspn_ssp(bdd_dict* dict, const gspn_environment& env,
-				   const tgba* operand)
+  tgba_gspn_ssp::tgba_gspn_ssp(bdd_dict* dict,
+			       const ltl::declarative_environment& env,
+			       const tgba* operand)
   {
     data_ = new tgba_gspn_ssp_private_(dict, env, operand);
   }
@@ -534,7 +536,8 @@ namespace spot
 
   gspn_ssp_interface::gspn_ssp_interface(int argc, char **argv,
 					 bdd_dict* dict,
-					 const gspn_environment& env,
+					 const
+					 ltl::declarative_environment& env,
 					 bool inclusion)
     : dict_(dict), env_(env)
   {

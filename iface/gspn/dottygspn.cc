@@ -26,7 +26,7 @@ int
 main(int argc, char **argv)
   try
     {
-      spot::gspn_environment env;
+      spot::ltl::declarative_environment env;
 
       if (argc <= 2)
 	{

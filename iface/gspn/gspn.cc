@@ -92,16 +92,16 @@ namespace spot
     bdd alive_prop;
     bdd dead_prop;
 
-    tgba_gspn_private_(bdd_dict* dict, gspn_environment& env,
+    tgba_gspn_private_(bdd_dict* dict, ltl::declarative_environment& env,
 		       const std::string& dead)
       : refs(1), dict(dict), all_indexes(0), last_state_conds_input(0)
     {
-      const gspn_environment::prop_map& p = env.get_prop_map();
+      const ltl::declarative_environment::prop_map& p = env.get_prop_map();
 
       try
 	{
-	  for (gspn_environment::prop_map::const_iterator i = p.begin();
-	       i != p.end(); ++i)
+	  for (ltl::declarative_environment::prop_map::const_iterator i
+		 = p.begin(); i != p.end(); ++i)
 	    {
 	      // Skip the DEAD proposition, GreatSPN knows nothing
 	      // about it.
@@ -319,7 +319,7 @@ namespace spot
   class tgba_gspn: public tgba
   {
   public:
-    tgba_gspn(bdd_dict* dict, gspn_environment& env,
+    tgba_gspn(bdd_dict* dict, ltl::declarative_environment& env,
 	      const std::string& dead);
     tgba_gspn(const tgba_gspn& other);
     tgba_gspn& operator=(const tgba_gspn& other);
@@ -341,7 +341,7 @@ namespace spot
   };
 
 
-  tgba_gspn::tgba_gspn(bdd_dict* dict, gspn_environment& env,
+  tgba_gspn::tgba_gspn(bdd_dict* dict, ltl::declarative_environment& env,
 		       const std::string& dead)
   {
     data_ = new tgba_gspn_private_(dict, env, dead);
@@ -462,7 +462,8 @@ namespace spot
   //////////////////////////////////////////////////////////////////////
 
   gspn_interface::gspn_interface(int argc, char **argv,
-				 bdd_dict* dict, gspn_environment& env,
+				 bdd_dict* dict,
+				 ltl::declarative_environment& env,
 				 const std::string& dead)
     : dict_(dict), env_(env), dead_(dead)
   {

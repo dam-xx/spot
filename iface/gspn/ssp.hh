@@ -30,6 +30,7 @@
 # include "common.hh"
 # include "tgbaalgos/gtec/gtec.hh"
 # include "tgbaalgos/gtec/ce.hh"
+# include "ltlenv/declenv.hh"
 
 namespace spot
 {
@@ -38,13 +39,13 @@ namespace spot
   {
   public:
     gspn_ssp_interface(int argc, char **argv,
-		       bdd_dict* dict, const gspn_environment& env,
+		       bdd_dict* dict, const ltl::declarative_environment& env,
 		       bool inclusion = false);
     ~gspn_ssp_interface();
     tgba* automaton(const tgba* operand) const;
   private:
     bdd_dict* dict_;
-    const gspn_environment& env_;
+    const ltl::declarative_environment& env_;
   };
 
   emptiness_check* emptiness_check_ssp_semi(const tgba* ssp_automata);

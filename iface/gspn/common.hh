@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -24,9 +24,6 @@
 
 # include <string>
 # include <iostream>
-# include "ltlast/atomic_prop.hh"
-# include "ltlenv/environment.hh"
-
 
 // Do not include gspnlib.h here, or it will polute the user's
 // namespace with internal C symbols.
@@ -61,31 +58,6 @@ namespace spot
   };
 
   std::ostream& operator<<(std::ostream& os, const gspn_exeption& e);
-
-  class gspn_environment : public ltl::environment
-  {
-  public:
-    gspn_environment();
-    ~gspn_environment();
-
-    /// Declare an atomic proposition.  Return false iff the
-    /// proposition was already declared.
-    bool declare(const std::string& prop_str);
-
-    virtual ltl::formula* require(const std::string& prop_str);
-
-    /// Get the name of the environment.
-    virtual const std::string& name();
-
-    typedef std::map<const std::string, ltl::atomic_prop*> prop_map;
-
-    /// Get the map of atomic proposition known to this environment.
-    const prop_map& get_prop_map() const;
-
-  private:
-    prop_map props_;
-  };
-
 }
 
 #endif // SPOT_IFACE_GSPN_COMMON_HH

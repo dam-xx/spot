@@ -90,7 +90,7 @@ main(int argc, char **argv)
       bool proj = true;
       std::string dead = "true";
 
-      spot::gspn_environment env;
+      spot::ltl::declarative_environment env;
 
       while (formula_index < argc && *argv[formula_index] == '-')
 	{

@@ -1,5 +1,16 @@
 2004-06-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/common.cc, iface/gspn/common.hh: Remove the
+	class gspn_environment, and move it to ...
+	* src/ltlenv/declenv.cc, src/ltlenv/declenv.hh: .. this new file
+	as class declarative_environment.
+	* src/ltlenv/Makefile.am (ltlenv_HEADERS): Add declenv.hh.
+	(libltlenv_la_SOURCES): Add declenv.cc.
+	* iface/gspn/dottygspn.cc, iface/gspn/dottyssp.cc,
+	iface/gspn/gspn.cc, iface/gspn/gspn.hh, iface/gspn/ltlgspn.cc,
+	iface/gspn/ssp.cc, iface/gspn/ssp.hh: Adjust references
+	to declarative_environment.
+
 	* HACKING, src/sanity/style.test: NULL is not portable, prohibit it.
 	* iface/gspn/ssp.cc, src/ltltest/reduc.cc, src/ltltest/syntimpl.cc,
 	src/ltlvisit/basereduc.cc, src/ltlvisit/reducform.cc,

@@ -1,4 +1,4 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -25,9 +25,11 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 ltlenvdir = $(pkgincludedir)/ltlenv
 
 ltlenv_HEADERS = \
+  declenv.hh \
   defaultenv.hh \
   environment.hh
 
 noinst_LTLIBRARIES = libltlenv.la
 libltlenv_la_SOURCES = \
+  declenv.cc \
   defaultenv.cc
