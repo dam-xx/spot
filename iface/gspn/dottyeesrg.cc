@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -40,8 +40,8 @@ main(int argc, char **argv)
       while (argc > 3)
 	env.declare(argv[--argc]);
 
-      spot::gspn_eesrg_interface gspn(2, argv);
       spot::bdd_dict* dict = new spot::bdd_dict();
+      spot::gspn_eesrg_interface gspn(2, argv, dict, env);
 
       spot::tgba_parse_error_list pel1;
       spot::tgba_explicit* control = spot::tgba_parse(argv[--argc], pel1,
@@ -49,12 +49,10 @@ main(int argc, char **argv)
       if (spot::format_tgba_parse_errors(std::cerr, pel1))
 	return 2;
 
-      {
-	spot::tgba_gspn_eesrg a(dict, env, control);
+      spot::tgba* a = gspn.automaton(control);
+      spot::dotty_reachable(std::cout, a);
 
-	spot::dotty_reachable(std::cout, &a);
-      }
-
+      delete a;
       delete control;
       delete dict;
     }

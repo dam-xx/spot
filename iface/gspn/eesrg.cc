@@ -30,21 +30,6 @@
 namespace spot
 {
 
-  gspn_eesrg_interface::gspn_eesrg_interface(int argc, char **argv)
-  {
-    int res = initialize(argc, argv);
-    if (res)
-      throw gspn_exeption("initialize()", res);
-  }
-
-  gspn_eesrg_interface::~gspn_eesrg_interface()
-  {
-    int res = finalize();
-    if (res)
-      throw gspn_exeption("finalize()", res);
-  }
-
-
   // state_gspn_eesrg
   //////////////////////////////////////////////////////////////////////
 
@@ -345,6 +330,30 @@ namespace spot
   // tgba_gspn_eesrg
   //////////////////////////////////////////////////////////////////////
 
+  class tgba_gspn_eesrg: public tgba
+  {
+  public:
+    tgba_gspn_eesrg(bdd_dict* dict, const gspn_environment& env,
+		    const tgba* operand);
+    tgba_gspn_eesrg(const tgba_gspn_eesrg& other);
+    tgba_gspn_eesrg& operator=(const tgba_gspn_eesrg& other);
+    virtual ~tgba_gspn_eesrg();
+    virtual state* get_init_state() const;
+    virtual tgba_succ_iterator*
+    succ_iter(const state* local_state,
+	      const state* global_state = 0,
+	      const tgba* global_automaton = 0) const;
+    virtual bdd_dict* get_dict() const;
+    virtual std::string format_state(const state* state) const;
+    virtual state* project_state(const state* s, const tgba* t) const;
+    virtual bdd all_acceptance_conditions() const;
+    virtual bdd neg_acceptance_conditions() const;
+  protected:
+    virtual bdd compute_support_conditions(const spot::state* state) const;
+    virtual bdd compute_support_variables(const spot::state* state) const;
+  private:
+    tgba_gspn_eesrg_private_* data_;
+  };
 
   tgba_gspn_eesrg::tgba_gspn_eesrg(bdd_dict* dict, const gspn_environment& env,
 				   const tgba* operand)
@@ -467,6 +476,32 @@ namespace spot
     // There is no acceptance conditions in GSPN systems, they all
     // come from the operand automaton.
     return data_->operand->neg_acceptance_conditions();
+  }
+
+  // gspn_eesrg_interface
+  //////////////////////////////////////////////////////////////////////
+
+  gspn_eesrg_interface::gspn_eesrg_interface(int argc, char **argv,
+					     bdd_dict* dict,
+					     const gspn_environment& env)
+    : dict_(dict), env_(env)
+  {
+    int res = initialize(argc, argv);
+    if (res)
+      throw gspn_exeption("initialize()", res);
+  }
+
+  gspn_eesrg_interface::~gspn_eesrg_interface()
+  {
+    int res = finalize();
+    if (res)
+      throw gspn_exeption("finalize()", res);
+  }
+
+  tgba*
+  gspn_eesrg_interface::automaton(const tgba* operand) const
+  {
+    return new tgba_gspn_eesrg(dict_, env_, operand);
   }
 
 }

@@ -27,21 +27,6 @@
 namespace spot
 {
 
-  gspn_interface::gspn_interface(int argc, char **argv)
-  {
-    int res = initialize(argc, argv);
-    if (res)
-      throw gspn_exeption("initialize()", res);
-  }
-
-  gspn_interface::~gspn_interface()
-  {
-    int res = finalize();
-    if (res)
-      throw gspn_exeption("finalize()", res);
-  }
-
-
   // state_gspn
   //////////////////////////////////////////////////////////////////////
 
@@ -276,6 +261,35 @@ namespace spot
   //////////////////////////////////////////////////////////////////////
 
 
+
+
+  /// Data private to tgba_gspn.
+  struct tgba_gspn_private_;
+
+  class tgba_gspn: public tgba
+  {
+  public:
+    tgba_gspn(bdd_dict* dict, const gspn_environment& env);
+    tgba_gspn(const tgba_gspn& other);
+    tgba_gspn& operator=(const tgba_gspn& other);
+    virtual ~tgba_gspn();
+    virtual state* get_init_state() const;
+    virtual tgba_succ_iterator*
+    succ_iter(const state* local_state,
+	      const state* global_state = 0,
+	      const tgba* global_automaton = 0) const;
+    virtual bdd_dict* get_dict() const;
+    virtual std::string format_state(const state* state) const;
+    virtual bdd all_acceptance_conditions() const;
+    virtual bdd neg_acceptance_conditions() const;
+  protected:
+    virtual bdd compute_support_conditions(const spot::state* state) const;
+    virtual bdd compute_support_variables(const spot::state* state) const;
+  private:
+    tgba_gspn_private_* data_;
+  };
+
+
   tgba_gspn::tgba_gspn(bdd_dict* dict, const gspn_environment& env)
   {
     data_ = new tgba_gspn_private_(dict, env);
@@ -390,6 +404,31 @@ namespace spot
   {
     // There is no acceptance conditions in GSPN systems.
     return bddtrue;
+  }
+
+  // gspn_interface
+  //////////////////////////////////////////////////////////////////////
+
+  gspn_interface::gspn_interface(int argc, char **argv,
+				 bdd_dict* dict, const gspn_environment& env)
+    : dict_(dict), env_(env)
+  {
+    int res = initialize(argc, argv);
+    if (res)
+      throw gspn_exeption("initialize()", res);
+  }
+
+  gspn_interface::~gspn_interface()
+  {
+    int res = finalize();
+    if (res)
+      throw gspn_exeption("finalize()", res);
+  }
+
+  tgba*
+  gspn_interface::automaton() const
+  {
+    return new tgba_gspn(dict_, env_);
   }
 
 

@@ -35,39 +35,13 @@ namespace spot
   class gspn_eesrg_interface
   {
   public:
-    gspn_eesrg_interface(int argc, char **argv);
+    gspn_eesrg_interface(int argc, char **argv,
+			 bdd_dict* dict, const gspn_environment& env);
     ~gspn_eesrg_interface();
-    // FIXME: I think we should have
-    // tgba* get_automata();
-  };
-
-
-  /// Data private to tgba_gspn.
-  struct tgba_gspn_eesrg_private_;
-
-  class tgba_gspn_eesrg: public tgba
-  {
-  public:
-    tgba_gspn_eesrg(bdd_dict* dict, const gspn_environment& env,
-		    const tgba* operand);
-    tgba_gspn_eesrg(const tgba_gspn_eesrg& other);
-    tgba_gspn_eesrg& operator=(const tgba_gspn_eesrg& other);
-    virtual ~tgba_gspn_eesrg();
-    virtual state* get_init_state() const;
-    virtual tgba_succ_iterator*
-    succ_iter(const state* local_state,
-	      const state* global_state = 0,
-	      const tgba* global_automaton = 0) const;
-    virtual bdd_dict* get_dict() const;
-    virtual std::string format_state(const state* state) const;
-    virtual state* project_state(const state* s, const tgba* t) const;
-    virtual bdd all_acceptance_conditions() const;
-    virtual bdd neg_acceptance_conditions() const;
-  protected:
-    virtual bdd compute_support_conditions(const spot::state* state) const;
-    virtual bdd compute_support_variables(const spot::state* state) const;
+    tgba* automaton(const tgba* operand) const;
   private:
-    tgba_gspn_eesrg_private_* data_;
+    bdd_dict* dict_;
+    const gspn_environment& env_;
   };
 
 }

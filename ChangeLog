@@ -1,3 +1,24 @@
+2004-02-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	Hide the tgba_gspn and tgba_gspn_eesrg classes.  Offer the
+	corresponding automaton via the automaton() method of the
+	gspn_interface and gspn_eesrg_interface classes.
+
+	* iface/gspn/gspn.hh (gspn_interface::gspn_interface): Take dict and
+	env arguments.
+	(gspn_interface::automaton): New method.
+	(tgba_gspn): Move all the declaration ...
+	* iface/gspn/gspn.cc (tgba_gspn): ... here.
+	(gspn_interface::automaton): Implement it.
+	* iface/gspn/eesrg.hh (gspn_eesrg_interface::gspn_eesrg_interface):
+	Take dict and env arguments.
+	(gspn_eesrg_interface::automaton): New method.
+	(tgba_gspn_eesrg): Move all the declaration ...
+	* iface/gspn/gspn.cc (tgba_gspn_eesrg): ... here.
+	(gspn_eesrg_interface::automaton): Implement it.
+	* iface/gspn/dottygspn.cc, iface/gspn/dottyeesrg.cc,
+	iface/gspn/ltlgspn.cc: Adjust.
+
 2004-01-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlvisit/tostring.cc: Fix output of F0, F1, G0, G1, X0, and X1.

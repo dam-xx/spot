@@ -132,7 +132,7 @@ main(int argc, char **argv)
       spot::bdd_dict* dict = new spot::bdd_dict();
 
 #if EESRG
-      spot::gspn_eesrg_interface gspn(2, argv);
+      spot::gspn_eesrg_interface gspn(2, argv, dict, env);
 
       spot::tgba_parse_error_list pel1;
       spot::tgba_explicit* control = spot::tgba_parse(argv[formula_index + 2],
@@ -140,7 +140,7 @@ main(int argc, char **argv)
       if (spot::format_tgba_parse_errors(std::cerr, pel1))
 	return 2;
 #else
-      spot::gspn_interface gspn(2, argv);
+      spot::gspn_interface gspn(2, argv, dict, env);
 #endif
 
       spot::tgba* a_f = 0;
@@ -156,11 +156,11 @@ main(int argc, char **argv)
       spot::ltl::destroy(f);
 
 #ifndef EESRG
-      spot::tgba* model        = new spot::tgba_gspn(dict, env);
+      spot::tgba* model        = gspn.automaton();
       spot::tgba_product* prod = new spot::tgba_product(model, a_f);
 #else
       spot::tgba_product* ca = new spot::tgba_product(control, a_f);
-      spot::tgba* model      = new spot::tgba_gspn_eesrg(dict, env, ca);
+      spot::tgba* model      = gspn.automaton(ca);
       spot::tgba* prod = model;
 #endif
 

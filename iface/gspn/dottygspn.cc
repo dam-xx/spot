@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -40,16 +40,13 @@ main(int argc, char **argv)
 	  --argc;
 	}
 
-      spot::gspn_interface gspn(2, argv);
-
       spot::bdd_dict* dict = new spot::bdd_dict();
+      spot::gspn_interface gspn(2, argv, dict, env);
+      spot::tgba* a = gspn.automaton();
 
-      {
-	spot::tgba_gspn a(dict, env);
+      spot::dotty_reachable(std::cout, a);
 
-	spot::dotty_reachable(std::cout, &a);
-      }
-
+      delete a;
       delete dict;
     }
   catch (spot::gspn_exeption e)

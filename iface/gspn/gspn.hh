@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -35,39 +35,14 @@ namespace spot
   class gspn_interface
   {
   public:
-    gspn_interface(int argc, char **argv);
+    gspn_interface(int argc, char **argv,
+		   bdd_dict* dict, const gspn_environment& env);
     ~gspn_interface();
-    // FIXME: I think we should have
-    // tgba* get_automata();
-  };
-
-
-  /// Data private to tgba_gspn.
-  struct tgba_gspn_private_;
-
-  class tgba_gspn: public tgba
-  {
-  public:
-    tgba_gspn(bdd_dict* dict, const gspn_environment& env);
-    tgba_gspn(const tgba_gspn& other);
-    tgba_gspn& operator=(const tgba_gspn& other);
-    virtual ~tgba_gspn();
-    virtual state* get_init_state() const;
-    virtual tgba_succ_iterator*
-    succ_iter(const state* local_state,
-	      const state* global_state = 0,
-	      const tgba* global_automaton = 0) const;
-    virtual bdd_dict* get_dict() const;
-    virtual std::string format_state(const state* state) const;
-    virtual bdd all_acceptance_conditions() const;
-    virtual bdd neg_acceptance_conditions() const;
-  protected:
-    virtual bdd compute_support_conditions(const spot::state* state) const;
-    virtual bdd compute_support_variables(const spot::state* state) const;
+    tgba* automaton() const;
   private:
-    tgba_gspn_private_* data_;
+    bdd_dict* dict_;
+    const gspn_environment& env_;
   };
-
 }
 
 #endif // SPOT_IFACE_GSPN_GSPN_HH
