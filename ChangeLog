@@ -1,16 +1,21 @@
-2003-09-25  Rachid REBIHA  <rebiha@nyx>
+2003-09-30  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
-	* src/tgbatest/emptinesscheckexplicit.test (acc): New file.
+	* src/tgba/state.hh (state_ptr_less_than, state_ptr_equal):
+	Declare as std::binary_function.
+	(state_ptr_hash): Declare as std::unary_function.
+	* src/tgbaalgos/lbtt.cc (state_acc_pair_equal,
+	state_acc_pair_hash): Likewise.
+	* src/misc/bddlt.hh (bdd_less_than): Likewise.
+	* src/misc/hash.hh (ptr_hash, string_hash): Likewise.
 
-	* src/tgbatest/emptinesscheckexplicit.cc (main): New file.
+2003-09-25  Rachid REBIHA  <rebiha@src.lip6.fr>
 
-	* src/tgbatest/emptinesscheck.test: New file.
-
-	* src/tgbatest/emptinesscheck.cc (main): New file.
-
-	* src/tgbaalgos/emptinesscheck.cc (spot): New method.
-
-	* src/tgbaalgos/emptinesscheck.hh: New interface.
+	* src/tgbatest/emptinesscheckexplicit.test,
+	src/tgbatest/emptinesscheckexplicit.cc
+	src/tgbatest/emptinesscheck.test,
+	src/tgbatest/emptinesscheck.cc,
+	src/tgbaalgos/emptinesscheck.cc,
+	src/tgbaalgos/emptinesscheck.hh: New files.
 
 2003-09-22  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 

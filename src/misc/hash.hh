@@ -2,6 +2,7 @@
 #  define SPOT_MISC_HASH_HH
 
 #  include <string>
+#  include <functional>
 
 // See the G++ FAQ for details about the following.
 #  ifdef __GNUC__
@@ -34,7 +35,8 @@ namespace spot
 
   /// A hash function for pointers.
   template <class T>
-  struct ptr_hash
+  struct ptr_hash :
+    public std::unary_function<const T*, size_t>
   {
     size_t operator()(const T* p) const
     {
@@ -43,7 +45,9 @@ namespace spot
   };
 
   /// A hash function for strings.
-  struct string_hash : Sgi::hash<const char*>
+  struct string_hash :
+    public Sgi::hash<const char*>,
+    public std::unary_function<const std::string&, size_t>
   {
     size_t operator()(const std::string& s) const
     {

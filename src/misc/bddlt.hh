@@ -2,11 +2,13 @@
 # define SPOT_MISC_BDDLT_HH
 
 # include <bdd.h>
+# include <functional>
 
 namespace spot
 {
   /// Comparison functor for BDDs.
-  struct bdd_less_than
+  struct bdd_less_than :
+    public std::binary_function<const bdd&, const bdd&, bool>
   {
     bool
     operator()(const bdd& left, const bdd& right) const

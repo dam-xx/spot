@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 #include <sstream>
+#include <functional>
 #include "tgba/tgba.hh"
 #include "save.hh"
 #include "tgba/bddprint.hh"
@@ -87,7 +88,9 @@ namespace spot
 
   typedef std::pair<state*, bdd> state_acc_pair;
 
-  struct state_acc_pair_equal
+  struct state_acc_pair_equal :
+    public std::binary_function<const state_acc_pair&,
+                                const state_acc_pair&, bool>
   {
     bool
     operator()(const state_acc_pair& left, const state_acc_pair& right) const
@@ -98,7 +101,8 @@ namespace spot
     }
   };
 
-  struct state_acc_pair_hash
+  struct state_acc_pair_hash :
+    public std::unary_function<const state_acc_pair&, size_t>
   {
     bool
     operator()(const state_acc_pair& that) const

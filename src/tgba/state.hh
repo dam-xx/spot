@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <bdd.h>
 #include <cassert>
+#include <functional>
 
 namespace spot
 {
@@ -64,7 +65,8 @@ namespace spot
   ///   // Remember how many times each state has been visited.
   ///   std::map<spot::state*, int, spot::state_ptr_less_than> seen;
   /// \endcode
-  struct state_ptr_less_than
+  struct state_ptr_less_than :
+    public std::binary_function<const state*, const state*, bool>
   {
     bool
     operator()(const state* left, const state* right) const
@@ -86,7 +88,8 @@ namespace spot
   ///   Sgi::hash_map<spot::state*, int, spot::state_ptr_less_than,
   ///                                    spot::state_ptr_equal> seen;
   /// \endcode
-  struct state_ptr_equal
+  struct state_ptr_equal :
+    public std::binary_function<const state*, const state*, bool>
   {
     bool
     operator()(const state* left, const state* right) const
@@ -108,7 +111,8 @@ namespace spot
   ///   Sgi::hash_map<spot::state*, int, spot::state_ptr_less_than,
   ///                                    spot::state_ptr_equal> seen;
   /// \endcode
-  struct state_ptr_hash
+  struct state_ptr_hash :
+    public std::unary_function<const state*, size_t>
   {
     size_t
     operator()(const state* that) const
