@@ -94,13 +94,14 @@ namespace spot
 
     };
 
-    void
+    std::ostream&
     dotty(const formula* f, std::ostream& os)
     {
       dotty_visitor v(os);
       os << "digraph G {" << std::endl;
       f->accept(v);
       os << "}" << std::endl;
+      return os;
     }
 
   }

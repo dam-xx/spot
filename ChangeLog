@@ -1,5 +1,12 @@
 2003-05-16  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/ltlvisit/dump.hh (dump): Return the passed ostream.
+	* src/ltlvisit/dump.cc (dump): Likewise.
+	* src/ltlvisit/dotty.hh (dotty): Likewise.
+	* src/ltlvisit/dotty.cc (dotty): Likewise.
+	* src/ltlvisit/tostring.hh (to_string): Likewise.
+	* src/ltlvisit/tostring.cc (to_string): Likewise.
+
 	* src/ltlvisit/dump.hh (dump): Take a formula* as argument,
 	not a formula&.  This is more homogeneous.
 	* src/ltlvisit/dump.cc (dump): Likewise.
@@ -7,7 +14,7 @@
 	* src/ltlvisit/dotty.cc (dotty): Likewise.
 	* src/ltlvisit/tostring.hh (to_string): Likewise.
 	* src/ltlvisit/tostring.cc (to_string): Likewise.
-	* src/ltltest/readltl.cc, src/ltltest/equals.cc, 
+	* src/ltltest/readltl.cc, src/ltltest/equals.cc,
 	src/ltltest/tostring.cc: Adjust usage.
 
 	Check trivial multop equality at build time.  The makes the

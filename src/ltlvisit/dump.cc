@@ -68,11 +68,12 @@ namespace spot
       std::ostream& os_;
     };
 
-    void
+    std::ostream&
     dump(const formula* f, std::ostream& os)
     {
       dump_visitor v(os);
       f->accept(v);
+      return os;
     }
 
   }

@@ -114,11 +114,12 @@ namespace spot
       std::ostream& os_;
     };
 
-    void
+    std::ostream&
     to_string(const formula* f, std::ostream& os)
     {
       to_string_visitor v(os);
       f->accept(v);
+      return os;
     }
 
     std::string
