@@ -22,7 +22,7 @@ syntax(char* prog)
 	    << "  -r   display the relation BDD, not the reachability graph"
 	    << std::endl
 	    << "  -R   same as -r, but as a set" << std::endl
-	    << "  -v   display the BDD variables used by the automaton" 
+	    << "  -v   display the BDD variables used by the automaton"
 	    << std::endl;
   exit(2);
 }
