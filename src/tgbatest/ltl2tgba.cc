@@ -445,14 +445,16 @@ main(int argc, char** argv)
 
 	      if (reduc_aut & (spot::Reduce_quotient_Dir_Sim |
 			       spot::Reduce_transition_Dir_Sim))
-		rel_dir = spot::get_direct_relation_simulation(a,
-							       std::cout,
-							       display_parity_game);
+		rel_dir =
+		  spot::get_direct_relation_simulation(a,
+						       std::cout,
+						       display_parity_game);
 	      else if (reduc_aut & (spot::Reduce_quotient_Del_Sim |
 				    spot::Reduce_transition_Del_Sim))
-		rel_del = spot::get_delayed_relation_simulation(a,
-								std::cout,
-								display_parity_game);
+		rel_del =
+		  spot::get_delayed_relation_simulation(a,
+							std::cout,
+							display_parity_game);
 
 	      if (display_rel_sim)
 		{
