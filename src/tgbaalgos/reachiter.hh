@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -93,7 +93,7 @@ namespace spot
     virtual const state* next_state();
 
   protected:
-    std::stack<const state*> todo; ///< A stack of state yet to explore.
+    std::stack<const state*> todo; ///< A stack of states yet to explore.
   };
 
   /// \brief An implementation of spot::tgba_reachable_iterator that browses
@@ -107,7 +107,7 @@ namespace spot
     virtual const state* next_state();
 
   protected:
-    std::deque<const state*> todo; ///< A queue of state yet to explore.
+    std::deque<const state*> todo; ///< A queue of states yet to explore.
   };
 
 

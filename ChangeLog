@@ -1,5 +1,7 @@
 2004-01-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/reachiter.hh: Typos in comments.
+
 	* iface/gspn/eesrg.cc (tgba_gspn_eesrg::all_acceptance_conditions,
 	tgba_gspn_eesrg::neg_acceptance_conditions): Forward to
 	data_->operand.
