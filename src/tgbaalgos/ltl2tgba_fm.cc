@@ -63,18 +63,18 @@ namespace spot
       {
 	fv_map::iterator i;
 	for (i = a_map.begin(); i != a_map.end(); ++i)
-	  ltl::destroy(i->first);
+	  destroy(i->first);
 	for (i = var_map.begin(); i != var_map.end(); ++i)
-	  ltl::destroy(i->first);
+	  destroy(i->first);
 	for (i = next_map.begin(); i != next_map.end(); ++i)
-	  ltl::destroy(i->first);
+	  destroy(i->first);
       }
 
       /// Formula-to-BDD-variable maps.
-      typedef Sgi::hash_map<const ltl::formula*, int,
-			    ptr_hash<ltl::formula> > fv_map;
+      typedef Sgi::hash_map<const formula*, int,
+			    ptr_hash<formula> > fv_map;
       /// BDD-variable-to-formula maps.
-      typedef Sgi::hash_map<int, const ltl::formula*> vf_map;
+      typedef Sgi::hash_map<int, const formula*> vf_map;
 
       fv_map a_map;	       ///< Maps formulae to "a" BDD variables
       vf_map a_formula_map;    ///< Maps "a" BDD variables to formulae
@@ -88,7 +88,7 @@ namespace spot
       bdd next_set;
 
       int
-      register_proposition(const ltl::formula* f)
+      register_proposition(const formula* f)
       {
 	int num;
 	// Do not build a variable that already exists.
@@ -109,7 +109,7 @@ namespace spot
       }
 
       int
-      register_a_variable(const ltl::formula* f)
+      register_a_variable(const formula* f)
       {
 	int num;
 	// Do not build an accepting variable that already exists.
@@ -130,7 +130,7 @@ namespace spot
       }
 
       int
-      register_next_variable(const ltl::formula* f)
+      register_next_variable(const formula* f)
       {
 	int num;
 	// Do not build a Next variable that already exists.
@@ -175,35 +175,35 @@ namespace spot
 	return os;
       }
 
-      ltl::formula*
+      formula*
       var_to_formula(int var) const
       {
 	vf_map::const_iterator isi = next_formula_map.find(var);
 	if (isi != next_formula_map.end())
-	  return ltl::clone(isi->second);
+	  return clone(isi->second);
 	isi = a_formula_map.find(var);
 	if (isi != a_formula_map.end())
-	  return ltl::clone(isi->second);
+	  return clone(isi->second);
 	isi = var_formula_map.find(var);
 	if (isi != var_formula_map.end())
-	  return ltl::clone(isi->second);
+	  return clone(isi->second);
 	assert(0);
       }
 
-      ltl::formula*
+      formula*
       conj_bdd_to_formula(bdd b)
       {
 	if (b == bddfalse)
-	  return ltl::constant::false_instance();
-	ltl::multop::vec* v = new ltl::multop::vec;
+	  return constant::false_instance();
+	multop::vec* v = new multop::vec;
 	while (b != bddtrue)
 	  {
 	    int var = bdd_var(b);
-	    ltl::formula* res = var_to_formula(var);
+	    formula* res = var_to_formula(var);
 	    bdd high = bdd_high(b);
 	    if (high == bddfalse)
 	      {
-		res = ltl::unop::instance(ltl::unop::Not, res);
+		res = unop::instance(unop::Not, res);
 		b = bdd_low(b);
 	      }
 	    else
@@ -214,14 +214,14 @@ namespace spot
 	    assert(b != bddfalse);
 	    v->push_back(res);
 	  }
-	return ltl::multop::instance(ltl::multop::And, v);
+	return multop::instance(multop::And, v);
       }
 
       const formula*
       bdd_to_formula(bdd f)
       {
 	if (f == bddfalse)
-	  return ltl::constant::false_instance();
+	  return constant::false_instance();
 
 	multop::vec* v = new multop::vec;
 
@@ -248,13 +248,13 @@ namespace spot
 	      }
 	    else
 	      {
-		ltl::formula* ac = var_to_formula(var);
+		formula* ac = var_to_formula(var);
 
 		if (! a->has_accepting_condition(ac))
-		  a->declare_accepting_condition(ltl::clone(ac));
+		  a->declare_accepting_condition(clone(ac));
 		a->add_accepting_condition(t, ac);
 
-		ltl::atomic_prop::instance_count();
+		atomic_prop::instance_count();
 		b = high;
 	      }
 	    assert(b != bddfalse);
@@ -321,10 +321,25 @@ namespace spot
 	    }
 	  case unop::G:
 	    {
-	      // r(Gy) = r(y)r(XGy)
-	      bdd y = recurse(node->child());
+	      const formula* child = node->child();
 	      int x = dict_.register_next_variable(node);
-	      res_ = y & bdd_ithvar(x);
+	      // GFy is pretty frequent and easy to optimize, to we
+	      // want to detect it.
+	      const unop* Fy = dynamic_cast<const unop*>(child);
+	      if (Fy && Fy->op() == unop::F)
+		{
+		  // r(GFy) = (r(y) + a(y))r(XGFy)
+		  const formula* child = Fy->child();
+		  bdd y = recurse(child);
+		  int a = dict_.register_a_variable(child);
+		  res_ = (y | bdd_ithvar(a)) & bdd_ithvar(x);
+		}
+	      else
+		{
+		  // r(Gy) = r(y)r(XGy)
+		  bdd y = recurse(child);
+		  res_ = y & bdd_ithvar(x);
+		}
 	      return;
 	    }
 	  case unop::Not:
@@ -420,18 +435,18 @@ namespace spot
   }
 
   tgba_explicit*
-  ltl_to_tgba_fm(const ltl::formula* f, bdd_dict* dict)
+  ltl_to_tgba_fm(const formula* f, bdd_dict* dict)
   {
     // Normalize the formula.  We want all the negations on
     // the atomic propositions.  We also suppress logic
     // abbreviations such as <=>, =>, or XOR, since they
     // would involve negations at the BDD level.
-    ltl::formula* f1 = ltl::unabbreviate_logic(f);
-    ltl::formula* f2 = ltl::negative_normal_form(f1);
-    ltl::destroy(f1);
+    formula* f1 = unabbreviate_logic(f);
+    formula* f2 = negative_normal_form(f1);
+    destroy(f1);
 
-    std::set<ltl::formula*> formulae_seen;
-    std::set<ltl::formula*> formulae_to_translate;
+    std::set<formula*> formulae_seen;
+    std::set<formula*> formulae_to_translate;
 
     formulae_seen.insert(f2);
     formulae_to_translate.insert(f2);
@@ -443,7 +458,7 @@ namespace spot
     while (!formulae_to_translate.empty())
       {
 	// Pick one formula.
-	ltl::formula* f = *formulae_to_translate.begin();
+	formula* f = *formulae_to_translate.begin();
 	formulae_to_translate.erase(formulae_to_translate.begin());
 
 	// Translate it into a BDD to simplify it.
@@ -458,7 +473,7 @@ namespace spot
 	bdd cube;
 	while ((cube = isop.next()) != bddfalse)
 	  {
-	    ltl::formula* dest =
+	    formula* dest =
 	      d.conj_bdd_to_formula(bdd_existcomp(cube, d.next_set));
 
 	    std::string next = to_string(dest);
@@ -476,15 +491,15 @@ namespace spot
 	      }
 	    else
 	      {
-		ltl::destroy(dest);
+		destroy(dest);
 	      }
 	  }
       }
 
     // Free all formulae.
-    for (std::set<ltl::formula*>::iterator i = formulae_seen.begin();
+    for (std::set<formula*>::iterator i = formulae_seen.begin();
 	 i != formulae_seen.end(); ++i)
-      ltl::destroy(*i);
+      destroy(*i);
 
     // Turn all promises into real accepting conditions.
     a->complement_all_accepting_conditions();

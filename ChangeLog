@@ -1,5 +1,8 @@
 2003-11-26  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_trad_visitor::visit) <G>:
+	Optimize translation of GFy.
+
 	* src/tgba/bddprint.cc (print_accset_handler, bdd_print_accset): New
 	functions.
 	* src/tgba/bddprint.cc (bdd_print_accset): Declare it.
