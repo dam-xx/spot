@@ -53,7 +53,7 @@ namespace spot
     const tgba_bdd_dict& get_dict() const;
 
     /// Add a new constraint to the relation.
-    void add_relation(bdd new_rel);
+    void constrain_relation(bdd new_rel);
 
     /// \brief Perfom final computations before the relation can be used.
     ///

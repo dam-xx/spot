@@ -73,7 +73,7 @@ namespace spot
 	    bdd now = fact_.ithvar(v);
 	    bdd next = fact_.ithvar(v + 1);
 	    bdd x = recurse(node->child());
-	    fact_.add_relation(bdd_apply(now, x | next, bddop_biimp));
+	    fact_.constrain_relation(bdd_apply(now, x | next, bddop_biimp));
 	    /*
 	      `x | next', doesn't actually encode the fact that x
 	      should be fulfilled eventually.  We ensure this by
@@ -95,7 +95,7 @@ namespace spot
 	    // This saves 2 BDD variables.
 	    if (root_)
 	      {
-		fact_.add_relation(child);
+		fact_.constrain_relation(child);
 		res_ = child;
 		return;
 	      }
@@ -103,7 +103,8 @@ namespace spot
 	    int v = fact_.create_state(node);
 	    bdd now = fact_.ithvar(v);
 	    bdd next = fact_.ithvar(v + 1);
-	    fact_.add_relation(bdd_apply(now, child & next, bddop_biimp));
+	    fact_.constrain_relation(bdd_apply(now, child & next,
+					       bddop_biimp));
 	    res_ = now;
 	    return;
 	  }
@@ -117,8 +118,8 @@ namespace spot
 	    int v = fact_.create_state(node->child());
 	    bdd now = fact_.ithvar(v);
 	    bdd next = fact_.ithvar(v + 1);
-	    fact_.add_relation(bdd_apply(now, recurse(node->child()),
-					 bddop_biimp));
+	    fact_.constrain_relation(bdd_apply(now, recurse(node->child()),
+					       bddop_biimp));
 	    res_ = next;
 	    return;
 	  }
@@ -154,7 +155,8 @@ namespace spot
 	    int v = fact_.create_state(node);
 	    bdd now = fact_.ithvar(v);
 	    bdd next = fact_.ithvar(v + 1);
-	    fact_.add_relation(bdd_apply(now, f2 | (f1 & next), bddop_biimp));
+	    fact_.constrain_relation(bdd_apply(now, f2 | (f1 & next),
+					       bddop_biimp));
 	    /*
 	      The rightmost conjunction, f1 & next, doesn't actually
 	      encode the fact that f2 should be fulfilled eventually.
@@ -175,7 +177,8 @@ namespace spot
 	    int v = fact_.create_state(node);
 	    bdd now = fact_.ithvar(v);
 	    bdd next = fact_.ithvar(v + 1);
-	    fact_.add_relation(bdd_apply(now, f2 & (f1 | next), bddop_biimp));
+	    fact_.constrain_relation(bdd_apply(now, f2 & (f1 | next),
+					       bddop_biimp));
 	    res_ = now;
 	    return;
 	  }

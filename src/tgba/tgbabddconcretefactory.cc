@@ -135,7 +135,7 @@ namespace spot
   }
 
   void
-  tgba_bdd_concrete_factory::add_relation(bdd new_rel)
+  tgba_bdd_concrete_factory::constrain_relation(bdd new_rel)
   {
     data_.relation &= new_rel;
   }

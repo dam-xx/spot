@@ -1,5 +1,11 @@
 2003-07-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/tgbabddconcretefactory.hh
+	(tgba_bdd_concrete_factory::add_relation): Rename as ...
+	(tgba_bdd_concrete_factory::constrain_relation): ... this.
+	* src/tgba/tgbabddconcretefactory.cc, src/tgbaalgos/ltl2tgba.cc:
+	Adjust.
+
 	* src/tgbaalgos/ltl2tgba.cc (ltl_trad_visitor::visit(unop::G)): Do
 	not create Now/Next variable when G is the root of the formula.
 	(ltl_trad_visitor::ltl_trad_visitor): Take a root argument.
