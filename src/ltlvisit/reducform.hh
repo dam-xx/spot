@@ -30,25 +30,27 @@ namespace spot
   namespace ltl
   {
 
+    /// Options for spot::ltl::reduce.
     enum reduce_options
       {
+	/// No reduction.
 	Reduce_None = 0,
+	/// Basic reductions.
 	Reduce_Basics = 1,
+	/// Somenzi & Bloem syntactic implication.
 	Reduce_Syntactic_Implications = 2,
+	/// Etessami & Holzmann eventuality and universality reductions.
 	Reduce_Eventuality_And_Universality = 4,
+	/// All reductions.
 	Reduce_All = -1U
       };
 
-    /// \brief Reduce a formula \a f using Basic rewriting, implies
-    /// relation, and class of eventuality and univerality formula.
+    /// \brief Reduce a formula \a f.
     ///
-    /// Put the formula in negative normal form with
-    /// spot::ltl::negative_normal_form and then reduce it according
-    /// to options:
-    /// Base for spot::ltl::Basic_reduce_form,
-    /// Inf for spot::ltl::reduce_inf_form,
-    /// EventualUniversal for spot::ltl::reduce_eventuality_universality_form,
-    /// BRI for spot::ltl::reduce_form.
+    /// \param f the formula to reduce
+    /// \param opt a conjonction of spot::ltl::reduce_options specifying
+    //             which optimizations to apply.
+    /// \return the reduced formula
     formula* reduce(const formula* f, int opt = Reduce_All);
 
     /// Implement basic rewriting.

@@ -1,5 +1,8 @@
 2004-05-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlvisit/reducform.hh: Update Doxygen comments for
+	previous change.
+
 	* src/ltlvisit/reducform.hh (option): Rename as ...
 	(reduce_options): ... this, and use it as a bit field so
 	option can be combined easily.
