@@ -1,3 +1,7 @@
+2004-10-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* wrap/python/Makefile.am (_spot_la_SOURCES): Add spot_wrap.h.
+
 2004-10-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/misc/modgray.hh (loopless_modular_mixed_radix_gray_code::done,

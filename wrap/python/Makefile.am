@@ -42,7 +42,7 @@ $(srcdir)/swigpy_wrap.c: $(srcdir)/swigpy.i
 
 ## spot
 
-_spot_la_SOURCES = $(srcdir)/spot_wrap.cxx
+_spot_la_SOURCES = $(srcdir)/spot_wrap.cxx $(srcdir)/spot_wrap.h
 _spot_la_LDFLAGS = -avoid-version -module
 _spot_la_LIBADD = $(top_builddir)/src/libspot.la libspotswigpy.la
 
