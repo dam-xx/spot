@@ -23,31 +23,22 @@ SUBDIRS = . cgi tests
 
 AM_CPPFLAGS = -I$(PYTHONINC) -I$(top_srcdir)/src $(BUDDY_CPPFLAGS)
 
-EXTRA_DIST = ltihooks.py spot.i buddy.i swigpy.i
+EXTRA_DIST = ltihooks.py spot.i buddy.i
 python_PYTHON = $(srcdir)/spot.py $(srcdir)/buddy.py
 pyexec_LTLIBRARIES = _spot.la _buddy.la
-lib_LTLIBRARIES = libspotswigpy.la
 
-
-## libspotswigpy is the SWIG runtime common to the other modules.
-
-libspotswigpy_la_SOURCES = $(srcdir)/swigpy_wrap.c
-libspotswigpy_la_CFLAGS = -DSWIG_GLOBAL
-libspotswigpy_la_LDFLAGS = -avoid-version
-
-$(srcdir)/swigpy_wrap.c: $(srcdir)/swigpy.i
-	swig -runtime -python $(srcdir)/swigpy.i
-	rm -f $(srcdir)/swigpy.py
-
+MAINTAINERCLEANFILES = \
+  $(srcdir)/spot_wrap.cxx $(srcdir)/spot.py \
+  $(srcdir)/buddy_wrap.cxx $(srcdir)/buddy.py
 
 ## spot
 
 _spot_la_SOURCES = $(srcdir)/spot_wrap.cxx $(srcdir)/spot_wrap.h
 _spot_la_LDFLAGS = -avoid-version -module
-_spot_la_LIBADD = $(top_builddir)/src/libspot.la libspotswigpy.la
+_spot_la_LIBADD = $(top_builddir)/src/libspot.la
 
 $(srcdir)/spot_wrap.cxx: $(srcdir)/spot.i
-	swig -noruntime -c++ -python -I$(srcdir) -I$(top_srcdir)/src $(srcdir)/spot.i
+	swig -c++ -python -I$(srcdir) -I$(top_srcdir)/src $(srcdir)/spot.i
 
 $(srcdir)/spot.py: $(srcdir)/spot.i
 	$(MAKE) $(AM_MAKEFLAGS) spot_wrap.cxx
@@ -57,17 +48,9 @@ $(srcdir)/spot.py: $(srcdir)/spot.i
 
 _buddy_la_SOURCES = $(srcdir)/buddy_wrap.cxx
 _buddy_la_LDFLAGS = -avoid-version -module $(BUDDY_LDFLAGS)
-_buddy_la_LIBADD = libspotswigpy.la
 
 $(srcdir)/buddy_wrap.cxx: $(srcdir)/buddy.i
-	swig -noruntime -c++ -python $(BUDDY_CPPFLAGS) $(srcdir)/buddy.i
+	swig -c++ -python $(BUDDY_CPPFLAGS) $(srcdir)/buddy.i
 
 $(srcdir)/buddy.py: $(srcdir)/buddy.i
 	$(MAKE) $(AM_MAKEFLAGS) buddy_wrap.cxx
-
-
-
-MAINTAINERCLEANFILES = \
-  $(srcdir)/spot_wrap.cxx $(srcdir)/spot.py \
-  $(srcdir)/buddy_wrap.cxx $(srcdir)/buddy.py \
-  $(srcdir)/swigpy_wrap.cxx
