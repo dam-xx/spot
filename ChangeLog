@@ -1,5 +1,10 @@
 2004-04-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.hh
+	(counter_example::connected_component_set::has_state): Return
+	a const state* and behave like h_filt.
+	* src/tgbaalgos/emptinesscheck.cc: Adjust.
+
 	* src/tgbaalgos/emptinesscheck.hh (emptiness_check::check2): Move
 	into ...
 	(emptiness_check_shy): This new subclass of emptiness_check.

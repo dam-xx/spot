@@ -491,10 +491,18 @@ namespace spot
 
   //////////////////////////////////////////////////////////////////////
 
-  bool
+  const state*
   counter_example::connected_component_set::has_state(const state* s) const
   {
-    return states.find(s) != states.end();
+    set_type::const_iterator it = states.find(s);
+    if (it != states.end())
+      {
+	if (s != *it)
+	  delete s;
+	return *it;
+      }
+    else
+      return 0;
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -571,15 +579,17 @@ namespace spot
 		const state* dest = i->current_state();
 
 		// Are we leaving this SCC?
-		if (!scc[k].has_state(dest))
+		const state* h_dest = scc[k].has_state(dest);
+		if (!h_dest)
 		  {
 		    // If we have found a state in the next SCC.
 		    // Unwind the path and populate SUFFIX.
-		    if (scc[k+1].has_state(dest))
+		    h_dest = scc[k+1].has_state(dest);
+		    if (h_dest)
 		      {
 			state_sequence seq;
 
-			seq.push_front(ecs_->h_filt(dest));
+			seq.push_front(h_dest);
 			while (src->compare(start))
 			  {
 			    seq.push_front(src);
@@ -596,16 +606,14 @@ namespace spot
 			break;
 		      }
 		    // Restrict the BFS to state inside the SCC.
-		    delete dest;
 		    continue;
 		  }
 
-		dest = ecs_->h_filt(dest);
-		if (father.find(dest) == father.end())
+		if (father.find(h_dest) == father.end())
 		  {
-		    todo.push_back(pair_state_iter(dest,
+		    todo.push_back(pair_state_iter(h_dest,
 						   ecs_->aut->succ_iter(dest)));
-		    father[dest] = src;
+		    father[h_dest] = src;
 		  }
 	      }
 	    delete i;
@@ -652,21 +660,23 @@ namespace spot
 	    const state* dest = i->current_state();
 
 	    // Do not escape this SCC or visit a state already visited.
-	    if (!scc.has_state(dest) || father.find(dest) != father.end())
+	    const state* h_dest = scc.has_state(dest);
+	    if (!h_dest)
 	      {
 		delete dest;
 		continue;
 	      }
-	    dest = ecs_->h_filt(dest);
+	    if (father.find(h_dest) != father.end())
+	      continue;
 
 	    bdd cond = i->current_condition();
 
 	    // If we have reached our destination, unwind the path
 	    // and populate PERIOD.
-	    if (dest == to)
+	    if (h_dest == to)
 	      {
 		cycle_path p;
-		p.push_front(state_proposition(dest, cond));
+		p.push_front(state_proposition(h_dest, cond));
 		while (src != from)
 		  {
 		    const state_proposition& psi = father[src];
@@ -685,8 +695,9 @@ namespace spot
 	      }
 
 	    // Common case: record backlinks and continue BFS.
-	    todo.push_back(pair_state_iter(dest, ecs_->aut->succ_iter(dest)));
-	    father[dest] = state_proposition(src, cond);
+	    todo.push_back(pair_state_iter(h_dest,
+					   ecs_->aut->succ_iter(h_dest)));
+	    father[h_dest] = state_proposition(src, cond);
 	  }
 	delete i;
       }
@@ -755,30 +766,30 @@ namespace spot
 		continue;
 	      }
 
-	    const state* dest = iter->current_state();
-
 	    // We must not escape the current SCC.
-	    if (!scc.has_state(dest))
+	    const state* dest = iter->current_state();
+	    const state* h_dest = scc.has_state(dest);
+	    if (!h_dest)
 	      {
 		delete dest;
 		iter->next();
 		continue;
 	      }
 
-	    dest = ecs_->h_filt(dest);
 	    bdd acc = iter->current_acceptance_conditions() | todo.top().acc;
-	    path.push_back(state_proposition(dest, iter->current_condition()));
+	    path.push_back(state_proposition(h_dest,
+					     iter->current_condition()));
 
 	    // Advance iterator for next step.
 	    iter->next();
 
-	    if (seen.find(dest) == seen.end())
+	    if (seen.find(h_dest) == seen.end())
 	      {
 		// A new state: continue the DFS.
-		tgba_succ_iterator* di = ecs_->aut->succ_iter(dest);
+		tgba_succ_iterator* di = ecs_->aut->succ_iter(h_dest);
 		di->first();
-		todo.push(triplet(dest, di, acc));
-		seen.insert(dest);
+		todo.push(triplet(h_dest, di, acc));
+		seen.insert(h_dest);
 		continue;
 	      }
 

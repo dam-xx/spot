@@ -183,8 +183,12 @@ namespace spot
       /// component
       set_type states;
 
-      /// Check if the SCC contains states \a s.
-      bool has_state(const state* s) const;
+      /// \brief Check if the SCC contains states \a s.
+      ///
+      /// Return the representative of \a s in the SCC, and delete \a
+      /// s if it is different (acting like
+      /// emptiness_check_status::h_filt), or 0 otherwise.
+      const state* has_state(const state* s) const;
     };
 
     /// Called by counter_example to find a path which traverses all
