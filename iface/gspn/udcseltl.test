@@ -20,7 +20,8 @@ chmod +w udcs
 # !G(ReP1 => F(gsP1)) is false
 ../ltlgspn-srg -c -l -e udcs/udcs \
   '!G(ReP1 => F(gsP1))' ReP1 gsP1 >output && exit 1
-../ltlgspn-srg -c -l -e2 udcs/udcs \
+../ltlgspn-srg -d dead -c -l -e2 udcs/udcs \
   '!G(ReP1 => F(gsP1))' ReP1 gsP1 >output && exit 1
-
+grep 'dead:0' output
+grep 'dead:1' output && exit 1
 :

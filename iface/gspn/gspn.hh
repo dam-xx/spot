@@ -36,12 +36,14 @@ namespace spot
   {
   public:
     gspn_interface(int argc, char **argv,
-		   bdd_dict* dict, const gspn_environment& env);
+		   bdd_dict* dict, gspn_environment& env,
+		   const std::string& dead = "true");
     ~gspn_interface();
     tgba* automaton() const;
   private:
     bdd_dict* dict_;
-    const gspn_environment& env_;
+    gspn_environment& env_;
+    const std::string dead_;
   };
 }
 

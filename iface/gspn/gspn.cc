@@ -89,9 +89,11 @@ namespace spot
     size_t index_count;
     const state_gspn* last_state_conds_input;
     bdd last_state_conds_output;
+    bdd alive_prop;
+    bdd dead_prop;
 
-
-    tgba_gspn_private_(bdd_dict* dict, const gspn_environment& env)
+    tgba_gspn_private_(bdd_dict* dict, gspn_environment& env,
+		       const std::string& dead)
       : refs(1), dict(dict), all_indexes(0), last_state_conds_input(0)
     {
       const gspn_environment::prop_map& p = env.get_prop_map();
@@ -101,6 +103,11 @@ namespace spot
 	  for (gspn_environment::prop_map::const_iterator i = p.begin();
 	       i != p.end(); ++i)
 	    {
+	      // Skip the DEAD proposition, GreatSPN knows nothing
+	      // about it.
+	      if (i->first == dead)
+		continue;
+
 	      int var = dict->register_proposition(i->second, this);
 	      AtomicProp index;
 	      int err = prop_index(i->first.c_str(), &index);
@@ -128,6 +135,38 @@ namespace spot
 	  // all BDD variables which have been registered so far.
 	  dict->unregister_all_my_variables(this);
 	  throw;
+	}
+
+      // Register the "dead" proposition.  There are three cases to
+      // consider:
+      //  * If DEAD is "false", it means we are not interested in finite
+      //    sequences of the system.
+      //  * If DEAD is "true", we want to check finite sequences as well
+      //    as infinite sequences, but do not need to distinguish them.
+      //  * If DEAD is any other string, this is the name a property
+      //    that should be true when looping on a dead state, and false
+      //    otherwise.
+      // We handle these three case by setting ALIVE_PROP and DEAD_PROP
+      // appropriately.  ALIVE_PROP is the bdd that should be ANDed
+      // to all transitions leaving a live state, while DEAD_PROP should
+      // bdd ANDed to all transitions leaving a dead state.
+      if (!strcasecmp(dead.c_str(), "false"))
+	{
+	  alive_prop = bddtrue;
+	  dead_prop = bddfalse;
+	}
+      else if (!strcasecmp(dead.c_str(), "true"))
+	{
+	  alive_prop = bddtrue;
+	  dead_prop = bddtrue;
+	}
+      else
+	{
+	  ltl::formula* f = env.require(dead);
+	  assert(f);
+	  int var = dict->register_proposition(f, this);
+	  dead_prop = bdd_ithvar(var);
+	  alive_prop = bdd_nithvar(var);
 	}
     }
 
@@ -193,21 +232,22 @@ namespace spot
 	successors_(0),
 	size_(0),
 	current_(0),
-	data_(data)
+	data_(data),
+	from_state_(state)
     {
       int res = succ(state, &successors_, &size_);
       if (res)
 	throw gspn_exeption("succ()", res);
-      assert(successors_);
-      // GSPN is expected to return a looping "dead" transition where
-      // there is no successor.
-      assert(size_ > 0);
+      // GreatSPN should return successors_ == 0 and size_ == 0 when a
+      // state has no successors.
+      assert((size_ <= 0) ^ (successors_ != 0));
     }
 
     virtual
     ~tgba_succ_iterator_gspn()
     {
-      succ_free(successors_);
+      if (successors_)
+	succ_free(successors_);
     }
 
     virtual void
@@ -232,14 +272,23 @@ namespace spot
     virtual state*
     current_state() const
     {
-      return new state_gspn(successors_[current_].s);
+      // If GreatSPN returned no successor, we stutter on the dead state.
+      return
+	new state_gspn(successors_ ? successors_[current_].s : from_state_);
     }
 
     virtual bdd
     current_condition() const
     {
-      bdd p = data_->index_to_bdd(successors_[current_].p);
-      return state_conds_ & p;
+      if (successors_)
+	{
+	  bdd p = data_->index_to_bdd(successors_[current_].p);
+	  return state_conds_ & p & data_->alive_prop;
+	}
+      else
+	{
+	  return state_conds_ & data_->dead_prop;
+	}
     }
 
     virtual bdd
@@ -254,6 +303,7 @@ namespace spot
     size_t size_;		/// size of successors_
     size_t current_;		/// current position in successors_
     tgba_gspn_private_* data_;
+    State from_state_;
   }; // tgba_succ_iterator_gspn
 
 
@@ -269,7 +319,8 @@ namespace spot
   class tgba_gspn: public tgba
   {
   public:
-    tgba_gspn(bdd_dict* dict, const gspn_environment& env);
+    tgba_gspn(bdd_dict* dict, gspn_environment& env,
+	      const std::string& dead);
     tgba_gspn(const tgba_gspn& other);
     tgba_gspn& operator=(const tgba_gspn& other);
     virtual ~tgba_gspn();
@@ -290,9 +341,10 @@ namespace spot
   };
 
 
-  tgba_gspn::tgba_gspn(bdd_dict* dict, const gspn_environment& env)
+  tgba_gspn::tgba_gspn(bdd_dict* dict, gspn_environment& env,
+		       const std::string& dead)
   {
-    data_ = new tgba_gspn_private_(dict, env);
+    data_ = new tgba_gspn_private_(dict, env, dead);
   }
 
   tgba_gspn::tgba_gspn(const tgba_gspn& other)
@@ -410,8 +462,9 @@ namespace spot
   //////////////////////////////////////////////////////////////////////
 
   gspn_interface::gspn_interface(int argc, char **argv,
-				 bdd_dict* dict, const gspn_environment& env)
-    : dict_(dict), env_(env)
+				 bdd_dict* dict, gspn_environment& env,
+				 const std::string& dead)
+    : dict_(dict), env_(env), dead_(dead)
   {
     int res = initialize(argc, argv);
     if (res)
@@ -428,9 +481,7 @@ namespace spot
   tgba*
   gspn_interface::automaton() const
   {
-    return new tgba_gspn(dict_, env_);
+    return new tgba_gspn(dict_, env_, dead_);
   }
-
-
 
 }

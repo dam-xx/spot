@@ -52,6 +52,12 @@ syntax(char* prog)
 	    << "  -c  compute an example" << std::endl
 	    << "      (instead of just checking for emptiness)" << std::endl
 	    << std::endl
+#ifndef SSP
+            << "  -d DEAD" << std::endl
+            << "      use DEAD as property for marking dead states"
+	    << " (by default DEAD=true)" << std::endl
+#endif
+
 	    << "  -e  use Couvreur's emptiness-check (default)" << std::endl
 	    << "  -e2 use Couvreur's emptiness-check's shy variant" << std::endl
 #ifdef SSP
@@ -81,6 +87,7 @@ main(int argc, char **argv)
       enum { Lacim, Fm } trans = Lacim;
       bool compute_counter_example = false;
       bool proj = true;
+      std::string dead = "true";
 
       spot::gspn_environment env;
 
@@ -90,6 +97,17 @@ main(int argc, char **argv)
 	    {
 	      compute_counter_example = true;
 	    }
+#ifndef SSP
+	  else if (!strcmp(argv[formula_index], "-d"))
+	    {
+	      if (formula_index + 1 >= argc)
+		syntax(argv[0]);
+	      dead = argv[++formula_index];
+	      if (strcasecmp(dead.c_str(), "true")
+		  && strcasecmp(dead.c_str(), "false"))
+		env.declare(dead);
+	    }
+#endif
 	  else if (!strcmp(argv[formula_index], "-e"))
 	    {
 	      check = Couvreur;
@@ -164,7 +182,7 @@ main(int argc, char **argv)
       if (spot::format_tgba_parse_errors(std::cerr, pel1))
 	return 2;
 #else
-      spot::gspn_interface gspn(2, argv, dict, env);
+      spot::gspn_interface gspn(2, argv, dict, env, dead);
 #endif
 
       spot::tgba* a_f = 0;

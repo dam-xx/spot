@@ -1,5 +1,16 @@
 2004-05-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/gspn.cc (tgba_gspn_private_): Define alive_prop,
+	and dead_prop from the dead argument passed to the constructor.
+	(tgba_succ_iterator_gspn): Stutter on dead transitions.
+	(tgba_gspn::tgba_gspn): Hand dead to tgba_gspn_private_.
+	(gspn_interface::gspn_interface): Hand dead to tgba_gspn.
+	* iface/gspn/gspn.hh (gspn_interface::gspn_interface): Take a
+	dead argument.
+	* iface/gspn/ltlgspn.cc [!SSP]: Add a option -d to specify the
+	dead property.
+	* iface/gspn/udcseltl.test: Try option -d.
+
 	* src/sanity/style.test: Check the iface/ tree too.
 	* iface/gspn/gspn.cc, iface/gspn/ssp.cc: Fix style.
 
