@@ -1,3 +1,8 @@
+2003-07-13  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac: Bump version to 0.0d.
+	* NEWS, README: New files.
+
 2003-07-12  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* m4/lbtt.m4: Run lbtt-translate, not lbtt.
@@ -116,7 +121,7 @@
 2003-07-03  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/tgbaproduct.cc (tgba_product_succ_iterator::first):
-	Simplify, do not call next_non_false_() either side is done.
+	Simplify, do not call next_non_false_() if either side is done.
 
 	* src/tgba/succiter.hh (tgba_succ_iterator::current_condition):
 	State that this is a boolean function.

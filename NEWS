@@ -1,0 +1,18 @@
+New in spot 0.0d (2003-07-13):
+
+  * Optimize translation of G operators occurring at the root
+    of a formula (or its immediate children when the root is a
+    conjunction).  This saves two BDD variables per G operator.
+  * Distribute lbtt, and run it during `make check'.
+  * First sketch of GSPN interface.
+  * succ_iter_concreate::next() completely rewritten.
+  * Transitions are now labelled by boolean formulae (not only
+    conjunctions).
+  * Documentation:
+    - Output collaboration diagrams.
+    - Build and distribute PDF manual.
+  * Many bug fixes.
+
+New in spot 0.0b (2003-06-26):
+
+  * Everything.

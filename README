@@ -1,0 +1,38 @@
+Layout of the source tree
+=========================
+
+Core directories
+----------------
+
+src/           Sources for libspot.
+   ltlast/     LTL abstract syntax tree.
+   ltlenv/     LTL environments.
+   ltlparse/   Parser for LTL formulae.
+   ltlvisit/   Visitors of LTL formulae.
+   ltltest/    Tests for ltlast/, ltlenv/, ltlparse/, and ltlvisit/.
+   misc/       Miscellaneous support files.
+   tgba/       TGBA objects and cousins.
+   tgbaalgos/  Algorithms on TGBAs.
+   tgbaparse/  Parser for explicit TGBAs.
+   tgbatest/   Tests for tgba/, tgbaalgos/, and tgbaparse/.
+doc/	       Documentation for libspot.
+   spot.html/  HTML manual.
+   spot.latex/ Sources for the PDF manual. (No distributed, can be rebuilt.)
+   spotref.pdf PDF manual.
+wrap/	       Wrappers for other languages.
+iface/	       Interfaces to other libraries.
+   gspn/       GreatSPN interface.
+
+
+Third party softwares
+---------------------
+
+buddy/   A patched version of BuDDy 2.2 (a BDD library).
+lbtt/    A patched version of lbtt 1.0.1 (an LTL to Büchi automata test bench).
+
+
+Build-system stuffs
+-------------------
+
+m4/      M4 macros used by configure.ac.
+tools/   Helper scripts used during the build.
