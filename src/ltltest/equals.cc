@@ -34,20 +34,29 @@
 void
 syntax(char* prog)
 {
-  std::cerr << prog << " formula1 formula2" << std::endl;
+  std::cerr << prog << " [-E] formula1 formula2" << std::endl;
   exit(2);
 }
 
 int
 main(int argc, char** argv)
 {
+  bool check_first = true;
+
+  if (argc > 1 && !strcmp(argv[1], "-E"))
+    {
+      check_first = false;
+      argv[1] = argv[0];
+      ++argv;
+      --argc;
+    }
   if (argc != 3)
     syntax(argv[0]);
 
   spot::ltl::parse_error_list p1;
   spot::ltl::formula* f1 = spot::ltl::parse(argv[1], p1);
 
-  if (spot::ltl::format_parse_errors(std::cerr, argv[1], p1))
+  if (check_first && spot::ltl::format_parse_errors(std::cerr, argv[1], p1))
     return 2;
 
   spot::ltl::parse_error_list p2;

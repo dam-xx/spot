@@ -1,5 +1,10 @@
 2004-11-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltltest/equals.cc (main): Add option -E.
+	* src/ltltest/parseerr.test: Use `equals -E' instead of `readltl'
+	to check the parsing of erroneous strings without being sensible
+	to the ordering for formulae in memory.
+
 	* src/tgbatest/randtgba.cc (to_float): Use strtod() instead of
 	strtof() to please Solaris 9.
 
