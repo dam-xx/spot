@@ -1,5 +1,7 @@
 2004-06-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* configure.ac, NEWS: Bump version to 0.0w.
+
 	* configure.ac, NEWS: Bump version to 0.0v.
 
 2004-06-28  Thomas Martinez  <martinez@src.lip6.fr>
