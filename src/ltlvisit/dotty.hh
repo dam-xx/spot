@@ -9,12 +9,12 @@ namespace spot
   namespace ltl
   {
     /// \brief Write a formula tree using dot's syntax.
-    /// \param f The formula to translate.
     /// \param os The stream where it should be output.
+    /// \param f The formula to translate.
     ///
     /// \c dot is part of the GraphViz package
     /// http://www.research.att.com/sw/tools/graphviz/
-    std::ostream& dotty(const formula* f, std::ostream& os);
+    std::ostream& dotty(std::ostream& os, const formula* f);
   }
 }
 

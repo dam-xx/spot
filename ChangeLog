@@ -1,3 +1,10 @@
+2003-08-06  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/ltlvisit/dotty.hh (dotty): Move the ostream argument first.
+	* src/ltlvisit/dump.hh (dump): Likewise.
+	* src/ltltest/equals.cc, src/ltltest/readltl.cc,
+	src/ltlvisit/dotty.cc, src/ltlvisit/dump.cc: Adjust.
+
 2003-08-05  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/misc/version.hh, src/misc/version.cc: New files.

@@ -9,11 +9,11 @@ namespace spot
   namespace ltl
   {
     /// \brief Dump a formula tree.
-    /// \param f The formula to dump.
     /// \param os The stream where it should be output.
+    /// \param f The formula to dump.
     ///
     /// This is useful to display a formula when debugging.
-    std::ostream& dump(const formula* f, std::ostream& os);
+    std::ostream& dump(std::ostream& os, const formula* f);
   }
 }
 

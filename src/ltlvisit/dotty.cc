@@ -101,7 +101,7 @@ namespace spot
     };
 
     std::ostream&
-    dotty(const formula* f, std::ostream& os)
+    dotty(std::ostream& os, const formula* f)
     {
       dotty_visitor::map m;
       dotty_visitor v(os, m);
