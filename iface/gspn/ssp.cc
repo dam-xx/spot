@@ -385,7 +385,7 @@ namespace spot
             state_array = (state**) realloc(state_array,
 					    (size_states + 1) * sizeof(state*));
 	    state_array[size_states] = i->current_state();
-	    props_[nb_arc_props].arc->curr_state  = size_states;
+	    props_[nb_arc_props].arc->curr_state = size_states;
             size_states++;
 
 	    while (all_conds_ != bddfalse)
@@ -533,10 +533,14 @@ namespace spot
   //////////////////////////////////////////////////////////////////////
 
   gspn_ssp_interface::gspn_ssp_interface(int argc, char **argv,
-					     bdd_dict* dict,
-					     const gspn_environment& env)
+					 bdd_dict* dict,
+					 const gspn_environment& env,
+					 bool inclusion)
     : dict_(dict), env_(env)
   {
+    if (inclusion)
+      inclusion_version();
+
     int res = initialize(argc, argv);
     if (res)
       throw gspn_exeption("initialize()", res);

@@ -174,7 +174,8 @@ main(int argc, char **argv)
       spot::bdd_dict* dict = new spot::bdd_dict();
 
 #if SSP
-      spot::gspn_ssp_interface gspn(2, argv, dict, env);
+      bool inclusion = (check != Couvreur && check != Couvreur2);
+      spot::gspn_ssp_interface gspn(2, argv, dict, env, inclusion);
 
       spot::tgba_parse_error_list pel1;
       spot::tgba_explicit* control = spot::tgba_parse(argv[formula_index + 2],

@@ -1,3 +1,12 @@
+2004-05-24  Soheib Baarir  <Souheib.Baarir@lip6.fr>
+
+	* iface/gspn/ssp.hh (gspn_ssp_interface::gspn_ssp_interface): Add
+	the `inclusion' flag.
+	* iface/gspn/ssp.cc (gspn_ssp_interface::gspn_ssp_interface): Call
+	inclusion_version when inclusion is set.
+	* iface/gspn/ltlgspn.cc (main) [SSP]: Turn on inclusion for -e3,
+	-e4, and -e5.
+
 2004-05-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/gspn.cc (tgba_gspn_private_): Define alive_prop,

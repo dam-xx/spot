@@ -38,7 +38,8 @@ namespace spot
   {
   public:
     gspn_ssp_interface(int argc, char **argv,
-			 bdd_dict* dict, const gspn_environment& env);
+		       bdd_dict* dict, const gspn_environment& env,
+		       bool inclusion = false);
     ~gspn_ssp_interface();
     tgba* automaton(const tgba* operand) const;
   private:
