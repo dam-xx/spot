@@ -244,7 +244,7 @@ means <code>G(F(a))</code>.  Use <code>"GFa"</code> if you really want
 to refer to <code>GFa</code> as a proposition.<br>Conversly, infix
 letter operators are not assumed to be operators if they are part of
 an indentifier: <code>aUb</code> is an atomic proposition, unlike
-<code>a&nbsp;U&nbsp;b</code> and <code>(a)U(b)</code><br>
+<code>a&nbsp;U&nbsp;b</code> and <code>(a)U(b)</code></p>
 
 <table border="1"><tr><td>
 <table border="0" rules="groups" frame="void" cellpadding="3" cellspacing=0>
@@ -297,7 +297,7 @@ an indentifier: <code>aUb</code> is an atomic proposition, unlike
     </tr>
 
   </tbody>
-</table></td></tr></table></p>"""
+</table></td></tr></table>"""
 
 column = [[], []]
 
@@ -331,11 +331,10 @@ for opt, desc, color in translators:
     else:
 	str = ""
     globals()[opt] = str
-    s = '<TD bgcolor=%s><INPUT type="radio" name="trans" value="%s" %s>%s</TD>'
+    s = \
+      '<TD bgcolor="%s"><INPUT type="radio" name="trans" value="%s" %s>%s</TD>'
     column[0].append(s % (color, opt, str, desc))
     add_options('', 0, color, globals()['options_' + opt])
-
-print """</TD></TR></TABLE><TABLE>"""
 
 add_options("Common Options", 1, '', options_common)
 add_options("Debugging Options", 1, '', options_debug)
