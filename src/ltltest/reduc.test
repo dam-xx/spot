@@ -36,7 +36,7 @@ for opt in 0 1 2 3; do
     ./reduc $opt "$f" >> result.data
   done
 
-  test $? == 0 || exit 1
+  test $? = 0 || exit 1
 
   perl -ne 'BEGIN { $sum1 = 0; $sum2 = 0; }
 /^(\d+)\s+(\d+)/;

@@ -1,3 +1,8 @@
+2004-07-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltltest/reduc.test: Use `test a = b' not `test a == b'.
+	Reported by <Denis.Poitrenaud@lip6.fr> (failure on Cygwin).
+
 2004-07-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/defs.in (VALGRIND): Specify --tool=memcheck for
