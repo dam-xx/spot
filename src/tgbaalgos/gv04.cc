@@ -238,8 +238,7 @@ namespace spot
 
       struct result:
 	public emptiness_check_result,
-	public acss_statistics,
-	public ars_statistics
+	public acss_statistics
       {
 	gv04& data;
 
@@ -265,7 +264,7 @@ namespace spot
 	    }
 	}
 
-	virtual int
+	virtual unsigned
 	acss_states() const
 	{
 	  // Gross!

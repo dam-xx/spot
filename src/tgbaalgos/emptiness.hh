@@ -26,6 +26,7 @@
 #include <iosfwd>
 #include <bdd.h>
 #include "tgba/state.hh"
+#include "emptiness_stats.hh"
 
 namespace spot
 {
@@ -98,6 +99,10 @@ namespace spot
     {
       return a_;
     }
+
+    /// Return statistics, if available.
+    virtual const unsigned_statistics* statistics() const;
+
   protected:
     const tgba* a_;		///< The automaton.
   };
@@ -130,6 +135,9 @@ namespace spot
     /// Some emptiness_check algorithms may allow check() to be called
     /// several time, but generally you should not assume that.
     virtual emptiness_check_result* check() = 0;
+
+    /// Return statistics, if available.
+    virtual const unsigned_statistics* statistics() const;
 
     /// Print statistics, if any.
     virtual std::ostream& print_stats(std::ostream& os) const;

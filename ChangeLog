@@ -1,5 +1,16 @@
 2005-02-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* tgbaalgos/emptiness_stats.hh (unsigned_statistics): New base
+	class for ec_statistics and ars_statistics.
+	(acss_statistics): Inherit from ars_statistics.
+	* tgbaalgos/emptiness.cc, tgbaalgos/emptiness.hh:
+	(emptiness_check::statistics, emptiness_check_result::statistics):
+	New methods.
+	* tgbatest/randtgba.cc: Adjust to use the above.
+	* tgbaalgos/gv04.cc, tgbaalgos/ndfs_result.hxx, tgbaalgos/gtec/ce.cc,
+	tgbaalgos/gtec/ce.hh: Do not inherit from ars_statistics if
+	acss_statistics is used.
+
 	* src/tgbaalgos/gtec/gtec.hh (couvreur99_check): Add pseudo code.
 
 2005-02-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>

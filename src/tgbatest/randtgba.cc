@@ -302,11 +302,11 @@ struct ec_stat
   }
 
   void
-  count(const spot::ec_statistics* ec)
+  count(const spot::unsigned_statistics* ec)
   {
-    int s = ec->states();
-    int t = ec->transitions();
-    int m = ec->max_depth();
+    int s = ec->get("states");
+    int t = ec->get("transitions");
+    int m = ec->get("max. depth");
 
     if (n++)
       {
@@ -348,12 +348,15 @@ struct ec_ratio_stat
   }
 
   void
-  count(const spot::ec_statistics* ec, const spot::tgba* a)
+  count(const spot::unsigned_statistics* ec, const spot::tgba* a)
   {
     spot::tgba_statistics a_size = spot::stats_reachable(a);
-    float ms = ec->states() / static_cast<float>(a_size.states);
-    float mt = ec->transitions() / static_cast<float>(a_size.transitions);
-    float mm = ec->max_depth() / static_cast<float>(a_size.states);
+    int s = ec->get("states");
+    int t = ec->get("transitions");
+    int m = ec->get("max. depth");
+    float ms = s / static_cast<float>(a_size.states);
+    float mt = t / static_cast<float>(a_size.transitions);
+    float mm = m / static_cast<float>(a_size.states);
 
     if (n++)
       {
@@ -1413,8 +1416,7 @@ main(int argc, char** argv)
 		      ec = cons_emptiness_check(i, a, degen, real_n_acc);
 		    }
 		  tm_ec.stop(algo);
-		  const spot::ec_statistics* ecs =
-		    dynamic_cast<const spot::ec_statistics*>(ec);
+		  const spot::unsigned_statistics* ecs = ec->statistics();
 		  if (opt_z && ecs)
 		    {
 		      ec_stats[algo].count(ecs);
@@ -1432,7 +1434,8 @@ main(int argc, char** argv)
 			std::cout << "acc. run";
 		      ++n_non_empty;
 		      const spot::acss_statistics* acss =
-			dynamic_cast<const spot::acss_statistics*>(res);
+			dynamic_cast<const spot::acss_statistics*>
+			  (res->statistics());
 		      if (opt_z && acss)
 			{
 			  acss_stats[algo].count(acss);
@@ -1443,7 +1446,8 @@ main(int argc, char** argv)
 			  spot::tgba_run* run;
 
 			  const spot::ars_statistics* ars =
-			    dynamic_cast<const spot::ars_statistics*>(res);
+			    dynamic_cast<const spot::ars_statistics*>
+			      (res->statistics());
 
 			  tm_ar.start(algo);
 			  for (int count = opt_R;;)

@@ -82,10 +82,10 @@ namespace spot
   {
   }
 
-  int
+  unsigned
   couvreur99_check_result::acss_states() const
   {
-    int count = 0;
+    unsigned count = 0;
     int scc_root = ecs_->root.top().index;
 
     numbered_state_heap_const_iterator* i = ecs_->h->iterator();

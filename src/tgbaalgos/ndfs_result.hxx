@@ -67,15 +67,16 @@ namespace spot
     // size() method (which we indicate using n==1).
 
     template <typename T, int n>
-    struct acss_interface
+    struct stats_interface
+      : public ars_statistics
     {
     };
 
     template <typename T>
-    struct acss_interface<T, 1>
+    struct stats_interface<T, 1>
       : public acss_statistics
     {
-      int
+      unsigned
       acss_states() const
       {
 	// all visited states are in the state space search
@@ -89,9 +90,8 @@ namespace spot
   template <typename ndfs_search, typename heap>
   class ndfs_result:
     public emptiness_check_result,
-    public ars_statistics,
-    // Conditionally inherit from acss_statistics.
-    public acss_interface<ndfs_result<ndfs_search, heap>, heap::Has_Size>
+    // Conditionally inherit from acss_statistics or ars_statistics.
+    public stats_interface<ndfs_result<ndfs_search, heap>, heap::Has_Size>
   {
   public:
     ndfs_result(const ndfs_search& ms)
@@ -216,7 +216,7 @@ namespace spot
     const ndfs_search& ms_;
     const heap& h_;
     template <typename T, int n>
-    friend struct acss_interface;
+    friend struct stats_interface;
 
     struct transition {
       const state* source;
@@ -286,7 +286,7 @@ namespace spot
                     }
                   else if (seen.find(s_prime) == seen.end())
                     {
-		      inc_ars_cycle_states();
+		      this->inc_ars_cycle_states();
                       ndfsr_trace << "  it is not seen, go down" << std::endl;
                       seen.insert(s_prime);
                       tgba_succ_iterator* i = a_->succ_iter(s_prime);
@@ -295,7 +295,7 @@ namespace spot
                     }
                   else if ((acc & covered_acc) != acc)
                     {
-		      inc_ars_cycle_states();
+		      this->inc_ars_cycle_states();
                       ndfsr_trace << "  a propagation is needed, "
                                   << "start a search" << std::endl;
                       if (search(s_prime, target, dead))

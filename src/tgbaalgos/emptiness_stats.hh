@@ -23,6 +23,8 @@
 # define SPOT_TGBAALGOS_EMPTINESS_STATS_HH
 
 #include <cassert>
+#include <map>
+#include <string>
 
 namespace spot
 {
@@ -30,17 +32,48 @@ namespace spot
   /// \addtogroup emptiness_check_stats
   /// @{
 
+  class unsigned_statistics
+  {
+  public:
+
+    virtual
+    ~unsigned_statistics()
+    {
+    }
+
+    unsigned
+    get(const char* str) const
+    {
+      stats_map_::const_iterator i = stats_.find(str);
+      assert(i != stats_.end());
+      return (this->*i->second)();
+    }
+
+  protected:
+    typedef unsigned (unsigned_statistics::*unsigned_fun_)() const;
+    typedef std::map<std::string, unsigned_fun_> stats_map_;
+    stats_map_ stats_;
+  };
+
   /// \brief Emptiness-check statistics
   ///
   /// Implementations of spot::emptiness_check may also implement
   /// this interface.  Try to dynamic_cast the spot::emptiness_check
   /// pointer to know whether these statistics are available.
-  class ec_statistics
+  class ec_statistics: public unsigned_statistics
   {
   public :
     ec_statistics()
     : states_(0), transitions_(0), depth_(0), max_depth_(0)
     {
+      stats_["states"] =
+	static_cast<unsigned_statistics::unsigned_fun_>(&ec_statistics::states);
+      stats_["transitions"] =
+	static_cast<unsigned_statistics::unsigned_fun_>
+	  (&ec_statistics::transitions);
+      stats_["max. depth"] =
+	static_cast<unsigned_statistics::unsigned_fun_>
+	  (&ec_statistics::max_depth);
     }
 
     void
@@ -76,25 +109,25 @@ namespace spot
       depth_ -= n;
     }
 
-    int
+    unsigned
     states() const
     {
       return states_;
     }
 
-    int
+    unsigned
     transitions() const
     {
       return transitions_;
     }
 
-    int
+    unsigned
     max_depth() const
     {
       return max_depth_;
     }
 
-    int
+    unsigned
     depth() const
     {
       return depth_;
@@ -107,29 +140,23 @@ namespace spot
     unsigned max_depth_;	/// maximal depth of the stack(s)
   };
 
-  /// \brief Accepting Cycle Search Space statistics
-  ///
-  /// Implementations of spot::emptiness_check_result may also implement
-  /// this interface.  Try to dynamic_cast the spot::emptiness_check_result
-  /// pointer to know whether these statistics are available.
-  class acss_statistics
-  {
-  public:
-    /// Number of states in the search space for the accepting cycle.
-    virtual int acss_states() const = 0;
-  };
-
   /// \brief Accepting Run Search statistics.
   ///
   /// Implementations of spot::emptiness_check_result may also implement
   /// this interface.  Try to dynamic_cast the spot::emptiness_check_result
   /// pointer to know whether these statistics are available.
-  class ars_statistics
+  class ars_statistics: public unsigned_statistics
   {
   public:
     ars_statistics()
       : prefix_states_(0), cycle_states_(0)
     {
+      stats_["(non unique) states for prefix"] =
+	static_cast<unsigned_statistics::unsigned_fun_>
+	  (&ars_statistics::ars_prefix_states);
+      stats_["(non unique) states for cycle"] =
+	static_cast<unsigned_statistics::unsigned_fun_>
+	  (&ars_statistics::ars_cycle_states);
     }
 
     void
@@ -138,7 +165,7 @@ namespace spot
       ++prefix_states_;
     }
 
-    int
+    unsigned
     ars_prefix_states() const
     {
       return prefix_states_;
@@ -150,7 +177,7 @@ namespace spot
       ++cycle_states_;
     }
 
-    int
+    unsigned
     ars_cycle_states() const
     {
       return cycle_states_;
@@ -160,6 +187,31 @@ namespace spot
     unsigned prefix_states_;	/// states visited to construct the prefix
     unsigned cycle_states_;	/// states visited to construct the cycle
   };
+
+  /// \brief Accepting Cycle Search Space statistics
+  ///
+  /// Implementations of spot::emptiness_check_result may also implement
+  /// this interface.  Try to dynamic_cast the spot::emptiness_check_result
+  /// pointer to know whether these statistics are available.
+  class acss_statistics: public ars_statistics
+  {
+  public:
+    acss_statistics()
+    {
+      stats_["search space states"] =
+	static_cast<unsigned_statistics::unsigned_fun_>
+	  (&acss_statistics::acss_states);
+    }
+
+    virtual
+    ~acss_statistics()
+    {
+    }
+
+    /// Number of states in the search space for the accepting cycle.
+    virtual unsigned acss_states() const = 0;
+  };
+
 
   /// @}
 }
