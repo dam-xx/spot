@@ -32,12 +32,14 @@
 namespace spot
 {
 
+  /*
   enum search_opt
     {
       magic     = 0,
       nested    = 1,
       my_nested = 2
     };
+  */
 
   class nesteddfs_search: public emptyness_search
   {

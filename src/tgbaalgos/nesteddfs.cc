@@ -76,7 +76,7 @@ namespace spot
     if (hi == h.end())
       {
 	//magic d = { !m, m, true, stack.size() + 1};
-	magic d = { !m, m, true, };
+	magic d = { !m, m, true };
 	h[s] = d;
       }
     else

@@ -36,9 +36,20 @@ namespace spot
 	 i != stack.end(); ++i)
       {
 	//if ((*i).s)
+	hash_type::iterator hi = h.find(i->s);
+	if (hi != h.end())
+	  h.erase(hi);
 	delete (*i).s;
 	//if ((*i).lasttr)
 	delete (*i).lasttr;
+      }
+
+    for (hash_type::iterator i = h.begin();
+	 i != h.end();)
+      {
+	const state *s = i->first;
+	++i;
+	delete s;
       }
   }
 
@@ -98,10 +109,10 @@ namespace spot
   void
   tarjan_on_fly::push(const state* s)
   {
-    h[s] = 1;
+    h[s] = top;
     top++;
 
-    struct_state ss = { s, 0, top, dftop, 0, 0 };
+    struct_state ss = { s, 0, top, dftop, 0 };
 
     if (a->state_is_accepting(s))
       {
@@ -117,7 +128,12 @@ namespace spot
       {
 	const state* sdel = stack[top].s;
 	tgba_succ_iterator* iter = stack[top].lasttr;
-	delete sdel;
+
+	if (h.find(sdel) == h.end())
+	  {
+	    assert(0);
+	    delete sdel;
+	  }
 	if (iter)
 	  delete iter;
 
@@ -135,6 +151,12 @@ namespace spot
   void
   tarjan_on_fly::pop()
   {
+    /*
+      const state *s = stack[dftop].s;
+      hash_type::iterator hi = h.find(s);
+      hi->second = -1;
+    */
+
     int p = stack[dftop].pre;
 
     if (p >= 0)
@@ -163,6 +185,15 @@ namespace spot
   tarjan_on_fly::in_stack(const state* s) const
   {
     int n = 0;
+
+    /*
+    hash_type::const_iterator hi = h.find(s);
+    if (hi != h.end())
+      n = hi->second;
+    else
+      n = -1;
+    */
+
     stack_type::const_iterator i;
     for (i = stack.begin(); i != stack.end(); ++i, ++n)
       if (s->compare((*i).s) == 0)

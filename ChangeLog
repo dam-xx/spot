@@ -1,5 +1,13 @@
 2004-09-14  Thomas Martinez  <martinez@src.lip6.fr>
 
+	* src/tgbatest/emptchk.test
+	src/tgbaalgos/tarjan_on_fly.hh,
+	src/tgbaalgos/tarjan_on_fly.cc,
+	src/tgbaalgos/nesteddfs.hh,
+	src/tgbaalgos/nesteddfs.cc,
+	src/tgbaalgos/minimalce.hh,
+	src/tgbaalgos/minimalce.cc: To correct a bug.
+
 	* src/ltltest/reduc.test (FICH): bad file name.
 
 2004-09-13  Thomas Martinez  <martinez@src.lip6.fr>

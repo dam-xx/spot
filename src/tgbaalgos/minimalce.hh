@@ -36,6 +36,13 @@
 namespace spot
 {
 
+  enum search_opt
+    {
+      magic     = 0,
+      nested    = 1,
+      my_nested = 2
+    };
+
   namespace ce
   {
 
@@ -89,7 +96,8 @@ namespace spot
   class minimalce_search: public emptyness_search
   {
   public:
-    minimalce_search(const tgba_tba_proxy *a, bool mode = false);
+    //minimalce_search(const tgba_tba_proxy *a, bool mode = false);
+    minimalce_search(const tgba_tba_proxy *a, int opt = nested);
 
     virtual ~minimalce_search();
 
@@ -97,17 +105,34 @@ namespace spot
     virtual ce::counter_example* check();
 
     /// \brief Find a counter example shorter than \a min_ce.
-    ce::counter_example* check(ce::counter_example* min_ce);
+    //ce::counter_example* check(ce::counter_example* min_ce);
 
-    ce::counter_example* find();
+    //ce::counter_example* find();
 
     /// \brief Print Stat.
     std::ostream& print_stat(std::ostream& os) const;
+    std::ostream& print_result(std::ostream& os,
+			       const tgba* restrict = 0) const;
 
-    ce::counter_example* get_minimal_cyle() const;
-    ce::counter_example* get_minimal_prefix() const;
+    //ce::counter_example* get_minimal_cyle() const;
+    //ce::counter_example* get_minimal_prefix() const;
 
   private:
+
+    /// \brief Minimisation is implemented on the magic search algorithm.
+    struct magic
+    {
+      bool seen_without : 1;
+      bool seen_with    : 1;
+      bool seen_path    : 1;
+      unsigned int depth;
+    };
+
+    struct magic_state
+    {
+      const state* s;
+      bool m;
+    };
 
     enum search_mode
       {
@@ -116,6 +141,52 @@ namespace spot
       };
     //int mode;
 
+
+    typedef std::pair<magic_state, tgba_succ_iterator*> state_iter_pair;
+    typedef std::list<state_iter_pair> stack_type;
+    stack_type stack;		///< Stack of visited states on the path.
+
+    typedef std::list<bdd> tstack_type;
+    /// \brief Stack of transitions.
+    ///
+    /// This is an addition to the data from the paper.
+    tstack_type tstack;
+
+    typedef Sgi::hash_map<const state*, magic,
+			  state_ptr_hash, state_ptr_equal> hash_type;
+    hash_type h;		///< Map of visited states.
+
+    /// Append a new state to the current path.
+    bool push(const state* s, bool m);
+    /// Check whether we already visited \a s with the Magic bit set to \a m.
+    bool has(const state* s, bool m) const;
+    /// Check if \a s is in the path.
+    bool exist_path(const state* s) const;
+    /// Return the depth of the state \a s in stack.
+    int depth_path(const state* s) const;
+
+    void build_counter();
+
+    const tgba_tba_proxy* a;	///< The automata to check.
+    /// The state for which we are currently seeking an SCC.
+    const state* x;
+    /// \brief Active the nested search which produce a
+    /// smaller counter example.
+    bool nested_;
+    /// \brief Active the nested bis search which produce a
+    /// smaller counter example.
+    const state* x_bis;
+    bool my_nested_;
+    bool accepted_path_;
+    int accepted_depth_;
+
+    unsigned int Maxsize;
+
+    ce::counter_example* counter_;
+    std::list<ce::counter_example*> l_ce;
+
+    ///////////////////////////////////////////////////////////////////
+    /*
     //typedef std::pair<int, tgba_succ_iterator*> state_iter_pair;
     typedef Sgi::hash_map<const state*, int,
 			  state_ptr_hash, state_ptr_equal> hash_type;
@@ -158,6 +229,7 @@ namespace spot
     /// Save the current path in stack as a counter example.
     /// this counter example is the minimal that we have found yet.
     void save_counter(const state* s, std::ostringstream& os);
+    */
   };
 
 }

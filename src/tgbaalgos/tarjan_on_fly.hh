@@ -57,7 +57,7 @@ namespace spot
       int pre;
       int acc;
 
-      int pos;
+      //int pos;
     };
 
     //typedef std::pair<int, tgba_succ_iterator*> state_iter_pair;
