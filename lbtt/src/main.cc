@@ -111,13 +111,16 @@ vector<TestStatistics, ALLOC(TestStatistics) >      /* Overall test        */
  *
  *****************************************************************************/
 
-void testLoop()
+int testLoop()
 {
   using namespace DispUtil;
   using namespace SharedTestData;
   using namespace StatDisplay;
   using namespace StringUtil;
   using namespace TestOperations;
+
+  /* Return code.  Will be set to 1 if any of the test fails.  */
+  int exit_status = 0;
 
   const Configuration::GlobalConfiguration& global_options
     = configuration.global_options;
@@ -170,9 +173,9 @@ void testLoop()
     try
     {
       round_info.transcript_file << "lbtt " PACKAGE_VERSION
-                                    " error log file, created on "
-                                    + string(ctime(&current_time))
-	                            + '\n';
+				    " error log file, created on "
+				    + string(ctime(&current_time))
+				    + '\n';
 
       configuration.print(round_info.transcript_file);
     }
@@ -262,14 +265,14 @@ void testLoop()
 
   for (round_info.current_round = 1;
        !round_info.abort
-         && round_info.current_round <= global_options.number_of_rounds;
+	 && round_info.current_round <= global_options.number_of_rounds;
        ++round_info.current_round)
   {
     user_break = false;
     round_info.error = false;
     round_info.skip
       = (round_info.current_round < round_info.next_round_to_run);
-	
+
     if (!round_info.skip)
     {
       if (!printText(string("Round ") + toString(round_info.current_round)
@@ -296,7 +299,7 @@ void testLoop()
       round_info.fresh_statespace
 	= ((global_options.do_comp_test || global_options.do_cons_test)
 	   && round_info.next_round_to_change_statespace
-	        == round_info.current_round);
+		== round_info.current_round);
 
       if (round_info.fresh_statespace)
       {
@@ -304,13 +307,13 @@ void testLoop()
 	seed48(statespace_random_state);
 	for (int i = 0; i < 3; i++)
 	  statespace_random_state[i] = static_cast<short int>
-	                                 (LRAND(0, LONG_MAX));
+					 (LRAND(0, LONG_MAX));
 #else
 	SRAND(global_options.statespace_random_seed);
 	configuration.global_options.statespace_random_seed
 	  = LRAND(0, RAND_MAX);
 #endif /* HAVE_RAND48 */
-	
+
 	if (global_options.statespace_change_interval == 0)
 	  round_info.next_round_to_change_statespace
 	    = global_options.number_of_rounds + 1;
@@ -349,7 +352,7 @@ void testLoop()
        */
 
       round_info.fresh_formula
-	= (round_info.next_round_to_change_formula 
+	= (round_info.next_round_to_change_formula
 	     == round_info.current_round);
 
       if (round_info.fresh_formula)
@@ -419,7 +422,7 @@ void testLoop()
 	  verifyFormulaOnPath();
 
 	if (!round_info.error)
-        {
+	{
 	  unsigned long int num_enabled_implementations = 0;
 
 	  for (unsigned long int algorithm_id = 0;
@@ -450,7 +453,7 @@ void testLoop()
 	      try
 	      {
 		try
-	        {
+		{
 		  round_info.product_automaton = 0;
 
 		  /*
@@ -479,7 +482,7 @@ void testLoop()
 		     */
 
 		    performEmptinessCheck(counter, algorithm_id);
-		    
+
 		    /*
 		     *  If a product automaton was computed in this test round
 		     *  (it might have not if the emptiness checking result was
@@ -556,7 +559,7 @@ void testLoop()
 	      if (num_enabled_implementations >= 2
 		  || (num_enabled_implementations == 1
 		      && global_options.statespace_generation_mode
-		           & Configuration::PATH))
+			   & Configuration::PATH))
 		compareResults();
 	    }
 
@@ -586,6 +589,9 @@ void testLoop()
       user_break = false;
       round_info.next_round_to_stop = round_info.current_round;
     }
+
+    if (round_info.error)
+      exit_status = 1;
 
     /*
      *  Determine from the program configuration and the error status whether
@@ -655,7 +661,7 @@ void testLoop()
     time(&current_time);
 
     round_info.transcript_file << "lbtt error log closed on "
-                                  + string(ctime(&current_time))
+				  + string(ctime(&current_time))
 			       << endl;
 
     round_info.transcript_file.close();
@@ -666,6 +672,8 @@ void testLoop()
 
   if (round_info.formula_input_file.is_open())
     round_info.formula_input_file.close();
+
+  return exit_status;
 }
 
 
@@ -678,7 +686,7 @@ void testLoop()
 
 int main(int argc, char* argv[])
 {
-  try 
+  try
   {
     configuration.read(argc, argv);
   }
@@ -706,9 +714,9 @@ int main(int argc, char* argv[])
   using_history();
 #endif  /* HAVE_READLINE */
 
-  try 
+  try
   {
-    testLoop();
+    return testLoop();
   }
   catch (const Exception& e)
   {
@@ -720,6 +728,4 @@ int main(int argc, char* argv[])
     cerr << argv[0] << ": out of memory" << endl;
     exit(-1);
   }
-
-  return 0;
 }

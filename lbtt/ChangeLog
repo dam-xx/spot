@@ -1,6 +1,10 @@
 2003-07-09  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
-	* src/ExternalTranslator.h (class ExternalTranslator): 
+	I want $? = 1 whenever some test fails.
+	* src/main.cc (testLoop): Return 1 iff an error occured.
+	(main): Use testLoop's output as exit status.
+
+	* src/ExternalTranslator.h (class ExternalTranslator):
 	Declare class SpotWrapper as a friend.
 	* src/SpotWrapper.h, src/SpotWrapper.cc: New files.
 	* src/Makefile.am (lbtt_translate_SOURCES): Add SpotWrapper.cc
