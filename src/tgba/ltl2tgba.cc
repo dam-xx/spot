@@ -1,5 +1,8 @@
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
+#include "ltlvisit/lunabbrev.hh"
+#include "ltlvisit/nenoform.hh"
+#include "ltlvisit/destroy.hh"
 #include "tgbabddconcretefactory.hh"
 #include <cassert>
 
@@ -211,12 +214,23 @@ namespace spot
   tgba_bdd_concrete
   ltl_to_tgba(const ltl::formula* f)
   {
+    // Normalize the formula.  We want all the negation on
+    // the atomic proposition.  We also suppress logic
+    // abbreviation such as <=>, =>, or XOR, since they
+    // would involve negations at the BDD level.
+    const ltl::formula* f1 = ltl::unabbreviate_logic(f);
+    const ltl::formula* f2 = ltl::negative_normal_form(f1);
+    ltl::destroy(f1);
+
+    // Traverse the formula and draft the automaton in a factory.
     tgba_bdd_concrete_factory fact;
     ltl_trad_visitor v(fact);
-    f->accept(v);
+    f2->accept(v);
+    ltl::destroy(f2);
     fact.finish();
-    tgba_bdd_concrete g(fact);
-    g.set_init_state(v.result());
+
+    // Finally setup the resulting automaton.
+    tgba_bdd_concrete g(fact, v.result());
     return g;
   }
 }

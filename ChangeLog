@@ -1,5 +1,23 @@
 2003-06-25  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/succiterconcrete.hh (next_succ_set_): Rename as ...
+	(succ_set_left_): ... this.
+	(current_base_, current_base_left_): New variables.
+	* src/tgba/succiterconcrete.cc (tgba_succ_iterator_concrete::first):
+	Reset current_.
+	(tgba_succ_iterator_concrete::next): Rewrite.
+	(tgba_succ_iterator_concrete::current_state): Simplify.
+	(tgba_succ_iterator_concrete::current_accepting_conditions): Remove
+	atomic proposition with universal quantification.
+	* src/tgba/ltl2tgba.cc (ltl_to_tgba): Normalize the formula.
+	* src/tgba/tgbabddconcrete.cc (tgba_bdd_concrete::set_init_state): 
+	Complete the initial state.
+	(tgba_bdd_concrete::succ_iter): Do not remove Now variable
+	from the BDD passed to the iterator.
+	* tgba/tgbabddcoredata.hh (notnow_set, var_set): New variables.
+	* tgba/tgbabddcoredata.cc, tgba/tgbabddtranslatefactory.cc: Adjust
+	to update notnow_set and var_set.
+
 	* src/tgbatest/ltl2tgba.cc: Support -v.
 
 2003-06-24  Alexandre Duret-Lutz  <aduret@src.lip6.fr>

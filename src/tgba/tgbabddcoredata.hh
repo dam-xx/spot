@@ -31,9 +31,9 @@ namespace spot
     /// in which a transition is.  Actually we never return Acc[x]
     /// alone, but Acc[x] and all other accepting variables negated.
     ///
-    /// So if there is three accepting set \c a, \c b, and \c c, and 
+    /// So if there is three accepting set \c a, \c b, and \c c, and
     /// a transition is in set \c a, we'll return \c Acc[a]&!Acc[b]&!Acc[c].
-    /// If the transition is in both \c a and \c b, we'll return 
+    /// If the transition is in both \c a and \c b, we'll return
     /// \c (Acc[a]\&!Acc[b]\&!Acc[c]) \c | \c (!Acc[a]\&Acc[b]\&!Acc[c]).
     ///
     /// Accepting conditions are attributed to transitions and are
@@ -65,8 +65,14 @@ namespace spot
     /// The conjunction of all Now variables, in their negated form.
     bdd negnow_set;
     /// \brief The (positive) conjunction of all variables which are
+    /// not Now variables.
+    bdd notnow_set;
+    /// \brief The (positive) conjunction of all variables which are
     /// not Next variables.
     bdd notnext_set;
+    /// \brief The (positive) conjunction of all variables which are
+    /// atomic propositions.
+    bdd var_set;
     /// \brief The (positive) conjunction of all variables which are
     /// not atomic propositions.
     bdd notvar_set;

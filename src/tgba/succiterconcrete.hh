@@ -13,12 +13,14 @@ namespace spot
   public:
     /// \brief Build a spot::tgba_succ_iterator_concrete.
     ///
-    /// \param successors The set of successors with ingoing conditions
-    /// and promises, represented as a BDD.  The job of this iterator
-    /// will be to enumerate the satisfactions of that BDD and split
-    /// them into destination state, conditions, and promises.
-    /// \param d The core data of the automata.  These contains
-    /// sets of variables useful to split a BDD.
+    /// \param successors The set of successors with ingoing
+    ///   conditions and accepting conditions, represented as a BDD.
+    ///   The job of this iterator will be to enumerate the
+    ///   satisfactions of that BDD and split them into destination
+    ///   states and conditions, and compute accepting conditions.  
+    /// \param d The core data of the automata.  
+    ///   These contains sets of variables useful to split a BDD, and
+    ///   compute accepting conditions.
     tgba_succ_iterator_concrete(const tgba_bdd_core_data& d, bdd successors);
     virtual ~tgba_succ_iterator_concrete();
 
@@ -33,10 +35,17 @@ namespace spot
     bdd current_accepting_conditions();
 
   private:
-    const tgba_bdd_core_data& data_; ///< Core data of the automata.
+    const tgba_bdd_core_data& data_; ///< Core data of the automaton.
     bdd succ_set_;	///< The set of successors.
-    bdd next_succ_set_;	///< Unexplored successors (including current_).
-    bdd current_;	///< Current successor.
+    bdd succ_set_left_;	///< Unexplored successors (including current_).
+    bdd current_;	///< Current successor, as a conjunction of
+			///  atomic proposition and Next variables.
+    bdd current_state_;	///< Current successor, as a
+			///  conjunction of Now variables.
+    bdd current_base_;	///< Current successor base.
+    bdd current_base_left_; ///< Used to lists all possible full satisfaction
+			    /// current_base_ which haven't been explored.
+
   };
 }
 
