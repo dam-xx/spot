@@ -51,3 +51,9 @@ check 'a U (b c) U e R (f g <=> h)' \
       'binop(R, binop(U, binop(U, AP(a), AP(b)), AP(e)), AP(f))'
 check 'a U ((c) U e) R (<=> f g)' \
       'binop(R, binop(U, AP(a), binop(U, AP(c), AP(e))), constant(0))'
+
+# Missing parentheses
+check 'a & (a + b' 'multop(And, AP(a), multop(Or, AP(a), AP(b)))'
+check 'a & (a + b c' 'multop(And, AP(a), multop(Or, AP(a), AP(b)))'
+check 'a & (+' 'multop(And, constant(0), AP(a))'
+check 'a & ('  'multop(And, constant(0), AP(a))'

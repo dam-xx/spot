@@ -1,11 +1,16 @@
-2003-08-07  Alexandre Duret-Lutz  <adl@gnu.org>
+2003-08-08  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/ltlparse/ltlparse.yy: Handle and diagnose mismatched parentheses.
+	* src/ltltest/parseerr.test: Add some examples.
+
+2003-08-07  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* wrap/python/cgi/ltl2tgba.in: Convert GIFs to PNGs.  Restrict
 	the size of dot's output to 1024x1024.
 	* src/tgbaalgos/dotty.cc (dotty_bfs::start): Do not preset
 	the size of the graph.  Set height=0 for the invisible state.
 
-2003-08-06  Alexandre Duret-Lutz  <adl@gnu.org>
+2003-08-06  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltlparse/ltlparse.yy: Fix precedence OP_OR < OP_XOR < OP_AND.
 	* src/ltlast/binop.cc (binop::instance): Order operands for

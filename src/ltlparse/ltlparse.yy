@@ -120,10 +120,18 @@ subformula: ATOMIC_PROP
 		 "treating this parenthetical block as false"));
 		$$ = constant::false_instance();
 	      }
-	    | PAR_OPEN subformula many_errors PAR_CLOSE
-	      { error_list.push_back(parse_error(@3,
-				      "unexpected input ignored"));
+	    | PAR_OPEN subformula many_errors_diagnosed PAR_CLOSE
+              { $$ = $2; }
+	    | PAR_OPEN subformula many_errors_diagnosed END_OF_INPUT
+	      { error_list.push_back(parse_error(@1 + @2,
+				      "missing closing parenthesis"));
 		$$ = $2;
+	      }
+	    | PAR_OPEN many_errors_diagnosed END_OF_INPUT
+	      { error_list.push_back(parse_error(@$,
+                    "missing closing parenthesis, "
+		    "treating this parenthetical block as false"));
+		$$ = constant::false_instance();
 	      }
 	    | OP_NOT subformula
 	      { $$ = unop::instance(unop::Not, $2); }
