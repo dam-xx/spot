@@ -17,4 +17,9 @@ $(srcdir)/stamp: $(srcdir)/Doxyfile.in $(top_srcdir)/configure.ac
 spot.html: $(srcdir)/stamp
 spot.latex: $(srcdir)/stamp
 
-EXTRA_DIST = $(srcdir)/stamp spot.html mainpage.dox
+$(srcdir)/spotref.pdf: $(srcdir)/stamp
+	cd spot.latex \
+	  && texi2dvi --pdf refman.tex \
+	  && cd .. && mv -f spot.latex/refman.pdf $@
+
+EXTRA_DIST = $(srcdir)/stamp spot.html mainpage.dox $(srcdir)/spotref.pdf

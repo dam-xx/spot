@@ -1,5 +1,9 @@
 2003-06-30  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* doc/Doxygen.in: Enable LaTeX output.
+	* doc/Makefile.am (spotref.pdf): New rule.
+	(EXTRA_DIST): Add spotref.pdf.
+
 	* src/tgba/tgbabddconcretefactory.cc:
 	(tgba_bdd_concrete_factory::tgba_bdd_concrete_factory): New.
 	(tgba_bdd_concrete_factory::create_state): Update now_to_next_.
