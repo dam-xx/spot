@@ -1,5 +1,9 @@
 2004-11-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/bfssteps.hh, src/tgbaalgos/bfssteps.cc: Revert
+	previous change (bfs_steps_with_path_conditions turned up
+	useless), and document bfs_step.
+
 	* src/tgbaalgos/bfssteps.hh (bfs_steps_with_path_conditions): New
 	class.
 	* src/tgbaalgos/bfssteps.cc: Remove includes that are now superfluous.

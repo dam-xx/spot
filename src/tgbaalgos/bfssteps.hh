@@ -22,11 +22,7 @@
 #ifndef SPOT_TGBAALGOS_BFSSTEPS_HH
 # define SPOT_TGBAALGOS_BFSSTEPS_HH
 
-#include <map>
-#include <deque>
-#include <utility>
 #include "emptiness.hh"
-#include "tgba/tgba.hh"
 
 namespace spot
 {
@@ -36,105 +32,60 @@ namespace spot
   /// This class should be used to compute the shortest path
   /// between a state of a spot::tgba and the first transition or
   /// state that matches some conditions.
+  ///
+  /// These conditions should be specified by defining bfs_steps::match()
+  /// in a subclass.  Also the search can be restricted to some set of
+  /// states with a proper definition of bfs_steps::filter().
   class bfs_steps
   {
   public:
     bfs_steps(const tgba* a);
     virtual ~bfs_steps();
+
+    /// \brief Start the search from \a start, and append the
+    /// resulting path (if any) to \a l.
+    ///
+    /// \return the destination state of the last step (not included
+    /// in \a l) if a matching path was found, or 0 otherwise.
     const state* search(const state* start, tgba_run::steps& l);
+
+    /// \brief Return a state* that is unique for \a a.
+    ///
+    /// bfs_steps does not do handle the memory for the states it
+    /// generates, this is the job of filter().  Here \a s is a new
+    /// state* that search() has just allocated (using
+    /// tgba_succ_iterator::current_state()), and the return of this
+    /// function should be a state* that does not need to be freed by
+    /// search().
+    ///
+    /// If you already have a map or a set which uses states as keys,
+    /// you should probably arrange for filter() to return these keys,
+    /// and delete \a s.  Otherwise you will have to define such a
+    /// set, just to be able to delete all the state* in a subclass.
+    ///
+    /// This function can return 0 if the given state should not be
+    /// explored.
     virtual const state* filter(const state* s) = 0;
+
+    /// \brief Whether a new transition completes a path.
+    ///
+    /// This function is called immediately after each call to
+    /// filter() that does not return 0.
+    ///
+    /// \param step the source state (as returned by filter()), and the
+    ///             labels of the outgoing transition
+    /// \param dest the destination state (as returned by filter())
+    /// \return true iff a path that included this step should be accepted.
+    ///
+    /// The search() algorithms stops as soon as match() returns true,
+    /// and when this happens the list argument of search() is be
+    /// augmented with the shortest past that ends with this
+    /// transition.
     virtual bool match(tgba_run::step& step, const state* dest) = 0;
   protected:
-    const tgba* a_;
+    const tgba* a_;		///< The spot::tgba we are searching into.
   };
 
-  template<typename T>
-  class bfs_steps_with_path_conditions
-  {
-  public:
-    bfs_steps_with_path_conditions(const tgba* a)
-      : a_(a)
-    {
-    }
-
-    virtual
-    ~bfs_steps_with_path_conditions()
-    {
-    }
-
-    virtual const state* filter(const state* s) = 0;
-    virtual bool match(tgba_run::step& step, const state* dest,
-		       const T& src_cond, T& dest_cond) = 0;
-
-    const state*
-    search(const state* start, tgba_run::steps& l)
-    {
-      // Records backlinks to parent state during the BFS.
-      // (This also stores the propositions of this link.)
-      std::map<const state*, tgba_run::step,
-	state_ptr_less_than> father;
-      // BFS queue.
-      std::deque<std::pair<const state*, T> > todo;
-      // Initial state.
-      todo.push_back(start);
-
-      while (!todo.empty())
-	{
-	  const state* src = todo.front().first;
-	  T cond = todo.front().second;
-	  todo.pop_front();
-	  tgba_succ_iterator* i = a_->succ_iter(src);
-	  for (i->first(); !i->done(); i->next())
-	    {
-	      const state* dest = filter(i->current_state());
-
-	      if (!dest)
-		continue;
-
-	      bdd cond = i->current_condition();
-	      bdd acc = i->current_acceptance_conditions();
-	      tgba_run::step s = { src, cond, acc };
-
-	      std::pair<const state*, T> next;
-	      next.first = src;
-
-	      if (match(s, dest, cond, next.second))
-		{
-		  // Found it!
-
-		  tgba_run::steps p;
-		  for (;;)
-		    {
-		      tgba_run::step tmp = s;
-		      tmp.s = tmp.s->clone();
-		      p.push_front(tmp);
-		      if (s.s == start)
-			break;
-		      s = father[s.s];
-		    }
-
-		  l.splice(l.end(), p);
-		  delete i;
-		  return dest;
-		}
-
-	      // Common case: record backlinks and continue BFS
-	      // for unvisited states.
-	      if (father.find(dest) == father.end())
-		{
-		  todo.push_back(next);
-		  father[dest] = s;
-		}
-	    }
-	  delete i;
-	}
-      return 0;
-
-    }
-
-  protected:
-    const tgba* a_;
-  };
 
 }
 
