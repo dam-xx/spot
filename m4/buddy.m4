@@ -18,7 +18,7 @@ AC_DEFUN([AX_CHECK_BUDDY], [
 
   if test "$with_included_buddy" = yes;  then
      AC_CONFIG_SUBDIRS([buddy])
-     BUDDY_LDFLAGS='$(top_srcdir)/buddy/src/bdd.la'
+     BUDDY_LDFLAGS='$(top_builddir)/buddy/src/libbdd.la'
      BUDDY_CPPFLAGS='-I$(top_srcdir)/buddy/src'
   else
      BUDDY_LDFLAGS='-lbdd'

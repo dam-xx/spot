@@ -1,5 +1,8 @@
 2003-06-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* m4/buddy.m4 (BUDDY_LDFLAGS): Use $(top_builddir), not $(top_srcdir).
+	* src/tgbaparse/Makefile.am (AM_CPPFLAGS): Add $(BUDDY_CPPFLAGS).
+
 	* doc/Makefile.am: Rewrite to run Doxygen whenever Doxyfile.in
 	or configure.ac changes.  Distribute the html doc.
 	* doc/Doxyfile.in (EXCLUDE_PATTERNS): Complete with
