@@ -148,12 +148,17 @@ namespace spot
   {
     assert(dict_ == right->get_dict());
 
+    bdd lna = left_->neg_accepting_conditions();
+    bdd rna = right_->neg_accepting_conditions();
+    left_acc_complement_ = bdd_exist(lna, bdd_support(rna));
+    right_acc_complement_ = bdd_exist(rna, bdd_support(lna));
+
     all_accepting_conditions_ = ((left_->all_accepting_conditions()
-				  & right_->neg_accepting_conditions())
+				  & left_acc_complement_)
 				 | (right_->all_accepting_conditions()
-				    & left_->neg_accepting_conditions()));
-    neg_accepting_conditions_ = (left_->neg_accepting_conditions()
-				 & right_->neg_accepting_conditions());
+				    & right_acc_complement_));
+    neg_accepting_conditions_ = lna & rna;
+
     dict_->register_all_variables_of(&left_, this);
     dict_->register_all_variables_of(&right_, this);
   }
@@ -192,8 +197,8 @@ namespace spot
     tgba_succ_iterator* ri = right_->succ_iter(s->right(),
 					       global_state, global_automaton);
     return new tgba_succ_iterator_product(li, ri,
-					  left_->neg_accepting_conditions(),
-					  right_->neg_accepting_conditions());
+					  left_acc_complement_,
+					  right_acc_complement_);
   }
 
   bdd

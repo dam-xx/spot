@@ -122,6 +122,8 @@ namespace spot
     bdd_dict* dict_;
     const tgba* left_;
     const tgba* right_;
+    bdd left_acc_complement_;
+    bdd right_acc_complement_;
     bdd all_accepting_conditions_;
     bdd neg_accepting_conditions_;
     // Disallow copy.

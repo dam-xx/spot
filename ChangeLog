@@ -1,3 +1,14 @@
+2003-08-22  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	Fix computation of product acceptance conditions, when the
+	two operands share some acceptance conditions.
+	* src/tgba/tgbaproduct.hh (tgba_product::left_acc_complement_,
+	tgba_product::right_acc_complement_): New attribute.
+	* src/tgba/tgbaproduct.cc (tgba_product::tgba_product): Set them.
+	(tgba_product::succ_iter): Use them.
+	* src/tgba/explpro2.test: New file.
+	* src/tgba/Makefile.am (TESTS): Add it.
+
 2003-08-20  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* tgba/tgbaproduct.cc, tgba/tgbaproduct.hh:

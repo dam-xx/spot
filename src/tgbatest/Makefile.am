@@ -38,10 +38,11 @@ TESTS = \
   ltlprod.test \
   bddprod.test \
   explprod.test \
+  explpro2.test \
   tripprod.test \
   mixprod.test \
-  spotlbtt.test \
-  ltlmagic.test
+  ltlmagic.test \
+  spotlbtt.test
 
 EXTRA_DIST = $(TESTS)
 
