@@ -1,5 +1,9 @@
 2004-11-04  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* wrap/python/spot.i: Generate bindings for tgbaalgos/dottydec.hh,
+	tgbaalgos/emptiness.hh, tgbaalgos/gtec/gtec.hh, and
+	tgbaalgos/rundotdec.hh.
+
 	* src/tgbaalgos/lbtt.cc (lbtt_bfs::process_link): Adjust prototype.
 
 2004-11-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>

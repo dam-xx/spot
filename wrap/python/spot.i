@@ -76,11 +76,15 @@
 
 #include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"
+#include "tgbaalgos/dottydec.hh"
 #include "tgbaalgos/dotty.hh"
 #include "tgbaalgos/dupexp.hh"
 #include "tgbaalgos/lbtt.hh"
+#include "tgbaalgos/emptiness.hh"
+#include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/neverclaim.hh"
+#include "tgbaalgos/rundotdec.hh"
 #include "tgbaalgos/save.hh"
 #include "tgbaalgos/stats.hh"
 
@@ -126,6 +130,8 @@ using namespace spot;
 %feature("new") spot::tgba_succ_iterator::current_state;
 %feature("new") spot::tgba_dupexp_bfs;
 %feature("new") spot::tgba_dupexp_dfs;
+%feature("new") spot::emptiness_check::check;
+%feature("new") spot::emptiness_check_result::accepting_run;
 
 // Help SWIG with namespace lookups.
 #define ltl spot::ltl
@@ -144,11 +150,15 @@ using namespace spot;
 
 %include "tgbaalgos/ltl2tgba_lacim.hh"
 %include "tgbaalgos/ltl2tgba_fm.hh"
+%include "tgbaalgos/dottydec.hh"
 %include "tgbaalgos/dotty.hh"
 %include "tgbaalgos/dupexp.hh"
 %include "tgbaalgos/lbtt.hh"
+%include "tgbaalgos/emptiness.hh"
+%include "tgbaalgos/gtec/gtec.hh"
 %include "tgbaalgos/magic.hh"
 %include "tgbaalgos/neverclaim.hh"
+%include "tgbaalgos/rundotdec.hh"
 %include "tgbaalgos/save.hh"
 %include "tgbaalgos/stats.hh"
 #undef ltl
