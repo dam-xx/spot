@@ -30,7 +30,7 @@ namespace spot
     // inspection
     state_bdd* current_state();
     bdd current_condition();
-    bdd current_promise();
+    bdd current_accepting_conditions();
 
   private:
     const tgba_bdd_core_data& data_; ///< Core data of the automata.

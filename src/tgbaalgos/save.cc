@@ -2,6 +2,7 @@
 #include "tgba/tgba.hh"
 #include "save.hh"
 #include "tgba/bddprint.hh"
+#include "ltlvisit/tostring.hh"
 
 namespace spot
 {
@@ -19,9 +20,9 @@ namespace spot
 	state* s = si->current_state();
 	os << "\"" << cur << "\", \"" << g.format_state(s) << "\", ";
 
-	bdd_print_sat(os, g.get_dict(), si->current_condition()) << ", ";
-	bdd_print_sat(os, g.get_dict(), si->current_promise()) << ";"
-							       << std::endl;
+	bdd_print_sat(os, g.get_dict(), si->current_condition()) << ",";
+	bdd_print_acc(os, g.get_dict(), si->current_accepting_conditions())
+	  << ";" << std::endl;
 
 	// Destination already explored?
 	seen_set::iterator i = m.find(s);
@@ -41,6 +42,16 @@ namespace spot
   std::ostream&
   tgba_save_reachable(std::ostream& os, const tgba& g)
   {
+    const tgba_bdd_dict& d = g.get_dict();
+    os << "acc =";
+    for (tgba_bdd_dict::fv_map::const_iterator ai = d.acc_map.begin();
+	 ai != d.acc_map.end(); ++ai)
+      {
+	os << " \"";
+	ltl::to_string(ai->first, os) << "\"";
+      }
+    os << ";" << std::endl;
+
     seen_set m;
     state* state = g.get_init_state();
     save_rec(os, g, state, m);

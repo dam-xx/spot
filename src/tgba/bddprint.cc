@@ -8,8 +8,8 @@ namespace spot
   /// Global dictionary used by print_handler() to lookup variables.
   static const tgba_bdd_dict* dict;
 
-  /// Global flag to enable Prom[x] output (instead of `x').
-  static bool want_prom;
+  /// Global flag to enable Acc[x] output (instead of `x').
+  static bool want_acc;
 
   /// Stream handler used by Buddy to display BDD variables.
   static void
@@ -21,12 +21,12 @@ namespace spot
       to_string(isi->second, o);
     else
       {
-	isi = dict->prom_formula_map.find(var);
-	if (isi != dict->prom_formula_map.end())
+	isi = dict->acc_formula_map.find(var);
+	if (isi != dict->acc_formula_map.end())
 	  {
-	    if (want_prom)
+	    if (want_acc)
 	      {
-		o << "Prom[";
+		o << "Acc[";
 		to_string(isi->second, o) << "]";
 	      }
 	    else
@@ -83,9 +83,34 @@ namespace spot
   {
     dict = &d;
     where = &os;
-    want_prom = false;
-    assert (bdd_satone(b) == b);
-    bdd_allsat (b, print_sat_handler);
+    want_acc = false;
+    assert(bdd_satone(b) == b);
+    bdd_allsat(b, print_sat_handler);
+    return os;
+  }
+
+  static void
+  print_acc_handler(char* varset, int size)
+  {
+    for (int v = 0; v < size; ++v)
+      {
+	if (varset[v] < 0)
+	  continue;
+	if (varset[v] > 0)
+	  {
+	    *where << " ";
+	    print_handler(*where, v);
+	  }
+      }
+  }
+
+  std::ostream&
+  bdd_print_acc(std::ostream& os, const tgba_bdd_dict& d, bdd b)
+  {
+    dict = &d;
+    where = &os;
+    want_acc = false;
+    bdd_allsat(b, print_acc_handler);
     return os;
   }
 
@@ -101,7 +126,7 @@ namespace spot
   bdd_print_set(std::ostream& os, const tgba_bdd_dict& d, bdd b)
   {
     dict = &d;
-    want_prom = true;
+    want_acc = true;
     bdd_strm_hook(print_handler);
     os << bddset << b;
     bdd_strm_hook(0);
@@ -120,7 +145,7 @@ namespace spot
   bdd_print_dot(std::ostream& os, const tgba_bdd_dict& d, bdd b)
   {
     dict = &d;
-    want_prom = true;
+    want_acc = true;
     bdd_strm_hook(print_handler);
     os << bdddot << b;
     bdd_strm_hook(0);
@@ -131,7 +156,7 @@ namespace spot
   bdd_print_table(std::ostream& os, const tgba_bdd_dict& d, bdd b)
   {
     dict = &d;
-    want_prom = true;
+    want_acc = true;
     bdd_strm_hook(print_handler);
     os << bddtable << b;
     bdd_strm_hook(0);

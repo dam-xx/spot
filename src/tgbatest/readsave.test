@@ -5,23 +5,34 @@
 set -e
 
 cat >input <<EOF
+acc = c d;
 s1, "s2", a!b, c d;
-"s2", "state 3", a, !c;
+"s2", "state 3", a, c;
 "state 3", s1,,;
 EOF
 
 ./readsave input > stdout
 
 cat >expected <<EOF
+acc = "c" "d";
 "s1", "s2", a !b, "c" "d";
-"s2", "state 3", a, !"c";
-"state 3", "s1", , ;
+"s2", "state 3", a, "c";
+"state 3", "s1", ,;
 EOF
+
+# Sort out some possible inversions in the output.
+# (The order is not guaranteed by SPOT.)
+sed 's/"d" "c"/"c" "d"/g' stdout > tmp_ && mv tmp_ stdout
 
 diff stdout expected
 
 mv stdout input
 ./readsave input > stdout
+
+# Sort out some possible inversions in the output.
+# (The order is not guaranteed by SPOT.)
+sed 's/"d" "c"/"c" "d"/g' stdout > tmp_ && mv tmp_ stdout
+
 diff input stdout
 
 rm input stdout expected

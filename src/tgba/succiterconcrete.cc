@@ -45,7 +45,9 @@ namespace spot
   tgba_succ_iterator_concrete::current_state()
   {
     assert(!done());
-    return new state_bdd(bdd_exist(current_, data_.notnow_set));
+
+    return new state_bdd(bdd_replace(bdd_exist(current_, data_.notnext_set),
+				     data_.next_to_now));
   }
 
   bdd
@@ -56,10 +58,11 @@ namespace spot
   }
 
   bdd
-  tgba_succ_iterator_concrete::current_promise()
+  tgba_succ_iterator_concrete::current_accepting_conditions()
   {
     assert(!done());
-    return bdd_exist(current_, data_.notprom_set);
+    return bdd_exist(bdd_restrict(data_.accepting_conditions, current_), 
+		     data_.notacc_set);
   }
 
 }

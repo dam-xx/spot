@@ -29,9 +29,9 @@ namespace spot
       var.insert(i->first);
 
     // Merge promises.
-    for (i = l.prom_map.begin(); i != l.prom_map.end(); ++i)
+    for (i = l.acc_map.begin(); i != l.acc_map.end(); ++i)
       prom.insert(i->first);
-    for (i = r.prom_map.begin(); i != r.prom_map.end(); ++i)
+    for (i = r.acc_map.begin(); i != r.acc_map.end(); ++i)
       prom.insert(i->first);
 
     // Ensure we have enough BDD variables.
@@ -54,8 +54,8 @@ namespace spot
     for (f = prom.begin(); f != prom.end(); ++f)
       {
 	clone(*f);
-	res.prom_map[*f] = v;
-	res.prom_formula_map[v] = *f;
+	res.acc_map[*f] = v;
+	res.acc_formula_map[v] = *f;
 	++v;
       }
     for (f = var.begin(); f != var.end(); ++f)

@@ -53,9 +53,9 @@ namespace spot
   }
 
   bdd
-  tgba_translate_proxy_succ_iterator::current_promise()
+  tgba_translate_proxy_succ_iterator::current_accepting_conditions()
   {
-    return bdd_replace(iter_->current_promise(), rewrite_);
+    return bdd_replace(iter_->current_accepting_conditions(), rewrite_);
   }
 
 
@@ -89,13 +89,18 @@ namespace spot
 	bdd_setpair(rewrite_to_, i_from->second, i_to->second);
 	bdd_setpair(rewrite_from_, i_to->second, i_from->second);
       }
-    for (i_from = f.prom_map.begin(); i_from != f.prom_map.end(); ++i_from)
+    for (i_from = f.acc_map.begin(); i_from != f.acc_map.end(); ++i_from)
       {
-	i_to = to_.prom_map.find(i_from->first);
-	assert(i_to != to_.prom_map.end());
+	i_to = to_.acc_map.find(i_from->first);
+	assert(i_to != to_.acc_map.end());
 	bdd_setpair(rewrite_to_, i_from->second, i_to->second);
 	bdd_setpair(rewrite_from_, i_to->second, i_from->second);
       }
+
+    all_accepting_conditions_ = bdd_replace(from.all_accepting_conditions(),
+					    rewrite_to_);
+    neg_accepting_conditions_ = bdd_replace(from.neg_accepting_conditions(),
+					    rewrite_to_);
   }
 
   tgba_translate_proxy::~tgba_translate_proxy()
@@ -138,6 +143,17 @@ namespace spot
     std::string res = from_.format_state(s2);
     delete s2;
     return res;
+  }
+
+  bdd
+  tgba_translate_proxy::all_accepting_conditions() const
+  {
+    return all_accepting_conditions_;
+  }
+
+  bdd tgba_translate_proxy::neg_accepting_conditions() const
+  {
+    return neg_accepting_conditions_;
   }
 
 }

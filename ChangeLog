@@ -1,3 +1,79 @@
+2003-06-23  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	Switch from "promises" to "accepting set".  Fix the definitions
+	of these accepting set so that they are really usable.  Provide
+	a all_accepting_conditions() method for use in the emptyness
+	check, and a neg_accepting_conditions() for products.
+	Predeclare TGBA accepting conditions is the i/o.
+
+	* src/tgba/bddprint.cc (want_prom): Rename as ...
+	(want_prom): ... this.
+	(print_handler): Adjust to display Acc[].
+	(print_acc_handler, bdd_print_acc): New functions.
+	* src/tgba/bddprint.hh (print_acc_handler, bdd_print_acc):
+	New functions.
+	* src/tgba/succiter.hh (current_promise): Rename as ...
+	(current_accepting_conditions): ... this.
+	* src/tgba/succiterconcrete.cc (current_state):
+	Rename next to now.
+	(current_promise): Rename as ...
+	(current_accepting_conditions): ... this, and compute
+	the accepting conditions.
+	* src/tgba/dictunion.cc, src/tgba/ltl2tgba.cc,
+	src/tgba/succiterconcrete.hh,
+	src/tgba/tgbabddconcretefactory.cc,
+	src/tgba/tgbabddcoredata.cc, src/tgba/tgbabddcoredata.hh,
+	src/tgba/tgbabdddict.hh, src/tgba/tgbabdddict.cc,
+	src/tgba/tgbabddtranslatefactory.cc,
+	src/tgbaalgos/dotty.cc: Adjust to new names.
+	* src/tgba/tgba.hh (all_accepting_conditions,
+	neg_accepting_conditions): New functions.
+	* src/tgba/tgbabddconcretefactory.cc: Adjust to new
+	names, and record accepting conditions instead of promises.
+	* src/tgba/tgbabddcoredata.hh (accepting_conditions,
+	all_accepting_conditions, negacc_set): New variables.
+	(notnow_set, notprom_set, declare_promise): Rename as ...
+	(notnext_set, notacc_set, declare_accepting_condition): ... these.
+	* src/tgba/tgbaexplicit.hh
+	(tgba_explicit_succ_iterator::current_promise): Rename as ...
+	(tgba_explicit_succ_iterator::current_accepting_conditions): ... this.
+	(tgba_explicit::add_promise): Rename as ...
+	(tgba_explicit::add_accepting_condition): ... this.
+	(tgba_explicit::declare_accepting_condition,
+	tgba_explicit::has_accepting_condition): New variables.
+	(tgba_explicit::get_promise): Rename as ...
+	(tgba_explicit::get_accepting_condition): ... this.
+	(tgba_explicit::all_accepting_conditions,
+	tgba_explicit::neg_accepting_conditions): Implement them.
+	(all_accepting_conditions, neg_accepting_conditions,
+	all_accepting_conditions): New variables.
+	(tgba_explicit_succ_iterator): Embed all_accepting_conditions_.
+	* src/tgba/tgbaexplicit.cc: Likewise.
+	* src/tgba/tgbaproduct.hh
+	(tgba_product_succ_uterator): Embed left_neg_ and right_neg_.
+	(tgba_product::all_accepting_conditions,
+	tgba_product::neg_accepting_conditions): Implement them.
+	* src/tgba/tgbatranslateproxy.hh:
+	(tgba_translate_proxy::all_accepting_conditions,
+	tgba_translate_proxy::neg_accepting_conditions): Implement them.
+	* src/tgba/tgbatranslateproxy.cc: Likewise.
+	* src/tgbaalgos/save.cc (save_rec): Call bdd_print
+	(tgba_save_reachable): Output the `acc =' line.
+	* src/tgbaparse/tgbaparse.yy: Support the for
+	accepting conditions definitions using an "acc =" line
+	at the start.  Later, use has_accepting_condition while
+	parsing	accepting conditions to ensure they were declared.
+	Disallow !cond in accepting conditions.
+	* src/tgbaparse/tgbascan.ll (ACC_DEF): New token.
+	* src/tgbatest/explicit.cc (main): Declare accepting conditions.
+	* src/tgbatest/ltl2tgba.cc (main): Add support for the -a, -A,
+	and -R new options.
+	* src/tgbatest/tgbaread.cc (main): Really exit on parse error.
+	* src/tgbatest/explicit.test, src/tgbatest/explprod.test,
+	src/tgbatest/mixprod.test, src/tgbatest/readsave.test,
+	src/tgbatest/tgbaread.test, src/tgbatest/tripprod.test: Reflect
+	recent changes.
+
 2003-06-22  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgbatest/tripprod.test, src/tgbatest/explprod.test:

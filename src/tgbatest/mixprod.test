@@ -8,6 +8,7 @@ set -e
 # trigger assertions or I/O errors.
 
 cat >input1 <<EOF
+acc = p1;
 s1, s3, a,;
 s1, s2, b, p1;
 s2, s1, !a,;

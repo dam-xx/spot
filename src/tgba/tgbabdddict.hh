@@ -16,12 +16,12 @@ namespace spot
     /// BDD-variable-to-formula maps.
     typedef std::map<int, const ltl::formula*> vf_map;
 
-    fv_map now_map;		///< Maps formulae to "Now" BDD variables.
-    vf_map now_formula_map;	///< Maps "Now" BDD variables to formulae.
+    fv_map now_map;		///< Maps formulae to "Now" BDD variables
+    vf_map now_formula_map;	///< Maps "Now" BDD variables to formulae
     fv_map var_map;		///< Maps atomic propisitions to BDD variables
     vf_map var_formula_map;     ///< Maps BDD variables to atomic propisitions
-    fv_map prom_map;		///< Maps promises to BDD variables.
-    vf_map prom_formula_map;    ///< Maps BDD variables to promises.
+    fv_map acc_map;		///< Maps accepting conditions to BDD variables
+    vf_map acc_formula_map;	///< Maps BDD variables to accepting conditions
 
     /// \brief Dump all variables for debugging.
     /// \param os The output stream.

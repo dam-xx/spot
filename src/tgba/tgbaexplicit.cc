@@ -1,4 +1,5 @@
 #include "ltlast/atomic_prop.hh"
+#include "ltlast/constant.hh"
 #include "ltlvisit/destroy.hh"
 #include "tgbaexplicit.hh"
 #include <cassert>
@@ -10,8 +11,8 @@ namespace spot
   // tgba_explicit_succ_iterator
 
   tgba_explicit_succ_iterator::tgba_explicit_succ_iterator
-  (const tgba_explicit::state* s)
-    : s_(s)
+  (const tgba_explicit::state* s, bdd all_acc)
+    : s_(s), all_accepting_conditions_(all_acc)
   {
   }
 
@@ -46,9 +47,9 @@ namespace spot
   }
 
   bdd
-  tgba_explicit_succ_iterator::current_promise()
+  tgba_explicit_succ_iterator::current_accepting_conditions()
   {
-    return (*i_)->promise;
+    return (*i_)->accepting_conditions & all_accepting_conditions_;
   }
 
 
@@ -80,7 +81,9 @@ namespace spot
 
 
   tgba_explicit::tgba_explicit()
-    : init_(0)
+    : init_(0), all_accepting_conditions_(bddfalse),
+      neg_accepting_conditions_(bddtrue),
+      all_accepting_conditions_computed_(false)
   {
   }
 
@@ -124,12 +127,13 @@ namespace spot
     transition* t = new transition;
     t->dest = d;
     t->condition = bddtrue;
-    t->promise = bddtrue;
+    t->accepting_conditions = bddfalse;
     s->push_back(t);
     return t;
   }
 
-  int tgba_explicit::get_condition(ltl::formula* f)
+  bdd
+  tgba_explicit::get_condition(ltl::formula* f)
   {
     assert(dynamic_cast<ltl::atomic_prop*>(f));
     tgba_bdd_dict::fv_map::iterator i = dict_.var_map.find(f);
@@ -145,45 +149,72 @@ namespace spot
 	ltl::destroy(f);
 	v = i->second;
       }
-    return v;
+    return ithvar(v);
   }
 
-  void tgba_explicit::add_condition(transition* t, ltl::formula* f)
+  void
+  tgba_explicit::add_condition(transition* t, ltl::formula* f)
   {
-    t->condition &= ithvar(get_condition(f));
+    t->condition &= get_condition(f);
   }
 
-  void tgba_explicit::add_neg_condition(transition* t, ltl::formula* f)
+  void
+  tgba_explicit::add_neg_condition(transition* t, ltl::formula* f)
   {
-    t->condition &= ! ithvar(get_condition(f));
+    t->condition &= ! get_condition(f);
   }
 
-  int tgba_explicit::get_promise(ltl::formula* f)
+  void
+  tgba_explicit::declare_accepting_condition(ltl::formula* f)
   {
-    tgba_bdd_dict::fv_map::iterator i = dict_.prom_map.find(f);
-    int v;
-    if (i == dict_.prom_map.end())
+    tgba_bdd_dict::fv_map::iterator i = dict_.acc_map.find(f);
+    if (i == dict_.acc_map.end())
       {
+	int v;
 	v = create_node();
-	dict_.prom_map[f] = v;
-	dict_.prom_formula_map[v] = f;
+	dict_.acc_map[f] = v;
+	dict_.acc_formula_map[v] = f;
+	neg_accepting_conditions_ &= !ithvar(v);
       }
-    else
+  }
+
+  bool
+  tgba_explicit::has_accepting_condition(ltl::formula* f) const
+  {
+    tgba_bdd_dict::fv_map::const_iterator i = dict_.acc_map.find(f);
+    return i != dict_.acc_map.end();
+  }
+
+  bdd
+  tgba_explicit::get_accepting_condition(ltl::formula* f)
+  {
+    ltl::constant* c = dynamic_cast<ltl::constant*>(f);
+    if (c)
       {
-	ltl::destroy(f);
-	v = i->second;
+	switch (c->val())
+	  {
+	  case ltl::constant::True:
+	    return bddtrue;
+	  case ltl::constant::False:
+	    return bddfalse;
+	  }
+	/* Unreachable code.  */
+	assert(0);
       }
+
+    tgba_bdd_dict::fv_map::iterator i = dict_.acc_map.find(f);
+    assert (i != dict_.acc_map.end());
+    ltl::destroy(f);
+    bdd v = ithvar(i->second);
+    v &= bdd_exist(neg_accepting_conditions_, v);
     return v;
   }
 
-  void tgba_explicit::add_promise(transition* t, ltl::formula* f)
+  void
+  tgba_explicit::add_accepting_condition(transition* t, ltl::formula* f)
   {
-    t->promise &= ithvar(get_promise(f));
-  }
-
-  void tgba_explicit::add_neg_promise(transition* t, ltl::formula* f)
-  {
-    t->promise &= ! ithvar(get_promise(f));
+    bdd c = get_accepting_condition(f);
+    t->accepting_conditions |= c;
   }
 
   state*
@@ -197,7 +228,8 @@ namespace spot
   {
     const state_explicit* s = dynamic_cast<const state_explicit*>(state);
     assert(s);
-    return new tgba_explicit_succ_iterator(s->get_state());
+    return new tgba_explicit_succ_iterator(s->get_state(),
+					   all_accepting_conditions());
   }
 
   const tgba_bdd_dict&
@@ -214,6 +246,30 @@ namespace spot
     sn_map::const_iterator i = state_name_map_.find(se->get_state());
     assert(i != state_name_map_.end());
     return i->second;
+  }
+
+  bdd
+  tgba_explicit::all_accepting_conditions() const
+  {
+    if (!all_accepting_conditions_computed_)
+      {
+	bdd all = bddfalse;
+	tgba_bdd_dict::fv_map::const_iterator i;
+	for (i = dict_.acc_map.begin(); i != dict_.acc_map.end(); ++i)
+	  {
+	    bdd v = ithvar(i->second);
+	    all |= v & bdd_exist(neg_accepting_conditions_, v);
+	  }
+	all_accepting_conditions_ = all;
+	all_accepting_conditions_computed_ = true;
+      }
+    return all_accepting_conditions_;
+  }
+
+  bdd
+  tgba_explicit::neg_accepting_conditions() const
+  {
+    return neg_accepting_conditions_;
   }
 
 }

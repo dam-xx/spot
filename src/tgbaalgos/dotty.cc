@@ -42,8 +42,8 @@ namespace spot
 	bool recurse = dotty_state(os, g, s, m, node);
 	os << "  " << father << " -> " << node << " [label=\"";
 	bdd_print_set(os, g.get_dict(), si->current_condition()) << "\\n";
-	bdd_print_set(os, g.get_dict(), si->current_promise()) << "\"]"
-							       << std::endl;
+	bdd_print_set(os, g.get_dict(), si->current_accepting_conditions())
+	  << "\"]" << std::endl;
 	if (recurse)
 	  {
 	    dotty_rec(os, g, s, m, node);

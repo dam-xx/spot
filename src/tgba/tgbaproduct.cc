@@ -43,8 +43,11 @@ namespace spot
   // tgba_product_succ_iterator
 
   tgba_product_succ_iterator::tgba_product_succ_iterator
-  (tgba_succ_iterator* left, tgba_succ_iterator* right)
-    : left_(left), right_(right)
+  (tgba_succ_iterator* left, tgba_succ_iterator* right,
+   bdd left_neg, bdd right_neg)
+    : left_(left), right_(right),
+      left_neg_(left_neg),
+      right_neg_(right_neg)
   {
   }
 
@@ -131,9 +134,10 @@ namespace spot
     return current_cond_;
   }
 
-  bdd tgba_product_succ_iterator::current_promise()
+  bdd tgba_product_succ_iterator::current_accepting_conditions()
   {
-    return left_->current_promise() & right_->current_promise();
+    return ((left_->current_accepting_conditions() & right_neg_)
+	    | (right_->current_accepting_conditions() & left_neg_));
   }
 
   ////////////////////////////////////////////////////////////
@@ -165,6 +169,13 @@ namespace spot
 	right_ = new tgba_translate_proxy(right, dict_);
 	right_should_be_freed_ = true;
       }
+
+    all_accepting_conditions_ = ((left_->all_accepting_conditions()
+				  & right_->neg_accepting_conditions())
+				 | (right_->all_accepting_conditions()
+				    & left_->neg_accepting_conditions()));
+    neg_accepting_conditions_ = (left_->neg_accepting_conditions()
+				 & right_->neg_accepting_conditions());
   }
 
   tgba_product::~tgba_product()
@@ -190,7 +201,9 @@ namespace spot
 
     tgba_succ_iterator* li = left_->succ_iter(s->left());
     tgba_succ_iterator* ri = right_->succ_iter(s->right());
-    return new tgba_product_succ_iterator(li, ri);
+    return new tgba_product_succ_iterator(li, ri,
+					  left_->neg_accepting_conditions(),
+					  right_->neg_accepting_conditions());
   }
 
   const tgba_bdd_dict&
@@ -209,5 +222,16 @@ namespace spot
 	    + right_->format_state(s->right()));
   }
 
+  bdd
+  tgba_product::all_accepting_conditions() const
+  {
+    return all_accepting_conditions_;
+  }
+
+  bdd
+  tgba_product::neg_accepting_conditions() const
+  {
+    return neg_accepting_conditions_;
+  }
 
 }

@@ -22,7 +22,7 @@ namespace spot
     // inspection
     state* current_state();
     bdd current_condition();
-    bdd current_promise();
+    bdd current_accepting_conditions();
   protected:
     tgba_succ_iterator* iter_;
     bddPair* rewrite_;
@@ -51,11 +51,17 @@ namespace spot
 
     virtual std::string format_state(const state* state) const;
 
+    virtual bdd all_accepting_conditions() const;
+
+    virtual bdd neg_accepting_conditions() const;
+
   private:
     const tgba& from_;		///< The spot::tgba to masquerade.
     tgba_bdd_dict to_;		///< The new dictionar to use.
     bddPair* rewrite_to_;	///< The rewriting pair for from->to.
     bddPair* rewrite_from_;	///< The rewriting pair for to->from.
+    bdd all_accepting_conditions_;
+    bdd neg_accepting_conditions_;
   };
 
 }

@@ -10,28 +10,72 @@ namespace spot
   {
     /// \brief encodes the transition relation of the TGBA.
     ///
-    /// \c relation uses four kinds of variables:
+    /// \c relation uses three kinds of variables:
     /// \li "Now" variables, that encode the current state
     /// \li "Next" variables, that encode the destination state
     /// \li atomic propositions, which are things to verify before going on
     ///     to the next state
-    /// \li promises: \c a \c U \c b, or \c F \c b, both imply that \c b
-    ///     should be verified eventually.  We encode this with \c Prom[b],
-    ///     and check that promises are fullfilled in the emptyness check.
     bdd relation;
+
+    /// \brief encodes the accepting conditions
+    ///
+    /// \c a \c U \c b, or \c F \c b, both imply that \c b
+    /// should be verified eventually.  We encode this with generalized
+    /// Büchi acceptating conditions.  An accepting set, called Acc[b],
+    /// hold all the state that do not promise to verify \c b eventually.
+    /// (I.e., all the states that contain \c b, or do not conatain
+    /// \c a \c U \c b, or \c F \c b.)
+    ///
+    /// The spot::succ_iter::current_accepting_conditions() method
+    /// will return the Acc[x] variables of the accepting sets
+    /// in which a transition is.  Actually we never return Acc[x]
+    /// alone, but Acc[x] and all other accepting variables negated.
+    ///
+    /// So if there is three accepting set \c a, \c b, and \c c, and 
+    /// a transition is in set \c a, we'll return \c Acc[a]&!Acc[b]&!Acc[c].
+    /// If the transition is in both \c a and \c b, we'll return 
+    /// \c (Acc[a]\&!Acc[b]\&!Acc[c]) \c | \c (!Acc[a]\&Acc[b]\&!Acc[c]).
+    ///
+    /// Accepting conditions are attributed to transitions and are
+    /// only concerned by atomic propositions (which label the
+    /// transitions) and Next variables (the destination).  Typically,
+    /// a transition should bear the variable Acc[b] if it doesn't
+    /// check for `b' and have a destination of the form \c a \c U \c
+    /// b, or \c F \c b.
+    ///
+    /// To summarize, \c accepting_conditions contains three kinds of
+    /// variables:
+    /// \li "Next" variables, that encode the destination state,
+    /// \li atomic propositions, which are things to verify before going on
+    ///     to the next state,
+    /// \li promise variables.
+    bdd accepting_conditions;
+
+    /// The set of all accepting conditions used by the Automaton.
+    ///
+    /// The goal of the emptiness check is to ensure that
+    /// a strongly connected component walks through each
+    /// of these acceptiong conditions.  I.e., the union
+    /// of the acceptiong conditions of all transition in
+    /// the SCC should be equal to the result of this function.
+    bdd all_accepting_conditions;
 
     /// The conjunction of all Now variables, in their positive form.
     bdd now_set;
     /// The conjunction of all Now variables, in their negated form.
     bdd negnow_set;
     /// \brief The (positive) conjunction of all variables which are
-    /// not Now variables.
-    bdd notnow_set;
+    /// not Next variables.
+    bdd notnext_set;
     /// \brief The (positive) conjunction of all variables which are
     /// not atomic propositions.
     bdd notvar_set;
-    /// The (positive) conjunction of all variables which are not promises.
-    bdd notprom_set;
+    /// The (positive) conjunction of all variables which are not
+    /// accepting conditions.
+    bdd notacc_set;
+    /// The negative conjunction of all variables which are accepting
+    /// conditions.
+    bdd negacc_set;
 
     /// Record pairings between Next and Now variables.
     bddPair* next_to_now;
@@ -60,8 +104,9 @@ namespace spot
     /// \brief Update the variable sets to take a new automic proposition into
     /// account.
     void declare_atomic_prop(bdd var);
-    /// Update the variable sets to take a new promise into account.
-    void declare_promise(bdd prom);
+    /// \brief Update the variable sets to take a new accepting condition
+    /// into account.
+    void declare_accepting_condition(bdd prom);
   };
 }
 

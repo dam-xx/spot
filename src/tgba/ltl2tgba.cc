@@ -73,12 +73,13 @@ namespace spot
 	    fact_.add_relation(bdd_apply(now, x | next, bddop_biimp));
 	    /*
 	      `x | next', doesn't actually encode the fact that x
-	      should be fulfilled at eventually.  So we declare any
-	      transition going to NEXT without checking X as
-	      "promising x".  This promises will be checked by during
-	      the emptiness check.
+	      should be fulfilled at eventually.  We ensure
+	      this by creating a new generalized Büchi accepting set,
+	      Acc[x], and leave any transition going to NEXT without
+	      checking X out of this set.  Such accepting conditions
+	      are checked for during the emptiness check.
 	    */
-	    fact_.declare_promise(next & !x, node->child());
+	    fact_.declare_accepting_condition(x | !next, node->child());
 	    res_ = now;
 	    return;
 	  }
@@ -145,10 +146,10 @@ namespace spot
 	    /*
 	      The rightmost conjunction, f1 & next, doesn't actually
 	      encode the fact that f2 should be fulfilled eventually.
-	      We declare a promise for this purpose (see the comment
-	      in the unop::F case).
+	      We declare an accepting condition for this purpose (see
+	      the comment in the unop::F case).
 	    */
-	    fact_.declare_promise(next & !f2, node->second());
+	    fact_.declare_accepting_condition(f2 | !next, node->second());
 	    res_ = now;
 	    return;
 	  }

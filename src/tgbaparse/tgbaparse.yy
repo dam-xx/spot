@@ -12,10 +12,14 @@
 {
   int token;
   std::string* str;
-  std::list<std::pair<bool, spot::ltl::formula*> >* list;
+  std::list<std::pair<bool, spot::ltl::formula*> >* listp;
+  std::list<spot::ltl::formula*>* list;
 }
 
 %{
+#include "ltlast/constant.hh"
+#include "ltlvisit/destroy.hh"
+
 /* tgbaparse.hh and parsedecl.hh include each other recursively.
    We mut ensure that YYSTYPE is declared (by the above %union)
    before parsedecl.hh uses it. */
@@ -33,15 +37,20 @@ typedef std::pair<bool, spot::ltl::formula*> pair;
 %token <str> STRING
 %token <str> IDENT
 %type <str> strident
-%type <list> prop_list
-
+%type <listp> cond_list
+%type <list> acc_list
+%token ACC_DEF
 
 %%
+tgba: accepting_decl lines | lines;
+
+accepting_decl: ACC_DEF acc_decl ';'
+
 lines:
        | lines line
        ;
 
-line: strident ',' strident ',' prop_list ',' prop_list ';'
+line: strident ',' strident ',' cond_list ',' acc_list ';'
        {
 	 spot::tgba_explicit::transition* t
 	   = result->create_transition(*$1, *$3);
@@ -51,11 +60,9 @@ line: strident ',' strident ',' prop_list ',' prop_list ';'
 	     result->add_neg_condition(t, i->second);
 	   else
 	     result->add_condition(t, i->second);
-	 for (i = $7->begin(); i != $7->end(); ++i)
-	   if (i->first)
-	     result->add_neg_promise(t, i->second);
-	   else
-	     result->add_promise(t, i->second);
+	 std::list<formula*>::iterator i2;
+	 for (i2 = $7->begin(); i2 != $7->end(); ++i2)
+	     result->add_accepting_condition(t, *i2);
 	 delete $1;
 	 delete $3;
 	 delete $5;
@@ -65,27 +72,67 @@ line: strident ',' strident ',' prop_list ',' prop_list ';'
 
 strident: STRING | IDENT;
 
-prop_list:
+cond_list:
        {
 	 $$ = new std::list<pair>;
        }
-       | prop_list strident
+       | cond_list strident
        {
 	 if (*$2 != "")
-	   $1->push_back(pair(false, parse_environment.require(*$2)));
+	   {
+	     $1->push_back(pair(false, parse_environment.require(*$2)));
+	   }
 	 delete $2;
 	 $$ = $1;
        }
-       | prop_list '!' strident
+       | cond_list '!' strident
        {
 	 if (*$3 != "")
-	   $1->push_back(pair(true, parse_environment.require(*$3)));
+	   {
+	     $1->push_back(pair(true, parse_environment.require(*$3)));
+	   }
 	 delete $3;
 	 $$ = $1;
        }
        ;
 
-;
+acc_list:
+       {
+	 $$ = new std::list<formula*>;
+       }
+       | acc_list strident
+       {
+	 if (*$2 == "true")
+	   {
+	     $1->push_back(constant::true_instance());
+	   }
+	 else if (*$2 != "" && *$2 != "false")
+	   {
+	     formula* f = parse_environment.require(*$2);
+	     if (! result->has_accepting_condition(f))
+	       {
+		 error_list.push_back(spot::tgba_parse_error(@2,
+			 "undeclared accepting condition"));
+		 destroy(f);
+		 delete $2;
+		 YYERROR;
+	       }
+	     $1->push_back(f);
+	   }
+	 delete $2;
+	 $$ = $1;
+       }
+       ;
+
+
+acc_decl:
+       | acc_decl strident
+       {
+	 formula* f = parse_environment.require(*$2);
+	 result->declare_accepting_condition(f);
+	 delete $2;
+       }
+       ;
 
 %%
 

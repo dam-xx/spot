@@ -52,6 +52,9 @@ namespace spot
     /// rules, etc.
     const tgba_bdd_core_data& get_core_data() const;
 
+    virtual bdd all_accepting_conditions() const;
+    virtual bdd neg_accepting_conditions() const;
+
   protected:
     tgba_bdd_core_data data_;	///< Core data associated to the automaton.
     tgba_bdd_dict dict_;	///< Dictionary used by the automaton.

@@ -13,11 +13,12 @@ namespace spot
     const tgba_bdd_core_data& in = from.get_core_data();
 
     data_.relation = bdd_replace(in.relation, rewrite);
+    data_.accepting_conditions = bdd_replace(in.accepting_conditions, rewrite);
     data_.now_set = bdd_replace(in.now_set, rewrite);
     data_.negnow_set = bdd_replace(in.negnow_set, rewrite);
-    data_.notnow_set = bdd_replace(in.notnow_set, rewrite);
+    data_.notnext_set = bdd_replace(in.notnext_set, rewrite);
     data_.notvar_set = bdd_replace(in.notvar_set, rewrite);
-    data_.notprom_set = bdd_replace(in.notprom_set, rewrite);
+    data_.notacc_set = bdd_replace(in.notacc_set, rewrite);
 
     init_ = bdd_replace(from.get_init_bdd(), rewrite);
 
@@ -40,7 +41,6 @@ namespace spot
       {
 	i_to = dict_.now_map.find(i_from->first);
 	assert(i_to != dict_.now_map.end());
-
 	bdd_setpair(rewrite, i_from->second, i_to->second);
 	bdd_setpair(rewrite, i_from->second + 1, i_to->second + 1);
 	bdd_setpair(data_.next_to_now, i_to->second + 1, i_to->second);
@@ -51,12 +51,12 @@ namespace spot
 	assert(i_to != dict_.var_map.end());
 	bdd_setpair(rewrite, i_from->second, i_to->second);
       }
-    for (i_from = from.prom_map.begin();
-	 i_from != from.prom_map.end();
+    for (i_from = from.acc_map.begin();
+	 i_from != from.acc_map.end();
 	 ++i_from)
       {
-	i_to = dict_.prom_map.find(i_from->first);
-	assert(i_to != dict_.prom_map.end());
+	i_to = dict_.acc_map.find(i_from->first);
+	assert(i_to != dict_.acc_map.end());
 	bdd_setpair(rewrite, i_from->second, i_to->second);
       }
     return rewrite;

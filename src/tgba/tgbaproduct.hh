@@ -57,7 +57,8 @@ namespace spot
   {
   public:
     tgba_product_succ_iterator(tgba_succ_iterator* left,
-			       tgba_succ_iterator* right);
+			       tgba_succ_iterator* right,
+			       bdd left_neg, bdd right_neg);
 
     virtual ~tgba_product_succ_iterator();
 
@@ -69,7 +70,7 @@ namespace spot
     // inspection
     state_bdd_product* current_state();
     bdd current_condition();
-    bdd current_promise();
+    bdd current_accepting_conditions();
 
   private:
     //@{
@@ -82,6 +83,8 @@ namespace spot
     tgba_succ_iterator* left_;
     tgba_succ_iterator* right_;
     bdd current_cond_;
+    bdd left_neg_;
+    bdd right_neg_;
   };
 
   /// \brief A lazy product.  (States are computed on the fly.)
@@ -105,12 +108,17 @@ namespace spot
 
     virtual std::string format_state(const state* state) const;
 
+    virtual bdd all_accepting_conditions() const;
+    virtual bdd neg_accepting_conditions() const;
+
   private:
     const tgba* left_;
     bool left_should_be_freed_;
     const tgba* right_;
     bool right_should_be_freed_;
     tgba_bdd_dict dict_;
+    bdd all_accepting_conditions_;
+    bdd neg_accepting_conditions_;
   };
 
 }

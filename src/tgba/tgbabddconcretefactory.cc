@@ -1,14 +1,13 @@
 #include "ltlvisit/clone.hh"
 #include "ltlvisit/destroy.hh"
 #include "tgbabddconcretefactory.hh"
-
 namespace spot
 {
   tgba_bdd_concrete_factory::~tgba_bdd_concrete_factory()
   {
-    promise_map_::iterator pi;
-    for (pi = prom_.begin(); pi != prom_.end(); ++pi)
-      destroy(pi->first);
+    acc_map_::iterator ai;
+    for (ai = acc_.begin(); ai != acc_.end(); ++ai)
+      destroy(ai->first);
   }
 
   int
@@ -56,43 +55,50 @@ namespace spot
   }
 
   void
-  tgba_bdd_concrete_factory::declare_promise(bdd b,
-					     const ltl::formula* p)
+  tgba_bdd_concrete_factory::declare_accepting_condition(bdd b,
+							 const ltl::formula* a)
   {
-    // Maintain a disjunction of BDDs associated to P.
-    // We will latter (in tgba_bdd_concrete_factory::finish())
-    // record this disjunction as equivalant to P.
-    promise_map_::iterator pi = prom_.find(p);
-    if (pi == prom_.end())
+    // Maintain a conjunction of BDDs associated to A.  We will latter
+    // (in tgba_bdd_concrete_factory::finish()) associate this
+    // conjunction to A.
+    acc_map_::iterator ai = acc_.find(a);
+    if (ai == acc_.end())
       {
-	p = clone(p);
-	prom_[p] = b;
+	a = clone(a);
+	acc_[a] = b;
       }
     else
       {
-	pi->second |= b;
+	ai->second &= b;
       }
   }
 
   void
   tgba_bdd_concrete_factory::finish()
   {
-    promise_map_::iterator pi;
-    for (pi = prom_.begin(); pi != prom_.end(); ++pi)
+    acc_map_::iterator ai;
+    for (ai = acc_.begin(); ai != acc_.end(); ++ai)
       {
-	// Register a BDD variable for this promise.
-	int p = create_node();
-	const ltl::formula* f = clone(pi->first); // The promised formula.
-	dict_.prom_map[f] = p;
-	dict_.prom_formula_map[p] = f;
+	// Register a BDD variable for this accepting condition.
+	int a = create_node();
+	const ltl::formula* f = clone(ai->first); // The associated formula.
+	dict_.acc_map[f] = a;
+	dict_.acc_formula_map[a] = f;
+	bdd acc = ithvar(a);
+	// Keep track of all accepting conditions for easy
+	// existential quantification.
+	data_.declare_accepting_condition(acc);
+      }
+    for (ai = acc_.begin(); ai != acc_.end(); ++ai)
+      {
+	bdd acc = ithvar(dict_.acc_map[ai->first]);
 
-	bdd prom = ithvar(p);
-	// Keep track of all promises for easy existential quantification.
-	data_.declare_promise(prom);
+	// Complete acc with all the other accepting conditions negated.
+	acc &= bdd_exist(data_.negacc_set, acc);
 
-	// The promise P must hold if we have to verify any of the
-	// (BDD) formulae registered.
-	add_relation(bdd_apply(prom, pi->second, bddop_biimp));
+	// Any state matching the BDD formulae registered is part
+	// of this accepting set.
+	data_.accepting_conditions |= ai->second & acc;
       }
   }
 

@@ -68,8 +68,9 @@ namespace spot
     virtual state* current_state() = 0;
     /// \brief Get the condition on the transition leading to this successor.
     virtual bdd current_condition() = 0;
-    /// \brief Get the promise on the transition leading to this successor.
-    virtual bdd current_promise() = 0;
+    /// \brief Get the accepting conditions on the transition leading
+    /// to this successor.
+    virtual bdd current_accepting_conditions() = 0;
 
     //@}
   };

@@ -35,6 +35,8 @@ eol      \n|\r|\n\r|\r\n
 	                  return STRING;
 		        }
 
+acc[ \t]*=		return ACC_DEF;
+
 [a-zA-Z][a-zA-Z0-9_]*   {
 			  yylval->str = new std::string(yytext);
 	                  return IDENT;

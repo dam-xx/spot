@@ -33,9 +33,9 @@ main(int argc, char** argv)
   spot::tgba_parse_error_list pel;
   spot::tgba_explicit* a = spot::tgba_parse(argv[filename_index],
 					    pel, env, debug);
-  
-  exit_code =
-    spot::format_tgba_parse_errors(std::cerr, pel);
+
+  if (spot::format_tgba_parse_errors(std::cerr, pel))
+    return 2;
 
   if (a)
     {
@@ -44,7 +44,7 @@ main(int argc, char** argv)
     }
   else
     {
-      exit_code = 1;
+      return 1;
     }
-  return exit_code;
+  return 0;
 }

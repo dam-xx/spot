@@ -77,6 +77,28 @@ namespace spot
     /// This formating is the responsability of the automata
     /// who owns the state.
     virtual std::string format_state(const state* state) const = 0;
+
+    /// \brief Return the set of all accepting conditions used
+    /// by this automaton.
+    ///
+    /// The goal of the emptiness check is to ensure that
+    /// a strongly connected component walks through each
+    /// of these acceptiong conditions.  I.e., the union
+    /// of the acceptiong conditions of all transition in
+    /// the SCC should be equal to the result of this function.
+    virtual bdd all_accepting_conditions() const = 0;
+
+    /// \brief Return the conjuction of all negated accepting
+    /// variables. 
+    ///
+    /// For instance if the automaton uses variables \c Acc[a],
+    /// \c Acc[b] and \c Acc[c] to describe accepting sets,
+    /// this function should return \c !Acc[a]\&!Acc[b]\&!Acc[c].
+    ///
+    /// This is useful when making products: each operand conditions
+    /// set should be augmented with the neg_accepting_conditions() of
+    /// the other operand.
+    virtual bdd neg_accepting_conditions() const = 0;
   };
 
 }

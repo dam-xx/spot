@@ -24,7 +24,7 @@ namespace spot
     struct transition
     {
       bdd condition;
-      bdd promise;
+      bdd accepting_conditions;
       state* dest;
     };
 
@@ -33,8 +33,9 @@ namespace spot
 
     void add_condition(transition* t, ltl::formula* f);
     void add_neg_condition(transition* t, ltl::formula* f);
-    void add_promise(transition* t, ltl::formula* f);
-    void add_neg_promise(transition* t, ltl::formula* f);
+    void declare_accepting_condition(ltl::formula* f);
+    bool has_accepting_condition(ltl::formula* f) const;
+    void add_accepting_condition(transition* t, ltl::formula* f);
 
     // tgba interface
     virtual ~tgba_explicit();
@@ -44,10 +45,13 @@ namespace spot
     virtual const tgba_bdd_dict& get_dict() const;
     virtual std::string format_state(const spot::state* state) const;
 
+    virtual bdd all_accepting_conditions() const;
+    virtual bdd neg_accepting_conditions() const;
+
   protected:
     state* add_state(const std::string& name);
-    int get_condition(ltl::formula* f);
-    int get_promise(ltl::formula* f);
+    bdd get_condition(ltl::formula* f);
+    bdd get_accepting_condition(ltl::formula* f);
 
     typedef std::map<const std::string, tgba_explicit::state*> ns_map;
     typedef std::map<const tgba_explicit::state*, std::string> sn_map;
@@ -55,6 +59,9 @@ namespace spot
     sn_map state_name_map_;
     tgba_bdd_dict dict_;
     tgba_explicit::state* init_;
+    mutable bdd all_accepting_conditions_;
+    bdd neg_accepting_conditions_;
+    mutable bool all_accepting_conditions_computed_;
   };
 
 
@@ -83,7 +90,7 @@ namespace spot
   class tgba_explicit_succ_iterator : public tgba_succ_iterator
   {
   public:
-    tgba_explicit_succ_iterator(const tgba_explicit::state* s);
+    tgba_explicit_succ_iterator(const tgba_explicit::state* s, bdd all_acc);
 
     virtual
     ~tgba_explicit_succ_iterator()
@@ -96,11 +103,12 @@ namespace spot
 
     virtual state_explicit* current_state();
     virtual bdd current_condition();
-    virtual bdd current_promise();
+    virtual bdd current_accepting_conditions();
 
   private:
     const tgba_explicit::state* s_;
     tgba_explicit::state::const_iterator i_;
+    bdd all_accepting_conditions_;
   };
 
 }

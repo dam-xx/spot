@@ -34,17 +34,18 @@ namespace spot
     /// can be turned into BDD using ithvar().
     int create_atomic_prop(const ltl::formula* f);
 
-    /// Declare a promise.
-    ///
-    /// \param b that BDD of the expression that makes a promise
-    /// \param p the formula promised
+    /// Declare an accepting condition.
     ///
     /// Formula such as 'f U g' or 'F g' make the promise
     /// that 'g' will be fulfilled eventually.  So once
     /// one of this formula has been translated into a BDD,
-    /// we use declare_promise() to associate the promise 'g'
-    /// to this BDD.
-    void declare_promise(bdd b, const ltl::formula* p);
+    /// we use declare_accepting_condition() to associate
+    /// all other states to the accepting set of 'g'.
+    ///
+    /// \param b a BDD indicating which variables are in the
+    ///          accepting set
+    /// \param a the formula associated
+    void declare_accepting_condition(bdd b, const ltl::formula* a);
 
     const tgba_bdd_core_data& get_core_data() const;
     const tgba_bdd_dict& get_dict() const;
@@ -63,8 +64,8 @@ namespace spot
     tgba_bdd_core_data data_;	///< Core data for the new automata.
     tgba_bdd_dict dict_;	///< Dictionary for the new automata.
 
-    typedef std::map<const ltl::formula*, bdd> promise_map_;
-    promise_map_ prom_;		///< BDD associated to each promises
+    typedef std::map<const ltl::formula*, bdd> acc_map_;
+    acc_map_ acc_;		///< BDD associated to each accepting condition
   };
 
 }

@@ -41,9 +41,7 @@ namespace spot
   {
     const state_bdd* s = dynamic_cast<const state_bdd*>(state);
     assert(s);
-    bdd succ_set = bdd_replace(bdd_exist(data_.relation & s->as_bdd(),
-					 data_.now_set),
-			       data_.next_to_now);
+    bdd succ_set = bdd_exist(data_.relation & s->as_bdd(), data_.now_set);
     return new tgba_succ_iterator_concrete(data_, succ_set);
   }
 
@@ -59,6 +57,18 @@ namespace spot
   tgba_bdd_concrete::get_dict() const
   {
     return dict_;
+  }
+
+  bdd
+  tgba_bdd_concrete::all_accepting_conditions() const
+  {
+    return data_.all_accepting_conditions;
+  }
+
+  bdd
+  tgba_bdd_concrete::neg_accepting_conditions() const
+  {
+    return data_.negacc_set;
   }
 
   const tgba_bdd_core_data&

@@ -23,8 +23,8 @@ namespace spot
 	os << "  " << sii->second + 1 << ": Next[";
 	to_string(sii->first, os) << "]" << std::endl;
       }
-    os << "Promises:" << std::endl;
-    for (sii = prom_map.begin(); sii != prom_map.end(); ++sii)
+    os << "Accepting Conditions:" << std::endl;
+    for (sii = acc_map.begin(); sii != acc_map.end(); ++sii)
       {
 	os << "  " << sii->second << ": ";
 	to_string(sii->first, os) << std::endl;
@@ -48,10 +48,10 @@ namespace spot
 	if (i2 == now_map.end() || i->second != i2->second)
 	  return false;
       }
-    for (i = other.prom_map.begin(); i != other.prom_map.end(); ++i)
+    for (i = other.acc_map.begin(); i != other.acc_map.end(); ++i)
       {
-	fv_map::const_iterator i2 = prom_map.find(i->first);
-	if (i2 == prom_map.end() || i->second != i2->second)
+	fv_map::const_iterator i2 = acc_map.find(i->first);
+	if (i2 == acc_map.end() || i->second != i2->second)
 	  return false;
       }
     return true;
@@ -66,15 +66,15 @@ namespace spot
       now_formula_map(other.now_formula_map),
       var_map(other.var_map),
       var_formula_map(other.var_formula_map),
-      prom_map(other.prom_map),
-      prom_formula_map(other.prom_formula_map)
+      acc_map(other.acc_map),
+      acc_formula_map(other.acc_formula_map)
   {
     fv_map::iterator i;
     for (i = now_map.begin(); i != now_map.end(); ++i)
       ltl::clone(i->first);
     for (i = var_map.begin(); i != var_map.end(); ++i)
       ltl::clone(i->first);
-    for (i = prom_map.begin(); i != prom_map.end(); ++i)
+    for (i = acc_map.begin(); i != acc_map.end(); ++i)
       ltl::clone(i->first);
   }
 
@@ -96,7 +96,7 @@ namespace spot
       ltl::destroy(i->first);
     for (i = var_map.begin(); i != var_map.end(); ++i)
       ltl::destroy(i->first);
-    for (i = prom_map.begin(); i != prom_map.end(); ++i)
+    for (i = acc_map.begin(); i != acc_map.end(); ++i)
       ltl::destroy(i->first);
   }
 
