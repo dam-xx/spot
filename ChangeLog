@@ -1,4 +1,6 @@
-2004-02-02  Alexandre Duret-Lutz  <adl@gnu.org>
+2004-02-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* wrap/python/cgi/ltl2tgba.in: Output a description of the syntax.
 
 	* wrap/python/cgi/ltl2tgba.in: Import spot and redirect stderr
 	to stdout early.
@@ -36,8 +38,6 @@
 	* wrap/python/cgi/ltl2tgba.in (print_stats): New function.  Call
 	it to display the size of the generalized and degeneralized
 	automata.
-
-2004-02-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbalagos/stats.hh, src/tgbalagos/stats.cc: New files.
 	* src/tgbalagos/Makefile.am: Add them.

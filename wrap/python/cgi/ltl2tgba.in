@@ -116,8 +116,9 @@ def render_bdd(basename, dictionary, bdd):
     render_dot(basename)
 
 
-print "<TITLE>LTL-to-Büchi test</TITLE>"
-print "<H1>Input</H1>"
+print "<TITLE>LTL-to-B&uuml;chi test</TITLE>"
+print """<H1><a href="http://spot.lip6.fr/">Spot</a>'s on-line
+LTL-to-B&uuml;chi translator</H1>"""
 
 formula = form.getfirst('formula', '')
 
@@ -130,12 +131,18 @@ options = [
     ('show_degen_dot',      'print degeneralized Büchi automaton as .dot', 0),
     ('show_degen_gif',      'draw degeneralized Büchi automaton',          0),
     ('show_dictionnay',     'print BDD dictionary',                        0),
-    ('show_relation_dot',   'print the transition relation as .dot',       0),
-    ('show_relation_set',   'print the transition relation as a BDD set',  0),
-    ('show_relation_gif',   'draw the transition relation',                0),
-    ('show_acceptance_dot', 'print the acceptance relation as .dot'  ,     0),
-    ('show_acceptance_set', 'print the acceptance relation as a BDD set',  0),
-    ('show_acceptance_gif', 'draw the acceptance relation',                0),
+    ('show_relation_dot',
+     'print the transition relation as .dot (LaCIM only)',                 0),
+    ('show_relation_set',
+     'print the transition relation as a BDD set (LaCIM only)',            0),
+    ('show_relation_gif',
+     'draw the transition relation (LaCIM only)',                          0),
+    ('show_acceptance_dot',
+     'print the acceptance relation as .dot (LaCIM only)'  ,               0),
+    ('show_acceptance_set',
+     'print the acceptance relation as a BDD set (LaCIM only)',            0),
+    ('show_acceptance_gif',
+     'draw the acceptance relation (LaCIM only)',                          0),
     ('show_lbtt',           'convert automaton for LBTT',                  0),
     ]
 
@@ -146,8 +153,72 @@ translators = [
     ]
 
 print """<FORM action="%s" method="post"><P>
-Formula to translate: <INPUT type="text"  name="formula" value="%s"><BR>
-Translator:<TABLE><TR><TD>""" % (myself, formula)
+Formula to translate:
+<INPUT size=50 type="text"  name="formula" value="%s"><BR>
+
+<p>Use alphanumeric identifiers or double-quoted strings for atomic
+propositions, and parentheses for grouping.<BR>Identifiers cannot
+start with the letter of a prefix operator (<code>F</code>,
+<code>G</code>, or <code>X</code>): for instance <code>GFa</code>
+means <code>G(F(a))</code>.  Use <code>"GFa"</code> if you really want
+to refer to <code>GFa</code> as a proposition.<br>Conversly, infix
+letter operators are not assumed to be operators if they are part of
+an indentifier: <code>aUb</code> is an atomic proposition, unlike
+<code>a&nbsp;U&nbsp;b</code> and <code>(a)U(b)</code><br>
+
+<table border="1" rules="groups" frame="border" cellpadding="2">
+  <colgroup span=2>
+  <colgroup span=2>
+  <colgroup span=2>
+  <colgroup span=2>
+  <thead>
+    <tr>
+      <th colspan=2>Unary operators<br>(prefix)</th>
+      <th colspan=4>Binary operators<br>(infix)</th>
+      <th colspan=2>Constants</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="right">not:</td><td><code>!</code></td>
+      <td align="right">and:</td><td><code>&</code> <code>&&</code>
+                                     <code>.</code> <code>*</code>
+                                     <code>/\</code></td>
+      <td align="right">xor:</td><td><code>^</code> <code>xor</code></td>
+      <td align="right">true:</td><td><code>1</code>
+                                      <code>true</code></td>
+    </tr>
+    <tr>
+      <td align="right">eventually:</td><td><code>F</code>
+                                            <code>&lt;&gt;</code></td>
+      <td align="right">or:</td><td><code>|</code> <code>||</code>
+                                    <code>+</code> <code>\/</code></td>
+
+      <td align="right">until:</td><td><code>U</code></td>
+      <td align="right">false:</td><td><code>0</code>
+                                       <code>false</code></td>
+    </tr>
+    <tr>
+      <td align="right">always:</td><td><code>G</code>
+                                        <code>[]</code></td>
+      <td align="right">implies:</td><td><code>-&gt;</code>
+                                         <code>=&gt;</code></td>
+      <td align="right">release:</td><td><code>R</code>
+                                         <code>V</code></td>
+      <td></td><td></td>
+    </tr>
+    <tr>
+      <td align="right">next:</td><td><code>X</code> <code>()</code></td>
+      <td align="right">equivalent:</td><td><code>&lt;-&gt;
+                                            </code> <code>&lt;=&gt;
+                                            </code></td>
+      <td></td><td></td>
+      <td></td><td></td>
+    </tr>
+
+  </tbody>
+</table></p>
+Translator:<TABLE><TR><TD>""" % (myself, cgi.escape(formula, True))
 
 
 trans = form.getfirst("trans", default_translator)
