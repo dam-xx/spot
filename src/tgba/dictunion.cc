@@ -52,21 +52,21 @@ namespace spot
     std::set<const ltl::formula*>::const_iterator f;
     for (f = prom.begin(); f != prom.end(); ++f)
       {
-        res.prom_map[*f] = v;
-        res.prom_formula_map[v] = *f;
-        ++v;
+	res.prom_map[*f] = v;
+	res.prom_formula_map[v] = *f;
+	++v;
       }
     for (f = var.begin(); f != var.end(); ++f)
       {
-        res.var_map[*f] = v;
-        res.var_formula_map[v] = *f;
-        ++v;
+	res.var_map[*f] = v;
+	res.var_formula_map[v] = *f;
+	++v;
       }
     for (f = now.begin(); f != now.end(); ++f)
       {
-        res.now_map[*f] = v;
-        res.now_formula_map[v] = *f;
-        v += 2;
+	res.now_map[*f] = v;
+	res.now_formula_map[v] = *f;
+	v += 2;
       }
 
     assert (v == want);

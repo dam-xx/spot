@@ -7,4 +7,3 @@ libtgbaalgos_la_SOURCES = \
   dotty.hh \
   save.cc \
   save.hh
-

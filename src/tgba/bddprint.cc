@@ -6,7 +6,7 @@ namespace spot
 {
   /// Global dictionary used by print_handler() to lookup variables.
   static const tgba_bdd_dict* dict;
-  
+
   /// Global flag to enable Prom[x] output (instead of `x').
   static bool want_prom;
 
@@ -24,7 +24,7 @@ namespace spot
 	if (isi != dict->prom_formula_map.end())
 	  {
 	    if (want_prom)
-	      o << "Prom["; 
+	      o << "Prom[";
 	    to_string(isi->second, o);
 	    if (want_prom)
 	      o << "]";
