@@ -1,3 +1,22 @@
+2005-01-29  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgbatest/randtgba.cc (syntax): Missing std::endl.
+
+	* bench/Makefile.am, bench/emptchk/Makefile.am,
+	bench/emptchk/README, bench/emptchk/algorithms,
+	bench/emptchk/defs.in, bench/emptchk/ltl-human.sh,
+	bench/emptchk/ltl-random.sh, bench/emptchk/pml-clserv.sh,
+	bench/emptchk/pml-eeaean.sh, bench/emptchk/pml2tgba.pl,
+	bench/emptchk/models/cl3serv1.pml,
+	bench/emptchk/models/cl3serv3.pml,
+	bench/emptchk/models/clserv.ltl, bench/emptchk/models/eeaean.ltl,
+	bench/emptchk/models/eeaean2.pml: New files.
+	* README: Adjust.
+	* configure.ac: Output bench/Makefile and bench/emptchk/Makefile.
+	Check for PERL, and define the NEVER conditional.
+	* Makefile.am (SUBDIRS) [NEVER]: Add bench.
+
+
 2005-01-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/emptiness_stats.hh: Make sure depth() >= 0.

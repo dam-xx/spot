@@ -155,7 +155,8 @@ syntax(char* prog)
 	    << "Options:" << std::endl
 	    << "  -0      suppress default output, just generate the graph"
 	    << " in memory" << std::endl
-	    << "  -1    produce minimal output dedicated to the paper"
+	    << "  -1      produce minimal output (for our paper)"
+	    << std::endl
 	    << "  -a N F  number of acceptance conditions and probability that"
 	    << " one is true" << std::endl
 	    << "            [0 0.0]" << std::endl
