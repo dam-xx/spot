@@ -1,5 +1,7 @@
 2004-08-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* m4/ndebug.m4: Update CPPFLAGS, not CFLAGS.
+
 	* src/tgbaalgos/ltl2tgba_fm.hh (ltl_to_tgba_fm): Document all
 	parameters.
 	* src/tgbaalgos/ltl2tgba_lacim.hh (ltl_to_tgba_lacim): Likewise.
