@@ -27,10 +27,10 @@ set -e
 
 cat >input1 <<EOF
 acc = p1;
-s1, s3, "a", true;
+s1, s3, "a", p1;
 s1, s2, "b", p1;
-s2, s1, "!a", true;
-s2, s3, "c", true;
+s2, s1, "!a", p1;
+s2, s3, "c", p1;
 EOF
 
 cat >input2 <<EOF

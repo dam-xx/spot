@@ -1,6 +1,15 @@
 2004-01-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
-	After this changes, degeneralized automata are 40% smaller
+	* src/tgba/tgbaexplicit.cc (tgba_explicit::get_acceptance_condition):
+	Do not treat true and false specially.  Otherwise it breaks
+	translation of F(false).
+	* src/tgbatest/explprod.test, src/tgbatest/tripprod.test: Do not
+	use true as acceptance condition.
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_trad_visitor): Use Acc[b] as
+	acceptance condition for Fb, not Acc[Fb].
+
+	After this change, degeneralized automata are 40% smaller
 	in LBTT's statistics.
 
 	* src/tgba/tgbatba.cc (state_tba_proxy): Store an iterator,

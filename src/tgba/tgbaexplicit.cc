@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -260,19 +260,6 @@ namespace spot
   bdd
   tgba_explicit::get_acceptance_condition(const ltl::formula* f)
   {
-    const ltl::constant* c = dynamic_cast<const ltl::constant*>(f);
-    if (c)
-      {
-	switch (c->val())
-	  {
-	  case ltl::constant::True:
-	    return bddtrue;
-	  case ltl::constant::False:
-	    return bddfalse;
-	  }
-	/* Unreachable code.  */
-	assert(0);
-      }
     bdd_dict::fv_map::iterator i = dict_->acc_map.find(f);
     assert(has_acceptance_condition(f));
     /* If this second assert fails and the first doesn't,

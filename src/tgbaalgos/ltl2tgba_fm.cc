@@ -312,8 +312,9 @@ namespace spot
 	  case unop::F:
 	    {
 	      // r(Fy) = r(y) + a(y)r(XFy)
-	      bdd y = recurse(node->child());
-	      int a = dict_.register_a_variable(node);
+	      const formula* child = node->child();
+	      bdd y = recurse(child);
+	      int a = dict_.register_a_variable(child);
 	      int x = dict_.register_next_variable(node);
 	      res_ = y | (bdd_ithvar(a) & bdd_ithvar(x));
 	      return;
