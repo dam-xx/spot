@@ -1,5 +1,10 @@
 2004-02-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_trad_visitor::visit) <unop::G>:
+	suppress the GFy optimisation introduced on 2003-11-26, it is
+	generalized by the identification of states with same symbolic
+	rewriting introduced on 2004-02-02.
+
 	* lbtt/: Merge lbtt 1.0.3.
 
 2004-02-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>

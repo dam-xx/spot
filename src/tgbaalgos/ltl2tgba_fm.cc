@@ -321,25 +321,22 @@ namespace spot
 	    }
 	  case unop::G:
 	    {
+	      // The paper suggests that we optimize GFy
+	      // as
+	      //   r(GFy) = (r(y) + a(y))r(XGFy)
+	      // instead of
+	      //   r(GFy) = (r(y) + a(y)r(XFy)).r(XGFy)
+	      // but this is just a particular case
+	      // of the "merge all states with the same
+	      // symbolic rewriting" optimization we do later.
+	      // (r(Fy).r(GFy) and r(GFy) have the same symbolic
+	      // rewriting.)  Let's keep things simple here.
+
+	      // r(Gy) = r(y)r(XGy)
 	      const formula* child = node->child();
 	      int x = dict_.register_next_variable(node);
-	      // GFy is pretty frequent and easy to optimize, so we
-	      // want to detect it.
-	      const unop* Fy = dynamic_cast<const unop*>(child);
-	      if (Fy && Fy->op() == unop::F)
-		{
-		  // r(GFy) = (r(y) + a(y))r(XGFy)
-		  const formula* child = Fy->child();
-		  bdd y = recurse(child);
-		  int a = dict_.register_a_variable(child);
-		  res_ = (y | bdd_ithvar(a)) & bdd_ithvar(x);
-		}
-	      else
-		{
-		  // r(Gy) = r(y)r(XGy)
-		  bdd y = recurse(child);
-		  res_ = y & bdd_ithvar(x);
-		}
+	      bdd y = recurse(child);
+	      res_ = y & bdd_ithvar(x);
 	      return;
 	    }
 	  case unop::Not:
