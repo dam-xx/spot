@@ -1,5 +1,16 @@
 2003-10-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/ltlgspn.cc: Use command-line options to
+	select algorithms, not #defines.
+	* iface/gspn/Makefile.am (check_PROGRAMS): Remove eltlgspn-srg,
+	efmgspn-srg, fmgspn-rg, and fmgspn-srg and their associated
+	source variables.  These are all replaced by
+	ltlgspn-rg and ltlgspn-srg.
+	* iface/gspn/dcswavefm.test, iface/gspn/dcswaveltl.test,
+	iface/gspn/dcswaveeltl.test, iface/gspn/udcsefm.test,
+	iface/gspn/udcseltl.test, iface/gspn/udcsfm.test,
+	iface/gspn/udcsltl.test: Adjust calls to ltlgspn-srg.
+
 	* iface/gspn/Makefile.am (XFAIL_TESTS): Remove.
 
 2003-10-06  Rachid REBIHA  <rebiha@src.lip6.fr>
@@ -1691,7 +1702,7 @@
 	now that CVS Bison is fixed.
 	* src/ltlparse/ltlscan.ll: Use yyunput to shut up a GCC warning.
 
-2003-04-24  Rachid REBIHA  <rebiha@nyx>
+2003-04-24  Rachid REBIHA  <rebiha@src.lip6.fr>
 
 	* src/ltltest/tostring.test: New file.
 	* src/ltltest/tostring.cc: New files.
