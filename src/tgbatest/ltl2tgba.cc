@@ -379,8 +379,8 @@ main(int argc, char** argv)
 		    exit_code = 1;
 		    break;
 		  }
-		ec.counter_example();
-		ec.print_result(std::cout);
+		spot::counter_example ce(ec.result());
+		ce.print_result(std::cout);
 	      }
 	    else
 	      {

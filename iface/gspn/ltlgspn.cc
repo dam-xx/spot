@@ -175,24 +175,27 @@ main(int argc, char **argv)
 	      res = ec.check();
 	    else
 	      res = ec.check2();
+	    const spot::emptiness_check_status* ecs = ec.result();
 	    if (!res)
 	      {
 		if (compute_counter_example)
 		  {
-		    ec.counter_example();
-		    ec.print_result(std::cout, proj ? model : 0);
+		    spot::counter_example ce(ecs);
+		    ce.print_result(std::cout, proj ? model : 0);
+		    ce.print_stats(std::cout);
 		  }
 		else
 		  {
 		    std::cout << "non empty" << std::endl;
+		    ecs->print_stats(std::cout);
 		  }
 	      }
 	    else
 	      {
 		std::cout << "empty" << std::endl;
+		ecs->print_stats(std::cout);
 	      }
 	    std::cout << std::endl;
-	    ec.print_stats(std::cout);
 	    if (!res)
 	      exit(1);
 	  }

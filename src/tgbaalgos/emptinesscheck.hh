@@ -53,7 +53,8 @@ namespace spot
     size_t size() const;
     bool empty() const;
 
-    std::stack<connected_component> s;
+    typedef std::stack<connected_component> stack_type;
+    stack_type s;
   };
 
   class emptiness_check_status
@@ -74,6 +75,9 @@ namespace spot
     typedef Sgi::hash_map<const state*, int,
 			  state_ptr_hash, state_ptr_equal> hash_type;
     hash_type h;		///< Map of visited states.
+
+    /// Output statistics about this object.
+    void print_stats(std::ostream& os) const;
   };
 
   /// \brief Check whether the language of an automate is empty.
@@ -98,9 +102,6 @@ namespace spot
   /// \endverbatim
   class emptiness_check
   {
-    typedef std::list<const state*> state_sequence;
-    typedef std::pair<const state*, bdd> state_proposition;
-    typedef std::list<state_proposition> cycle_path;
   public:
     emptiness_check(const tgba* a);
     ~emptiness_check();
@@ -130,8 +131,31 @@ namespace spot
     bool check2();
     //@}
 
-    /// Compute a counter example if tgba_emptiness_check() returned false.
-    void counter_example();
+    const emptiness_check_status* result() const;
+
+  private:
+
+    emptiness_check_status* ecs_;
+    /// \brief Remove a strongly component from the hash.
+    ///
+    /// This function remove all accessible state from a given
+    /// state. In other words, it removes the strongly connected
+    /// component that contains this state.
+    void remove_component(const state* start_delete);
+
+  };
+
+
+  class counter_example
+  {
+  public:
+    counter_example(const emptiness_check_status* ecs);
+
+    typedef std::pair<const state*, bdd> state_proposition;
+    typedef std::list<const state*> state_sequence;
+    typedef std::list<state_proposition> cycle_path;
+    state_sequence suffix;
+    cycle_path period;
 
     /// \brief Display the example computed by counter_example().
     ///
@@ -142,8 +166,7 @@ namespace spot
     /// Output statistics about this object.
     void print_stats(std::ostream& os) const;
 
-  private:
-
+  protected:
     struct connected_component_set: public scc_stack::connected_component
     {
       typedef Sgi::hash_set<const state*,
@@ -156,17 +179,6 @@ namespace spot
       bool has_state(const state* s) const;
     };
 
-    emptiness_check_status* ecs_;
-    state_sequence suffix;
-    cycle_path period;
-
-    /// \brief Remove a strongly component from the hash.
-    ///
-    /// This function remove all accessible state from a given
-    /// state. In other words, it removes the strongly connected
-    /// component that contains this state.
-    void remove_component(const state* start_delete);
-
     /// Called by counter_example to find a path which traverses all
     /// acceptance conditions in the accepted SCC.
     void accepting_path (const connected_component_set& scc,
@@ -176,6 +188,9 @@ namespace spot
     /// example.  Append a sequence to the path given by accepting_path.
     void complete_cycle(const connected_component_set& scc,
 			const state* from, const state* to);
+
+  private:
+    const emptiness_check_status* ecs_;
   };
 }
 #endif // SPOT_EMPTINESS_CHECK_HH

@@ -1,5 +1,11 @@
 2004-04-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgo/semptinesscheck.hh (counter_example): New class,
+	extracted from ...
+	(emptiness_check): ... here.
+	* src/tgbaalgos/emptinesscheck.cc, src/tgbatest/ltl2tgba.cc,
+	iface/gspn/ltlgspn.cc: Adjust.
+
 	* wrap/python/Makefile.am ($(srcdir)/spot_wrap.cxx)
 	($(srcdir)/buddy_wrap.cxx): Use -noruntime instead of -c.
 

@@ -96,6 +96,14 @@ namespace spot
     return i->first;
   }
 
+  void
+  emptiness_check_status::print_stats(std::ostream& os) const
+  {
+    os << h.size() << " unique states visited" << std::endl;
+    os << root.size()
+       << " strongly connected components in search stack"
+       << std::endl;
+  }
 
 
   //////////////////////////////////////////////////////////////////////
@@ -103,13 +111,6 @@ namespace spot
   typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
 
 
-
-
-  bool
-  emptiness_check::connected_component_set::has_state(const state* s) const
-  {
-    return states.find(s) != states.end();
-  }
 
 
   emptiness_check::emptiness_check(const tgba* a)
@@ -473,68 +474,42 @@ namespace spot
       }
   }
 
-
-  std::ostream&
-  emptiness_check::print_result(std::ostream& os, const tgba* restrict) const
+  const emptiness_check_status*
+  emptiness_check::result() const
   {
-    os << "Prefix:" << std::endl;
-    const bdd_dict* d = ecs_->aut->get_dict();
-    for (state_sequence::const_iterator i_se = suffix.begin();
-	 i_se != suffix.end(); ++i_se)
-      {
-	os << "  ";
-	if (restrict)
-	  {
-	    const state* s = ecs_->aut->project_state(*i_se, restrict);
-	    assert(s);
-	    os << restrict->format_state(s) << std::endl;
-	    delete s;
-	  }
-	else
-	  {
-	    os << ecs_->aut->format_state(*i_se) << std::endl;
-	  }
-      }
-    os << "Cycle:" <<std::endl;
-    for (cycle_path::const_iterator it = period.begin();
-	 it != period.end(); ++it)
-      {
-	os << "    | " << bdd_format_set(d, it->second) << std::endl;
-	os << "  ";
-	if (restrict)
-	  {
-	    const state* s = ecs_->aut->project_state(it->first, restrict);
-	    assert(s);
-	    os << restrict->format_state(s) << std::endl;
-	    delete s;
-	  }
-	else
-	  {
-	    os << ecs_->aut->format_state(it->first) << std::endl;
-	  }
-      }
-    return os;
+    return ecs_;
   }
 
-  void
-  emptiness_check::counter_example()
+  //////////////////////////////////////////////////////////////////////
+
+  bool
+  counter_example::connected_component_set::has_state(const state* s) const
+  {
+    return states.find(s) != states.end();
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  counter_example::counter_example(const emptiness_check_status* ecs)
+    : ecs_(ecs)
   {
     assert(!ecs_->root.empty());
     assert(suffix.empty());
 
-    int comp_size = ecs_->root.size();
+    scc_stack::stack_type root = ecs_->root.s;
+    int comp_size = root.size();
     // Transform the stack of connected component into an array.
     connected_component_set* scc = new connected_component_set[comp_size];
     for (int j = comp_size - 1; 0 <= j; --j)
       {
-	scc[j].index = ecs_->root.top().index;
-	scc[j].condition = ecs_->root.top().condition;
-	ecs_->root.pop();
+	scc[j].index = root.top().index;
+	scc[j].condition = root.top().condition;
+	root.pop();
       }
-    assert(ecs_->root.empty());
+    assert(root.empty());
 
     // Build the set of states for all SCCs.
-    for (emptiness_check_status::hash_type::iterator i = ecs_->h.begin();
+    for (emptiness_check_status::hash_type::const_iterator i = ecs_->h.begin();
 	 i != ecs_->h.end(); ++i)
       {
 	int index = i->second;
@@ -635,7 +610,7 @@ namespace spot
   }
 
   void
-  emptiness_check::complete_cycle(const connected_component_set& scc,
+  counter_example::complete_cycle(const connected_component_set& scc,
 				  const state* from,
 				  const state* to)
   {
@@ -727,7 +702,7 @@ namespace spot
   }
 
   void
-  emptiness_check::accepting_path(const connected_component_set& scc,
+  counter_example::accepting_path(const connected_component_set& scc,
 				  const state* start, bdd acc_to_traverse)
   {
     // State seen during the DFS.
@@ -861,16 +836,55 @@ namespace spot
     complete_cycle(scc, start, suffix.back());
   }
 
+  std::ostream&
+  counter_example::print_result(std::ostream& os, const tgba* restrict) const
+  {
+    os << "Prefix:" << std::endl;
+    const bdd_dict* d = ecs_->aut->get_dict();
+    for (state_sequence::const_iterator i_se = suffix.begin();
+	 i_se != suffix.end(); ++i_se)
+      {
+	os << "  ";
+	if (restrict)
+	  {
+	    const state* s = ecs_->aut->project_state(*i_se, restrict);
+	    assert(s);
+	    os << restrict->format_state(s) << std::endl;
+	    delete s;
+	  }
+	else
+	  {
+	    os << ecs_->aut->format_state(*i_se) << std::endl;
+	  }
+      }
+    os << "Cycle:" <<std::endl;
+    for (cycle_path::const_iterator it = period.begin();
+	 it != period.end(); ++it)
+      {
+	os << "    | " << bdd_format_set(d, it->second) << std::endl;
+	os << "  ";
+	if (restrict)
+	  {
+	    const state* s = ecs_->aut->project_state(it->first, restrict);
+	    assert(s);
+	    os << restrict->format_state(s) << std::endl;
+	    delete s;
+	  }
+	else
+	  {
+	    os << ecs_->aut->format_state(it->first) << std::endl;
+	  }
+      }
+    return os;
+  }
+
 
   void
-  emptiness_check::print_stats(std::ostream& os) const
+  counter_example::print_stats(std::ostream& os) const
   {
-    os << ecs_->h.size() << " unique states visited" << std::endl;
+    ecs_->print_stats(os);
     os << suffix.size() << " states in suffix" << std::endl;
     os << period.size() << " states in period" << std::endl;
-    os << ecs_->root.size()
-       << " strongly connected components in search stack"
-       << std::endl;
   }
 
 }
