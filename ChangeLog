@@ -1,5 +1,30 @@
 2003-05-15  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	Implements spot::ltl::destroy() and exercise it.
+
+	* src/ltlast/atomic_prop.hh: Declare instance_count().
+	* src/ltlast/binop.hh, src/ltlast/unop.hh, src/ltlast/multop.hh:
+	Likewise.  Also, really inherit for ref_formula this time.
+	* src/ltlast/atomic_prop.cc, src/ltlast/binop.cc,
+	src/ltlast/unop.cc, src/ltlast/multop.cc: On destruction, suppress
+	the instance from the instance map.  Implement instance_count().
+	* src/ltlast/formula.cc, src/ltlast/formula.hh,
+	src/ltlast/ref_formula.cc, src/ltlast/ref_formula.hh: Add virtual
+	destructors.
+	* src/ltlparse/ltlparse.yy: Recover from binary operators with
+	missing right hand operand (the point is just to destroy the
+	the left hand operand).
+	* src/ltltest/equals.cc, src/ltltest/readltl.cc,
+	src/ltltest/tostring.cc: Destroy used formulae.  Make sure
+	instance_count()s are null are the end.
+	* src/ltltest/parseerr.test: Adjust expected result, now
+	that the parser lnows about missing right hand operands.
+	* src/ltlvisit/destroy.hh, src/ltlvisit/destroy.cc,
+	src/ltlvisit/postfix.hh, src/ltlvisit/postfix.cc: New files.
+	* src/ltlvisit/Makefile.am (libltlvisit_la_SOURCES): Add them.
+	* src/ltlvisit/lunabbrev.cc (Xor, Equiv): Clone formulae
+	occurring twice in the rewritten expression.
+
 	Massage the AST so that identical sub-formula share the same
 	reference-counted formula*.  One can't call constructors for AST
 	items anymore, everything need to be acquired through instance()

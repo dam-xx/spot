@@ -13,6 +13,12 @@ namespace spot
 
     binop::~binop()
     {
+      // Get this instance out of the instance map.
+      pairf pf(first(), second());
+      pair p(op(), pf);
+      map::iterator i = instances.find(p);
+      assert (i != instances.end());
+      instances.erase(i);
     }
 
     void
@@ -95,5 +101,10 @@ namespace spot
       return static_cast<binop*>(ap->ref());
     }
 
+    unsigned
+    binop::instance_count()
+    {
+      return instances.size();
+    }
   }
 }

@@ -2,7 +2,7 @@
 # define SPOT_LTLAST_BINOP_HH
 
 #include <map>
-#include "formula.hh"
+#include "refformula.hh"
 
 namespace spot
 {
@@ -10,7 +10,7 @@ namespace spot
   {
 
     /// Binary operator.
-    class binop : public formula
+    class binop : public ref_formula
     {
     public:
       /// Different kinds of binary opertaors
@@ -39,6 +39,9 @@ namespace spot
       type op() const;
       /// Get the type of this operator, as a string.
       const char* op_name() const;
+
+      /// Number of instantiated binary operators.  For debugging.
+      static unsigned instance_count();
 
     protected:
       typedef std::pair<formula*, formula*> pairf;

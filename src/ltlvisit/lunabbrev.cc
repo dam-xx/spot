@@ -1,4 +1,5 @@
 #include "ltlast/allnodes.hh"
+#include "ltlvisit/clone.hh"
 #include "lunabbrev.hh"
 
 namespace spot
@@ -23,10 +24,10 @@ namespace spot
 	  /* f1 ^ f2  ==  (f1 & !f2) | (f2 & !f1) */
 	case binop::Xor:
 	  result_ = multop::instance(multop::Or,
-				     multop::instance(multop::And, f1,
+				     multop::instance(multop::And, clone(f1),
 						      unop::instance(unop::Not,
 								     f2)),
-				     multop::instance(multop::And, f2,
+				     multop::instance(multop::And, clone(f2),
 						      unop::instance(unop::Not,
 								     f1)));
 	  return;
@@ -38,7 +39,8 @@ namespace spot
 	  /* f1 <=> f2  ==  (f1 & f2) | (!f1 & !f2) */
 	case binop::Equiv:
 	  result_ = multop::instance(multop::Or,
-				     multop::instance(multop::And, f1, f2),
+				     multop::instance(multop::And,
+						      clone(f1), clone(f2)),
 				     multop::instance(multop::And,
 						      unop::instance(unop::Not,
 								     f1),

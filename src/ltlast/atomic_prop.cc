@@ -13,6 +13,11 @@ namespace spot
 
     atomic_prop::~atomic_prop()
     {
+      // Get this instance out of the instance map.
+      pair p(name(), &env());
+      map::iterator i = instances.find(p);
+      assert (i != instances.end());
+      instances.erase(i);
     }
 
     void
@@ -53,6 +58,12 @@ namespace spot
       atomic_prop* ap = new atomic_prop(name, env);
       instances[p] = ap;
       return static_cast<atomic_prop*>(ap->ref());
+    }
+
+    unsigned
+    atomic_prop::instance_count()
+    {
+      return instances.size();
     }
 
   }

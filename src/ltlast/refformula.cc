@@ -10,6 +10,10 @@ namespace spot
     {
     }
 
+    ref_formula::~ref_formula()
+    {
+    }
+
     void
     ref_formula::ref_()
     {

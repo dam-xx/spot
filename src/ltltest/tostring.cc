@@ -2,6 +2,8 @@
 #include "ltlparse/public.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/equals.hh"
+#include "ltlvisit/destroy.hh"
+#include "ltlast/allnodes.hh"
 
 void
 syntax(char *prog)
@@ -45,5 +47,12 @@ main(int argc, char **argv)
 
   if (f2s != f1s)
     return 1;
+
+  spot::ltl::destroy(f1);
+  spot::ltl::destroy(f2);
+  assert(spot::ltl::atomic_prop::instance_count() == 0);
+  assert(spot::ltl::unop::instance_count() == 0);
+  assert(spot::ltl::binop::instance_count() == 0);
+  assert(spot::ltl::multop::instance_count() == 0);
+  return 0;
 }
- 

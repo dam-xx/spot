@@ -11,6 +11,10 @@ namespace spot
       return this;
     }
 
+    formula::~formula()
+    {
+    }
+
     void
     formula::unref(formula* f)
     {

@@ -15,6 +15,8 @@ namespace spot
     class formula
     {
     public:
+      virtual ~formula();
+
       virtual void accept(visitor& v) = 0;
       virtual void accept(const_visitor& v) const = 0;
 

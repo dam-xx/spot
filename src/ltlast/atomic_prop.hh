@@ -26,6 +26,10 @@ namespace spot
       const std::string& name() const;
       /// Get the environment of the atomic proposition.
       environment& env() const;
+
+      /// Number of instantiated atomic propositions.  For debugging.
+      static unsigned instance_count();
+
     protected:
       atomic_prop(const std::string& name, environment& env);
       virtual ~atomic_prop();

@@ -2,6 +2,8 @@
 #include "ltlparse/public.hh"
 #include "ltlvisit/dump.hh"
 #include "ltlvisit/dotty.hh"
+#include "ltlvisit/destroy.hh"
+#include "ltlast/allnodes.hh"
 
 void
 syntax(char* prog)
@@ -27,15 +29,15 @@ main(int argc, char** argv)
       if (argc < 3)
 	syntax(argv[0]);
       formula_index = 2;
-    }    
-  
+    }
+
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::parse_error_list pel;
-  spot::ltl::formula* f = spot::ltl::parse(argv[formula_index], 
+  spot::ltl::formula* f = spot::ltl::parse(argv[formula_index],
 					   pel, env, debug);
 
   spot::ltl::parse_error_list::iterator it;
-  exit_code = 
+  exit_code =
     spot::ltl::format_parse_errors(std::cerr, argv[formula_index], pel);
 
   if (f)
@@ -46,11 +48,16 @@ main(int argc, char** argv)
       spot::ltl::dump(*f, std::cout);
       std::cout << std::endl;
 #endif
+      spot::ltl::destroy(f);
     }
   else
     {
       exit_code = 1;
     }
-    
+
+  assert(spot::ltl::atomic_prop::instance_count() == 0);
+  assert(spot::ltl::unop::instance_count() == 0);
+  assert(spot::ltl::binop::instance_count() == 0);
+  assert(spot::ltl::multop::instance_count() == 0);
   return exit_code;
 }

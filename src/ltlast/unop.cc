@@ -13,6 +13,11 @@ namespace spot
 
     unop::~unop()
     {
+      // Get this instance out of the instance map.
+      pair p(op(), child());
+      map::iterator i = instances.find(p);
+      assert (i != instances.end());
+      instances.erase(i);
     }
 
     void
@@ -80,5 +85,10 @@ namespace spot
       return static_cast<unop*>(ap->ref());
     }
 
+    unsigned
+    unop::instance_count()
+    {
+      return instances.size();
+    }
   }
 }

@@ -2,7 +2,7 @@
 # define SPOT_LTLAST_UNOP_HH
 
 #include <map>
-#include "formula.hh"
+#include "refformula.hh"
 
 namespace spot
 {
@@ -10,7 +10,7 @@ namespace spot
   {
 
     /// Unary operator.
-    class unop : public formula
+    class unop : public ref_formula
     {
     public:
       enum type { Not, X, F, G };
@@ -31,6 +31,9 @@ namespace spot
       type op() const;
       /// Get the type of this operator, as a string.
       const char* op_name() const;
+
+      /// Number of instantiated unary operators.  For debugging.
+      static unsigned instance_count();
 
     protected:
       typedef std::pair<type, formula*> pair;

@@ -2,6 +2,7 @@
 #include <string>
 #include "public.hh"
 #include "ltlast/allnodes.hh"
+#include "ltlvisit/destroy.hh"
 
 extern spot::ltl::formula* result;
 
@@ -83,6 +84,9 @@ ltl_formula: subformula
 many_errors: error
 	    | many_errors error
 
+/* The reason we use `constant::false_instance()' for error recovery
+   is that it isn't reference counted.  (Hence it can't leak references.)  */
+
 subformula: ATOMIC_PROP
 	      {
 		$$ = parse_environment.require(*$1);
@@ -120,18 +124,67 @@ subformula: ATOMIC_PROP
 	      { $$ = unop::instance(unop::Not, $2); }
             | subformula OP_AND subformula
 	      { $$ = multop::instance(multop::And, $1, $3); }
+            | subformula OP_AND error
+              {
+		destroy($1);
+	        error_list.push_back(parse_error(@2,
+				     "missing right operand for OP_AND"));
+		$$ = constant::false_instance();
+	      }
 	    | subformula OP_OR subformula
 	      { $$ = multop::instance(multop::Or, $1, $3); }
+            | subformula OP_OR error
+              {
+		destroy($1);
+	        error_list.push_back(parse_error(@2,
+				     "missing right operand for OP_OR"));
+		$$ = constant::false_instance();
+	      }
 	    | subformula OP_XOR subformula
 	      { $$ = binop::instance(binop::Xor, $1, $3); }
+            | subformula OP_XOR error
+              {
+		destroy($1);
+	        error_list.push_back(parse_error(@2,
+				     "missing right operand for OP_XOR"));
+		$$ = constant::false_instance();
+	      }
 	    | subformula OP_IMPLIES subformula
 	      { $$ = binop::instance(binop::Implies, $1, $3); }
+            | subformula OP_IMPLIES error
+              {
+		destroy($1);
+	        error_list.push_back(parse_error(@2,
+				     "missing right operand for OP_IMPLIES"));
+		$$ = constant::false_instance();
+	      }
             | subformula OP_EQUIV subformula
 	      { $$ = binop::instance(binop::Equiv, $1, $3); }
+            | subformula OP_EQUIV error
+              {
+		destroy($1);
+	        error_list.push_back(parse_error(@2,
+				     "missing right operand for OP_EQUIV"));
+		$$ = constant::false_instance();
+	      }
             | subformula OP_U subformula
 	      { $$ = binop::instance(binop::U, $1, $3); }
+            | subformula OP_U error
+              {
+		destroy($1);
+	        error_list.push_back(parse_error(@2,
+				     "missing right operand for OP_U"));
+		$$ = constant::false_instance();
+	      }
             | subformula OP_R subformula
 	      { $$ = binop::instance(binop::R, $1, $3); }
+            | subformula OP_R error
+              {
+		destroy($1);
+	        error_list.push_back(parse_error(@2,
+				     "missing right operand for OP_R"));
+		$$ = constant::false_instance();
+	      }
             | OP_F subformula
 	      { $$ = unop::instance(unop::F, $2); }
             | OP_G subformula

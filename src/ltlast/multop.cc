@@ -14,6 +14,12 @@ namespace spot
 
     multop::~multop()
     {
+      // Get this instance out of the instance map.
+      pair p(op(), children_);
+      map::iterator i = instances.find(p);
+      assert (i != instances.end());
+      instances.erase(i);
+
       delete children_;
     }
 
@@ -132,5 +138,10 @@ namespace spot
       *m = instance(op, v);
     }
 
+    unsigned
+    multop::instance_count()
+    {
+      return instances.size();
+    }
   }
 }

@@ -5,6 +5,8 @@ noinst_LTLIBRARIES = libltlvisit.la
 libltlvisit_la_SOURCES = \
   clone.cc \
   clone.hh \
+  destroy.cc \
+  destroy.hh \
   dotty.cc \
   dotty.hh \
   dump.cc \
@@ -17,5 +19,7 @@ libltlvisit_la_SOURCES = \
   lunabbrev.cc \
   nenoform.hh \
   nenoform.cc \
+  postfix.hh \
+  postfix.cc \
   tunabbrev.hh \
   tunabbrev.cc

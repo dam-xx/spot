@@ -12,6 +12,7 @@ namespace spot
     class ref_formula : public formula
     {
     protected:
+      virtual ~ref_formula();
       ref_formula();
       void ref_();
       bool unref_();

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <map>
-#include "formula.hh"
+#include "refformula.hh"
 
 namespace spot
 {
@@ -13,7 +13,7 @@ namespace spot
     /// \brief Multi-operand operators.
     ///
     /// These operators are considered commutative and associative.
-    class multop : public formula
+    class multop : public ref_formula
     {
     public:
       enum type { Or, And };
@@ -60,6 +60,9 @@ namespace spot
       type op() const;
       /// Get the type of this operator, as a string.
       const char* op_name() const;
+
+      /// Number of instantiated multi-operand operators.  For debugging.
+      static unsigned instance_count();
 
     protected:
       typedef std::vector<formula*> vec;
