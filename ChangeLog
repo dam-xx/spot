@@ -1,8 +1,11 @@
 2003-10-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::complete_cycle):
+	Simplify, comment, and free memory.
+
 	* src/tgbaalgos/emptinesscheck.cc (triplet): New class.
-	(emptiness_check::accepting_path):
-	Simplify, comment, derecursive, and free memory...
+	(emptiness_check::accepting_path): Simplify, comment,
+	derecursive, and free memory...
 
 2003-10-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 

@@ -398,55 +398,69 @@ namespace spot
   }
 
   void
-  emptiness_check::complete_cycle(const connected_component_set& comp_path,
-				  const state* from_state,
-				  const state* to_state)
+  emptiness_check::complete_cycle(const connected_component_set& scc,
+				  const state* from,
+				  const state* to)
   {
-    if (h[from_state] != h[to_state])
+    if (from == to)
+      return;
+
+    // Records backlinks to parent state during the BFS.
+    // (This also stores the propositions of this link.)
+    std::map<const state*, state_proposition, state_ptr_less_than> father;
+
+    // BFS queue.
+    std::deque<pair_state_iter> todo;
+
+    // Initial state.
+    {
+      tgba_succ_iterator* i = aut_->succ_iter(from);
+      todo.push_back(pair_state_iter(from, i));
+    }
+
+    while (!todo.empty())
       {
-	std::map<const state*, state_proposition,
-	         state_ptr_less_than> complete_map;
-	std::deque<pair_state_iter> todo_complete;
-	tgba_succ_iterator* ite = aut_->succ_iter(from_state);
-	todo_complete.push_back(pair_state_iter(from_state, ite));
-	cycle_path tmp_comp;
-	while(!todo_complete.empty())
+	const state* src = todo.front().first;
+	tgba_succ_iterator* i = todo.front().second;
+	todo.pop_front();
+	for (i->first(); !i->done(); i->next())
 	  {
-	    pair_state_iter started_ = todo_complete.front();
-	    todo_complete.pop_front();
-	    tgba_succ_iterator* iter_s = started_.second;
-	    iter_s->first();
-	    for (iter_s->first(); !iter_s->done(); iter_s->next())
+	    const state* dest = h_filt(i->current_state());
+
+	    // Do not escape this SCC.
+	    if (!scc.has_state(dest))
+	      continue;
+
+	    bdd cond = i->current_condition();
+
+	    // If we have reached our destination, unwind the path
+	    // and populate PERIOD.
+	    if (dest == to)
 	      {
-		const state* curr_state = started_.second->current_state();
-		if (comp_path.has_state(curr_state))
+		cycle_path p;
+		p.push_front(state_proposition(dest, cond));
+		while (src != from)
 		  {
-		    if (curr_state->compare(to_state) == 0)
-		      {
-			const state* curr_father = started_.first;
-			bdd curr_condition = iter_s->current_condition();
-			tmp_comp.push_front(state_proposition(curr_state, curr_condition));
-			while (curr_father->compare(from_state) != 0)
-			  {
-			    tmp_comp.push_front(state_proposition(curr_father,
-						 complete_map[curr_father].second));
-			    curr_father = complete_map[curr_father].first;
-			  }
-			period.splice(period.end(), tmp_comp);
-			todo_complete.clear();
-			break;
-		      }
-		    else
-		      {
-			todo_complete.push_back(pair_state_iter(curr_state,
-								aut_->succ_iter(curr_state)));
-			complete_map[curr_state] =
-			  state_proposition(started_.first,
-					    iter_s->current_condition());
-		      }
+		    const state_proposition& psi = father[src];
+		    p.push_front(state_proposition(src, psi.second));
+		    src = psi.first;
 		  }
+		period.splice(period.end(), p);
+
+		// Exit the BFS, but release all iterators first.
+		while (!todo.empty())
+		  {
+		    delete todo.front().second;
+		    todo.pop_front();
+		  }
+		break;
 	      }
+
+	    // Common case: record backlinks and continue BFS.
+	    todo.push_back(pair_state_iter(dest, aut_->succ_iter(dest)));
+	    father[dest] = state_proposition(src, cond);
 	  }
+	delete i;
       }
   }
 
