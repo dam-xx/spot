@@ -469,15 +469,17 @@ namespace spot
   bdd
   tgba_gspn_eesrg::all_acceptance_conditions() const
   {
-    // There is no acceptance conditions in GSPN systems.
-    return bddfalse;
+    // There is no acceptance conditions in GSPN systems, they all
+    // come from the operand automaton.
+    return data_->operand->all_acceptance_conditions();
   }
 
   bdd
   tgba_gspn_eesrg::neg_acceptance_conditions() const
   {
-    // There is no acceptance conditions in GSPN systems.
-    return bddtrue;
+    // There is no acceptance conditions in GSPN systems, they all
+    // come from the operand automaton.
+    return data_->operand->neg_acceptance_conditions();
   }
 
 }

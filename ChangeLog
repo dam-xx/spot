@@ -1,5 +1,9 @@
 2004-01-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/eesrg.cc (tgba_gspn_eesrg::all_acceptance_conditions,
+	tgba_gspn_eesrg::neg_acceptance_conditions): Forward to
+	data_->operand.
+
 	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::complete_cycle):
 	Do not skip this computation if from == to but the period is empty.
 
