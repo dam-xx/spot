@@ -393,6 +393,10 @@ main(int argc, char** argv)
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 	}
 
+      spot::tgba_tba_proxy* degeneralized = 0;
+      if (degeneralize_opt)
+	a = degeneralized = new spot::tgba_tba_proxy(a);
+
       spot::tgba_reduc* aut_red = 0;
       if (reduc_aut != spot::Reduce_None)
 	{
@@ -422,14 +426,8 @@ main(int argc, char** argv)
 	    }
 
 	  if (reduc_aut & spot::Reduce_Scc)
-	    {
-	      aut_red->prune_scc();
-	    }
+	    aut_red->prune_scc();
 	}
-
-      spot::tgba_tba_proxy* degeneralized = 0;
-      if (degeneralize_opt)
-	a = degeneralized = new spot::tgba_tba_proxy(a);
 
       spot::tgba_explicit* expl = 0;
       switch (dupexp)

@@ -1,3 +1,8 @@
+2004-06-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/ltl2tgba.cc (main): Degeneralize before
+	the simulations.
+
 2004-06-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlvisit/tostring.cc (is_bare_word): New function.
