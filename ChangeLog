@@ -1,3 +1,8 @@
+2004-12-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgba/tgbaexplicit.cc (tgba_explicit::create_transition):
+	Make sure to create the source state before the destination state.
+
 2004-12-08  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/emptiness.cc: Suppress a horrible space before a ')'.
@@ -7,9 +12,9 @@
 	* src/tgba/tgbaexplicit.hh, src/tgba/tgbaexplicit.cc
 	(set_init_state): Return a pointer to the initial state.
 
-        * src/tgbaalgos/emptiness.hh, src/tgbaalgos/emptiness.cc
+	* src/tgbaalgos/emptiness.hh, src/tgbaalgos/emptiness.cc
 	(tgba_run_to_tgba): New function.
-        * src/tgbatest/ltl2tgba.cc: Add option -G.
+	* src/tgbatest/ltl2tgba.cc: Add option -G.
 
 2004-12-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 

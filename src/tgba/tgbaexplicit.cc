@@ -175,7 +175,11 @@ namespace spot
   tgba_explicit::create_transition(const std::string& source,
 				   const std::string& dest)
   {
-    return create_transition(add_state(source), add_state(dest));
+    // It's important that the source be created before the
+    // destination, so the first encountered source becomes the
+    // default initial state.
+    state* s = add_state(source);
+    return create_transition(s, add_state(dest));
   }
 
   void
