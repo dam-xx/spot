@@ -31,8 +31,10 @@
 #include "ltlenv/defaultenv.hh"
 #include "ltlast/atomic_prop.hh"
 #include "tgbaalgos/dotty.hh"
+#include "tgbaparse/public.hh"
 #include "misc/random.hh"
 #include "tgba/tgbatba.hh"
+#include "tgba/tgbaproduct.hh"
 #include "misc/timer.hh"
 
 #include "tgbaalgos/emptiness.hh"
@@ -132,6 +134,8 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -n N    number of nodes of the graph [20]" << std::endl
 	    << "  -O ALGO run Only ALGO" << std::endl
+	    << "  -P FILE multiply the random automata with the automaton "
+	    << "from `FILE'." << std::endl
 	    << "  -r      compute and replay acceptance runs (implies -e)"
 	    << std::endl
 	    << "  -R N    repeat each emptiness-check and accepting run "
@@ -431,8 +435,12 @@ main(int argc, char** argv)
 
   int exit_code = 0;
 
+  spot::tgba_explicit* formula = 0;
+  spot::tgba* product = 0;
+
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* ap = new spot::ltl::atomic_prop_set;
+  spot::bdd_dict* dict = new spot::bdd_dict();
 
   if (argc <= 1)
     syntax(argv[0]);
@@ -504,6 +512,16 @@ main(int argc, char** argv)
 	      exit(1);
 	    }
 	}
+      else if (!strcmp(argv[argn], "-P"))
+	{
+	  if (argc < argn + 2)
+	    syntax(argv[0]);
+	  spot::tgba_parse_error_list pel;
+	  formula = spot::tgba_parse(argv[++argn], pel, dict, env);
+	  if (spot::format_tgba_parse_errors(std::cerr, argv[argn], pel))
+	    return 2;
+	  formula->merge_transitions();
+	}
       else if (!strcmp(argv[argn], "-r"))
 	{
 	  opt_replay = true;
@@ -544,8 +562,6 @@ main(int argc, char** argv)
 	}
     }
 
-  spot::bdd_dict* dict = new spot::bdd_dict();
-
   spot::timer_map tm_ec;
   spot::timer_map tm_ar;
   std::set<int> failed_seeds;
@@ -557,8 +573,12 @@ main(int argc, char** argv)
 	  spot::srand(opt_ec_seed);
 	}
 
-      spot::tgba* a = spot::random_graph(opt_n, opt_d, ap, dict,
-					 opt_n_acc, opt_a, opt_t, &env);
+      spot::tgba* a;
+      spot::tgba* r = a = spot::random_graph(opt_n, opt_d, ap, dict,
+					     opt_n_acc, opt_a, opt_t, &env);
+
+      if (formula)
+	a = product = new spot::tgba_product(formula, a);
 
       if (!opt_ec)
 	{
@@ -725,7 +745,9 @@ main(int argc, char** argv)
 	  delete degen;
 	}
 
-      delete a;
+      delete product;
+      delete r;
+      delete formula;
 
       if (opt_ec)
 	{
