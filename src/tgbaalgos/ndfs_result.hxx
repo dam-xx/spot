@@ -272,7 +272,7 @@ namespace spot
           if (!f.it->done())
             {
               const state *s_prime = f.it->current_state();
-	      inc_ars_states();
+	      inc_ars_cycle_states();
               ndfsr_trace << "  Visit the successor: "
                           << a_->format_state(s_prime) << std::endl;
               bdd label = f.it->current_condition();
@@ -398,7 +398,7 @@ namespace spot
 
       const state* filter(const state* s)
       {
-	ars->inc_ars_states();
+	ars->inc_ars_cycle_states();
         if (!h.has_been_visited(s)
 	    || seen.find(s) != seen.end()
 	    || dead.find(s) != dead.end())
@@ -459,6 +459,7 @@ namespace spot
     typedef Sgi::hash_multimap<const state*, transition,
 			       state_ptr_hash, state_ptr_equal> m_source_trans;
 
+    template<bool cycle>
     class min_path: public bfs_steps
     {
     public:
@@ -490,7 +491,11 @@ namespace spot
 
       const state* filter(const state* s)
       {
-	ars->inc_ars_states();
+	if (cycle)
+	  ars->inc_ars_cycle_states();
+	else
+	  ars->inc_ars_prefix_states();
+
         ndfsr_trace << "filter: " << a_->format_state(s);
         if (!h.has_been_visited(s) || seen.find(s) != seen.end())
           {
@@ -568,7 +573,7 @@ namespace spot
 	  typename m_source_trans::iterator i = target.find(current.dest);
 	  if (i == target.end())
 	    {
-	      min_path s(this, a_, target, h_);
+	      min_path<true> s(this, a_, target, h_);
 	      const state* res = s.search(current.dest->clone(), run->cycle);
 	      // init current to the corresponding transition.
 	      assert(res);
@@ -598,7 +603,7 @@ namespace spot
 		      << a_->format_state(begin) << std::endl;
 	  transition tmp;
 	  target.insert(std::make_pair(begin, tmp));
-	  min_path s(this, a_, target, h_);
+	  min_path<true> s(this, a_, target, h_);
 	  const state* res = s.search(current.dest->clone(), run->cycle);
 	  assert(res);
 	  assert(res->compare(begin) == 0);
@@ -633,7 +638,7 @@ namespace spot
       else
         {
           // This initial state is outside the cycle.  Compute the prefix.
-          min_path s(this, a_, target, h_);
+          min_path<false> s(this, a_, target, h_);
           cycle_entry_point = s.search(prefix_start, run->prefix);
           assert(cycle_entry_point);
           cycle_entry_point = cycle_entry_point->clone();

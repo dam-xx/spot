@@ -336,9 +336,12 @@ struct acss_stat
 
 struct ars_stat
 {
-  int min_states;
-  int max_states;
-  int tot_states;
+  int min_prefix_states;
+  int max_prefix_states;
+  int tot_prefix_states;
+  int min_cycle_states;
+  int max_cycle_states;
+  int tot_cycle_states;
   int n;
 
   ars_stat()
@@ -349,20 +352,24 @@ struct ars_stat
   void
   count(const spot::ars_statistics* acss)
   {
-    int s = acss->ars_states();
+    int p = acss->ars_prefix_states();
+    int c = acss->ars_cycle_states();
     if (n++)
       {
-	min_states = std::min(min_states, s);
-	max_states = std::max(max_states, s);
-	tot_states += s;
+	min_prefix_states = std::min(min_prefix_states, p);
+	max_prefix_states = std::max(max_prefix_states, p);
+	tot_prefix_states += p;
+	min_cycle_states = std::min(min_cycle_states, c);
+	max_cycle_states = std::max(max_cycle_states, c);
+	tot_cycle_states += c;
       }
     else
       {
-	min_states = max_states = tot_states = s;
+	min_prefix_states = max_prefix_states = tot_prefix_states = p;
+	min_cycle_states = max_cycle_states = tot_cycle_states = c;
       }
   }
 };
-
 
 struct ar_stat
 {
@@ -1259,7 +1266,7 @@ main(int argc, char** argv)
       std::cout << "Statistics about accepting run computation:"
 		<< std::endl;
       std::cout << std::setw(22) << ""
-		<< " |      (non unique) states      |"
+		<< " |(non unique) states for prefix |"
 		<< std::endl << std::setw(22) << "algorithm"
 		<< " |   min   < mean  < max | total |  n"
 		<< std::endl
@@ -1268,14 +1275,37 @@ main(int argc, char** argv)
       for (ars_stats_type::const_iterator i = ars_stats.begin();
 	   i != ars_stats.end(); ++i)
 	std::cout << std::setw(22) << i->first << " |"
-		  << std::setw(6) << i->second.min_states
+		  << std::setw(6) << i->second.min_prefix_states
 		  << " "
 		  << std::setw(8)
-		  << static_cast<float>(i->second.tot_states) / i->second.n
+		  << (static_cast<float>(i->second.tot_prefix_states)
+		      / i->second.n)
 		  << " "
-		  << std::setw(6) << i->second.max_states
+		  << std::setw(6) << i->second.max_prefix_states
 		  << " |"
-		  << std::setw(6) << i->second.tot_states
+		  << std::setw(6) << i->second.tot_prefix_states
+		  << " |"
+		  << std::setw(4) << i->second.n
+		  << std::endl;
+      std::cout << std::setw(22) << ""
+		<< " | (non unique) states for cycle |"
+		<< std::endl << std::setw(22) << "algorithm"
+		<< " |   min   < mean  < max | total |  n"
+		<< std::endl
+		<< std::setw(61) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl;
+      for (ars_stats_type::const_iterator i = ars_stats.begin();
+	   i != ars_stats.end(); ++i)
+	std::cout << std::setw(22) << i->first << " |"
+		  << std::setw(6) << i->second.min_cycle_states
+		  << " "
+		  << std::setw(8)
+		  << (static_cast<float>(i->second.tot_cycle_states)
+		      / i->second.n)
+		  << " "
+		  << std::setw(6) << i->second.max_cycle_states
+		  << " |"
+		  << std::setw(6) << i->second.tot_cycle_states
 		  << " |"
 		  << std::setw(4) << i->second.n
 		  << std::endl;

@@ -48,7 +48,7 @@ namespace spot
       const state*
       filter(const state* s)
       {
-	r->inc_ars_states();
+	r->inc_ars_prefix_states();
 	numbered_state_heap::state_index_p sip = ecs->h->find(s);
 	// Ignore unknown states ...
 	if (!sip.first)
@@ -180,7 +180,7 @@ namespace spot
 	  virtual const state*
 	  filter(const state* s)
 	  {
-	    r->inc_ars_states();
+	    r->inc_ars_cycle_states();
 	    numbered_state_heap::state_index_p sip = ecs->h->find(s);
 	    // Ignore unknown states.
 	    if (!sip.first)

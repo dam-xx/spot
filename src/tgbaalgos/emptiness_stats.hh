@@ -125,24 +125,37 @@ namespace spot
   {
   public:
     ars_statistics()
-      : states_(0)
+      : prefix_states_(0), cycle_states_(0)
     {
     }
 
     void
-    inc_ars_states()
+    inc_ars_prefix_states()
     {
-      ++states_;
+      ++prefix_states_;
     }
 
     int
-    ars_states() const
+    ars_prefix_states() const
     {
-      return states_;
+      return prefix_states_;
+    }
+
+    void
+    inc_ars_cycle_states()
+    {
+      ++cycle_states_;
+    }
+
+    int
+    ars_cycle_states() const
+    {
+      return cycle_states_;
     }
 
   private:
-    unsigned states_;	/// number of states visited
+    unsigned prefix_states_;	/// states visited to construct the prefix
+    unsigned cycle_states_;	/// states visited to construct the cycle
   };
 
   /// @}

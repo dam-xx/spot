@@ -339,7 +339,7 @@ namespace spot
 	    virtual const state*
 	    filter(const state* s)
 	    {
-	      r->inc_ars_states();
+	      r->inc_ars_cycle_states();
 	      // Do not escape the SCC
 	      hash_type::const_iterator j = data.h.find(s);
 	      if (// This state was never visited so far.
