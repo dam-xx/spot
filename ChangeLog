@@ -1,4 +1,10 @@
-2004-11-23  Poitrenaud Denis  <Denis.Poitrenaud@lip6.fr>
+2004-11-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gv04.cc (gv04::result): New struct to compute
+	counter examples.
+	(gv04:check): Return a gv04::result.
+
+2004-11-23  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/tau03opt.cc: Fix a warning.
 
@@ -25,7 +31,7 @@
 	new algorithm.
 	* src/tgbatest/emptchk.test: Test it.
 
-2004-11-22  Poitrenaud Denis  <denis@src.lip6.fr>
+2004-11-22  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/emptiness_stats.hh, src/tgbaalgos/weight.cc,
 	src/tgbaalgos/weight.hh: New files.
@@ -53,7 +59,7 @@
 	* src/tgbatest/randtgba.cc (main): Add options -z and -Z for statistics.
 	(ce_stat): New struct.
 
-2004-11-17  Poitrenaud Denis  <denis@src.lip6.fr>
+2004-11-17  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/se05.hh, src/tgbaalgos/tau03.hh: Typo.
 	* src/tgbaalgos/tau03.cc: Suppress optimisations, the algorithm is now
@@ -81,7 +87,7 @@
 	src/misc/random.hh, src/misc/version.hh, src/tgba/state.hh: More
 	Doxygen groups.
 
-2004-11-17  Poitrenaud Denis  <denis@src.lip6.fr>
+2004-11-17  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/magic.hh: Fix a comment and remove se05 interface.
 	* src/tgbaalgos/magic.cc: Fix a comment.
@@ -187,7 +193,7 @@
 	of randtgba.
 	* src/tgbatest/emptchk.test: Adjust.
 
-2004-11-15  Poitrenaud Denis  <denis@src.lip6.fr>
+2004-11-15  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/magic.cc: Fix a stupid bug.
 	* src/tgbaalgos/se05.cc: Fix the same bug.
@@ -209,7 +215,7 @@
 	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Write to the
 	supplied stream, not std::cout.
 
-2004-11-15  Poitrenaud Denis  <denis@src.lip6.fr>
+2004-11-15  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/magic.cc: Add a bit state hashing version.
 	* src/tgbaalgos/se05.cc: Add a bit state hashing version.
@@ -269,7 +275,7 @@
 	* src/tgbatest/ltl2tgba.cc (syntax): Fix old typos and reword
 	some help strings.
 
-2004-11-09  Poitrenaud Denis  <denis@src.lip6.fr>
+2004-11-09  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/magic.cc: rewrite to externalize the heap and
 	prepare it to a bit state hashing version.
@@ -1462,7 +1468,7 @@
 	* wrap/python/spot.i: Process tgbaalgos/neverclaim.hh.
 	* wrap/python/cgi/ltl2tgba.in: Display the never claim on demand.
 
-2004-04-21  Denis Poitrenaud  <dp@src.lip6.fr>
+2004-04-21  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/ltlvisit/tostring.hh (to_spin_string): New function.
 	Convert a formula into a string parsable by Spin.
