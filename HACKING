@@ -232,6 +232,8 @@ Naming
 
   * C Macros are all uppercase.
 
+  * Use *.hxx for the implementation of templates that are private
+    to Spot (i.e. not installed) and need to be included multiple times.
 
 Other style recommandations
 ===========================

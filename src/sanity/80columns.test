@@ -8,7 +8,9 @@ rm -f failures
 
 for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
 
-  find "$dir" \( -name "${1-*}.hh" -o -name "${1-*}.cc" \
+  find "$dir" \(    -name "${1-*}.hh" \
+                 -o -name "${1-*}.hxx" \
+                 -o -name "${1-*}.cc" \
 		 -o -name "${1-*}.test" \) -a -type f -a -print |
   while read file; do
      x='........................................'

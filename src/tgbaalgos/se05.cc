@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -35,7 +35,7 @@
 #include "emptiness.hh"
 #include "emptiness_stats.hh"
 #include "se05.hh"
-#include "ndfs_result.hh"
+#include "ndfs_result.hxx"
 
 /// FIXME: make compiling depedent the taking into account of weights.
 

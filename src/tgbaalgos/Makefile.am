@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -38,7 +38,6 @@ tgbaalgos_HEADERS = \
   ltl2tgba_fm.hh \
   ltl2tgba_lacim.hh \
   magic.hh \
-  ndfs_result.hh \
   neverclaim.hh \
   powerset.hh \
   projrun.hh \
@@ -67,6 +66,7 @@ libtgbaalgos_la_SOURCES = \
   ltl2tgba_fm.cc \
   ltl2tgba_lacim.cc \
   magic.cc \
+  ndfs_result.hxx \
   neverclaim.cc \
   powerset.cc \
   projrun.cc \

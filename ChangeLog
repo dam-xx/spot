@@ -1,5 +1,15 @@
 2005-01-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* doc/Doxyfile.in (FILE_PATTERNS): Remove *.hxx.
+	* src/sanity/80columns.test, src/sanity/style.test: Process *.hxx files.
+	* src/tgbaalgos/ndfs_result.hh: Rename as ..
+	* src/tgbaalgos/ndfs_result.hxx: ... this, so it does not get
+	documented (and so Doxygen do not complain).
+	* src/tgbaalgos/magic.cc, src/tgbaalgos/se05.cc, src/tgbaalgos/tau03.cc,
+	src/tgbaalgos/tau03opt.cc: Adjust include.
+	* src/tgbaalgos/Makefile.am: Rename ndfs_result.hh as ndfs_result.hxx
+	and do not install it, this is a private header.
+
 	* src/tgbaalgos/emptiness.hh: Declare Doxygen group
 	emptiness_check_stats.
 	* src/tgbaalgos/emptiness_stats.hh: Use it.

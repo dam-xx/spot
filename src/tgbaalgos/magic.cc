@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -35,7 +35,7 @@
 #include "emptiness.hh"
 #include "emptiness_stats.hh"
 #include "magic.hh"
-#include "ndfs_result.hh"
+#include "ndfs_result.hxx"
 
 namespace spot
 {
