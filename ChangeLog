@@ -1,5 +1,7 @@
 2005-01-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/bfssteps.hh (bfs_steps::finalize): Document.
+
 	* src/tgbaalgos/emptiness_stats.hh (accs_statistics): New class.
 	* src/tgbaalgos/gtec/ce.cc, src/tgbaalgos/gtec/ce.hh
 	(couvreur99_check_result): Inherit from acss_statistics.

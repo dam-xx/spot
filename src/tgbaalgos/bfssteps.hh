@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -85,12 +85,17 @@ namespace spot
     /// transition.
     virtual bool match(tgba_run::step& step, const state* dest) = 0;
 
-    virtual void finalize(const std::map<const state*,
-                tgba_run::step,
-                state_ptr_less_than>& father,
-                const tgba_run::step& s,
-                const state* start,
-                tgba_run::steps& l);
+    /// \brief Append the resulting path to the resulting run.
+    ///
+    /// This is called after match() has returned true, to append the
+    /// resulting path to \a l.  This seldom needs to be overridden,
+    /// unless you do not want \a l to be updated (in which case an empty
+    /// finalize() will do).
+    virtual void finalize(const std::map<const state*, tgba_run::step,
+			                 state_ptr_less_than>& father,
+			  const tgba_run::step& s,
+			  const state* start,
+			  tgba_run::steps& l);
 
   protected:
     const tgba* a_;		///< The spot::tgba we are searching into.
