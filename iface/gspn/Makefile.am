@@ -71,7 +71,6 @@ TESTS = \
   udcseltl.test \
   udcsfm.test \
   udcsefm.test
-XFAIL_TESTS = udcseltl.test udcsefm.test
 
 # Each test case depends on defs.
 check_SCRIPTS = defs
