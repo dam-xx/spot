@@ -74,9 +74,6 @@ namespace spot
     /// FIXME: Describe what universal formulae are.  Cite paper.
     bool is_universal(const formula* f);
 
-    /// Length of a formula.
-    int length(const formula* f);
-
     /// Type the first node of a formula.
     class node_type_form_visitor : public const_visitor
     {

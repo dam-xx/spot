@@ -1,5 +1,13 @@
 2004-05-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlvisit/formlength.cc: Rename as ...
+	* src/ltlvisit/length.cc: ... this.
+	* src/ltlvisit/length.hh: New file, extracted from ...
+	* src/ltlvisit/reducform.hh: ... here.
+	* src/ltlvisit/Makefile.am (ltlvisit_HEADERS): Add length.hh.
+	(libltlvisit_la_SOURCES): Rename formlength.cc as length.cc.
+	* src/ltltest/reduc.cc: Include length.hh.
+
 	* src/ltlvisit/formlength.cc (length_form_vistor): Rename as ..
 	(length_visitor): ... this.
 	(form_length): Rename as ...
