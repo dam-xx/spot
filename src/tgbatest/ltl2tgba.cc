@@ -42,6 +42,7 @@
 #include "tgbaalgos/dupexp.hh"
 #include "tgbaalgos/neverclaim.hh"
 #include "tgbaalgos/reductgba_sim.hh"
+#include "tgbaalgos/replayrun.hh"
 
 void
 syntax(char* prog)
@@ -575,11 +576,13 @@ main(int argc, char** argv)
 		  spot::tgba_run* run = res->accepting_run();
 		  if (!run)
 		    {
-		      std::cout << "an accepting run exist" << std::endl;
+		      std::cout << "an accepting run exists" << std::endl;
 		    }
 		  else
 		    {
 		      spot::print_tgba_run(std::cout, run, ec_a);
+		      // if (!spot::replay_tgba_run(std::cout, ec_a, run))
+		      //   exit_code = 1;
 		      delete run;
 		    }
 		}

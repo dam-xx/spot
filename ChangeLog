@@ -1,3 +1,14 @@
+2004-10-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/replayrun.cc, src/tgbaalgos/replayrun.hh: New files.
+	Cannot test them because the run returned by the emptiness checks
+	are currently incomplete (they lack the acceptance conditions, and
+	sometimes even the labels in the prefix).
+	* src/tgbaalgos/Makefile.am (tgbaalgos_HEADERS,
+	libtgbaalgos_la_SOURCES): Add them.
+	* src/tgbatest/ltl2tgba.cc (main): Prepare to use replay_tgba_run
+	when the emptiness checks are fixed.
+
 2004-10-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	Introduce an emptiness-check interface, and modify the existing

@@ -37,6 +37,7 @@ tgbaalgos_HEADERS = \
   neverclaim.hh \
   powerset.hh \
   reachiter.hh \
+  replayrun.hh \
   save.hh \
   stats.hh \
   reductgba_sim.hh
@@ -53,6 +54,7 @@ libtgbaalgos_la_SOURCES = \
   neverclaim.cc \
   powerset.cc \
   reachiter.cc \
+  replayrun.cc \
   save.cc \
   stats.cc \
   reductgba_sim.cc \
