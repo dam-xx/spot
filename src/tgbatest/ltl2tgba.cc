@@ -58,7 +58,8 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -A    same as -a, but as a set" << std::endl
 	    << "  -d    turn on traces during parsing" << std::endl
-	    << "  -D    degeneralize the automaton" << std::endl
+	    << "  -D    degeneralize the automaton as a TBA" << std::endl
+	    << "  -DS   degeneralize the automaton as an SBA" << std::endl
 	    << "  -e[ALGO]  emptiness-check, expect and compute an "
 	    << "accepting run" << std::endl
 	    << "  -E[ALGO]  emptiness-check, expect no accepting run"
@@ -134,7 +135,7 @@ main(int argc, char** argv)
   int exit_code = 0;
 
   bool debug_opt = false;
-  bool degeneralize_opt = false;
+  enum { NoDegen, DegenTBA, DegenSBA } degeneralize_opt = NoDegen;
   bool degeneralize_maybe = false;
   bool fm_opt = false;
   bool fm_exprop_opt = false;
@@ -182,7 +183,11 @@ main(int argc, char** argv)
 	}
       else if (!strcmp(argv[formula_index], "-D"))
 	{
-	  degeneralize_opt = true;
+	  degeneralize_opt = DegenTBA;
+	}
+      else if (!strcmp(argv[formula_index], "-DS"))
+	{
+	  degeneralize_opt = DegenSBA;
 	}
       else if (!strncmp(argv[formula_index], "-e", 2))
         {
@@ -231,7 +236,7 @@ main(int argc, char** argv)
 	}
       else if (!strcmp(argv[formula_index], "-N"))
 	{
-	  degeneralize_opt = true;
+	  degeneralize_opt = DegenSBA;
 	  output = 8;
 	}
       else if (!strcmp(argv[formula_index], "-p"))
@@ -494,10 +499,14 @@ main(int argc, char** argv)
 
       spot::tgba_tba_proxy* degeneralized = 0;
 
-      if (degeneralize_maybe && a->number_of_acceptance_conditions() > 1)
-	degeneralize_opt = true;
-      if (degeneralize_opt)
+      if (degeneralize_maybe
+	  && degeneralize_opt == NoDegen
+	  && a->number_of_acceptance_conditions() > 1)
+	degeneralize_opt = DegenTBA;
+      if (degeneralize_opt == DegenTBA)
 	a = degeneralized = new spot::tgba_tba_proxy(a);
+      else if (degeneralize_opt == DegenSBA)
+	a = degeneralized = new spot::tgba_sba_proxy(a);
 
       spot::tgba_reduc* aut_red = 0;
       if (reduc_aut != spot::Reduce_None)
@@ -602,8 +611,13 @@ main(int argc, char** argv)
 	  spot::lbtt_reachable(std::cout, a);
 	  break;
 	case 8:
-	  spot::never_claim_reachable(std::cout, degeneralized, f);
-	  break;
+	  {
+	    assert(degeneralize_opt == DegenSBA);
+	    const spot::tgba_sba_proxy* s =
+	      static_cast<const spot::tgba_sba_proxy*>(degeneralized);
+	    spot::never_claim_reachable(std::cout, s, f);
+	    break;
+	  }
 	default:
 	  assert(!"unknown output option");
 	}

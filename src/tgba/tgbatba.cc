@@ -112,9 +112,10 @@ namespace spot
       typedef tgba_tba_proxy::cycle_list::const_iterator iterator;
     public:
       tgba_tba_proxy_succ_iterator(tgba_succ_iterator* it,
-				   iterator expected, iterator end,
+				   iterator expected,
+				   const list& cycle,
 				   bdd the_acceptance_cond)
-	: it_(it), expected_(expected), end_(end),
+	: it_(it), expected_(expected), cycle_(cycle),
 	  the_acceptance_cond_(the_acceptance_cond)
       {
       }
@@ -131,12 +132,14 @@ namespace spot
       first()
       {
 	it_->first();
+	sync_();
       }
 
       void
       next()
       {
 	it_->next();
+	sync_();
       }
 
       bool
@@ -150,27 +153,7 @@ namespace spot
       state_tba_proxy*
       current_state() const
       {
-	// A transition in the *EXPECTED acceptance set should be directed
-	// to the next acceptance set.  If the current transition is also
-	// in the next acceptance set, then go the one after, etc.
-	//
-	// See Denis Oddoux's PhD thesis for a nice explanation (in French).
-	//  @PhDThesis{	  oddoux.03.phd,
-	//    author	= {Denis Oddoux},
-	//    title	= {Utilisation des automates alternants pour un
-	//  		  model-checking efficace des logiques temporelles
-	//  		  lin{\'e}aires.},
-	//    school	= {Universit{\'e}e Paris 7},
-	//    year	= {2003},
-	//    address	= {Paris, France},
-	//    month	= {December}
-	//  }
-	//
-	iterator next = expected_;
-	bdd acc = it_->current_acceptance_conditions();
-	while ((acc & *next) == *next && next != end_)
-	  ++next;
-	return new state_tba_proxy(it_->current_state(), next);
+	return new state_tba_proxy(it_->current_state(), next_);
       }
 
       bdd
@@ -182,13 +165,66 @@ namespace spot
       bdd
       current_acceptance_conditions() const
       {
-	return the_acceptance_cond_;
+	return accepting_ ? the_acceptance_cond_ : bddfalse;
       }
 
     protected:
+
+      void
+      sync_()
+      {
+	if (done())
+	  return;
+
+	bdd acc = it_->current_acceptance_conditions();
+
+	// bddtrue is a special condition used for tgba_sba_proxy
+	// to denote the (N+1)th copy of the state, after all acceptance
+	// conditions have been traversed.  Such state is always accepting,
+	// so do not check acc for this.
+	// bddtrue is also used by tgba_tba_proxy if the automata do not
+	// use acceptance conditions.  In that cases, all state are accepting.
+	if (*expected_ != bddtrue)
+	  {
+	    // A transition in the *EXPECTED acceptance set should be
+	    // directed to the next acceptance set.  If the current
+	    // transition is also in the next acceptance set, then go
+	    // the one after, etc.
+	    //
+	    // See Denis Oddoux's PhD thesis for a nice explanation (in French).
+	    // @PhDThesis{	  oddoux.03.phd,
+	    //   author	= {Denis Oddoux},
+	    //   title	= {Utilisation des automates alternants pour un
+	    // 		  model-checking efficace des logiques temporelles
+	    // 		  lin{\'e}aires.},
+	    //   school	= {Universit{\'e}e Paris 7},
+	    //   year	= {2003},
+	    //   address= {Paris, France},
+	    //   month	= {December}
+	    // }
+
+	    next_ = expected_;
+	    while (next_ != cycle_.end() && (acc & *next_) == *next_)
+	      ++next_;
+	    if (next_ != cycle_.end())
+	      {
+		accepting_ = false;
+		return;
+	      }
+	  }
+	// The transition is accepting.
+	accepting_ = true;
+	// Skip as much acceptance conditions as we can on our cycle.
+	next_ = cycle_.begin();
+	while (next_ != expected_ && (acc & *next_) == *next_)
+	  ++next_;
+      }
+
       tgba_succ_iterator* it_;
       const iterator expected_;
-      const iterator end_;
+      iterator next_;
+      bool accepting_;
+      const list& cycle_;
       const bdd the_acceptance_cond_;
       friend class tgba_tba_proxy;
     };
@@ -198,23 +234,26 @@ namespace spot
   tgba_tba_proxy::tgba_tba_proxy(const tgba* a)
     : a_(a)
   {
-    bdd all = a_->all_acceptance_conditions();
-
     // We will use one acceptance condition for this automata.
     // Let's call it Acc[True].
     int v = get_dict()
       ->register_acceptance_variable(ltl::constant::true_instance(), this);
     the_acceptance_cond_ = bdd_ithvar(v);
 
-    // Now build the "cycle" of acceptance conditions.
-
-    acc_cycle_.push_front(bddtrue);
-
-    while (all != bddfalse)
+    if (a->number_of_acceptance_conditions() == 0)
       {
-	bdd next = bdd_satone(all);
-	all -= next;
-	acc_cycle_.push_front(next);
+	acc_cycle_.push_front(bddtrue);
+      }
+    else
+      {
+	// Build a cycle of expected acceptance conditions.
+	bdd all = a_->all_acceptance_conditions();
+	while (all != bddfalse)
+	  {
+	    bdd next = bdd_satone(all);
+	    all -= next;
+	    acc_cycle_.push_front(next);
+	  }
       }
   }
 
@@ -241,13 +280,8 @@ namespace spot
     tgba_succ_iterator* it = a_->succ_iter(s->real_state(),
 					   global_state, global_automaton);
 
-    cycle_list::const_iterator j = s->acceptance_iterator();
-    cycle_list::const_iterator i = j++;
-    if (j == acc_cycle_.end())
-      return new tgba_tba_proxy_succ_iterator(it, acc_cycle_.begin(),
-					      acc_cycle_.end(),
-					      the_acceptance_cond_);
-    return new tgba_tba_proxy_succ_iterator(it, i, acc_cycle_.end(), bddfalse);
+    return new tgba_tba_proxy_succ_iterator(it, s->acceptance_iterator(),
+					    acc_cycle_, the_acceptance_cond_);
   }
 
   bdd_dict*
@@ -290,15 +324,6 @@ namespace spot
     return !the_acceptance_cond_;
   }
 
-  bool
-  tgba_tba_proxy::state_is_accepting(const state* state) const
-  {
-    const state_tba_proxy* s =
-      dynamic_cast<const state_tba_proxy*>(state);
-    assert(s);
-    return bddtrue == s->acceptance_cond();
-  }
-
   bdd
   tgba_tba_proxy::compute_support_conditions(const state* state) const
   {
@@ -324,6 +349,25 @@ namespace spot
       dynamic_cast<const tgba_tba_proxy_succ_iterator*>(t);
     assert(i);
     return a_->transition_annotation(i->it_);
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  // tgba_sba_proxy
+
+  tgba_sba_proxy::tgba_sba_proxy(const tgba* a)
+    : tgba_tba_proxy(a)
+  {
+    if (a->number_of_acceptance_conditions() > 0)
+      acc_cycle_.push_back(bddtrue);
+  }
+
+  bool
+  tgba_sba_proxy::state_is_accepting(const state* state) const
+  {
+    const state_tba_proxy* s =
+      dynamic_cast<const state_tba_proxy*>(state);
+    assert(s);
+    return bddtrue == s->acceptance_cond();
   }
 
 }

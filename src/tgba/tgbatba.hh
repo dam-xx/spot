@@ -29,13 +29,12 @@
 namespace spot
 {
 
-  /// \brief Degeneralize a spot::tgba on the fly.
+  /// \brief Degeneralize a spot::tgba on the fly, producing a TBA.
   ///
   /// This class acts as a proxy in front of a spot::tgba, that should
-  /// be degeneralized on the fly.
-  ///
-  /// This automaton is a spot::tgba, but it will always have exactly
-  /// one acceptance condition.
+  /// be degeneralized on the fly.  The result is still a spot::tgba,
+  /// but it will always have exactly one acceptance condition so
+  /// it could be called TBA (without the G).
   ///
   /// The degeneralization is done by synchronizing the input
   /// automaton with a "counter" automaton such as the one shown in
@@ -43,8 +42,10 @@ namespace spot
   /// Couveur, FME99).
   ///
   /// If the input automaton uses N acceptance conditions, the output
-  /// automaton can have at most max(N,1)+1 times more states and
+  /// automaton can have at most max(N,1) times more states and
   /// transitions.
+  ///
+  /// \see tgba_sba_proxy
   class tgba_tba_proxy : public tgba
   {
   public:
@@ -71,28 +72,47 @@ namespace spot
     virtual bdd all_acceptance_conditions() const;
     virtual bdd neg_acceptance_conditions() const;
 
-    /// \brief Whether the state is accepting.
-    ///
-    /// A particularity of a spot::tgba_tba_proxy automaton is that
-    /// when a state has an outgoing accepting arc, all its outgoing
-    /// arcs are accepting.  The state itself can therefore be
-    /// considered accepting.  This is useful to many algorithms
-    /// working on degeneralized automata with state acceptance
-    /// conditions.
-    bool state_is_accepting(const state* state) const;
-
     typedef std::list<bdd> cycle_list;
   protected:
     virtual bdd compute_support_conditions(const state* state) const;
     virtual bdd compute_support_variables(const state* state) const;
 
+    cycle_list acc_cycle_;
   private:
     const tgba* a_;
-    cycle_list acc_cycle_;
     bdd the_acceptance_cond_;
     // Disallow copy.
     tgba_tba_proxy(const tgba_tba_proxy&);
     tgba_tba_proxy& tgba_tba_proxy::operator=(const tgba_tba_proxy&);
+  };
+
+  /// \brief Degeneralize a spot::tgba on the fly, producing an SBA.
+  ///
+  /// This class acts as a proxy in front of a spot::tgba, that should
+  /// be degeneralized on the fly.
+  ///
+  /// This is similar to tgba_tba_proxy, except that automata produced
+  /// with this algorithms can also been see as State-based Büchi
+  /// Automata (SBA).  See tgba_sba_proxy::state_is_accepting().  (An
+  /// SBA is a TBA, and a TBA is a TGBA.)
+  ///
+  /// This extra property has a small cost in size: if the input
+  /// automaton uses N acceptance conditions, the output automaton can
+  /// have at most max(N,1)+1 times more states and transitions.
+  /// (This is only max(N,1) for tgba_tba_proxy.)
+  class tgba_sba_proxy : public tgba_tba_proxy
+  {
+  public:
+    tgba_sba_proxy(const tgba* a);
+
+    /// \brief Whether the state is accepting.
+    ///
+    /// A particularity of a spot::tgba_sba_proxy automaton is that
+    /// when a state has an outgoing accepting arc, all its outgoing
+    /// arcs are accepting.  The state itself can therefore be
+    /// considered accepting.  This is useful in algorithms working on
+    /// degeneralized automata with state acceptance conditions.
+    bool state_is_accepting(const state* state) const;
   };
 
 }

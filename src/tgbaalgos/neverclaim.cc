@@ -37,7 +37,7 @@ namespace spot
     class never_claim_bfs : public tgba_reachable_iterator_breadth_first
     {
     public:
-      never_claim_bfs(const tgba_tba_proxy* a, std::ostream& os,
+      never_claim_bfs(const tgba_sba_proxy* a, std::ostream& os,
 		      const ltl::formula* f)
 	: tgba_reachable_iterator_breadth_first(a),
 	  os_(os), f_(f), accept_all_(-1), fi_needed_(false)
@@ -76,7 +76,7 @@ namespace spot
       state_is_accepting(const state *s)
       {
 	return
-	  dynamic_cast<const tgba_tba_proxy*>(automata_)->state_is_accepting(s);
+	  dynamic_cast<const tgba_sba_proxy*>(automata_)->state_is_accepting(s);
       }
 
       std::string
@@ -184,7 +184,7 @@ namespace spot
   } // anonymous
 
   std::ostream&
-  never_claim_reachable(std::ostream& os, const tgba_tba_proxy* g,
+  never_claim_reachable(std::ostream& os, const tgba_sba_proxy* g,
 			const ltl::formula* f)
   {
     never_claim_bfs n(g, os, f);

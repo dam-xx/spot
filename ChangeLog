@@ -1,5 +1,18 @@
 2004-11-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgba/tgbatba.hh (tgba_sba_proxy): New class, with the
+	functionality of the old tgba_tba_proxy.
+	* src/tgba/tgbatba.cc (tgba_tba_proxy_succ_iterator,
+	tgba_tba_proxy): Rewrite to produce TBA with at most N copies of
+	each state, skipping the `bddtrue' stage now used only in
+	tgba_sba_proxy.  Doing so removes approximately 6% of states in
+	the degeneralized tests of spotlbtt.test.
+	(tgba_sba_proxy): Implement it.
+	* src/tgbaalgos/neverclaim.hh, src/tgbaalgos/neverclaim.cc: Adjust
+	to take a tgba_sba_proxy.
+	* src/tgbatest/ltl2tgba.cc: Add option -DS and adjust call to
+	never_claim_reachable().
+
 	* src/tgba/tgbatba.cc (state_tba_proxy::hash): Use wang32_hash.
 	* src/tgba/tgbaproduct.cc (state_product::hash): Likewise.
 
@@ -8,7 +21,7 @@
 	* src/evtgba/product.cc (evtgba_product_state::hash): ... here.
 	* src/misc/Makefile.am (misc_HEADERS): Add hashfunc.hh.
 
-2004-11-15  Alexandre Duret-Lutz  <adl@gnu.org>
+2004-11-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/ltl2tgba.cc (main): For non-generalized emptiness
 	check, degeneralize the automaton only if it has too much

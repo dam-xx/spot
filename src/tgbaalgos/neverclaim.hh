@@ -35,7 +35,7 @@ namespace spot
   /// \param f The (optional) formula associated to the automaton.  If given
   ///          it will be output as a comment.
   std::ostream& never_claim_reachable(std::ostream& os,
-				      const tgba_tba_proxy* g,
+				      const tgba_sba_proxy* g,
 				      const ltl::formula* f = 0);
 }
 
