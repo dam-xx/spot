@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -196,6 +196,9 @@ namespace spot
   tgba* tgba_run_to_tgba(const tgba* a, const tgba_run* run);
 
   /// @}
+
+  /// \addtogroup emptiness_check_stats Emptiness-check statistics
+  /// \ingroup emptiness_check
 }
 
 #endif // SPOT_TGBAALGOS_EMPTINESS_HH

@@ -25,10 +25,14 @@
 namespace spot
 {
 
-  /// \addtogroup ec_misc
+  /// \addtogroup emptiness_check_stats
   /// @{
 
-  /// Emptiness-check statistics
+  /// \brief Emptiness-check statistics
+  ///
+  /// Implementations of spot::emptiness_check may also implement
+  /// this interface.  Try to dynamic_cast the spot::emptiness_check
+  /// pointer to know whether these statistics are available.
   class ec_statistics
   {
   public :
@@ -94,7 +98,11 @@ namespace spot
     unsigned max_depth_;	/// maximal depth of the stack(s)
   };
 
-  /// Accepting Cycle Search Space statistics
+  /// \brief Accepting Cycle Search Space statistics
+  ///
+  /// Implementations of spot::emptiness_check_result may also implement
+  /// this interface.  Try to dynamic_cast the spot::emptiness_check_result
+  /// pointer to know whether these statistics are available.
   class acss_statistics
   {
   public:
@@ -102,7 +110,11 @@ namespace spot
     virtual int acss_states() const = 0;
   };
 
-  /// Accepting Run Search statistics.
+  /// \brief Accepting Run Search statistics.
+  ///
+  /// Implementations of spot::emptiness_check_result may also implement
+  /// this interface.  Try to dynamic_cast the spot::emptiness_check_result
+  /// pointer to know whether these statistics are available.
   class ars_statistics
   {
   public:
@@ -130,4 +142,4 @@ namespace spot
   /// @}
 }
 
-#endif // SPOT_TGBAALGOS_EMPTINESS_STATS_HH
+#endif // SPOT_TGBAALGOS_EMPTINESS_STATS_
