@@ -1,5 +1,11 @@
 2004-11-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/Makefile.am (EXTRA_DIST): Distribute the files
+	from tba_samples_from_spin.
+	* src/tgbatest/tba_samples_from_spin.test: Get these example files
+	from $srcdir, for the sake of VPATH builds.
+	(light_run): Remove, not needed.
+
 	* src/misc/bareword.hh, src/misc/bddalloc.hh, src/misc/bddlt.hh,
 	src/misc/escape.hh, src/misc/freelist.hh, src/misc/hash.hh,
 	src/misc/hashfunc.hh, src/misc/minato.hh, src/misc/modgray.hh,
@@ -17,7 +23,7 @@
 	* src/tgbaalgos/Makefile.am: Add it.
 	* src/tgbatest/ltl2tgba.cc: Add tau03 new emptiness check.
 	* src/tgbatest/randtgba.cc: Add tau03 new emptiness check.
-	* src/tgbatest/emptchkr: Fix a comment.
+	* src/tgbatest/emptchkr.test: Fix a comment.
 	* src/tgbatest/tba_samples_from_spin/explicit1_1.tba,
 	src/tgbatest/tba_samples_from_spin/explicit1_2.tba,
 	src/tgbatest/tba_samples_from_spin/explicit1_3.tba,

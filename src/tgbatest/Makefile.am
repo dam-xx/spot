@@ -87,7 +87,27 @@ TESTS = \
   tba_samples_from_spin.test \
   spotlbtt.test
 
-EXTRA_DIST = $(TESTS) ltl2baw.pl
+EXTRA_DIST = $(TESTS) ltl2baw.pl $(TBA_SAMPLES_FROM_SPIN)
+
+TBA_SAMPLES_FROM_SPIN = \
+  tba_samples_from_spin/explicit1_1.tba \
+  tba_samples_from_spin/explicit1_2.tba \
+  tba_samples_from_spin/explicit1_3.tba \
+  tba_samples_from_spin/explicit1_4.tba \
+  tba_samples_from_spin/explicit1_5.tba \
+  tba_samples_from_spin/explicit1_6.tba \
+  tba_samples_from_spin/explicit1_7.tba \
+  tba_samples_from_spin/explicit1_8.tba \
+  tba_samples_from_spin/explicit1_9.tba \
+  tba_samples_from_spin/explicit2_1.tba \
+  tba_samples_from_spin/explicit2_2.tba \
+  tba_samples_from_spin/explicit2_3.tba \
+  tba_samples_from_spin/explicit2_4.tba \
+  tba_samples_from_spin/explicit2_5.tba \
+  tba_samples_from_spin/explicit2_6.tba \
+  tba_samples_from_spin/explicit2_7.tba \
+  tba_samples_from_spin/explicit2_8.tba \
+  tba_samples_from_spin/explicit2_9.tba
 
 CLEANFILES = \
   blue_counter \
