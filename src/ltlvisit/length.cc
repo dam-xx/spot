@@ -27,62 +27,64 @@ namespace spot
 {
   namespace ltl
   {
-
-   class length_visitor : public const_visitor
+    namespace
     {
-    public:
-
-      length_visitor()
+      class length_visitor: public const_visitor
       {
-	result_ = 0;
-      }
+      public:
 
-      virtual
-      ~length_visitor()
-      {
-      }
+	length_visitor()
+	{
+	  result_ = 0;
+	}
 
-      int
-      result() const
-      {
-	return result_;
-      }
+	virtual
+	~length_visitor()
+	{
+	}
 
-      void
-      visit(const atomic_prop*)
-      {
-	result_ = 1;
-      }
+	int
+	result() const
+	{
+	  return result_;
+	}
 
-      void
-      visit(const constant*)
-      {
-	result_ = 1;
-      }
+	void
+	visit(const atomic_prop*)
+	{
+	  result_ = 1;
+	}
 
-      void
-      visit(const unop* uo)
-      {
-	result_ = 1 + length(uo->child());
-      }
+	void
+	visit(const constant*)
+	{
+	  result_ = 1;
+	}
 
-      void
-      visit(const binop* bo)
-      {
-	result_ = 1 + length(bo->first()) + length(bo->second());
-      }
+	void
+	visit(const unop* uo)
+	{
+	  result_ = 1 + length(uo->child());
+	}
 
-      void
-      visit(const multop* mo)
-      {
-	unsigned mos = mo->size();
-	for (unsigned i = 0; i < mos; ++i)
-	  result_ += length(mo->nth(i));
-      }
+	void
+	visit(const binop* bo)
+	{
+	  result_ = 1 + length(bo->first()) + length(bo->second());
+	}
 
-    protected:
-      int result_; // size of the formula
-    };
+	void
+	visit(const multop* mo)
+	{
+	  unsigned mos = mo->size();
+	  for (unsigned i = 0; i < mos; ++i)
+	    result_ += length(mo->nth(i));
+	}
+
+      protected:
+	int result_; // size of the formula
+      };
+    }
 
     int
     length(const formula* f)

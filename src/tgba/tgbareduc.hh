@@ -39,8 +39,12 @@ namespace spot
     typedef Sgi::vector<state_couple*> delayed_simulation_relation;
   */
 
-  class direct_simulation_relation : public simulation_relation{};
-  class delayed_simulation_relation : public simulation_relation{};
+  class direct_simulation_relation: public simulation_relation
+  {
+  };
+  class delayed_simulation_relation: public simulation_relation
+  {
+  };
 
 
   class tgba_reduc: public tgba_explicit,

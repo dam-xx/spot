@@ -28,72 +28,73 @@
 
 namespace spot
 {
-
-  class save_bfs : public tgba_reachable_iterator_breadth_first
+  namespace
   {
-  public:
-    save_bfs(const tgba* a, std::ostream& os)
-      : tgba_reachable_iterator_breadth_first(a), os_(os)
+    class save_bfs: public tgba_reachable_iterator_breadth_first
     {
-    }
+    public:
+      save_bfs(const tgba* a, std::ostream& os)
+	: tgba_reachable_iterator_breadth_first(a), os_(os)
+      {
+      }
 
-    void
-    start()
-    {
-      os_ << "acc =";
-      print_acc(automata_->all_acceptance_conditions()) << ";" << std::endl;
-    }
+      void
+      start()
+      {
+	os_ << "acc =";
+	print_acc(automata_->all_acceptance_conditions()) << ";" << std::endl;
+      }
 
-    void
-    process_state(const state* s, int, tgba_succ_iterator* si)
-    {
-      const bdd_dict* d = automata_->get_dict();
-      std::string cur = automata_->format_state(s);
-      for (si->first(); !si->done(); si->next())
-	{
-	  state* dest = si->current_state();
-	  os_ << "\"" << cur << "\", \""
-	      << automata_->format_state(dest) << "\", \"";
-	  escape_str(os_, bdd_format_formula(d, si->current_condition()));
-	  os_ << "\",";
-	  print_acc(si->current_acceptance_conditions()) << ";" << std::endl;
-	  delete dest;
-	}
-    }
+      void
+      process_state(const state* s, int, tgba_succ_iterator* si)
+      {
+	const bdd_dict* d = automata_->get_dict();
+	std::string cur = automata_->format_state(s);
+	for (si->first(); !si->done(); si->next())
+	  {
+	    state* dest = si->current_state();
+	    os_ << "\"" << cur << "\", \""
+		<< automata_->format_state(dest) << "\", \"";
+	    escape_str(os_, bdd_format_formula(d, si->current_condition()));
+	    os_ << "\",";
+	    print_acc(si->current_acceptance_conditions()) << ";" << std::endl;
+	    delete dest;
+	  }
+      }
 
-  private:
-    std::ostream& os_;
+    private:
+      std::ostream& os_;
 
-    std::ostream&
-    print_acc(bdd acc)
-    {
-      const bdd_dict* d = automata_->get_dict();
-      while (acc != bddfalse)
-	{
-	  bdd cube = bdd_satone(acc);
-	  acc -= cube;
-	  while (cube != bddtrue)
-	    {
-	      assert(cube != bddfalse);
-	      // Display the first variable that is positive.
-	      // There should be only one per satisfaction.
-	      if (bdd_high(cube) != bddfalse)
-		{
-		  int v = bdd_var(cube);
-		  bdd_dict::vf_map::const_iterator vi =
-		    d->acc_formula_map.find(v);
-		  assert(vi != d->acc_formula_map.end());
-		  os_ << " \"";
-		  escape_str(os_, ltl::to_string(vi->second)) << "\"";
-		  break;
-		}
-	      cube = bdd_low(cube);
-	    }
-	}
-      return os_;
-    }
-  };
-
+      std::ostream&
+      print_acc(bdd acc)
+      {
+	const bdd_dict* d = automata_->get_dict();
+	while (acc != bddfalse)
+	  {
+	    bdd cube = bdd_satone(acc);
+	    acc -= cube;
+	    while (cube != bddtrue)
+	      {
+		assert(cube != bddfalse);
+		// Display the first variable that is positive.
+		// There should be only one per satisfaction.
+		if (bdd_high(cube) != bddfalse)
+		  {
+		    int v = bdd_var(cube);
+		    bdd_dict::vf_map::const_iterator vi =
+		      d->acc_formula_map.find(v);
+		    assert(vi != d->acc_formula_map.end());
+		    os_ << " \"";
+		    escape_str(os_, ltl::to_string(vi->second)) << "\"";
+		    break;
+		  }
+		cube = bdd_low(cube);
+	      }
+	  }
+	return os_;
+      }
+    };
+  }
 
   std::ostream&
   tgba_save_reachable(std::ostream& os, const tgba* g)

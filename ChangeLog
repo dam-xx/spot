@@ -1,3 +1,22 @@
+2004-10-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* iface/gspn/gspn.cc, src/ltlvisit/basicreduce.cc,
+	src/ltlvisit/destroy.cc, src/ltlvisit/dotty.cc,
+	src/ltlvisit/dump.cc, src/ltlvisit/length.cc,
+	src/ltlvisit/nenoform.cc, src/ltlvisit/reduce.cc,
+	src/ltlvisit/syntimpl.cc, src/ltlvisit/tostring.cc,
+	src/tgba/formula2bdd.cc, src/tgba/tgbabddconcreteproduct.cc,
+	src/tgba/tgbatba.cc, src/tgbaalgos/dotty.cc,
+	src/tgbaalgos/dupexp.cc, src/tgbaalgos/lbtt.cc,
+	src/tgbaalgos/ltl2tgba_lacim.cc, src/tgbaalgos/neverclaim.cc,
+	src/tgbaalgos/save.cc, src/tgbaalgos/stats.cc,
+	src/tgbaalgos/gtec/nsheap.cc, src/tgbaalgos/gtec/nsheap.hh:
+	Declare private classes and helper function in anonymous namespaces.
+	* HACKING, src/sanity/style.test: Document and check this.
+	Also check for trailing { after namespace or class.
+	* src/ltlast/predecl.hh, src/ltlast/visitor.hh,
+	src/tgba/tgbareduc.hh: Fix trailing {.
+
 2004-10-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gtec/ce.cc: Reinstall change from 2004-09-21.

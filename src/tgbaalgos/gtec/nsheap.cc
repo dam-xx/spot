@@ -23,54 +23,57 @@
 
 namespace spot
 {
-  class numbered_state_heap_hash_map_const_iterator :
-    public numbered_state_heap_const_iterator
+  namespace
   {
-  public:
-    numbered_state_heap_hash_map_const_iterator
-      (const numbered_state_heap_hash_map::hash_type& h)
-	: numbered_state_heap_const_iterator(), h(h)
+    class numbered_state_heap_hash_map_const_iterator:
+      public numbered_state_heap_const_iterator
     {
-    }
+    public:
+      numbered_state_heap_hash_map_const_iterator
+	(const numbered_state_heap_hash_map::hash_type& h)
+	  : numbered_state_heap_const_iterator(), h(h)
+      {
+      }
 
-    ~numbered_state_heap_hash_map_const_iterator()
-    {
-    }
+      ~numbered_state_heap_hash_map_const_iterator()
+      {
+      }
 
-    virtual void
-    first()
-    {
-      i = h.begin();
-    }
+      virtual void
+      first()
+      {
+	i = h.begin();
+      }
 
-    virtual void
-    next()
-    {
-      ++i;
-    }
+      virtual void
+      next()
+      {
+	++i;
+      }
 
-    virtual bool
-    done() const
-    {
-      return i == h.end();
-    }
+      virtual bool
+      done() const
+      {
+	return i == h.end();
+      }
 
-    virtual const state*
-    get_state() const
-    {
-      return i->first;
-    }
+      virtual const state*
+      get_state() const
+      {
+	return i->first;
+      }
 
-    virtual int
-    get_index() const
-    {
-      return i->second;
-    }
+      virtual int
+      get_index() const
+      {
+	return i->second;
+      }
 
-  private:
-    numbered_state_heap_hash_map::hash_type::const_iterator i;
-    const numbered_state_heap_hash_map::hash_type& h;
-  };
+    private:
+      numbered_state_heap_hash_map::hash_type::const_iterator i;
+      const numbered_state_heap_hash_map::hash_type& h;
+    };
+  } // anonymous
 
   numbered_state_heap_hash_map::~numbered_state_heap_hash_map()
   {

@@ -28,51 +28,53 @@
 
 namespace spot
 {
-
-  class dotty_bfs : public tgba_reachable_iterator_breadth_first
+  namespace
   {
-  public:
-    dotty_bfs(const tgba* a, std::ostream& os)
-      : tgba_reachable_iterator_breadth_first(a), os_(os)
+    class dotty_bfs : public tgba_reachable_iterator_breadth_first
     {
-    }
+    public:
+      dotty_bfs(const tgba* a, std::ostream& os)
+	: tgba_reachable_iterator_breadth_first(a), os_(os)
+      {
+      }
 
-    void
-    start()
-    {
-      os_ << "digraph G {" << std::endl;
-      os_ << "  0 [label=\"\", style=invis, height=0]" << std::endl;
-      os_ << "  0 -> 1" << std::endl;
-    }
+      void
+      start()
+      {
+	os_ << "digraph G {" << std::endl;
+	os_ << "  0 [label=\"\", style=invis, height=0]" << std::endl;
+	os_ << "  0 -> 1" << std::endl;
+      }
 
-    void
-    end()
-    {
-      os_ << "}" << std::endl;
-    }
+      void
+      end()
+      {
+	os_ << "}" << std::endl;
+      }
 
-    void
-    process_state(const state* s, int n, tgba_succ_iterator*)
-    {
-      os_ << "  " << n << " [label=\"";
-      escape_str(os_, automata_->format_state(s)) << "\"]" << std::endl;
-    }
+      void
+      process_state(const state* s, int n, tgba_succ_iterator*)
+      {
+	os_ << "  " << n << " [label=\"";
+	escape_str(os_, automata_->format_state(s)) << "\"]" << std::endl;
+      }
 
-    void
-    process_link(int in, int out, const tgba_succ_iterator* si)
-    {
-      os_ << "  " << in << " -> " << out << " [label=\"";
-      escape_str(os_, bdd_format_formula(automata_->get_dict(),
-					 si->current_condition())) << "\\n";
-      escape_str(os_,
-		 bdd_format_accset(automata_->get_dict(),
-				   si->current_acceptance_conditions()))
-	<< "\"]" << std::endl;
-    }
+      void
+      process_link(int in, int out, const tgba_succ_iterator* si)
+      {
+	os_ << "  " << in << " -> " << out << " [label=\"";
+	escape_str(os_, bdd_format_formula(automata_->get_dict(),
+					   si->current_condition())) << "\\n";
+	escape_str(os_,
+		   bdd_format_accset(automata_->get_dict(),
+				     si->current_acceptance_conditions()))
+	  << "\"]" << std::endl;
+      }
 
-  private:
-    std::ostream& os_;
-  };
+    private:
+      std::ostream& os_;
+    };
+  }
 
   std::ostream&
   dotty_reachable(std::ostream& os, const tgba* g)

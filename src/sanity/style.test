@@ -72,6 +72,12 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
     grep '[	 ]switch (.*).*{' $tmp &&
       diag 'Opening { should be on its own line.'
 
+    grep 'namespace .*{' $tmp &&
+      diag 'Opening { should be on its own line.'
+
+    grep 'class .*{' $tmp &&
+      diag 'Opening { should be on its own line.'
+
     grep '( ' $tmp &&
       diag 'No space after opening (.'
 
@@ -137,6 +143,15 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
             diag 'Avoid <iostream> in headers, better use <iosfwd>.'
         fi
         ;;
+      *.cc)
+        if grep 'namespace$' $tmp >/dev/null; then
+	  :
+	else
+	  # We only check classes, but the rule should apply to functions too
+	  grep '^[	 ]*class[	 ]' $tmp &&
+	    diag 'Private definitions must be in anonymous namespace.'
+	fi
+	;;
     esac
 
 

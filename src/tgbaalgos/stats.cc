@@ -25,30 +25,32 @@
 
 namespace spot
 {
-
-  class stats_bfs : public tgba_reachable_iterator_breadth_first
+  namespace
   {
-  public:
-    stats_bfs(const tgba* a, tgba_statistics& s)
-      : tgba_reachable_iterator_breadth_first(a), s_(s)
+    class stats_bfs: public tgba_reachable_iterator_breadth_first
     {
-    }
+    public:
+      stats_bfs(const tgba* a, tgba_statistics& s)
+	: tgba_reachable_iterator_breadth_first(a), s_(s)
+      {
+      }
 
-    void
-    process_state(const state*, int, tgba_succ_iterator*)
-    {
-      ++s_.states;
-    }
+      void
+      process_state(const state*, int, tgba_succ_iterator*)
+      {
+	++s_.states;
+      }
 
-    void
-    process_link(int, int, const tgba_succ_iterator*)
-    {
-      ++s_.transitions;
-    }
+      void
+      process_link(int, int, const tgba_succ_iterator*)
+      {
+	++s_.transitions;
+      }
 
-  private:
-    tgba_statistics& s_;
-  };
+    private:
+      tgba_statistics& s_;
+    };
+  } // anonymous
 
   tgba_statistics
   stats_reachable(const tgba* g)

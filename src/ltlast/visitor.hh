@@ -26,9 +26,10 @@
 
 #include "predecl.hh"
 
-namespace spot {
-  namespace ltl {
-
+namespace spot
+{
+  namespace ltl
+  {
     /// \brief Formula visitor that can modify the formula.
     ///
     /// Writing visitors is the prefered way

@@ -34,258 +34,261 @@ namespace spot
 {
   namespace ltl
   {
-
-    class reduce_visitor : public visitor
+    namespace
     {
-    public:
-
-      reduce_visitor(int opt)
-	: opt_(opt)
+      class reduce_visitor: public visitor
       {
-      }
+      public:
 
-      virtual ~reduce_visitor()
-      {
-      }
+	reduce_visitor(int opt)
+	  : opt_(opt)
+	{
+	}
 
-      formula*
-      result() const
-      {
-	return result_;
-      }
+	virtual ~reduce_visitor()
+	{
+	}
 
-      void
-      visit(atomic_prop* ap)
-      {
-	formula* f = ap->ref();
-	result_ = f;
-      }
+	formula*
+	result() const
+	{
+	  return result_;
+	}
 
-      void
-      visit(constant* c)
-      {
-	result_ = c;
-      }
+	void
+	visit(atomic_prop* ap)
+	{
+	  formula* f = ap->ref();
+	  result_ = f;
+	}
 
-      void
-      visit(unop* uo)
-      {
-	result_ = recurse(uo->child());
+	void
+	visit(constant* c)
+	{
+	  result_ = c;
+	}
 
-	switch (uo->op())
-	  {
-	  case unop::Not:
-	    result_ = unop::instance(unop::Not, result_);
-	    return;
+	void
+	visit(unop* uo)
+	{
+	  result_ = recurse(uo->child());
 
-	  case unop::X:
-	    result_ = unop::instance(unop::X, result_);
-	    return;
+	  switch (uo->op())
+	    {
+	    case unop::Not:
+	      result_ = unop::instance(unop::Not, result_);
+	      return;
 
-	  case unop::F:
-	    /* If f is a pure eventuality formula then F(f)=f.  */
-	    if (!(opt_ & Reduce_Eventuality_And_Universality)
-		|| !is_eventual(result_))
-	      result_ = unop::instance(unop::F, result_);
-	    return;
+	    case unop::X:
+	      result_ = unop::instance(unop::X, result_);
+	      return;
 
-	  case unop::G:
-	    /* If f is a pure universality formula then G(f)=f.  */
-	    if (!(opt_ & Reduce_Eventuality_And_Universality)
-		|| !is_universal(result_))
-	      result_ = unop::instance(unop::G, result_);
-	    return;
-	  }
-	/* Unreachable code.  */
-	assert(0);
-      }
+	    case unop::F:
+	      /* If f is a pure eventuality formula then F(f)=f.  */
+	      if (!(opt_ & Reduce_Eventuality_And_Universality)
+		  || !is_eventual(result_))
+		result_ = unop::instance(unop::F, result_);
+	      return;
 
-      void
-      visit(binop* bo)
-      {
-	formula* f2 = recurse(bo->second());
+	    case unop::G:
+	      /* If f is a pure universality formula then G(f)=f.  */
+	      if (!(opt_ & Reduce_Eventuality_And_Universality)
+		  || !is_universal(result_))
+		result_ = unop::instance(unop::G, result_);
+	      return;
+	    }
+	  /* Unreachable code.  */
+	  assert(0);
+	}
 
-	/* If b is a pure eventuality formula then a U b = b.
-	   If b is a pure universality formula a R b = b. */
-	if ((opt_ & Reduce_Eventuality_And_Universality)
-	    && ((is_eventual(f2) && ((bo->op()) == binop::U))
-		|| (is_universal(f2) && ((bo->op()) == binop::R))))
-	  {
-	    result_ = f2;
-	    return;
-	  }
-	/* case of implies */
-	formula* f1 = recurse(bo->first());
+	void
+	visit(binop* bo)
+	{
+	  formula* f2 = recurse(bo->second());
 
-	if (opt_ & Reduce_Syntactic_Implications)
-	  {
-	    // FIXME: These should be done only when needed.
-	    bool inf = syntactic_implication(f1, f2);
-	    bool infinv = syntactic_implication(f2, f1);
-	    bool infnegleft = syntactic_implication_neg(f2, f1, false);
-	    bool infnegright = syntactic_implication_neg(f2, f1, true);
+	  /* If b is a pure eventuality formula then a U b = b.
+	     If b is a pure universality formula a R b = b. */
+	  if ((opt_ & Reduce_Eventuality_And_Universality)
+	      && ((is_eventual(f2) && ((bo->op()) == binop::U))
+		  || (is_universal(f2) && ((bo->op()) == binop::R))))
+	    {
+	      result_ = f2;
+	      return;
+	    }
+	  /* case of implies */
+	  formula* f1 = recurse(bo->first());
 
-	    switch (bo->op())
-	      {
-	      case binop::Xor:
-	      case binop::Equiv:
-	      case binop::Implies:
-		break;
+	  if (opt_ & Reduce_Syntactic_Implications)
+	    {
+	      // FIXME: These should be done only when needed.
+	      bool inf = syntactic_implication(f1, f2);
+	      bool infinv = syntactic_implication(f2, f1);
+	      bool infnegleft = syntactic_implication_neg(f2, f1, false);
+	      bool infnegright = syntactic_implication_neg(f2, f1, true);
 
-	      case binop::U:
-		/* a < b => a U b = b */
-		if (inf)
-		  {
-		    result_ = f2;
-		    destroy(f1);
-		    return;
-		  }
-		/* !b < a => a U b = Fb */
-		if (infnegleft)
-		  {
-		    result_ = unop::instance(unop::F, f2);
-		    destroy(f1);
-		    return;
-		  }
-		/* a < b => a U (b U c) = (b U c) */
+	      switch (bo->op())
 		{
-		  binop* bo = dynamic_cast<binop*>(f2);
-		  if (bo && bo->op() == binop::U
-		      && syntactic_implication(f1, bo->first()))
+		case binop::Xor:
+		case binop::Equiv:
+		case binop::Implies:
+		  break;
+
+		case binop::U:
+		  /* a < b => a U b = b */
+		  if (inf)
 		    {
 		      result_ = f2;
 		      destroy(f1);
 		      return;
 		    }
-		}
-		break;
+		  /* !b < a => a U b = Fb */
+		  if (infnegleft)
+		    {
+		      result_ = unop::instance(unop::F, f2);
+		      destroy(f1);
+		      return;
+		    }
+		  /* a < b => a U (b U c) = (b U c) */
+		  {
+		    binop* bo = dynamic_cast<binop*>(f2);
+		    if (bo && bo->op() == binop::U
+			&& syntactic_implication(f1, bo->first()))
+		      {
+			result_ = f2;
+			destroy(f1);
+			return;
+		      }
+		  }
+		  break;
 
-	      case binop::R:
-		/* b < a => a R b = b */
-		if (infinv)
-		  {
-		    result_ = f2;
-		    destroy(f1);
-		    return;
-		  }
-		/* b < !a => a R b = Gb */
-		if (infnegright)
-		  {
-		    result_ = unop::instance(unop::G, f2);
-		    destroy(f1);
-		    return;
-		  }
-		/* b < a => a R (b R c) = b R c */
-		{
-		  binop* bo = dynamic_cast<binop*>(f2);
-		  if (bo && bo->op() == binop::R
-		      && syntactic_implication(bo->first(), f1))
+		case binop::R:
+		  /* b < a => a R b = b */
+		  if (infinv)
 		    {
 		      result_ = f2;
 		      destroy(f1);
 		      return;
 		    }
+		  /* b < !a => a R b = Gb */
+		  if (infnegright)
+		    {
+		      result_ = unop::instance(unop::G, f2);
+		      destroy(f1);
+		      return;
+		    }
+		  /* b < a => a R (b R c) = b R c */
+		  {
+		    binop* bo = dynamic_cast<binop*>(f2);
+		    if (bo && bo->op() == binop::R
+			&& syntactic_implication(bo->first(), f1))
+		      {
+			result_ = f2;
+			destroy(f1);
+			return;
+		      }
+		  }
+		  break;
 		}
-		break;
-	      }
-	  }
-	result_ = binop::instance(bo->op(), f1, f2);
-      }
+	    }
+	  result_ = binop::instance(bo->op(), f1, f2);
+	}
 
-      void
-      visit(multop* mo)
-      {
-	unsigned mos = mo->size();
-	multop::vec* res = new multop::vec;
+	void
+	visit(multop* mo)
+	{
+	  unsigned mos = mo->size();
+	  multop::vec* res = new multop::vec;
 
-	for (unsigned i = 0; i < mos; ++i)
-	  res->push_back(recurse(mo->nth(i)));
+	  for (unsigned i = 0; i < mos; ++i)
+	    res->push_back(recurse(mo->nth(i)));
 
-	if (opt_ & Reduce_Syntactic_Implications)
-	  {
+	  if (opt_ & Reduce_Syntactic_Implications)
+	    {
 
-	    bool removed = true;
-	    multop::vec::iterator f1;
-	    multop::vec::iterator f2;
+	      bool removed = true;
+	      multop::vec::iterator f1;
+	      multop::vec::iterator f2;
 
-	    while (removed)
-	      {
-		removed = false;
-		f2 = f1 = res->begin();
-		++f1;
-		while (f1 != res->end())
-		  {
-		    assert(f1 != f2);
-		    // a < b => a + b = b
-		    // a < b => a & b = a
-		    if ((syntactic_implication(*f1, *f2) && // f1 < f2
-			 (mo->op() == multop::Or)) ||
-			((syntactic_implication(*f2, *f1)) && // f2 < f1
-			 (mo->op() == multop::And)))
-		      {
-			// We keep f2
-			destroy(*f1);
-			res->erase(f1);
-			removed = true;
-			break;
-		      }
-		    else if ((syntactic_implication(*f2, *f1) && // f2 < f1
-			      (mo->op() == multop::Or)) ||
-			     ((syntactic_implication(*f1, *f2)) && // f1 < f2
-			      (mo->op() == multop::And)))
-		      {
-			// We keep f1
-			destroy(*f2);
-			res->erase(f2);
-			removed = true;
-			break;
-		      }
-		    else
-		      ++f1;
-		  }
-	      }
+	      while (removed)
+		{
+		  removed = false;
+		  f2 = f1 = res->begin();
+		  ++f1;
+		  while (f1 != res->end())
+		    {
+		      assert(f1 != f2);
+		      // a < b => a + b = b
+		      // a < b => a & b = a
+		      if ((syntactic_implication(*f1, *f2) && // f1 < f2
+			   (mo->op() == multop::Or)) ||
+			  ((syntactic_implication(*f2, *f1)) && // f2 < f1
+			   (mo->op() == multop::And)))
+			{
+			  // We keep f2
+			  destroy(*f1);
+			  res->erase(f1);
+			  removed = true;
+			  break;
+			}
+		      else if ((syntactic_implication(*f2, *f1) && // f2 < f1
+				(mo->op() == multop::Or)) ||
+			       ((syntactic_implication(*f1, *f2)) && // f1 < f2
+				(mo->op() == multop::And)))
+			{
+			  // We keep f1
+			  destroy(*f2);
+			  res->erase(f2);
+			  removed = true;
+			  break;
+			}
+		      else
+			++f1;
+		    }
+		}
 
-	    // FIXME
-	    /* f1 < !f2 => f1 & f2 = false
-	       !f1 < f2 => f1 | f2 = true */
-	    for (f1 = res->begin(); f1 != res->end(); f1++)
-	      for (f2 = res->begin(); f2 != res->end(); f2++)
-		if (f1 != f2 &&
-		    syntactic_implication_neg(*f1, *f2,
-					      mo->op() !=  multop::Or))
-		  {
-		    for (multop::vec::iterator j = res->begin();
-			 j != res->end(); j++)
-		      destroy(*j);
-		    res->clear();
-		    delete res;
-		    if (mo->op() == multop::Or)
-		      result_ = constant::true_instance();
-		    else
-		      result_ = constant::false_instance();
-		    return;
-		  }
+	      // FIXME
+	      /* f1 < !f2 => f1 & f2 = false
+		 !f1 < f2 => f1 | f2 = true */
+	      for (f1 = res->begin(); f1 != res->end(); f1++)
+		for (f2 = res->begin(); f2 != res->end(); f2++)
+		  if (f1 != f2 &&
+		      syntactic_implication_neg(*f1, *f2,
+						mo->op() !=  multop::Or))
+		    {
+		      for (multop::vec::iterator j = res->begin();
+			   j != res->end(); j++)
+			destroy(*j);
+		      res->clear();
+		      delete res;
+		      if (mo->op() == multop::Or)
+			result_ = constant::true_instance();
+		      else
+			result_ = constant::false_instance();
+		      return;
+		    }
 
-	  }
+	    }
 
-	if (!res->empty())
-	  {
-	    result_ = multop::instance(mo->op(), res);
-	    return;
-	  }
-	assert(0);
-      }
+	  if (!res->empty())
+	    {
+	      result_ = multop::instance(mo->op(), res);
+	      return;
+	    }
+	  assert(0);
+	}
 
-      formula*
-      recurse(formula* f)
-      {
-	return reduce(f, opt_);
-      }
+	formula*
+	recurse(formula* f)
+	{
+	  return reduce(f, opt_);
+	}
 
-    protected:
-      formula* result_;
-      int opt_;
-    };
+      protected:
+	formula* result_;
+	int opt_;
+      };
+
+    } // anonymous
 
     formula*
     reduce(const formula* f, int opt)

@@ -249,3 +249,9 @@ Other style recommandations
     Prefer <iosfwd> when predeclarations are sufficient, and then
     use for instance use just <ostream> in the corresponding .cc file.
     (A plain <iostream> is needed when using std::cout, std::cerr, etc.)
+
+  * Always declare helper functions and other local class definitions
+    (used in a single .cc files) in anonymous namespaces.  (The risk
+    otherwise is to declare two classes with the same name: the linker
+    will ignore one of the two silently.  The resulting bugs are often
+    difficult to understand.)

@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -25,16 +25,18 @@ namespace spot
 {
   namespace ltl
   {
-
-    class destroy_visitor : public postfix_visitor
+    namespace
     {
-    public:
-      virtual void
-      doit_default(formula* c)
+      class destroy_visitor: public postfix_visitor
       {
-	formula::unref(c);
-      }
-    };
+      public:
+	virtual void
+	doit_default(formula* c)
+	{
+	  formula::unref(c);
+	}
+      };
+    }
 
     void
     destroy(const formula* f)

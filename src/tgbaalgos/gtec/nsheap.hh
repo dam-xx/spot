@@ -119,12 +119,11 @@ namespace spot
     virtual int size() const;
 
     virtual numbered_state_heap_const_iterator* iterator() const;
-  protected:
+
     typedef Sgi::hash_map<const state*, int,
 			  state_ptr_hash, state_ptr_equal> hash_type;
+  protected:
     hash_type h;		///< Map of visited states.
-
-    friend class numbered_state_heap_hash_map_const_iterator;
   };
 
   /// \brief Factory for numbered_state_heap_hash_map.

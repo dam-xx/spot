@@ -26,171 +26,174 @@
 
 namespace spot
 {
-
-  /// \brief A state for spot::tgba_tba_proxy.
-  ///
-  /// This state is in fact a pair of state: the state from the tgba
-  /// automaton, and a state of the "counter" (we use a pointer
-  /// to the position in the cycle_acc_ list).
-  class state_tba_proxy : public state
+  namespace
   {
-    typedef tgba_tba_proxy::cycle_list::const_iterator iterator;
-  public:
-    state_tba_proxy(state* s, iterator acc)
-      :	s_(s), acc_(acc)
+    /// \brief A state for spot::tgba_tba_proxy.
+    ///
+    /// This state is in fact a pair of state: the state from the tgba
+    /// automaton, and a state of the "counter" (we use a pointer
+    /// to the position in the cycle_acc_ list).
+    class state_tba_proxy: public state
     {
-    }
+      typedef tgba_tba_proxy::cycle_list::const_iterator iterator;
+    public:
+      state_tba_proxy(state* s, iterator acc)
+	:	s_(s), acc_(acc)
+      {
+      }
 
-    /// Copy constructor
-    state_tba_proxy(const state_tba_proxy& o)
-      : state(),
-	s_(o.real_state()->clone()),
-	acc_(o.acceptance_iterator())
+      /// Copy constructor
+      state_tba_proxy(const state_tba_proxy& o)
+	: state(),
+	  s_(o.real_state()->clone()),
+	  acc_(o.acceptance_iterator())
+      {
+      }
+
+      virtual
+      ~state_tba_proxy()
+      {
+	delete s_;
+      }
+
+      state*
+      real_state() const
+      {
+	return s_;
+      }
+
+      bdd
+      acceptance_cond() const
+      {
+	return *acc_;
+      }
+
+      iterator
+      acceptance_iterator() const
+      {
+	return acc_;
+      }
+
+      virtual int
+      compare(const state* other) const
+      {
+	const state_tba_proxy* o = dynamic_cast<const state_tba_proxy*>(other);
+	assert(o);
+	int res = s_->compare(o->real_state());
+	if (res != 0)
+	  return res;
+	return acc_->id() - o->acceptance_cond().id();
+      }
+
+      virtual size_t
+      hash() const
+      {
+	// We expect to have many more states than acceptance conditions.
+	// Hence we keep only 8 bits for acceptance conditions.
+	return (s_->hash() << 8) + (acc_->id() & 0xFF);
+      }
+
+      virtual
+      state_tba_proxy* clone() const
+      {
+	return new state_tba_proxy(*this);
+      }
+
+    private:
+      state* s_;
+      iterator acc_;
+    };
+
+
+    /// \brief Iterate over the successors of tgba_tba_proxy computed
+    /// on the fly.
+    class tgba_tba_proxy_succ_iterator: public tgba_succ_iterator
     {
-    }
+      typedef tgba_tba_proxy::cycle_list list;
+      typedef tgba_tba_proxy::cycle_list::const_iterator iterator;
+    public:
+      tgba_tba_proxy_succ_iterator(tgba_succ_iterator* it,
+				   iterator expected, iterator end,
+				   bdd the_acceptance_cond)
+	: it_(it), expected_(expected), end_(end),
+	  the_acceptance_cond_(the_acceptance_cond)
+      {
+      }
 
-    virtual
-    ~state_tba_proxy()
-    {
-      delete s_;
-    }
+      virtual
+      ~tgba_tba_proxy_succ_iterator()
+      {
+	delete it_;
+      }
 
-    state*
-    real_state() const
-    {
-      return s_;
-    }
+      // iteration
 
-    bdd
-    acceptance_cond() const
-    {
-      return *acc_;
-    }
+      void
+      first()
+      {
+	it_->first();
+      }
 
-    iterator
-    acceptance_iterator() const
-    {
-      return acc_;
-    }
+      void
+      next()
+      {
+	it_->next();
+      }
 
-    virtual int
-    compare(const state* other) const
-    {
-      const state_tba_proxy* o = dynamic_cast<const state_tba_proxy*>(other);
-      assert(o);
-      int res = s_->compare(o->real_state());
-      if (res != 0)
-	return res;
-      return acc_->id() - o->acceptance_cond().id();
-    }
+      bool
+      done() const
+      {
+	return it_->done();
+      }
 
-    virtual size_t
-    hash() const
-    {
-      // We expect to have many more states than acceptance conditions.
-      // Hence we keep only 8 bits for acceptance conditions.
-      return (s_->hash() << 8) + (acc_->id() & 0xFF);
-    }
+      // inspection
 
-    virtual
-    state_tba_proxy* clone() const
-    {
-      return new state_tba_proxy(*this);
-    }
+      state_tba_proxy*
+      current_state() const
+      {
+	// A transition in the *EXPECTED acceptance set should be directed
+	// to the next acceptance set.  If the current transition is also
+	// in the next acceptance set, then go the one after, etc.
+	//
+	// See Denis Oddoux's PhD thesis for a nice explanation (in French).
+	//  @PhDThesis{	  oddoux.03.phd,
+	//    author	= {Denis Oddoux},
+	//    title	= {Utilisation des automates alternants pour un
+	//  		  model-checking efficace des logiques temporelles
+	//  		  lin{\'e}aires.},
+	//    school	= {Universit{\'e}e Paris 7},
+	//    year	= {2003},
+	//    address	= {Paris, France},
+	//    month	= {December}
+	//  }
+	//
+	iterator next = expected_;
+	bdd acc = it_->current_acceptance_conditions();
+	while ((acc & *next) == *next && next != end_)
+	  ++next;
+	return new state_tba_proxy(it_->current_state(), next);
+      }
 
-  private:
-    state* s_;
-    iterator acc_;
-  };
+      bdd
+      current_condition() const
+      {
+	return it_->current_condition();
+      }
 
+      bdd
+      current_acceptance_conditions() const
+      {
+	return the_acceptance_cond_;
+      }
 
-  /// \brief Iterate over the successors of tgba_tba_proxy computed on the fly.
-  class tgba_tba_proxy_succ_iterator: public tgba_succ_iterator
-  {
-    typedef tgba_tba_proxy::cycle_list list;
-    typedef tgba_tba_proxy::cycle_list::const_iterator iterator;
-  public:
-    tgba_tba_proxy_succ_iterator(tgba_succ_iterator* it,
-				 iterator expected, iterator end,
-				 bdd the_acceptance_cond)
-      : it_(it), expected_(expected), end_(end),
-	the_acceptance_cond_(the_acceptance_cond)
-    {
-    }
+    protected:
+      tgba_succ_iterator* it_;
+      const iterator expected_;
+      const iterator end_;
+      const bdd the_acceptance_cond_;
+    };
 
-    virtual
-    ~tgba_tba_proxy_succ_iterator()
-    {
-      delete it_;
-    }
-
-    // iteration
-
-    void
-    first()
-    {
-      it_->first();
-    }
-
-    void
-    next()
-    {
-      it_->next();
-    }
-
-    bool
-    done() const
-    {
-      return it_->done();
-    }
-
-    // inspection
-
-    state_tba_proxy*
-    current_state() const
-    {
-      // A transition in the *EXPECTED acceptance set should be directed
-      // to the next acceptance set.  If the current transition is also
-      // in the next acceptance set, then go the one after, etc.
-      //
-      // See Denis Oddoux's PhD thesis for a nice explanation (in French).
-      //  @PhDThesis{	  oddoux.03.phd,
-      //    author	= {Denis Oddoux},
-      //    title	= {Utilisation des automates alternants pour un
-      //  		  model-checking efficace des logiques temporelles
-      //  		  lin{\'e}aires.},
-      //    school	= {Universit{\'e}e Paris 7},
-      //    year	= {2003},
-      //    address	= {Paris, France},
-      //    month	= {December}
-      //  }
-      //
-      iterator next = expected_;
-      bdd acc = it_->current_acceptance_conditions();
-      while ((acc & *next) == *next && next != end_)
-	++next;
-      return new state_tba_proxy(it_->current_state(), next);
-    }
-
-    bdd
-    current_condition() const
-    {
-      return it_->current_condition();
-    }
-
-    bdd
-    current_acceptance_conditions() const
-    {
-      return the_acceptance_cond_;
-    }
-
-  protected:
-    tgba_succ_iterator* it_;
-    const iterator expected_;
-    const iterator end_;
-    const bdd the_acceptance_cond_;
-  };
-
+  } // anonymous
 
   tgba_tba_proxy::tgba_tba_proxy(const tgba* a)
     : a_(a)
