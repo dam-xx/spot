@@ -19,7 +19,10 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include <cmath>
+#ifndef SPOT_MISC_RANDOM_HH
+# define SPOT_MISC_RANDOM_HH
+
+# include <cmath>
 
 namespace spot
 {
@@ -114,3 +117,5 @@ namespace spot
   int prand(double p);
   /// @}
 }
+
+#endif // SPOT_MISC_RANDOM_HH
