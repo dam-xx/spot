@@ -1,3 +1,7 @@
+2003-05-20  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/pairs.c (bdd_setbddpair): Fix prototype in documentation.
+
 2003-05-19  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/bdd.h: Declare bdd_copypair().

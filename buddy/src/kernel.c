@@ -1,6 +1,6 @@
 /*========================================================================
-               Copyright (C) 1996-2002 by Jorn Lind-Nielsen
-                            All rights reserved
+	       Copyright (C) 1996-2002 by Jorn Lind-Nielsen
+			    All rights reserved
 
     Permission is hereby granted, without written agreement and without
     license or royalty fees, to use, reproduce, prepare derivative
@@ -28,14 +28,14 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.c,v 1.3 2003/05/12 09:30:19 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.c,v 1.4 2003/05/20 08:22:36 aduret Exp $
   FILE:  kernel.c
   DESCR: implements the bdd kernel functions.
   AUTH:  Jorn Lind
   DATE:  (C) june 1997
 
   WARNING: Do not use pointers to nodes across makenode calls,
-           as makenode may resize/move the nodetable.
+	   as makenode may resize/move the nodetable.
 
 *************************************************************************/
 #include <stdlib.h>
@@ -151,7 +151,7 @@ SECTION {* kernel *}
 SHORT  {* initializes the BDD package *}
 PROTO  {* int bdd_init(int nodesize, int cachesize) *}
 DESCR  {* This function initiates the bdd package and {\em must} be called
-          before any bdd operations are done. The argument {\tt nodesize}
+	  before any bdd operations are done. The argument {\tt nodesize}
 	  is the initial number of nodes in the nodetable and {\tt cachesize}
 	  is the fixed size of the internal caches. Typical values for
 	  {\tt nodesize} are 10000 nodes for small test examples and up to
@@ -161,29 +161,29 @@ DESCR  {* This function initiates the bdd package and {\em must} be called
 
 	  The number of cache entries can also be set to depend on the size
 	  of the nodetable using a call to {\tt bdd\_setcacheratio}.
-	  
+
 	  The initial number of nodes is not critical for any bdd operation
 	  as the table will be resized whenever there are to few nodes left
 	  after a garbage collection. But it does have some impact on the
 	  efficency of the operations. *}
 RETURN {* If no errors occur then 0 is returned, otherwise
-          a negative error code. *}
+	  a negative error code. *}
 ALSO   {* bdd\_done, bdd\_resize\_hook *}
 */
 int bdd_init(int initnodesize, int cs)
 {
    int n, err;
-   
+
    if (bddrunning)
       return bdd_error(BDD_RUNNING);
-   
+
    bddnodesize = bdd_prime_gte(initnodesize);
-   
+
    if ((bddnodes=(BddNode*)malloc(sizeof(BddNode)*bddnodesize)) == NULL)
       return bdd_error(BDD_MEMORY);
 
    bddresized = 0;
-   
+
    for (n=0 ; n<bddnodesize ; n++)
    {
       bddnodes[n].refcou = 0;
@@ -197,7 +197,7 @@ int bdd_init(int initnodesize, int cs)
    bddnodes[0].refcou = bddnodes[1].refcou = MAXREF;
    LOW(0) = HIGH(0) = 0;
    LOW(1) = HIGH(1) = 1;
-   
+
    if ((err=bdd_operator_init(cs)) < 0)
    {
       bdd_done();
@@ -215,7 +215,7 @@ int bdd_init(int initnodesize, int cs)
    bddmaxnodeincrease = DEFAULTMAXNODEINC;
 
    bdderrorcond = 0;
-   
+
    bddcachestats.uniqueAccess = 0;
    bddcachestats.uniqueChain = 0;
    bddcachestats.uniqueHit = 0;
@@ -223,14 +223,14 @@ int bdd_init(int initnodesize, int cs)
    bddcachestats.opHit = 0;
    bddcachestats.opMiss = 0;
    bddcachestats.swapCount = 0;
- 
+
    bdd_gbc_hook(bdd_default_gbchandler);
    bdd_error_hook(bdd_default_errhandler);
    bdd_resize_hook(NULL);
    bdd_pairs_init();
    bdd_reorder_init();
    bdd_fdd_init();
-   
+
    if (setjmp(bddexception) != 0)
       assert(0);
 
@@ -244,7 +244,7 @@ SECTION {* kernel *}
 SHORT {* resets the bdd package *}
 PROTO {* void bdd_done(void) *}
 DESCR {* This function frees all memory used by the bdd package and resets
-         the package to it's initial state.*}
+	 the package to it's initial state.*}
 ALSO  {* bdd\_init *}
 */
 void bdd_done(void)
@@ -253,13 +253,13 @@ void bdd_done(void)
    bdd_fdd_done();
    bdd_reorder_done();
    bdd_pairs_done();
-   
+
    free(bddnodes);
    free(bddrefstack);
    free(bddvarset);
    free(bddvar2level);
    free(bddlevel2var);
-   
+
    bddnodes = NULL;
    bddrefstack = NULL;
    bddvarset = NULL;
@@ -271,7 +271,7 @@ void bdd_done(void)
    bddmaxnodesize = 0;
    bddvarnum = 0;
    bddproduced = 0;
-   
+
    err_handler = NULL;
    gbc_handler = NULL;
    resize_handler = NULL;
@@ -284,7 +284,7 @@ SECTION {* kernel *}
 SHORT   {* set the number of used bdd variables *}
 PROTO   {* int bdd_setvarnum(int num) *}
 DESCR   {* This function is used to define the number of variables used in
-           the bdd package. It may be called more than one time, but only
+	   the bdd package. It may be called more than one time, but only
 	   to increase the number of variables. The argument
 	   {\tt num} is the number of variables to use. *}
 RETURN  {* Zero on succes, otherwise a negative error code. *}
@@ -296,7 +296,7 @@ int bdd_setvarnum(int num)
    int oldbddvarnum = bddvarnum;
 
    bdd_disable_reorder();
-      
+
    if (num < 1  ||  num > MAXVAR)
    {
       bdd_error(BDD_RANGE);
@@ -350,13 +350,13 @@ int bdd_setvarnum(int num)
       bddvarset[bddvarnum*2] = PUSHREF( bdd_makenode(bddvarnum, 0, 1) );
       bddvarset[bddvarnum*2+1] = bdd_makenode(bddvarnum, 1, 0);
       POPREF(1);
-      
+
       if (bdderrorcond)
       {
 	 bddvarnum = bdv;
 	 return -bdderrorcond;
       }
-      
+
       bddnodes[bddvarset[bddvarnum*2]].refcou = MAXREF;
       bddnodes[bddvarset[bddvarnum*2+1]].refcou = MAXREF;
       bddlevel2var[bddvarnum] = bddvarnum;
@@ -367,12 +367,12 @@ int bdd_setvarnum(int num)
    LEVEL(1) = num;
    bddvar2level[num] = num;
    bddlevel2var[num] = num;
-   
+
    bdd_pairs_resize(oldbddvarnum, bddvarnum);
    bdd_operator_varresize();
-   
+
    bdd_enable_reorder();
-   
+
    return 0;
 }
 
@@ -383,14 +383,14 @@ SECTION {* kernel *}
 SHORT   {* add extra BDD variables *}
 PROTO   {* int bdd_extvarnum(int num) *}
 DESCR   {* Extends the current number of allocated BDD variables with
-           {\tt num} extra variables. *}
+	   {\tt num} extra variables. *}
 RETURN  {* The old number of allocated variables or a negative error code. *}
 ALSO    {* bdd\_setvarnum, bdd\_ithvar, bdd\_nithvar *}
 */
 int bdd_extvarnum(int num)
 {
    int start = bddvarnum;
-   
+
    if (num < 0  ||  num > 0x3FFFFFFF)
       return bdd_error(BDD_RANGE);
 
@@ -405,7 +405,7 @@ SECTION {* kernel *}
 SHORT {* set a handler for error conditions *}
 PROTO {* bddinthandler bdd_error_hook(bddinthandler handler) *}
 DESCR {* Whenever an error occurs in the bdd package a test is done to
-        see if an error handler is supplied by the user and if such exists
+	see if an error handler is supplied by the user and if such exists
 	then it will be called
 	with an error code in the variable {\tt errcode}. The handler may
 	then print any usefull information and return or exit afterwards.
@@ -440,7 +440,7 @@ SECTION {* kernel *}
 SHORT   {* clears an error condition in the kernel *}
 PROTO   {* void bdd_clear_error(void) *}
 DESCR   {* The BuDDy kernel may at some point run out of new ROBDD nodes if
-           a maximum limit is set with {\tt bdd\_setmaxnodenum}. In this case
+	   a maximum limit is set with {\tt bdd\_setmaxnodenum}. In this case
 	   the current error handler is called and an internal error flag
 	   is set. Further calls to BuDDy will always return {\tt bddfalse}.
 	   From here BuDDy must either be restarted or {\tt bdd\_clear\_error}
@@ -462,7 +462,7 @@ SECTION {* kernel *}
 SHORT {* set a handler for garbage collections *}
 PROTO {* bddgbchandler bdd_gbc_hook(bddgbchandler handler) *}
 DESCR {* Whenever a garbage collection is required, a test is done to
-         see if a handler for this event is supplied by the user and if such
+	 see if a handler for this event is supplied by the user and if such
 	 exists then it is called, both before and after the garbage collection
 	 takes places. This is indicated by an integer flag {\tt pre} passed to
 	 the handler, which will be one before garbage collection and zero
@@ -498,7 +498,7 @@ SECTION {* kernel *}
 SHORT {* set a handler for nodetable resizes *}
 PROTO {* bdd2inthandler bdd_resize_hook(bdd2inthandler handler) *}
 DESCR {* Whenever it is impossible to get enough free nodes by a garbage
-         collection then the node table is resized and a test is done to see
+	 collection then the node table is resized and a test is done to see
 	 if a handler is supllied by the user for this event. If so then
 	 it is called with {\tt oldsize} being the old nodetable size and
 	 {\tt newsize} being the new nodetable size.
@@ -531,7 +531,7 @@ SECTION {* kernel *}
 SHORT   {* set max. number of nodes used to increase node table *}
 PROTO   {* int bdd_setmaxincrease(int size) *}
 DESCR   {* The node table is expanded by doubling the size of the table
-           when no more free nodes can be found, but a maximum for the
+	   when no more free nodes can be found, but a maximum for the
 	   number of new nodes added can be set with {\tt bdd\_maxincrease}
 	   to {\tt size} nodes. The default is 50000 nodes (1 Mb). *}
 RETURN  {* The old threshold on succes, otherwise a negative error code. *}
@@ -540,7 +540,7 @@ ALSO    {* bdd\_setmaxnodenum, bdd\_setminfreenodes *}
 int bdd_setmaxincrease(int size)
 {
    int old = bddmaxnodeincrease;
-   
+
    if (size < 0)
       return bdd_error(BDD_SIZE);
 
@@ -554,7 +554,7 @@ SECTION {* kernel *}
 SHORT {* set the maximum available number of bdd nodes *}
 PROTO {* int bdd_setmaxnodenum(int size) *}
 DESCR {* This function sets the maximal number of bdd nodes the package may
-         allocate before it gives up a bdd operation. The
+	 allocate before it gives up a bdd operation. The
 	 argument {\tt size} is the absolute maximal number of nodes there
 	 may be allocated for the nodetable. Any attempt to allocate more
 	 nodes results in the constant false being returned and the error
@@ -584,7 +584,7 @@ SECTION {* kernel *}
 SHORT   {* set min. no. of nodes to be reclaimed after GBC. *}
 PROTO   {* int bdd_setminfreenodes(int n) *}
 DESCR   {* Whenever a garbage collection is executed the number of free
-           nodes left are checked to see if a resize of the node table is
+	   nodes left are checked to see if a resize of the node table is
 	   required. If $X = (\mathit{bddfreenum}*100)/\mathit{maxnum}$
 	   is less than or
 	   equal to {\tt n} then a resize is initiated. The range of
@@ -599,7 +599,7 @@ ALSO    {* bdd\_setmaxnodenum, bdd\_setmaxincrease *}
 int bdd_setminfreenodes(int mf)
 {
    int old = minfreenodes;
-   
+
    if (mf<0 || mf>100)
       return bdd_error(BDD_RANGE);
 
@@ -614,7 +614,7 @@ SECTION {* kernel *}
 SHORT   {* get the number of active nodes in use *}
 PROTO   {* int bdd_getnodenum(void) *}
 DESCR   {* Returns the number of nodes in the nodetable that are
-           currently in use. Note that dead nodes that have not been
+	   currently in use. Note that dead nodes that have not been
 	   reclaimed yet
 	   by a garbage collection are counted as active. *}
 RETURN  {* The number of nodes. *}
@@ -632,7 +632,7 @@ SECTION {* kernel *}
 SHORT   {* get the number of allocated nodes *}
 PROTO   {* int bdd_getallocnum(void) *}
 DESCR   {* Returns the number of nodes currently allocated. This includes
-           both dead and active nodes. *}
+	   both dead and active nodes. *}
 RETURN  {* The number of nodes. *}
 ALSO    {* bdd\_getnodenum, bdd\_setmaxnodenum *}
 */
@@ -648,7 +648,7 @@ SECTION {* kernel *}
 SHORT   {* test whether the package is started or not *}
 PROTO   {* void bdd_isrunning(void) *}
 DESCR   {* This function tests the internal state of the package and returns
-          a status. *}
+	  a status. *}
 RETURN  {* 1 (true) if the package has been started, otherwise 0. *}
 ALSO    {* bdd\_init, bdd\_done *}
 */
@@ -664,7 +664,7 @@ SECTION {* kernel *}
 SHORT   {* returns a text string with version information *}
 PROTO   {* char* bdd_versionstr(void) *}
 DESCR   {* This function returns a text string with information about the
-           version of the bdd package. *}
+	   version of the bdd package. *}
 ALSO    {* bdd\_versionnum *}
 */
 char *bdd_versionstr(void)
@@ -681,7 +681,7 @@ SECTION {* kernel *}
 SHORT   {* returns the version number of the bdd package *}
 PROTO   {* int bdd_versionnum(void) *}
 DESCR   {* This function returns the version number of the bdd package. The
-           number is in the range 10-99 for version 1.0 to 9.9. *}
+	   number is in the range 10-99 for version 1.0 to 9.9. *}
 ALSO    {* bdd\_versionstr *}
 */
 int bdd_versionnum(void)
@@ -696,7 +696,7 @@ SECTION {* kernel *}
 SHORT   {* returns some status information about the bdd package *}
 PROTO   {* void bdd_stats(bddStat* stat) *}
 DESCR   {* This function acquires information about the internal state of
-           the bdd package. The status information is written into the
+	   the bdd package. The status information is written into the
 	   {\tt stat} argument. *}
 ALSO    {* bddStat *}
 */
@@ -720,7 +720,7 @@ SECTION {* kernel *}
 SHORT   {* Fetch cache access usage *}
 PROTO   {* void bdd_cachestats(bddCacheStat *s) *}
 DESCR   {* Fetches cache usage information and stores it in {\tt s}. The
-           fields of {\tt s} can be found in the documentaion for
+	   fields of {\tt s} can be found in the documentaion for
 	   {\tt bddCacheStat}. This function may or may not be compiled
 	   into the BuDDy package - depending on the setup at compile
 	   time of BuDDy. *}
@@ -740,7 +740,7 @@ SHORT   {* print cache statistics *}
 PROTO   {* void bdd_printstat(void)
 void bdd_fprintstat(FILE *ofile) *}
 DESCR   {* Prints information about the cache performance on standard output
-           (or the supplied file). The information contains the number of
+	   (or the supplied file). The information contains the number of
 	   accesses to the unique node table, the number of times a node
 	   was (not) found there and how many times a hash chain had to
 	   traversed. Hit and miss count is also given for the operator
@@ -751,21 +751,21 @@ void bdd_fprintstat(FILE *ofile)
 {
    bddCacheStat s;
    bdd_cachestats(&s);
-   
+
    fprintf(ofile, "\nCache statistics\n");
    fprintf(ofile, "----------------\n");
-   
+
    fprintf(ofile, "Unique Access:  %ld\n", s.uniqueAccess);
    fprintf(ofile, "Unique Chain:   %ld\n", s.uniqueChain);
    fprintf(ofile, "Unique Hit:     %ld\n", s.uniqueHit);
    fprintf(ofile, "Unique Miss:    %ld\n", s.uniqueMiss);
    fprintf(ofile, "=> Hit rate =   %.2f\n",
-	   (s.uniqueHit+s.uniqueMiss > 0) ? 
+	   (s.uniqueHit+s.uniqueMiss > 0) ?
 	   ((float)s.uniqueHit)/((float)s.uniqueHit+s.uniqueMiss) : 0);
    fprintf(ofile, "Operator Hits:  %ld\n", s.opHit);
    fprintf(ofile, "Operator Miss:  %ld\n", s.opMiss);
    fprintf(ofile, "=> Hit rate =   %.2f\n",
-	   (s.opHit+s.opMiss > 0) ? 
+	   (s.opHit+s.opMiss > 0) ?
 	   ((float)s.opHit)/((float)s.opHit+s.opMiss) : 0);
    fprintf(ofile, "Swap count =    %ld\n", s.swapCount);
 }
@@ -787,7 +787,7 @@ SECTION {* kernel *}
 SHORT   {* converts an error code to a string*}
 PROTO   {* const char *bdd_errstring(int errorcode) *}
 DESCR   {* Converts a negative error code {\tt errorcode} to a descriptive
-           string that can be used for error handling. *}
+	   string that can be used for error handling. *}
 RETURN  {* An error description string if {\tt e} is known, otherwise {\tt NULL}. *}
 ALSO    {* bdd\_err\_hook *}
 */
@@ -811,7 +811,7 @@ int bdd_error(int e)
 {
    if (err_handler != NULL)
       err_handler(e);
-   
+
    return e;
 }
 
@@ -826,7 +826,7 @@ SECTION {* kernel *}
 SHORT   {* returns the constant true bdd *}
 PROTO   {* BDD bdd_true(void) *}
 DESCR   {* This function returns the constant true bdd and can freely be
-           used together with the {\tt bddtrue} and {\tt bddfalse}
+	   used together with the {\tt bddtrue} and {\tt bddfalse}
 	   constants. *}
 RETURN  {* The constant true bdd *}
 ALSO    {* bdd\_false, bddtrue, bddfalse *}
@@ -843,7 +843,7 @@ SECTION {* kernel *}
 SHORT   {* returns the constant false bdd *}
 PROTO   {* BDD bdd_false(void) *}
 DESCR   {* This function returns the constant false bdd and can freely be
-           used together with the {\tt bddtrue} and {\tt bddfalse}
+	   used together with the {\tt bddtrue} and {\tt bddfalse}
 	   constants. *}
 RETURN  {* The constant false bdd *}
 ALSO    {* bdd\_true, bddtrue, bddfalse *}
@@ -860,7 +860,7 @@ SECTION {* kernel *}
 SHORT   {* returns a bdd representing the I'th variable *}
 PROTO   {* BDD bdd_ithvar(int var) *}
 DESCR   {* This function is used to get a bdd representing the I'th
-           variable (one node with the childs true and false). The requested
+	   variable (one node with the childs true and false). The requested
 	   variable must be in the range define by {\tt
 	   bdd\_setvarnum} starting with 0 being the first. For ease
 	   of use then the bdd returned from {\tt bdd\_ithvar} does
@@ -889,12 +889,12 @@ SECTION {* kernel *}
 SHORT   {* returns a bdd representing the negation of the I'th variable *}
 PROTO   {* BDD bdd_nithvar(int var) *}
 DESCR   {* This function is used to get a bdd representing the negation of
-           the I'th variable (one node with the childs false and true).
+	   the I'th variable (one node with the childs false and true).
 	   The requested variable must be in the range define by
 	   {\tt bdd\_setvarnum} starting with 0 being the first. For ease of
 	   use then the bdd returned from {\tt bdd\_nithvar} does not have
 	   to be referenced counted with a call to {\tt bdd\_addref}. *}
-RETURN  {* The negated I'th variable on succes, otherwise the constant false bdd *}	   
+RETURN  {* The negated I'th variable on succes, otherwise the constant false bdd *}
 ALSO    {* bdd\_setvarnum, bdd\_ithvar, bddtrue, bddfalse *}
 */
 BDD bdd_nithvar(int var)
@@ -904,7 +904,7 @@ BDD bdd_nithvar(int var)
       bdd_error(BDD_VAR);
       return bddfalse;
    }
-   
+
    return bddvarset[var*2+1];
 }
 
@@ -915,7 +915,7 @@ SECTION {* kernel *}
 SHORT   {* returns the number of defined variables *}
 PROTO   {* int bdd_varnum(void) *}
 DESCR   {* This function returns the number of variables defined by
-           a call to {\tt bdd\_setvarnum}.*}
+	   a call to {\tt bdd\_setvarnum}.*}
 RETURN  {* The number of defined variables *}
 ALSO    {* bdd\_setvarnum, bdd\_ithvar *}
 */
@@ -1044,7 +1044,7 @@ void bdd_gbc(void)
       s.num = gbcollectnum;
       gbc_handler(1, &s);
    }
-   
+
    for (r=bddrefstack ; r<bddrefstacktop ; r++)
       bdd_mark(*r);
 
@@ -1054,7 +1054,7 @@ void bdd_gbc(void)
 	 bdd_mark(n);
       bddnodes[n].hash = 0;
    }
-   
+
    bddfreepos = 0;
    bddfreenum = 0;
 
@@ -1105,7 +1105,7 @@ SECTION {* kernel *}
 SHORT   {* increases the reference count on a node *}
 PROTO   {* BDD bdd_addref(BDD r) *}
 DESCR   {* Reference counting is done on externaly referenced nodes only
-           and the count for a specific node {\tt r} can and must be
+	   and the count for a specific node {\tt r} can and must be
 	   increased using this function to avoid loosing the node in the next
 	   garbage collection. *}
 ALSO    {* bdd\_delref *}
@@ -1131,7 +1131,7 @@ SECTION {* kernel *}
 SHORT   {* decreases the reference count on a node *}
 PROTO   {* BDD bdd_delref(BDD r) *}
 DESCR   {* Reference counting is done on externaly referenced nodes only
-           and the count for a specific node {\tt r} can and must be
+	   and the count for a specific node {\tt r} can and must be
 	   decreased using this function to make it possible to reclaim the
 	   node in the next garbage collection. *}
 ALSO    {* bdd\_addref *}
@@ -1146,9 +1146,9 @@ BDD bdd_delref(BDD root)
    if (LOW(root) == -1)
       return bdd_error(BDD_ILLBDD);
 
-   /* if the following line is present, fails there much earlier */ 
+   /* if the following line is present, fails there much earlier */
    if (!HASREF(root)) bdd_error(BDD_BREAK); /* distinctive */
-   
+
    DECREF(root);
    return root;
 }
@@ -1159,16 +1159,16 @@ BDD bdd_delref(BDD root)
 void bdd_mark(int i)
 {
    BddNode *node;
-   
+
    if (i < 2)
       return;
 
    node = &bddnodes[i];
    if (LEVELp(node) & MARKON  ||  LOWp(node) == -1)
       return;
-   
+
    LEVELp(node) |= MARKON;
-   
+
    bdd_mark(LOWp(node));
    bdd_mark(HIGHp(node));
 }
@@ -1177,13 +1177,13 @@ void bdd_mark(int i)
 void bdd_mark_upto(int i, int level)
 {
    BddNode *node = &bddnodes[i];
-   
+
    if (i < 2)
       return;
-   
+
    if (LEVELp(node) & MARKON  ||  LOWp(node) == -1)
       return;
-   
+
    if (LEVELp(node) > level)
       return;
 
@@ -1197,17 +1197,17 @@ void bdd_mark_upto(int i, int level)
 void bdd_markcount(int i, int *cou)
 {
    BddNode *node;
-   
+
    if (i < 2)
       return;
 
    node = &bddnodes[i];
    if (MARKEDp(node)  ||  LOWp(node) == -1)
       return;
-   
+
    SETMARKp(node);
    *cou += 1;
-   
+
    bdd_markcount(LOWp(node), cou);
    bdd_markcount(HIGHp(node), cou);
 }
@@ -1216,7 +1216,7 @@ void bdd_markcount(int i, int *cou)
 void bdd_unmark(int i)
 {
    BddNode *node;
-   
+
    if (i < 2)
       return;
 
@@ -1225,7 +1225,7 @@ void bdd_unmark(int i)
    if (!MARKEDp(node)  ||  LOWp(node) == -1)
       return;
    UNMARKp(node);
-   
+
    bdd_unmark(LOWp(node));
    bdd_unmark(HIGHp(node));
 }
@@ -1237,12 +1237,12 @@ void bdd_unmark_upto(int i, int level)
 
    if (i < 2)
       return;
-   
+
    if (!(LEVELp(node) & MARKON))
       return;
-   
+
    LEVELp(node) &= MARKOFF;
-   
+
    if (LEVELp(node) > level)
       return;
 
@@ -1264,7 +1264,7 @@ int bdd_makenode(unsigned int level, int low, int high)
 #ifdef CACHESTATS
    bddcachestats.uniqueAccess++;
 #endif
-   
+
       /* check whether childs are equal */
    if (low == high)
       return low;
@@ -1288,7 +1288,7 @@ int bdd_makenode(unsigned int level, int low, int high)
       bddcachestats.uniqueChain++;
 #endif
    }
-   
+
       /* No existing node -> build one */
 #ifdef CACHESTATS
    bddcachestats.uniqueMiss++;
@@ -1299,8 +1299,8 @@ int bdd_makenode(unsigned int level, int low, int high)
    {
       if (bdderrorcond)
 	 return 0;
-      
-         /* Try to allocate more nodes */
+
+	 /* Try to allocate more nodes */
       bdd_gbc();
 
       if ((bddnodesize-bddfreenum) >= usednodes_nextreorder  &&
@@ -1315,7 +1315,7 @@ int bdd_makenode(unsigned int level, int low, int high)
 	 hash = NODEHASH(level, low, high);
       }
 
-         /* Panic if that is not possible */
+	 /* Panic if that is not possible */
       if (bddfreepos == 0)
       {
 	 bdd_error(BDD_NODENUM);
@@ -1329,12 +1329,12 @@ int bdd_makenode(unsigned int level, int low, int high)
    bddfreepos = bddnodes[bddfreepos].next;
    bddfreenum--;
    bddproduced++;
-   
+
    node = &bddnodes[res];
    LEVELp(node) = level;
    LOWp(node) = low;
    HIGHp(node) = high;
-   
+
       /* Insert node */
    node->next = bddnodes[hash].hash;
    bddnodes[hash].hash = res;
@@ -1351,7 +1351,7 @@ int bdd_noderesize(int doRehash)
 
    if (bddnodesize >= bddmaxnodesize  &&  bddmaxnodesize > 0)
       return -1;
-   
+
    bddnodesize = bddnodesize << 1;
 
    if (bddnodesize > oldsize + bddmaxnodeincrease)
@@ -1361,7 +1361,7 @@ int bdd_noderesize(int doRehash)
       bddnodesize = bddmaxnodesize;
 
    bddnodesize = bdd_prime_lte(bddnodesize);
-   
+
    if (resize_handler != NULL)
       resize_handler(oldsize, bddnodesize);
 
@@ -1373,7 +1373,7 @@ int bdd_noderesize(int doRehash)
    if (doRehash)
       for (n=0 ; n<oldsize ; n++)
 	 bddnodes[n].hash = 0;
-   
+
    for (n=oldsize ; n<bddnodesize ; n++)
    {
       bddnodes[n].refcou = 0;
@@ -1390,7 +1390,7 @@ int bdd_noderesize(int doRehash)
       bdd_gbc_rehash();
 
    bddresized = 1;
-   
+
    return 0;
 }
 
@@ -1401,7 +1401,7 @@ void bdd_checkreorder(void)
 
       /* Do not reorder before twice as many nodes have been used */
    usednodes_nextreorder = 2 * (bddnodesize - bddfreenum);
-   
+
       /* And if very little was gained this time (< 20%) then wait until
        * even more nodes (upto twice as many again) have been used */
    if (bdd_reorder_gain() < 20)
@@ -1420,7 +1420,7 @@ SECTION {* kernel *}
 SHORT   {* returns an integer representation of a variable set *}
 PROTO   {* int bdd_scanset(BDD r, int **v, int *n) *}
 DESCR   {* Scans a variable set {\tt r} and copies the stored variables into
-           an integer array of variable numbers. The argument {\tt v} is
+	   an integer array of variable numbers. The argument {\tt v} is
 	   the address of an integer pointer where the array is stored and
 	   {\tt n} is a pointer to an integer where the number of elements
 	   are stored. It is the users responsibility to make sure the
@@ -1440,13 +1440,13 @@ int bdd_scanset(BDD r, int **varset, int *varnum)
       *varset = NULL;
       return 0;
    }
-   
+
    for (n=r, num=0 ; n > 1 ; n=HIGH(n))
       num++;
 
    if (((*varset) = (int *)malloc(sizeof(int)*num)) == NULL)
       return bdd_error(BDD_MEMORY);
-   
+
    for (n=r, num=0 ; n > 1 ; n=HIGH(n))
       (*varset)[num++] = bddlevel2var[LEVEL(n)];
 
@@ -1462,7 +1462,7 @@ SECTION {* kernel *}
 SHORT   {* builds a BDD variable set from an integer array *}
 PROTO   {* BDD bdd_makeset(int *v, int n) *}
 DESCR   {* Reads a set of variable numbers from the integer array {\tt v}
-           which must hold exactly {\tt n} integers and then builds a BDD
+	   which must hold exactly {\tt n} integers and then builds a BDD
 	   representing the variable set.
 
 	   The BDD variable set is represented as the conjunction of
@@ -1475,7 +1475,7 @@ RETURN {* A BDD variable set. *} */
 BDD bdd_makeset(int *varset, int varnum)
 {
    int v, res=1;
-   
+
    for (v=varnum-1 ; v>=0 ; v--)
    {
       BDD tmp;

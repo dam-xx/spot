@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/pairs.c,v 1.3 2003/05/19 15:58:44 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/pairs.c,v 1.4 2003/05/20 08:22:36 aduret Exp $
   FILE:  pairs.c
   DESCR: Pair management for BDD package.
   AUTH:  Jorn Lind
@@ -170,7 +170,7 @@ bddPair *bdd_newpair(void)
    p = bdd_pairalloc();
    if (p == NULL)
      return NULL;
-     
+
    for (n=0 ; n<bddvarnum ; n++)
       p->result[n] = bdd_ithvar(bddlevel2var[n]);
 
@@ -201,7 +201,7 @@ bddPair *bdd_copypair(bddPair *from)
    p = bdd_pairalloc();
    if (p == NULL)
      return NULL;
-     
+
    for (n=0 ; n<bddvarnum ; n++)
       p->result[n] = from->result[n];
 
@@ -219,7 +219,7 @@ EXTRA   {* bdd\_setbddpair *}
 SECTION {* kernel *}
 SHORT   {* set one variable pair *}
 PROTO   {* int bdd_setpair(bddPair *pair, int oldvar, int newvar)
-int bdd_setbddpair(bddPair *pair, BDD oldvar, BDD newvar) *}
+int bdd_setbddpair(bddPair *pair, int oldvar, BDD newvar) *}
 DESCR   {* Adds the pair {\tt (oldvar,newvar)} to the table of pairs
 	   {\tt pair}. This results in {\tt oldvar} being substituted
 	   with {\tt newvar} in a call to {\tt bdd\_replace}. In the first

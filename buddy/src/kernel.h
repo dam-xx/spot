@@ -1,6 +1,6 @@
 /*========================================================================
-               Copyright (C) 1996-2002 by Jorn Lind-Nielsen
-                            All rights reserved
+	       Copyright (C) 1996-2002 by Jorn Lind-Nielsen
+			    All rights reserved
 
     Permission is hereby granted, without written agreement and without
     license or royalty fees, to use, reproduce, prepare derivative
@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.h,v 1.3 2003/05/05 14:07:28 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.h,v 1.4 2003/05/20 08:22:36 aduret Exp $
   FILE:  kernel.h
   DESCR: Kernel specific definitions for BDD package
   AUTH:  Jorn Lind
@@ -95,7 +95,7 @@ typedef struct s_BddNode /* Node table entry */
 #ifdef CPLUSPLUS
 extern "C" {
 #endif
-   
+
 extern int       bddrunning;         /* Flag - package initialized */
 extern int       bdderrorcond;       /* Some error condition was met */
 extern int       bddnodesize;        /* Number of allocated nodes */
@@ -111,11 +111,11 @@ extern jmp_buf   bddexception;
 extern int       bddreorderdisabled;
 extern int       bddresized;
 extern bddCacheStat bddcachestats;
-   
+
 #ifdef CPLUSPLUS
 }
 #endif
-   
+
 
 /*=== KERNEL DEFINITIONS ===============================================*/
 
@@ -190,7 +190,7 @@ extern bddCacheStat bddcachestats;
 #ifdef CPLUSPLUS
 extern "C" {
 #endif
-   
+
 extern int    bdd_error(int);
 extern int    bdd_makenode(unsigned int, int, int);
 extern int    bdd_noderesize(int);
