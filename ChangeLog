@@ -1,5 +1,12 @@
 2004-08-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlast/allnodes.hh, src/ltlast/atomic_prop.hh,
+	src/ltlast/binop.hh, src/ltlast/constant.hh,
+	src/ltlast/formula.hh, src/ltlast/multop.hh,
+	src/ltlast/predecl.hh, src/ltlast/refformula.hh,
+	src/ltlast/unop.hh, src/ltlast/visitor.hh: Use \file to introduce
+	each file.
+
 	* doc/Doxyfile.in (STRIP_FROM_INC_PATH): Define, so that the
 	`#include' references are correct.
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,6 +19,13 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+/// \file ltlast/predecl.hh
+/// \brief Predeclare all LTL node types.
+///
+/// This file is usually used when \b declaring methods and functions
+/// over LTL nodes.
+/// Use ltlast/allnodes.hh or an individual header when the definition of
+/// the node is actually needed.
 #ifndef SPOT_LTLAST_PREDECL_HH
 # define SPOT_LTLAST_PREDECL_HH
 
