@@ -1,5 +1,12 @@
 2004-11-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptiness.cc,
+	src/tgbaalgos/emptiness.hh (print_tgba_run): Take the tgba*
+	argument before the tgba_run* argument (for consistency with
+	replay_tgba_run).
+	* src/tgbatest/ltl2tgba.cc, iface/gspn/ltlgspn.cc: Adjust
+	calls to print_tgba_run().
+
 	* src/ltlast/formula.hh (ltl::formula::~formula): Make it protected.
 
 2004-10-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>

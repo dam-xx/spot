@@ -54,8 +54,8 @@ namespace spot
 
   class tgba;
   std::ostream& print_tgba_run(std::ostream& os,
-			       const tgba_run* run,
-			       const tgba* a);
+			       const tgba* a,
+			       const tgba_run* run);
 
   /// \brief The result of an emptiness check.
   ///

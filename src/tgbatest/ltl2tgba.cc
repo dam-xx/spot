@@ -580,7 +580,7 @@ main(int argc, char** argv)
 		    }
 		  else
 		    {
-		      spot::print_tgba_run(std::cout, run, ec_a);
+		      spot::print_tgba_run(std::cout, ec_a, run);
 		      if (!spot::replay_tgba_run(std::cout, ec_a, run))
 			exit_code = 1;
 		      delete run;

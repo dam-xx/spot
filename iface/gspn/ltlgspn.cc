@@ -267,7 +267,7 @@ main(int argc, char **argv)
 #endif
 		    spot::tgba_run* run = ce->accepting_run();
 		    // FIXME: reimplement the projection
-		    spot::print_tgba_run(std::cout, run, prod);
+		    spot::print_tgba_run(std::cout, prod, run);
 		    ce->print_stats(std::cout);
 		    delete run;
 		    delete ce;
@@ -302,7 +302,7 @@ main(int argc, char **argv)
 		  {
 		    spot::tgba_run* run = res->accepting_run();
 		    // FIXME: reimplement the projection
-		    spot::print_tgba_run(std::cout, run, prod);
+		    spot::print_tgba_run(std::cout, prod, run);
 		    delete run;
 		  }
 		else
