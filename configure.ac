@@ -44,6 +44,7 @@ AC_CONFIG_FILES([
   src/misc/Makefile
   wrap/Makefile
   wrap/python/Makefile
+  wrap/python/cgi/Makefile
   wrap/python/tests/Makefile
 ])
 AC_CONFIG_FILES([wrap/python/tests/run], [chmod +x wrap/python/tests/run])

@@ -1,0 +1,227 @@
+#!@PYTHON@
+
+import sys
+import os
+import cgi
+import cgitb; cgitb.enable()
+
+sys.path.insert(0, '@pythondir@')
+# Directory for temporary files (images and other auxiliary files). 
+imgdir = 'spotimg'
+
+# Cleanup stale files from our image directory.
+os.system('find ' + imgdir + ' -type f -amin +10 -print | xargs rm -f')
+
+myself = os.environ['SCRIPT_NAME'];
+form = cgi.FieldStorage()
+filled = form.has_key('formula')
+# FIXME: This assumes Apache.
+uid = os.environ['UNIQUE_ID'];
+imgprefix = imgdir + '/' + uid
+
+def escaped_print_dot(dict, what):
+    print '<pre>'; sys.stdout.flush()
+    s = spot.ostringstream()
+    spot.bdd_print_dot(s, dict, what)
+    print cgi.escape(s.str())
+    del s
+    print '</pre>'; sys.stdout.flush()
+
+def escaped_print_set(dict, what):
+    print '<pre>'; sys.stdout.flush()
+    s = spot.ostringstream()
+    spot.bdd_print_set(s, dict, what)
+    print cgi.escape(s.str())
+    del s
+    print '</pre>'; sys.stdout.flush()
+
+
+print "Content-Type: text/html"
+print
+
+os.close(sys.stderr.fileno())
+os.dup2(sys.stdout.fileno(), sys.stderr.fileno())
+
+import spot
+
+print "<TITLE>LTL-to-Büchi test</TITLE>"
+print "<H1>Input</H1>"
+
+formula = form.getfirst('formula', '')
+
+options = [
+    ('show_parse',          'show traces during parsing',                  0),
+    ('show_automaton_dot',  'print Büchi automaton as .dot',               0),
+    ('show_automaton_gif',  'draw Büchi automaton',                        1),
+    ('show_degen_dot',      'print degeneralized Büchi automaton as .dot', 0),
+    ('show_degen_gif',      'draw degeneralized Büchi automaton',          0),
+    ('show_dictionnay',     'print BDD dictionary',                        0),
+    ('show_relation_dot',   'print the transition relation as .dot',       0),
+    ('show_relation_set',   'print the transition relation as a BDD set',  0),
+    ('show_relation_gif',   'draw the transition relation',                0),
+    ('show_acceptance_dot', 'print the acceptance relation as .dot'  ,     0),
+    ('show_acceptance_set', 'print the acceptance relation as a BDD set',  0),
+    ('show_acceptance_gif', 'draw the acceptance relation',                0),
+    ('show_lbtt',           'convert automaton for LBTT',                  0),
+    ]
+
+print """<FORM action="%s" method="post"><P>
+Formula to translate: <INPUT type="text"  name="formula" value="%s"><BR>
+Options:<TABLE><TR><TD>""" % (myself, formula)
+
+for opt, desc, arg, in options:
+    if formula:
+	val = int(form.getfirst(opt, 0))
+    else:
+	val = arg
+    if val:
+	str = "checked"
+    else:
+	str = ""
+    globals()[opt] = val
+    print '<INPUT type="checkbox" name="%s" value="1" %s>%s<br>' % (opt, str,
+								    desc)
+print '</TD></TR></TABLE><INPUT type="submit" value="Send"></FORM>'
+
+if not filled:
+    sys.exit(0)
+
+print "<hr><H1>Output</H1>"
+
+env = spot.default_environment.instance()
+
+print "<H2>LTL Formula</H2>"
+
+if show_parse: print '<pre>'
+sys.stdout.flush()
+sys.stderr.flush()
+
+pel = spot.empty_parse_error_list()
+f = spot.parse(formula, pel, env, show_parse)
+if show_parse: print '</pre>'
+
+print '<font color="red"><pre>'
+err = spot.format_parse_errors(spot.get_cout(), formula, pel)
+print '</pre></font>'
+
+if not f:
+    print '<p><b>Aborting...</b></p>'
+    sys.exit(0)
+if err:
+    print '<p><b>Continuing anyway...</b></p>'
+
+print "<p>Formula is<code>", f, "</code></p>"
+
+print '<H2>Automaton</H2>'
+
+dict = spot.bdd_dict()
+
+print '<p>Building automaton...',
+sys.stdout.flush()
+
+concrete = spot.ltl_to_tgba(f, dict)
+
+print 'done.</p>'
+sys.stdout.flush()
+
+if show_automaton_dot:
+    print '<pre>'; sys.stdout.flush()
+    s = spot.ostringstream()
+    spot.dotty_reachable(s, concrete)
+    print cgi.escape(s.str())
+    del s
+    print '</pre>'; sys.stdout.flush()
+
+if show_automaton_gif:
+    outfile = spot.ofstream(imgprefix + '-a.dot')
+    spot.dotty_reachable(outfile, concrete)
+    del outfile
+    os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-o',
+	       imgprefix + '-a.gif', imgprefix + '-a.dot')
+    print '<img src="' + imgprefix + '-a.gif">'
+
+
+if show_degen_dot or show_degen_gif:
+    print '<H3>Degeneralized automaton</H3>'
+    degen = spot.tgba_tba_proxy(concrete)
+    if show_degen_dot:
+	print '<pre>'; sys.stdout.flush()
+	s = spot.ostringstream()
+	spot.dotty_reachable(s, degen)
+	print cgi.escape(s.str())
+	del s
+	print '</pre>'; sys.stdout.flush()
+    if show_degen_gif:
+	outfile = spot.ofstream(imgprefix + '-d.dot')
+	spot.dotty_reachable(outfile, degen)
+	del outfile
+	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-o',
+		   imgprefix + '-d.gif', imgprefix + '-d.dot')
+	print '<img src="' + imgprefix + '-d.gif">'
+else:
+    degen = 0
+
+if show_dictionnay:
+    print '<H3>BDD dictionary</H3>'
+    print '<pre>'
+    sys.stdout.flush()
+    concrete.get_dict().dump(spot.get_cout())
+    print '</pre>'
+
+if show_relation_dot or show_relation_set or show_relation_gif:
+    print '<H3>Transition relation</H3>'
+    if show_relation_dot:
+	escaped_print_dot(concrete.get_dict(),
+			  concrete.get_core_data().relation)
+    if show_relation_set:
+	escaped_print_set(concrete.get_dict(),
+			  concrete.get_core_data().relation)
+    if show_relation_gif:
+	outfile = spot.ofstream(imgprefix + '-b.dot')
+	spot.bdd_print_dot(outfile, concrete.get_dict(),
+			   concrete.get_core_data().relation)
+	del outfile
+	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-o',
+		   imgprefix + '-b.gif', imgprefix + '-b.dot')
+	print '<img src="' + imgprefix + '-b.gif">'
+
+if show_acceptance_dot or show_acceptance_set or show_acceptance_gif:
+    print '<H3>Acceptance relation</H3>'
+    if show_acceptance_dot:
+	escaped_print_dot(concrete.get_dict(),
+			  concrete.get_core_data().accepting_conditions)
+    if show_acceptance_set:
+	escaped_print_set(concrete.get_dict(),
+			  concrete.get_core_data().accepting_conditions)
+    if show_acceptance_gif:
+	outfile = spot.ofstream(imgprefix + '-c.dot')
+	spot.bdd_print_dot(outfile, concrete.get_dict(),
+			   concrete.get_core_data().accepting_conditions)
+	del outfile
+	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-o',
+		   imgprefix + '-c.gif', imgprefix + '-c.dot')
+	print '<img src="' + imgprefix + '-c.gif">'
+
+if show_lbtt:
+    print '<H3>LBTT conversion</H3>'
+    if degen:
+	print '<H4>Conversion of the generalized automaton</H4>'
+    print '<pre>'
+    sys.stdout.flush()
+    spot.lbtt_reachable(spot.get_cout(), concrete)
+    print '</pre>'
+    if degen:
+	print '<H4>Conversion of the degeneralized automaton</H4>'
+	print '<pre>'
+	sys.stdout.flush()
+	spot.lbtt_reachable(spot.get_cout(), degen)
+	print '</pre>'
+
+sys.stdout.flush()
+
+# Make sure degen is cleared before concrete.
+del degen
+del concrete
+
+print '<hr>'
+print 'Spot @PACKAGE_VERSION@'

@@ -1,5 +1,10 @@
 2003-08-05  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* wrap/python/cgi/Makefile.am, wrap/python/cgi/ltl2tgba.in,
+	wrap/python/cgi/README: New files.
+	* wrap/python/Makefile.am (SUBDIRS): Add cgi.
+	* configure.ac: Output wrap/python/cgi/Makefile.
+
 	* wrap/python/spot.i: Add an ostringstream emulation.
 
 2003-08-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
