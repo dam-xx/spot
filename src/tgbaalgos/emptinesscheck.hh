@@ -154,6 +154,33 @@ namespace spot
   //@}
 
 
+  class explicit_connected_component: public scc_stack::connected_component
+  {
+  public:
+    virtual ~explicit_connected_component() {};
+    /// \brief Check if the SCC contains states \a s.
+    ///
+    /// Return the representative of \a s in the SCC, and delete \a
+    /// s if it is different (acting like
+    /// emptiness_check_status::h_filt), or 0 otherwise.
+    virtual const state* has_state(const state* s) const = 0;
+
+    /// Insert a new state in the SCC.
+    virtual void insert(const state* s) = 0;
+  };
+
+  class connected_component_hash_set: public explicit_connected_component
+  {
+  public:
+    virtual ~connected_component_hash_set() {};
+    virtual const state* has_state(const state* s) const;
+    virtual void insert(const state* s);
+  protected:
+    typedef Sgi::hash_set<const state*,
+			  state_ptr_hash, state_ptr_equal> set_type;
+    set_type states;
+  };
+
   class counter_example
   {
   public:
@@ -175,30 +202,14 @@ namespace spot
     void print_stats(std::ostream& os) const;
 
   protected:
-    struct connected_component_set: public scc_stack::connected_component
-    {
-      typedef Sgi::hash_set<const state*,
-			    state_ptr_hash, state_ptr_equal> set_type;
-      /// for the counter example we need to know all the states of the
-      /// component
-      set_type states;
-
-      /// \brief Check if the SCC contains states \a s.
-      ///
-      /// Return the representative of \a s in the SCC, and delete \a
-      /// s if it is different (acting like
-      /// emptiness_check_status::h_filt), or 0 otherwise.
-      const state* has_state(const state* s) const;
-    };
-
     /// Called by counter_example to find a path which traverses all
     /// acceptance conditions in the accepted SCC.
-    void accepting_path (const connected_component_set& scc,
+    void accepting_path (const explicit_connected_component* scc,
 			 const state* start, bdd acc_to_traverse);
 
     /// Complete a cycle that caraterise the period of the counter
     /// example.  Append a sequence to the path given by accepting_path.
-    void complete_cycle(const connected_component_set& scc,
+    void complete_cycle(const explicit_connected_component* scc,
 			const state* from, const state* to);
 
   private:

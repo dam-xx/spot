@@ -492,7 +492,7 @@ namespace spot
   //////////////////////////////////////////////////////////////////////
 
   const state*
-  counter_example::connected_component_set::has_state(const state* s) const
+  connected_component_hash_set::has_state(const state* s) const
   {
     set_type::const_iterator it = states.find(s);
     if (it != states.end())
@@ -503,6 +503,12 @@ namespace spot
       }
     else
       return 0;
+  }
+
+  void
+  connected_component_hash_set::insert(const state* s)
+  {
+    states.insert(s);
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -516,11 +522,13 @@ namespace spot
     scc_stack::stack_type root = ecs_->root.s;
     int comp_size = root.size();
     // Transform the stack of connected component into an array.
-    connected_component_set* scc = new connected_component_set[comp_size];
+    explicit_connected_component** scc =
+      new (explicit_connected_component*)[comp_size];
     for (int j = comp_size - 1; 0 <= j; --j)
       {
-	scc[j].index = root.top().index;
-	scc[j].condition = root.top().condition;
+	scc[j] = new connected_component_hash_set();
+	scc[j]->index = root.top().index;
+	scc[j]->condition = root.top().condition;
 	root.pop();
       }
     assert(root.empty());
@@ -538,9 +546,9 @@ namespace spot
 	// Find the SCC this state belongs to.
 	int j;
 	for (j = 1; j < comp_size; ++j)
-	  if (index < scc[j].index)
+	  if (index < scc[j]->index)
 	    break;
-	scc[j - 1].states.insert(i->first);
+	scc[j - 1]->insert(i->first);
       }
 
     suffix.push_front(ecs_->h_filt(ecs_->aut->get_init_state()));
@@ -579,12 +587,12 @@ namespace spot
 		const state* dest = i->current_state();
 
 		// Are we leaving this SCC?
-		const state* h_dest = scc[k].has_state(dest);
+		const state* h_dest = scc[k]->has_state(dest);
 		if (!h_dest)
 		  {
 		    // If we have found a state in the next SCC.
 		    // Unwind the path and populate SUFFIX.
-		    h_dest = scc[k+1].has_state(dest);
+		    h_dest = scc[k+1]->has_state(dest);
 		    if (h_dest)
 		      {
 			state_sequence seq;
@@ -611,8 +619,8 @@ namespace spot
 
 		if (father.find(h_dest) == father.end())
 		  {
-		    todo.push_back(pair_state_iter(h_dest,
-						   ecs_->aut->succ_iter(dest)));
+		    todo.push_back
+		      (pair_state_iter(h_dest, ecs_->aut->succ_iter(h_dest)));
 		    father[h_dest] = src;
 		  }
 	      }
@@ -621,13 +629,16 @@ namespace spot
       }
 
     accepting_path(scc[comp_size - 1], suffix.back(),
-		   scc[comp_size - 1].condition);
+		   scc[comp_size - 1]->condition);
 
+
+    for (int j = comp_size - 1; 0 <= j; --j)
+      delete scc[j];
     delete[] scc;
   }
 
   void
-  counter_example::complete_cycle(const connected_component_set& scc,
+  counter_example::complete_cycle(const explicit_connected_component* scc,
 				  const state* from,
 				  const state* to)
   {
@@ -660,7 +671,7 @@ namespace spot
 	    const state* dest = i->current_state();
 
 	    // Do not escape this SCC or visit a state already visited.
-	    const state* h_dest = scc.has_state(dest);
+	    const state* h_dest = scc->has_state(dest);
 	    if (!h_dest)
 	      {
 		delete dest;
@@ -722,11 +733,13 @@ namespace spot
   }
 
   void
-  counter_example::accepting_path(const connected_component_set& scc,
+  counter_example::accepting_path(const explicit_connected_component* scc,
 				  const state* start, bdd acc_to_traverse)
   {
     // State seen during the DFS.
-    connected_component_set::set_type seen;
+    typedef Sgi::hash_set<const state*,
+                          state_ptr_hash, state_ptr_equal> set_type;
+    set_type seen;
     // DFS stack.
     std::stack<triplet> todo;
 
@@ -768,7 +781,7 @@ namespace spot
 
 	    // We must not escape the current SCC.
 	    const state* dest = iter->current_state();
-	    const state* h_dest = scc.has_state(dest);
+	    const state* h_dest = scc->has_state(dest);
 	    if (!h_dest)
 	      {
 		delete dest;

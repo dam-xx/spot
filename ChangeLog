@@ -1,5 +1,12 @@
 2004-04-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.hh (explicit_connected_component):
+	New class.
+	(counter_example::connected_component_set): Rename as ...
+	(connected_component_hash_set): ... this, and inherit from
+	explicit_connected_component.
+	(counter_example::accepting_path, counter_example::complete_cycle):
+
 	* src/tgbaalgos/emptinesscheck.hh
 	(counter_example::connected_component_set::has_state): Return
 	a const state* and behave like h_filt.
