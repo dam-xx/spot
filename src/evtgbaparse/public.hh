@@ -40,8 +40,6 @@ namespace spot
   /// \param filename The name of the file to parse.
   /// \param error_list A list that will be filled with
   ///        parse errors that occured during parsing.
-  /// \param dict The BDD dictionary where to use.
-  /// \param env The environment into which parsing should take place.
   /// \param debug When true, causes the parser to trace its execution.
   /// \return A pointer to the evtgba built from \a filename, or
   ///        0 if the file could not be opened.

@@ -37,7 +37,6 @@ namespace spot
   /// \param run the run to replay
   /// \param a_run the automata on which the run was generated
   /// \param a_proj the automata on which to project the run
-  /// \param os the stream on which the replay should be traced
   /// \return true iff the run could be completed
   tgba_run* project_tgba_run(const tgba* a_run,
 			     const tgba* a_proj,

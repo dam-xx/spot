@@ -1,5 +1,8 @@
 2004-11-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/evtgbaparse/public.hh (evtgba_parse): Fix doxygen comments.
+	* src/tgbaalgos/projrun.hh (project_tgba_run): Likewise.
+
 	* src/tgbaalgos/emptiness.hh (print_tgba_run): Document it.
 
 	* src/tgbaalgos/replayrun.hh,
