@@ -108,6 +108,8 @@ void ExternalTranslator::translate
   string translated_formula;
   translateFormula(formula, translated_formula);
 
+  std::cout << translated_formula << std::endl;
+
   ofstream input_file;
   input_file.open(external_program_input_file.getName().c_str(),
 		  ios::out | ios::trunc);

@@ -37,6 +37,7 @@
 #include "tgbaalgos/gtec/ce.hh"
 #include "tgbaparse/public.hh"
 #include "tgbaalgos/dupexp.hh"
+#include "tgbaalgos/neverclaim.hh"
 
 void
 syntax(char* prog)
@@ -69,6 +70,8 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -n   same as -m, but display more counter-examples"
 	    << std::endl
+	    << "  -N   display the never clain for Spin "
+	    << "(implies -D)" << std::endl
 	    << "  -r   display the relation BDD, not the reachability graph"
 	    << std::endl
 	    << "  -R   same as -r, but as a set" << std::endl
@@ -186,6 +189,11 @@ main(int argc, char** argv)
 	  output = -1;
 	  magic_many = true;
 	}
+      else if (!strcmp(argv[formula_index], "-N"))
+	{
+	  degeneralize_opt = true;
+	  output = 8;
+	}
       else if (!strcmp(argv[formula_index], "-r"))
 	{
 	  output = 1;
@@ -295,7 +303,6 @@ main(int argc, char** argv)
 					       fm_symb_merge_opt);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
-	  spot::ltl::destroy(f);
 	}
 
       spot::tgba_tba_proxy* degeneralized = 0;
@@ -353,6 +360,9 @@ main(int argc, char** argv)
 	  break;
 	case 7:
 	  spot::nonacceptant_lbtt_reachable(std::cout, a);
+	  break;
+	case 8:
+	  spot::never_claim_reachable(std::cout, degeneralized, f);
 	  break;
 	default:
 	  assert(!"unknown output option");
@@ -414,6 +424,8 @@ main(int argc, char** argv)
 	  break;
 	}
 
+      if (f)
+        spot::ltl::destroy(f);
       if (expl)
 	delete expl;
       if (degeneralize_opt)

@@ -1,3 +1,15 @@
+2004-04-21  Denis Poitrenaud  <dp@src.lip6.fr>
+
+	* src/ltlvisit/tostring.hh (to_spin_string): New function.
+	Convert a formula into a string parsable by Spin.
+	* src/tgbaalgos/neverclaim.hh, src/tgbaalgos/neverclaim.cc: New files.
+	Print the never claim in Spin format of a degeneralized TGBA.
+	* src/tgbaalgos/Makefile.am: Add them.
+	* src/tgbatest/ltl2tgba.cc: Add the option -N which outputs the
+	never claim in Spin format of a degeneralized TGBA.
+	* src/tgbatest/ltl2neverclaim.test: New file.
+	* src/tgbatest/Makefile.am: Add it.
+
 2004-04-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltltest/defs.in, src/tgbatest/defs.in: Correctly set exitcode

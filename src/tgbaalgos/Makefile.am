@@ -33,6 +33,7 @@ tgbaalgos_HEADERS = \
   ltl2tgba_fm.hh \
   ltl2tgba_lacim.hh \
   magic.hh \
+  neverclaim.hh \
   powerset.hh \
   reachiter.hh \
   save.hh \
@@ -46,6 +47,7 @@ libtgbaalgos_la_SOURCES = \
   ltl2tgba_fm.cc \
   ltl2tgba_lacim.cc \
   magic.cc \
+  neverclaim.cc \
   powerset.cc \
   reachiter.cc \
   save.cc \

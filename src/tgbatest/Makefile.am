@@ -60,6 +60,7 @@ TESTS = \
   tgbaread.test \
   readsave.test \
   ltl2tgba.test \
+  ltl2neverclaim.test \
   ltlprod.test \
   bddprod.test \
   explprod.test \

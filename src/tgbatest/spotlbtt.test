@@ -72,6 +72,13 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- FM), degeneralized, via never claim"
+   Path = "${LBTT_TRANSLATE} --spin './ltl2tgba -F -f -N'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM), fake"
    Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -T'"
    Enabled = no
@@ -257,7 +264,7 @@ FormulaOptions
 
   AndPriority = 10
   OrPriority = 10
-  # XorPriority = 0
+  XorPriority = 0
   # EquivalencePriority = 0
 
   BeforePriority = 0

@@ -37,6 +37,15 @@ namespace spot
     /// \brief Convert a formula into a (parsable) string.
     /// \param f The formula to translate.
     std::string to_string(const formula* f);
+
+    /// \brief Output a formula as a (parsable by Spin) string.
+    /// \param f The formula to translate.
+    /// \param os The stream where it should be output.
+    std::ostream& to_spin_string(const formula* f, std::ostream& os);
+
+    /// \brief Convert a formula into a (parsable by Spin) string.
+    /// \param f The formula to translate.
+    std::string to_spin_string(const formula* f);
   }
 }
 
