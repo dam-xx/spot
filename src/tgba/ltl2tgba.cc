@@ -3,11 +3,15 @@
 #include "tgbabddconcretefactory.hh"
 
 #include "ltl2tgba.hh"
-// FIXME: Add ref to Couvreur's paper.
 
 namespace spot
 {
   using namespace ltl;
+
+  /// \brief Recursively translate a formula into a BDD.
+  ///
+  /// The algorithm used here is adapted from Jean-Michel Couvreur's
+  /// Probataf tool.
   class ltl_trad_visitor: public const_visitor
   {
   public:
@@ -171,7 +175,7 @@ namespace spot
   };
 
   tgba_bdd_concrete
-  ltl_to_tgba(const formula* f)
+  ltl_to_tgba(const ltl::formula* f)
   {
     tgba_bdd_concrete_factory fact;
     ltl_trad_visitor v(fact);

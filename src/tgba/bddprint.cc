@@ -4,9 +4,10 @@
 
 namespace spot
 {
-
+  /// Global dictionary used by print_handler() to lookup variables.
   const tgba_bdd_dict* dict;
 
+  /// Stream handler used by Buddy to display BDD variables.
   static void
   print_handler(std::ostream& o, int var)
   {

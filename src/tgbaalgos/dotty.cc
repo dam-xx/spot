@@ -7,6 +7,7 @@ namespace spot
 {
   typedef std::map<state*, int, state_ptr_less_than> seen_map;
 
+  /// Output and record a state.
   static bool
   dotty_state(std::ostream& os,
 	      const tgba& g, state* st, seen_map& m, int& node)
@@ -28,6 +29,7 @@ namespace spot
     return true;
   }
 
+  /// Process successors.
   static void
   dotty_rec(std::ostream& os,
 	    const tgba& g, state* st, seen_map& m, int father)

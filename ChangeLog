@@ -1,5 +1,13 @@
 2003-05-27  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/bddprint.cc, src/tgba/bddprint.hh,
+	src/tgba/dictunion.hh, src/tgba/ltl2tgba.cc, src/tgba/ltl2tgba.hh,
+	src/tgba/tgbabddconcretefactory.hh,
+	src/tgba/tgbabddconcreteproduct.cc,
+	src/tgba/tgbabddconcreteproduct.hh, src/tgba/tgbabddfactory.hh,
+	src/tgba/tgbabddtranslatefactory.hh, src/tgbaalgos/dotty.cc:
+	Add Doxygen comments.
+
 	* src/tgba/bddfactory.hh, src/tgba/statebdd.hh, 
 	src/tgba/succiterconcrete.hh, src/tgba/tgbabddconcrete.hh, 
 	src/tgba/tgbabddcoredata.hh, src/tgba/tgbabdddict.hh: Add
