@@ -47,13 +47,12 @@ main(int argc, char** argv)
 
   spot::ltl::parse_error_list p1;
   spot::ltl::formula* f1 = spot::ltl::parse(argv[2], p1);
-  spot::ltl::formula* f2 = NULL;
 
   if (spot::ltl::format_parse_errors(std::cerr, argv[2], p1))
     return 2;
 
   spot::ltl::parse_error_list p2;
-  f2 = spot::ltl::parse(argv[3], p2);
+  spot::ltl::formula* f2 = spot::ltl::parse(argv[3], p2);
 
   if (spot::ltl::format_parse_errors(std::cerr, argv[3], p2))
     return 2;

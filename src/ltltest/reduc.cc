@@ -77,7 +77,7 @@ main(int argc, char** argv)
 
   spot::ltl::parse_error_list p1;
   spot::ltl::formula* f1 = spot::ltl::parse(argv[2], p1);
-  spot::ltl::formula* f2 = NULL;
+  spot::ltl::formula* f2 = 0;
 
   if (spot::ltl::format_parse_errors(std::cerr, argv[2], p1))
     return 2;
@@ -119,7 +119,7 @@ main(int argc, char** argv)
 
   bool red = (length_f1_after < length_f1_before);
   std::string f2s = "";
-  if (f2 != NULL)
+  if (f2)
     {
       ftmp1 = f2;
       f2 = unabbreviate_logic(f2);
@@ -170,7 +170,7 @@ main(int argc, char** argv)
     }
 
   spot::ltl::destroy(f1);
-  if (f2 != NULL)
+  if (f2)
     spot::ltl::destroy(f2);
 
 

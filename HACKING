@@ -172,6 +172,25 @@ Formating
 	  }
       }
 
+  * Pointers and references are part of the type, and should be put
+    near the type, not near the variable.
+
+      int* p;        // not `int *p;'
+      list& l;       // not `list &l;'
+      void* magic(); // not `void *magic();'
+
+  * Do not declare many variables on one line.
+    Use
+      int* p;
+      int* q;
+    instead of
+      int *p, *q;
+    The former declarations also allow you to describe each variable.
+
+  * The include guard for src/somedir/foo.hh is
+    SPOT_SOMEDIR_FOO_HH
+
+
 Naming
 ======
 
@@ -212,20 +231,15 @@ Naming
 
   * C Macros are all uppercase.
 
-  * Pointers and references are part of the type, and should be put
-    near the type, not near the variable.
 
-      int* p;        // not `int *p;'
-      list& l;       // not `list &l;'
-      void* magic(); // not `void *magic();'
+Other style recommandations
+===========================
 
-  * Do not declare many variables on one line.
-    Use
-      int* p;
-      int* q;
-    instead of
-      int *p, *q;
-    The former declarations also allow you to describe each variable.
+  * Do not use the NULL macro, it is not always implemented in a way
+    which is compatible with all pointer types.  Always use 0 instead.
 
-  * The include guard for src/somedir/foo.hh is
-    SPOT_SOMEDIR_FOO_HH
+  * Limit the scope of local variables by defining them as late as
+    possible.  Do not reuse a local variables for two different things.
+
+  * Do not systematically initialise local variables with 0 or other
+    meaningless values.  This hides errors to valgrind.

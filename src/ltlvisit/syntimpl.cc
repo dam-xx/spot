@@ -220,7 +220,6 @@ namespace spot
       visit(const unop* uo)
       {
 	const formula* f1 = uo->child();
-	const formula* tmp = NULL;
 	switch (uo->op())
 	  {
 	  case unop::Not:
@@ -240,10 +239,8 @@ namespace spot
 	    return;
 	  case unop::G:
 	    /* G(a) = false R a */
-	    tmp = constant::false_instance();
-	    if (syntactic_implication(f, tmp))
+	    if (syntactic_implication(f, constant::false_instance()))
 	      result_ = true;
-	    destroy(tmp);
 	    return;
 	  }
 	/* Unreachable code.  */

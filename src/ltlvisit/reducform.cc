@@ -193,28 +193,24 @@ namespace spot
       void
       visit(multop* mo)
       {
-	formula* f1 = NULL;
-	formula* f2 = NULL;
 	unsigned mos = mo->size();
 	multop::vec* res = new multop::vec;
-	multop::vec::iterator index;
-	multop::vec::iterator indextmp;
 
 	for (unsigned i = 0; i < mos; ++i)
 	  res->push_back(recurse(mo->nth(i)));
 
 	if (opt_ & Reduce_Syntactic_Implications)
 	  {
+	    formula* f1;
+	    formula* f2;
+	    multop::vec::iterator index = res->begin();
+	    multop::vec::iterator indextmp = index;
 	    switch (mo->op())
 	      {
-
 	      case multop::Or:
-		index = indextmp = res->begin();
 		if (index != res->end())
-		  {
-		    f1 = *index;
-		    index++;
-		  }
+		  break;
+		f1 = *index++;
 		for (; index != res->end(); index++)
 		  {
 		    f2 = *index;
@@ -237,12 +233,9 @@ namespace spot
 		break;
 
 	      case multop::And:
-		index = indextmp = res->begin();
-		if (mos)
-		  {
-		    f1 = mo->nth(0);
-		    index++;
-		  }
+		if (index != res->end())
+		  break;
+		f1 = *index++;
 		for (; index != res->end(); index++)
 		  {
 		    f2 = *index;

@@ -938,7 +938,7 @@ namespace spot
 		    {
 		      if (spot_inclusion(old_state->left(), new_state->left()))
 			{
-			  State* succ_tgba_ = NULL;
+			  State* succ_tgba_ = 0;
 			  size_t size_tgba_ = 0;
 			  succ_queue& queue = todo.top().second;
 

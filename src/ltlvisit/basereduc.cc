@@ -90,9 +90,9 @@ namespace spot
       {
 	formula* f = uo->child();
 	result_ = basic_reduce(f);
-	multop* mo = NULL;
-	unop* u = NULL;
-	binop* bo = NULL;
+	multop* mo = 0;
+	unop* u = 0;
+	binop* bo = 0;
 	switch (uo->op())
 	  {
 	  case unop::Not:
@@ -261,9 +261,8 @@ namespace spot
       {
 	formula* f1 = bo->first();
 	formula* f2 = bo->second();
-	formula* ftmp = NULL;
-	unop* fu1 = NULL;
-	unop* fu2 = NULL;
+	unop* fu1;
+	unop* fu2;
 	switch (bo->op())
 	  {
 	  case binop::Xor:
@@ -301,9 +300,9 @@ namespace spot
 		(fu1->op() == unop::X) &&
 		(fu2->op() == unop::X))
 	      {
-		ftmp = binop::instance(binop::U,
-				       basic_reduce(fu1->child()),
-				       basic_reduce(fu2->child()));
+		formula* ftmp = binop::instance(binop::U,
+						basic_reduce(fu1->child()),
+						basic_reduce(fu2->child()));
 		result_ = unop::instance(unop::X, basic_reduce(ftmp));
 		destroy(f1);
 		destroy(f2);
@@ -334,9 +333,9 @@ namespace spot
 		(fu1->op() == unop::X) &&
 		(fu2->op() == unop::X))
 	      {
-		ftmp = binop::instance(bo->op(),
-				       basic_reduce(fu1->child()),
-				       basic_reduce(fu2->child()));
+		formula* ftmp = binop::instance(bo->op(),
+						basic_reduce(fu1->child()),
+						basic_reduce(fu2->child()));
 		result_ = unop::instance(unop::X, basic_reduce(ftmp));
 		destroy(f1);
 		destroy(f2);
@@ -361,19 +360,14 @@ namespace spot
 
 	multop::vec* tmpX = new multop::vec;
 	multop::vec* tmpU = new multop::vec;
-	multop::vec* tmpUright = NULL;
 	multop::vec* tmpR = new multop::vec;
-	multop::vec* tmpRright = NULL;
 	multop::vec* tmpFG = new multop::vec;
 	multop::vec* tmpGF = new multop::vec;
 
 	multop::vec* tmpOther = new multop::vec;
 
-	formula* ftmp = NULL;
-
 	for (unsigned i = 0; i < mos; ++i)
 	  res->push_back(basic_reduce(mo->nth(i)));
-
 
 	switch (op)
 	  {
@@ -381,7 +375,8 @@ namespace spot
 
 	    for (multop::vec::iterator i = res->begin(); i != res->end(); i++)
 	      {
-		if (*i == NULL)
+		// FIXME: why would *i be 0 ?
+		if (!*i)
 		  continue;
 		unop* uo = dynamic_cast<unop*>(*i);
 		binop* bo = dynamic_cast<binop*>(*i);
@@ -408,8 +403,8 @@ namespace spot
 		    if (bo->op() == binop::U)
 		      {
 			// (a U b) & (c U b) = (a & c) U b
-			ftmp = dynamic_cast<binop*>(*i)->second();
-			tmpUright = new multop::vec;
+			formula* ftmp = dynamic_cast<binop*>(*i)->second();
+			multop::vec* tmpUright = new multop::vec;
 			for (multop::vec::iterator j = i; j != res->end(); j++)
 			  {
 			    if (!*j)
@@ -438,8 +433,8 @@ namespace spot
 		    else if (bo->op() == binop::R)
 		      {
 			// (a R b) & (a R c) = a R (b & c)
-			ftmp = dynamic_cast<binop*>(*i)->first();
-			tmpRright = new multop::vec;
+			formula* ftmp = dynamic_cast<binop*>(*i)->first();
+			multop::vec* tmpRright = new multop::vec;
 			for (multop::vec::iterator j = i; j != res->end(); j++)
 			  {
 			    if (!*j)
@@ -512,8 +507,8 @@ namespace spot
 		    if (bo->op() == binop::U)
 		      {
 			// (a U b) | (a U c) = a U (b | c)
-			ftmp = bo->first();
-			tmpUright = new multop::vec;
+			formula* ftmp = bo->first();
+			multop::vec* tmpUright = new multop::vec;
 			for (multop::vec::iterator j = i; j != res->end(); j++)
 			  {
 			    if (!*j)
@@ -540,8 +535,8 @@ namespace spot
 		    else if (bo->op() == binop::R)
 		      {
 			// (a R b) | (c R b) = (a | c) R b
-			ftmp = dynamic_cast<binop*>(*i)->second();
-			tmpRright = new multop::vec;
+			formula* ftmp = dynamic_cast<binop*>(*i)->second();
+			multop::vec* tmpRright = new multop::vec;
 			for (multop::vec::iterator j = i; j != res->end(); j++)
 			  {
 			    if (!*j)
@@ -604,22 +599,22 @@ namespace spot
 	else
 	  delete tmpR;
 
-	if ((tmpGF != NULL) &&
-	    (tmpGF->size()))
+	if (tmpGF && tmpGF->size())
 	  {
-	    ftmp = unop::instance(unop::G,
-				  unop::instance(unop::F,
-						 multop::instance(mo->op(),
-								  tmpGF)));
+	    formula* ftmp
+	      = unop::instance(unop::G,
+			       unop::instance(unop::F,
+					      multop::instance(mo->op(),
+							       tmpGF)));
 	    tmpOther->push_back(ftmp);
 	  }
-	if ((tmpFG != NULL) &&
-	    (tmpFG->size()))
+	if (tmpFG && tmpFG->size())
 	  {
-	    ftmp = unop::instance(unop::F,
-				  unop::instance(unop::G,
-						 multop::instance(mo->op(),
-								  tmpFG)));
+	    formula* ftmp
+	      = unop::instance(unop::F,
+			       unop::instance(unop::G,
+					      multop::instance(mo->op(),
+							       tmpFG)));
 	    tmpOther->push_back(ftmp);
 	  }
 

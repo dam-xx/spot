@@ -113,6 +113,9 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
     grep -e 'return[	 ]*[(][^(]*[)];' $tmp &&
       diag 'No useless parentheses after delete.'
 
+    grep  'NULL' $tmp &&
+      diag 'Use 0 instead of NULL.  NULL is not portable.'
+
     $fail && echo "$file" >>failures
   done
 done
