@@ -23,6 +23,7 @@
 #include "tgbatba.hh"
 #include "bddprint.hh"
 #include "ltlast/constant.hh"
+#include "misc/hashfunc.hh"
 
 namespace spot
 {
@@ -30,7 +31,7 @@ namespace spot
   {
     /// \brief A state for spot::tgba_tba_proxy.
     ///
-    /// This state is in fact a pair of state: the state from the tgba
+    /// This state is in fact a pair of states: the state from the tgba
     /// automaton, and a state of the "counter" (we use a pointer
     /// to the position in the cycle_acc_ list).
     class state_tba_proxy: public state
@@ -88,9 +89,7 @@ namespace spot
       virtual size_t
       hash() const
       {
-	// We expect to have many more states than acceptance conditions.
-	// Hence we keep only 8 bits for acceptance conditions.
-	return (s_->hash() << 8) + (acc_->id() & 0xFF);
+	return wang32_hash(s_->hash()) ^ wang32_hash(acc_->id());
       }
 
       virtual

@@ -1,5 +1,8 @@
 2004-11-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgba/tgbatba.cc (state_tba_proxy::hash): Use wang32_hash.
+	* src/tgba/tgbaproduct.cc (state_product::hash): Likewise.
+
 	* src/misc/hashfunc.hh (wang32_hash): New file and function,
 	extracted from...
 	* src/evtgba/product.cc (evtgba_product_state::hash): ... here.

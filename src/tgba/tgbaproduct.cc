@@ -22,6 +22,7 @@
 #include "tgbaproduct.hh"
 #include <string>
 #include <cassert>
+#include "misc/hashfunc.hh"
 
 namespace spot
 {
@@ -56,8 +57,8 @@ namespace spot
   size_t
   state_product::hash() const
   {
-    // We assume that size_t has at least 32bits.
-    return (left_->hash() << 16) + (right_->hash() & 0xFFFF);
+    // We assume that size_t is 32-bit wide.
+    return wang32_hash(left_->hash()) ^ wang32_hash(right_->hash());
   }
 
   state_product*
