@@ -15,5 +15,6 @@ libltlast_a_SOURCES = \
   multop.hh \
   predecl.hh \
   unop.cc \
-  unop.hh
+  unop.hh \
+  visitor.hh
 
