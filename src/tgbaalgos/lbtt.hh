@@ -10,10 +10,10 @@ namespace spot
   ///
   /// Note that LBTT expects an automaton with transition
   /// labeled by propositional formulae, and generalized
-  /// Büchi accepting conditions on \emph states.  This
+  /// Büchi accepting conditions on \b states.  This
   /// is unlike our spot::tgba automata which put
   /// both generalized accepting conditions and propositional
-  /// formulae) on \emph transitions.
+  /// formulae) on \b transitions.
   ///
   /// This algorithm will therefore produce an automata where
   /// accepting conditions have been moved from each transition to
