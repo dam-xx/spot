@@ -111,8 +111,6 @@ namespace spot
   typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
 
 
-
-
   emptiness_check::emptiness_check(const tgba* a)
   {
     ecs_ = new emptiness_check_status(a);
@@ -309,6 +307,23 @@ namespace spot
     return true;
   }
 
+  const emptiness_check_status*
+  emptiness_check::result() const
+  {
+    return ecs_;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  emptiness_check_shy::emptiness_check_shy(const tgba* a)
+    : emptiness_check(a)
+  {
+  }
+
+  emptiness_check_shy::~emptiness_check_shy()
+  {
+  }
+
   struct successor {
     bdd acc;
     const spot::state* s;
@@ -316,7 +331,7 @@ namespace spot
   };
 
   bool
-  emptiness_check::check2()
+  emptiness_check_shy::check()
   {
     // We use five main data in this algorithm:
     // * emptiness_check::root, a stack of strongly connected components (SCC),
@@ -472,12 +487,6 @@ namespace spot
 					iter->current_state()));
 	delete iter;
       }
-  }
-
-  const emptiness_check_status*
-  emptiness_check::result() const
-  {
-    return ecs_;
   }
 
   //////////////////////////////////////////////////////////////////////

@@ -364,28 +364,30 @@ main(int argc, char** argv)
 	case Couvreur:
 	case Couvreur2:
 	  {
-	    spot::emptiness_check ec = spot::emptiness_check(a);
-	    bool res;
-
+	    spot::emptiness_check* ec;
 	    if (echeck == Couvreur)
-	      res = ec.check();
+	      ec = new spot::emptiness_check(a);
 	    else
-	      res = ec.check2();
+	      ec = new spot::emptiness_check_shy(a);
+
+	    bool res = ec->check();
 
 	    if (expect_counter_example)
 	      {
 		if (res)
 		  {
 		    exit_code = 1;
+		    delete ec;
 		    break;
 		  }
-		spot::counter_example ce(ec.result());
+		spot::counter_example ce(ec->result());
 		ce.print_result(std::cout);
 	      }
 	    else
 	      {
 		exit_code = !res;
 	      }
+	    delete ec;
 	  }
 	  break;
 	case MagicSearch:

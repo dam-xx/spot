@@ -169,13 +169,16 @@ main(int argc, char **argv)
 	case Couvreur:
 	case Couvreur2:
 	  {
-	    spot::emptiness_check ec(prod);
-	    bool res;
+	    spot::emptiness_check* ec;
+
 	    if (check == Couvreur)
-	      res = ec.check();
+	      ec = new spot::emptiness_check(prod);
 	    else
-	      res = ec.check2();
-	    const spot::emptiness_check_status* ecs = ec.result();
+	      ec = new spot::emptiness_check_shy(prod);
+
+	    bool res = ec->check();
+
+	    const spot::emptiness_check_status* ecs = ec->result();
 	    if (!res)
 	      {
 		if (compute_counter_example)
@@ -196,6 +199,7 @@ main(int argc, char **argv)
 		ecs->print_stats(std::cout);
 	      }
 	    std::cout << std::endl;
+	    delete ec;
 	    if (!res)
 	      exit(1);
 	  }

@@ -80,6 +80,7 @@ namespace spot
     void print_stats(std::ostream& os) const;
   };
 
+  //@{
   /// \brief Check whether the language of an automate is empty.
   ///
   /// This is based on the following paper.
@@ -100,41 +101,39 @@ namespace spot
   ///   isbn      = {3-540-66587-0}
   /// }
   /// \endverbatim
+  ///
+  /// check() returns true if the automaton's language is empty.  When
+  /// it return false, a stack of SCC has been built and can
+  /// later be used by counter_example().
+  ///
+  /// There are two variants of this algorithm: emptiness_check() and
+  /// emptiness_check_shy().  They differ in their memory usage, the
+  /// number for successors computed before they are used and the way
+  /// the depth first search is directed.
+  ///
+  /// emptiness_check() performs a straightforward depth first search.
+  /// The DFS stacks store tgba_succ_iterators, so that only the
+  /// iterators which really are explored are computed.
+  ///
+  /// emptiness_check_shy() try to explore successors which are
+  /// visited states first.  this helps to merge SCCs and generally
+  /// helps to produce shorter counter-examples.  However this
+  /// algorithm cannot stores unprocessed successors as
+  /// tgba_succ_iterators: it must compute all successors of a state
+  /// at once in order to decide which to explore first, and must keep
+  /// a list of all unexplored successors in its DFS stack.
   class emptiness_check
   {
   public:
     emptiness_check(const tgba* a);
-    ~emptiness_check();
+    virtual ~emptiness_check();
 
-    //@{
-    /// \brief check whether an automaton's language is empty
-    ///
-    /// Returns true if the automaton's language is empty.  When
-    /// it return false, a stack of SCC has been built and can
-    /// later be used by counter_example().
-    ///
-    /// There are two variants of this algorithm: check() and check2().
-    /// They differ in their memory usage, the number for successors computed
-    /// before they are used  and the way the depth first search is directed.
-    ///
-    /// check() performs a straightforward depth first search.  The DFS
-    /// stacks store tgba_succ_iterators, so that only the iterators which
-    /// really are explored are computed.
-    ///
-    /// check2() try to explore successors which are visited states first.
-    /// this helps to merge SCCs and generally helps to produce shorter
-    /// counter-examples.  However this algorithm cannot stores unprocessed
-    /// successors as tgba_succ_iterators: it must compute all successors
-    /// of a state at once in order to decide which to explore first, and
-    /// must keep a list of all unexplored successors in its DFS stack.
-    bool check();
-    bool check2();
-    //@}
+    /// check whether the automaton's language is empty
+    virtual bool check();
 
     const emptiness_check_status* result() const;
 
-  private:
-
+  protected:
     emptiness_check_status* ecs_;
     /// \brief Remove a strongly component from the hash.
     ///
@@ -142,8 +141,17 @@ namespace spot
     /// state. In other words, it removes the strongly connected
     /// component that contains this state.
     void remove_component(const state* start_delete);
-
   };
+
+  class emptiness_check_shy : public emptiness_check
+  {
+  public:
+    emptiness_check_shy(const tgba* a);
+    virtual ~emptiness_check_shy();
+
+    virtual bool check();
+  };
+  //@}
 
 
   class counter_example
