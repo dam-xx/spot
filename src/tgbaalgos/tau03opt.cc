@@ -519,6 +519,7 @@ namespace spot
         {
           assert(hc.find(s)==hc.end() && h.find(s)==h.end());
           assert(c == CYAN);
+          (void)c;
           hc.insert(std::make_pair(s, std::make_pair(w, bddfalse)));
         }
 
