@@ -230,7 +230,7 @@ namespace spot
     bool root_;
   };
 
-  tgba_bdd_concrete
+  tgba_bdd_concrete*
   ltl_to_tgba(const ltl::formula* f, bdd_dict* dict)
   {
     // Normalize the formula.  We want all the negations on
@@ -249,7 +249,6 @@ namespace spot
     fact.finish();
 
     // Finally setup the resulting automaton.
-    tgba_bdd_concrete g(fact, v.result());
-    return g;
+    return new tgba_bdd_concrete(fact, v.result());
   }
 }

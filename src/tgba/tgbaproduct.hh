@@ -87,14 +87,14 @@ namespace spot
   };
 
   /// \brief A lazy product.  (States are computed on the fly.)
-  class tgba_product : public tgba
+  class tgba_product: public tgba
   {
   public:
     /// \brief Constructor.
     /// \param left The left automata in the product.
     /// \param right The right automata in the product.
     /// Do not be fooled by these arguments: a product is commutative.
-    tgba_product(const tgba& left, const tgba& right);
+    tgba_product(const tgba* left, const tgba* right);
 
     virtual ~tgba_product();
 
@@ -116,6 +116,9 @@ namespace spot
     const tgba* right_;
     bdd all_accepting_conditions_;
     bdd neg_accepting_conditions_;
+    // Disallow copy.
+    tgba_product(const tgba_product&);
+    tgba_product& tgba_product::operator=(const tgba_product&);
   };
 
 }

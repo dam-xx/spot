@@ -28,7 +28,7 @@ namespace spot
   ///
   /// \param g The automata to print.
   /// \param os Where to print.
-  std::ostream& lbtt_reachable(std::ostream& os, const tgba& g);
+  std::ostream& lbtt_reachable(std::ostream& os, const tgba* g);
 }
 
 #endif // SPOT_TGBAALGOS_LBTT_HH

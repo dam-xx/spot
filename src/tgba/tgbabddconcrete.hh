@@ -58,6 +58,10 @@ namespace spot
   protected:
     tgba_bdd_core_data data_;	///< Core data associated to the automaton.
     bdd init_;			///< Initial state.
+  private:
+    // Disallow copy.
+    tgba_bdd_concrete(const tgba_bdd_concrete&);
+    tgba_bdd_concrete& tgba_bdd_concrete::operator=(const tgba_bdd_concrete&);
   };
 }
 

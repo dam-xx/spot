@@ -48,9 +48,10 @@ main(int argc, char** argv)
 
   if (f)
     {
-      spot::tgba_bdd_concrete a = spot::ltl_to_tgba(f, dict);
+      spot::tgba_bdd_concrete* a = spot::ltl_to_tgba(f, dict);
       spot::ltl::destroy(f);
       spot::lbtt_reachable(std::cout, a);
+      delete a;
     }
   else
     {

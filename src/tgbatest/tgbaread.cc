@@ -43,7 +43,7 @@ main(int argc, char** argv)
 
   if (a)
     {
-      spot::dotty_reachable(std::cout, *a);
+      spot::dotty_reachable(std::cout, a);
       delete a;
     }
   else

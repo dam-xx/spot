@@ -10,7 +10,7 @@ namespace spot
   /// Output and record a state.
   static bool
   dotty_state(std::ostream& os,
-	      const tgba& g, state* st, seen_map& m, int& node)
+	      const tgba* g, state* st, seen_map& m, int& node)
   {
     seen_map::iterator i = m.find(st);
 
@@ -25,24 +25,24 @@ namespace spot
     m[st] = node;
 
     os << "  " << node << " [label=\""
-       << g.format_state(st) << "\"]" << std::endl;
+       << g->format_state(st) << "\"]" << std::endl;
     return true;
   }
 
   /// Process successors.
   static void
   dotty_rec(std::ostream& os,
-	    const tgba& g, state* st, seen_map& m, int father)
+	    const tgba* g, state* st, seen_map& m, int father)
   {
-    tgba_succ_iterator* si = g.succ_iter(st);
+    tgba_succ_iterator* si = g->succ_iter(st);
     for (si->first(); !si->done(); si->next())
       {
 	int node;
 	state* s = si->current_state();
 	bool recurse = dotty_state(os, g, s, m, node);
 	os << "  " << father << " -> " << node << " [label=\"";
-	bdd_print_set(os, g.get_dict(), si->current_condition()) << "\\n";
-	bdd_print_set(os, g.get_dict(), si->current_accepting_conditions())
+	bdd_print_set(os, g->get_dict(), si->current_condition()) << "\\n";
+	bdd_print_set(os, g->get_dict(), si->current_accepting_conditions())
 	  << "\"]" << std::endl;
 	if (recurse)
 	  {
@@ -58,10 +58,10 @@ namespace spot
   }
 
   std::ostream&
-  dotty_reachable(std::ostream& os, const tgba& g)
+  dotty_reachable(std::ostream& os, const tgba* g)
   {
     seen_map m;
-    state* state = g.get_init_state();
+    state* state = g->get_init_state();
     os << "digraph G {" << std::endl;
     os << "  size=\"7.26,10.69\"" << std::endl;
     os << "  0 [label=\"\", style=invis]" << std::endl;

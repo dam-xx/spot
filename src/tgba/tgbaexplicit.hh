@@ -17,8 +17,6 @@ namespace spot
   {
   public:
     tgba_explicit(bdd_dict* dict);
-    tgba_explicit(const tgba_explicit& other);
-    tgba_explicit& tgba_explicit::operator=(const tgba_explicit& other);
 
     struct transition;
     typedef std::list<transition*> state;
@@ -65,6 +63,11 @@ namespace spot
     mutable bdd all_accepting_conditions_;
     bdd neg_accepting_conditions_;
     mutable bool all_accepting_conditions_computed_;
+
+  private:
+    // Disallow copy.
+    tgba_explicit(const tgba_explicit& other);
+    tgba_explicit& tgba_explicit::operator=(const tgba_explicit& other);
   };
 
 

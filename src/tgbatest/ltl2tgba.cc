@@ -88,7 +88,7 @@ main(int argc, char** argv)
   spot::bdd_dict* dict = new spot::bdd_dict();
   if (f)
     {
-      spot::tgba_bdd_concrete a = spot::ltl_to_tgba(f, dict);
+      spot::tgba_bdd_concrete* a = spot::ltl_to_tgba(f, dict);
       spot::ltl::destroy(f);
       switch (output)
 	{
@@ -96,23 +96,23 @@ main(int argc, char** argv)
 	  spot::dotty_reachable(std::cout, a);
 	  break;
 	case 1:
-	  spot::bdd_print_dot(std::cout, a.get_dict(),
-			      a.get_core_data().relation);
+	  spot::bdd_print_dot(std::cout, a->get_dict(),
+			      a->get_core_data().relation);
 	  break;
 	case 2:
-	  spot::bdd_print_dot(std::cout, a.get_dict(),
-			      a.get_core_data().accepting_conditions);
+	  spot::bdd_print_dot(std::cout, a->get_dict(),
+			      a->get_core_data().accepting_conditions);
 	  break;
 	case 3:
-	  spot::bdd_print_set(std::cout, a.get_dict(),
-			      a.get_core_data().relation);
+	  spot::bdd_print_set(std::cout, a->get_dict(),
+			      a->get_core_data().relation);
 	  break;
 	case 4:
-	  spot::bdd_print_set(std::cout, a.get_dict(),
-			      a.get_core_data().accepting_conditions);
+	  spot::bdd_print_set(std::cout, a->get_dict(),
+			      a->get_core_data().accepting_conditions);
 	  break;
 	case 5:
-	  a.get_dict()->dump(std::cout);
+	  a->get_dict()->dump(std::cout);
 	  break;
 	case 6:
 	  spot::lbtt_reachable(std::cout, a);
@@ -120,6 +120,7 @@ main(int argc, char** argv)
 	default:
 	  assert(!"unknown output option");
 	}
+      delete a;
     }
   else
     {

@@ -7,7 +7,7 @@
 namespace spot
 {
   /// \brief Print reachable states in dot format.
-  std::ostream& dotty_reachable(std::ostream& os, const tgba& g);
+  std::ostream& dotty_reachable(std::ostream& os, const tgba* g);
 }
 
 #endif // SPOT_TGBAALGOS_DOTTY_HH

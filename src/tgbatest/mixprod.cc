@@ -39,11 +39,11 @@ main(int argc, char** argv)
     return 2;
 
   {
-    spot::tgba_bdd_concrete a1 = spot::ltl_to_tgba(f1, dict);
+    spot::tgba_bdd_concrete* a1 = spot::ltl_to_tgba(f1, dict);
     spot::ltl::destroy(f1);
-    spot::tgba_product p(a1, *a2);
-
-    spot::tgba_save_reachable(std::cout, p);
+    spot::tgba_product p(a1, a2);
+    spot::tgba_save_reachable(std::cout, &p);
+    delete a1;
   }
 
   assert(spot::ltl::unop::instance_count() == 0);

@@ -87,31 +87,6 @@ namespace spot
   {
   }
 
-  tgba_explicit::tgba_explicit(const tgba_explicit& other)
-    : tgba(),
-      name_state_map_(other.name_state_map_),
-      state_name_map_(other.state_name_map_),
-      dict_(other.dict_),
-      init_(other.init_),
-      all_accepting_conditions_(other.all_accepting_conditions_),
-      neg_accepting_conditions_(other.neg_accepting_conditions_),
-      all_accepting_conditions_computed_(other.
-					 all_accepting_conditions_computed_)
-  {
-    dict_->register_all_variables_of(&other, this);
-  }
-
-  tgba_explicit&
-  tgba_explicit::operator=(const tgba_explicit& other)
-  {
-    if (&other != this)
-      {
-	this->~tgba_explicit();
-	new (this) tgba_explicit(other);
-      }
-    return *this;
-  }
-
   tgba_explicit::~tgba_explicit()
   {
     ns_map::iterator i;

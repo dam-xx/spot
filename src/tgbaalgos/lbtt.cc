@@ -130,7 +130,7 @@ namespace spot
   // a supplementary state, to act as initial state for LBTT.)
   void
   fill_todo(todo_set& todo, seen_map& seen, acp_seen_map& acp_seen,
-	    state* state, const tgba& g,
+	    state* state, const tgba* g,
 	    minmax_pair& mmp, unsigned& state_number,
 	    bool init)
   {
@@ -147,7 +147,7 @@ namespace spot
     // Browse the successors of STATE to gather accepting
     // conditions of outgoing transitions.
     bdd_set acc_seen;
-    tgba_succ_iterator* si = g.succ_iter(state);
+    tgba_succ_iterator* si = g->succ_iter(state);
     for (si->first(); !si->done(); si->next())
       {
 	acc_seen.insert(si->current_accepting_conditions());
@@ -176,9 +176,9 @@ namespace spot
   }
 
   std::ostream&
-  lbtt_reachable(std::ostream& os, const tgba& g)
+  lbtt_reachable(std::ostream& os, const tgba* g)
   {
-    const bdd_dict* d = g.get_dict();
+    const bdd_dict* d = g->get_dict();
     std::ostringstream body;
 
     seen_map seen;
@@ -189,8 +189,8 @@ namespace spot
     minmax_pair mmp;
 
     fill_todo(todo, seen, acp_seen,
-	      g.get_init_state(), g, mmp, state_number, true);
-    accepting_cond_splitter acs(g.all_accepting_conditions());
+	      g->get_init_state(), g, mmp, state_number, true);
+    accepting_cond_splitter acs(g->all_accepting_conditions());
 
     while(! todo.empty())
       {
@@ -209,7 +209,7 @@ namespace spot
 	  acs.split(body, sap.second);
 	body << "-1" << std::endl;
 
-	tgba_succ_iterator* si = g.succ_iter(sap.first);
+	tgba_succ_iterator* si = g->succ_iter(sap.first);
 	for (si->first(); !si->done(); si->next())
 	  {
 	    // We have put the accepting conditions on the state,

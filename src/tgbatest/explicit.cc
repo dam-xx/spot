@@ -29,7 +29,7 @@ main()
   a->add_accepting_condition(t1, e.require("q"));
   a->add_accepting_condition(t2, e.require("r"));
 
-  spot::dotty_reachable(std::cout, *a);
+  spot::dotty_reachable(std::cout, a);
 
   delete a;
   delete dict;

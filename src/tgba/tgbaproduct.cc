@@ -143,10 +143,10 @@ namespace spot
   ////////////////////////////////////////////////////////////
   // tgba_product
 
-  tgba_product::tgba_product(const tgba& left, const tgba& right)
-    : dict_(left.get_dict()), left_(&left), right_(&right)
+  tgba_product::tgba_product(const tgba* left, const tgba* right)
+    : dict_(left->get_dict()), left_(left), right_(right)
   {
-    assert(dict_ == right.get_dict());
+    assert(dict_ == right->get_dict());
 
     all_accepting_conditions_ = ((left_->all_accepting_conditions()
 				  & right_->neg_accepting_conditions())

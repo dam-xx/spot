@@ -10,18 +10,18 @@ namespace spot
 
   /// Process successors.
   static void
-  save_rec(std::ostream& os, const tgba& g, state* st, seen_set& m)
+  save_rec(std::ostream& os, const tgba* g, state* st, seen_set& m)
   {
     m.insert(st);
-    std::string cur = g.format_state(st);
-    tgba_succ_iterator* si = g.succ_iter(st);
+    std::string cur = g->format_state(st);
+    tgba_succ_iterator* si = g->succ_iter(st);
     for (si->first(); !si->done(); si->next())
       {
 	state* s = si->current_state();
-	os << "\"" << cur << "\", \"" << g.format_state(s) << "\", ";
+	os << "\"" << cur << "\", \"" << g->format_state(s) << "\", ";
 
-	bdd_print_sat(os, g.get_dict(), si->current_condition()) << ",";
-	bdd_print_acc(os, g.get_dict(), si->current_accepting_conditions())
+	bdd_print_sat(os, g->get_dict(), si->current_condition()) << ",";
+	bdd_print_acc(os, g->get_dict(), si->current_accepting_conditions())
 	  << ";" << std::endl;
 
 	// Destination already explored?
@@ -40,9 +40,9 @@ namespace spot
   }
 
   std::ostream&
-  tgba_save_reachable(std::ostream& os, const tgba& g)
+  tgba_save_reachable(std::ostream& os, const tgba* g)
   {
-    const bdd_dict* d = g.get_dict();
+    const bdd_dict* d = g->get_dict();
     os << "acc =";
     for (bdd_dict::fv_map::const_iterator ai = d->acc_map.begin();
 	 ai != d->acc_map.end(); ++ai)
@@ -53,7 +53,7 @@ namespace spot
     os << ";" << std::endl;
 
     seen_set m;
-    state* state = g.get_init_state();
+    state* state = g->get_init_state();
     save_rec(os, g, state, m);
     // Finally delete all states used as keys in m:
     for (seen_set::iterator i = m.begin(); i != m.end(); ++i)

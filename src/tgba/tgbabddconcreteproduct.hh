@@ -9,8 +9,8 @@ namespace spot
   ///
   /// This function build the resulting product, as another
   /// tgba::tgba_bdd_concrete automaton.
-  tgba_bdd_concrete
-  product(const tgba_bdd_concrete& left, const tgba_bdd_concrete& right);
+  tgba_bdd_concrete*
+  product(const tgba_bdd_concrete* left, const tgba_bdd_concrete* right);
 }
 
 #endif // SPOT_TGBA_TGBABDDCONCRETEPRODUCT_HH

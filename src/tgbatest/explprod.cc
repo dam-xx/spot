@@ -35,8 +35,8 @@ main(int argc, char** argv)
     return 2;
 
   {
-    spot::tgba_product p(*a1, *a2);
-    spot::tgba_save_reachable(std::cout, p);
+    spot::tgba_product p(a1, a2);
+    spot::tgba_save_reachable(std::cout, &p);
   }
 
   assert(spot::ltl::unop::instance_count() == 0);

@@ -43,7 +43,7 @@ main(int argc, char** argv)
 
   if (a)
     {
-      spot::tgba_save_reachable(std::cout, *a);
+      spot::tgba_save_reachable(std::cout, a);
       delete a;
     }
   else

@@ -1,3 +1,34 @@
+2003-07-15  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	Homogenize passing of automata as pointers, not references.
+	Disallow copy for security.
+
+	* src/tgba/tgbabddconcrete.hh (tgba_bdd_concrete): Disallow copy.
+	* src/tgba/tgbaexplicit.hh (tgba_explicit): Likewise.
+	* src/tgba/tgbaexplicit.cc (tgba_explicit::operator=,
+	tgba_explicit::tgba_explicit(tgba_explicit)): Remove.
+	* src/tgba/tgbabddconcreteproduct.cc
+	(tgba_bdd_concrete_product_factory::tgba_bdd_concrete_product_factory,
+	product): Take operand automata as pointers.
+	* src/tgba/tgbabddconcreteproduct.hh (product): Likewise.
+	* src/tgba/tgbaproduct.cc, src/tgba/tgbaproduct.hh:
+	(tgba_product): Disallow copy.
+	(tgba_product::tgba_product): Take operand automata as pointers.
+	* src/tgbaalgos/dotty.cc (dotty_state, dotty_rec, dotty_reachable):
+	Take tgba arguments as pointer.
+	* src/tgbaalgos/dotty.hh (dotty_reachable): Likewise.
+	* src/tgbaalgos/lbtt.cc (fill_todo, lbtt_reachable): Likewise.
+	* src/tgbaalgos/lbtt.hh (lbtt_reachable): Likewise.
+	* src/tgbaalgos/ltl2tgba.cc, src/tgbaalgos/ltl2tgba.hh (ltl_to_tgba):
+	Likewise.
+	* src/tgbaalgos/save.cc (save_rec, tgba_save_reachable): Likewise.
+	* src/tgbaalgos/save.hh (save): Likewise.
+	* src/tgbatest/explicit.cc, src/tgbatest/explprod.cc,
+	src/tgbatest/ltl2tgba.cc, src/tgbatest/ltlprod.cc,
+	src/tgbatest/mixprod.cc, src/tgbatest/readsave.cc,
+	src/tgbatest/spotlbtt.cc, src/tgbatest/tgbaread.cc,
+	src/tgbatest/tripprod.cc: Likewise.
+
 2003-07-14  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	Before this change, all automata would construct their own
