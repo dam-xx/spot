@@ -28,7 +28,7 @@ SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse tgba tgbaalgos tgbaparse . \
 
 lib_LTLIBRARIES = libspot.la
 libspot_la_SOURCES =
-libspot_la_LDFLAGS = $(BUDDY_LDFLAGS)
+libspot_la_LDFLAGS = $(BUDDY_LDFLAGS) -no-undefined
 libspot_la_LIBADD =  \
   misc/libmisc.la \
   ltlenv/libltlenv.la \

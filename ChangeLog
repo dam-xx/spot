@@ -1,3 +1,8 @@
+2004-07-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* configure.ac: Call AC_LIBTOOL_WIN32_DLL
+	* src/Makefile.am (libspot_la_LDFLAGS): Add -no-undefined.
+
 2004-07-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/explicit.test: Do not use `-i', it's not needed
