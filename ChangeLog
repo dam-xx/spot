@@ -1,3 +1,11 @@
+2005-01-25  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/tgbatest/randtgba.cc: Complete performance measurements.
+
+	* src/tgbatest/ltl2tgba.cc: Typo.
+
+	* src/tgbaalgos/magic.hh: Correct pseudo-code.
+
 2005-01-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/tau03opt.hh, src/tgbaalgos/se05.hh: Correct
@@ -15,7 +23,7 @@
 2005-01-24  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbatest/randtgba.cc, src/tgbatest/ltl2tgba.cc: Add options
-          dedicated to display of stats.
+	dedicated to display of stats.
 
 2005-01-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 

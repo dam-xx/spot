@@ -55,7 +55,8 @@ namespace spot
   ///   for all t in post(s) do
   ///     if t.color == white then
   ///       call dfs_blue(t);
-  ///     else if (the edge (s,t) is accepting) then
+  ///     end if;
+  ///     if (the edge (s,t) is accepting) then
   ///       target = s;
   ///       call dfs_red(t);
   ///     end if;

@@ -801,7 +801,7 @@ main(int argc, char** argv)
                               << std::right << std::setw(10)
                               << ecs->max_depth();
                   else
-                    std::cout << "no stats,, ";
+                    std::cout << "no stats, , ";
                   if (res)
                     std::cout << ", accepting run found";
                   else
