@@ -877,8 +877,6 @@ main(int argc, char** argv)
             {
               if (formula_file->bad())
                 std::cerr << "Failed to read " << opt_i << std::endl;
-              else
-                std::cerr << "End of " << opt_i << std::endl;
               break;
             }
         }
@@ -1280,7 +1278,7 @@ main(int argc, char** argv)
 
   if (opt_i && strcmp(opt_i, "-"))
     {
-      //formula_file->close();
+      dynamic_cast<std::ifstream*>(formula_file)->close();
       delete formula_file;
     }
   delete ap;

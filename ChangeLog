@@ -1,5 +1,9 @@
 2005-01-13  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
+	* src/tgbatest/randtgba.cc: Close the formula file and remove a trace.
+
+2005-01-13  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
 	* src/tgbatest/randtgba.cc: Add products with formulae issued of a file
 	and more statistics.
 	* src/tgbatest/readsave.test: Undo previous change.
