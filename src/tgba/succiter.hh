@@ -27,7 +27,7 @@ namespace spot
     /// \brief Position the iterator on the first successor (if any).
     ///
     /// This method can be called several times to make multiple
-    /// passes over successors.  
+    /// passes over successors.
     ///
     /// \warning One should always call \c done() to
     /// ensure there is a successor, even after \c first().  A

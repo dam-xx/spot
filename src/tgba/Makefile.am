@@ -35,4 +35,6 @@ libtgba_la_SOURCES = \
   tgbabddtranslatefactory.cc \
   tgbabddtranslatefactory.hh \
   tgbabddtranslateproxy.cc \
-  tgbabddtranslateproxy.hh
+  tgbabddtranslateproxy.hh \
+  tgbaexplicit.cc \
+  tgbaexplicit.hh

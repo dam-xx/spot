@@ -1,3 +1,13 @@
+2003-06-05  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* configure.ac: Output src/tgbatest/Makefile and src/tgbatest/defs.
+	* src/Makefile.am (SUBDIRS): Add tgbatest.
+	* src/tgba/tgbaexplicit.hh, src/tgba/tgbaexplicit.cc: New file.
+	* src/tgba/Makefile.am (libtgba_la_SOURCES): Add tgbaexplicit.cc
+	and tgbaexplicit.hh.
+	* src/tgbatest/Makefile.am, src/tgbatest/defs.in, 
+	src/tgbatest/explicit.cc, src/tgbatest/explicit.test: New files.
+
 2003-06-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltlparse/ltlparse.yy (result): Suppress unused definition.
