@@ -1,5 +1,7 @@
 2004-11-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/sanity/style.test: Allow "'" after ",".
+
 	* src/tgbaalgos/gv04.cc, src/tgbaalgos/gv04.hh: New files, partly
 	based on Thomas Martinez's src/tgbaalgos/tarjan_on_fly.cc and
 	src/tgbaalgos/tarjan_on_fly.hh former implementation.
