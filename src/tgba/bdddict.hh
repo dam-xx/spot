@@ -27,8 +27,8 @@ namespace spot
 
     fv_map now_map;		///< Maps formulae to "Now" BDD variables
     vf_map now_formula_map;	///< Maps "Now" BDD variables to formulae
-    fv_map var_map;		///< Maps atomic propisitions to BDD variables
-    vf_map var_formula_map;     ///< Maps BDD variables to atomic propisitions
+    fv_map var_map;		///< Maps atomic propositions to BDD variables
+    vf_map var_formula_map;     ///< Maps BDD variables to atomic propositions
     fv_map acc_map;		///< Maps accepting conditions to BDD variables
     vf_map acc_formula_map;	///< Maps BDD variables to accepting conditions
 
