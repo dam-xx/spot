@@ -70,3 +70,8 @@ flex_set_buffer(const char *buf)
 .		return *yytext;
 
 <<EOF>>		return END_OF_INPUT;
+
+%{
+  /* Dummy use of yyunput to shut up a gcc warning.  */
+  (void) &yyunput;
+%}

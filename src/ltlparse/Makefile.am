@@ -1,4 +1,5 @@
 AM_CPPFLAGS = -I$(srcdir)/..
+AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
 lib_LIBRARIES = libltlparse.a
 
