@@ -1,5 +1,10 @@
 2005-02-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/magic.hh, src/tgbaalgos/magic.cc,
+	src/tgbaalgos/se05.hh, src/tgbaalgos/se05.cc: Provide wrapper
+	functions that read the hash-map size from a "bsh" option.
+	* src/tgbatest/randtgba.cc: Simplify.
+
 	* src/misc/optionmap.hh, src/misc/optionmap.cc
 	(option_map::parse_options): Rewrite.  Do not modify the input
 	string, allow !foo as a shorthand for foo=0, and support K and

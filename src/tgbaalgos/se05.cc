@@ -675,4 +675,13 @@ namespace spot
     return new se05_search<bsh_se05_search_heap>(a, size, o);
   }
 
+  emptiness_check*
+  se05(const tgba *a, option_map o)
+  {
+    size_t size = o.get("bsh");
+    if (size)
+      return bit_state_hashing_se05_search(a, size, o);
+    return explicit_se05_search(a, o);
+  }
+
 }

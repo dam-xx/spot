@@ -133,6 +133,15 @@ namespace spot
   emptiness_check* bit_state_hashing_se05_search(const tgba *a, size_t size,
 						 option_map o = option_map());
 
+
+  /// \brief Wrapper for the two se05 implementations.
+  ///
+  /// This wrapper calls explicit_se05_search() or
+  /// bit_state_hashing_se05_search() according to the \c "bsh" option
+  /// in the \c option_map.  If \c "bsh" is set and non null, its value
+  /// is used as the size of the hash map.
+  emptiness_check* se05(const tgba *a, option_map o);
+
   /// @}
 }
 

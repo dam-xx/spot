@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -82,7 +82,7 @@ namespace spot
   /// (which deals with accepting states) presented in
   ///
   /// \verbatim
-  ///  Article{         courcoubertis.92.fmsd,
+  ///  Article{         courcoubetis.92.fmsd,
   ///    author        = {Costas Courcoubetis and Moshe Y. Vardi and Pierre
   ///                    Wolper and Mihalis Yannakakis},
   ///    title         = {Memory-Efficient Algorithm for the Verification of
@@ -94,6 +94,8 @@ namespace spot
   ///  }
   /// \endverbatim
   ///
+  /// \fixme The name is misleading.  Magic-search is the algorithm
+  /// from \c godefroid.93.pstv, not \c courcoubetis.92.fmsd.
   emptiness_check* explicit_magic_search(const tgba *a,
                                          option_map o = option_map());
 
@@ -126,6 +128,14 @@ namespace spot
   ///
   emptiness_check* bit_state_hashing_magic_search(const tgba *a, size_t size,
                                                   option_map o = option_map());
+
+  /// \brief Wrapper for the two magic_search implementations.
+  ///
+  /// This wrapper calls explicit_magic_search_search() or
+  /// bit_state_hashing_magic_search() according to the \c "bsh" option
+  /// in the \c option_map.  If \c "bsh" is set and non null, its value
+  /// is used as the size of the hash map.
+  emptiness_check* magic_search(const tgba *a, option_map o = option_map());
 
   /// @}
 }

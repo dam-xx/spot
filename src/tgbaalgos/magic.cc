@@ -46,14 +46,14 @@ namespace spot
     /// \brief Emptiness checker on spot::tgba automata having at most one
     /// accepting condition (i.e. a TBA).
     template <typename heap>
-    class magic_search : public emptiness_check, public ec_statistics
+    class magic_search_ : public emptiness_check, public ec_statistics
     {
     public:
       /// \brief Initialize the Magic Search algorithm on the automaton \a a
       ///
       /// \pre The automaton \a a must have at most one accepting
       /// condition (i.e. it is a TBA).
-      magic_search(const tgba *a, size_t size, option_map o = option_map())
+      magic_search_(const tgba *a, size_t size, option_map o = option_map())
         : emptiness_check(a, o),
           h(size),
           all_cond(a->all_acceptance_conditions())
@@ -61,7 +61,7 @@ namespace spot
         assert(a->number_of_acceptance_conditions() <= 1);
       }
 
-      virtual ~magic_search()
+      virtual ~magic_search_()
       {
         // Release all iterators on the stacks.
         while (!st_blue.empty())
@@ -318,7 +318,7 @@ namespace spot
         public acss_statistics
       {
       public:
-        result_from_stack(magic_search& ms)
+        result_from_stack(magic_search_& ms)
           : emptiness_check_result(ms.automaton()), ms_(ms)
         {
         }
@@ -366,7 +366,7 @@ namespace spot
           return 0;
         }
       private:
-        magic_search& ms_;
+        magic_search_& ms_;
       };
 
 #     define FROM_STACK "ar:from_stack"
@@ -374,13 +374,13 @@ namespace spot
       class magic_search_result: public emptiness_check_result
       {
       public:
-        magic_search_result(magic_search& m, option_map o = option_map())
+        magic_search_result(magic_search_& m, option_map o = option_map())
           : emptiness_check_result(m.automaton(), o), ms(m)
         {
           if (options()[FROM_STACK])
             computer = new result_from_stack(ms);
           else
-            computer = new ndfs_result<magic_search<heap>, heap>(ms);
+            computer = new ndfs_result<magic_search_<heap>, heap>(ms);
         }
 
         virtual void options_updated(const option_map& old)
@@ -388,7 +388,7 @@ namespace spot
           if (old[FROM_STACK] && !options()[FROM_STACK])
             {
               delete computer;
-              computer = new ndfs_result<magic_search<heap>, heap>(ms);
+              computer = new ndfs_result<magic_search_<heap>, heap>(ms);
             }
           else if (!old[FROM_STACK] && options()[FROM_STACK])
             {
@@ -414,7 +414,7 @@ namespace spot
 
       private:
         emptiness_check_result* computer;
-        magic_search& ms;
+        magic_search_& ms;
       };
     };
 
@@ -575,13 +575,22 @@ namespace spot
 
   emptiness_check* explicit_magic_search(const tgba *a, option_map o)
   {
-    return new magic_search<explicit_magic_search_heap>(a, 0, o);
+    return new magic_search_<explicit_magic_search_heap>(a, 0, o);
   }
 
   emptiness_check* bit_state_hashing_magic_search(const tgba *a, size_t size,
                                                   option_map o)
   {
-    return new magic_search<bsh_magic_search_heap>(a, size, o);
+    return new magic_search_<bsh_magic_search_heap>(a, size, o);
+  }
+
+  emptiness_check*
+  magic_search(const tgba *a, option_map o)
+  {
+    size_t size = o.get("bsh");
+    if (size)
+      return bit_state_hashing_magic_search(a, size, o);
+    return explicit_magic_search(a, o);
   }
 
 }

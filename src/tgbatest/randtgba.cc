@@ -68,30 +68,6 @@ couvreur99_cons(const spot::tgba* a, spot::option_map o)
   return spot::couvreur99(a, o);
 }
 
-spot::emptiness_check*
-ms_cons(const spot::tgba* a, spot::option_map o)
-{
-  return spot::explicit_magic_search(a, o);
-}
-
-spot::emptiness_check*
-se05_cons(const spot::tgba* a, spot::option_map o)
-{
-  return spot::explicit_se05_search(a, o);
-}
-
-spot::emptiness_check*
-bsh_ms_cons(const spot::tgba* a, spot::option_map o)
-{
-  return spot::bit_state_hashing_magic_search(a, 4096, o);
-}
-
-spot::emptiness_check*
-bsh_se05_cons(const spot::tgba* a, spot::option_map o)
-{
-  return spot::bit_state_hashing_se05_search(a, 4096, o);
-}
-
 struct ec_algo
 {
   const char* name;
@@ -117,15 +93,15 @@ ec_algo ec_algos[] =
     { "Cou99_rem_shy",  "poprem shy group",
                         couvreur99_cons,                     0, -1U, true },
     { "CVWY90",         0,
-                        ms_cons,                             0,   1, true },
-    { "CVWY90_bsh",     0,
-                        bsh_ms_cons,                         0,   1, false },
+                        spot::magic_search,                  0,   1, true },
+    { "CVWY90_bsh",     "bsh=4K",
+                        spot::magic_search,                  0,   1, false },
     { "GV04",           0,
                         spot::explicit_gv04_check,           0,   1, true },
     { "SE05",           0,
-                        se05_cons,                           0,   1, true },
-    { "SE05_bsh",       0,
-                        bsh_se05_cons,                       0,   1, false },
+                        spot::se05,                          0,   1, true },
+    { "SE05_bsh",       "bsh=4K",
+                        spot::se05,                          0,   1, false },
     { "Tau03",          0,
                         spot::explicit_tau03_search,         1, -1U, true },
     { "Tau03_opt",      0,
