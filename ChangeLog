@@ -1,3 +1,8 @@
+2005-02-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/tau03opt.hh, src/tgbaalgos/tau03.hh: Include
+	misc/optionmap.hh.
+
 2005-02-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* bench/emptchk/README: Document the file `algorithms'.

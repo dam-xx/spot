@@ -22,6 +22,8 @@
 #ifndef SPOT_TGBAALGOS_TAU03OPT_HH
 # define SPOT_TGBAALGOS_TAU03OPT_HH
 
+#include "misc/optionmap.hh"
+
 namespace spot
 {
   class tgba;
