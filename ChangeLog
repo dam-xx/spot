@@ -1,3 +1,13 @@
+2003-08-20  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* iface/gspn/dcswavefm.test: New file.
+	* iface/gspn/Makefile.am (check_PROGRAMS): Add fmgspn-rg and
+	fmgspn-srg.
+	(fmgspn_rg_SOURCES, fmgspn_rg_CPPFLAGS, fmgspn_rg_LDADD,
+	fmgspn_srg_SOURCES, fmgspn_srg_CPPFLAGS, fmgspn_srg_LDADD):
+	New variables.
+	(TESTS): Add dcswavefm.test.
+
 2003-08-19  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltlast/formula.hh: Make it clear that ref() and unref()

@@ -4,6 +4,7 @@
 #include "tgba/tgbatba.hh"
 #include "tgba/tgbaproduct.hh"
 #include "tgbaalgos/ltl2tgba.hh"
+#include "tgbaalgos/ltl2tgba_fm.hh"
 #include "tgbaalgos/magic.hh"
 
 int
@@ -34,7 +35,11 @@ main(int argc, char **argv)
       spot::gspn_interface gspn(2, argv);
       spot::bdd_dict* dict = new spot::bdd_dict();
 
+#if FM
+      spot::tgba* a_f = spot::ltl_to_tgba_fm(f, dict);
+#else
       spot::tgba* a_f = spot::ltl_to_tgba(f, dict);
+#endif
       spot::ltl::destroy(f);
 
       spot::tgba* model        = new spot::tgba_gspn(dict, env);
