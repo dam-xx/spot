@@ -1,3 +1,7 @@
+2004-01-26  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/defs.in (run): Use libtool --mode=execute.
+
 2004-01-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Merge transitions
