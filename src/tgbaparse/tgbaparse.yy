@@ -46,7 +46,8 @@ tgba: accepting_decl lines | lines;
 
 accepting_decl: ACC_DEF acc_decl ';'
 
-lines:
+/* At least one line.  */
+lines: line
        | lines line
        ;
 

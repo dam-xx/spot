@@ -5,16 +5,16 @@
 
 namespace spot {
   namespace ltl {
-    
+
     /// \brief Formula visitor that can modify the formula.
     ///
-    /// Writing visitors is the prefered way 
+    /// Writing visitors is the prefered way
     /// to traverse a formula, since it doesn't
     /// involve any cast.
     ///
     /// If you do not need to modify the visited formula, inherit from
     /// spot::ltl:const_visitor instead.
-    struct visitor 
+    struct visitor
     {
       virtual void visit(atomic_prop* node) = 0;
       virtual void visit(constant* node) = 0;
@@ -25,13 +25,13 @@ namespace spot {
 
     /// \brief Formula visitor that cannot modify the formula.
     ///
-    /// Writing visitors is the prefered way 
+    /// Writing visitors is the prefered way
     /// to traverse a formula, since it doesn't
     /// involve any cast.
     ///
     /// If you want to modify the visited formula, inherit from
     /// spot::ltl:visitor instead.
-    struct const_visitor 
+    struct const_visitor
     {
       virtual void visit(const atomic_prop* node) = 0;
       virtual void visit(const constant* node) = 0;
