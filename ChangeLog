@@ -1,5 +1,7 @@
 2004-04-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgba/bdddict.hh (bdd_dict::annon_free_list): Hide from Swig.
+
 	* src/tgbaalgo/semptinesscheck.hh (counter_example): New class,
 	extracted from ...
 	(emptiness_check): ... here.

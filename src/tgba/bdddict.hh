@@ -169,6 +169,9 @@ namespace spot
 
     void unregister_variable(vr_map::iterator& cur, const void* me);
 
+    // SWIG does not grok the following definition, no idea why.
+    // It's not important for the Python interface anyway.
+#ifndef SWIG
     class annon_free_list : public spot::free_list
     {
     public:
@@ -180,6 +183,7 @@ namespace spot
     private:
       bdd_dict* dict_;
     };
+#endif
 
     /// List of unused anonymous variable number for each automaton.
     typedef Sgi::hash_map<const void*, annon_free_list,
