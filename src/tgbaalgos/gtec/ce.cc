@@ -25,12 +25,6 @@
 
 namespace spot
 {
-  namespace
-  {
-    typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
-    typedef std::pair<const state*, bdd> state_proposition;
-  }
-
   couvreur99_check_result::couvreur99_check_result
   (const couvreur99_check_status* ecs,
    const explicit_connected_component_factory* eccf)
@@ -89,30 +83,27 @@ namespace spot
     // first SCC, the starting state is the initial state of the
     // automaton.  The destination state is the closest state
     // from the next SCC.  This destination state becomes the
-    // starting state when building a path though the next SCC.
+    // starting state when building a path through the next SCC.
     for (int k = 0; k < comp_size - 1; ++k)
       {
 	// FIFO for the breadth-first search.
 	// (we are looking for the closest state in the next SCC.)
-	std::deque<pair_state_iter> todo;
+	std::deque<const state*> todo;
 
 	// Record the father of each state, while performing the BFS.
-	typedef std::map<const state*, const state*,
+	typedef std::map<const state*, tgba_run::step,
 	                 state_ptr_less_than> father_map;
 	father_map father;
 
 	// Initial state of the BFS.
 	const state* start = run_->prefix.back().s;
-	{
-	  tgba_succ_iterator* i = ecs_->aut->succ_iter(start);
-	  todo.push_back(pair_state_iter(start, i));
-	}
+	todo.push_back(start);
 
 	while (!todo.empty())
 	  {
-	    const state* src = todo.front().first;
-	    tgba_succ_iterator* i = todo.front().second;
+	    const state* src = todo.front();
 	    todo.pop_front();
+	    tgba_succ_iterator* i = ecs_->aut->succ_iter(src);
 
 	    for (i->first(); !i->done(); i->next())
 	      {
@@ -129,26 +120,31 @@ namespace spot
 		      {
 			tgba_run::steps seq;
 
-			/// FIXME: Should compute label and acceptance
-			/// condition.
+			// The condition and acceptance conditions
+			// for the transition leaving H_DEST will
+			// be overwritten later when we know them.
+
 			tgba_run::step s = { h_dest, bddtrue, bddfalse };
 			seq.push_front(s);
-			while (src->compare(start))
+
+			// Now unwind our track until we reach START.
+			tgba_run::step t =
+			  { src,
+			    i->current_condition(),
+			    i->current_acceptance_conditions() };
+			while (t.s->compare(start))
 			  {
-			    /// FIXME: Should compute label and acceptance
-			    /// condition.
-			    tgba_run::step s = { h_dest, bddtrue, bddfalse };
-			    seq.push_front(s);
-			    src = father[src];
+			    seq.push_front(t);
+			    t = father[t.s];
 			  }
+			assert(!run_->prefix.empty());
+			run_->prefix.back() = t;
+
 			// Append SEQ to RUN_->PREFIX.
 			run_->prefix.splice(run_->prefix.end(), seq);
+
 			// Exit this BFS for this SCC.
-			while (!todo.empty())
-			  {
-			    delete todo.front().second;
-			    todo.pop_front();
-			  }
+			todo.clear();
 			break;
 		      }
 		    // Restrict the BFS to state inside the SCC.
@@ -158,9 +154,11 @@ namespace spot
 
 		if (father.find(h_dest) == father.end())
 		  {
-		    todo.push_back
-		      (pair_state_iter(h_dest, ecs_->aut->succ_iter(h_dest)));
-		    father[h_dest] = src;
+		    todo.push_back(h_dest);
+		    tgba_run::step s = { src,
+					 i->current_condition(),
+					 i->current_acceptance_conditions() };
+		    father[h_dest] = s;
 		  }
 	      }
 	    delete i;
@@ -202,22 +200,19 @@ namespace spot
 
     // Records backlinks to parent state during the BFS.
     // (This also stores the propositions of this link.)
-    std::map<const state*, state_proposition, state_ptr_less_than> father;
+    std::map<const state*, tgba_run::step, state_ptr_less_than> father;
 
     // BFS queue.
-    std::deque<pair_state_iter> todo;
+    std::deque<const state*> todo;
 
     // Initial state.
-    {
-      tgba_succ_iterator* i = ecs_->aut->succ_iter(from);
-      todo.push_back(pair_state_iter(from, i));
-    }
+    todo.push_back(from);
 
     while (!todo.empty())
       {
-	const state* src = todo.front().first;
-	tgba_succ_iterator* i = todo.front().second;
+	const state* src = todo.front();
 	todo.pop_front();
+	tgba_succ_iterator* i = ecs_->aut->succ_iter(src);
 	for (i->first(); !i->done(); i->next())
 	  {
 	    const state* dest = i->current_state();
@@ -233,38 +228,31 @@ namespace spot
 	      continue;
 
 	    bdd cond = i->current_condition();
+	    bdd acc = i->current_acceptance_conditions();
+	    tgba_run::step s = { src, cond, acc };
 
 	    // If we have reached our destination, unwind the path
 	    // and populate RUN_->CYCLE.
 	    if (h_dest == to)
 	      {
 		tgba_run::steps p;
-		// FIXME: should compute acceptance condition.
-		tgba_run::step s = { h_dest, cond, bddfalse };
-		p.push_front(s);
-		while (src != from)
+
+		while (s.s != from)
 		  {
-		    const state_proposition& psi = father[src];
-		    // FIXME: should compute acceptance condition.
-		    tgba_run::step s = { src, psi.second, bddfalse };
 		    p.push_front(s);
-		    src = psi.first;
+		    s = father[s.s];
 		  }
+		p.push_front(s);
 		run_->cycle.splice(run_->cycle.end(), p);
 
 		// Exit the BFS, but release all iterators first.
-		while (!todo.empty())
-		  {
-		    delete todo.front().second;
-		    todo.pop_front();
-		  }
+		todo.clear();
 		break;
 	      }
 
 	    // Common case: record backlinks and continue BFS.
-	    todo.push_back(pair_state_iter(h_dest,
-					   ecs_->aut->succ_iter(h_dest)));
-	    father[h_dest] = state_proposition(src, cond);
+	    todo.push_back(h_dest);
+	    father[h_dest] = s;
 	  }
 	delete i;
       }
@@ -315,6 +303,8 @@ namespace spot
 	tgba_run::steps path;
 	// The best path seen so far.
 	tgba_run::steps best_path;
+	// The end state of the base path.
+	const state* best_end;
 	// The acceptance conditions traversed by BEST_PATH.
 	bdd best_acc = bddfalse;
 
@@ -348,8 +338,8 @@ namespace spot
 	      }
 
 	    bdd acc = iter->current_acceptance_conditions() | todo.top().acc;
-	    tgba_run::step st = { h_dest, iter->current_condition(),
-				 iter->current_acceptance_conditions() };
+	    tgba_run::step st = { s, iter->current_condition(),
+				  iter->current_acceptance_conditions() };
 	    path.push_back(st);
 
 	    // Advance iterator for next step.
@@ -403,6 +393,7 @@ namespace spot
 	    // The current path the best one.
 	    best_path = path;
 	    best_acc = acc;
+	    best_end = h_dest;
 
 	  backtrack_path:
 	    // Continue exploration from parent to find better paths.
@@ -420,7 +411,7 @@ namespace spot
 	// Prepare to find another path for the remaining acceptance
 	// conditions.
 	acc_to_traverse -= best_acc;
-	start = run_->cycle.back().s;
+	start = best_end;
       }
 
     // Complete the path so that it goes back to its beginning,

@@ -111,9 +111,22 @@ namespace spot
 	       << bdd_format_formula(a->get_dict(), label)
 	       << " and acc=" << bdd_format_accset(a->get_dict(), acc)
 	       << " leaving state " << serial
-	       << " and going to state "
-	       << a->format_state(next)
-	       << std::endl;
+	       << " for state " << a->format_state(next)
+	       << std::endl
+	       << "The following transitions leave state " << serial
+	       << ":" << std::endl;
+	    for (j->first(); !j->done(); j->next())
+	      {
+		const state* s2 = j->current_state();
+		os << "  * "
+		   << "label=" << bdd_format_formula(a->get_dict(),
+						     j->current_condition())
+		   << " and acc="
+		   << bdd_format_accset(a->get_dict(),
+					j->current_acceptance_conditions())
+		   << " going to " << a->format_state(s2) << std::endl;
+		delete s2;
+	      }
 	    delete j;
 	    return false;
 	  }

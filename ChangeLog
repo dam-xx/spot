@@ -1,3 +1,15 @@
+2004-10-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/ce.cc (couvreur99_check_result::accepting_run,
+	couvreur99_check_result::complete_cycle,
+	couvreur99_check_result::accepting_path): Record conditions and
+	acceptance conditions in the accepting run.  Simplify the
+	todo BFS stack for accepting_run and complete_cycle.
+	* src/tgbatest/ltl2tgba.cc (main): Do use replay_tgba_run
+	now everything works.
+	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Be more verbose
+	when an outgoing transition is not found.
+
 2004-10-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/magic.hh, src/tgbaalgos/magic.cc (magic_search):
