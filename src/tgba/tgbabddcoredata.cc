@@ -5,6 +5,7 @@ namespace spot
   tgba_bdd_core_data::tgba_bdd_core_data()
     : relation(bddtrue),
       accepting_conditions(bddfalse),
+      all_accepting_conditions(bddfalse),
       now_set(bddtrue),
       next_set(bddtrue),
       nownext_set(bddtrue),
@@ -23,6 +24,7 @@ namespace spot
   tgba_bdd_core_data::tgba_bdd_core_data(const tgba_bdd_core_data& copy)
     : relation(copy.relation),
       accepting_conditions(copy.accepting_conditions),
+      all_accepting_conditions(copy.all_accepting_conditions),
       now_set(copy.now_set),
       next_set(copy.next_set),
       nownext_set(copy.nownext_set),
@@ -44,6 +46,8 @@ namespace spot
     : relation(left.relation & right.relation),
       accepting_conditions(left.accepting_conditions
 			   | right.accepting_conditions),
+      all_accepting_conditions(left.all_accepting_conditions
+			       | right.all_accepting_conditions),
       now_set(left.now_set & right.now_set),
       next_set(left.next_set & right.next_set),
       nownext_set(left.nownext_set & right.nownext_set),
@@ -114,6 +118,7 @@ namespace spot
   {
     relation = bdd_replace(relation, rewrite);
     accepting_conditions = bdd_replace(accepting_conditions, rewrite);
+    all_accepting_conditions = bdd_replace(all_accepting_conditions, rewrite);
     now_set = bdd_replace(now_set, rewrite);
     next_set = bdd_replace(next_set, rewrite);
     nownext_set = bdd_replace(nownext_set, rewrite);

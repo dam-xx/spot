@@ -105,6 +105,11 @@ namespace spot
 	// Any state matching the BDD formulae registered is part
 	// of this accepting set.
 	data_.accepting_conditions |= ai->second & acc;
+
+	// Keep track of all accepting conditions, so that we can
+	// easily check whether a transition satisfies all accepting
+	// conditions.
+	data_.all_accepting_conditions |= acc;
       }
 
     // Any constraint between Now variables also exist between Next
