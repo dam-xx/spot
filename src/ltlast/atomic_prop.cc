@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -86,6 +86,19 @@ namespace spot
     atomic_prop::instance_count()
     {
       return instances.size();
+    }
+
+    std::ostream&
+    atomic_prop::dump_instances(std::ostream& os)
+    {
+
+      for (map::iterator i = instances.begin(); i != instances.end(); ++i)
+	{
+	  os << i->second << " = " << i->second->ref_count_()
+	     << " * atomic_prop(" << i->first.first << ", "
+	     << i->first.second->name() << ")" << std::endl;
+	}
+      return os;
     }
 
   }

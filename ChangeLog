@@ -1,5 +1,10 @@
 2004-01-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlast/refformula.hh (ref_formula::ref_count_): New method.
+	* src/ltlast/refformula.cc (ref_formula::ref_count_): New method.
+	* src/ltlast/atomic_prop.hh (atomic_prop::dump_instance): New method.
+	* src/ltlast/atomic_prop.cc (atomic_prop::dump_instance): New method.
+
 	* src/tgbaalgos/ltl2tgba_fm.cc: Typos in comments.
 
 2004-01-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>

@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,6 +23,7 @@
 # define SPOT_LTLAST_ATOMIC_PROP_HH
 
 #include <string>
+#include <iostream>
 #include <map>
 #include "refformula.hh"
 #include "ltlenv/environment.hh"
@@ -50,6 +51,8 @@ namespace spot
 
       /// Number of instantiated atomic propositions.  For debugging.
       static unsigned instance_count();
+      /// List all instances of atomic propositions.  For debugging.
+      static std::ostream& dump_instances(std::ostream& os);
 
     protected:
       atomic_prop(const std::string& name, environment& env);

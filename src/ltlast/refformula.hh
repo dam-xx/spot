@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -37,8 +37,10 @@ namespace spot
       ref_formula();
       void ref_();
       bool unref_();
+      /// Number of references to this formula.
+      unsigned ref_count_();
     private:
-      unsigned ref_count_;
+      unsigned ref_counter_;
     };
 
   }
