@@ -1,3 +1,9 @@
+2005-02-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/randtgba.cc: Factorize more code using the
+	unsigned_statistics interface.
+	* bench/emptchk/README: Adjust description of output.
+
 2005-02-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/sanity/style.test: Strip all strings before checking the

@@ -203,7 +203,7 @@ This directory contains:
   The ltl-*.sh tests output look as follows:
 
   | density: 0.001
-  | Ratios about empt. check (all tests)
+  | Emptiness check ratios
   |                 CVWY90      5.5      4.4      6.3   25
   |             CVWY90_bsh      5.7      4.8      6.3   25
   |                  Cou99      5.5      3.3      4.3   25
@@ -211,21 +211,13 @@ This directory contains:
   | ...
 				(A)      (B)      (C)   (D)
   |
-  | Ratios about search space
-  |                 CVWY90      5.5
-  |                  Cou99      2.0
-  |              Cou99_rem      2.0
-  |          Cou99_rem_shy      1.2
+  | Accepting run ratios
+  |                 CVWY90      5.5      2.6
+  |                  Cou99      2.0      2.6
+  |              Cou99_rem      2.0      2.1
+  |          Cou99_rem_shy      1.2      2.1
   | ...
-				(E)
-  |
-  | Ratios about acc. run computation
-  |                 CVWY90      2.6
-  |             CVWY90_bsh      2.6
-  |                  Cou99      2.1
-  |              Cou99_rem      2.1
-  | ...
-				(F)
+				(E)	 (F)
 
   (A) mean number of distinct states visited
       expressed as a % of the number of state of the product space

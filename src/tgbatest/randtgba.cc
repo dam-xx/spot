@@ -297,13 +297,34 @@ to_float_nonneg(const char* s, const char* arg)
   return res;
 }
 
+// Convertors using for statistics:
+
+template <typename T>
+T
+id(const char*, unsigned x)
+{
+  return static_cast<T>(x);
+}
+
+spot::tgba_statistics prod_stats;
+
+float
+prod_conv(const char* name, unsigned x)
+{
+  float y = static_cast<float>(x);
+  if (!strcmp(name, "transitions"))
+    return y / prod_stats.transitions * 100.0;
+  return y / prod_stats.states * 100.0;
+}
+
+template <typename T, T (*convertor)(const char*, unsigned) = id<T> >
 struct stat_collector
 {
   struct one_stat
   {
-    unsigned min;
-    unsigned max;
-    unsigned tot;
+    T min;
+    T max;
+    T tot;
     unsigned n;
 
     one_stat()
@@ -312,7 +333,7 @@ struct stat_collector
     }
 
     void
-    count(unsigned val)
+    count(T val)
     {
       if (n++)
 	{
@@ -344,13 +365,15 @@ struct stat_collector
       return;
     spot::unsigned_statistics::stats_map::const_iterator i;
     for (i = s->stats.begin(); i != s->stats.end(); ++i)
-      stats[i->first][algorithm].count((s->*i->second)());
+      stats[i->first][algorithm].count(convertor(i->first, (s->*i->second)()));
   }
 
   std::ostream&
   display(std::ostream& os,
-	  const alg_1stat_map& m, const std::string title) const
+	  const alg_1stat_map& m, const std::string title,
+	  bool total = true) const
   {
+    std::ios::fmtflags old = os.flags();
     os << std::setw(22) << "" << " | "
        << std::setw(30) << std::left << title << std::right << "|" << std::endl
        << std::setw(22) << "algorithm"
@@ -358,152 +381,42 @@ struct stat_collector
        << std::endl
        << std::setw(61) << std::setfill('-') << "" << std::setfill(' ')
        << std::endl;
-    for (alg_1stat_map::const_iterator i = m.begin(); i != m.end(); ++i)
-      os << std::setw(22) << i->first << " |"
-	 << std::setw(6) << i->second.min
-	 << " "
-	 << std::setw(8)
-	 << static_cast<float>(i->second.tot) / i->second.n
-	 << " "
-	 << std::setw(6) << i->second.max
-	 << " |"
-	 << std::setw(6) << i->second.tot
-	 << " |"
-	 << std::setw(4) << i->second.n
-	 << std::endl;
+    os << std::right << std::fixed << std::setprecision(1);
+    for (typename alg_1stat_map::const_iterator i = m.begin();
+	 i != m.end(); ++i)
+      {
+	os << std::setw(22) << i->first << " |"
+	   << std::setw(6) << i->second.min
+	   << " "
+	   << std::setw(8)
+	   << static_cast<float>(i->second.tot) / i->second.n
+	   << " "
+	   << std::setw(6) << i->second.max
+	   << " |";
+	if (total)
+	  os << std::setw(6) << i->second.tot;
+	else
+	  os << "      ";
+	os << " |"
+	   << std::setw(4) << i->second.n
+	   << std::endl;
+      }
     os << std::setw(61) << std::setfill('-') << "" << std::setfill(' ')
        << std::endl;
+    os << std::setiosflags(old);
     return os;
   }
 
   std::ostream&
-  display(std::ostream& os) const
+  display(std::ostream& os, bool total = true) const
   {
-    stats_alg_map::const_iterator i;
+    typename stats_alg_map::const_iterator i;
     for (i = stats.begin(); i != stats.end(); ++i)
-      display(os, i->second, i->first);
+      display(os, i->second, i->first, total);
     return os;
   }
 
 
-};
-
-struct ec_ratio_stat
-{
-  float min_states;
-  float max_states;
-  float tot_states;
-  float min_transitions;
-  float max_transitions;
-  float tot_transitions;
-  float min_depth;
-  float max_depth;
-  float tot_depth;
-  int n;
-
-  ec_ratio_stat()
-    : n(0)
-  {
-  }
-
-  void
-  count(const spot::unsigned_statistics* ec, const spot::tgba* a)
-  {
-    spot::tgba_statistics a_size = spot::stats_reachable(a);
-    int s = ec->get("states");
-    int t = ec->get("transitions");
-    int m = ec->get("max. depth");
-    float ms = s / static_cast<float>(a_size.states);
-    float mt = t / static_cast<float>(a_size.transitions);
-    float mm = m / static_cast<float>(a_size.states);
-
-    if (n++)
-      {
-        min_states = std::min(min_states, ms);
-        max_states = std::max(max_states, ms);
-        tot_states += ms;
-        min_transitions = std::min(min_transitions, mt);
-        max_transitions = std::max(max_transitions, mt);
-        tot_transitions += mt;
-        min_depth = std::min(min_depth, mm);
-        max_depth = std::max(max_depth, mm);
-        tot_depth += mm;
-      }
-    else
-      {
-        min_states = max_states = tot_states = ms;
-        min_transitions = max_transitions = tot_transitions = mt;
-        min_depth = max_depth = tot_depth = mm;
-      }
-  }
-};
-
-struct acss_ratio_stat
-{
-  float min_states;
-  float max_states;
-  float tot_states;
-  int n;
-
-  acss_ratio_stat()
-    : n(0)
-  {
-  }
-
-  void
-  count(const spot::acss_statistics* acss, const spot::tgba* a)
-  {
-    spot::tgba_statistics a_size = spot::stats_reachable(a);
-    float ms = acss->acss_states() / static_cast<float>(a_size.states);
-    if (n++)
-      {
-        min_states = std::min(min_states, ms);
-        max_states = std::max(max_states, ms);
-        tot_states += ms;
-      }
-    else
-      {
-        min_states = max_states = tot_states = ms;
-      }
-  }
-};
-
-struct ars_ratio_stat
-{
-  float min_prefix_states;
-  float max_prefix_states;
-  float tot_prefix_states;
-  float min_cycle_states;
-  float max_cycle_states;
-  float tot_cycle_states;
-  int n;
-
-  ars_ratio_stat()
-    : n(0)
-  {
-  }
-
-  void
-  count(const spot::ars_statistics* acss, const spot::tgba* a)
-  {
-    spot::tgba_statistics a_size = spot::stats_reachable(a);
-    float mp = acss->ars_prefix_states() / static_cast<float>(a_size.states);
-    float mc = acss->ars_cycle_states() / static_cast<float>(a_size.states);
-    if (n++)
-      {
-	min_prefix_states = std::min(min_prefix_states, mp);
-	max_prefix_states = std::max(max_prefix_states, mp);
-	tot_prefix_states += mp;
-	min_cycle_states = std::min(min_cycle_states, mc);
-	max_cycle_states = std::max(max_cycle_states, mc);
-	tot_cycle_states += mc;
-      }
-    else
-      {
-	min_prefix_states = max_prefix_states = tot_prefix_states = mp;
-	min_cycle_states = max_cycle_states = tot_cycle_states = mc;
-      }
-  }
 };
 
 struct ar_stat
@@ -548,19 +461,15 @@ struct ar_stat
   }
 };
 
-stat_collector sc_ec;
-stat_collector sc_arc;
+stat_collector<unsigned> sc_ec;
+stat_collector<unsigned> sc_arc;
 
-typedef std::map<std::string, ec_ratio_stat> ec_ratio_stat_type;
+typedef stat_collector<float, prod_conv> ec_ratio_stat_type;
 ec_ratio_stat_type glob_ec_ratio_stats;
 typedef std::map<int, ec_ratio_stat_type > ec_ratio_stats_type;
 ec_ratio_stats_type ec_ratio_stats;
 
-typedef std::map<std::string, acss_ratio_stat> acss_ratio_stats_type;
-acss_ratio_stats_type acss_ratio_stats;
-
-typedef std::map<std::string, ars_ratio_stat> ars_ratio_stats_type;
-ars_ratio_stats_type ars_ratio_stats;
+ec_ratio_stat_type arc_ratio_stats;
 
 typedef std::map<std::string, ar_stat> ar_stats_type;
 ar_stats_type ar_stats;		// Statistics about accepting runs.
@@ -568,280 +477,70 @@ ar_stats_type mar_stats;        // ... about minimized accepting runs.
 
 
 void
-print_ar_stats(ar_stats_type& ar_stats, const std::string s,
-	       bool opt_paper = false)
+print_ar_stats(ar_stats_type& ar_stats, const std::string s)
 {
   std::ios::fmtflags old = std::cout.flags();
-  if (!opt_paper)
-    {
-      std::cout << std::endl << s << std::endl;
-      std::cout << std::right << std::fixed << std::setprecision(1);
+  std::cout << std::endl << s << std::endl;
+  std::cout << std::right << std::fixed << std::setprecision(1);
 
-      std::cout << std::setw(22) << ""
-                << " |         prefix        |         cycle         |"
-                << std::endl
-                << std::setw(22) << "algorithm"
-                << " |   min   < mean  < max |   min   < mean  < max |   n"
-                << std::endl
-                << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-                << std::endl;
-      for (ar_stats_type::const_iterator i = ar_stats.begin();
+  std::cout << std::setw(22) << ""
+            << " |         prefix        |         cycle         |"
+            << std::endl
+            << std::setw(22) << "algorithm"
+            << " |   min   < mean  < max |   min   < mean  < max |   n"
+            << std::endl
+            << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+            << std::endl;
+  for (ar_stats_type::const_iterator i = ar_stats.begin();
 	   i != ar_stats.end(); ++i)
-        std::cout << std::setw(22) << i->first << " |"
-                  << std::setw(6) << i->second.min_prefix
-                  << " "
-                  << std::setw(8)
-                  << static_cast<float>(i->second.tot_prefix) / i->second.n
-                  << " "
-                  << std::setw(6) << i->second.max_prefix
-                  << " |"
-                  << std::setw(6) << i->second.min_cycle
-                  << " "
-                  << std::setw(8)
-                  << static_cast<float>(i->second.tot_cycle) / i->second.n
-                  << " "
-                  << std::setw(6) << i->second.max_cycle
-                  << " |"
-                  << std::setw(4) << i->second.n
-                  << std::endl;
-      std::cout << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-                << std::endl
-                << std::setw(22) << ""
-                << " |          runs         |         total         |"
-                << std::endl <<
+    std::cout << std::setw(22) << i->first << " |"
+              << std::setw(6) << i->second.min_prefix
+              << " "
+              << std::setw(8)
+              << static_cast<float>(i->second.tot_prefix) / i->second.n
+              << " "
+              << std::setw(6) << i->second.max_prefix
+              << " |"
+              << std::setw(6) << i->second.min_cycle
+              << " "
+              << std::setw(8)
+              << static_cast<float>(i->second.tot_cycle) / i->second.n
+              << " "
+              << std::setw(6) << i->second.max_cycle
+              << " |"
+              << std::setw(4) << i->second.n
+              << std::endl;
+  std::cout << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+            << std::endl
+            << std::setw(22) << ""
+            << " |          runs         |         total         |"
+            << std::endl <<
 	std::setw(22) << "algorithm"
-                << " |   min   < mean  < max |  pre.   cyc.     runs |   n"
-                << std::endl
-                << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-                << std::endl;
-      for (ar_stats_type::const_iterator i = ar_stats.begin();
+            << " |   min   < mean  < max |  pre.   cyc.     runs |   n"
+            << std::endl
+            << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+            << std::endl;
+  for (ar_stats_type::const_iterator i = ar_stats.begin();
 	   i != ar_stats.end(); ++i)
-        std::cout << std::setw(22) << i->first << " |"
-                  << std::setw(6)
-                  << i->second.min_run
-                  << " "
-                  << std::setw(8)
-                  << static_cast<float>(i->second.tot_prefix
-                                        + i->second.tot_cycle) / i->second.n
-                  << " "
-                  << std::setw(6)
-                  << i->second.max_run
-                  << " |"
-                  << std::setw(6) << i->second.tot_prefix
-                  << " "
-                  << std::setw(6) << i->second.tot_cycle
-                  << " "
-                  << std::setw(8) << i->second.tot_prefix + i->second.tot_cycle
-                  << " |"
-                  << std::setw(4) << i->second.n
-                  << std::endl;
-    }
-  std::cout << std::setiosflags(old);
-}
-
-void
-print_ec_ratio_stats(const std::string& s,
-		     const ec_ratio_stat_type& ec_ratio_stats,
-		     bool opt_paper = false)
-{
-  std::ios::fmtflags old = std::cout.flags();
-  if (opt_paper)
-    {
-      std::cout << std::endl;
-      std::cout << "Ratios about empt. check (" << s << ")" << std::endl;
-      std::cout << std::right << std::fixed << std::setprecision(1);
-      for (ec_ratio_stat_type::const_iterator i = ec_ratio_stats.begin();
-	   i != ec_ratio_stats.end(); ++i)
-        std::cout << std::setw(22)  << i->first
-                  << " " << std::setw(8)
-                  << (i->second.tot_states / i->second.n) * 100.
-                  << " " << std::setw(8)
-                  << (static_cast<float>(i->second.tot_transitions) /
-		      i->second.n) * 100.
-                  << " " << std::setw(8)
-                  << (static_cast<float>(i->second.tot_depth) /
-		      i->second.n) * 100.
-                  << " " << std::setw(4)
-                  << i->second.n
-                  << std::endl;
-    }
-  else
-    {
-      std::cout << std::endl;
-      std::cout << std::right << std::fixed << std::setprecision(1);
-      std::cout << "Ratios in case of non-emptiness (" << s << ")"
-                << std::endl;
-      std::cout << "<for all algorithms, the reference size is the one of"
-                << " the generalized automaton>" << std::endl;
-      std::cout << std::setw(22) << ""
-                << " |       % states        |    % transitions      |"
-                << std::endl << std::setw(22) << "algorithm"
-                << " |   min   < mean  < max |   min   < mean  < max |   n"
-                << std::endl
-                << std::setw(79) << std::setfill('-') << ""
-                << std::setfill(' ') << std::endl;
-      for (ec_ratio_stat_type::const_iterator i = ec_ratio_stats.begin();
-	   i != ec_ratio_stats.end(); ++i)
-        std::cout << std::setw(22) << i->first << " |"
-                  << std::setw(6) << i->second.min_states * 100.
-                  << " "
-                  << std::setw(8)
-                  << (i->second.tot_states / i->second.n) * 100.
-                  << " "
-                  << std::setw(6) << i->second.max_states * 100.
-                  << " |"
-                  << std::setw(6) << i->second.min_transitions * 100.
-                  << " "
-                  << std::setw(8)
-                  << (i->second.tot_transitions / i->second.n) * 100.
-                  << " "
-                  << std::setw(6) << i->second.max_transitions * 100.
-                  << " |"
-                  << std::setw(4) << i->second.n
-                  << std::endl;
-      std::cout << std::setw(79) << std::setfill('-') << ""
-                << std::setfill(' ') << std::endl
-                << std::setw(22) << ""
-                << " |   % maximal depth     |"
-                << std::endl
-                << std::setw(22) << "algorithm"
-                << " |   min   < mean  < max |   n"
-                << std::endl
-                << std::setw(53) << std::setfill('-') << ""
-                << std::setfill(' ') << std::endl;
-      for (ec_ratio_stat_type::const_iterator i = ec_ratio_stats.begin();
-	   i != ec_ratio_stats.end(); ++i)
-        std::cout << std::setw(22) << i->first << " |"
-                  << std::setw(6)
-                  << i->second.min_depth * 100.
-                  << " "
-                  << std::setw(8)
-                  << (i->second.tot_depth / i->second.n) * 100.
-                  << " "
-                  << std::setw(6)
-                  << i->second.max_depth * 100.
-                  << " |"
-                  << std::setw(4) << i->second.n
-                  << std::endl;
-    }
-  std::cout << std::setiosflags(old);
-}
-
-void
-print_acss_ratio_stats(const acss_ratio_stats_type& acss_ratio_stats,
-		       bool opt_paper = false)
-{
-  std::ios::fmtflags old = std::cout.flags();
-  if (opt_paper)
-    {
-      std::cout << std::endl;
-      std::cout << "Ratios about search space" << std::endl;
-      std::cout << std::right << std::fixed << std::setprecision(1);
-      for (acss_ratio_stats_type::const_iterator i = acss_ratio_stats.begin();
-	   i != acss_ratio_stats.end(); ++i)
-        std::cout << std::setw(22)  << i->first
-                  << " " << std::setw(8)
-                  << (i->second.tot_states / i->second.n) * 100.
-                  << std::endl;
-    }
-  else
-    {
-      std::cout << std::endl;
-      std::cout << std::right << std::fixed << std::setprecision(1);
-
-      std::cout << "Ratios about accepting cycle search space:"
-		<< std::endl;
-      std::cout << std::setw(22) << ""
-		<< " |            % states           |"
-		<< std::endl << std::setw(22) << "algorithm"
-		<< " |   min   < mean  < max | total |  n"
-		<< std::endl
-		<< std::setw(61) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl;
-      for (acss_ratio_stats_type::const_iterator i = acss_ratio_stats.begin();
-	   i != acss_ratio_stats.end(); ++i)
-	std::cout << std::setw(22) << i->first << " |"
-		  << std::setw(6) << i->second.min_states * 100.
-		  << " "
-		  << std::setw(8)
-		  << (i->second.tot_states / i->second.n) * 100.
-		  << " "
-		  << std::setw(6) << i->second.max_states * 100.
-		  << " |"
-		  << std::setw(6) << i->second.tot_states * 100.
-		  << " |"
-		  << std::setw(4) << i->second.n
-		  << std::endl;
-    }
-  std::cout << std::setiosflags(old);
-}
-
-void
-print_ars_ratio_stats(const ars_ratio_stats_type& ars_ratio_stats,
-		      bool opt_paper = false)
-{
-  std::ios::fmtflags old = std::cout.flags();
-  if (opt_paper)
-    {
-      std::cout << std::endl;
-      std::cout << "Ratios about acc. run computation" << std::endl;
-      std::cout << std::right << std::fixed << std::setprecision(1);
-      for (ars_ratio_stats_type::const_iterator i = ars_ratio_stats.begin();
-	   i != ars_ratio_stats.end(); ++i)
-        std::cout << std::setw(22)  << i->first
-	          << " " << std::setw(8)
-		  << (i->second.tot_cycle_states / i->second.n) * 100.
-                  << std::endl;
-    }
-  else
-    {
-      std::cout << std::endl;
-      std::cout << std::right << std::fixed << std::setprecision(1);
-
-      std::cout << "Ratios about accepting run computation:"
-		<< std::endl;
-      std::cout << std::setw(22) << ""
-		<< " |%(non unique) states for prefix|"
-		<< std::endl << std::setw(22) << "algorithm"
-		<< " |   min   < mean  < max | total |  n"
-		<< std::endl
-		<< std::setw(61) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl;
-      for (ars_ratio_stats_type::const_iterator i = ars_ratio_stats.begin();
-	   i != ars_ratio_stats.end(); ++i)
-	std::cout << std::setw(22) << i->first << " |"
-		  << std::setw(6) << i->second.min_prefix_states * 100.
-		  << " " << std::setw(8)
-		  << (i->second.tot_prefix_states / i->second.n) * 100.
-		  << " " << std::setw(6)
-                  << i->second.max_prefix_states * 100.
-		  << " |"
-		  << std::setw(6) << i->second.tot_prefix_states * 100.
-		  << " |"
-		  << std::setw(4) << i->second.n
-		  << std::endl;
-      std::cout << std::setw(22) << ""
-		<< " |% (non unique) states for cycle|"
-		<< std::endl << std::setw(22) << "algorithm"
-		<< " |   min   < mean  < max | total |  n"
-		<< std::endl
-		<< std::setw(61) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl;
-      for (ars_ratio_stats_type::const_iterator i = ars_ratio_stats.begin();
-	   i != ars_ratio_stats.end(); ++i)
-	std::cout << std::setw(22) << i->first << " |"
-		  << std::setw(6) << i->second.min_cycle_states * 100.
-		  << " "
-		  << std::setw(8)
-		  << (i->second.tot_cycle_states / i->second.n) * 100.
-		  << " "
-		  << std::setw(6) << i->second.max_cycle_states * 100.
-		  << " |"
-		  << std::setw(6) << i->second.tot_cycle_states * 100.
-		  << " |"
-		  << std::setw(4) << i->second.n
-		  << std::endl;
-    }
+    std::cout << std::setw(22) << i->first << " |"
+              << std::setw(6)
+              << i->second.min_run
+              << " "
+              << std::setw(8)
+              << static_cast<float>(i->second.tot_prefix
+                                    + i->second.tot_cycle) / i->second.n
+              << " "
+              << std::setw(6)
+              << i->second.max_run
+              << " |"
+              << std::setw(6) << i->second.tot_prefix
+              << " "
+              << std::setw(6) << i->second.tot_cycle
+              << " "
+              << std::setw(8) << i->second.tot_prefix + i->second.tot_cycle
+              << " |"
+              << std::setw(4) << i->second.n
+              << std::endl;
   std::cout << std::setiosflags(old);
 }
 
@@ -953,6 +652,7 @@ main(int argc, char** argv)
       else if (!strcmp(argv[argn], "-1"))
 	{
 	  opt_paper = true;
+	  opt_z = true;
 	}
       else if (!strcmp(argv[argn], "-a"))
 	{
@@ -968,7 +668,6 @@ main(int argc, char** argv)
               std::cerr << "Failed to parse " << argv[argn] << std::endl;
               exit(2);
             }
-
         }
       else if (!strcmp(argv[argn], "-d"))
 	{
@@ -1255,15 +954,26 @@ main(int argc, char** argv)
 		    }
 		  tm_ec.stop(algo);
 		  const spot::unsigned_statistics* ecs = ec->statistics();
+		  if (opt_z && res)
+		    {
+		      // Notice that ratios are computed w.r.t. the
+		      // generalized automaton a.
+		      prod_stats = spot::stats_reachable(a);
+		    }
+		  else
+		    {
+		      // To trigger a division by 0 if used erroneously.
+		      prod_stats.states = 0;
+		      prod_stats.transitions = 0;
+		    }
+
 		  if (opt_z && ecs)
 		    {
 		      sc_ec.count(algo, ecs);
 		      if (res)
 			{
-			  // Notice that ratios are computed w.r.t. the
-			  // generalized automaton a.
-			  ec_ratio_stats[real_n_acc][algo].count(ecs, a);
-			  glob_ec_ratio_stats[algo].count(ecs, a);
+			  ec_ratio_stats[real_n_acc].count(algo, ecs);
+			  glob_ec_ratio_stats.count(algo, ecs);
 			}
 		    }
 		  if (res)
@@ -1271,33 +981,23 @@ main(int argc, char** argv)
 		      if (!opt_paper)
 			std::cout << "acc. run";
 		      ++n_non_empty;
-		      const spot::acss_statistics* acss =
-			dynamic_cast<const spot::acss_statistics*>
-			  (res->statistics());
-		      if (opt_z && acss)
-			{
-			  sc_arc.count(algo, acss);
-			  acss_ratio_stats[algo].count(acss, a);
-			}
 		      if (opt_replay)
 			{
 			  spot::tgba_run* run;
-
-			  const spot::ars_statistics* ars =
-			    dynamic_cast<const spot::ars_statistics*>
-			      (res->statistics());
-
+			  bool done = false;
 			  tm_ar.start(algo);
 			  for (int count = opt_R;;)
 			    {
 			      run = res->accepting_run();
-			      if (opt_z && ars)
+			      if (opt_z && !done)
 				{
 				  // Count only the first run (the other way
 				  // would be to divide the stats by opt_R).
-				  sc_arc.count(algo, ars);
-				  ars_ratio_stats[algo].count(ars, a);
-				  ars = 0;
+				  done = true;
+				  const spot::unsigned_statistics* s
+				    = res->statistics();
+				  sc_arc.count(algo, s);
+				  arc_ratio_stats.count(algo, s);
 				}
 			      if (count-- <= 0 || !run)
 				break;
@@ -1425,7 +1125,7 @@ main(int argc, char** argv)
     }
   while (opt_F || opt_i);
 
-  if (!opt_paper)
+  if (!opt_paper && opt_z)
     {
       if (!sc_ec.empty())
 	{
@@ -1441,36 +1141,33 @@ main(int argc, char** argv)
 		    << std::endl;
 	  sc_arc.display(std::cout);
 	}
-    }
-
-  if (!glob_ec_ratio_stats.empty())
-    {
-      print_ec_ratio_stats("all tests", glob_ec_ratio_stats, opt_paper);
-      if (ec_ratio_stats.size() > 1)
-        for (ec_ratio_stats_type::const_iterator i = ec_ratio_stats.begin();
-	     i != ec_ratio_stats.end(); ++i)
-          {
-            std::ostringstream s;
-            s << "tests with " << i->first << " acceptance conditions";
-            print_ec_ratio_stats(s.str(), i->second, opt_paper);
-          }
-    }
-
-  if (!acss_ratio_stats.empty())
-    print_acss_ratio_stats(acss_ratio_stats, opt_paper);
-
-  if (!ars_ratio_stats.empty())
-    print_ars_ratio_stats(ars_ratio_stats, opt_paper);
-
-  if (!ar_stats.empty())
-    print_ar_stats(ar_stats, "Statistics about accepting runs:", opt_paper);
-
-  if (!mar_stats.empty())
-    print_ar_stats(mar_stats, "Statistics about reduced accepting runs:",
-		   opt_paper);
-
-  if (!opt_paper && opt_z)
-    {
+      if (!glob_ec_ratio_stats.empty())
+	{
+	  std::cout << std::endl
+		    << "Emptiness check ratios for non-empty automata:"
+		    << std::endl << "all tests"
+		    << std::endl;
+	  glob_ec_ratio_stats.display(std::cout, false);
+	  if (ec_ratio_stats.size() > 1)
+	    for (ec_ratio_stats_type::const_iterator i = ec_ratio_stats.begin();
+		 i != ec_ratio_stats.end(); ++i)
+	      {
+		std::cout << "tests with " << i->first
+			  << " acceptance conditions"
+			  << std::endl;
+		i->second.display(std::cout, false);
+	      }
+	}
+      if (!ar_stats.empty())
+	print_ar_stats(ar_stats, "Statistics about accepting runs:");
+      if (!mar_stats.empty())
+	print_ar_stats(mar_stats, "Statistics about reduced accepting runs:");
+      if (!arc_ratio_stats.empty())
+	{
+	  std::cout << std::endl
+		    << "Accepting run ratios:" << std::endl;
+	  arc_ratio_stats.display(std::cout, false);
+	}
       if (!tm_ec.empty())
 	{
 	  std::cout << std::endl
@@ -1483,6 +1180,79 @@ main(int argc, char** argv)
 		    << "accepting runs cumulated timings:" << std::endl;
 	  tm_ar.print(std::cout);
 	}
+    }
+  else if (opt_paper)
+    {
+      std::cout << "Emptiness check ratios" << std::endl;
+      std::cout << std::right << std::fixed << std::setprecision(1);
+      ec_ratio_stat_type::stats_alg_map& stats = glob_ec_ratio_stats.stats;
+      typedef ec_ratio_stat_type::alg_1stat_map::const_iterator ec_iter;
+
+      for (unsigned i = 0; i < sizeof(ec_algos) / sizeof(*ec_algos); ++i)
+	{
+	  const char* algo = ec_algos[i].name;
+
+	  int n = -1;
+
+	  std::cout << std::setw(22)  << algo << " " << std::setw(8);
+
+	  ec_iter i = stats["states"].find(algo);
+	  if (i != stats["states"].end())
+	    {
+	      std::cout << i->second.tot / i->second.n;
+	      n = i->second.n;
+	    }
+	  else
+	    std::cout << "";
+	  std::cout << " " << std::setw(8);
+
+	  i = stats["transitions"].find(algo);
+	  if (i != stats["transitions"].end())
+	    {
+	      std::cout << i->second.tot / i->second.n;
+	      n = i->second.n;
+	    }
+	  else
+	    std::cout << "";
+	  std::cout << " " << std::setw(8);
+
+	  i = stats["max. depth"].find(algo);
+	  if (i != stats["max. depth"].end())
+	    {
+	      std::cout << i->second.tot / i->second.n;
+	      n = i->second.n;
+	    }
+	  else
+	    std::cout << "";
+	  if (n >= 0)
+	    std::cout << " " << std::setw(8) << n;
+	  std::cout << std::endl;
+	}
+
+      std::cout << std::endl << "Accepting run ratios" << std::endl;
+      std::cout << std::right << std::fixed << std::setprecision(1);
+      ec_ratio_stat_type::stats_alg_map& stats2 = arc_ratio_stats.stats;
+
+      for (unsigned i = 0; i < sizeof(ec_algos) / sizeof(*ec_algos); ++i)
+	{
+	  const char* algo = ec_algos[i].name;
+
+	  std::cout << std::setw(22)  << algo << " " << std::setw(8);
+
+	  ec_iter i = stats2["search space states"].find(algo);
+	  if (i != stats2["search space states"].end())
+	    std::cout << i->second.tot / i->second.n;
+	  else
+	    std::cout << "";
+	  std::cout << " " << std::setw(8);
+
+	  i = stats2["(non unique) states for cycle"].find(algo);
+	  if (i != stats2["(non unique) states for cycle"].end())
+	    std::cout << i->second.tot / i->second.n;
+	  else
+	    std::cout << "";
+	  std::cout << std::endl;
+      }
     }
 
   if (!failed_seeds.empty())
