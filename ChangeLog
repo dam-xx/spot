@@ -1,5 +1,7 @@
 2003-06-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/ltlparse/ltlparse.yy (result): Suppress unused definition.
+
 	* src/Makefile.am (SUBDIRS): Build `ltltest' after `.'.
 
 	* src/ltlparse/ltlscan.ll: Use ltlyy as %prefix.

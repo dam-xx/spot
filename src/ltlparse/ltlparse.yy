@@ -4,8 +4,6 @@
 #include "ltlast/allnodes.hh"
 #include "ltlvisit/destroy.hh"
 
-extern spot::ltl::formula* result;
-
 %}
 
 %parse-param {spot::ltl::parse_error_list &error_list}
@@ -27,7 +25,7 @@ extern spot::ltl::formula* result;
 #include "parsedecl.hh"
 using namespace spot::ltl;
 
-/* Ugly hack so that Bison use ltlyylex, not yylex.  
+/* Ugly hack so that Bison uses ltlyylex, not yylex.
    (%name-prefix doesn't work for the lalr1.cc skeleton
    at the time of writing.)  */
 #define yylex ltlyylex
