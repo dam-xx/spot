@@ -1,5 +1,21 @@
 2003-06-05  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* configure.ac: Output src/tgbaparse/Makefile.
+	* src/Makefile.am (SUBDIRS): Add tgbaparse.
+	(libspot_la_LDADD): Add tgbaparse/libtgbaparse.la.
+	* src/tgba/tgbaexplicit.cc (tgba_explicit::get_condition,
+	tgba_explicit::get_promise, tgba_explicit::add_neg_condition,
+	tgba_explicit::add_neg_promise): New methods.
+	* src/tgba/tgbaexplicit.hh: Declare them.
+	* src/tgbaparse/Makefile.am, src/tgbaparse/fmterror.cc,
+	src/tgbaparse/parsedecl.hh, src/tgbaparse/public.hh,
+	src/tgbaparse/tgbaparse.yy, src/tgbaparse/tgbascan.ll,
+	src/tgbatest/tgbaread.cc, src/tgbatest/tgbaread.test: New files.
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Add tgbaread.
+	(TESTS): Add tgbaread.cc.
+	(CLEANFILES): Add input.
+	(tgbaread_SOURCES): New variable.
+
 	* src/ltlparse/ltlparse.yy: Typo in comment.
 
 	* configure.ac: Output src/tgbatest/Makefile and src/tgbatest/defs.
@@ -7,7 +23,7 @@
 	* src/tgba/tgbaexplicit.hh, src/tgba/tgbaexplicit.cc: New file.
 	* src/tgba/Makefile.am (libtgba_la_SOURCES): Add tgbaexplicit.cc
 	and tgbaexplicit.hh.
-	* src/tgbatest/Makefile.am, src/tgbatest/defs.in, 
+	* src/tgbatest/Makefile.am, src/tgbatest/defs.in,
 	src/tgbatest/explicit.cc, src/tgbatest/explicit.test: New files.
 
 2003-06-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>

@@ -36,7 +36,6 @@ main(int argc, char** argv)
   spot::ltl::formula* f = spot::ltl::parse(argv[formula_index],
 					   pel, env, debug);
 
-  spot::ltl::parse_error_list::iterator it;
   exit_code =
     spot::ltl::format_parse_errors(std::cerr, argv[formula_index], pel);
 

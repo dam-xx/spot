@@ -4,3 +4,4 @@ Makefile.in
 defs
 explicit
 .libs
+tgbaread

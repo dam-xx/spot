@@ -122,7 +122,7 @@ namespace spot
     return t;
   }
 
-  void tgba_explicit::add_condition(transition* t, ltl::formula* f)
+  int tgba_explicit::get_condition(ltl::formula* f)
   {
     assert(dynamic_cast<ltl::atomic_prop*>(f));
     tgba_bdd_dict::fv_map::iterator i = dict_.var_map.find(f);
@@ -137,10 +137,20 @@ namespace spot
       {
 	v = i->second;
       }
-    t->condition &= ithvar(v);
+    return v;
   }
 
-  void tgba_explicit::add_promise(transition* t, ltl::formula* f)
+  void tgba_explicit::add_condition(transition* t, ltl::formula* f)
+  {
+    t->condition &= ithvar(get_condition(f));
+  }
+
+  void tgba_explicit::add_neg_condition(transition* t, ltl::formula* f)
+  {
+    t->condition &= ! ithvar(get_condition(f));
+  }
+
+  int tgba_explicit::get_promise(ltl::formula* f)
   {
     tgba_bdd_dict::fv_map::iterator i = dict_.prom_map.find(f);
     int v;
@@ -154,7 +164,17 @@ namespace spot
       {
 	v = i->second;
       }
-    t->promise &= ithvar(v);
+    return v;
+  }
+
+  void tgba_explicit::add_promise(transition* t, ltl::formula* f)
+  {
+    t->promise &= ithvar(get_promise(f));
+  }
+
+  void tgba_explicit::add_neg_promise(transition* t, ltl::formula* f)
+  {
+    t->promise &= ! ithvar(get_promise(f));
   }
 
   state* 

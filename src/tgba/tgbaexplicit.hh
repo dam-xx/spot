@@ -32,7 +32,9 @@ namespace spot
     create_transition(const std::string& source, const std::string& dest);
 
     void add_condition(transition* t, ltl::formula* f);
+    void add_neg_condition(transition* t, ltl::formula* f);
     void add_promise(transition* t, ltl::formula* f);
+    void add_neg_promise(transition* t, ltl::formula* f);
 
     // tgba interface
     virtual ~tgba_explicit();
@@ -44,6 +46,9 @@ namespace spot
 
   protected:
     state* add_state(const std::string& name);
+    int get_condition(ltl::formula* f);
+    int get_promise(ltl::formula* f);
+
     typedef std::map<const std::string, tgba_explicit::state*> ns_map;
     typedef std::map<const tgba_explicit::state*, std::string> sn_map;
     ns_map name_state_map_;

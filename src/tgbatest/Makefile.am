@@ -4,13 +4,16 @@ LDADD = ../libspot.la
 check_SCRIPTS = defs
 # Keep this sorted alphabetically.
 check_PROGRAMS = \
-  explicit
+  explicit \
+  tgbaread
 
 explicit_SOURCES = explicit.cc
+tgbaread_SOURCES = tgbaread.cc
 
 TESTS = \
-  explicit.test
+  explicit.test \
+  tgbaread.test
 
 EXTRA_DIST = $(TESTS)
 
-CLEANFILES = stdout expected
+CLEANFILES = inpu stdout expected
