@@ -10,7 +10,7 @@ namespace spot
 
     /// \brief A laxist environment.
     ///
-    /// The environment recognize all atomic propositions.
+    /// This environment recognizes all atomic propositions.
     ///
     /// This is a singleton.  Use default_environment::instance()
     /// to obtain the instance.
