@@ -1,3 +1,28 @@
+2004-08-23  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/tgbaalgos/tarjan_on_fly.hh,
+	src/tgbaalgos/tarjan_on_fly.cc,
+	src/tgbaalgos/nesteddfs.hh,
+	src/tgbaalgos/nesteddfs.cc,
+	src/tgbaalgos/minimalce.hh,
+	src/tgbaalgos/minimalce.cc,
+	src/tgbaalgos/colordfs.hh,
+	src/tgbaalgos/colordfs.cc: four new algorithms for emptyness check.
+
+	src/tgbaalgos/gtec/ce.hh,
+	src/tgbaalgos/gtec/ce.cc: Adapt the counter exemple for the ce
+	object in minimalce.hh.
+
+	src/tgbatest/ltl2tgba.cc,
+	src/tgbatest/emptchk.test,
+	src/tgbaalgos/Makefile.am: Add files for emptyness-check.
+
+2004-08-23  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/tgbaalgos/reductgba_sim_del.cc: Restrict to degeneralize automata.
+	* src/tgba/tgbareduc.hh: src/tgba/tgbareduc.cc: Merge transition
+	for scc reduce.
+
 2004-08-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac, NEWS: Bump version to 0.0y.

@@ -123,6 +123,8 @@ namespace spot
       this->compute_scc();
     this->prune_acc();
     this->delete_scc();
+
+    this->merge_transitions();
   }
 
   std::string
@@ -424,6 +426,12 @@ namespace spot
 
   }
 
+  void
+  tgba_reduc::merge_state_delayed(const spot::state*,
+				  const spot::state*)
+  {
+  }
+
   /////////////////////////////////////////
   /////////////////////////////////////////
 
@@ -580,8 +588,6 @@ namespace spot
   void
   tgba_reduc::remove_acc(const spot::state* s)
   {
-    //std::cout << "remove_acc" << std::endl;
-
     tgba_explicit::state* s1;
     seen_map::iterator sm = si_.find(s);
     sm = si_.find(s);
@@ -624,7 +630,6 @@ namespace spot
   tgba_reduc::is_not_accepting(const spot::state* s,
 			       int n)
   {
-    //std::cout << "is not accepting" << std::endl;
     bool b = false;
 
     // First call of is_terminal //
@@ -726,8 +731,6 @@ namespace spot
   bool
   tgba_reduc::is_terminal(const spot::state* s, int n)
   {
-    // FIXME
-
     // a SCC is terminal if there are no transition
     // leaving the SCC AND she doesn't contain all
     // the acceptance condition.

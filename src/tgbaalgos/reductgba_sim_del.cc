@@ -58,8 +58,6 @@ namespace spot
     lead_2_acc_all_ = false;
 
     seen_ = false;
-    //seen_ = new bool(false);
-    //bool_v[nb_node++] = seen_;
   }
 
   spoiler_node_delayed::~spoiler_node_delayed()
@@ -73,8 +71,6 @@ namespace spot
   {
     // We take the max of the progress measure of the successor node
     // because we are on a spoiler.
-
-    //std::cout << "spoiler_node_delayed::set_win" << std::endl;
 
     if (lnode_succ->size() == 0)
       progress_measure_ = nb_spoiler_loose_ + 1;
@@ -125,7 +121,6 @@ namespace spot
   bool
   spoiler_node_delayed::compare(spoiler_node* n)
   {
-    //std::cout << "spoiler_node_delayed::compare" << std::endl;
     return (this->spoiler_node::compare(n) &&
 	    (acceptance_condition_visited_ ==
 	     dynamic_cast<spoiler_node_delayed*>(n)->
@@ -183,7 +178,6 @@ namespace spot
   bool
   spoiler_node_delayed::get_lead_2_acc_all()
   {
-    //std::cout << "spoiler_node_delayed::get_lead_2_acc_all" << std::endl;
     return lead_2_acc_all_;
   }
 
@@ -191,7 +185,6 @@ namespace spot
   bool
   spoiler_node_delayed::set_lead_2_acc_all(bdd acc)
   {
-    //std::cout << "spoiler_node_delayed::set_lead_2_acc_all" << std::endl;
     if (!seen_)
       {
 	seen_ = true;
@@ -201,7 +194,6 @@ namespace spot
       }
     else
       {
-	//seen_ = true;
 	if (acc == all_acc_cond)
 	  lead_2_acc_all_ = true;
       }
@@ -225,9 +217,6 @@ namespace spot
     lead_2_acc_all_ = false;
 
     seen_ = false;
-    //seen_ = new bool(false);
-    //bool_v[nb_node++] = seen_;
-
   }
 
   duplicator_node_delayed::~duplicator_node_delayed()
@@ -240,8 +229,6 @@ namespace spot
     // We take the min of the progress measure of the successor node
     // because we are on a duplicator.
 
-    //std::cout << "duplicator_node_delayed::set_win" << std::endl;
-
     if (lnode_succ->size() == 0)
       progress_measure_ = nb_spoiler_loose_ + 1;
 
@@ -251,11 +238,14 @@ namespace spot
     bool change;
     int tmpmin = 0;
     int tmp = 0;
+    int tmpminwin = -1;
     sn_v::iterator i = lnode_succ->begin();
     if (i != lnode_succ->end())
       {
 	tmpmin =
 	  dynamic_cast<spoiler_node_delayed*>(*i)->get_progress_measure();
+	if (dynamic_cast<spoiler_node_delayed*>(*i)->get_lead_2_acc_all())
+	  tmpminwin = tmpmin;
 	++i;
       }
     for (; i != lnode_succ->end(); ++i)
@@ -263,7 +253,12 @@ namespace spot
 	tmp = dynamic_cast<spoiler_node_delayed*>(*i)->get_progress_measure();
 	if (tmp < tmpmin)
 	  tmpmin = tmp;
+	if (dynamic_cast<spoiler_node_delayed*>(*i)->get_lead_2_acc_all() &&
+	    (tmp > tmpminwin))
+	  tmpminwin = tmp;
       }
+    if (tmpminwin != -1)
+      tmpmin = tmpminwin;
 
     change = (progress_measure_ < tmpmin);
     progress_measure_ = tmpmin;
@@ -280,7 +275,14 @@ namespace spot
        << " [shape=box, label=\"("
        << a->format_state(sc_->first)
        << ", "
-       << a->format_state(sc_->second);
+       << a->format_state(sc_->second)
+       << ", ";
+    if (label_ == bddfalse)
+      os << "0";
+    else if (label_ == bddtrue)
+      os << "1";
+    else
+      bdd_print_acc(os, a->get_dict(), label_);
     //<< ", ";
     //bdd_print_acc(os, a->get_dict(), acc_);
     os << ")"
@@ -315,14 +317,12 @@ namespace spot
   bool
   duplicator_node_delayed::get_lead_2_acc_all()
   {
-    //std::cout << "duplicator_node_delayed::get_lead_2_acc_all" << std::endl;
     return lead_2_acc_all_;
   }
 
   bool
   duplicator_node_delayed::set_lead_2_acc_all(bdd acc)
   {
-    //std::cout << "duplicator_node_delayed::set_lead_2_acc_all" << std::endl;
     acc |= acc_;
     if (!seen_)
       {
@@ -397,20 +397,14 @@ namespace spot
   build_recurse_successor_spoiler(spoiler_node* sn,
 				  std::ostringstream& os)
   {
-    //std::cout << os.str() << "build_recurse_successor_spoiler : begin"
-    //<< std::endl;
-
     // FIXME
     if (sn == 0)
       return;
 
     tgba_succ_iterator* si = automata_->succ_iter(sn->get_spoiler_node());
 
-    //int i = 0;
     for (si->first(); !si->done(); si->next())
       {
-	//std::cout << "transition " << i++ << std::endl;
-
 	bdd btmp = si->current_acceptance_conditions() |
 	  dynamic_cast<spoiler_node_delayed*>(sn)->
 	  get_acceptance_condition_visited();
@@ -445,9 +439,6 @@ namespace spot
       }
 
     delete si;
-
-    //std::cout << os.str() << "build_recurse_successor_spoiler : end"
-    //<< std::endl;
   }
 
   void
@@ -456,43 +447,15 @@ namespace spot
 				     spoiler_node* ,
 				     std::ostringstream& os)
   {
-    /*
-    std::cout << os.str() << "build_recurse_successor_duplicator : begin"
-	      << std::endl;
-    */
-
     tgba_succ_iterator* si = automata_->succ_iter(dn->get_duplicator_node());
 
     for (si->first(); !si->done(); si->next())
       {
 
-	/*
-	  std::cout << automata_->format_state(dn->get_spoiler_node())
-	  << std::endl;
-	  std::cout << automata_->format_state(dn->get_duplicator_node())
-	  << std::endl;
-	*/
-
-	/*
-	bdd_print_acc(std::cout,
-		      automata_->get_dict(),
-		      si->current_condition());
-	std::cout << " // ";
-	bdd_print_acc(std::cout,
-		      automata_->get_dict(),
-		      dn->get_label());
-	std::cout << " // ";
-	bdd_print_acc(std::cout,
-		      automata_->get_dict(),
-		      si->current_condition() | !dn->get_label());
-	std::cout << std::endl;
-	*/
-
 	// if si->current_condition() doesn't implies dn->get_label()
 	// then duplicator can't play.
 	if ((si->current_condition() | !dn->get_label()) != bddtrue)
 	  {
-	    //std::cout << "doesn't implies" << std::endl;
 	    continue;
 	  }
 
@@ -528,11 +491,6 @@ namespace spot
       }
 
     delete si;
-
-    /*
-    std::cout << os.str() << "build_recurse_successor_duplicator : end"
-	      << std::endl;
-    */
   }
 
   duplicator_node_delayed*
@@ -600,41 +558,45 @@ namespace spot
   void
   parity_game_graph_delayed::lift()
   {
-    // TEST of the hash_map of node
-    /*
-    for (Sgi::vector<duplicator_node*>::iterator i
-	   = duplicator_vertice_.begin();
-	 i != duplicator_vertice_.end(); ++i)
-      seen_node_[*i] = 1;
-
-    for (Sgi::vector<spoiler_node*>::iterator i
-	   = spoiler_vertice_.begin();
-	 i != spoiler_vertice_.end(); ++i)
-      seen_node_[*i] = 1;
-    */
-    //
-
-
     // Before the lift we compute each vertices
     // to know if he belong to a all accepting cycle
     // of the graph.
-    /* FIXME
+
     if (this->nb_set_acc_cond() > 1)
-      for (Sgi::vector<duplicator_node*>::iterator i
-	     = duplicator_vertice_.begin();
-	   i != duplicator_vertice_.end(); ++i)
-	{
-	  for (Sgi::vector<duplicator_node*>::iterator i2
-		 = duplicator_vertice_.begin();
-	       i2 != duplicator_vertice_.end(); ++i2)
-	    dynamic_cast<duplicator_node_delayed*>(*i2)->seen_ = false;
-	  for (Sgi::vector<spoiler_node*>::iterator i3
-		 = spoiler_vertice_.begin();
-	       i3 != spoiler_vertice_.end(); ++i3)
-	    dynamic_cast<spoiler_node_delayed*>(*i3)->seen_ = false;
-	  dynamic_cast<duplicator_node_delayed*>(*i)->set_lead_2_acc_all();
-	}
-    */
+      {
+	for (Sgi::vector<duplicator_node*>::iterator i
+	       = duplicator_vertice_.begin();
+	     i != duplicator_vertice_.end(); ++i)
+	  {
+	    /*
+	    for (Sgi::vector<duplicator_node*>::iterator i2
+		   = duplicator_vertice_.begin();
+		 i2 != duplicator_vertice_.end(); ++i2)
+	      dynamic_cast<duplicator_node_delayed*>(*i2)->seen_ = false;
+	    for (Sgi::vector<spoiler_node*>::iterator i3
+		   = spoiler_vertice_.begin();
+		 i3 != spoiler_vertice_.end(); ++i3)
+	      dynamic_cast<spoiler_node_delayed*>(*i3)->seen_ = false;
+	    */
+	    dynamic_cast<duplicator_node_delayed*>(*i)->set_lead_2_acc_all();
+	  }
+	for (Sgi::vector<spoiler_node*>::iterator i
+	       = spoiler_vertice_.begin();
+	     i != spoiler_vertice_.end(); ++i)
+	  {
+	    /*
+	    for (Sgi::vector<duplicator_node*>::iterator i2
+		   = duplicator_vertice_.begin();
+		 i2 != duplicator_vertice_.end(); ++i2)
+	      dynamic_cast<duplicator_node_delayed*>(*i2)->seen_ = false;
+	    for (Sgi::vector<spoiler_node*>::iterator i3
+		   = spoiler_vertice_.begin();
+		 i3 != spoiler_vertice_.end(); ++i3)
+	      dynamic_cast<spoiler_node_delayed*>(*i3)->seen_ = false;
+	    */
+	    dynamic_cast<spoiler_node_delayed*>(*i)->set_lead_2_acc_all();
+	  }
+      }
 
     // Jurdzinski's algorithm
     //int iter = 0;
@@ -667,12 +629,17 @@ namespace spot
     state_couple* p = 0;
     seen_map::iterator j;
 
+    if (this->nb_set_acc_cond() > 1)
+      return rel;
+
     for (Sgi::vector<spoiler_node*>::iterator i
 	   = spoiler_vertice_.begin();
 	 i != spoiler_vertice_.end(); ++i)
       {
-	if (dynamic_cast<spoiler_node_delayed*>(*i)->get_progress_measure()
-	     < nb_spoiler_loose_ + 1)
+	if ((dynamic_cast<spoiler_node_delayed*>(*i)->get_progress_measure()
+	     < nb_spoiler_loose_ + 1) &&
+	    (dynamic_cast<spoiler_node_delayed*>(*i)
+	     ->get_acceptance_condition_visited() == bddfalse))
 	  {
 	    p = new state_couple((*i)->get_spoiler_node(),
 				 (*i)->get_duplicator_node());
@@ -702,18 +669,8 @@ namespace spot
     : parity_game_graph(a)
   {
     nb_spoiler_loose_ = 0;
-
-    /* FIXME
-       if (this->nb_set_acc_cond() > 1)
-       return;
-    */
-
-    //std::cout << "build couple" << std::endl;
     this->build_graph();
-    //std::cout << "lift begin : " << nb_spoiler_loose_ << std::endl;
     this->lift();
-    //std::cout << "lift end : " << nb_spoiler_loose_ << std::endl;
-    //std::cout << "END" << std::endl;
   }
 
   ///////////////////////////////////////////

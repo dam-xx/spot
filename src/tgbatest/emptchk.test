@@ -27,6 +27,13 @@ set -e
 
 expect_ce()
 {
+  run 0 ./ltl2tgba -ms -f "$1"
+  run 0 ./ltl2tgba -m -f "$1"
+  run 0 ./ltl2tgba -ndfs -f "$1"
+  #run 0 ./ltl2tgba -ndfs2 -f "$1"
+  run 0 ./ltl2tgba -tj -f "$1"
+  run 0 ./ltl2tgba -c -f "$1"
+
   run 0 ./ltl2tgba -e "$1"
   run 0 ./ltl2tgba -e -D "$1"
   run 0 ./ltl2tgba -e -f "$1"
@@ -35,12 +42,19 @@ expect_ce()
   run 0 ./ltl2tgba -e2 -D "$1"
   run 0 ./ltl2tgba -e2 -f "$1"
   run 0 ./ltl2tgba -e2 -f -D "$1"
-  run 0 ./ltl2tgba -m "$1"
-  run 0 ./ltl2tgba -m -f "$1"
+  run 0 ./ltl2tgba -mold "$1"
+  run 0 ./ltl2tgba -mold -f "$1"
 }
 
 expect_no()
 {
+  run 0 ./ltl2tgba -Ms -f "$1"
+  run 0 ./ltl2tgba -M -f "$1"
+  run 0 ./ltl2tgba -Ndfs -f "$1"
+  run 0 ./ltl2tgba -Ndfs2 -f "$1"
+  run 0 ./ltl2tgba -TJ -f "$1"
+  run 0 ./ltl2tgba -C -f "$1"
+
   run 0 ./ltl2tgba -E "$1"
   run 0 ./ltl2tgba -E -D "$1"
   run 0 ./ltl2tgba -E -f "$1"
@@ -52,6 +66,9 @@ expect_no()
   run 0 ./ltl2tgba -M "$1"
   run 0 ./ltl2tgba -M -f "$1"
 }
+
+#expect_no '!((FF a) <=> (F a))'
+#expect_ce 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
 
 expect_ce 'a'
 expect_ce 'a U b'

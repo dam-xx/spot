@@ -117,6 +117,12 @@ namespace spot
     void merge_state(const spot::state* s1,
 		     const spot::state* s2);
 
+    /// Redirect all transition leading to s1 to s2.
+    /// Note that we can do the reverse because
+    /// s1 and s2 belong to a co-simulate relation.
+    void merge_state_delayed(const spot::state* s1,
+			     const spot::state* s2);
+
     /// Remove all the scc which are terminal and doesn't
     /// contains all the acceptance conditions.
     void delete_scc();
