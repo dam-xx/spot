@@ -1,5 +1,8 @@
 2004-01-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::check): Typos
+	in comment.
+
 	* m4/gspnlib.m4 (AX_CHECK_GSPNLIB): Do not warn about a missing
 	library for eesrg.  Define the WITH_GSPN_EESRG conditional.
 	* iface/gspn/Makefile.am (gspn_HEADERS, check_PROGRAMS): Add the

@@ -117,7 +117,7 @@ namespace spot
   {
     // We use five main data in this algorithm:
     // * emptiness_check::root, a stack of strongly connected components (SCC),
-    // * emptiness_check::h, a hash of all visited node, with their order,
+    // * emptiness_check::h, a hash of all visited nodes, with their order,
     //   (it is called "Hash" in Couvreur's paper)
     // * arc, a stack of acceptance conditions between each of these SCC,
     std::stack<bdd> arc;
