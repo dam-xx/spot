@@ -1,3 +1,8 @@
+2003-07-17  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* iface/gspn/gspn.cc (EVENT_TRUE): Override temporarily..
+	(tgba_gspn::succ_iter): Fix usage of cube.
+
 2003-07-16  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* m4/gspnlib.m4: New file.

@@ -5,6 +5,11 @@
 #include "gspn.hh"
 #include "ltlvisit/destroy.hh"
 
+// FIXME: Override signed definition of EVENT_TRUE until this is fixed 
+// in gspnlib.h.
+#undef EVENT_TRUE
+#define EVENT_TRUE 0U
+
 namespace spot
 {
 
@@ -304,15 +309,18 @@ namespace spot
 
     // Build the BDD of the conditions available on this state.
     unsigned char* cube = 0;
-    int res = satisfy(s->get_state(),
-		      data_->all_indexes, &cube, data_->index_count);
+    // This is temporary. We ought to ask only what we need.
+    AtomicProp* want = data_->all_indexes;
+    size_t count = data_->index_count;
+    int res = satisfy(s->get_state(), want, &cube, count);
     if (res)
       throw gspn_exeption("satisfy()", res);
     assert(cube);
     bdd state_conds = bddtrue;
-    for (size_t i = 0; i < data_->index_count; ++i)
+    for (size_t i = 0; i < count; ++i)
       {
-	state_conds &= data_->index_to_bdd(cube[i]);
+	bdd v = data_->index_to_bdd(want[i]);
+	state_conds &= cube[i] ? v : !v;
       }
     satisfy_free(cube);
 
