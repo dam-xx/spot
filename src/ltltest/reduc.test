@@ -23,30 +23,37 @@
 
 # Check for the reduc visitor.
 
-. ./defs || exit 1
+#. ./defs || exit 1
 
 set -e
 
-FICH=${1-$srcdir/formules.ltl}
+#FICH=${1-$srcdir/formules.ltl}
+FICH=${1-formules.ltl}
 
 #####################################
 
-rm -f result.data
-
-cat $FICH |
-while read f; do
-  if [ -n "$f" ] && [ "$f" != "####" ]; then
-    ./reduc "$f" >> result.data
-  fi
-done
-
-test $? == 0 || exit 1
-
+for opt in 0 1 2 3
+  do
+  rm -f result.data
+  
+  cat $FICH |
+  while read f; do
+      if [ -n "$f" ] && [ "$f" != "####" ]; then
+	  ./reduc $opt "$f" >> result.data
+      fi
+  done
+  
+  test $? == 0 || exit 1
+  
 #####################################
-
-perl -ne 'BEGIN { $sum1 = 0; $sum2 = 0; }
+  
+  perl -ne 'BEGIN { $sum1 = 0; $sum2 = 0; }
 /^(\d+)\s+(\d+)/;
 $sum1 += $1;
 $sum2 += $2;
-END { print $sum2 * 100 / $sum1; print "\n"; }
+END { print 100 - ($sum2 * 100 / $sum1); print "\n"; }
 ' < result.data
+  
+done
+
+#####################################

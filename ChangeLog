@@ -1,3 +1,13 @@
+2004-05-13  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/ltlvisit/Makefile.am: Copyright 2004.
+	* src/ltltest/inf.test: More test.
+	* src/ltlvisit/basereduc.cc, src/ltlvisit/forminf.cc (spot):
+	Use dynamic_cast.
+	* src/ltlvisit/reducform.cc, src/ltlvisit/reducform.hh,
+	src/ltltest/reduc.test, src/ltltest/reduc.cc: Add an option
+	to choose which rules applies to simplify the formula.
+
 2004-05-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltltest/reduc.test: Typo.

@@ -32,19 +32,13 @@ namespace spot
   namespace ltl
   {
 
-
-    //class unabbreviate_FG_visitor::unabbreviate_logic_visitor()
-
     class reduce_form_visitor : public visitor
     {
     public:
 
-      reduce_form_visitor()
+      reduce_form_visitor(option o)
       {
-	/*
-	  eventuality_ = false;
-	  universality_ = false;
-	*/
+	this->o = o;
       }
 
       virtual ~reduce_form_visitor()
@@ -56,20 +50,6 @@ namespace spot
       {
 	return result_;
       }
-
-      /*
-	bool
-	is_eventuality()
-	{
-	return eventuality_;
-	}
-
-	bool
-	is_universality()
-	{
-	return universality_;
-	}
-      */
 
       void
       visit(atomic_prop* ap)
@@ -111,14 +91,14 @@ namespace spot
 
 	  case unop::F:
 	    /* if f is class of eventuality then F(f)=f */
-	    if (!is_eventual(result_)) {
+	    if (!is_eventual(result_) || (o == Inf)) {
 	      result_ = unop::instance(unop::F, result_);
 	    }
 	    return;
 
 	  case unop::G:
 	    /* if f is class of universality then G(f)=f */
-	    if (!is_universal(result_)) {
+	    if (!is_universal(result_) || (o == Inf)) {
 	      result_ = unop::instance(unop::G, result_);
 	    }
 	    return;
@@ -134,86 +114,85 @@ namespace spot
 
 	/* if b is of class eventuality then a U b = b
 	   if b is of class universality then a R b = b */
-	if ( ( is_eventual(f2) && ( (bo->op()) == binop::U )) ||
-	     ( is_universal(f2) && ( (bo->op()) == binop::R )) )
-	  {
-	    result_ = f2;
-	    return;
-	  }
-
+	if (o != Inf) {
+	  if ((is_eventual(f2) && ((bo->op()) == binop::U)) ||
+	      (is_universal(f2) && ((bo->op()) == binop::R)))
+	    {
+	      result_ = f2;
+	      return;
+	    }
+	}
 	/* case of implies */
 	formula* f1 = recurse(bo->first());
-	bool inf = inf_form(f1,f2);
-	bool infinv = inf_form(f2,f1);
-	//binop* ftmp = NULL;
-	bool infnegleft = infneg_form(f2,f1,0);
-	bool infnegright = infneg_form(f2,f1,1);
 
-	switch (bo->op())
-	  {
-	  case binop::Xor:
-	  case binop::Equiv:
-	  case binop::Implies:
-	    result_ = binop::instance(bo->op(), f1, f2);
-	    return;
+	if (o != EventualUniversal) {
+	  bool inf = inf_form(f1,f2);
+	  bool infinv = inf_form(f2,f1);
+	  bool infnegleft = infneg_form(f2,f1,0);
+	  bool infnegright = infneg_form(f2,f1,1);
 
-	  case binop::U:
-	    /* a < b => a U b = b */
-	    if (inf)
-	      {
-		result_ = f2;
-		spot::ltl::destroy(f1);
-		return;
-	      }
-	    /* !b < a => a U b = Fb */
-	    if (infnegleft)
-	      {
-		result_ = unop::instance(unop::F, f2);
-		spot::ltl::destroy(f1);
-		return;
-	      }
-	    /* a < b => a U (b U c) = (b U c) */
-	    if (node_type(f2) == node_type_form_visitor::Binop)
-	      if (((binop*)f2)->op() == binop::U)
-		if (inf_form(f1,((binop*)f2)->first())){
+	  switch (bo->op())
+	    {
+	    case binop::Xor:
+	    case binop::Equiv:
+	    case binop::Implies:
+	      break;;
+
+	    case binop::U:
+	      /* a < b => a U b = b */
+	      if (inf)
+		{
 		  result_ = f2;
 		  spot::ltl::destroy(f1);
 		  return;
 		}
-	    result_ = binop::instance(binop::U,
-				      f1, f2);
-	    return;
+	      /* !b < a => a U b = Fb */
+	      if (infnegleft)
+		{
+		  result_ = unop::instance(unop::F, f2);
+		  spot::ltl::destroy(f1);
+		  return;
+		}
+	      /* a < b => a U (b U c) = (b U c) */
+	      if (node_type(f2) == node_type_form_visitor::Binop)
+		if (dynamic_cast<binop*>(f2)->op() == binop::U)
+		  if (inf_form(f1,dynamic_cast<binop*>(f2)->first()))
+		    {
+		      result_ = f2;
+		      spot::ltl::destroy(f1);
+		      return;
+		    }
+	      break;
 
-	  case binop::R:
-	    /* b < a => a R b = b */
-	    if (infinv)
-	      {
-		result_ = f2;
-		spot::ltl::destroy(f1);
-		return;
-	      }
-	    /* b < !a => a R b = Gb */
-	    if (infnegright)
-	      {
-		result_ = unop::instance(unop::G, f2);
-		spot::ltl::destroy(f1);
-		return;
-	      }
-	    /* b < a => a R (b R c) = b R c */
-	    if (node_type(f2) == node_type_form_visitor::Binop)
-	      if (((binop*)f2)->op() == binop::R)
-		if (inf_form(((binop*)f2)->first(),f1)){
+	    case binop::R:
+	      /* b < a => a R b = b */
+	      if (infinv)
+		{
 		  result_ = f2;
 		  spot::ltl::destroy(f1);
 		  return;
 		}
+	      /* b < !a => a R b = Gb */
+	      if (infnegright)
+		{
+		  result_ = unop::instance(unop::G, f2);
+		  spot::ltl::destroy(f1);
+		  return;
+		}
+	      /* b < a => a R (b R c) = b R c */
+	      if (node_type(f2) == node_type_form_visitor::Binop)
+		if (dynamic_cast<binop*>(f2)->op() == binop::R)
+		  if (inf_form(dynamic_cast<binop*>(f2)->first(),f1))
+		    {
+		      result_ = f2;
+		      spot::ltl::destroy(f1);
+		      return;
+		    }
+	      break;
 
-	    result_ = binop::instance(binop::R,
-				      f1, f2);
-	    return;
-	  }
-	/* Unreachable code.  */
-	assert(0);
+	    }
+	}
+	result_ = binop::instance(bo->op(), f1, f2);
       }
 
       void
@@ -229,109 +208,86 @@ namespace spot
 	for (unsigned i = 0; i < mos; ++i)
 	  res->push_back(recurse(mo->nth(i)));
 
-      	switch (mo->op())
-	  {
+	if (o != EventualUniversal){
+	  switch (mo->op())
+	    {
 
-	  case multop::Or:
-	    index = indextmp = res->begin();
-	    if (index != res->end())
-	      {
-		f1 = *index;
-		index++;
-	      }
-	    for (; index != res->end();index++)
-	      {
-		f2 = *index;
-		/* a < b => a + b = b */
-		if (inf_form(f1,f2)) // f1 < f2
-		  {
-		    f1 = f2;
-		    spot::ltl::destroy(*indextmp);
-		    res->erase(indextmp);
-		    indextmp = index;
-		    index--;
-		  }
-		else if (inf_form(f2,f1)) // f2 < f1
-		  {
-		    spot::ltl::destroy(*index);
-		    res->erase(index);
-		    index--;
-		  }
-	      }
-	    break;
-
-	  case multop::And:
-	    index = indextmp = res->begin();
-	    if (mos)
-	      {
-		f1 = mo->nth(0);
-		index++;
-	      }
-	    for (; index != res->end(); index++)
-	      {
-		f2 = *index;
-		/* a < b => a & b = a */
-		if (inf_form(f1,f2)) // f1 < f2
-		  {
-		    spot::ltl::destroy(*index);
-		    res->erase(index);
-		    index--;
-		  }
-		else if (inf_form(f2,f1)) // f2 < f1
-		  {
-		    f1 = f2;
-		    spot::ltl::destroy(*indextmp);
-		    res->erase(indextmp);
-		    indextmp = index;
-		    index--;
-		  }
-	      }
-	    break;
-	  }
-
-	/* f1 < !f2 => f1 & f2 = false
-	   !f1 < f2 => f1 | f2 = true */
-
-	for (index = res->begin(); index != res->end(); index++){
-	  for (indextmp = res->begin(); indextmp != res->end(); indextmp++){
-	    if (index != indextmp){
-	      if (infneg_form(*index,*indextmp, (mo->op() == multop::Or) ? 0 : 1)) {
-		for (multop::vec::iterator j = res->begin(); j != res->end(); j++){
-		  spot::ltl::destroy(*j);
+	    case multop::Or:
+	      index = indextmp = res->begin();
+	      if (index != res->end())
+		{
+		  f1 = *index;
+		  index++;
 		}
-		if (mo->op() == multop::Or)
-		  result_ = constant::true_instance();
-		else
-		  result_ = constant::false_instance();
-		return;
-	      }
+	      for (; index != res->end();index++)
+		{
+		  f2 = *index;
+		  /* a < b => a + b = b */
+		  if (inf_form(f1,f2)) // f1 < f2
+		    {
+		      f1 = f2;
+		      spot::ltl::destroy(*indextmp);
+		      res->erase(indextmp);
+		      indextmp = index;
+		      index--;
+		    }
+		  else if (inf_form(f2,f1)) // f2 < f1
+		    {
+		      spot::ltl::destroy(*index);
+		      res->erase(index);
+		      index--;
+		    }
+		}
+	      break;
 
-	      /*
-	      if ((constant*)(*index) != NULL)
-		if (((((constant*)(*index))->val() == constant::True) &&
-		     (mo->op() == multop::Or)) ||
-		    (((((constant*)(*index))->val() == constant::False))
-		     && (mo->op() == multop::And))
-		    ) {
-		  //std::cout << "constant" << std::endl;
-		  for (multop::vec::iterator j = res->begin(); j != res->end(); j++){
+	    case multop::And:
+	      index = indextmp = res->begin();
+	      if (mos)
+		{
+		  f1 = mo->nth(0);
+		  index++;
+		}
+	      for (; index != res->end(); index++)
+		{
+		  f2 = *index;
+		  /* a < b => a & b = a */
+		  if (inf_form(f1,f2)) // f1 < f2
+		    {
+		      spot::ltl::destroy(*index);
+		      res->erase(index);
+		      index--;
+		    }
+		  else if (inf_form(f2,f1)) // f2 < f1
+		    {
+		      f1 = f2;
+		      spot::ltl::destroy(*indextmp);
+		      res->erase(indextmp);
+		      indextmp = index;
+		      index--;
+		    }
+		}
+	      break;
+	    }
+
+	  /* f1 < !f2 => f1 & f2 = false
+	     !f1 < f2 => f1 | f2 = true */
+	  for (index = res->begin(); index != res->end(); index++) {
+	    for (indextmp = res->begin(); indextmp != res->end(); indextmp++) {
+	      if (index != indextmp){
+		if (infneg_form(*index,*indextmp, (mo->op() == multop::Or) ? 0 : 1)) {
+		  for (multop::vec::iterator j = res->begin(); j != res->end(); j++) {
 		    spot::ltl::destroy(*j);
 		  }
 		  if (mo->op() == multop::Or)
 		    result_ = constant::true_instance();
 		  else
 		    result_ = constant::false_instance();
-
-		  std::cout << "2" << std::endl;
-		  spot::ltl::dump(std::cout,mo);
 		  return;
 		}
-	      */
-
+	      }
 	    }
 	  }
 	}
-
 	if (res->size()) {
 	  result_ = multop::instance(mo->op(),res);
 	  return;
@@ -342,36 +298,41 @@ namespace spot
       formula*
       recurse(formula* f)
       {
-	return reduce_form(f);
+	return reduce_form(f,o);
       }
 
     protected:
       formula* result_;
-      /*
-	bool eventuality_;
-	bool universality_;
-      */
+      option o;
     };
 
     formula*
-    reduce_form(const formula* f)
+    reduce_form(const formula* f, option o)
     {
-      spot::ltl::formula* ftmp1;
-      spot::ltl::formula* ftmp2;
-      reduce_form_visitor v;
+      spot::ltl::formula* ftmp1 = NULL;
+      spot::ltl::formula* ftmp2 = NULL;
+      reduce_form_visitor v(o);
 
-      ftmp1 = spot::ltl::basic_reduce_form(f);
-      const_cast<formula*>(ftmp1)->accept(v);
-      ftmp2 = spot::ltl::basic_reduce_form(v.result());
+      if (o == BRI) {
+	ftmp1 = spot::ltl::basic_reduce_form(f);
+	const_cast<formula*>(ftmp1)->accept(v);
+	ftmp2 = spot::ltl::basic_reduce_form(v.result());
+	spot::ltl::destroy(ftmp1);
+	spot::ltl::destroy(v.result());
 
-      spot::ltl::destroy(ftmp1);
-      spot::ltl::destroy(v.result());
+	return ftmp2;
+      }
+      else {
+	const_cast<formula*>(f)->accept(v);
+	return v.result();
+      }
 
-      return ftmp2;
+      /* unreachable code */
+      assert(0);
     }
 
     formula*
-    reduce(const formula* f)
+    reduce(const formula* f, option o)
     {
       spot::ltl::formula* ftmp1;
       spot::ltl::formula* ftmp2;
@@ -379,14 +340,27 @@ namespace spot
 
       ftmp1 = spot::ltl::unabbreviate_logic(f);
       ftmp2 = spot::ltl::negative_normal_form(ftmp1);
-      ftmp3 = spot::ltl::reduce_form(ftmp2);
 
+      switch (o) {
+      case Base:
+	ftmp3 = spot::ltl::basic_reduce_form(ftmp2);
+	break;
+      case Inf:
+	ftmp3 = spot::ltl::reduce_form(ftmp2,o);
+	break;
+      case EventualUniversal:
+	ftmp3 = spot::ltl::reduce_form(ftmp2,o);
+	break;
+      case BRI:
+	ftmp3 = spot::ltl::reduce_form(ftmp2);
+	break;
+      default:
+	assert(0);
+      }
       spot::ltl::destroy(ftmp1);
       spot::ltl::destroy(ftmp2);
 
       return ftmp3;
-
     }
-
   }
 }

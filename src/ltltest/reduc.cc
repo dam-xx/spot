@@ -34,30 +34,45 @@
 void
 syntax(char* prog)
 {
-  std::cerr << prog << " formula1 (formula2)?" << std::endl;
+  std::cerr << prog << " option formula1 (formula2)?" << std::endl;
   exit(2);
 }
-
-typedef spot::ltl::formula*  ptrfunct(const spot::ltl::formula*);
 
 int
 main(int argc, char** argv)
 {
-  if (argc < 2)
+  if (argc < 3)
     syntax(argv[0]);
 
+  spot::ltl::option o;
+  switch(atoi(argv[1])){
+  case 0:
+    o = spot::ltl::Base;
+    break;
+  case 1:
+    o = spot::ltl::Inf;
+    break;
+  case 2:
+    o = spot::ltl::EventualUniversal;
+    break;
+  case 3:
+    o = spot::ltl::BRI;
+    break;
+  default: return 2;
+  }
+
   spot::ltl::parse_error_list p1;
-  spot::ltl::formula* f1 = spot::ltl::parse(argv[1], p1);
+  spot::ltl::formula* f1 = spot::ltl::parse(argv[2], p1);
   spot::ltl::formula* f2 = NULL;
 
-  if (spot::ltl::format_parse_errors(std::cerr, argv[1], p1))
+  if (spot::ltl::format_parse_errors(std::cerr, argv[2], p1))
     return 2;
 
 
-  if (argc == 3){
+  if (argc == 4){
     spot::ltl::parse_error_list p2;
-    f2 = spot::ltl::parse(argv[2], p2);
-    if (spot::ltl::format_parse_errors(std::cerr, argv[2], p2))
+    f2 = spot::ltl::parse(argv[3], p2);
+    if (spot::ltl::format_parse_errors(std::cerr, argv[3], p2))
       return 2;
   }
 
@@ -78,7 +93,7 @@ main(int argc, char** argv)
   std::string f1s_before = spot::ltl::to_string(f1);
 
   ftmp1 = f1;
-  f1 = spot::ltl::reduce(f1);
+  f1 = spot::ltl::reduce(f1,o);
   ftmp2 = f1;
   f1 = spot::ltl::unabbreviate_logic(f1);
   spot::ltl::destroy(ftmp1);
@@ -133,13 +148,6 @@ main(int argc, char** argv)
   else{
     if (length_f1_after < length_f1_before) exit_code = 0;
   }
-
-  /*
-  spot::ltl::dump(std::cout, f1); std::cout << std::endl;
-  if (f2 != NULL)
-    spot::ltl::dump(std::cout, f2); std::cout << std::endl;
-  */
-
 
   spot::ltl::destroy(f1);
   if (f2 != NULL)

@@ -35,10 +35,10 @@ namespace spot
     bool
     is_GF(const formula* f)
     {
-      if ((const unop*)f != NULL)
-	if (((const unop*)f)->op() == unop::G)
-	  if ((const unop*)(((const unop*)f)->child()) != NULL)
-	    if (((const unop*)((const unop*)f)->child())->op() == unop::F)
+      if (node_type(f) == node_type_form_visitor::Unop)
+	if (dynamic_cast<const unop*>(f)->op() == unop::G)
+	  if (node_type(((const unop*)f)->child()) == node_type_form_visitor::Unop)
+	    if (dynamic_cast<const unop*>(dynamic_cast<const unop*>(f)->child())->op() == unop::F)
 	      return true;
       return false;
     }
@@ -46,23 +46,13 @@ namespace spot
     bool
     is_FG(const formula* f)
     {
-      if ((const unop*)f != NULL)
-	if (((const unop*)f)->op() == unop::F)
-	  if ((const unop*)(((const unop*)f)->child()) != NULL)
-	    if (((const unop*)((const unop*)f)->child())->op() == unop::G)
+      if (node_type(f) == node_type_form_visitor::Unop)
+	if (dynamic_cast<const unop*>(f)->op() == unop::F)
+	  if (node_type(((const unop*)f)->child()) == node_type_form_visitor::Unop)
+	    if (dynamic_cast<const unop*>(dynamic_cast<const unop*>(f)->child())->op() == unop::G)
 	      return true;
       return false;
     }
-
-    int
-    nb_term_multop(const formula* f)
-    {
-      if ((const multop*)f == NULL) return -1;
-
-      unsigned mos = ((const multop*)(f))->size();
-      return mos;
-    }
-
 
     node_type_form_visitor::node_type_form_visitor(){}
 
@@ -102,7 +92,7 @@ namespace spot
     node_type_form_visitor::type node_type(const formula* f)
     {
       node_type_form_visitor v;
-      if (f == NULL) std::cout << "f == NULL !!!!!!!!" << std::endl;
+      assert(f != NULL);
       const_cast<formula*>(f)->accept(v);
       return v.result();
     }
@@ -113,7 +103,7 @@ namespace spot
 
       form_eventual_universal_visitor()
       {
-	eventual = false; // faux au départ
+	eventual = false;
 	universal = false;
       }
 
@@ -179,12 +169,12 @@ namespace spot
 	    return;
 	  case binop::U:
 	    if (node_type(f1) == node_type_form_visitor::Const)
-	      if (((const constant*)f1)->val() == constant::True)
+	      if (dynamic_cast<const constant*>(f1)->val() == constant::True)
 		eventual = true;
 	    return;
 	  case binop::R:
-	    if (node_type(f1) != node_type_form_visitor::Const)
-	      if (((const constant*)f1)->val() == constant::False)
+	    if (node_type(f1) == node_type_form_visitor::Const)
+	      if (dynamic_cast<const constant*>(f1)->val() == constant::False)
 		universal = true;
 	    return;
 	  }
@@ -201,13 +191,13 @@ namespace spot
 	eventual = true;
 	universal = true;
 	for (unsigned i = 0; i < mos; ++i){
-	  if ( !(recurse_ev(mo->nth(i))) ){
+	  if (!(recurse_ev(mo->nth(i)))){
 	    eventual = false;
 	    break;
 	  }
 	}
 	for (unsigned i = 0; i < mos; ++i){
-	  if ( !(recurse_un(mo->nth(i))) ){
+	  if (!(recurse_un(mo->nth(i)))){
 	    universal = false;
 	    break;
 	  }
@@ -259,25 +249,13 @@ namespace spot
       inf_form_right_recurse_visitor(const formula *f)
       {
 	this->f = f;
-	result_ = false; // faux au départ
+	result_ = false;
       }
 
       virtual ~inf_form_right_recurse_visitor()
       {
       }
-      /*
-      bool special_case(const formula* f2,binop::operator op)
-      {
-	const binop* b = (const binop*)f;
-	const binop* b2 = (const binop*)f2;
-	if ((b != NULL) && (b2 != NULL) &&
-	    (b->op() == b2_>op() == op))
-	  if (inf_form(b2->first(),b->first())
-	      && inf_form(b2->second(),b->second()) )
-	    return true;
-	return false;
-      }
-      */
+
       int
       result() const
       {
@@ -287,7 +265,7 @@ namespace spot
       void
       visit(const atomic_prop* ap)
       {
-	if ((const atomic_prop*)f == ap)
+	if (dynamic_cast<const atomic_prop*>(f) == ap)
 	  result_ = true;
       }
 
@@ -312,18 +290,24 @@ namespace spot
 	const formula* tmp = NULL;
 	switch (uo->op())
 	  {
-	  case unop::Not:// à gérer !!
+	  case unop::Not:
+	    if (uo == f)
+	      result_ = true;
 	    return;
-	  case unop::X:// à gérer !!
+	  case unop::X:
+	    if (node_type(f) == node_type_form_visitor::Unop)
+	      if (dynamic_cast<const unop*>(f)->op() == unop::X) {
+		result_ = inf_form(dynamic_cast<const unop*>(f)->child(),f1);
+	      }
 	    return;
 	  case unop::F:
-	    // F(a) = true U a
+	    /* F(a) = true U a */
 	    result_ = inf_form(f,f1);
 	    return;
 	  case unop::G:
-	    // G(a) = false R a
+	    /* G(a) = false R a */
 	    tmp = constant::false_instance();
-	    if ( inf_form(f,tmp) )
+	    if (inf_form(f,tmp))
 	      result_ = true;
 	    spot::ltl::destroy(tmp);
 	    return;
@@ -344,11 +328,11 @@ namespace spot
 	  case binop::Implies:
 	    return;
 	  case binop::U:
-	    if ( (inf_form(f,f2)) )
+	    if ((inf_form(f,f2)))
 	      result_ = true;
 	    return;
 	  case binop::R:
-	    if ( (inf_form(f,f1)) && (inf_form(f,f2)) )
+	    if ((inf_form(f,f1)) && (inf_form(f,f2)))
 	      result_ = true;
 	    return;
 	  }
@@ -366,13 +350,13 @@ namespace spot
 	  {
 	  case multop::And:
 	    for (unsigned i = 0; (i < mos) ; ++i)
-	      if ( !(inf_form(f,mo->nth(i))) )
+	      if (!(inf_form(f,mo->nth(i))))
 		return;
 	    result_ = true;
 	    break;
 	  case multop::Or:
 	    for (unsigned i = 0; i < mos && !result_; ++i)
-	      if ( (inf_form(f,mo->nth(i))) )
+	      if ((inf_form(f,mo->nth(i))))
 		result_ = true;
 	    break;
 	  }
@@ -388,7 +372,7 @@ namespace spot
       }
 
     protected:
-      bool result_; // true si f < f1, false sinon.
+      bool result_; /* true if f < f1, false otherwise. */
       const formula* f;
     };
 
@@ -412,11 +396,20 @@ namespace spot
       {
 	if ((node_type(f) == node_type_form_visitor::Binop)
 	    && (node_type(f2) == node_type_form_visitor::Binop))
-	  if (((const binop*)f)->op() == ((const binop*)f2)->op())
-	    if (inf_form(((const binop*)f2)->first(),((const binop*)f)->first())
-		&& inf_form(((const binop*)f2)->second(),
-			    ((const binop*)f)->second()))
+	  if (dynamic_cast<const binop*>(f)->op() == dynamic_cast<const binop*>(f2)->op())
+	    if (inf_form(dynamic_cast<const binop*>(f2)->first(),dynamic_cast<const binop*>(f)->first())
+		&& inf_form(dynamic_cast<const binop*>(f2)->second(),dynamic_cast<const binop*>(f)->second()))
 	      return true;
+	return false;
+      }
+
+      bool nodeX()
+      {
+	/*
+	  if (node_type(f) == node_type_form_visitor::Unop)
+	  if (dynamic_cast<const unop*>(f)->op() == unop::X)
+	  return true;
+	*/
 	return false;
       }
 
@@ -429,6 +422,7 @@ namespace spot
       void
       visit(const atomic_prop* ap)
       {
+	if (this->nodeX()) return;
 	inf_form_right_recurse_visitor v(ap);
 	const_cast<formula*>(f)->accept(v);
 	result_ = v.result();
@@ -437,6 +431,7 @@ namespace spot
       void
       visit(const constant* c)
       {
+	if (this->nodeX()) return;
 	inf_form_right_recurse_visitor v(c);
 	switch (c->val())
 	  {
@@ -466,32 +461,34 @@ namespace spot
 	    return;
 	  case unop::X:
 	    if (node_type(f) == node_type_form_visitor::Unop)
-	      if (((const unop*)f)->op() == unop::X) {
-		result_ = inf_form(f1,((const unop*)f)->child());
+	      if (dynamic_cast<const unop*>(f)->op() == unop::X) {
+		result_ = inf_form(f1,dynamic_cast<const unop*>(f)->child());
 	      }
 	    return;
 	  case unop::F:
-	    // F(a) = true U a
+	    if (this->nodeX()) return;
+	    /* F(a) = true U a */
 	    tmp = binop::instance(binop::U,constant::true_instance(),clone(f1));
 	    if (this->special_case(tmp)){
 	      result_ = true;
 	      spot::ltl::destroy(tmp);
 	      return;
 	    }
-	    if ( inf_form(tmp,f) )
+	    if (inf_form(tmp,f))
 	      result_ = true;
 	    spot::ltl::destroy(tmp);
 	    return;
 	  case unop::G:
-	    // F(a) = false R a
+	    if (this->nodeX()) return;
+	    /* F(a) = false R a */
 	    tmp = binop::instance(binop::R,
-				  constant::false_instance(), clone(f1));
+				  constant::false_instance(),clone(f1));
 	    if (this->special_case(tmp)){
 	      result_ = true;
 	      spot::ltl::destroy(tmp);
 	      return;
 	    }
-	    if ( inf_form(f1,f) )
+	    if (inf_form(f1,f))
 	      result_ = true;
 	    spot::ltl::destroy(tmp);
 	    return;
@@ -503,6 +500,7 @@ namespace spot
       void
       visit(const binop* bo)
       {
+	if (this->nodeX()) return;
 
 	if (this->special_case(bo))
 	  {
@@ -519,11 +517,11 @@ namespace spot
 	  case binop::Implies:
 	    return;
 	  case binop::U:
-	    if ( (inf_form(f1,f)) && (inf_form(f2,f)) )
+	    if ((inf_form(f1,f)) && (inf_form(f2,f)))
 	      result_ = true;
 	    return;
 	  case binop::R:
-	    if ( (inf_form(f2,f)) )
+	    if ((inf_form(f2,f)))
 	      result_ = true;
 	    return;
 	  }
@@ -534,19 +532,20 @@ namespace spot
       void
       visit(const multop* mo)
       {
-	if (mo == NULL);
+	if (this->nodeX()) return;
+
 	multop::type op = mo->op();
 	unsigned mos = mo->size();
 	switch (op)
 	  {
 	  case multop::And:
 	    for (unsigned i = 0; (i < mos) && !result_ ; ++i)
-	      if ( (inf_form(mo->nth(i),f)) )
+	      if ((inf_form(mo->nth(i),f)))
 		result_ = true;
 	    break;
 	  case multop::Or:
 	    for (unsigned i = 0; i < mos ; ++i)
-	      if ( !(inf_form(mo->nth(i),f)) )
+	      if (!(inf_form(mo->nth(i),f)))
 		return;
 	    result_ = true;
 	    break;
@@ -554,21 +553,21 @@ namespace spot
       }
 
     protected:
-      bool result_; // true if f1 < f, 1 otherwise.
+      bool result_; /* true if f1 < f, 1 otherwise. */
       const formula* f;
     };
 
     bool inf_form(const formula* f1, const formula* f2)
     {
-      // f1 and f2 are unabbreviate
+      /* f1 and f2 are unabbreviate */
       if (f1 == f2) return true;
       inf_form_left_recurse_visitor v1(f2);
       inf_form_right_recurse_visitor v2(f1);
 
-      if ( (node_type(f1) == node_type_form_visitor::Const) &&
-	   (node_type(f2) == node_type_form_visitor::Const) )
-	if ( (((const constant*)f2)->val() == constant::True) ||
-	     (((const constant*)f1)->val() == constant::False) )
+      if ((node_type(f1) == node_type_form_visitor::Const) &&
+	  (node_type(f2) == node_type_form_visitor::Const))
+	if ((dynamic_cast<const constant*>(f2)->val() == constant::True) ||
+	    (dynamic_cast<const constant*>(f1)->val() == constant::False))
 	  {
 	    return true;
 	  }
