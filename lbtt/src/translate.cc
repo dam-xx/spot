@@ -48,6 +48,17 @@ char** command_line_arguments;
 
 /******************************************************************************
  *
+ * Pointer to an object providing operations for translating a formula into an
+ * automaton.
+ *
+ *****************************************************************************/
+
+static TranslatorInterface* translator = 0;
+
+
+
+/******************************************************************************
+ *
  * A function for showing warnings to the user.
  *
  *****************************************************************************/
@@ -61,17 +72,42 @@ void printWarning(const string& msg)
 
 /******************************************************************************
  *
- * Signal handler for debugging purposes.
+ * Handler for SIGINT, SIGQUIT, SIGABRT and SIGTERM.
  *
  *****************************************************************************/
 
-RETSIGTYPE signalHandler(int signal_number)
+static void signalHandler(int signal_number)
 {
-  cerr << string(command_line_arguments[0]) + ": received signal "
-       << signal_number
-       << endl;
-  signal(signal_number, SIG_DFL);
+  if (translator != 0)
+    delete translator;
+  struct sigaction s;
+  s.sa_handler = SIG_DFL;
+  sigemptyset(&s.sa_mask);
+  s.sa_flags = 0;
+  sigaction(signal_number, &s, static_cast<struct sigaction*>(0));
   raise(signal_number);
+}
+
+
+
+/******************************************************************************
+ *
+ * Function for installing signal handlers.
+ *
+ *****************************************************************************/
+
+static void installSignalHandler(int signum)
+{
+  struct sigaction s;
+  sigaction(signum, static_cast<struct sigaction*>(0), &s);
+
+  if (s.sa_handler != SIG_IGN)
+  {
+    s.sa_handler = signalHandler;
+    sigemptyset(&s.sa_mask);
+    s.sa_flags = 0;
+    sigaction(signum, &s, static_cast<struct sigaction*>(0));
+  }
 }
 
 
@@ -84,7 +120,7 @@ RETSIGTYPE signalHandler(int signal_number)
 
 int main(int argc, char** argv)
 {
-  typedef enum {OPT_HELP = 'h', OPT_LBT, OPT_SPIN, OPT_SPOT, OPT_VERSION = 'v'}
+  typedef enum {OPT_HELP = 'h', OPT_LBT, OPT_SPIN, OPT_SPOT, OPT_VERSION = 'V'}
     OptionType;
 
   static OPTIONSTRUCT command_line_options[] =
@@ -102,12 +138,10 @@ int main(int argc, char** argv)
   opterr = 1;
   int opttype, option_index;
 
-  TranslatorInterface* translator = 0;
-
   do
   {
     option_index = 0;
-    opttype = getopt_long(argc, argv, "hv", command_line_options,
+    opttype = getopt_long(argc, argv, "hV", command_line_options,
 			  &option_index);
 
     switch (opttype)
@@ -118,7 +152,7 @@ int main(int argc, char** argv)
 		"file] [automaton file]\n"
 		"General options:\n"
 		"  --h, --help              Show this help\n"
-		"  --v, --version           Show version and exit\n\n"
+		"  --V, --version           Show version and exit\n\n"
 		"Translator options:\n"
 		"       --lbt               lbt\n"
 		"       --spin              Spin\n"
@@ -175,16 +209,15 @@ int main(int argc, char** argv)
 
   int exitstatus = 0;
 
-  signal(SIGHUP, signalHandler);
-  signal(SIGINT, signalHandler);
-  signal(SIGQUIT, signalHandler);
-  signal(SIGILL, signalHandler);
-  signal(SIGABRT, signalHandler);
-  signal(SIGFPE, signalHandler);
-  signal(SIGSEGV, signalHandler);
-  signal(SIGPIPE, signalHandler);
-  signal(SIGALRM, signalHandler);
-  signal(SIGTERM, signalHandler);
+  installSignalHandler(SIGHUP);
+  installSignalHandler(SIGINT);
+  installSignalHandler(SIGQUIT);
+  installSignalHandler(SIGABRT);
+  installSignalHandler(SIGPIPE);
+  installSignalHandler(SIGALRM);
+  installSignalHandler(SIGTERM);
+  installSignalHandler(SIGUSR1);
+  installSignalHandler(SIGUSR2);
 
   ::Ltl::LtlFormula* formula(0);
 

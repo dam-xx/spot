@@ -3,55 +3,61 @@ AM_YFLAGS = -d
 
 bin_PROGRAMS = lbtt lbtt-translate
 lbtt_SOURCES = \
-  BitArray.cc \
   BitArray.h \
   Bitset.h \
-  BuchiAutomaton.cc \
+  BitArray.cc \
   BuchiAutomaton.h \
-  Config-lex.ll \
+  BuchiAutomaton.cc \
+  BuchiProduct.h \
+  BuchiProduct.cc \
   Config-parse.yy \
-  Configuration.cc \
+  Config-lex.ll \
   Configuration.h \
-  DispUtil.cc \
+  Configuration.cc \
   DispUtil.h \
+  DispUtil.cc \
   EdgeContainer.h \
   Exception.h \
-  FormulaRandomizer.cc \
   FormulaRandomizer.h \
+  FormulaRandomizer.cc \
   FormulaWriter.h \
+  IntervalList.h \
+  IntervalList.cc \
   LbttAlloc.h \
-  LtlFormula.cc \
   LtlFormula.h \
+  LtlFormula.cc \
+  Ltl-parse.yy \
   main.cc \
-  PathEvaluator.cc \
   PathEvaluator.h \
-  PathIterator.cc \
+  PathEvaluator.cc \
   PathIterator.h \
-  ProductAutomaton.cc \
-  ProductAutomaton.h \
+  PathIterator.cc \
+  Product.h \
   Random.h \
-  SccIterator.h \
+  SccCollection.h \
   SharedTestData.h \
-  StatDisplay.cc \
   StatDisplay.h \
-  StateSpace.cc \
+  StatDisplay.cc \
   StateSpace.h \
-  StateSpaceRandomizer.cc \
+  StateSpace.cc \
+  StateSpaceProduct.h \
   StateSpaceRandomizer.h \
-  StringUtil.cc \
+  StateSpaceRandomizer.cc \
   StringUtil.h \
-  TestOperations.cc \
+  StringUtil.cc \
+  TempFsysName.h \
+  TempFsysName.cc \
   TestOperations.h \
+  TestOperations.cc \
   TestRoundInfo.h \
-  TestStatistics.cc \
   TestStatistics.h \
-  UserCommandReader.cc \
+  TestStatistics.cc \
   UserCommandReader.h \
-  UserCommands.cc \
-  UserCommands.h
-
+  UserCommandReader.cc \
+  UserCommands.h \
+  UserCommands.cc
 EXTRA_lbtt_SOURCES = gnu-getopt.h
-lbtt_LDADD = $(LIBOBJS) $(READLINELIBS)
+lbtt_LDADD = @LIBOBJS@ @READLINELIBS@
 
 lbtt_translate_SOURCES = \
   BitArray.h \
@@ -60,10 +66,13 @@ lbtt_translate_SOURCES = \
   ExternalTranslator.h \
   ExternalTranslator.cc \
   FormulaWriter.h \
+  IntervalList.h \
+  IntervalList.cc \
   LbttAlloc.h \
   LbtWrapper.h \
   LtlFormula.h \
   LtlFormula.cc \
+  Ltl-parse.yy \
   NeverClaim-parse.yy \
   NeverClaim-lex.ll \
   NeverClaimAutomaton.h \
@@ -74,9 +83,10 @@ lbtt_translate_SOURCES = \
   SpotWrapper.cc \
   StringUtil.h \
   StringUtil.cc \
+  TempFsysName.h \
+  TempFsysName.cc \
   translate.h \
   translate.cc \
   TranslatorInterface.h
-
 EXTRA_lbtt_translate_SOURCES = gnu-getopt.h
-lbtt_translate_LDADD = $(LIBOBJS)
+lbtt_translate_LDADD = @LIBOBJS@
