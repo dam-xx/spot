@@ -31,4 +31,6 @@ $(srcdir)/buddy.py: $(srcdir)/buddy.i
 	$(MAKE) $(AM_MAKEFLAGS) buddy_wrap.cxx
 
 
-MAINTAINERCLEANFILES = $(srcdir)/spot_wrap.cxx $(srcdir)/spot.py
+MAINTAINERCLEANFILES = \
+  $(srcdir)/spot_wrap.cxx $(srcdir)/spot.py \
+  $(srcdir)/buddy_wrap.cxx $(srcdir)/buddy.py

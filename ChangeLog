@@ -1,3 +1,8 @@
+2003-08-23  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* wrap/python/Makefile.am (MAINTAINERCLEANFILES): Add
+	buddy_wrap.cxx and buddy.py.
+
 2003-08-22  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgbaalgos/magic.cc (seen_with_magic, seen_without_magic): Remove.
