@@ -35,13 +35,17 @@ $(srcdir)/stamp: $(srcdir)/Doxyfile.in $(top_srcdir)/configure.ac
 	$(DOXYGEN)
 	touch $@
 
-$(srcdir)/spot.html: $(srcdir)/stamp
+$(srcdir)/spot.html $(srcdir)/spot.tag: $(srcdir)/stamp
 spot.latex: $(srcdir)/stamp
 
 $(srcdir)/spotref.pdf: $(srcdir)/stamp
 	cd spot.latex \
 	  && texi2dvi --pdf refman.tex \
 	  && cd .. && mv -f spot.latex/refman.pdf $@
+
+# spot.tag is useful to third-party packages that must link to the
+# Spot documentation.
+dist_pkgdata_DATA = $(srcdir)/spot.tag
 
 EXTRA_DIST = \
   footer.html \

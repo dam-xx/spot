@@ -1,5 +1,8 @@
 2004-08-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* doc/Doxyfile.in (GENERATE_TAGFILE): Build spot.tag.
+	* doc/Makefile.am (dist_pkgdata_DATA): Add spot.tag.
+
 	* src/tgbatest/ltl2tgba.cc (syntax): Typo.
 
 	* doc/Doxyfile.in (STRIP_FROM_PATH): Strip @srcdir@ so its
