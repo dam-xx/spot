@@ -1,5 +1,9 @@
 2004-11-04  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgba/tgba.hh, src/tgba/tgba.cc
+	(tgba::number_of_acceptance_conditions): New method.
+	* src/tgbaalgos/lbtt.cc (lbtt_bfs::lbtt_bfs): Use it.
+
 	* wrap/python/spot.i: Generate bindings for tgbaalgos/dottydec.hh,
 	tgbaalgos/emptiness.hh, tgbaalgos/gtec/gtec.hh, and
 	tgbaalgos/rundotdec.hh.

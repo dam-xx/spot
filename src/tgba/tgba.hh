@@ -173,6 +173,9 @@ namespace spot
     /// the SCC should be equal to the result of this function.
     virtual bdd all_acceptance_conditions() const = 0;
 
+    /// The number of acceptance conditions.
+    virtual int number_of_acceptance_conditions() const;
+
     /// \brief Return the conjuction of all negated acceptance
     /// variables.
     ///
@@ -195,6 +198,7 @@ namespace spot
     mutable bdd last_support_conditions_output_;
     mutable const state* last_support_variables_input_;
     mutable bdd last_support_variables_output_;
+    mutable int num_acc_;
   };
 
 }

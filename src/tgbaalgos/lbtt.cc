@@ -108,18 +108,9 @@ namespace spot
       lbtt_bfs(const tgba* a, std::ostream& os)
 	: tgba_reachable_iterator_breadth_first(a),
 	  os_(os),
-	  acc_count_(0),
+	  acc_count_(a->number_of_acceptance_conditions()),
 	  acs_(a->all_acceptance_conditions())
-
       {
-	// Count the number of acceptance_conditions.
-	bdd all = a->all_acceptance_conditions();
-	while (all != bddfalse)
-	  {
-	    bdd one = bdd_satone(all);
-	    all -= one;
-	    ++acc_count_;
-	  }
       }
 
       void

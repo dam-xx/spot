@@ -25,7 +25,8 @@ namespace spot
 {
   tgba::tgba()
     : last_support_conditions_input_(0),
-      last_support_variables_input_(0)
+      last_support_variables_input_(0),
+      num_acc_(-1)
   {
   }
 
@@ -73,6 +74,23 @@ namespace spot
   tgba::transition_annotation(const tgba_succ_iterator*) const
   {
     return "";
+  }
+
+  int
+  tgba::number_of_acceptance_conditions() const
+  {
+    if (num_acc_ < 0)
+      {
+	bdd all = all_acceptance_conditions();
+	int n = 0;
+	while (all != bddfalse)
+	  {
+	    ++n;
+	    all -= bdd_satone(all);
+	  }
+	num_acc_ = n;
+      }
+    return num_acc_;
   }
 
 }
