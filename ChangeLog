@@ -1,5 +1,8 @@
 2003-05-15  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/ltlparse/ltlscan.ll (to_parse_size): Declare as size_t to
+	remove a warning with newer versions of Flex.
+
 	* src/ltlparse/ltlparse.yy (error_list, parse_environment, result):
 	CVS Bison now supports %parse-param for the C++ skeleton; pass these
 	variables as arguments to the Parser::Parser constructor instead of

@@ -17,7 +17,7 @@
     yylloc->columns (yyleng);
 
 static const char *to_parse = 0;
-static int to_parse_size = 0;
+static size_t to_parse_size = 0;
   
 void
 flex_set_buffer(const char *buf)
