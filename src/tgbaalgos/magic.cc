@@ -19,12 +19,12 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include <cstring>
-#include <iostream>
-#include "misc/hash.hh"
+#include <cassert>
 #include <list>
 #include <iterator>
-#include <cassert>
+#include "misc/hash.hh"
+#include "tgba/tgba.hh"
+#include "emptiness.hh"
 #include "magic.hh"
 
 namespace spot
@@ -68,7 +68,7 @@ namespace spot
 
       /// \brief Perform a Magic Search.
       ///
-      /// \return non null pointer iff the algorithm has found a 
+      /// \return non null pointer iff the algorithm has found a
       /// new accepting path.
       ///
       /// check() can be called several times (until it returns a null
@@ -129,10 +129,10 @@ namespace spot
         const state* s;
         /// Design the next successor of \a s which has to be visited.
         tgba_succ_iterator* it;
-        /// The label of the transition followed to reach \a s
+        /// The label of the transition traversed to reach \a s
         /// (false for the first one).
         bdd label;
-        /// The acc set of the transition followed to reach \a s
+        /// The acceptance set of the transition traversed to reach \a s
         /// (false for the first one).
         bdd acc;
       };
@@ -255,9 +255,6 @@ namespace spot
                 f.it->next();
                 typename heap::color_ref c = h.get_color_ref(s_prime);
                 if (c.is_white())
-                // Notice that this case is taken into account only to  
-                // support successive calls to the check method. Without
-                // this functionnality, one can check assert(c.is_white()).
                 // Go down the edge (f.s, <label, acc>, s_prime)
                   {
                     ++nbn;

@@ -43,7 +43,9 @@ tgbaalgos_HEADERS = \
   replayrun.hh \
   rundotdec.hh \
   save.hh \
+  se05.hh \
   stats.hh \
+  tau03.hh \
   reductgba_sim.hh
 
 noinst_LTLIBRARIES = libtgbaalgos.la
@@ -66,6 +68,7 @@ libtgbaalgos_la_SOURCES = \
   save.cc \
   se05.cc \
   stats.cc \
+  tau03.cc \
   reductgba_sim.cc \
   reductgba_sim_del.cc
 

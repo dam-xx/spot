@@ -1,0 +1,76 @@
+#!/bin/sh
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# département Systèmes Répartis Coopératifs (SRC), Université Pierre
+# et Marie Curie.
+#
+# This file is part of Spot, a model checking library.
+#
+# Spot is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Spot is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+# License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Spot; see the file COPYING.  If not, write to the Free
+# Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+. ./defs
+
+light_run()
+{
+  expected_exitcode=$1
+  shift
+  exitcode=0
+  "$@" || exitcode=$?
+  test $exitcode = $expected_exitcode || exit 1
+}
+
+set -e
+
+expect_ce()
+{
+  light_run 0 ./ltl2tgba -X -e "$1"
+  light_run 0 ./ltl2tgba -X -ecouvreur99_shy "$1"
+  light_run 0 ./ltl2tgba -X -emagic_search "$1"
+  light_run 0 ./ltl2tgba -X -ebsh_magic_search "$1"
+  light_run 0 ./ltl2tgba -X -ese05_search "$1"
+  light_run 0 ./ltl2tgba -X -ebsh_se05_search "$1"
+  light_run 0 ./ltl2tgba -X -etau03_search "$1"
+}
+
+expect_no()
+{
+  light_run 0 ./ltl2tgba -X -E "$1"
+  light_run 0 ./ltl2tgba -X -Ecouvreur99_shy "$1"
+  light_run 0 ./ltl2tgba -X -Emagic_search "$1"
+  light_run 0 ./ltl2tgba -X -Ebsh_magic_search "$1"
+  light_run 0 ./ltl2tgba -X -Ese05_search "$1"
+  light_run 0 ./ltl2tgba -X -Ebsh_se05_search "$1"
+  light_run 0 ./ltl2tgba -X -Etau03_search "$1"
+}
+
+expect_no tba_samples_from_spin/explicit1_1.tba
+expect_ce tba_samples_from_spin/explicit1_2.tba
+expect_no tba_samples_from_spin/explicit1_3.tba
+expect_no tba_samples_from_spin/explicit1_4.tba
+expect_ce tba_samples_from_spin/explicit1_5.tba
+expect_no tba_samples_from_spin/explicit1_6.tba
+expect_no tba_samples_from_spin/explicit1_7.tba
+expect_ce tba_samples_from_spin/explicit1_8.tba
+expect_ce tba_samples_from_spin/explicit1_9.tba
+
+expect_ce tba_samples_from_spin/explicit2_1.tba
+expect_ce tba_samples_from_spin/explicit2_2.tba
+expect_no tba_samples_from_spin/explicit2_3.tba
+expect_no tba_samples_from_spin/explicit2_4.tba
+expect_ce tba_samples_from_spin/explicit2_5.tba
+expect_no tba_samples_from_spin/explicit2_6.tba
+expect_ce tba_samples_from_spin/explicit2_7.tba
+expect_ce tba_samples_from_spin/explicit2_8.tba
+expect_no tba_samples_from_spin/explicit2_9.tba

@@ -36,7 +36,7 @@ run 0 ./randtgba -e 100 -s  50 -r -a 1 0.1 -d 0.02
 run 0 ./randtgba -e 100 -s 100 -r -a 1 0.1 -d 0.04
 run 0 ./randtgba -e 100 -s 150 -r -a 1 0.1 -d 0.08
 
-# Two acceptance conditions
+# Four acceptance conditions
 run 0 ./randtgba -e 100 -s 200 -r -a 4 0.1 -d 0.01
 run 0 ./randtgba -e 100 -s 250 -r -a 4 0.1 -d 0.02
 run 0 ./randtgba -e 100 -s 300 -r -a 4 0.1 -d 0.04

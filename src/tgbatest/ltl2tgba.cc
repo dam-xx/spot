@@ -36,6 +36,8 @@
 #include "tgbaalgos/lbtt.hh"
 #include "tgba/tgbatba.hh"
 #include "tgbaalgos/magic.hh"
+#include "tgbaalgos/se05.hh"
+#include "tgbaalgos/tau03.hh"
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/gtec/ce.hh"
 #include "tgbaparse/public.hh"
@@ -125,7 +127,8 @@ syntax(char* prog)
 	    << "  bsh_se05_search[(heap size in MB - 10MB by default)]"
             << std::endl
 	    << "  bsh_se05_search_repeated[(heap size in MB - 10MB"
-            << " by default)]" << std::endl;
+            << " by default)]" << std::endl
+	    << "  tau03_search" << std::endl;
   exit(2);
 }
 
@@ -144,9 +147,10 @@ main(int argc, char** argv)
   int output = 0;
   int formula_index = 0;
   std::string echeck_algo;
-  enum { None, Couvreur, Couvreur2, MagicSearch, Se05Search } echeck = None;
+  enum { None, Couvreur, Couvreur2, MagicSearch, Se05Search, Tau03Search }
+                                                                 echeck = None;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
-  bool magic_many = false;
+  bool search_many = false;
   bool bit_state_hashing = false;
   int heap_size = 10*1024*1024;
   bool expect_counter_example = false;
@@ -368,7 +372,7 @@ main(int argc, char** argv)
 	{
 	  echeck = MagicSearch;
 	  degeneralize_maybe = true;
-	  magic_many = true;
+	  search_many = true;
 	}
       else if (echeck_algo == "bsh_magic_search")
 	{
@@ -381,7 +385,7 @@ main(int argc, char** argv)
 	  echeck = MagicSearch;
 	  degeneralize_maybe = true;
           bit_state_hashing = true;
-	  magic_many = true;
+	  search_many = true;
 	}
       else if (echeck_algo == "se05_search")
 	{
@@ -392,7 +396,7 @@ main(int argc, char** argv)
 	{
 	  echeck = Se05Search;
 	  degeneralize_maybe = true;
-	  magic_many = true;
+	  search_many = true;
 	}
       else if (echeck_algo == "bsh_se05_search")
 	{
@@ -405,7 +409,11 @@ main(int argc, char** argv)
 	  echeck = Se05Search;
 	  degeneralize_maybe = true;
           bit_state_hashing = true;
-	  magic_many = true;
+	  search_many = true;
+	}
+      else if (echeck_algo == "tau03_search")
+	{
+	  echeck = Tau03Search;
 	}
       else
 	{
@@ -649,6 +657,19 @@ main(int argc, char** argv)
           else
             ec = spot::explicit_se05_search(a);
           break;
+
+	case Tau03Search:
+          if (a->number_of_acceptance_conditions() == 0)
+            {
+              std::cout << "To apply tau03_search, the automaton must have at "
+                        << "least on accepting condition. Try with another "
+                        << "algorithm." << std::endl;
+            }
+          else
+            {
+              ec = spot::explicit_tau03_search(a);
+            }
+	  break;
 	}
 
       if (ec)
@@ -702,7 +723,7 @@ main(int argc, char** argv)
 		}
 	      delete res;
 	    }
-	  while (magic_many);
+	  while (search_many);
 	  delete ec;
 	}
 

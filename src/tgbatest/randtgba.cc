@@ -34,6 +34,8 @@
 #include "tgbaalgos/emptiness.hh"
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/magic.hh"
+#include "tgbaalgos/se05.hh"
+#include "tgbaalgos/tau03.hh"
 #include "tgbaalgos/replayrun.hh"
 
 void
@@ -42,7 +44,7 @@ syntax(char* prog)
   std::cerr << "Usage: "<< prog << " [OPTIONS...] PROPS..." << std::endl
 	    << std::endl
 	    << "Options:" << std::endl
-	    << "  -a N F  number of accepence conditions a propability that"
+	    << "  -a N F  number of acceptance conditions and probability that"
 	    << " one is true [0 0.0]" << std::endl
 	    << "  -d F    density of the graph [0.2]" << std::endl
 	    << "  -e N    compare result of all "
@@ -204,6 +206,13 @@ main(int argc, char** argv)
 	  ec_obj.push_back(new spot::couvreur99_check_shy(a));
 	  ec_name.push_back("couvreur99_shy");
 	  ec_safe.push_back(true);
+
+	  if (opt_n_acc >= 1)
+	    {
+              ec_obj.push_back(spot::explicit_tau03_search(a));
+              ec_name.push_back("explicit_tau03_search");
+              ec_safe.push_back(true);
+            }
 
 	  if (opt_n_acc <= 1)
 	    {

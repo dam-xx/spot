@@ -24,11 +24,14 @@
 #ifdef TRACE
 #include <iostream>
 #endif
-#include "misc/hash.hh"
+
+#include <cassert>
 #include <list>
 #include <iterator>
-#include <cassert>
-#include "magic.hh"
+#include "misc/hash.hh"
+#include "tgba/tgba.hh"
+#include "emptiness.hh"
+#include "se05.hh"
 
 namespace spot
 {
@@ -133,10 +136,10 @@ namespace spot
         const state* s;
         /// Design the next successor of \a s which has to be visited.
         tgba_succ_iterator* it;
-        /// The label of the transition followed to reach \a s
+        /// The label of the transition traversed to reach \a s
         /// (false for the first one).
         bdd label;
-        /// The acc set of the transition followed to reach \a s
+        /// The acceptance set of the transition traversed to reach \a s
         /// (false for the first one).
         bdd acc;
       };
@@ -181,7 +184,7 @@ namespace spot
             stack_item& f = st_blue.front();
 #ifdef TRACE
             std::cout << "DFS_BLUE treats: "
-            << a->format_state(f.s) << std::endl;
+                      << a->format_state(f.s) << std::endl;
 #endif
             if (!f.it->done())
               {
@@ -299,7 +302,7 @@ namespace spot
             stack_item& f = st_red.front();
 #ifdef TRACE
             std::cout << "DFS_RED treats: "
-            << a->format_state(f.s) << std::endl;
+                      << a->format_state(f.s) << std::endl;
 #endif
             if (!f.it->done())
               {
@@ -314,9 +317,6 @@ namespace spot
                 f.it->next();
                 typename heap::color_ref c = h.get_color_ref(s_prime);
                 if (c.is_white())
-                // Notice that this case is taken into account only to
-                // support successive calls to the check method. Without
-                // this functionnality => assert(c.is_white())
                 // Go down the edge (f.s, <label, acc>, s_prime)
                   {
 #ifdef TRACE

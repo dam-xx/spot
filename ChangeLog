@@ -1,3 +1,36 @@
+2004-11-17  Poitrenaud Denis  <denis@src.lip6.fr>
+
+	* src/tgbaalgos/magic.hh: Fix a comment and remove se05 interface.
+	* src/tgbaalgos/magic.cc: Fix a comment.
+	* src/tgbaalgos/se05.hh: New file.
+	* src/tgbaalgos/se05.cc: Fix a comment.
+	* src/tgbaalgos/tau03.hh: New file.
+	* src/tgbaalgos/tau03.cc: New file.
+	* src/tgbaalgos/Makefile.am: Add it.
+	* src/tgbatest/ltl2tgba.cc: Add tau03 new emptiness check.
+	* src/tgbatest/randtgba.cc: Add tau03 new emptiness check.
+	* src/tgbatest/emptchkr: Fix a comment.
+	* src/tgbatest/tba_samples_from_spin/explicit1_1.tba,
+	src/tgbatest/tba_samples_from_spin/explicit1_2.tba,
+	src/tgbatest/tba_samples_from_spin/explicit1_3.tba,
+	src/tgbatest/tba_samples_from_spin/explicit1_4.tba,
+	src/tgbatest/tba_samples_from_spin/explicit1_5.tba,
+	src/tgbatest/tba_samples_from_spin/explicit1_6.tba,
+	src/tgbatest/tba_samples_from_spin/explicit1_7.tba,
+	src/tgbatest/tba_samples_from_spin/explicit1_8.tba,
+	src/tgbatest/tba_samples_from_spin/explicit1_9.tba,
+	src/tgbatest/tba_samples_from_spin/explicit2_1.tba,
+	src/tgbatest/tba_samples_from_spin/explicit2_2.tba,
+	src/tgbatest/tba_samples_from_spin/explicit2_3.tba,
+	src/tgbatest/tba_samples_from_spin/explicit2_4.tba,
+	src/tgbatest/tba_samples_from_spin/explicit2_5.tba,
+	src/tgbatest/tba_samples_from_spin/explicit2_6.tba,
+	src/tgbatest/tba_samples_from_spin/explicit2_7.tba,
+	src/tgbatest/tba_samples_from_spin/explicit2_8.tba,
+	src/tgbatest/tba_samples_from_spin/explicit2_9.tba: New files
+	* src/tgbatest/tba_samples_from_spin.test : New test.
+	* src/tgbatest/Makefile.am: Add it.
+
 2004-11-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgba/tgba.hh, src/tgbaalgos/dotty.hh,
