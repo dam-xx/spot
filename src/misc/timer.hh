@@ -22,6 +22,7 @@
 #ifndef SPOT_MISC_TIMER_HH
 # define SPOT_MISC_TIMER_HH
 
+# include <cassert>
 # include <iosfwd>
 # include <string>
 # include <map>

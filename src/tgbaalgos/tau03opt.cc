@@ -26,7 +26,7 @@
 ///   dfs:
 ///   - favorize the arcs conducting to the blue stack (the states of color
 ///     cyan)
-///   - in this category, favorize the arcs labelled
+///   - in this category, favorize the labelled arcs
 ///   - for the remaining ones, favorize the arcs labelled by the greatest
 ///     number of new acceptance conditions (notice that this number may evolve
 ///     after the visit of previous successors).
@@ -50,6 +50,7 @@
 #include "emptiness_stats.hh"
 #include "tau03opt.hh"
 #include "weight.hh"
+#include "bfssteps.hh"
 
 namespace spot
 {
@@ -333,12 +334,213 @@ namespace spot
 
       class result: public emptiness_check_result
       {
+      private:
+        typedef Sgi::hash_set<const state*,
+                              state_ptr_hash, state_ptr_equal> state_set;
+
+        class shortest_path: public bfs_steps
+        {
+        public:
+          shortest_path(const tgba* a, const state* t,
+                      const state_set& d, heap& h)
+            : bfs_steps(a), target(t), dead(d), h(h)
+          {
+          }
+
+          ~shortest_path()
+          {
+          }
+
+          const state*
+          search(const state* start, tgba_run::steps& l)
+          {
+            const state* s = filter(start);
+            if (s)
+              return this->bfs_steps::search(s, l);
+            else
+              return 0;
+          }
+
+          const state*
+          filter(const state* s)
+          {
+            typename heap::color_ref c = h.get_color_ref(s);
+            if (c.is_white())
+              {
+                delete s;
+                return 0;
+              }
+            else if (dead.find(s) != dead.end())
+              return 0;
+            seen.insert(s);
+            return s;
+          }
+
+          const state_set&
+          get_seen() const
+          {
+            return seen;
+          }
+
+          bool
+          match(tgba_run::step&, const state* dest)
+          {
+            return target->compare(dest) == 0;
+          }
+
+        private:
+          state_set seen;
+          const state* target;
+          const state_set& dead;
+          heap& h;
+        };
+
+        stack_type st1;
+
+        tau03_opt_search& ms_;
+
+        void complete_cycle(tgba_run::steps& cycle, bdd& covered_acc,
+                      const tgba_run::step& start, tgba_run::steps& path,
+                      const state_set& dead)
+        {
+          tgba_run::steps new_cycle;
+
+          // find the minimal path between st1.back().s and st1.front().s
+          if (st1.back().s->compare(st1.front().s)!=0)
+            {
+              shortest_path s(ms_.a_, st1.front().s, dead, ms_.h);
+              const state* res = s.search(st1.back().s, new_cycle);
+              assert(res && res->compare(st1.front().s) == 0);
+              (void)res;
+              for (tgba_run::steps::const_iterator it = new_cycle.begin();
+                                                    it != new_cycle.end(); ++it)
+              covered_acc |= it->acc;
+            }
+
+          // traverse the accepting transition
+          covered_acc |= start.acc;
+          tgba_run::step s = { st1.front().s->clone(), start.label, start.acc };
+          new_cycle.push_back(s);
+
+          // follow the minimal path returning to st1.back().s
+          for (tgba_run::steps::const_iterator it = path.begin();
+                                                      it != path.end(); ++it)
+            covered_acc |= it->acc;
+          new_cycle.splice(new_cycle.end(), path);
+
+          // concat this new loop to the existing ones
+          cycle.splice(cycle.end(), new_cycle);
+        }
+
+        bool dfs_result(const state* target, tgba_run::steps& cycle,
+                                                            bdd& covered_acc)
+        {
+          state_set seen, dead;
+
+          seen.insert(target);
+          while (!st1.empty())
+            {
+              stack_item& f = st1.front();
+              trace << "DFS1 treats: " << a_->format_state(f.s) << std::endl;
+              if (!f.it->done())
+                {
+                  const state *s_prime = f.it->current_state();
+                  trace << "  Visit the successor: "
+                        << a_->format_state(s_prime) << std::endl;
+                  bdd label = f.it->current_condition();
+                  bdd acc = f.it->current_acceptance_conditions();
+                  f.it->next();
+                  typename heap::color_ref c_prime =
+                                                ms_.h.get_color_ref(s_prime);
+                  if (!c_prime.is_white())
+                    {
+                      if (dead.find(s_prime) != dead.end())
+                        {
+                          trace << "  it is dead, pop it" << std::endl;
+                        }
+                      else if (seen.find(s_prime) == seen.end())
+                        {
+                          trace << "  it is not seen, go down" << std::endl;
+                          seen.insert(s_prime);
+                          tgba_succ_iterator* i = a_->succ_iter(s_prime);
+                          i->first();
+                          st1.push_front(stack_item(s_prime, i, label, acc));
+                        }
+                      else if ((acc & covered_acc) != acc)
+                        {
+                          trace << "  a propagation is needed, start a search"
+                                << std::endl;
+                          tgba_run::step s = {s_prime, label, acc};
+                          if (search(s, target, dead, cycle, covered_acc))
+                            return true;
+                        }
+                      else
+                        {
+                          trace << "  already seen, pop it" << std::endl;
+                        }
+                    }
+                  else
+                    delete s_prime;
+                }
+              else
+                {
+                  trace << "  all the successors have been visited"
+                        << std::endl;
+                  stack_item f_dest(f);
+                  delete st1.front().it;
+                  st1.pop_front();
+                  if (!st1.empty() && (f_dest.acc & covered_acc) != f_dest.acc)
+                    {
+                      trace << "  a propagation is needed, start a search"
+                            << std::endl;
+                          tgba_run::step s = {f_dest.s,
+                                              f_dest.label,
+                                              f_dest.acc};
+                          if (search(s, target, dead, cycle, covered_acc))
+                            return true;
+                    }
+                  else
+                    {
+                      trace << "  no propagation needed, pop it" << std::endl;
+                    }
+                }
+            }
+          return false;
+        }
+
+        bool search(const tgba_run::step& start, const state* target,
+                      state_set& dead, tgba_run::steps& cycle, bdd& covered_acc)
+        {
+          tgba_run::steps path;
+          if (start.s->compare(target)==0)
+            {
+              trace << "  complete the cycle" << std::endl;
+              complete_cycle(cycle, covered_acc, start, path, dead);
+              return covered_acc == ms_.all_acc;
+            }
+
+            shortest_path s(ms_.a_, target, dead, ms_.h);
+            const state* res = s.search(start.s, path);
+            if (res)
+              {
+                assert(res->compare(target) == 0);
+                trace << "  complete the cycle" << std::endl;
+                complete_cycle(cycle, covered_acc, start, path, dead);
+                return covered_acc == ms_.all_acc;
+              }
+            state_set::const_iterator it;
+            for (it = s.get_seen().begin(); it != s.get_seen().end(); ++it)
+              dead.insert(*it);
+            return false;
+        }
+
       public:
         result(tau03_opt_search& ms)
           : emptiness_check_result(ms.a_),
             ms_(ms)
         {
         }
+
         virtual ~result()
         {
           while (!st1.empty())
@@ -346,12 +548,8 @@ namespace spot
               delete st1.front().it;
               st1.pop_front();
             }
-          while (!st2.empty())
-            {
-              delete st2.front().it;
-              st2.pop_front();
-            }
         }
+
         virtual tgba_run* accepting_run()
         {
           assert(!ms_.st_blue.empty());
@@ -394,212 +592,26 @@ namespace spot
 
           if (ms_.all_acc != covered_acc)
             {
-              ms_.push(st1, target, bddfalse, bddfalse);
-              bool b = dfs1(target, run->cycle, covered_acc);
+              // try to minimize the first loop in run->cycle ??
+              // what transitions have to be preserved  (it depend on
+              // the detection (in the blue or red dfs) ??
+              tgba_succ_iterator* i = a_->succ_iter(target);
+              i->first();
+              st1.push_front(stack_item(target, i, bddfalse, bddfalse));
+              bool b = dfs_result(target, run->cycle, covered_acc);
               assert(b);
               (void)b;
+              while (!st1.empty())
+                {
+                  delete st1.front().it;
+                  st1.pop_front();
+                }
             }
 
           return run;
         }
 
-      private:
-        stack_type st1, st2;
-        tau03_opt_search& ms_;
-
-        void complete_cycle(tgba_run::steps& cycle, bdd& covered_acc)
-        {
-          tgba_run::steps new_cycle;
-          typename stack_type::const_reverse_iterator i, j, end;
-
-          i = j = st1.rbegin(); ++j;
-          end = st1.rend();
-          for (; j != end; ++i, ++j)
-            {
-              covered_acc |= j->acc;
-              tgba_run::step s = { i->s->clone(), j->label, j->acc };
-              new_cycle.push_back(s);
-            }
-
-          j = st2.rbegin();
-          covered_acc |= j->acc;
-          tgba_run::step s = { i->s->clone(), j->label, j->acc };
-          new_cycle.push_back(s);
-
-          i = j; ++j;
-          end = st2.rend();
-          for (; j != end; ++i, ++j)
-            {
-              covered_acc |= j->acc;
-              tgba_run::step s = { i->s->clone(), j->label, j->acc };
-              new_cycle.push_back(s);
-            }
-          cycle.splice(cycle.end(), new_cycle);
-        }
-
-        typedef Sgi::hash_map<const state*, bdd,
-                              state_ptr_hash, state_ptr_equal> seen_type;
-
-        bool dfs1(const state* target, tgba_run::steps& cycle, bdd& covered_acc)
-        {
-          seen_type seen;
-          seen.insert(std::make_pair(target, covered_acc));
-          while (!st1.empty())
-            {
-              stack_item& f = st1.front();
-              trace << "DFS1 treats: " << a_->format_state(f.s) << std::endl;
-              if (!f.it->done())
-                {
-                  const state *s_prime = f.it->current_state();
-                  trace << "  Visit the successor: "
-                        << a_->format_state(s_prime) << std::endl;
-                  bdd label = f.it->current_condition();
-                  bdd acc = f.it->current_acceptance_conditions();
-                  f.it->next();
-                  typename heap::color_ref c_prime =
-                                                ms_.h.get_color_ref(s_prime);
-                  if (!c_prime.is_white())
-                    {
-                      seen_type::iterator it = seen.find(s_prime);
-                      if (it == seen.end())
-                        {
-                          trace << "  it is not seen, go down" << std::endl;
-                          seen.insert(std::make_pair(s_prime, covered_acc));
-                          ms_.push(st1, s_prime, label, acc);
-                        }
-                      else if ((acc & (it->second | covered_acc)) != acc)
-                        {
-                          it->second |= acc;
-                          ms_.push(st2, s_prime, label, acc);
-                          trace << "  a propagation is needed, start a dfs2"
-                                << std::endl;
-                          if (dfs2(seen, target, cycle, covered_acc, acc))
-                            return true;
-                        }
-                    }
-                  else
-                    delete s_prime;
-                }
-              else
-                {
-                  trace << "  all the successors have been visited"
-                        << std::endl;
-                  stack_item f_dest(f);
-                  ms_.pop(st1);
-                  if (!st1.empty())
-                    {
-                      seen_type::iterator it = seen.find(f_dest.s);
-                      assert(it != seen.end());
-                      if ((f_dest.acc & (it->second | covered_acc)) !=
-                                                                     f_dest.acc)
-                        {
-                          it->second |= f_dest.acc | covered_acc;
-                          ms_.push(st2, f_dest.s, f_dest.label, f_dest.acc);
-                          trace << "  a propagation is needed, start a dfs2"
-                                << std::endl;
-                          if (dfs2(seen, target, cycle, covered_acc,
-                                                                    f_dest.acc))
-                            return true;
-                        }
-                    }
-                }
-            }
-          return false;
-        }
-
-        bool dfs2(seen_type& seen, const state* target, tgba_run::steps& cycle,
-                                              bdd& covered_acc, const bdd& acu)
-        {
-          if (st2.front().s->compare(target)==0)
-            {
-              trace << "  complete the cycle" << std::endl;
-              complete_cycle(cycle, covered_acc);
-              delete st2.front().it;
-              st2.pop_front();
-              if (covered_acc == ms_.all_acc)
-                {
-                  trace << "  the cycle is complete, report it"
-                        << std::endl;
-                  return true;
-                }
-              return false;
-            }
-
-          typedef Sgi::hash_set<const state*,
-                                   state_ptr_hash, state_ptr_equal> l_seen_type;
-          l_seen_type l_seen;
-
-          while (!st2.empty())
-            {
-              stack_item& f = st2.front();
-              trace << "DFS2 treats: " << a_->format_state(f.s) << std::endl;
-              if (!f.it->done())
-                {
-                  const state *s_prime = f.it->current_state();
-                  trace << "  Visit the successor: "
-                        << a_->format_state(s_prime) << std::endl;
-                  bdd label = f.it->current_condition();
-                  bdd acc = f.it->current_acceptance_conditions();
-                  f.it->next();
-                  typename heap::color_ref c_prime =
-                                                  ms_.h.get_color_ref(s_prime);
-                  if (!c_prime.is_white())
-                    {
-                      seen_type::iterator it = seen.find(s_prime);
-                      if (it != seen.end())
-                        {
-                          if ((acu & (it->second | covered_acc)) != acu)
-                            {
-                              it->second |= acu | covered_acc;
-                              ms_.push(st2, s_prime, label, acc);
-                              if (s_prime->compare(target)==0)
-                                {
-                                  trace << "  complete the cycle" << std::endl;
-                                  complete_cycle(cycle, covered_acc);
-                                  while (!st2.empty())
-                                    {
-                                      delete st2.front().it;
-                                      st2.pop_front();
-                                    }
-                                  if (covered_acc == ms_.all_acc)
-                                    {
-                                      trace << "  the cycle is complete, "
-                                            << "report it" << std::endl;
-                                      return true;
-                                    }
-                                  else
-                                    return false;
-                                }
-                            }
-                        }
-                      else
-                        {
-                          if (l_seen.find(s_prime) == l_seen.end())
-                            {
-                              l_seen.insert(s_prime);
-                              ms_.push(st2, s_prime, label, acc);
-                              trace << "  the propagation continues"
-                                    << std::endl;
-                            }
-                        }
-                    }
-                  else
-                    {
-                      trace << "  it is unknown, pop it"
-                            << std::endl;
-                      delete s_prime;
-                    }
-                }
-              else
-                {
-                  trace << "  all the successors have been visited, pop it"
-                        << std::endl;
-                  ms_.pop(st2);
-                }
-            }
-          return false;
-        }
-     };
+      };
 
     };
 

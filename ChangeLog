@@ -1,3 +1,10 @@
+2004-11-25  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/tgbaalgos/tau03opt.cc: Fix a memory leak in the computation of
+	accepting runs
+
+	* src/misc/timer.hh: Include cassert.
+
 2004-12-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/misc/timer.cc: Include cassert.
