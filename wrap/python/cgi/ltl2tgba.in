@@ -130,11 +130,7 @@ def print_stats(automaton):
     else:
         print " transitions,",
     # compute the number of acceptance conditions
-    acc = all = automaton.all_acceptance_conditions()
-    count = 0
-    while all != buddy.bddfalse:
-        all -= buddy.bdd_satone(all)
-        count += 1
+    count = automaton.number_of_acceptance_conditions()
     if count > 0:
         print count,
         if count <= 1:
@@ -142,6 +138,7 @@ def print_stats(automaton):
         else:
             print "acceptance conditions:",
             sys.stdout.flush()
+        acc = automaton.all_acceptance_conditions()
         spot.bdd_print_accset(spot.get_cout(), automaton.get_dict(), acc)
     else:
         print "no acceptance condition (all cycles are accepting)"
@@ -163,9 +160,12 @@ def render_dot(basename):
     print '<img src="' + b + '.png"><br>(<a href="' + b + '.txt">dot source</a>)'
     sys.stdout.flush()
 
-def render_automaton(basename, automata, dont_run_dot):
+def render_automaton(basename, automata, dont_run_dot, deco = False):
     outfile = spot.ofstream(basename + '.txt')
-    spot.dotty_reachable(outfile, automata)
+    if not deco:
+        spot.dotty_reachable(outfile, automata)
+    else:
+        spot.dotty_reachable(outfile, automata, deco)
     del outfile
     if dont_run_dot:
         print ('<p>' + dont_run_dot + ''' to be rendered on-line.  However
@@ -234,6 +234,17 @@ default_translator = 'trans_fm';
 translators = [
     ('trans_fm',    'Couvreur/FM',    color_fm),
     ('trans_lacim', 'Couvreur/LaCIM', color_lacim),
+    ]
+
+options_accepting_run = [
+    ('print_acc_run', 'print an accepting run...', 0),
+    ('draw_acc_run', 'draw an accepting run...', 0),
+    ('emptiness_check',
+     ['... found using this algorithm: ',
+      'couvreur99',
+      'couvreur99_shy',
+      'explicit_magic_search',
+      'explicit_se05'], 'no')
     ]
 
 print ("""<FORM action="%s" method="post"><P>
@@ -321,13 +332,32 @@ def add_options(opt_group, opt_column, opt_color, opt_list):
             val = int(form.getfirst(opt, 0))
         else:
             val = arg
-        if val:
-            str = " checked"
+
+        s = '<TD%s>%s' % (opt_color, prefix);
+        if isinstance(desc, list):
+            s += '%s <select name="%s">' % (desc[0], opt);
+            n = 1
+            if val >= len(desc) or val < 1:
+                val = n
+            for i in desc[1:]:
+                if n == val:
+                    str = ' selected'
+                else:
+                    str = ''
+                s += '<option value="%s"%s>%s' % (n, str, i);
+                n += 1
+            s += '</select>'
+            val = desc[val]
         else:
-            str = ""
+            if val:
+                str = ' checked'
+            else:
+                str = ''
+            s += '<INPUT type="checkbox" name="%s" value="1"%s>%s' % (opt, str,
+                                                                      desc)
+
+        column[opt_column].append((s + '</TD>'))
         globals()[opt] = val
-        s = '<TD%s>%s<INPUT type="checkbox" name="%s" value="1"%s>%s</TD>'
-        column[opt_column].append((s % (opt_color, prefix, opt, str, desc)))
 
 
 column[0].append("<TH>Algorithm</TH>")
@@ -343,6 +373,7 @@ for opt, desc, color in translators:
     column[0].append(s % (color, opt, str, desc))
     add_options('', 0, color, globals()['options_' + opt])
 
+add_options("Search accepting run?", 0, '', options_accepting_run)
 add_options("Common Options", 1, '', options_common)
 add_options("Formula Simplications", 1, '', options_reduce)
 add_options("Debugging Options", 1, '', options_debug)
@@ -521,6 +552,71 @@ if show_lbtt:
 	spot.lbtt_reachable(spot.get_cout(), degen)
 	print '</pre>'
 
+
+if draw_acc_run or print_acc_run:
+    print '<H3>Accepting run</H3>'
+    ec_msg = "Running " + emptiness_check
+    ec_a = automaton
+    if emptiness_check == 'couvreur99':
+        ec = spot.couvreur99_check(automaton)
+    elif emptiness_check == 'couvreur99_shy':
+        ec = spot.couvreur99_check_shy(automaton)
+    elif (emptiness_check == 'explicit_magic_search'
+          or emptiness_check == 'explicit_se05'):
+        ec_a = 0
+        if degen:
+            ec_a = degen
+            ec_msg += ' <b>on degeneralized automaton</b>'
+        else:
+            count = automaton.number_of_acceptance_conditions()
+            if (count <= 1):
+                ec_a = automaton
+            else:
+                ec_a = 0
+                print ('<font color="red">Cannot run ' + emptiness_check
+                       + ' on automata with more than 1 acceptance '
+                       + 'condition.  Please select "draw degeneralized '
+                       + 'Büchi automaton" if you want to try this'
+                       + ' algorithm on the degeneralized version of the'
+                       + ' automaton.</font>')
+        if ec_a:
+            if emptiness_check == 'explicit_magic_search':
+                ec = spot.explicit_magic_search(ec_a)
+            elif emptiness_check == 'explicit_se05':
+                ec = spot.explicit_se05_search(ec_a)
+        else:
+            ec = 0
+    else:
+        print emptiness_check, "unsupported"
+        sys.stdout.flush()
+        assert 0
+    if ec:
+        print '%s: ' % ec_msg
+        sys.stdout.flush()
+        ec_res = ec.check()
+        if not ec_res:
+            print "no accepting run found.<br>"
+        else:
+            ec_run = ec_res.accepting_run()
+            print "accepting run found.<br>"
+            if ec_run:
+                if print_acc_run:
+                    print '<pre>'; sys.stdout.flush()
+                    s = spot.ostringstream()
+                    spot.print_tgba_run(s, ec_a, ec_run)
+                    print cgi.escape(s.str())
+                    del s
+                    print '</pre>'; sys.stdout.flush()
+                if draw_acc_run:
+                    deco = spot.tgba_run_dotty_decorator(ec_run)
+                    dont_run_dot = print_stats(ec_a)
+                    render_automaton(imgprefix + '-e', ec_a, dont_run_dot, deco)
+                    del deco
+                del ec_run
+            del ec_res
+        del ec
+        del ec_a
+
 sys.stdout.flush()
 
 spot.destroy(f)
@@ -528,4 +624,5 @@ spot.destroy(f)
 del degen
 del automaton
 
+del dict
 print_footer()

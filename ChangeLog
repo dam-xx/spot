@@ -1,3 +1,10 @@
+2004-11-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* wrap/python/cgi/ltl2tgba.in: Add options to check the produced
+	automata for emptiness, using the existing algorithms.
+	* wrap/python/spot.i: Declare spot::explicit_magic_search,
+	and spot::explicit_se05_search as allocating their output.
+
 2004-11-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac: Check for srand48 and drand48.

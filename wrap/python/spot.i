@@ -132,6 +132,8 @@ using namespace spot;
 %feature("new") spot::tgba_dupexp_dfs;
 %feature("new") spot::emptiness_check::check;
 %feature("new") spot::emptiness_check_result::accepting_run;
+%feature("new") spot::explicit_magic_search;
+%feature("new") spot::explicit_se05_search;
 
 // Help SWIG with namespace lookups.
 #define ltl spot::ltl
