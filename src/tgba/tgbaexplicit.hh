@@ -56,7 +56,6 @@ namespace spot
     create_transition(const std::string& source, const std::string& dest);
 
     void add_condition(transition* t, const ltl::formula* f);
-    void add_neg_condition(transition* t, const ltl::formula* f);
     /// This assumes that all variables in \a f are known from dict.
     void add_conditions(transition* t, bdd f);
     void declare_acceptance_condition(const ltl::formula* f);
@@ -84,7 +83,6 @@ namespace spot
     virtual bdd compute_support_variables(const spot::state* state) const;
 
     state* add_state(const std::string& name);
-    bdd get_condition(const ltl::formula* f);
     bdd get_acceptance_condition(const ltl::formula* f);
 
     typedef Sgi::hash_map<const std::string, tgba_explicit::state*,

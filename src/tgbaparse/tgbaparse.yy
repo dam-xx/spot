@@ -33,7 +33,7 @@
 {
   int token;
   std::string* str;
-  std::list<std::pair<bool, spot::ltl::formula*> >* listp;
+  spot::ltl::formula* f;
   std::list<spot::ltl::formula*>* list;
 }
 
@@ -59,7 +59,7 @@ typedef std::pair<bool, spot::ltl::formula*> pair;
 %token <str> STRING UNTERMINATED_STRING
 %token <str> IDENT
 %type <str> strident string
-%type <listp> cond_list
+%type <f> condition
 %type <list> acc_list
 %token ACC_DEF
 
@@ -73,22 +73,16 @@ lines: line
        | lines line
        ;
 
-line: strident ',' strident ',' cond_list ',' acc_list ';'
+line: strident ',' strident ',' condition ',' acc_list ';'
        {
 	 spot::tgba_explicit::transition* t
 	   = result->create_transition(*$1, *$3);
-	 std::list<pair>::iterator i;
-	 for (i = $5->begin(); i != $5->end(); ++i)
-	   if (i->first)
-	     result->add_neg_condition(t, i->second);
-	   else
-	     result->add_condition(t, i->second);
-	 std::list<formula*>::iterator i2;
-	 for (i2 = $7->begin(); i2 != $7->end(); ++i2)
-	     result->add_acceptance_condition(t, *i2);
+	 result->add_condition(t, $5);
+	 std::list<formula*>::iterator i;
+	 for (i = $7->begin(); i != $7->end(); ++i)
+	   result->add_acceptance_condition(t, *i);
 	 delete $1;
 	 delete $3;
-	 delete $5;
 	 delete $7;
        }
        ;
@@ -102,40 +96,27 @@ string: STRING
 
 strident: string | IDENT
 
-cond_list:
+condition:
        {
-	 $$ = new std::list<pair>;
+	 $$ = constant::true_instance();
        }
-       | cond_list string
+       | string
        {
-	 if (*$2 != "")
+	 parse_error_list pel;
+	 formula* f = spot::ltl::parse(*$1, pel, parse_environment);
+	 for (parse_error_list::iterator i = pel.begin();
+	      i != pel.end(); ++i)
 	   {
-	     parse_error_list pel;
-	     formula* f = spot::ltl::parse(*$2, pel, parse_environment);
-	     for (parse_error_list::iterator i = pel.begin();
-		  i != pel.end(); ++i)
-	       {
-		 // Adjust the diagnostic to the current position.
-		 Location here = @2;
-		 here.begin.line += i->first.begin.line;
-		 here.begin.column += i->first.begin.column;
-		 here.end.line = here.begin.line + i->first.begin.line;
-		 here.end.column = here.begin.column + i->first.begin.column;
-		 error_list.push_back(spot::tgba_parse_error(here, i->second));
-	       }
-	     $1->push_back(pair(false, f));
+	     // Adjust the diagnostic to the current position.
+	     Location here = @1;
+	     here.begin.line += i->first.begin.line;
+	     here.begin.column += i->first.begin.column;
+	     here.end.line = here.begin.line + i->first.begin.line;
+	     here.end.column = here.begin.column + i->first.begin.column;
+	     error_list.push_back(spot::tgba_parse_error(here, i->second));
 	   }
-	 delete $2;
-	 $$ = $1;
-       }
-       | cond_list '!' strident
-       {
-	 if (*$3 != "")
-	   {
-	     $1->push_back(pair(true, parse_environment.require(*$3)));
-	   }
-	 delete $3;
-	 $$ = $1;
+	 delete $1;
+	 $$ = f ? f : constant::false_instance();
        }
        ;
 

@@ -1,5 +1,12 @@
 2003-11-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaparse/tgbaparse.yy (cond_list): Simplify into...
+	(condition): ... this.  We now accept only one condition, which
+	is a formula.
+	* src/tgba/tgbaexplicit.hh (tgba_explicit::add_neg_condition,
+	tgba_explicit::get_condition): Remove, unused.
+	* src/tgba/tgbaexplicit.cc: Likewise.
+
 	* iface/gspn/eesrg.cc, iface/gspn/eesrg.hh, iface/gspn/gspn.cc,
 	iface/gspn/gspn.hh, src/tgba/bdddict.cc, src/tgba/bdddict.hh,
 	src/tgba/bddprint.hh, src/tgba/succiter.hh,

@@ -171,26 +171,11 @@ namespace spot
     return t;
   }
 
-  bdd
-  tgba_explicit::get_condition(const ltl::formula* f)
-  {
-    assert(dynamic_cast<const ltl::atomic_prop*>(f));
-    int v = dict_->register_proposition(f, this);
-    ltl::destroy(f);
-    return bdd_ithvar(v);
-  }
-
   void
   tgba_explicit::add_condition(transition* t, const ltl::formula* f)
   {
     t->condition &= formula_to_bdd(f, dict_, this);
     ltl::destroy(f);
-  }
-
-  void
-  tgba_explicit::add_neg_condition(transition* t, const ltl::formula* f)
-  {
-    t->condition -= get_condition(f);
   }
 
   void
