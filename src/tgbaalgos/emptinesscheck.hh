@@ -61,10 +61,30 @@ namespace spot
     emptiness_check(const tgba* a);
     ~emptiness_check();
 
-    /// This function returns true if the automata's language is empty,
-    /// and builds a stack of SCC.
+    //@{
+    /// \brief check whether an automaton's language is empty
+    ///
+    /// Returns true if the automaton's language is empty.  When
+    /// it return false, a stack of SCC has been built and can
+    /// later be used by counter_example().
+    ///
+    /// There are two variants of this algorithm: check() and check2().
+    /// They differ in their memory usage, the number for successors computed
+    /// before they are used  and the way the depth first search is directed.
+    ///
+    /// check() performs a straightforward depth first search.  The DFS
+    /// stacks store tgba_succ_iterators, so that only the iterators which
+    /// really are explored are computed.
+    ///
+    /// check2() try to explore successors which are visited states first.
+    /// this helps to merge SCCs and generally helps to produce shorter
+    /// counter-examples.  However this algorithm cannot stores unprocessed
+    /// successors as tgba_succ_iterators: it must compute all successors
+    /// of a state at once in order to decide which to explore first, and
+    /// must keep a list of all unexplored successors in its DFS stack.
     bool check();
     bool check2();
+    //@}
 
     /// Compute a counter example if tgba_emptiness_check() returned false.
     void counter_example();
