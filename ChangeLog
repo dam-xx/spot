@@ -1,5 +1,10 @@
 2004-02-02  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/misc/bddalloc.hh: Make all methods public.
+	* wrap/python/spot.i: Include misc/bddalloc.hh and misc/minato.hh.
+	* wrap/python/tests/minato.py: New file.
+	* wrap/python/tests/Makefile.am (TESTS): Add minato.py.
+
 	* src/tgbatest/explicit.cc, src/tgbatest/explprod.cc,
 	src/tgbatest/ltl2tgba.cc, src/tgbatest/ltlprod.cc,
 	src/tgbatest/mixprod.cc, src/tgbatest/powerset.cc,

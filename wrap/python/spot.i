@@ -32,6 +32,8 @@
 #include <sstream>
 
 #include "misc/version.hh"
+#include "misc/bddalloc.hh"
+#include "misc/minato.hh"
 
 #include "ltlast/formula.hh"
 #include "ltlast/refformula.hh"
@@ -83,6 +85,8 @@ using namespace spot;
 %}
 
 %include "misc/version.hh"
+%include "misc/bddalloc.hh"
+%include "misc/minato.hh"
 
 %include "ltlast/formula.hh"
 %include "ltlast/refformula.hh"

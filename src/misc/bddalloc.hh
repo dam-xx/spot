@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -31,7 +31,7 @@ namespace spot
   /// Manage ranges of variables.
   class bdd_allocator
   {
-  protected:
+  public:
     /// Default constructor.
     bdd_allocator();
     /// Initialize the BDD library.
@@ -40,7 +40,7 @@ namespace spot
     int allocate_variables(int n);
     /// Release \a n BDD variables starting at \a base.
     void release_variables(int base, int n);
-
+  protected:
     static bool initialized; ///< Whether the BDD library has been initialized.
     static int varnum; ///< number of variables in use in the BDD library.
     int lvarnum; ///< number of variables in use in this allocator.
