@@ -117,9 +117,9 @@
 	* src/ltltest/readltl.cc, src/ltltest/equals.cc,
 	src/ltltest/tostring.cc: Adjust usage.
 
-	Check trivial multop equality at build time.  The makes the
-	equal visitor useless, since two equals formulae will now
-	share the same address.
+	Check trivial multop equality at build time.  This makes the equal
+	visitor useless, since two equals formulae will now share the same
+	address.
 
 	* src/ltlast/multop.hh (add_sorted): New function.
 	(paircmp): New comparison functor.
