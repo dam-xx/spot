@@ -29,6 +29,8 @@ namespace spot
       state* dest;
     };
 
+    void set_init_state(const std::string& state);
+
     transition*
     create_transition(const std::string& source, const std::string& dest);
 
@@ -37,6 +39,7 @@ namespace spot
     void declare_accepting_condition(ltl::formula* f);
     bool has_accepting_condition(ltl::formula* f) const;
     void add_accepting_condition(transition* t, ltl::formula* f);
+    void complement_all_accepting_conditions();
 
     // tgba interface
     virtual ~tgba_explicit();

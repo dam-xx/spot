@@ -49,6 +49,7 @@
 #include "tgba/tgbatba.hh"
 
 #include "tgbaalgos/ltl2tgba.hh"
+#include "tgbaalgos/ltl2tgba_fm.hh"
 #include "tgbaalgos/dotty.hh"
 #include "tgbaalgos/lbtt.hh"
 #include "tgbaalgos/magic.hh"
@@ -84,6 +85,7 @@ using namespace spot;
 %include "ltlvisit/tunabbrev.hh"
 
 %feature("new") spot::ltl_to_tgba;
+%feature("new") spot::ltl_to_tgba_fm;
 %feature("new") spot::tgba::get_init_state;
 %feature("new") spot::tgba::succ_iter;
 %feature("new") spot::tgba_succ_iterator::current_state;
@@ -104,6 +106,7 @@ using namespace spot;
 %include "tgba/tgbatba.hh"
 
 %include "tgbaalgos/ltl2tgba.hh"
+%include "tgbaalgos/ltl2tgba_fm.hh"
 %include "tgbaalgos/dotty.hh"
 %include "tgbaalgos/lbtt.hh"
 %include "tgbaalgos/magic.hh"

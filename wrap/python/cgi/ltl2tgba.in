@@ -68,9 +68,29 @@ options = [
     ('show_lbtt',           'convert automaton for LBTT',                  0),
     ]
 
+default_translator = 'trans_lacim';
+translators = [
+    ('trans_lacim',     'Convreur/LaCIM'),
+    ('trans_fm',        'Convreur/FM'),
+    ]
+
 print """<FORM action="%s" method="post"><P>
 Formula to translate: <INPUT type="text"  name="formula" value="%s"><BR>
-Options:<TABLE><TR><TD>""" % (myself, formula)
+Translator:<TABLE><TR><TD>""" % (myself, formula)
+
+
+trans = form.getfirst("trans", default_translator)
+for opt, desc, in translators:
+    if trans == opt:
+	str = "checked"
+    else:
+	str = ""
+    globals()[opt] = str
+    print '<INPUT type="radio" name="trans" value="%s" %s>%s<br>' % (opt, str,
+                                                                     desc)
+
+print """</TD></TR></TABLE>
+Options:<TABLE><TR><TD>"""
 
 for opt, desc, arg, in options:
     if formula:
@@ -140,7 +160,10 @@ dict = spot.bdd_dict()
 print '<p>Building automaton...',
 sys.stdout.flush()
 
-concrete = spot.ltl_to_tgba(f, dict)
+if trans_lacim:
+    automaton = spot.ltl_to_tgba(f, dict)
+elif trans_fm:
+    automaton = spot.ltl_to_tgba_fm(f, dict)
 
 print 'done.</p>'
 sys.stdout.flush()
@@ -148,14 +171,14 @@ sys.stdout.flush()
 if show_automaton_dot:
     print '<pre>'; sys.stdout.flush()
     s = spot.ostringstream()
-    spot.dotty_reachable(s, concrete)
+    spot.dotty_reachable(s, automaton)
     print cgi.escape(s.str())
     del s
     print '</pre>'; sys.stdout.flush()
 
 if show_automaton_gif:
     outfile = spot.ofstream(imgprefix + '-a.dot')
-    spot.dotty_reachable(outfile, concrete)
+    spot.dotty_reachable(outfile, automaton)
     del outfile
     os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
 	       imgprefix + '-a.gif', imgprefix + '-a.dot')
@@ -166,7 +189,7 @@ if show_automaton_gif:
 
 if show_degen_dot or show_degen_gif:
     print '<H3>Degeneralized automaton</H3>'
-    degen = spot.tgba_tba_proxy(concrete)
+    degen = spot.tgba_tba_proxy(automaton)
     if show_degen_dot:
 	print '<pre>'; sys.stdout.flush()
 	s = spot.ostringstream()
@@ -190,21 +213,22 @@ if show_dictionnay:
     print '<H3>BDD dictionary</H3>'
     print '<pre>'
     sys.stdout.flush()
-    concrete.get_dict().dump(spot.get_cout())
+    automaton.get_dict().dump(spot.get_cout())
     print '</pre>'
 
-if show_relation_dot or show_relation_set or show_relation_gif:
+if (type(automaton) == spot.tgba_bdd_concrete
+    and (show_relation_dot or show_relation_set or show_relation_gif)):
     print '<H3>Transition relation</H3>'
     if show_relation_dot:
-	escaped_print_dot(concrete.get_dict(),
-			  concrete.get_core_data().relation)
+	escaped_print_dot(automaton.get_dict(),
+			  automaton.get_core_data().relation)
     if show_relation_set:
-	escaped_print_set(concrete.get_dict(),
-			  concrete.get_core_data().relation)
+	escaped_print_set(automaton.get_dict(),
+			  automaton.get_core_data().relation)
     if show_relation_gif:
 	outfile = spot.ofstream(imgprefix + '-b.dot')
-	spot.bdd_print_dot(outfile, concrete.get_dict(),
-			   concrete.get_core_data().relation)
+	spot.bdd_print_dot(outfile, automaton.get_dict(),
+			   automaton.get_core_data().relation)
 	del outfile
 	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
 		   imgprefix + '-b.gif', imgprefix + '-b.dot')
@@ -212,18 +236,19 @@ if show_relation_dot or show_relation_set or show_relation_gif:
                    imgprefix + '-b.gif', imgprefix + '-b.png')
 	print '<img src="' + imgprefix + '-b.png">'
 
-if show_acceptance_dot or show_acceptance_set or show_acceptance_gif:
+if (type(automaton) == spot.tgba_bdd_concrete
+    and (show_acceptance_dot or show_acceptance_set or show_acceptance_gif)):
     print '<H3>Acceptance relation</H3>'
     if show_acceptance_dot:
-	escaped_print_dot(concrete.get_dict(),
-			  concrete.get_core_data().accepting_conditions)
+	escaped_print_dot(automaton.get_dict(),
+			  automaton.get_core_data().accepting_conditions)
     if show_acceptance_set:
-	escaped_print_set(concrete.get_dict(),
-			  concrete.get_core_data().accepting_conditions)
+	escaped_print_set(automaton.get_dict(),
+			  automaton.get_core_data().accepting_conditions)
     if show_acceptance_gif:
 	outfile = spot.ofstream(imgprefix + '-c.dot')
-	spot.bdd_print_dot(outfile, concrete.get_dict(),
-			   concrete.get_core_data().accepting_conditions)
+	spot.bdd_print_dot(outfile, automaton.get_dict(),
+			   automaton.get_core_data().accepting_conditions)
 	del outfile
 	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
 		   imgprefix + '-c.gif', imgprefix + '-c.dot')
@@ -237,7 +262,7 @@ if show_lbtt:
 	print '<H4>Conversion of the generalized automaton</H4>'
     print '<pre>'
     sys.stdout.flush()
-    spot.lbtt_reachable(spot.get_cout(), concrete)
+    spot.lbtt_reachable(spot.get_cout(), automaton)
     print '</pre>'
     if degen:
 	print '<H4>Conversion of the degeneralized automaton</H4>'
@@ -248,9 +273,10 @@ if show_lbtt:
 
 sys.stdout.flush()
 
-# Make sure degen is cleared before concrete.
+spot.destroy(f)
+# Make sure degen is cleared before automaton.
 del degen
-del concrete
+del automaton
 
 print '<hr>'
 print 'ltl2tgba.py @PACKAGE_VERSION@; Spot', spot.version()

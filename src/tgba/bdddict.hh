@@ -91,8 +91,13 @@ namespace spot
     /// Usually called in the destructor if \a me.
     void unregister_all_my_variables(const void* me);
 
+    /// @{
     /// Check whether formula \a f has already been registered by \a by_me.
-    bool is_registered(const ltl::formula* f, const void* by_me);
+    bool is_registered_proposition(const ltl::formula* f, const void* by_me);
+    bool is_registered_state(const ltl::formula* f, const void* by_me);
+    bool is_registered_accepting_variable(const ltl::formula* f,
+					  const void* by_me);
+    /// @}
 
     /// \brief Dump all variables for debugging.
     /// \param os The output stream.

@@ -7,15 +7,29 @@ set -e
 cat > config <<EOF
 Algorithm
 {
-   Name = "Spot"
-   Path = "${LBTT_TRANSLATE} --spot ./spotlbtt"
+   Name = "Spot (Couvreur -- LaCIM)"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -t'"
    Enabled = yes
 }
 
 Algorithm
 {
-   Name = "Spot TBA"
-   Path = "${LBTT_TRANSLATE} --spot ./tbalbtt"
+   Name = "Spot (Couvreur -- LACIM), degeneralized"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -t -D'"
+   Enabled = yes
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM)"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM), degeneralized"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -t -D'"
    Enabled = yes
 }
 

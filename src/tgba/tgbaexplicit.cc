@@ -111,6 +111,7 @@ namespace spot
 	state_name_map_[s] = name;
 
 	// The first state we add is the inititial state.
+	// It can also be overridden with set_init_state().
 	if (! init_)
 	  init_ = s;
 
@@ -118,6 +119,14 @@ namespace spot
       }
     return i->second;
   }
+
+  void
+  tgba_explicit::set_init_state(const std::string& state)
+  {
+    tgba_explicit::state* s = add_state(state);
+    init_ = s;
+  }
+
 
   tgba_explicit::transition*
   tgba_explicit::create_transition(const std::string& source,
@@ -159,13 +168,40 @@ namespace spot
   {
     int v = dict_->register_accepting_variable(f, this);
     ltl::destroy(f);
-    neg_accepting_conditions_ &= bdd_nithvar(v);
+    bdd neg = bdd_nithvar(v);
+    neg_accepting_conditions_ &= neg;
+
+    // Append neg to all acceptance conditions.
+    ns_map::iterator i;
+    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+      {
+	tgba_explicit::state::iterator i2;
+	for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	  (*i2)->accepting_conditions &= neg;
+      }
+
+    all_accepting_conditions_computed_ = false;
+  }
+
+  void
+  tgba_explicit::complement_all_accepting_conditions()
+  {
+    bdd all = all_accepting_conditions();
+    ns_map::iterator i;
+    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+      {
+	tgba_explicit::state::iterator i2;
+	for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	  {
+	    (*i2)->accepting_conditions = all - (*i2)->accepting_conditions;
+	  }
+      }
   }
 
   bool
   tgba_explicit::has_accepting_condition(ltl::formula* f) const
   {
-    return dict_->is_registered(f, this);
+    return dict_->is_registered_accepting_variable(f, this);
   }
 
   bdd
@@ -185,6 +221,9 @@ namespace spot
 	assert(0);
       }
     bdd_dict::fv_map::iterator i = dict_->acc_map.find(f);
+    assert(has_accepting_condition(f));
+    /* If this second assert fails and the first doesn't,
+       things are badly broken.  This has already happened. */
     assert(i != dict_->acc_map.end());
     ltl::destroy(f);
     bdd v = bdd_ithvar(i->second);

@@ -12,8 +12,6 @@ check_PROGRAMS = \
   ltlprod \
   mixprod \
   readsave \
-  spotlbtt \
-  tbalbtt \
   tgbaread \
   tripprod
 
@@ -27,11 +25,8 @@ ltlmagic_SOURCES = ltlmagic.cc
 ltlprod_SOURCES  = ltlprod.cc
 mixprod_SOURCES  = mixprod.cc
 readsave_SOURCES = readsave.cc
-tbalbtt_SOURCES  = spotlbtt.cc
-tbalbtt_CXXFLAGS = -DTBA
 tgbaread_SOURCES = tgbaread.cc
 tripprod_SOURCES = tripprod.cc
-spotlbtt_SOURCES = spotlbtt.cc
 
 # Keep this sorted by STRENGTH.  Test basic things first,
 # because such failures will be easier to diagnose and fix.

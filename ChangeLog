@@ -1,3 +1,46 @@
+2003-08-15  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	This implements Couvreur's FM'99 ltl2tgba translation.
+	* src/tgba/bdddict.cc (bdd_dict::is_registered): Split as ...
+	(bdd_dict::is_registered_proposition, bdd_dict::is_registered_state,
+	bdd_dict::is_registered_accepting_variable): ... these.
+	* src/tgba/bdddict.hh: Likewise.
+	* src/tgba/tgbaexplicit.cc (tgba_explicit::set_init_state): New method.
+	(tgba_explicit::declare_accepting_condition): Arrange so that this
+	function can be called during the construction of the automaton.
+	(tgba_explicit::complement_all_accepting_conditions): New method.
+	(tgba_explicit::has_accepting_condition): Adjust to call
+	bdd_dict::is_registered_accepting_variable.
+	* src/tgba/tgbaexplicit.hh (tgba_explicit::set_init_state,
+	tgba_explicit::complement_all_accepting_conditions): New methods.
+	* src/tgbaalgos/ltl2tgba_fm.cc, src/tgbaalgos/ltl2tgba_fm.hh:
+	New files.
+	* src/tgbaalgos/Makefile.am (tgbaalgos_HEADERS,
+	libtgbaalgos_la_SOURCES): Add them.
+	* src/tgbaalgos/ltl2tgba.hh: Add bibtex entry in comment.
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Remove spotlbtt
+	and tbalbtt.
+	(tbalbtt_SOURCES, tbalbtt_CXXFLAGS, spotlbtt_SOURCES): Remove.
+	* src/tgbatest/spotlbtt.cc: Delete, superseded by "ltl2tgba -F -t".
+	* src/tgbatest/ltl2tgba.cc: Implement the -f and -F options.
+	* src/tgbatest/spotlbtt.test: Use "ltl2tgba -F -t" instead of
+	"spotlbtt", "ltl2tgba -F -t -D" instead of "tbalbtt", and add
+	also check the ltl2tgba_fm translator.
+	* wrap/python/spot.i: Wrap ltl2tgba_fm.
+	* wrap/python/cgi/ltl2tgba.in: Add radio buttons to select
+	between ltl2tgba and ltl2tgba_fm.
+	* wrap/python/tests/ltl2tgba.py: Add support for the -f option.
+	* wrap/python/tests/ltl2tgba.test: Try the -f option.
+
+	varnum can be augmented by other allocator.  Keep track
+	of a local varnum (lvarnum) in each allocator.
+	* src/misc/bddalloc.cc (bdd_allocator::bdd_allocator): Initialize
+	lvarnum.
+	(bdd_allocator::extvarnum): New method.
+	(bdd_allocator::allocate_variables): Use lvarnum and extvarnum.
+	* src/misc/bddalloc.hh (bdd_allocator::extvarnum): New mathod.
+	(bdd_allocator::lvarnum): New variable.
+
 2003-08-14  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/state.hh, src/tgba/statebdd.hh, src/tgba/statebdd.cc:

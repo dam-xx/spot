@@ -8,6 +8,7 @@ tgbaalgos_HEADERS = \
   dotty.hh \
   lbtt.hh \
   ltl2tgba.hh \
+  ltl2tgba_fm.hh \
   magic.hh \
   save.hh
 
@@ -17,5 +18,6 @@ libtgbaalgos_la_SOURCES = \
   dotty.cc \
   lbtt.cc \
   ltl2tgba.cc \
+  ltl2tgba_fm.cc \
   magic.cc \
   save.cc

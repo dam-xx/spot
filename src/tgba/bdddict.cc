@@ -161,30 +161,33 @@ namespace spot
   }
 
   bool
-  bdd_dict::is_registered(const ltl::formula* f, const void* by_me)
+  bdd_dict::is_registered_proposition(const ltl::formula* f, const void* by_me)
   {
-    int var;
     fv_map::iterator fi = var_map.find(f);
-    if (fi != var_map.end())
-      {
-	var = fi->second;
-      }
-    else
-      {
-	fi = now_map.find(f);
-	if (fi != now_map.end())
-	  {
-	    var = fi->second;
-	  }
-	else
-	  {
-	    fi = acc_map.find(f);
-	    if (fi == acc_map.end())
-	      return false;
-	    var = fi->second;
-	  }
-      }
-    ref_set& s = var_refs[var];
+    if (fi == var_map.end())
+      return false;
+    ref_set& s = var_refs[fi->second];
+    return s.find(by_me) != s.end();
+  }
+
+  bool
+  bdd_dict::is_registered_state(const ltl::formula* f, const void* by_me)
+  {
+    fv_map::iterator fi = now_map.find(f);
+    if (fi == now_map.end())
+      return false;
+    ref_set& s = var_refs[fi->second];
+    return s.find(by_me) != s.end();
+  }
+
+  bool
+  bdd_dict::is_registered_accepting_variable(const ltl::formula* f,
+					     const void* by_me)
+  {
+    fv_map::iterator fi = acc_map.find(f);
+    if (fi == acc_map.end())
+      return false;
+    ref_set& s = var_refs[fi->second];
     return s.find(by_me) != s.end();
   }
 

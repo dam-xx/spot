@@ -14,6 +14,7 @@ Options:
   -A   same as -a, but as a set
   -d   turn on traces during parsing
   -D   degeneralize the automaton
+  -f   use Couvreur's FM algorithm for translation
   -r   display the relation BDD, not the reachability graph
   -R   same as -r, but as a set
   -t   display reachable states in LBTT's format
@@ -23,7 +24,7 @@ Options:
 
 prog = sys.argv[0]
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'aAdDrRtv')
+    opts, args = getopt.getopt(sys.argv[1:], 'aAdDfrRtv')
 except getopt.GetoptError:
     usage(prog)
 
@@ -31,6 +32,7 @@ exit_code = 0
 debug_opt = 0
 degeneralize_opt = None
 output = 0
+fm_opt = 0
 
 for o, a in opts:
     if o == '-a':
@@ -41,6 +43,8 @@ for o, a in opts:
         debug_opt = 1
     elif o == '-D':
         degeneralize_opt = 1
+    elif o == '-f':
+        fm_opt = 1
     elif o == '-r':
         output = 1
     elif o == '-R':
@@ -65,14 +69,17 @@ p = spot.empty_parse_error_list()
 f = spot.parse(args[0], p, e, debug_opt)
 if spot.format_parse_errors(cerr, args[0], p):
     exit_code = 1
-    
+
 dict = spot.bdd_dict()
 
 if f:
-    concrete = spot.ltl_to_tgba(f, dict)
+    if fm_opt:
+        a = spot.ltl_to_tgba_fm(f, dict)
+        concrete = 0
+    else:
+        a = concrete = spot.ltl_to_tgba(f, dict)
     spot.destroy(f)
     del f
-    a = concrete
 
     degeneralized = None
     if degeneralize_opt:
@@ -81,18 +88,22 @@ if f:
     if output == 0:
         spot.dotty_reachable(cout, a)
     elif output == 1:
-        spot.bdd_print_dot(cout, concrete.get_dict(),
-                           concrete.get_core_data().relation)
+        if concrete:
+            spot.bdd_print_dot(cout, concrete.get_dict(),
+                               concrete.get_core_data().relation)
     elif output == 2:
-        spot.bdd_print_dot(cout, concrete.get_dict(),
-                           concrete.get_core_data().accepting_conditions)
+        if concrete:
+            spot.bdd_print_dot(cout, concrete.get_dict(),
+                               concrete.get_core_data().accepting_conditions)
     elif output == 3:
-        spot.bdd_print_set(cout, concrete.get_dict(),
-                           concrete.get_core_data().relation)
+        if concrete:
+            spot.bdd_print_set(cout, concrete.get_dict(),
+                               concrete.get_core_data().relation)
         print
     elif output == 4:
-        spot.bdd_print_set(cout, concrete.get_dict(),
-                           concrete.get_core_data().accepting_conditions)
+        if concrete:
+            spot.bdd_print_set(cout, concrete.get_dict(),
+                               concrete.get_core_data().accepting_conditions)
         print
     elif output == 5:
         a.get_dict().dump(cout)
@@ -116,4 +127,3 @@ assert spot.atomic_prop.instance_count() == 0
 assert spot.unop.instance_count() == 0
 assert spot.binop.instance_count() == 0
 assert spot.multop.instance_count() == 0
-
