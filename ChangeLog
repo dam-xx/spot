@@ -1,3 +1,9 @@
+2004-12-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/randomgraph.cc (random_graph): Do not use the
+	pointer of the state created as keys in sets; otherwise the graph
+	created depends on the memory layout.
+
 2004-12-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgba/tgbaexplicit.cc (tgba_explicit::create_transition):
