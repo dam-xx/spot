@@ -60,12 +60,12 @@ namespace spot
   ///         weight[b] = weight[b] - 1;
   ///       end for;
   ///     else
-  ///       let (s, l, a, t) be the edge from s to t;
   ///       Acc = s.acc U a;
   ///       if t.color == cyan &&
-  ///                 (Acc U support(weight -s.weight) U t.acc) == all_acc then
+  ///                 (Acc U support(weight -t.weight) U t.acc) == all_acc then
   ///         report a cycle;
   ///       else if Acc not included in t.acc then
+  ///         t.acc := t.acc U Acc
   ///         call dfs_red(t, Acc);
   ///       end if;
   ///     end if;
@@ -81,6 +81,7 @@ namespace spot
   ///                 (Acc U support(weight -t.weight) U t.acc) == all_acc then
   ///       report a cycle;
   ///     else if t.color != white and Acc not included in t.acc then
+  ///       t.acc := t.acc U Acc
   ///       call dfs_red(t, Acc);
   ///     end if;
   ///   end for;

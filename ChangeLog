@@ -1,5 +1,7 @@
 2005-01-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/tau03opt.hh (explicit_tau03_opt_search): Doco.
+
 	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_shy::clear_todo,
 	couvreur99_check_shy::check): Sum all successors in the
 	todo stack AND all items on the stack.
