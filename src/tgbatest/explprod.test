@@ -18,11 +18,16 @@ EOF
 
 cat >expected <<EOF
 "s1 * s1", "s3 * s2", a b, "p2";
-"s1 * s1", "s2 * s2", b, "p2" "p1";
-"s2 * s2", "s3 * s1", c a, "p3";
+"s1 * s1", "s2 * s2", b, "p1" "p2";
+"s2 * s2", "s3 * s1", a c, "p3";
 EOF
 
 ./explprod input1 input2 > stdout
+
+# Sort out some possible inversions in the output.
+# (The order is not guaranteed by SPOT.)
+sed 's/c a/a c/g;s/b a/a b/g;s/"p2" "p1"/"p1" "p2"/g' stdout > tmp_ &&
+  mv tmp_ stdout
 
 cat stdout
 diff stdout expected

@@ -1,14 +1,19 @@
+2003-06-22  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgbatest/tripprod.test, src/tgbatest/explprod.test:
+	Sort out some possible inversions in the output.
+
 2003-06-19  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
-	* src/tgba/tgbabddconcretefactory.cc 
-	(tgba_bdd_concrete_factory::~tgba_bdd_concrete_factory): destroy the 
+	* src/tgba/tgbabddconcretefactory.cc
+	(tgba_bdd_concrete_factory::~tgba_bdd_concrete_factory): destroy the
 	formulae used as keys in prom_.
 	(tgba_bdd_concrete_factory::create_promise): Delete.
-	(tgba_bdd_concrete_factory::declare_promise, 
+	(tgba_bdd_concrete_factory::declare_promise,
 	tgba_bdd_concrete_factory::finish): New functions.
-	* src/tgba/tgbabddconcretefactory.hh 
+	* src/tgba/tgbabddconcretefactory.hh
 	(tgba_bdd_concrete_factory::create_promise): Delete.
-	(tgba_bdd_concrete_factory::declare_promise, 
+	(tgba_bdd_concrete_factory::declare_promise,
 	tgba_bdd_concrete_factory::finish): New functions.
 	(tgba_bdd_concrete_factory::prom_): New map.
 	* src/tgba/ltl2tgba.cc (ltl_trad_visitor::visit): Adjust
