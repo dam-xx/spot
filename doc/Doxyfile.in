@@ -115,7 +115,8 @@ FULL_PATH_NAMES        = YES
 # path to strip.
 
 STRIP_FROM_PATH        = @top_srcdir@/src/ \
-                         @top_srcdir@/iface/
+                         @top_srcdir@/iface/ \
+			 @srcdir@
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of
 # the path mentioned in the documentation of a class, which tells
