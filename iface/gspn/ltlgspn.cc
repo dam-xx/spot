@@ -239,6 +239,9 @@ main(int argc, char **argv)
 #endif
 	      default:
 		assert(0);
+		// Assign something so that GCC does not complains
+		// EC might be used uninitialized if assert is disabled.
+		ec = 0;
 	      }
 
 	    bool res = ec->check();
