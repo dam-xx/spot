@@ -109,7 +109,7 @@ namespace spot
     negacc_set &= !acc;
   }
 
-  void 
+  void
   tgba_bdd_core_data::translate(bddPair* rewrite)
   {
     relation = bdd_replace(relation, rewrite);
