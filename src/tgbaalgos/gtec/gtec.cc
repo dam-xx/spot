@@ -30,8 +30,9 @@ namespace spot
   }
 
   couvreur99_check::couvreur99_check(const tgba* a,
+				     bool poprem,
 				     const numbered_state_heap_factory* nshf)
-    : emptiness_check(a)
+    : emptiness_check(a), poprem_(poprem)
   {
     ecs_ = new couvreur99_check_status(a, nshf);
   }
@@ -44,6 +45,23 @@ namespace spot
   void
   couvreur99_check::remove_component(const state* from)
   {
+    // If rem has been updated, removing states is very easy.
+    if (poprem_)
+      {
+	assert(!ecs_->root.rem().empty());
+	dec_depth(ecs_->root.rem().size());
+	std::list<const state*>::iterator i;
+	for (i = ecs_->root.rem().begin(); i != ecs_->root.rem().end(); ++i)
+	  {
+	    numbered_state_heap::state_index_p spi = ecs_->h->index(*i);
+	    assert(spi.first == *i);
+	    assert(*spi.second != -1);
+	    *spi.second = -1;
+	  }
+	// ecs_->root.rem().clear();
+	return;
+      }
+
     // Remove from H all states which are reachable from state FROM.
 
     // Stack of iterators towards states to remove.
@@ -57,7 +75,6 @@ namespace spot
     assert(spi.first == from);
     assert(*spi.second != -1);
     *spi.second = -1;
-    dec_depth(); // FIXME: check once remove_component() is revamped.
     tgba_succ_iterator* i = ecs_->aut->succ_iter(from);
 
     for (;;)
@@ -65,7 +82,7 @@ namespace spot
 	// Remove each destination of this iterator.
 	for (i->first(); !i->done(); i->next())
 	  {
-	    // FIXME: inc_transitions();
+	    inc_transitions();
 
 	    state* s = i->current_state();
 	    numbered_state_heap::state_index_p spi = ecs_->h->index(s);
@@ -81,7 +98,6 @@ namespace spot
 	    if (*spi.second != -1)
 	      {
 		*spi.second = -1;
-		dec_depth(); // FIXME: check after revamping.
 		to_remove.push(ecs_->aut->succ_iter(spi.first));
 	      }
 	  }
@@ -139,20 +155,28 @@ namespace spot
 
 	    // Backtrack TODO.
 	    todo.pop();
-	    // FIXME: dec_depth();
+	    dec_depth();
 
+	    // If poprem is used, fill rem with any component removed,
+	    // so that remove_component() does not have to traverse
+	    // the SCC again.
+	    numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
+	    assert(spi.first);
+	    if (poprem_)
+	      {
+		ecs_->root.rem().push_front(spi.first);
+		inc_depth();
+	      }
 	    // When backtracking the root of an SCC, we must also
 	    // remove that SCC from the ARC/ROOT stacks.  We must
 	    // discard from H all reachable states from this SCC.
-	    numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
-	    assert(spi.first);
 	    assert(!ecs_->root.empty());
 	    if (ecs_->root.top().index == *spi.second)
 	      {
 		assert(!arc.empty());
 		arc.pop();
-		ecs_->root.pop();
 		remove_component(curr);
+		ecs_->root.pop();
 	      }
 
 	    delete succ;
@@ -203,12 +227,14 @@ namespace spot
 	// top of ROOT that have an index greater to the one of
 	// the SCC of S2 (called the "threshold").
 	int threshold = *spi.second;
+	std::list<const state*> rem;
 	while (threshold < ecs_->root.top().index)
 	  {
 	    assert(!ecs_->root.empty());
 	    assert(!arc.empty());
 	    acc |= ecs_->root.top().condition;
 	    acc |= arc.top();
+	    rem.splice(rem.end(), ecs_->root.rem());
 	    ecs_->root.pop();
 	    arc.pop();
 	  }
@@ -219,6 +245,7 @@ namespace spot
 
 	// Accumulate all acceptance conditions into the merged SCC.
 	ecs_->root.top().condition |= acc;
+	ecs_->root.rem().splice(ecs_->root.rem().end(), rem);
 
 	if (ecs_->root.top().condition
 	    == ecs_->aut->all_acceptance_conditions())
@@ -261,10 +288,11 @@ namespace spot
   //////////////////////////////////////////////////////////////////////
 
   couvreur99_check_shy::couvreur99_check_shy(const tgba* a,
+					     bool poprem,
 					     bool group,
 					     const numbered_state_heap_factory*
 					     nshf)
-    : couvreur99_check(a, nshf), num(1), group_(group)
+    : couvreur99_check(a, poprem, nshf), num(1), group_(group)
   {
     // Setup depth-first search from the initial state.
     todo.push_back(todo_item(0, 0));
@@ -297,8 +325,8 @@ namespace spot
 	dec_depth(todo.back().q.size() + 1);
 	todo.pop_back();
       }
-    // FIXME: enable after revamping remove_component().
-    // assert(depth() == 0);
+    dec_depth(ecs_->root.clear_rem());
+    assert(depth() == 0);
   }
 
   emptiness_check_result*
@@ -318,16 +346,28 @@ namespace spot
 	    // We have explored all successors of state CURR.
 	    const state* curr = todo.back().s;
 	    int index = todo.back().n;
+
 	    // Backtrack TODO.
 	    todo.pop_back();
-	    // FIXME: dec_depth();
+	    dec_depth();
+
 	    if (todo.empty())
 	      {
 		// This automaton recognizes no word.
 		set_states(ecs_->states());
-		// FIXME: enable after revamping remove_component().
-		// assert(depth() == 0);
+		assert(poprem_ || depth() == 0);
 		return 0;
+	      }
+
+	    // If poprem is used, fill rem with any component removed,
+	    // so that remove_component() does not have to traverse
+	    // the SCC again.
+	    if (poprem_)
+	      {
+		numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
+		assert(spi.first);
+		ecs_->root.rem().push_front(spi.first);
+		inc_depth();
 	      }
 
 	    // When backtracking the root of an SCC, we must also
@@ -338,8 +378,8 @@ namespace spot
 	      {
 		assert(!arc.empty());
 		arc.pop();
-		ecs_->root.pop();
 		remove_component(curr);
+		ecs_->root.pop();
 	      }
 	    continue;
 	  }
@@ -418,12 +458,14 @@ namespace spot
 	    // an index greater to the one of the SCC of S2
 	    // (called the "threshold").
 	    int threshold = *i;
+	    std::list<const state*> rem;
 	    while (threshold < ecs_->root.top().index)
 	      {
 		assert(!ecs_->root.empty());
 		assert(!arc.empty());
 		acc |= ecs_->root.top().condition;
 		acc |= arc.top();
+		rem.splice(rem.end(), ecs_->root.rem());
 		ecs_->root.pop();
 		arc.pop();
 	      }
@@ -435,6 +477,7 @@ namespace spot
 	    // Accumulate all acceptance conditions into the
 	    // merged SCC.
 	    ecs_->root.top().condition |= acc;
+	    ecs_->root.rem().splice(ecs_->root.rem().end(), rem);
 
 	    // Have we found all acceptance conditions?
 	    if (ecs_->root.top().condition
@@ -453,7 +496,7 @@ namespace spot
 	    // Group the pending successors of formed SCC if requested.
 	    if (group_)
 	      {
-		assert(todo.back().s != 0);
+		assert(todo.back().s);
 		while (ecs_->root.top().index < todo.back().n)
 		  {
 		    todo_list::reverse_iterator prev = todo.rbegin();
@@ -464,8 +507,21 @@ namespace spot
 			merged = true;
 		      }
 		    prev->q.splice(prev->q.end(), last->q);
+
+		    if (poprem_)
+		      {
+			numbered_state_heap::state_index_p spi =
+			  ecs_->h->index(todo.back().s);
+			assert(spi.first);
+			ecs_->root.rem().push_front(spi.first);
+			// Don't change the stack depth, since
+			// we are just moving the state from TODO to REM.
+		      }
+		    else
+		      {
+			dec_depth();
+		      }
 		    todo.pop_back();
-		    // dec_depth();
 		  }
 		new_queue = &todo.back().q;
 	      }

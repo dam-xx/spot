@@ -86,7 +86,7 @@ namespace spot
   couvreur99_check_result::acss_states() const
   {
     int count = 0;
-    int scc_root = ecs_->root.s.top().index;
+    int scc_root = ecs_->root.top().index;
 
     numbered_state_heap_const_iterator* i = ecs_->h->iterator();
     for (i->first(); !i->done(); i->next())
@@ -184,7 +184,7 @@ namespace spot
 		  couvreur99_check_result* r, bdd& acc_to_traverse)
 	    : bfs_steps(ecs->aut), ecs(ecs), r(r),
 	      acc_to_traverse(acc_to_traverse),
-	      scc_root(ecs->root.s.top().index)
+	      scc_root(ecs->root.top().index)
 	  {
 	  }
 
@@ -222,6 +222,7 @@ namespace spot
 	} b(ecs_, this, acc_to_traverse);
 
 	substart = b.search(substart, run_->cycle);
+	assert(substart);
       }
     while (acc_to_traverse != bddfalse || substart != ecs_->cycle_seed);
   }

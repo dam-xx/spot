@@ -1,3 +1,14 @@
+2005-01-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/emptiness_stats.hh: Make sure depth() >= 0.
+	* src/tgbaalgos/gtec/gtec.hh (couvreur99_check, couvreur99_check_shy):
+	Add the poprem option.
+	* src/tgbaalgos/gtec/gtec.cc: Implement it.
+	* src/tgbaalgos/gtec/sccstack.cc, src/tgbaalgos/gtec/sccstack.hh
+	(scc_stack::rem, scc_stack::clear_rem,
+	scc_stack::connected_component::rem): New.
+	* src/tgbatest/ltl2tgba.cc, src/tgbatest/randtgba.cc: Add rem variants.
+
 2005-01-28  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbatest/dfs.test, src/tgbatest/emptchk.test,

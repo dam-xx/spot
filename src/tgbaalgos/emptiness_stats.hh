@@ -22,6 +22,8 @@
 #ifndef SPOT_TGBAALGOS_EMPTINESS_STATS_HH
 # define SPOT_TGBAALGOS_EMPTINESS_STATS_HH
 
+#include <cassert>
+
 namespace spot
 {
 
@@ -42,7 +44,7 @@ namespace spot
     }
 
     void
-    set_states(int n)
+    set_states(unsigned n)
     {
       states_ = n;
     }
@@ -60,7 +62,7 @@ namespace spot
     }
 
     void
-    inc_depth(int n = 1)
+    inc_depth(unsigned n = 1)
     {
       depth_ += n;
       if (depth_ > max_depth_)
@@ -68,8 +70,9 @@ namespace spot
     }
 
     void
-    dec_depth(int n = 1)
+    dec_depth(unsigned n = 1)
     {
+      assert(depth_ >= n);
       depth_ -= n;
     }
 

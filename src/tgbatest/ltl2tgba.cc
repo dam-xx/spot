@@ -136,6 +136,9 @@ syntax(char* prog)
 	    << "  Cou99 (the default)" << std::endl
 	    << "  Cou99_shy-" << std::endl
 	    << "  Cou99_shy" << std::endl
+	    << "  Cou99_rem" << std::endl
+	    << "  Cou99_rem_shy-" << std::endl
+	    << "  Cou99_rem_shy" << std::endl
 	    << "  CVWY90" << std::endl
 	    << "  CVWY90_repeated" << std::endl
 	    << "  CVWY90_bsh[(heap size in Mo - 10Mo by default)]"
@@ -174,6 +177,7 @@ main(int argc, char** argv)
 	 Tau03Search, Tau03OptSearch, Gv04 } echeck = None;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
   bool couv_group = true;
+  bool poprem = false;
   bool search_many = false;
   bool bit_state_hashing = false;
   int heap_size = 10*1024*1024;
@@ -425,6 +429,23 @@ main(int argc, char** argv)
 	{
 	  echeck = Couvreur2;
 	  couv_group = false;
+	}
+      else if (echeck_algo == "Cou99_rem")
+	{
+	  echeck = Couvreur;
+	  poprem = true;
+	}
+      else if (echeck_algo == "Cou99_rem_shy")
+	{
+	  echeck = Couvreur2;
+	  couv_group = true;
+	  poprem = true;
+	}
+      else if (echeck_algo == "Cou99_rem_shy-")
+	{
+	  echeck = Couvreur2;
+	  couv_group = false;
+	  poprem = true;
 	}
       else if (echeck_algo == "CVWY90")
 	{
@@ -728,11 +749,11 @@ main(int argc, char** argv)
 	  break;
 
 	case Couvreur:
-	  ec = new spot::couvreur99_check(a);
+	  ec = new spot::couvreur99_check(a, poprem);
 	  break;
 
 	case Couvreur2:
-	  ec = new spot::couvreur99_check_shy(a, couv_group);
+	  ec = new spot::couvreur99_check_shy(a, poprem, couv_group);
 	  break;
 
         case MagicSearch:

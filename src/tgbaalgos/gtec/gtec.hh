@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -22,6 +22,7 @@
 #ifndef SPOT_TGBAALGOS_GTEC_GTEC_HH
 # define SPOT_TGBAALGOS_GTEC_GTEC_HH
 
+#include <stack>
 #include "status.hh"
 #include "tgbaalgos/emptiness.hh"
 #include "tgbaalgos/emptiness_stats.hh"
@@ -76,6 +77,7 @@ namespace spot
   {
   public:
     couvreur99_check(const tgba* a,
+		     bool poprem = true,
 		     const numbered_state_heap_factory* nshf
 		     = numbered_state_heap_hash_map_factory::instance());
     virtual ~couvreur99_check();
@@ -103,6 +105,9 @@ namespace spot
     /// state. In other words, it removes the strongly connected
     /// component that contains this state.
     void remove_component(const state* start_delete);
+
+    /// Whether to store the state to be removed.
+    bool poprem_;
   };
 
   /// \brief A version of spot::couvreur99_check that tries to visit
@@ -118,6 +123,7 @@ namespace spot
   {
   public:
     couvreur99_check_shy(const tgba* a,
+			 bool poprem = true,
 			 bool group = true,
 			 const numbered_state_heap_factory* nshf
 			 = numbered_state_heap_hash_map_factory::instance());
@@ -144,7 +150,6 @@ namespace spot
     // * todo, the depth-first search stack.  This holds pairs of the
     //   form (STATE, SUCCESSORS) where SUCCESSORS is a list of
     //   (ACCEPTANCE_CONDITIONS, STATE) pairs.
-
     typedef std::list<successor> succ_queue;
 
     struct todo_item

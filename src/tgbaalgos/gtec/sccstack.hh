@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -22,8 +22,9 @@
 #ifndef SPOT_TGBAALGOS_GTEC_SCCSTACK_HH
 # define SPOT_TGBAALGOS_GTEC_SCCSTACK_HH
 
-#include <stack>
 #include <bdd.h>
+#include <list>
+#include <tgba/state.hh>
 
 namespace spot
 {
@@ -42,6 +43,8 @@ namespace spot
       /// The bdd condition is the union of all acceptance conditions of
       /// transitions which connect the states of the connected component.
       bdd condition;
+
+      std::list<const state*> rem;
     };
 
     /// Stack a new SCC with index \a index.
@@ -50,16 +53,27 @@ namespace spot
     /// Access the top SCC.
     connected_component& top();
 
+    /// Access the top SCC.
+    const connected_component& top() const;
+
     /// Pop the top SCC.
     void pop();
 
     /// How many SCC are in stack.
     size_t size() const;
 
+    /// The \c rem member of the top SCC.
+    std::list<const state*>& rem();
+
+    /// Purge all \c rem members.
+    ///
+    /// \return the number of elements cleared.
+    unsigned clear_rem();
+
     /// Is the stack empty?
     bool empty() const;
 
-    typedef std::stack<connected_component> stack_type;
+    typedef std::list<connected_component> stack_type;
     stack_type s;
   };
 }
