@@ -142,4 +142,4 @@ namespace spot
   /// @}
 }
 
-#endif // SPOT_TGBAALGOS_EMPTINESS_STATS_
+#endif // SPOT_TGBAALGOS_EMPTINESS_STATS_HH
