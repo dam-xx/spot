@@ -1,5 +1,8 @@
 2004-11-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Do not leak
+	the initial state when no valid outgoing transition is found.
+
 	* src/tgbaparse/tgbaparse.yy: Add `%destructor's so the parser
 	does not leak on errors.
 	* src/tgbatest/ltl2tgba.cc: Free the automata if it could not be

@@ -166,6 +166,7 @@ namespace spot
 		delete s2;
 	      }
 	    delete j;
+	    delete s;
 	    return false;
 	  }
 	os << "transition";
