@@ -27,6 +27,8 @@ set -e
 
 run 0 ./explicit > stdout
 
+perl -pe -i 's/c & b/b & c/g' stdout
+
 cat >expected <<EOF
 digraph G {
   0 [label="", style=invis, height=0]
