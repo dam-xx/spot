@@ -3,6 +3,7 @@
 #include <queue>
 #include <stdio.h>
 #include <vector>
+#include <map>
 
 namespace spot
 {
@@ -22,11 +23,10 @@ namespace spot
   }
 
   void
-  emptiness_check::remove_component(seen& state_map,
-				    const state* start_delete)
+  emptiness_check::remove_component(const state* start_delete)
   {
     std::stack<tgba_succ_iterator*> to_remove;
-    state_map[start_delete] = -1;
+    h[start_delete] = -1;
     tgba_succ_iterator* iter_delete = aut_->succ_iter(start_delete);
     iter_delete->first();
     to_remove.push(iter_delete);
@@ -39,9 +39,9 @@ namespace spot
 	    to_remove.push(succ_delete);
 	    state* curr_state = succ_delete->current_state();
 	    succ_delete->next();
-	    if (state_map[curr_state] != -1)
+	    if (h[curr_state] != -1)
 	      {
-		state_map[curr_state] = -1;
+		h[curr_state] = -1;
 		tgba_succ_iterator* succ_delete2 = aut_->succ_iter(curr_state);
 		succ_delete2->first();
 		to_remove.push(succ_delete2);
@@ -57,7 +57,7 @@ namespace spot
     std::stack<bdd> arc_accepting;
     int nbstate = 1;
     state* init = aut_->get_init_state();
-    seen_state_num[init] = 1;
+    h[init] = 1;
     root_component.push(connected_component(1));
     arc_accepting.push(bddfalse);
     tgba_succ_iterator* iter_ = aut_->succ_iter(init);
@@ -72,12 +72,12 @@ namespace spot
 	    assert(!root_component.empty());
 	    connected_component comp_tmp = root_component.top();
 	    root_component.pop();
-	    seen::iterator i_0 = seen_state_num.find(step.first);
-	    assert(i_0 != seen_state_num.end());
-	    if (comp_tmp.index == seen_state_num[step.first])
+	    hash_type::iterator i_0 = h.find(step.first);
+	    assert(i_0 != h.end());
+	    if (comp_tmp.index == h[step.first])
 	      {
 		// The current node is a root of a Strong Connected Component.
-		emptiness_check::remove_component(seen_state_num, step.first);
+		emptiness_check::remove_component(step.first);
 		assert(!arc_accepting.empty());
 		arc_accepting.pop();
 		assert(root_component.size() == arc_accepting.size());
@@ -93,28 +93,28 @@ namespace spot
 	    iter_ = step.second;
 	    state* current_state = iter_->current_state();
 	    bdd current_accepting = iter_->current_accepting_conditions();
-	    seen::iterator i = seen_state_num.find(current_state);
+	    hash_type::iterator i = h.find(current_state);
 	    iter_->next();
-	    if (i == seen_state_num.end())
+	    if (i == h.end())
 	      {
 		// New node.
 		nbstate = nbstate + 1;
 		assert(nbstate != 0);
-		seen_state_num[current_state] = nbstate;
+		h[current_state] = nbstate;
 		root_component.push(connected_component(nbstate));
 		arc_accepting.push(current_accepting);
 		tgba_succ_iterator* iter2 = aut_->succ_iter(current_state);
 		iter2->first();
 		todo.push(pair_state_iter(current_state, iter2 ));
 	      }
-	    else if (seen_state_num[current_state] != -1)
+	    else if (h[current_state] != -1)
 	      {
 		// A node with order != -1 (a seen node not removed).
 		assert(!root_component.empty());
 		connected_component comp = root_component.top();
 		root_component.pop();
 		bdd new_condition = current_accepting;
-		int current_index = seen_state_num[current_state];
+		int current_index = h[current_state];
 		while (comp.index > current_index)
 		  {
 		    // root_component and arc_accepting are popped
@@ -215,8 +215,8 @@ namespace spot
     int q_index;
     int tmp_int = 0;
     // Fill the SCC in the stack root_component.
-    for (seen::iterator iter_map = seen_state_num.begin();
-	 iter_map != seen_state_num.end(); ++iter_map)
+    for (hash_type::iterator iter_map = h.begin();
+	 iter_map != h.end(); ++iter_map)
       {
 	q_index = iter_map->second;
 	tmp_int = 0;
@@ -261,18 +261,15 @@ namespace spot
 			const state* curr_father = started_from.first;
 			seq.push_front(*iter_set);
 			seq.push_front(curr_father);
-			seen::iterator i_2 =
-			  seen_state_num.find(curr_father);
-			assert(i_2 != seen_state_num.end());
-			while ((vec_component[k].index
-				< seen_state_num[curr_father])
-			       && (seen_state_num[curr_father] != 1))
+			hash_type::iterator i_2 = h.find(curr_father);
+			assert(i_2 != h.end());
+			while ((vec_component[k].index < h[curr_father])
+			       && (h[curr_father] != 1))
 			  {
 			    seq.push_front(path_map[curr_father]);
 			    curr_father = path_map[curr_father];
-			    seen::iterator i_3 =
-			      seen_state_num.find(curr_father);
-			    assert(i_3 != seen_state_num.end());
+			    hash_type::iterator i_3 = h.find(curr_father);
+			    assert(i_3 != h.end());
 			  }
 			vec_sequence[k] = seq;
 			seq.clear();
@@ -287,11 +284,10 @@ namespace spot
 			  {
 			    path_state::iterator i_path =
 			      path_map.find(curr_state);
-			    seen::iterator i_seen =
-			      seen_state_num.find(curr_state);
+			    hash_type::iterator i_seen = h.find(curr_state);
 
-			    if (i_seen != seen_state_num.end()
-				&& seen_state_num[curr_state] > 0
+			    if (i_seen != h.end()
+				&& h[curr_state] > 0
 				&& i_path == path_map.end())
 			      {
 				todo_trace.
@@ -326,7 +322,7 @@ namespace spot
 				  const state* from_state,
 				  const state* to_state)
   {
-    if (seen_state_num[from_state] != seen_state_num[to_state])
+    if (h[from_state] != h[to_state])
       {
 	std::map<const state*, state_proposition,
 	         state_ptr_less_than> complete_map;
@@ -382,7 +378,7 @@ namespace spot
   emptiness_check::accepting_path(const connected_component& comp_path,
 				  const state* start_path, bdd to_accept)
   {
-    seen seen_priority;
+    hash_type seen_priority;
     std::stack<triplet> todo_path;
     tgba_succ_iterator* t_s_i = aut_->succ_iter(start_path);
     t_s_i->first();
@@ -392,7 +388,7 @@ namespace spot
     cycle_path tmp_lst;
     cycle_path best_lst;
     bool ok = false;
-    seen_priority[start_path] = seen_state_num[start_path];
+    seen_priority[start_path] = h[start_path];
     while (!todo_path.empty())
       {
 	triplet step_ = todo_path.top();
@@ -410,7 +406,7 @@ namespace spot
 	      comp_path.state_set.find(curr_state);
 	    if (it_set != comp_path.state_set.end())
 	      {
-		seen::iterator i = seen_priority.find(curr_state);
+		hash_type::iterator i = seen_priority.find(curr_state);
 		if (i == seen_priority.end())
 		  {
 		    tgba_succ_iterator* c_iter = aut_->succ_iter(curr_state);
@@ -421,7 +417,7 @@ namespace spot
 					   curr_bdd));
 		    tmp_lst.push_back(state_proposition(curr_state,
 							iter_->current_condition()));
-		    seen_priority[curr_state] = seen_state_num[curr_state];
+		    seen_priority[curr_state] = h[curr_state];
 		  }
 		else
 		  {

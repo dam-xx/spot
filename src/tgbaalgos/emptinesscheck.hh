@@ -2,7 +2,7 @@
 # define SPOT_EMPTINESS_CHECK_HH
 
 #include "tgba/tgba.hh"
-#include <map>
+#include "misc/hash.hh"
 #include <stack>
 #include <list>
 #include <set>
@@ -53,7 +53,6 @@ namespace spot
   /// \endverbatim
   class emptiness_check
   {
-    typedef std::map<const spot::state*, int, spot::state_ptr_less_than> seen;
     typedef std::list<const state*> state_sequence;
     typedef std::pair<const spot::state*, bdd> state_proposition;
     typedef std::list<state_proposition> cycle_path;
@@ -73,16 +72,19 @@ namespace spot
   private:
     const tgba* aut_;
     std::stack<connected_component> root_component;
-    seen seen_state_num;
     state_sequence suffix;
     cycle_path period;
+
+    typedef Sgi::hash_map<const state*, int,
+			  state_ptr_hash, state_ptr_equal> hash_type;
+    hash_type h;		///< Map of visited states.
 
     /// \brief Remove a strongly component from the hash.
     ///
     /// This function remove all accessible state from a given
     /// state. In other words, it removes the strongly connected
     /// component that contains this state.
-    void remove_component(seen& state_map, const state* start_delete);
+    void remove_component(const state* start_delete);
 
     /// Called by counter_example to find a path which traverses all
     /// accepting conditions in the accepted SCC.

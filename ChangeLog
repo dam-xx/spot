@@ -1,5 +1,12 @@
 2003-10-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.hh (emptiness_check::seen_state_num):
+	Rename as ...
+	(emptiness_check::h): ... this, and define as a hash_map.
+	(emptiness_check::remove_component): Remove superfluous state_map
+	argument.
+	* src/tgbaalgos/emptinesscheck.cc: Adjust.
+
 	* src/tgbaalgos/emptinesscheck.hh, src/tgbaalgos/emptinesscheck.cc:
 	Remove superfluous includes.
 
