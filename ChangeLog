@@ -1,3 +1,11 @@
+2005-02-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	These tests are huge, and are obsoleted by randtgba-based checks,
+	and by bench/emptchk/.
+	* src/tgbatest/tba_samples_from_spin.test: Delete.
+	* src/tgbatest/tba_samples_from_spin/: Delete.
+	* src/tgbatest/Makefile.am: Adjust.
+
 2005-02-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/evtgbaparse/evtgbaparse.yy, src/evtgbaparse/evtgbascan.ll,
