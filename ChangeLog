@@ -1,5 +1,8 @@
 2004-11-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Fix a memory leak
+	if debug==false.
+
 	* src/tgbaalgos/randomgraph.cc (random_graph): Do declare all the
 	acceptance conditions in the produced automaton, in case they are
 	not actually used.

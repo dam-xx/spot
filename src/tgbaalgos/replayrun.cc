@@ -138,6 +138,10 @@ namespace spot
 
 	// browse the actual outgoing transitions
 	tgba_succ_iterator* j = a->succ_iter(s);
+	// When not debugging, S is not used as key in SEEN, so we can
+	// delete it right now.
+	if (!debug)
+	  delete s;
 	for (j->first(); !j->done(); j->next())
 	  {
 	    if (j->current_condition() != label
