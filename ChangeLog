@@ -1,3 +1,9 @@
+2003-04-29  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
+
+	* configure.ac (AM_INIT_AUTOMAKE): Use nostdinc, to make
+	sure we always use paths relative to src/ in src/'s 
+	subdirectories.
+
 2003-04-28  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
 	* src/ltlparse/Makefile.am (CXXFLAGS): Turn on GCC warnings

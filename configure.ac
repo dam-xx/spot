@@ -1,7 +1,7 @@
 AC_PREREQ([2.57])
 AC_INIT([spot], [0.1])
 AC_CONFIG_AUX_DIR([tools])
-AM_INIT_AUTOMAKE([foreign 1.7.3])
+AM_INIT_AUTOMAKE([foreign nostdinc 1.7.3])
 
 AC_PROG_CXX
 
