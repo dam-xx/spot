@@ -1,3 +1,15 @@
+2004-05-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba_fm.hh (ltl_to_tgba_fm): Add argument
+	fair_loop_approx.
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Implement the
+	fair_loop_approx optimization.
+	(ltl_promise_visitor, ltl_possible_fair_loop_visitor,
+	possible_fair_loop_checker): New classes.
+	* src/tgbatest/ltl2tgba.cc: Add the -L option.
+	* src/tgbatest/spotlbtt.test: Exercise fair_loop_approx.
+	* wrap/python/cgi/ltl2tgba.in: Make it an option.
+
 2004-05-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/ltl2tgba_fm.hh (ltl_to_tgba_fm): Add argument

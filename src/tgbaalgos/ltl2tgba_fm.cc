@@ -29,6 +29,7 @@
 #include "ltlvisit/nenoform.hh"
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/tostring.hh"
+#include "ltlvisit/postfix.hh"
 #include <cassert>
 
 #include "tgba/tgbabddconcretefactory.hh"
@@ -213,7 +214,7 @@ namespace spot
 	      {
 		formula* ac = var_to_formula(var);
 
-		if (! a->has_acceptance_condition(ac))
+		if (!a->has_acceptance_condition(ac))
 		  a->declare_acceptance_condition(clone(ac));
 		a->add_acceptance_condition(t, ac);
 		b = high;
@@ -221,6 +222,50 @@ namespace spot
 	    assert(b != bddfalse);
 	  }
       }
+    };
+
+
+
+    // Gather all promises of a formula.  These are the
+    // right-hand sides of U or F operators.
+    class ltl_promise_visitor: public postfix_visitor
+    {
+    public:
+      ltl_promise_visitor(translate_dict& dict)
+	: dict_(dict), res_(bddtrue)
+      {
+      }
+
+      virtual
+      ~ltl_promise_visitor()
+      {
+      }
+
+      bdd
+      result() const
+      {
+	return res_;
+      }
+
+      using postfix_visitor::doit;
+
+      virtual void
+      doit(unop* node)
+      {
+	if (node->op() == unop::F)
+	  res_ &= bdd_ithvar(dict_.register_a_variable(node->child()));
+      }
+
+      virtual void
+      doit(binop* node)
+      {
+	if (node->op() == binop::U)
+	  res_ &= bdd_ithvar(dict_.register_a_variable(node->second()));
+      }
+
+    private:
+      translate_dict& dict_;
+      bdd res_;
     };
 
 
@@ -239,7 +284,8 @@ namespace spot
       {
       }
 
-      bdd result() const
+      bdd
+      result() const
       {
 	return res_;
       }
@@ -394,6 +440,105 @@ namespace spot
       bdd res_;
     };
 
+
+    // Check whether a formula has a R or G operator at its top-level
+    // (preceding logical operators do not count).
+    class ltl_possible_fair_loop_visitor: public const_visitor
+    {
+    public:
+      ltl_possible_fair_loop_visitor()
+	: res_(false)
+      {
+      }
+
+      virtual
+      ~ltl_possible_fair_loop_visitor()
+      {
+      }
+
+      bool
+      result() const
+      {
+	return res_;
+      }
+
+      void
+      visit(const atomic_prop*)
+      {
+      }
+
+      void
+      visit(const constant*)
+      {
+      }
+
+      void
+      visit(const unop* node)
+      {
+	if (node->op() == unop::G)
+	  res_ = true;
+      }
+
+      void
+      visit(const binop* node)
+      {
+	switch (node->op())
+	  {
+	    // r(f1 logical-op f2) = r(f1) logical-op r(f2)
+	  case binop::Xor:
+	  case binop::Implies:
+	  case binop::Equiv:
+	    node->first()->accept(*this);
+	    if (!res_)
+	      node->second()->accept(*this);
+	    return;
+	  case binop::U:
+	    return;
+	  case binop::R:
+	    res_ = true;
+	    return;
+	  }
+	/* Unreachable code.  */
+	assert(0);
+      }
+
+      void
+      visit(const multop* node)
+      {
+	unsigned s = node->size();
+	for (unsigned n = 0; n < s && !res_; ++n)
+	  {
+	    node->nth(n)->accept(*this);
+	  }
+      }
+
+    private:
+      bool res_;
+    };
+
+    // Check whether a formula can be part of a fair loop.
+    // Cache the result for efficiency.
+    class possible_fair_loop_checker
+    {
+    public:
+      bool
+      check(const formula* f)
+      {
+	pfl_map::const_iterator i = pfl.find(f);
+	if (i != pfl.end())
+	  return i->second;
+	ltl_possible_fair_loop_visitor v;
+	f->accept(v);
+	bool rel = v.result();
+	pfl[f] = rel;
+	return rel;
+      }
+
+    private:
+      typedef Sgi::hash_map<const formula*, bool, ptr_hash<formula> > pfl_map;
+      pfl_map pfl;
+    };
+
   }
 
   typedef std::map<bdd, bdd, bdd_less_than> prom_map;
@@ -428,8 +573,16 @@ namespace spot
 	  }
       }
 
-    bdd promises = bdd_existcomp(label, d.a_set);
     bdd conds = bdd_existcomp(label, d.var_set);
+    bdd promises = bdd_existcomp(label, d.a_set);
+
+    // Clear the promises if the destination is the True state.
+    // (Normally this is already the case unless the fair_loop_approx
+    // optimization is used, because this can get confused by formulae
+    // like X(1): it doesn't know that X(1) is equivalent to 1, so it
+    // puts all promises on arcs going to X(1).)
+    if (dest == constant::true_instance())
+      promises = bddtrue;
 
     dest_map::iterator i = dests.find(dest);
     if (i == dests.end())
@@ -446,8 +599,11 @@ namespace spot
 
   tgba_explicit*
   ltl_to_tgba_fm(const formula* f, bdd_dict* dict,
-		 bool exprop, bool symb_merge, bool branching_postponement)
+		 bool exprop, bool symb_merge, bool branching_postponement,
+		 bool fair_loop_approx)
   {
+    possible_fair_loop_checker pflc;
+
     // Normalize the formula.  We want all the negations on
     // the atomic propositions.  We also suppress logic
     // abbreviations such as <=>, =>, or XOR, since they
@@ -463,9 +619,21 @@ namespace spot
     // `aR(bRc).(bRc)') are equivalent, and are trivially identified
     // by looking at the set of successors.
     succ_to_formula canonical_succ;
+    // For cosmetics, register 1 initially, so the algorithm will not
+    // register an equivalent formula first.
+    canonical_succ[bddtrue] = constant::true_instance();
 
     translate_dict d(dict);
     ltl_trad_visitor v(d);
+
+    // Compute the set of all promises occurring inside the formula.
+    bdd all_promises = bddtrue;
+    if (fair_loop_approx)
+      {
+	ltl_promise_visitor pv(d);
+	f2->accept(pv);
+	all_promises = pv.result();
+      }
 
     formulae_seen.insert(f2);
     formulae_to_translate.insert(f2);
@@ -549,8 +717,14 @@ namespace spot
 	    while ((cube = isop.next()) != bddfalse)
 	      {
 		bdd label = bdd_exist(cube, d.next_set);
-		formula* dest =
-		  d.conj_bdd_to_formula(bdd_existcomp(cube, d.next_set));
+		bdd dest_bdd = bdd_existcomp(cube, d.next_set);
+		formula* dest = d.conj_bdd_to_formula(dest_bdd);
+
+		// If the destination cannot possibly be part of a fair
+		// loop, make all possible promises.
+		if (fair_loop_approx
+		    && dest_bdd != bddtrue && !pflc.check(dest))
+		  label &= all_promises;
 
 		// If we are not postponing the branching, we can
 		// declare the outgoing transitions immediately.
@@ -575,8 +749,8 @@ namespace spot
 	    if (branching_postponement)
 	      for (succ_map::const_iterator si = succs.begin();
 		   si != succs.end(); ++si)
-		fill_dests (d, symb_merge, formulae_seen, canonical_succ, v,
-			    dests, si->first, si->second);
+		fill_dests(d, symb_merge, formulae_seen, canonical_succ, v,
+			   dests, si->first, si->second);
 	  }
 
 	// Check for an arc going to 1 (True).  Register it first, that
@@ -602,11 +776,11 @@ namespace spot
 	bdd cond_for_true = bddfalse;
 	if (i != dests.end())
 	  {
-	    // Transitions going to 1 (true) are not expected to make
-	    // any promises.
+	    // There should be only one transition going to 1 (true) ...
 	    assert(i->second.size() == 1);
-	    prom_map::const_iterator j = i->second.find(bddtrue);
-	    assert(j != i->second.end());
+	    prom_map::const_iterator j = i->second.begin();
+	    // ... and it is not expected to make any promises.
+	    assert(j->first == bddtrue);
 
 	    cond_for_true = j->second;
 	    tgba_explicit::transition* t =

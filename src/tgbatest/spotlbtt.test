@@ -128,6 +128,13 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- FM post_branch + exprop + flapprox)"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -x -p -L -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM post_branch + exprop), degeneralized"
    Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -p -x -t -D'"
    Enabled = yes
@@ -135,8 +142,29 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- FM post_branch + exprop + flapprox), degeneralized"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -p -x -t -L -D'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM exprop + post_branch), fake"
    Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -x -p -T'"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM exprop + flapprox), fake"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -x -L -T'"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM exprop + post_branch + flapprox), fake"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -x -p -L -T'"
    Enabled = no
 }
 

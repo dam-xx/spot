@@ -64,6 +64,7 @@ syntax(char* prog)
             << "  -f   use Couvreur's FM algorithm for translation"
 	    << std::endl
             << "  -F   read the formula from the file" << std::endl
+            << "  -L   fair-loop approximation (implies -f)" << std::endl
 	    << "  -m   magic-search (implies -D), expect a counter-example"
 	    << std::endl
 	    << "  -M   magic-search (implies -D), expect no counter-example"
@@ -113,6 +114,7 @@ main(int argc, char** argv)
   bool expect_counter_example = false;
   bool from_file = false;
   bool post_branching = false;
+  bool fair_loop_approx = false;
 
   for (;;)
     {
@@ -168,6 +170,11 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-F"))
 	{
 	  file_opt = true;
+	}
+      else if (!strcmp(argv[formula_index], "-L"))
+	{
+	  fair_loop_approx = true;
+	  fm_opt = true;
 	}
       else if (!strcmp(argv[formula_index], "-m"))
 	{
@@ -308,7 +315,8 @@ main(int argc, char** argv)
 	  if (fm_opt)
 	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt,
 					       fm_symb_merge_opt,
-					       post_branching);
+					       post_branching,
+					       fair_loop_approx);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 	}

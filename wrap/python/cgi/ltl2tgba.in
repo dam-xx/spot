@@ -212,6 +212,7 @@ options_trans_fm = [
     ('opt_symb_merge',
      'merge states with same symbolic successor representation',           1),
     ('opt_branch_post',     'branching postponement',                      0),
+    ('opt_fair_loop_approx','fair-loop approximations',                    0),
     ]
 options_trans_lacim = [
     ('show_relation_set',
@@ -412,12 +413,17 @@ if opt_branch_post:
     branching_postponement = 1
 else:
     branching_postponement = 0
+if opt_fair_loop_approx:
+    fair_loop_approx = 1
+else:
+    fair_loop_approx = 0
 
 if trans_lacim:
     automaton = spot.ltl_to_tgba_lacim(f, dict)
 elif trans_fm:
     automaton = spot.ltl_to_tgba_fm(f, dict,
-                                    exprop, symb_merge, branching_postponement)
+                                    exprop, symb_merge, branching_postponement,
+                                    fair_loop_approx)
 
 print 'done.</p>'
 sys.stdout.flush()

@@ -80,9 +80,14 @@ namespace spot
   ///   publisher = {Springer-Verlag}
   /// }
   /// \endverbatim
+  ///
+  /// If \a fair_loop_approx is set, a really simple characterization of
+  /// unstable state is used to suppress all acceptance conditions from
+  /// incoming transitions.
   tgba_explicit* ltl_to_tgba_fm(const ltl::formula* f, bdd_dict* dict,
 				bool exprop = false, bool symb_merge = true,
-				bool branching_postponement = false);
+				bool branching_postponement = false,
+				bool fair_loop_approx = false);
 }
 
 #endif // SPOT_TGBA_LTL2TGBA_HH
