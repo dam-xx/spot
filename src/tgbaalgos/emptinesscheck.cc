@@ -1,20 +1,8 @@
 #include "emptinesscheck.hh"
-#include "tgba/tgba.hh"
-#include "tgba/state.hh"
 #include "tgba/bddprint.hh"
-#include "tgba/tgbabddfactory.hh"
-#include "tgba/succiterconcrete.hh"
-#include "tgba/tgbabddconcrete.hh"
-#include "bdd.h"
-#include <map>
-#include <list>
-#include <stack>
 #include <queue>
 #include <stdio.h>
 #include <vector>
-#include <set>
-#include <utility>
-#include <ostream>
 
 namespace spot
 {

@@ -1,17 +1,13 @@
 #ifndef SPOT_EMPTINESS_CHECK_HH
 # define SPOT_EMPTINESS_CHECK_HH
+
 #include "tgba/tgba.hh"
-#include "tgba/statebdd.hh"
-#include "tgba/tgbabddfactory.hh"
-#include "tgba/succiterconcrete.hh"
-#include "tgba/tgbabddconcrete.hh"
 #include <map>
 #include <stack>
 #include <list>
-#include <vector>
 #include <set>
 #include <utility>
-#include <ostream>
+#include <iostream>
 
 namespace spot
 {
