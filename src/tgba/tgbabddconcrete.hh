@@ -21,6 +21,8 @@ namespace spot
 
     tgba_succ_iterator_concrete* succ_iter(const state* state) const;
 
+    std::string format_state(const state* state) const;
+
     const tgba_bdd_dict& get_dict() const;
     const tgba_bdd_core_data& get_core_data() const;
 

@@ -20,6 +20,12 @@ namespace spot
   /// transitions), and a path can be accepted only if it traverse
   /// at least one transition of each set infinitely often.
   ///
+  /// Actually we do not really encode accepting sets but their
+  /// complement: promise sets.  Formulae such as 'a U b' and
+  /// 'F b' make the promise to fulfil 'b' enventually.  A path can
+  /// be accepted if for each promise it traverse infinitely often
+  /// a transition that does not make this promise.
+  ///
   /// Browsing such automaton can be achieved using two functions.
   /// \c get_init_state, and \c succ_iter.  The former returns
   /// the initial state while the latter allows to explore the
@@ -65,7 +71,13 @@ namespace spot
     /// may use the same BDD variable for different formula),
     /// or simply when printing.
     virtual const tgba_bdd_dict& get_dict() const = 0;
-  };
+
+    /// \brief Format the state as a string for printing.
+    ///
+    /// This formating is the responsability of the automata
+    /// who owns the state.
+    virtual std::string format_state(const state* state) const = 0;
+  }; 
 
 }
 

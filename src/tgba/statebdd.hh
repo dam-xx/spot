@@ -14,8 +14,13 @@ namespace spot
     {
     }
 
-    virtual bdd as_bdd() const;
-    virtual int compare(const state& other) const;
+    bdd 
+    as_bdd() const
+    {
+      return state_;
+    }
+    
+    virtual int compare(const state* other) const;
 
   protected:
     bdd state_;

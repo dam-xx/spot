@@ -1,13 +1,28 @@
 2003-05-27  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/bddprint.hh (bdd_format_set): New function.
+	* src/tgba/bddprint.cc (bdd_format_set): Likewise.
+	* src/tgba/state.hh: Add Doxygen comments.
+	(state::compare): Take a state*, not a state&.
+	(state_ptr_less_than): New functor.
+	* src/tgba/statebdd.hh (state_bdd::compare): Take a state*, not a 
+	state&.
+	* src/tgba/statebdd.cc (state_bdd::compare): Likewise.
+	* src/tgba/succiter.hh: Add Doxygen comments.
+	* src/tgba/tgba.hh: Mention promises.
+	(tgba::formate_state): New pure virtual method.
+	* src/tgba/tgbabddconcrete.hh (tgba_bdd_concrete::formate_state):
+	New method.
+	* src/tgba/tgbabddconcrete.cc (tgba_bdd_concrete::formate_state):
+	Likewise.
+	* src/tgbaalgos/dotty.cc: Adjust to use state_ptr_less_than
+	and tgba::formate_state.
+
 	* src/tgba/succiter.hh (tgba_succ_iterator::current_state):
 	Return a state*, not a state_bdd.
 	* src/tgba/succiterconcrete.hh
 	(tgba_succ_iterator_concrete::current_state): Return a state_bdd*,
 	not a state_bdd.
-	* src/tgba/state.hh (state::as_bdd): New abstract method.
-	* src/tgba/statebdd.hh (state_bdd::as_bdd): Move definitions ...
-	* src/tgba/statebdd.cc (state_bdd::as_bdd): ... here.
 	* src/tgba/tgba.hh: Add Doxygen comments.
 	(tgba::succ_iter, tgba::get_init_state): Use state*, not state_bdd.
 	* src/tgba/tgbabddconcrete.hh (tgba_bdd_concrete::get_init_state):

@@ -5,14 +5,13 @@
 
 namespace spot
 {
-  typedef std::map<int, int> seen_map;
+  typedef std::map<state*, int, state_ptr_less_than> seen_map;
 
   static bool
   dotty_state(std::ostream& os,
 	      const tgba& g, state* st, seen_map& m, int& node)
   {
-    bdd s = st->as_bdd();
-    seen_map::iterator i = m.find(s.id());
+    seen_map::iterator i = m.find(st);
 
     // Already drawn?
     if (i != m.end())
@@ -22,10 +21,10 @@ namespace spot
       }
 
     node = m.size() + 1;
-    m[s.id()] = node;
+    m[st] = node;
 
-    std::cout << "  " << node << " [label=\"";
-    bdd_print_set(os, g.get_dict(), s) << "\"]" << std::endl;
+    os << "  " << node << " [label=\"" 
+       << g.format_state(st) << "\"]" << std::endl;
     return true;
   }
 
@@ -44,8 +43,14 @@ namespace spot
 	bdd_print_set(os, g.get_dict(), si->current_promise()) << "\"]"
 							       << std::endl;
 	if (recurse)
-	  dotty_rec(os, g, s, m, node);
-	delete s;
+	  {
+	    dotty_rec(os, g, s, m, node);
+	    // Do not delete S, it is used as key in M.
+	  }
+	else
+	  {
+	    delete s;
+	  }
       }
     delete si;
   }
@@ -63,7 +68,11 @@ namespace spot
     os << "  0 -> " << init << std::endl;
     dotty_rec(os, g, state, m, init);
     os << "}" << std::endl;
-    delete state;
+
+    // Finally delete all states used as keys in m:
+    for (seen_map::iterator i = m.begin(); i != m.end(); ++i)
+      delete i->first;
+
     return os;
   }
 

@@ -1,4 +1,5 @@
 #include "tgbabddconcrete.hh"
+#include "bddprint.hh"
 
 namespace spot
 {
@@ -43,6 +44,14 @@ namespace spot
 					 data_.now_set),
 			       data_.next_to_now);
     return new tgba_succ_iterator_concrete(data_, succ_set);
+  }
+
+  std::string
+  tgba_bdd_concrete::format_state(const state* state) const
+  {
+    const state_bdd* s = dynamic_cast<const state_bdd*>(state);
+    assert(s);
+    return bdd_format_set(dict_, s->as_bdd());
   }
 
   const tgba_bdd_dict&

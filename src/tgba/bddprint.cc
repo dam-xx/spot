@@ -1,3 +1,4 @@
+#include <sstream>
 #include "bddprint.hh"
 #include "ltlvisit/tostring.hh"
 
@@ -9,7 +10,7 @@ namespace spot
   static void
   print_handler(std::ostream& o, int var)
   {
-    tgba_bdd_dict::vf_map::const_iterator isi = 
+    tgba_bdd_dict::vf_map::const_iterator isi =
       dict->var_formula_map.find(var);
     if (isi != dict->var_formula_map.end())
       to_string(isi->second, o);
@@ -42,9 +43,9 @@ namespace spot
 	  }
       }
   }
-  
 
-  std::ostream& 
+
+  std::ostream&
   bdd_print_set(std::ostream& os, const tgba_bdd_dict& d, bdd b)
   {
     dict = &d;
@@ -54,7 +55,15 @@ namespace spot
     return os;
   }
 
-  std::ostream& 
+  std::string
+  bdd_format_set(const tgba_bdd_dict& d, bdd b)
+  {
+    std::ostringstream os;
+    bdd_print_set(os, d, b);
+    return os.str();
+  }
+
+  std::ostream&
   bdd_print_dot(std::ostream& os, const tgba_bdd_dict& d, bdd b)
   {
     dict = &d;
@@ -63,8 +72,8 @@ namespace spot
     bdd_strm_hook(0);
     return os;
   }
-  
-  std::ostream& 
+
+  std::ostream&
   bdd_print_table(std::ostream& os, const tgba_bdd_dict& d, bdd b)
   {
     dict = &d;
