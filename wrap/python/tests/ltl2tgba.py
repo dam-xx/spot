@@ -101,16 +101,11 @@ if f:
     else:
         assert "unknown output option"
 
+    if degeneralize_opt:
+        del degeneralized
     # Must delete absolutely all references to an automaton
     # so that the C++ destructor gets called.
-    del a
-
-    if degeneralize_opt:
-        degeneralized.thisown = 1
-        del degeneralized
-
-    concrete.thisown = 1
-    del concrete
+    del a, concrete
 
 else:
     exit_code = 1

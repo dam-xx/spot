@@ -73,6 +73,8 @@ using namespace spot;
 %include "ltlvisit/tostring.hh"
 %include "ltlvisit/tunabbrev.hh"
 
+%feature("new") spot::ltl_to_tgba;
+
 // Help SWIG with namespace lookups.
 #define ltl spot::ltl
 %include "tgba/bdddict.hh"

@@ -1,8 +1,13 @@
 2003-08-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* wrap/python/spot.i: Declare spot::ltl_to_tgba as a constructor.
+	* wrap/python/tests/ltl2tgba.py: Do not force `thisown=1' on tgba
+	objects.
+	
 	* wrap/python/spot.i: Include headers from tgba/ and tgbaalgos/.
 	* wrap/python/tests/ltl2tgba.py, wrap/python/tests/ltl2tgba.test:
 	New files.
+
 	* wrap/python/tests/Makefile.am (TESTS): Add ltl2tgba.test.
 	(EXTRA_DIST): Add ltl2tgba.py.
 	* wrap/python/tests/run.in: Distinguish *.py and *.test.
