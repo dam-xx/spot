@@ -26,7 +26,7 @@ queen:	queen.o bddlib
 	$(CPP) $(CFLAGS) queen.o -o queen -lbdd -lm
 
 bddlib:
-	cd ../..; make
+	cd ../../src ; make
 
 clean:
 	rm -f *~

@@ -3,6 +3,8 @@
 # - Edit the lines below to configure
 # ==============================================================
 
+VERSION = 23
+
 # --- Your compiler flags
 CFLAGS = -g -ansi -Wmissing-prototypes -Wall
 

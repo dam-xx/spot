@@ -22,8 +22,8 @@ CC = gcc
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
-statespace:	statespace.o bddlib
-	$(CPP) $(CFLAGS) statespace.o -o statespace -lbdd -lm
+fdd:	fdd.o bddlib
+	$(CPP) $(CFLAGS) fdd.o -o fdd -lbdd -lm
 
 bddlib:
 	cd ../../src; make
@@ -31,6 +31,6 @@ bddlib:
 clean:
 	rm -f *~
 	rm -f *.o
-	rm -f statespace
+	rm -f fdd
 
-statespace.o:	../../src/fdd.h
+fdd.o:	../../src/fdd.h

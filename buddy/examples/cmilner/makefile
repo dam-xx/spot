@@ -1,6 +1,6 @@
-# --------------------------------
-# Makefile for milner test example
-# --------------------------------
+# ---------------------------------
+# Makefile for cmilner test example
+# ---------------------------------
 
 # --- Compiler flags
 CFLAGS = -O3 -pedantic -Wall -ansi -L../../src -I../../src
@@ -22,15 +22,15 @@ CC = gcc
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
-milner:	milner.o bddlib
-	$(CC) $(CFLAGS) milner.o -o milner -lbdd -lm
+cmilner: cmilner.o bddlib
+	$(CC) $(CFLAGS) cmilner.o -o cmilner -lbdd -lm
 
 bddlib:
-	cd ../..; make
+	cd ../../src ; make
 
 clean:
 	rm -f *~
 	rm -f *.o
-	rm -f milner
+	rm -f cmilner
 
-milner.o:	../../src/bdd.h
+cmilner.o:	../../src/bdd.h

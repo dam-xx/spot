@@ -1,5 +1,5 @@
 # --------------------------------
-# Makefile for adder test example
+# Makefile for internal tests
 # --------------------------------
 
 # --- Compiler flags
@@ -22,8 +22,8 @@ CC = gcc
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
-adder:	adder.o bddlib
-	$(CPP) $(CFLAGS) adder.o -o adder -lbdd -lm
+bddtest:	bddtest.o bddlib
+	$(CPP) $(CFLAGS) bddtest.o -o bddtest -lbdd -lm
 
 bddlib:
 	cd ../../src ; make
@@ -31,6 +31,8 @@ bddlib:
 clean:
 	rm -f *~
 	rm -f *.o
-	rm -f adder
+	rm -f bddtest
 
-adder.o:	../../src/bdd.h
+bddtest.o:	../../src/bdd.h
+
+

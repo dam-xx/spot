@@ -26,7 +26,7 @@ money:	money.o bddlib
 	$(CPP) $(CFLAGS) money.o -o money -lbdd -lm
 
 bddlib:
-	cd ../../src; make
+	cd ../../src ; make
 
 clean:
 	rm -f *~

@@ -26,7 +26,7 @@ solitare: solitare.o bddlib
 	  $(CPP) $(CFLAGS) solitare.o -o solitare -lbdd -lm
 
 bddlib:
-	cd ../..; make
+	cd ../../src ; make
 
 clean:
 	rm -f *~

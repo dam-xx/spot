@@ -1,7 +1,7 @@
 ==========================================================================
                               *** BuDDy ***
                          Binary Decision Diagrams
-                           Library Package v2.2
+                           Library Package v2.3
 --------------------------------------------------------------------------
                Copyright (C) 1996-2002 by Jorn Lind-Nielsen
                             All rights reserved
@@ -32,12 +32,27 @@
 ==========================================================================
 
 
+---------------------------------------------------------------------
+--- PREFACE  --------------------------------------------------------
+---------------------------------------------------------------------
+
+BuDDy was originally developed by Jorn Lind-Nielsen as a part of his 
+Phd thesis.
+After using BuDDy as a BDD library for long time ( while getting some
+support from Jorn through Email ), I have been suggested by Jorn to take
+ownership of the project and move it to SourceForge.
+I invite all users who are interested to participate in the development
+to contact me. ( I always have desired tasks / features awaiting... )
+I hope that BuDDy will prosper under my management.
+
+Haim Cohen
+haimcohen2002@hotmail.com
 
 ---------------------------------------------------------------------
 --- REQUIREMENTS ----------------------------------------------------
 ---------------------------------------------------------------------
 
-* A (not to old) C++ compiler
+* A (not too old) C++ compiler. I use g++ 3.3.3
 * A machine that supports 32 bit integers
 
 
@@ -48,7 +63,7 @@
 2) Edit the file "config" to specify your compiler options and
 where the package is to be installed.
 
-3) type "make" to make the binary.
+3) type "make" to make the library and examples.
 
 4) type "make install" to copy the BDD files to their appropriate
 directories.
@@ -66,8 +81,8 @@ could be:
 
  g++ -I/usr/local/include myfile.cc -o myfile -L/usr/local/lib -lbdd
 
-Your machine may be setup to use the above directories auto-
-matically, so you might be able to do:
+Your machine may be setup to use the above directories automatically, 
+so you might be able to do:
 
  g++ myfile.cc -o myfile -lbdd
 
@@ -79,40 +94,18 @@ matically, so you might be able to do:
 src:           All files needed for the BuDDy package.
 examples:      Example files
   fdd:         An example of use of the FDD interface.
-  calculator:  An example of a BDD calculator. Uses reordering.
+  bddcalc:     An example of a BDD calculator. Uses reordering.
   adder:       Construction of a N-bit adder. Uses reordering.
-  milner:      A calculation of the reachable statespace for Milner's
+  milner:      A calculation of the reachable state space for Milner's
                scheduler. C++.
   cmilner:     As above but purely in ANSI-C.
   queen:       Solution to the N-queen chess problem.
   solitare:    Solution to a solitare game.
   money:       Solution to the send-more-money problem (bvec demo).
-  internal:    Some internal regression tests.
+  bddtest :    Some internal tests.
 doc:           Documentation.
   buddy.ps:    Package documentation.
   bddnotes.ps: BDD introduction notes.
 
 
----------------------------------------------------------------------
---- FEEDBACK --------------------------------------------------------
----------------------------------------------------------------------
-
-Please do not hesitate to send any questions or bug reports to:
-
-  Jorn Lind-Nielsen:  buddy@itu.dk
-  (or maybe jorn_lind_nielsen@hotmail.com or jln@fjeldgruppen.dk)
-
-It may take some time to get an answer since BuDDy do not have that
-much focus any more - but I'll try to give a reasonable answer
-in (finite) time.
-
-New updates and other info can be found at:
-
-  http://www.it-c.dk/research/buddy/
-  (or http://www.itu.dk/research/buddy)
-
-
-Hope you find some use for this software
-
-      Jorn Lind-Nielsen
 

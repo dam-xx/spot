@@ -19,10 +19,10 @@ include ../config
 .SUFFIXES: .cxx .c
 
 .cxx.o:
-	$(CPP) $(CFLAGS) $(DFLAGS) -c $<
+	$(CPP) $(CFLAGS) $(DFLAGS) -DVERSION=$(VERSION) -c $<
 
 .c.o:
-	$(CC) $(CFLAGS) $(DFLAGS) -c $<
+	$(CC) $(CFLAGS) $(DFLAGS) -DVERSION=$(VERSION) -c $<
 
 
 # --------------------------------------------------------------
