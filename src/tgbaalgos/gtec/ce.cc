@@ -42,7 +42,7 @@ namespace spot
     int comp_size = root.size();
     // Transform the stack of connected component into an array.
     explicit_connected_component** scc =
-      new (explicit_connected_component*)[comp_size];
+      new explicit_connected_component*[comp_size];
     for (int j = comp_size - 1; 0 <= j; --j)
       {
 	scc[j] = eccf->build();

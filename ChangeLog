@@ -1,3 +1,14 @@
+2004-07-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	Patch from Heikki Tauriainen <heikki.tauriainen@hut.fi>.
+	* src/tgbaalgos/gtec/ce.cc (counter_example::counter_example): Do
+	not parenthesize the type after the new operator (g++ 3.4 complains).
+	* src/tgbaalgos/dupexp.cc (dupexp_iter::process_state,
+	dupexp_iter::declare_state): Use this->automata_ instead of
+	automata_.    Local member automata_ inherited from template base
+	classes must be prefixed or g++ 3.4 will not look them
+	up (conforming to §14.6.2.3).
+
 2004-07-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* lbtt/: Merge lbtt 1.1.0.

@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -46,7 +46,7 @@ namespace spot {
     process_state(const state* s, int n, tgba_succ_iterator*)
     {
       std::ostringstream os;
-      os << "(#" << n << ") " << automata_->format_state(s);
+      os << "(#" << n << ") " << this->automata_->format_state(s);
       name_[n] = os.str();
     }
 
@@ -58,7 +58,7 @@ namespace spot {
       if (i == name_.end())
 	{
 	  std::ostringstream os;
-	  os << "(#" << n << ") " << automata_->format_state(s);
+	  os << "(#" << n << ") " << this->automata_->format_state(s);
 	  name_[n] = str = os.str();
 	}
       else
