@@ -1,5 +1,7 @@
 2004-11-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptiness.hh (print_tgba_run): Document it.
+
 	* src/tgbaalgos/replayrun.hh,
 	src/tgbaalgos/replayrun.cc (replay_tgba_run): Take a `debug'
 	option to decide whether the output should look like that of

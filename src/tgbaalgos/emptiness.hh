@@ -53,6 +53,16 @@ namespace spot
   };
 
   class tgba;
+
+  /// \brief Display a tgba_run.
+  ///
+  /// Output the prefix and cycle of the tgba_run \a run, even if it
+  /// does not corresponds to an actual run of the automaton \a a.
+  /// This is unlike replay_tgba_run(), which will ensure the run
+  /// actually exist in the automaton (and will display any transition
+  /// annotation).
+  ///
+  /// (\a a is used here only to format states and transitions.)
   std::ostream& print_tgba_run(std::ostream& os,
 			       const tgba* a,
 			       const tgba_run* run);
