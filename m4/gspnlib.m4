@@ -29,16 +29,16 @@ AC_DEFUN([AX_CHECK_GSPNLIB], [
      LDFLAGS="$LDFLAGS $LIBGSPN_LDFLAGS"
      # Soheib Baarir is working on this library, and it is not part
      # of the GreatSPN repository yet.  Use it only if it is here.
-     AC_CHECK_LIB([gspnESRG], [initialize], [have_eesrg=yes],
-	          [have_eesrg=no], [-lm -lfl])
-     LIBGSPNESRG_LDFLAGS="$LIBGSPN_LDFLAGS -lgspnESRG -lm -lfl"
+     AC_CHECK_LIB([gspnSSP], [initialize], [have_ssp=yes],
+	          [have_ssp=no], [-lm -lfl])
+     LIBGSPNSSP_LDFLAGS="$LIBGSPN_LDFLAGS -lgspnSSP -lm -lfl"
      LDFLAGS="$ax_tmp_LDFLAGS"
      LIBS="$ax_tmp_LIBS"
   fi
   AM_CONDITIONAL([WITH_GSPN], [test "x${with_gspn-no}" != xno])
-  AM_CONDITIONAL([WITH_GSPN_EESRG], [test "x${have_eesrg-no}" != xno])
+  AM_CONDITIONAL([WITH_GSPN_SSP], [test "x${have_ssp-no}" != xno])
   AC_SUBST([LIBGSPN_CPPFLAGS])
   AC_SUBST([LIBGSPNRG_LDFLAGS])
   AC_SUBST([LIBGSPNSRG_LDFLAGS])
-  AC_SUBST([LIBGSPNESRG_LDFLAGS])
+  AC_SUBST([LIBGSPNSSP_LDFLAGS])
 ])

@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_IFACE_GSPN_EESRG_HH
-# define SPOT_IFACE_GSPN_EESRG_HH
+#ifndef SPOT_IFACE_GSPN_SSP_HH
+# define SPOT_IFACE_GSPN_SSP_HH
 
 // Do not include gspnlib.h here, or it will polute the user's
 // namespace with internal C symbols.
@@ -34,23 +34,23 @@
 namespace spot
 {
 
-  class gspn_eesrg_interface
+  class gspn_ssp_interface
   {
   public:
-    gspn_eesrg_interface(int argc, char **argv,
+    gspn_ssp_interface(int argc, char **argv,
 			 bdd_dict* dict, const gspn_environment& env);
-    ~gspn_eesrg_interface();
+    ~gspn_ssp_interface();
     tgba* automaton(const tgba* operand) const;
   private:
     bdd_dict* dict_;
     const gspn_environment& env_;
   };
 
-  emptiness_check* emptiness_check_eesrg_semi(const tgba* eesrg_automata);
-  emptiness_check* emptiness_check_eesrg_shy_semi(const tgba* eesrg_automata);
-  emptiness_check* emptiness_check_eesrg_shy(const tgba* eesrg_automata);
+  emptiness_check* emptiness_check_ssp_semi(const tgba* ssp_automata);
+  emptiness_check* emptiness_check_ssp_shy_semi(const tgba* ssp_automata);
+  emptiness_check* emptiness_check_ssp_shy(const tgba* ssp_automata);
 
-  counter_example* counter_example_eesrg(const emptiness_check_status* status);
+  counter_example* counter_example_ssp(const emptiness_check_status* status);
 }
 
-#endif // SPOT_IFACE_GSPN_EESRG_GSPN_EESRG_HH
+#endif // SPOT_IFACE_GSPN_SSP_GSPN_SSP_HH

@@ -19,11 +19,11 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef EESRG
+#ifndef SSP
 #include "gspn.hh"
 #define MIN_ARG 3
 #else
-#include "eesrg.hh"
+#include "ssp.hh"
 #define MIN_ARG 4
 #include "tgba/tgbaexplicit.hh"
 #include "tgbaparse/public.hh"
@@ -43,7 +43,7 @@ void
 syntax(char* prog)
 {
   std::cerr << "Usage: "<< prog
-#ifndef EESRG
+#ifndef SSP
 	    << " [OPTIONS...] model formula props..."   << std::endl
 #else
 	    << " [OPTIONS...] model formula automata props..."   << std::endl
@@ -54,7 +54,7 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -e  use Couvreur's emptiness-check (default)" << std::endl
 	    << "  -e2 use Couvreur's emptiness-check's shy variant" << std::endl
-#ifdef EESRG
+#ifdef SSP
 	    << "  -e3 use semi-d. incl. Couvreur's emptiness-check"
 	    << std::endl
 	    << "  -e4 use semi-d. incl. Couvreur's emptiness-check's shy variant"
@@ -153,8 +153,8 @@ main(int argc, char **argv)
       argv[1] = argv[formula_index];
       spot::bdd_dict* dict = new spot::bdd_dict();
 
-#if EESRG
-      spot::gspn_eesrg_interface gspn(2, argv, dict, env);
+#if SSP
+      spot::gspn_ssp_interface gspn(2, argv, dict, env);
 
       spot::tgba_parse_error_list pel1;
       spot::tgba_explicit* control = spot::tgba_parse(argv[formula_index + 2],
@@ -177,7 +177,7 @@ main(int argc, char **argv)
 	}
       spot::ltl::destroy(f);
 
-#ifndef EESRG
+#ifndef SSP
       spot::tgba* model        = gspn.automaton();
       spot::tgba_product* prod = new spot::tgba_product(model, a_f);
 #else
@@ -204,15 +204,15 @@ main(int argc, char **argv)
 	      case Couvreur2:
 		ec = new spot::emptiness_check_shy(prod);
 		break;
-#ifdef EESRG
+#ifdef SSP
 	      case Couvreur3:
-		ec = spot::emptiness_check_eesrg_semi(prod);
+		ec = spot::emptiness_check_ssp_semi(prod);
 		break;
 	      case Couvreur4:
-		ec = spot::emptiness_check_eesrg_shy_semi(prod);
+		ec = spot::emptiness_check_ssp_shy_semi(prod);
 		break;
 	      case Couvreur5:
-		ec = spot::emptiness_check_eesrg_shy(prod);
+		ec = spot::emptiness_check_ssp_shy(prod);
 		break;
 #endif
 	      default:
@@ -227,10 +227,10 @@ main(int argc, char **argv)
 		if (compute_counter_example)
 		  {
 		    spot::counter_example* ce;
-#ifndef EESRG
+#ifndef SSP
 		    ce = new spot::counter_example(ecs);
 #else
-		    ce = spot::counter_example_eesrg(ecs);
+		    ce = spot::counter_example_ssp(ecs);
 #endif
 		    ce->print_result(std::cout, proj ? model : 0);
 		    ce->print_stats(std::cout);
@@ -273,7 +273,7 @@ main(int argc, char **argv)
 	    delete d;
 	  }
 	}
-#ifndef EESRG
+#ifndef SSP
       delete prod;
       delete model;
 #else

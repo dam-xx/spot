@@ -1,6 +1,15 @@
 2004-04-15  Soheib Baarir  <Souheib.Baarir@lip6.fr>
 	    Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	Rename EESRG as SSP.
+	* iface/gspn/eesrg.cc, iface/gspn/eesrg.hh,
+	iface/gspn/dottyeesrg.cc: Rename as ...
+	* iface/gspn/ssp.cc, iface/gspn/ssp.hh, iface/gspn/dottyssp.cc:
+	... these.  Adjust all classes and function names.
+	* iface/gspn/ltlgspn.cc, iface/gspn/Makefile.am: Adjust all classes
+	filenames and function names.
+	* m4/gspnlib.m4: Define WITH_GSPN_SSP and LIBGSPNSSP_LDFLAGS.
+
 	* src/tgbaalgos/gtec/nsheap.cc (numbered_state_heap_hash_map::find):
 	Rewrite.
 	(numbered_state_heap_hash_map::index): New functions.

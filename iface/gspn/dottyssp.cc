@@ -19,7 +19,7 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include "eesrg.hh"
+#include "ssp.hh"
 #include "tgbaalgos/dotty.hh"
 #include "tgba/tgbaexplicit.hh"
 #include "tgbaparse/public.hh"
@@ -41,7 +41,7 @@ main(int argc, char **argv)
 	env.declare(argv[--argc]);
 
       spot::bdd_dict* dict = new spot::bdd_dict();
-      spot::gspn_eesrg_interface gspn(2, argv, dict, env);
+      spot::gspn_ssp_interface gspn(2, argv, dict, env);
 
       spot::tgba_parse_error_list pel1;
       spot::tgba_explicit* control = spot::tgba_parse(argv[--argc], pel1,

@@ -23,7 +23,7 @@
 #include <map>
 #include <cassert>
 #include <gspnlib.h>
-#include "eesrg.hh"
+#include "ssp.hh"
 #include "misc/bddlt.hh"
 #include <bdd.h>
 #include "tgbaalgos/gtec/explscc.hh"
@@ -48,19 +48,19 @@ namespace spot
     }
   }
 
-  // state_gspn_eesrg
+  // state_gspn_ssp
   //////////////////////////////////////////////////////////////////////
 
-  class state_gspn_eesrg: public state
+  class state_gspn_ssp: public state
   {
   public:
-    state_gspn_eesrg(State left, const state* right)
+    state_gspn_ssp(State left, const state* right)
       : left_(left), right_(right)
     {
     }
 
     virtual
-    ~state_gspn_eesrg()
+    ~state_gspn_ssp()
     {
       delete right_;
     }
@@ -68,7 +68,7 @@ namespace spot
     virtual int
     compare(const state* other) const
     {
-      const state_gspn_eesrg* o = dynamic_cast<const state_gspn_eesrg*>(other);
+      const state_gspn_ssp* o = dynamic_cast<const state_gspn_ssp*>(other);
       assert(o);
       int res = (reinterpret_cast<char*>(o->left())
 		 - reinterpret_cast<char*>(left()));
@@ -84,9 +84,9 @@ namespace spot
 	      - static_cast<char*>(0)) << 10 + right_->hash();
     }
 
-    virtual state_gspn_eesrg* clone() const
+    virtual state_gspn_ssp* clone() const
     {
-      return new state_gspn_eesrg(left(), right()->clone());
+      return new state_gspn_ssp(left(), right()->clone());
     }
 
     State
@@ -104,12 +104,12 @@ namespace spot
   private:
     State left_;
     const state* right_;
-  }; // state_gspn_eesrg
+  }; // state_gspn_ssp
 
-  // tgba_gspn_eesrg_private_
+  // tgba_gspn_ssp_private_
   //////////////////////////////////////////////////////////////////////
 
-  struct tgba_gspn_eesrg_private_
+  struct tgba_gspn_ssp_private_
   {
     int refs;			// reference count
 
@@ -122,7 +122,7 @@ namespace spot
     size_t prop_count;
     const tgba* operand;
 
-    tgba_gspn_eesrg_private_(bdd_dict* dict, const gspn_environment& env,
+    tgba_gspn_ssp_private_(bdd_dict* dict, const gspn_environment& env,
 			     const tgba* operand)
       : refs(1), dict(dict), all_props(0),
 	operand(operand)
@@ -158,7 +158,7 @@ namespace spot
 	}
     }
 
-    tgba_gspn_eesrg_private_::~tgba_gspn_eesrg_private_()
+    tgba_gspn_ssp_private_::~tgba_gspn_ssp_private_()
     {
       dict->unregister_all_my_variables(this);
       if (all_props)
@@ -167,13 +167,13 @@ namespace spot
   };
 
 
-  // tgba_succ_iterator_gspn_eesrg
+  // tgba_succ_iterator_gspn_ssp
   //////////////////////////////////////////////////////////////////////
 
-  class tgba_succ_iterator_gspn_eesrg: public tgba_succ_iterator
+  class tgba_succ_iterator_gspn_ssp: public tgba_succ_iterator
   {
   public:
-    tgba_succ_iterator_gspn_eesrg(Succ_* succ_tgba,
+    tgba_succ_iterator_gspn_ssp(Succ_* succ_tgba,
 				  size_t size_tgba,
 				  bdd* bdd_arry,
 				  state** state_arry,
@@ -192,7 +192,7 @@ namespace spot
     }
 
     virtual
-    ~tgba_succ_iterator_gspn_eesrg()
+    ~tgba_succ_iterator_gspn_ssp()
     {
 
       for(size_t i = 0; i < size_states_; i++)
@@ -237,7 +237,7 @@ namespace spot
     current_state() const
     {
       return
-	new state_gspn_eesrg(successors_[current_succ_].succ_,
+	new state_gspn_ssp(successors_[current_succ_].succ_,
 			     (state_array_[successors_[current_succ_]
 					   .arc->curr_state])->clone());
     }
@@ -271,20 +271,20 @@ namespace spot
     size_t size_states_;
     Props_* props_;
     int size_prop_;
-  }; // tgba_succ_iterator_gspn_eesrg
+  }; // tgba_succ_iterator_gspn_ssp
 
 
-  // tgba_gspn_eesrg
+  // tgba_gspn_ssp
   //////////////////////////////////////////////////////////////////////
 
-  class tgba_gspn_eesrg: public tgba
+  class tgba_gspn_ssp: public tgba
   {
   public:
-    tgba_gspn_eesrg(bdd_dict* dict, const gspn_environment& env,
+    tgba_gspn_ssp(bdd_dict* dict, const gspn_environment& env,
 		    const tgba* operand);
-    tgba_gspn_eesrg(const tgba_gspn_eesrg& other);
-    tgba_gspn_eesrg& operator=(const tgba_gspn_eesrg& other);
-    virtual ~tgba_gspn_eesrg();
+    tgba_gspn_ssp(const tgba_gspn_ssp& other);
+    tgba_gspn_ssp& operator=(const tgba_gspn_ssp& other);
+    virtual ~tgba_gspn_ssp();
     virtual state* get_init_state() const;
     virtual tgba_succ_iterator*
     succ_iter(const state* local_state,
@@ -299,52 +299,52 @@ namespace spot
     virtual bdd compute_support_conditions(const spot::state* state) const;
     virtual bdd compute_support_variables(const spot::state* state) const;
   private:
-    tgba_gspn_eesrg_private_* data_;
+    tgba_gspn_ssp_private_* data_;
   };
 
-  tgba_gspn_eesrg::tgba_gspn_eesrg(bdd_dict* dict, const gspn_environment& env,
+  tgba_gspn_ssp::tgba_gspn_ssp(bdd_dict* dict, const gspn_environment& env,
 				   const tgba* operand)
   {
-    data_ = new tgba_gspn_eesrg_private_(dict, env, operand);
+    data_ = new tgba_gspn_ssp_private_(dict, env, operand);
   }
 
-  tgba_gspn_eesrg::tgba_gspn_eesrg(const tgba_gspn_eesrg& other)
+  tgba_gspn_ssp::tgba_gspn_ssp(const tgba_gspn_ssp& other)
     : tgba()
   {
     data_ = other.data_;
     ++data_->refs;
   }
 
-  tgba_gspn_eesrg::~tgba_gspn_eesrg()
+  tgba_gspn_ssp::~tgba_gspn_ssp()
   {
     if (--data_->refs == 0)
       delete data_;
   }
 
-  tgba_gspn_eesrg&
-  tgba_gspn_eesrg::operator=(const tgba_gspn_eesrg& other)
+  tgba_gspn_ssp&
+  tgba_gspn_ssp::operator=(const tgba_gspn_ssp& other)
   {
     if (&other == this)
       return *this;
-    this->~tgba_gspn_eesrg();
-    new (this) tgba_gspn_eesrg(other);
+    this->~tgba_gspn_ssp();
+    new (this) tgba_gspn_ssp(other);
     return *this;
   }
 
-  state* tgba_gspn_eesrg::get_init_state() const
+  state* tgba_gspn_ssp::get_init_state() const
   {
-    // Use 0 as initial state for the EESRG side.  State 0 does not
+    // Use 0 as initial state for the SSP side.  State 0 does not
     // exists, but when passed to succ() it will produce the list
     // of initial states.
-    return new state_gspn_eesrg(0, data_->operand->get_init_state());
+    return new state_gspn_ssp(0, data_->operand->get_init_state());
   }
 
   tgba_succ_iterator*
-  tgba_gspn_eesrg::succ_iter(const state* state_,
+  tgba_gspn_ssp::succ_iter(const state* state_,
 			     const state* global_state,
 			     const tgba* global_automaton) const
   {
-    const state_gspn_eesrg* s = dynamic_cast<const state_gspn_eesrg*>(state_);
+    const state_gspn_ssp* s = dynamic_cast<const state_gspn_ssp*>(state_);
     assert(s);
     (void) global_state;
     (void) global_automaton;
@@ -422,7 +422,7 @@ namespace spot
 			res = 1;
 		      }
 
-		    tgba_gspn_eesrg_private_::prop_map::iterator k
+		    tgba_gspn_ssp_private_::prop_map::iterator k
 		      = data_->prop_dict.find(var);
 
 		    if (k != data_->prop_dict.end())
@@ -450,36 +450,36 @@ namespace spot
        }
 
      delete i;
-     return new tgba_succ_iterator_gspn_eesrg(succ_tgba_, size_tgba_,
+     return new tgba_succ_iterator_gspn_ssp(succ_tgba_, size_tgba_,
 					      bdd_array, state_array,
 					      size_states, props_,
 					      nb_arc_props);
   }
 
   bdd
-  tgba_gspn_eesrg::compute_support_conditions(const spot::state* state) const
+  tgba_gspn_ssp::compute_support_conditions(const spot::state* state) const
   {
     (void) state;
     return bddtrue;
   }
 
   bdd
-  tgba_gspn_eesrg::compute_support_variables(const spot::state* state) const
+  tgba_gspn_ssp::compute_support_variables(const spot::state* state) const
   {
     (void) state;
     return bddtrue;
   }
 
   bdd_dict*
-  tgba_gspn_eesrg::get_dict() const
+  tgba_gspn_ssp::get_dict() const
   {
     return data_->dict;
   }
 
   std::string
-  tgba_gspn_eesrg::format_state(const state* state) const
+  tgba_gspn_ssp::format_state(const state* state) const
   {
-    const state_gspn_eesrg* s = dynamic_cast<const state_gspn_eesrg*>(state);
+    const state_gspn_ssp* s = dynamic_cast<const state_gspn_ssp*>(state);
     assert(s);
     char* str;
     State gs = s->left();
@@ -504,9 +504,9 @@ namespace spot
   }
 
   state*
-  tgba_gspn_eesrg::project_state(const state* s, const tgba* t) const
+  tgba_gspn_ssp::project_state(const state* s, const tgba* t) const
   {
-    const state_gspn_eesrg* s2 = dynamic_cast<const state_gspn_eesrg*>(s);
+    const state_gspn_ssp* s2 = dynamic_cast<const state_gspn_ssp*>(s);
     assert(s2);
     if (t == this)
       return s2->clone();
@@ -514,7 +514,7 @@ namespace spot
   }
 
   bdd
-  tgba_gspn_eesrg::all_acceptance_conditions() const
+  tgba_gspn_ssp::all_acceptance_conditions() const
   {
     // There is no acceptance conditions in GSPN systems, they all
     // come from the operand automaton.
@@ -522,17 +522,17 @@ namespace spot
   }
 
   bdd
-  tgba_gspn_eesrg::neg_acceptance_conditions() const
+  tgba_gspn_ssp::neg_acceptance_conditions() const
   {
     // There is no acceptance conditions in GSPN systems, they all
     // come from the operand automaton.
     return data_->operand->neg_acceptance_conditions();
   }
 
-  // gspn_eesrg_interface
+  // gspn_ssp_interface
   //////////////////////////////////////////////////////////////////////
 
-  gspn_eesrg_interface::gspn_eesrg_interface(int argc, char **argv,
+  gspn_ssp_interface::gspn_ssp_interface(int argc, char **argv,
 					     bdd_dict* dict,
 					     const gspn_environment& env)
     : dict_(dict), env_(env)
@@ -542,7 +542,7 @@ namespace spot
       throw gspn_exeption("initialize()", res);
   }
 
-  gspn_eesrg_interface::~gspn_eesrg_interface()
+  gspn_ssp_interface::~gspn_ssp_interface()
   {
     int res = finalize();
     if (res)
@@ -550,19 +550,19 @@ namespace spot
   }
 
   tgba*
-  gspn_eesrg_interface::automaton(const tgba* operand) const
+  gspn_ssp_interface::automaton(const tgba* operand) const
   {
-    return new tgba_gspn_eesrg(dict_, env_, operand);
+    return new tgba_gspn_ssp(dict_, env_, operand);
   }
 
 
   //////////////////////////////////////////////////////////////////////
 
-  class connected_component_eesrg: public explicit_connected_component
+  class connected_component_ssp: public explicit_connected_component
   {
   public:
     virtual
-    ~connected_component_eesrg()
+    ~connected_component_ssp()
     {
     }
 
@@ -573,8 +573,8 @@ namespace spot
 
       for (i = states.begin(); i !=states.end(); i++)
 	{
-	  const state_gspn_eesrg* old_state = (const state_gspn_eesrg*)(*i);
-	  const state_gspn_eesrg* new_state = (const state_gspn_eesrg*)(s);
+	  const state_gspn_ssp* old_state = (const state_gspn_ssp*)(*i);
+	  const state_gspn_ssp* new_state = (const state_gspn_ssp*)(s);
 
 	  if ((old_state->right())->compare(new_state->right()) == 0
 	      && old_state->left()
@@ -601,31 +601,31 @@ namespace spot
     set_type states;
   };
 
-  class connected_component_eesrg_factory :
+  class connected_component_ssp_factory :
     public explicit_connected_component_factory
   {
   public:
-    virtual connected_component_eesrg*
+    virtual connected_component_ssp*
     build() const
     {
-      return new connected_component_eesrg();
+      return new connected_component_ssp();
     }
 
     /// Get the unique instance of this class.
-    static const connected_component_eesrg_factory*
+    static const connected_component_ssp_factory*
     instance()
     {
-      static connected_component_eesrg_factory f;
+      static connected_component_ssp_factory f;
       return &f;
     }
 
   protected:
     virtual
-    ~connected_component_eesrg_factory()
+    ~connected_component_ssp_factory()
     {
     }
     /// Construction is forbiden.
-    connected_component_eesrg_factory()
+    connected_component_ssp_factory()
     {
     }
   };
@@ -633,11 +633,11 @@ namespace spot
   //////////////////////////////////////////////////////////////////////
 
 
-  class numbered_state_heap_eesrg_semi : public numbered_state_heap
+  class numbered_state_heap_ssp_semi : public numbered_state_heap
   {
   public:
     virtual
-    ~numbered_state_heap_eesrg_semi()
+    ~numbered_state_heap_ssp_semi()
     {
       // Free keys in H.
       hash_type::iterator i = h.begin();
@@ -658,10 +658,10 @@ namespace spot
       hash_type::const_iterator i;
       for (i = h.begin(); i != h.end(); ++i)
 	{
-	  const state_gspn_eesrg* old_state =
-	    dynamic_cast<const state_gspn_eesrg*>(i->first);
-	  const state_gspn_eesrg* new_state =
-	    dynamic_cast<const state_gspn_eesrg*>(s);
+	  const state_gspn_ssp* old_state =
+	    dynamic_cast<const state_gspn_ssp*>(i->first);
+	  const state_gspn_ssp* new_state =
+	    dynamic_cast<const state_gspn_ssp*>(s);
 	  assert(old_state);
 	  assert(new_state);
 
@@ -701,10 +701,10 @@ namespace spot
       hash_type::iterator i;
       for (i = h.begin(); i != h.end(); ++i)
 	{
-	  const state_gspn_eesrg* old_state =
-	    dynamic_cast<const state_gspn_eesrg*>(i->first);
-	  const state_gspn_eesrg* new_state =
-	    dynamic_cast<const state_gspn_eesrg*>(s);
+	  const state_gspn_ssp* old_state =
+	    dynamic_cast<const state_gspn_ssp*>(i->first);
+	  const state_gspn_ssp* new_state =
+	    dynamic_cast<const state_gspn_ssp*>(s);
 	  assert(old_state);
 	  assert(new_state);
 
@@ -797,22 +797,22 @@ namespace spot
 			  state_ptr_hash, state_ptr_equal> hash_type;
     hash_type h;		///< Map of visited states.
 
-    friend class numbered_state_heap_eesrg_const_iterator;
-    friend class emptiness_check_shy_eesrg;
+    friend class numbered_state_heap_ssp_const_iterator;
+    friend class emptiness_check_shy_ssp;
   };
 
 
-  class numbered_state_heap_eesrg_const_iterator :
+  class numbered_state_heap_ssp_const_iterator :
     public numbered_state_heap_const_iterator
   {
   public:
-    numbered_state_heap_eesrg_const_iterator
-      (const numbered_state_heap_eesrg_semi::hash_type& h)
+    numbered_state_heap_ssp_const_iterator
+      (const numbered_state_heap_ssp_semi::hash_type& h)
 	: numbered_state_heap_const_iterator(), h(h)
     {
     }
 
-    ~numbered_state_heap_eesrg_const_iterator()
+    ~numbered_state_heap_ssp_const_iterator()
     {
     }
 
@@ -847,57 +847,57 @@ namespace spot
     }
 
   private:
-    numbered_state_heap_eesrg_semi::hash_type::const_iterator i;
-    const numbered_state_heap_eesrg_semi::hash_type& h;
+    numbered_state_heap_ssp_semi::hash_type::const_iterator i;
+    const numbered_state_heap_ssp_semi::hash_type& h;
   };
 
 
   numbered_state_heap_const_iterator*
-  numbered_state_heap_eesrg_semi::iterator() const
+  numbered_state_heap_ssp_semi::iterator() const
   {
-    return new numbered_state_heap_eesrg_const_iterator(h);
+    return new numbered_state_heap_ssp_const_iterator(h);
   }
 
 
-  /// \brief Factory for numbered_state_heap_eesrg_semi
+  /// \brief Factory for numbered_state_heap_ssp_semi
   ///
   /// This class is a singleton.  Retrieve the instance using instance().
-  class numbered_state_heap_eesrg_factory_semi:
+  class numbered_state_heap_ssp_factory_semi:
     public numbered_state_heap_factory
   {
   public:
-    virtual numbered_state_heap_eesrg_semi*
+    virtual numbered_state_heap_ssp_semi*
     build() const
     {
-      return new numbered_state_heap_eesrg_semi();
+      return new numbered_state_heap_ssp_semi();
     }
 
     /// Get the unique instance of this class.
-    static const numbered_state_heap_eesrg_factory_semi*
+    static const numbered_state_heap_ssp_factory_semi*
     instance()
     {
-      static numbered_state_heap_eesrg_factory_semi f;
+      static numbered_state_heap_ssp_factory_semi f;
       return &f;
     }
 
   protected:
     virtual
-    ~numbered_state_heap_eesrg_factory_semi()
+    ~numbered_state_heap_ssp_factory_semi()
     {
     }
 
-    numbered_state_heap_eesrg_factory_semi()
+    numbered_state_heap_ssp_factory_semi()
     {
     }
   };
 
 
-  class emptiness_check_shy_eesrg : public emptiness_check_shy
+  class emptiness_check_shy_ssp : public emptiness_check_shy
   {
   public:
-    emptiness_check_shy_eesrg(const tgba* a)
+    emptiness_check_shy_ssp(const tgba* a)
       : emptiness_check_shy(a,
-			    numbered_state_heap_eesrg_factory_semi::instance())
+			    numbered_state_heap_ssp_factory_semi::instance())
     {
     }
 
@@ -905,16 +905,16 @@ namespace spot
     virtual int*
     find_state(const state* s)
     {
-      typedef numbered_state_heap_eesrg_semi::hash_type hash_type;
-      hash_type& h = dynamic_cast<numbered_state_heap_eesrg_semi*>(ecs_->h)->h;
+      typedef numbered_state_heap_ssp_semi::hash_type hash_type;
+      hash_type& h = dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->h;
 
       hash_type::iterator i;
       for (i = h.begin(); i != h.end(); ++i)
 	{
-	  const state_gspn_eesrg* old_state =
-	    dynamic_cast<const state_gspn_eesrg*>(i->first);
-	  const state_gspn_eesrg* new_state =
-	    dynamic_cast<const state_gspn_eesrg*>(s);
+	  const state_gspn_ssp* old_state =
+	    dynamic_cast<const state_gspn_ssp*>(i->first);
+	  const state_gspn_ssp* new_state =
+	    dynamic_cast<const state_gspn_ssp*>(s);
 	  assert(old_state);
 	  assert(new_state);
 
@@ -943,8 +943,8 @@ namespace spot
 
 			  for (size_t i = 0; i < size_tgba_; i++)
 			    {
-			      state_gspn_eesrg* s =
-				new state_gspn_eesrg
+			      state_gspn_ssp* s =
+				new state_gspn_ssp
 				  (succ_tgba_[i],
 				   old_state->right()->clone());
 			      queue.push_back(successor(queue.begin()->acc, s));
@@ -966,35 +966,35 @@ namespace spot
 
 
   emptiness_check*
-  emptiness_check_eesrg_semi(const tgba* eesrg_automata)
+  emptiness_check_ssp_semi(const tgba* ssp_automata)
   {
-    assert(dynamic_cast<const tgba_gspn_eesrg*>(eesrg_automata));
+    assert(dynamic_cast<const tgba_gspn_ssp*>(ssp_automata));
     return
-      new emptiness_check(eesrg_automata,
-			  numbered_state_heap_eesrg_factory_semi::instance());
+      new emptiness_check(ssp_automata,
+			  numbered_state_heap_ssp_factory_semi::instance());
   }
 
   emptiness_check*
-  emptiness_check_eesrg_shy_semi(const tgba* eesrg_automata)
+  emptiness_check_ssp_shy_semi(const tgba* ssp_automata)
   {
-    assert(dynamic_cast<const tgba_gspn_eesrg*>(eesrg_automata));
+    assert(dynamic_cast<const tgba_gspn_ssp*>(ssp_automata));
     return
       new emptiness_check_shy
-        (eesrg_automata,
-	 numbered_state_heap_eesrg_factory_semi::instance());
+        (ssp_automata,
+	 numbered_state_heap_ssp_factory_semi::instance());
   }
 
   emptiness_check*
-  emptiness_check_eesrg_shy(const tgba* eesrg_automata)
+  emptiness_check_ssp_shy(const tgba* ssp_automata)
   {
-    assert(dynamic_cast<const tgba_gspn_eesrg*>(eesrg_automata));
-    return new emptiness_check_shy_eesrg(eesrg_automata);
+    assert(dynamic_cast<const tgba_gspn_ssp*>(ssp_automata));
+    return new emptiness_check_shy_ssp(ssp_automata);
   }
 
   counter_example*
-  counter_example_eesrg(const emptiness_check_status* status)
+  counter_example_ssp(const emptiness_check_status* status)
   {
     return new counter_example(status,
-			       connected_component_eesrg_factory::instance());
+			       connected_component_ssp_factory::instance());
   }
 }

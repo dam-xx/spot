@@ -28,7 +28,7 @@ gspn_HEADERS = \
   common.hh \
   gspn.hh
 
-lib_LTLIBRARIES = libspotgspn.la libspotgspneesrg.la
+lib_LTLIBRARIES = libspotgspn.la libspotgspnssp.la
 libspotgspn_la_LIBADD = $(top_builddir)/src/libspot.la
 libspotgspn_la_SOURCES = \
   common.cc \
@@ -40,17 +40,17 @@ check_PROGRAMS = \
   ltlgspn-rg \
   ltlgspn-srg
 
-if WITH_GSPN_EESRG
-gspn_HEADERS += eesrg.hh
+if WITH_GSPN_SSP
+gspn_HEADERS += ssp.hh
 check_PROGRAMS += \
-  dottygspn-eesrg \
-  ltlgspn-eesrg
+  dottygspn-ssp \
+  ltlgspn-ssp
 
-libspotgspneesrg_la_LIBADD = $(top_builddir)/src/libspot.la
-libspotgspneesrg_la_CPPFLAGS = -DESYMBOLIC $(AM_CPPFLAGS)
-libspotgspneesrg_la_SOURCES = \
+libspotgspnssp_la_LIBADD = $(top_builddir)/src/libspot.la
+libspotgspnssp_la_CPPFLAGS = -DESYMBOLIC $(AM_CPPFLAGS)
+libspotgspnssp_la_SOURCES = \
   common.cc \
-  eesrg.cc
+  ssp.cc
 endif
 
 
@@ -60,8 +60,8 @@ dottygspn_rg_LDADD = libspotgspn.la $(LIBGSPNRG_LDFLAGS)
 dottygspn_srg_SOURCES = dottygspn.cc
 dottygspn_srg_LDADD = libspotgspn.la $(LIBGSPNSRG_LDFLAGS)
 
-dottygspn_eesrg_SOURCES = dottyeesrg.cc
-dottygspn_eesrg_LDADD = libspotgspneesrg.la $(LIBGSPNESRG_LDFLAGS)
+dottygspn_ssp_SOURCES = dottyssp.cc
+dottygspn_ssp_LDADD = libspotgspnssp.la $(LIBGSPNSSP_LDFLAGS)
 
 ltlgspn_rg_SOURCES = ltlgspn.cc
 ltlgspn_rg_LDADD = libspotgspn.la $(LIBGSPNRG_LDFLAGS)
@@ -69,9 +69,9 @@ ltlgspn_rg_LDADD = libspotgspn.la $(LIBGSPNRG_LDFLAGS)
 ltlgspn_srg_SOURCES = ltlgspn.cc
 ltlgspn_srg_LDADD = libspotgspn.la $(LIBGSPNSRG_LDFLAGS)
 
-ltlgspn_eesrg_SOURCES = ltlgspn.cc
-ltlgspn_eesrg_LDADD = libspotgspneesrg.la $(LIBGSPNESRG_LDFLAGS)
-ltlgspn_eesrg_CPPFLAGS = -DEESRG=1 $(AM_CPPFLAGS)
+ltlgspn_ssp_SOURCES = ltlgspn.cc
+ltlgspn_ssp_LDADD = libspotgspnssp.la $(LIBGSPNSSP_LDFLAGS)
+ltlgspn_ssp_CPPFLAGS = -DSSP=1 $(AM_CPPFLAGS)
 
 EXTRA_DIST = \
   examples/DCSwave/DCSWave.def \
