@@ -360,6 +360,11 @@ namespace spot
           hash_type::const_iterator it = h.find(s);
           return (it != h.end());
         }
+
+      int size() const
+        {
+          return h.size();
+        }
     private:
 
       typedef Sgi::hash_map<const state*, std::pair<color, bdd>,

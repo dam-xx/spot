@@ -64,12 +64,20 @@ namespace spot
   template <typename ndfs_search, typename heap>
   class ndfs_result:
     public emptiness_check_result,
-    public ars_statistics
+    public ars_statistics,
+    public acss_statistics
   {
   public:
     ndfs_result(const ndfs_search& ms)
-      : emptiness_check_result(ms.automaton()), ms_(ms), h_(ms_.get_heap())
+      : emptiness_check_result(ms.automaton()), ms_(ms),
+        h_(ms_.get_heap())
     {
+    }
+
+    int acss_states() const
+    {
+      // all visited states are in the state space search
+      return h_.size();
     }
 
     virtual ~ndfs_result()

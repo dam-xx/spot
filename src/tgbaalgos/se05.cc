@@ -445,6 +445,11 @@ namespace spot
           return true;
         }
 
+      int size() const
+        {
+          return h.size() + hc.size();
+        }
+
     private:
 
       hash_type h; // associate to each blue and red state its color
@@ -497,10 +502,10 @@ namespace spot
         unsigned char o;
       };
 
-      bsh_se05_search_heap(size_t s) : size(s)
+      bsh_se05_search_heap(size_t s) : size_(s)
         {
-          h = new unsigned char[size];
-          memset(h, WHITE, size);
+          h = new unsigned char[size_];
+          memset(h, WHITE, size_);
         }
 
       ~bsh_se05_search_heap()
@@ -513,8 +518,8 @@ namespace spot
           size_t ha = s->hash();
           hcyan_type::iterator ic = hc.find(s);
           if (ic!=hc.end())
-            return color_ref(&hc, *ic, &h[ha%size], ha%4);
-          return color_ref(&h[ha%size], ha%4);
+            return color_ref(&hc, *ic, &h[ha%size_], ha%4);
+          return color_ref(&h[ha%size_], ha%4);
         }
 
       void add_new_state(const state* s, color c)
@@ -540,11 +545,18 @@ namespace spot
           if (ic != hc.end())
             return true;
           size_t ha = s->hash();
-          return color((h[ha%size] >> ((ha%4)*2)) & 3U) != WHITE;
+          return color((h[ha%size_] >> ((ha%4)*2)) & 3U) != WHITE;
+        }
+
+      int size() const
+        {
+          // this method must return the number of state stored in the heap. Due
+          // to potential conflicts this size cannot be computed.
+          return 0;
         }
 
     private:
-      size_t size;
+      size_t size_;
       unsigned char* h;
       hcyan_type hc;
     };

@@ -387,6 +387,11 @@ namespace spot
           return (it != h.end());
         }
 
+      int size() const
+        {
+          return h.size();
+        }
+
     private:
 
       typedef Sgi::hash_map<const state*, color,
@@ -422,9 +427,9 @@ namespace spot
 
       bsh_magic_search_heap(size_t s)
         {
-          size = s;
-          h = new unsigned char[size];
-          memset(h, WHITE, size);
+          size_ = s;
+          h = new unsigned char[size_];
+          memset(h, WHITE, size_);
         }
 
       ~bsh_magic_search_heap()
@@ -435,7 +440,7 @@ namespace spot
       color_ref get_color_ref(const state*& s)
         {
           size_t ha = s->hash();
-          return color_ref(&(h[ha%size]), ha%4);
+          return color_ref(&(h[ha%size_]), ha%4);
         }
 
       void add_new_state(const state* s, color c)
@@ -453,11 +458,18 @@ namespace spot
       bool has_been_visited(const state* s) const
         {
           size_t ha = s->hash();
-          return color((h[ha%size] >> ((ha%4)*2)) & 3U) != WHITE;
+          return color((h[ha%size_] >> ((ha%4)*2)) & 3U) != WHITE;
+        }
+
+      int size() const
+        {
+          // this method must return the number of state stored in the heap. Due
+          // to potential conflicts this size cannot be computed.
+          return 0;
         }
 
     private:
-      size_t size;
+      size_t size_;
       unsigned char* h;
     };
 

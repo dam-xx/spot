@@ -1,3 +1,13 @@
+2005-01-06  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/ltltest/randltl.cc: Include cassert.
+
+	* src/tgbaalgos/ndfs_result.hxx: Implement the spot::acss_statistics
+	interface.
+	* src/tgbaalgos/magic.cc, src/tgbaalgos/se05.cc, src/tgbaalgos/tau03.cc,
+	src/tgbaalgos/tau03opt.cc: Add to each heap class a method returning its
+	size.
+
 2005-01-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltltest/randltl.cc: Add options -r and -u.

@@ -481,6 +481,11 @@ namespace spot
           return true;
         }
 
+      int size() const
+        {
+          return h.size() + hc.size();
+        }
+
     private:
 
       // associate to each blue and red state its color and its acceptance set
