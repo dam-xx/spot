@@ -1,5 +1,8 @@
 2005-01-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlast/formula.hh (formula_ptr_less_than): Two
+	formulae with the same hash key are not necessary equal!
+
 	* src/ltlast/formula.hh (hash, dump, dump_, hash_key_): New members.
 	(formula_ptr_less_than, formula_ptr_hash): New class.
 	* src/ltlast/atomic_prop.cc, src/ltlast/binop.cc,

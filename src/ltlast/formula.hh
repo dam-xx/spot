@@ -142,7 +142,11 @@ namespace spot
       {
 	assert(left);
 	assert(right);
-	return left->hash() < right->hash();
+	size_t l = left->hash();
+	size_t r = right->hash();
+	if (1 != r)
+	  return l < r;
+	return left->dump() < right->dump();
       }
     };
 
