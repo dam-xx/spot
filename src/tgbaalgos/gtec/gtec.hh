@@ -53,9 +53,48 @@ namespace spot
   /// }
   /// \endverbatim
   ///
-  /// check() returns true if the automaton's language is empty.  When
-  /// it return false, a stack of SCC has been built is available
-  /// using result() (spot::counter_example needs it).
+  /// A recursive definition of the algorithm would look as follows,
+  /// but the implementation is of course not recursive.
+  /// (<code>&lt;Sigma, Q, delta, q, F&gt;</code> is the automaton to
+  /// check, H is an associative array mapping each state to its
+  /// positive DFS order or 0 if it is dead, SCC is and ACC are two
+  /// stacks.)
+  ///
+  /// \verbatim
+  /// check(<Sigma, Q, delta, q, F>, H, SCC, ACC)
+  ///   if q is not in H   // new state
+  ///       H[q] = H.size + 1
+  ///       SCC.push(<H[q], {}>)
+  ///       forall <a, s> : <q, _, a, s> in delta
+  ///           ACC.push(a)
+  ///           res = check(<Sigma, Q, delta, s, F>, H, SCC, ACC)
+  ///           if res
+  ///               return res
+  ///       <n, _> = SCC.top()
+  ///       if n = H[q]
+  ///           SCC.pop()
+  ///           mark_reachable_states_as_dead(<Sigma, Q, delta, q, F>, H$)
+  ///       return 0
+  ///   else
+  ///       if H[q] = 0 // dead state
+  ///           ACC.pop()
+  ///           return true
+  ///       else // state in stack: merge SCC
+  ///           all = {}
+  ///           do
+  ///               <n, a> = SCC.pop()
+  ///               all = all union a union { ACC.pop() }
+  ///           until n <= H[q]
+  ///           SCC.push(<n, all>)
+  ///           if all != F
+  ///               return 0
+  ///           return new emptiness_check_result(necessary data)
+  /// \endverbatim
+  ///
+  /// check() returns 0 iff the automaton's language is empty.  It
+  /// returns an instance of emptiness_check_result.  If the automaton
+  /// accept a word.  (Use emptiness_check_result::accepting_run() to
+  /// extract an accepting run.)
   ///
   /// There are two variants of this algorithm: spot::couvreur99_check and
   /// spot::couvreur99_check_shy.  They differ in their memory usage, the

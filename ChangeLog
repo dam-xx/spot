@@ -1,3 +1,7 @@
+2005-02-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/gtec.hh (couvreur99_check): Add pseudo code.
+
 2005-02-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/randomgraph.cc (random_graph): Make sure n > 0.
