@@ -568,7 +568,8 @@ namespace spot
 
     bool change = true;
     Sgi::hash_map<int, const spot::state*>::iterator i;
-    Sgi::hash_map<int, const spot::state*>::iterator itmp;
+    //Sgi::hash_map<int, const spot::state*>::iterator itmp;
+    spot::state* s;
 
     // we check if there is a terminal SCC we can be remove while
     // they have been one removed, because a terminal SCC removed
@@ -576,21 +577,21 @@ namespace spot
     while (change)
       {
 	change = false;
-	for (i = state_scc_v_.begin(); i != state_scc_v_.end();)
+	for (i = state_scc_v_.begin(); i != state_scc_v_.end(); ++i)
 	  {
 	    std::cout << "delete_scc : ["
 		      << this->format_state(i->second)
 		      << "]"
 		      << "is_terminal ??" << std::endl;
-	      if (is_terminal(i->second))
+	    s = (i->second)->clone();
+	    if (is_terminal(s))
 	      {
-		//change = true;
-		change = false;
-		//this->remove_scc(const_cast<spot::state*>(i->second));
-		itmp = i;
-		//state_scc_v_.erase(itmp);
+		change = true;
+		this->remove_scc(const_cast<spot::state*>(i->second));
+		state_scc_v_.erase(i);
+		break;
 	      }
-	    ++i;
+	    std::cout << "end is_terminal" << std::endl;
 	  }
       }
   }
@@ -598,6 +599,8 @@ namespace spot
   bool
   tgba_reduc::is_terminal(const spot::state* s, int n)
   {
+    // FIXME
+
     // a SCC is terminal if there are no transition
     // leaving the SCC AND she doesn't contain all
     // the acceptance condition.
@@ -625,13 +628,17 @@ namespace spot
       }
     ///////////////////////////////
 
+    std::cout << "seen_->find" << std::endl;
     seen_map::const_iterator sm = seen_->find(s);
+    std::cout << "seen_->end" << std::endl;
     if (sm == seen_->end())
       {
 	// this state is visited for the first time.
 	std::cout << "first time" << std::endl;
 	seen_->insert(std::pair<const spot::state*, int>(s, 1));
+	std::cout << "seen_->insert" << std::endl;
 	i = si_.find(s);
+	std::cout << "assert" << std::endl;
 	assert(i->first != 0);
 	if (n != i->second)
 	    return false;
@@ -640,6 +647,8 @@ namespace spot
       // This state is already visited.
       {
 	std::cout << "second time" << std::endl;
+	delete s;
+	s = 0;
 	return true;
       }
 
@@ -653,17 +662,32 @@ namespace spot
 	s2 = j->current_state();
 	acc_ |= j->current_acceptance_conditions();
 	ret &= this->is_terminal(s2, n);
-	delete s2;
+	if (!ret)
+	  break;
       }
     delete j;
 
     // First call of is_terminal //
     if (b)
       {
+	std::cout << "if b : begin" << std::endl;
+	for (seen_map::iterator i = seen_->begin();
+	     i != seen_->end(); ++i)
+	  {
+	    std::cout << "delete" << std::endl;
+	    s2 = const_cast<spot::state*>(i->first);
+	    assert(s2 != 0);
+	    delete dynamic_cast<tgba_explicit*>(s2);
+	  }
+	seen_->clear();
+	std::cout << "delete seen_" << std::endl;
 	delete seen_;
+	std::cout << "seen_ = NULL" << std::endl;
 	seen_ = NULL;
+	std::cout << "acc_ == this->all_acceptance_conditions()" << std::endl;
 	if (acc_ == this->all_acceptance_conditions())
 	  ret = false;
+	std::cout << "if b : end" << nb_succ << std::endl;
       }
     ///////////////////////////////
 

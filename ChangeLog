@@ -1,6 +1,12 @@
+2004-06-21  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/tgbatest/reductgba.test, src/tgba/tgbareduc.cc:
+	There is bug in reduction with scc.
+	* src/tgbatest/reduccmp.test: More test.
+
 2004-06-17  Thomas Martinez  <martinez@src.lip6.fr>
 
-	* src/tgbatest/reductgba.test, src/ltltest/reduccmp.test: Wrong test are removed.
+	* src/tgbatest/reductgba.test: Wrong test are removed.
 
 2004-06-17  Thomas Martinez  <martinez@src.lip6.fr>
 
@@ -15,7 +21,6 @@
 	* src/tgba/tgbareduc.cc, src/tgba/tgbareduc.hh: Bug in SCC.
 
 	* src/ltlvisit/reducform.cc: Correct some bug for multop.
-	* src/ltltest/reduccmp.test: More Test.
 	* src/ltltest/reduc.cc: Thinko
 	* src/ltltest/equals.cc: Reduction compare
 
