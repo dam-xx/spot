@@ -1,3 +1,8 @@
+2004-10-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlvisit/tostring.cc (to_spin_string_visitor): Move to
+	anonymous namespace.
+
 2004-10-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* wrap/python/Makefile.am (_spot_la_SOURCES): Add spot_wrap.h.

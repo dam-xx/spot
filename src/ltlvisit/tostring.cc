@@ -185,7 +185,135 @@ namespace spot
 	std::ostream& os_;
 	bool top_level_;
       };
-    }
+
+      class to_spin_string_visitor : public to_string_visitor
+      {
+      public:
+      to_spin_string_visitor(std::ostream& os)
+	: to_string_visitor(os)
+	{
+	}
+
+	virtual
+	~to_spin_string_visitor()
+	{
+	}
+
+	void
+	visit(const binop* bo)
+	{
+	  bool top_level = top_level_;
+	  top_level_ = false;
+	  if (!top_level)
+	    os_ << "(";
+
+	  switch (bo->op())
+	    {
+	    case binop::Xor:
+	      os_ << "(!";
+	      bo->first()->accept(*this);
+	      os_ << " && ";
+	      bo->second()->accept(*this);
+	      os_ << ") || (";
+	      bo->first()->accept(*this);
+	      os_ << " && !";
+	      bo->second()->accept(*this);
+	      os_ << ")";
+	      break;
+	    case binop::Implies:
+	      os_ << "!";
+	      bo->first()->accept(*this);
+	      os_ << " || ";
+	      bo->second()->accept(*this);
+	      break;
+	    case binop::Equiv:
+	      os_ << "(";
+	      bo->first()->accept(*this);
+	      os_ << " && ";
+	      bo->second()->accept(*this);
+	      os_ << ") || (!";
+	      bo->first()->accept(*this);
+	      os_ << " && !";
+	      bo->second()->accept(*this);
+	      os_ << ")";
+	    case binop::U:
+	      bo->first()->accept(*this);
+	      os_ << " U ";
+	      bo->second()->accept(*this);
+	      break;
+	    case binop::R:
+	      bo->first()->accept(*this);
+	     os_ << " V ";
+	      bo->second()->accept(*this);
+	      break;
+	    }
+
+	  if (!top_level)
+	    os_ << ")";
+	}
+
+	void
+	visit(const unop* uo)
+	{
+	  // The parser treats X0, and X1 as atomic propositions.	 So
+	  // make sure we output X(0) and X(1).
+	  bool need_parent = false;
+	  switch (uo->op())
+	    {
+	    case unop::Not:
+	      os_ << "!";
+	      break;
+	    case unop::X:
+	      need_parent = !!dynamic_cast<const constant*>(uo->child());
+	      os_ << "X";
+	      break;
+	    case unop::F:
+	      os_ << "<>";
+	      break;
+	    case unop::G:
+	      os_ << "[]";
+	      break;
+	    }
+
+	  top_level_ = false;
+	  if (need_parent)
+	    os_ << "(";
+	  uo->child()->accept(*this);
+	  if (need_parent)
+	    os_ << ")";
+	}
+
+	void
+	visit(const multop* mo)
+	{
+	  bool top_level = top_level_;
+	  top_level_ = false;
+	  if (!top_level)
+	    os_ << "(";
+	  unsigned max = mo->size();
+	  mo->nth(0)->accept(*this);
+	  const char* ch = " ";
+	  switch (mo->op())
+	    {
+	    case multop::Or:
+	      ch = " || ";
+	      break;
+	    case multop::And:
+	      ch = " && ";
+	      break;
+	    }
+
+	  for (unsigned n = 1; n < max; ++n)
+	    {
+	      os_ << ch;
+	      mo->nth(n)->accept(*this);
+	    }
+	  if (!top_level)
+	    os_ << ")";
+	}
+      };
+
+    } // anonymous
 
     std::ostream&
     to_string(const formula* f, std::ostream& os)
@@ -202,133 +330,6 @@ namespace spot
       to_string(f, os);
       return os.str();
     }
-
-    class to_spin_string_visitor : public to_string_visitor
-    {
-    public:
-    to_spin_string_visitor(std::ostream& os)
-      : to_string_visitor(os)
-      {
-      }
-
-      virtual
-      ~to_spin_string_visitor()
-      {
-      }
-
-      void
-      visit(const binop* bo)
-      {
-	bool top_level = top_level_;
-	top_level_ = false;
-	if (!top_level)
-	  os_ << "(";
-
-	switch (bo->op())
-	  {
-	  case binop::Xor:
-	    os_ << "(!";
-	    bo->first()->accept(*this);
-	    os_ << " && ";
-	    bo->second()->accept(*this);
-	    os_ << ") || (";
-	    bo->first()->accept(*this);
-	    os_ << " && !";
-	    bo->second()->accept(*this);
-	    os_ << ")";
-	    break;
-	  case binop::Implies:
-	    os_ << "!";
-	    bo->first()->accept(*this);
-	    os_ << " || ";
-	    bo->second()->accept(*this);
-	    break;
-	  case binop::Equiv:
-	    os_ << "(";
-	    bo->first()->accept(*this);
-	    os_ << " && ";
-	    bo->second()->accept(*this);
-	    os_ << ") || (!";
-	    bo->first()->accept(*this);
-	    os_ << " && !";
-	    bo->second()->accept(*this);
-	    os_ << ")";
-	  case binop::U:
-	    bo->first()->accept(*this);
-	    os_ << " U ";
-	    bo->second()->accept(*this);
-	    break;
-	  case binop::R:
-	    bo->first()->accept(*this);
-	   os_ << " V ";
-	    bo->second()->accept(*this);
-	    break;
-	  }
-
-	if (!top_level)
-	  os_ << ")";
-      }
-
-      void
-      visit(const unop* uo)
-      {
-	// The parser treats X0, and X1 as atomic propositions.	 So
-	// make sure we output X(0) and X(1).
-	bool need_parent = false;
-	switch (uo->op())
-	  {
-	  case unop::Not:
-	    os_ << "!";
-	    break;
-	  case unop::X:
-	    need_parent = !!dynamic_cast<const constant*>(uo->child());
-	    os_ << "X";
-	    break;
-	  case unop::F:
-	    os_ << "<>";
-	    break;
-	  case unop::G:
-	    os_ << "[]";
-	    break;
-	  }
-
-	top_level_ = false;
-	if (need_parent)
-	  os_ << "(";
-	uo->child()->accept(*this);
-	if (need_parent)
-	  os_ << ")";
-      }
-
-      void
-      visit(const multop* mo)
-      {
-	bool top_level = top_level_;
-	top_level_ = false;
-	if (!top_level)
-	  os_ << "(";
-	unsigned max = mo->size();
-	mo->nth(0)->accept(*this);
-	const char* ch = " ";
-	switch (mo->op())
-	  {
-	  case multop::Or:
-	    ch = " || ";
-	    break;
-	  case multop::And:
-	    ch = " && ";
-	    break;
-	  }
-
-	for (unsigned n = 1; n < max; ++n)
-	  {
-	    os_ << ch;
-	    mo->nth(n)->accept(*this);
-	  }
-	if (!top_level)
-	  os_ << ")";
-      }
-    };
 
     std::ostream&
     to_spin_string(const formula* f, std::ostream& os)
