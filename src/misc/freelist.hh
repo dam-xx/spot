@@ -47,6 +47,13 @@ namespace spot
 
     /// Dump the list to \a os for debugging.
     std::ostream& dump_free_list(std::ostream& os) const;
+
+    /// Extend the list by inserting a new pos-lenght pair.
+    void insert(int base, int n);
+
+    /// Remove \a n consecutive entries from the list, starting at \a base.
+    void remove(int base, int n = 0);
+
   protected:
 
     /// Allocate \a n integer.
@@ -62,6 +69,9 @@ namespace spot
     typedef std::pair<int, int> pos_lenght_pair;
     typedef std::list<pos_lenght_pair> free_list_type;
     free_list_type fl; ///< Tracks unused BDD variables.
+
+    /// Remove \a n consecutive entries from the list, starting at \a base.
+    void remove(free_list_type::iterator i, int base, int n);
   };
 
 }

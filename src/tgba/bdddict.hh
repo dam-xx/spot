@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -118,6 +118,15 @@ namespace spot
     /// automaton).
     void register_acceptance_variables(bdd f, const void* for_me);
 
+    /// \brief Register anonymous BDD variables.
+    ///
+    /// Return (and maybe allocate) \a n consecutive BDD variables which
+    /// will be used only by \a for_me.
+    ///
+    /// \return The variable number.  Use bdd_ithvar() or bdd_nithvar()
+    ///   to convert this to a BDD.
+    int register_anonymous_variables(int n, const void* for_me);
+
     /// \brief Duplicate the variable usage of another object.
     ///
     /// This tells this dictionary that the \a for_me object
@@ -136,7 +145,7 @@ namespace spot
     bool is_registered_proposition(const ltl::formula* f, const void* by_me);
     bool is_registered_state(const ltl::formula* f, const void* by_me);
     bool is_registered_acceptance_variable(const ltl::formula* f,
-					  const void* by_me);
+					   const void* by_me);
     /// @}
 
     /// \brief Dump all variables for debugging.
@@ -154,6 +163,24 @@ namespace spot
     typedef Sgi::hash_set<const void*, ptr_hash<void> > ref_set;
     typedef Sgi::hash_map<int, ref_set> vr_map;
     vr_map var_refs;
+
+
+    class annon_free_list : public spot::free_list
+    {
+    public:
+      // WARNING: We need a default constructor so this can be used in
+      // a hash; but we should ensure that no object in the hash is
+      // constructed with d==0.
+      annon_free_list(bdd_dict* d = 0);
+      virtual int extend(int n);
+    private:
+      bdd_dict* dict_;
+    };
+
+    /// List of unused anonymous variable number for each automaton.
+    typedef Sgi::hash_map<const void*, annon_free_list,
+                          ptr_hash<void> > free_annonymous_list_of_type;
+    free_annonymous_list_of_type free_annonymous_list_of;
 
   private:
     // Disallow copy.

@@ -1,5 +1,22 @@
 2004-03-23  Alexandre DURET-LUTZ  <adl@src.lip6.fr>
 
+	* src/misc/freelist.hh (free_list::remove, free_list::insert): New
+	methods.
+	* src/misc/freelist.cc (free_list::register_n,
+	free_list::releases_n): Rewrite using free_list::remove and
+	free_list::insert.
+	(free_list::remove, free_list::insert): New methods.
+	* src/tgba/bdddict.hh (bdd_dict::register_anonymous_variables):
+	New method.
+	(bdd_dict::annon_free_list): New subclass.
+	(bdd_dict::free_annonymous_list_of_type_of): New attribute.
+	* src/tgba/bdddict.cc (bdd_dict::register_all_variables_of,
+	bdd_dict::unregister_all_my_variables): Handle anonymous variables
+	too.
+	(bdd_dict::register_anonymous_variables,
+	bdd_dict::annon_free_list::annon_free_list,
+	bdd_dict::annon_free_list::extend): New methods.
+
 	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::accepting_path)
 	Fix handling of PATH when backtracking.  Report from Soheib Baarir.
 

@@ -32,6 +32,7 @@ namespace spot
       next_to_now(bdd_newpair()),
       now_to_next(bdd_newpair())
   {
+    free_annonymous_list_of[0] = annon_free_list(this);
   }
 
   bdd_dict::~bdd_dict()
@@ -138,6 +139,25 @@ namespace spot
   }
 
 
+  int
+  bdd_dict::register_anonymous_variables(int n, const void* for_me)
+  {
+    free_annonymous_list_of_type::iterator i =
+      free_annonymous_list_of.find(for_me);
+
+    if (i == free_annonymous_list_of.end())
+      {
+ 	typedef free_annonymous_list_of_type fal;
+	i = (free_annonymous_list_of.insert
+	     (fal::value_type(for_me, free_annonymous_list_of[0]))).first;
+      }
+    int res = i->second.register_n(n);
+    while (n--)
+      var_refs[res + n].insert(for_me);
+    return res;
+  }
+
+
   void
   bdd_dict::register_all_variables_of(const void* from_other,
 				      const void* for_me)
@@ -149,6 +169,7 @@ namespace spot
 	if (s.find(from_other) != s.end())
 	  s.insert(for_me);
       }
+    free_annonymous_list_of[for_me] = free_annonymous_list_of[from_other];
   }
 
   void
@@ -196,10 +217,19 @@ namespace spot
 	    else
 	      {
 		vi = acc_formula_map.find(var);
-		f = vi->second;
-		assert(vi != now_formula_map.end());
-		acc_map.erase(f);
-		acc_formula_map.erase(vi);
+		if (vi != acc_formula_map.end())
+		  {
+		    f = vi->second;
+		    acc_map.erase(f);
+		    acc_formula_map.erase(vi);
+		  }
+		else
+		  {
+		    free_annonymous_list_of_type::iterator i;
+		    for (i = free_annonymous_list_of.begin();
+			 i != free_annonymous_list_of.end(); ++i)
+		      i->second.remove(var, n);
+		  }
 	      }
 	  }
 	// Actually release the associated BDD variables, and the
@@ -208,6 +238,7 @@ namespace spot
 	ltl::destroy(f);
 	var_refs.erase(cur);
       }
+    free_annonymous_list_of.erase(me);
   }
 
   bool
@@ -319,4 +350,25 @@ namespace spot
     dump(std::cerr);
     assert(0);
   }
+
+
+  bdd_dict::annon_free_list::annon_free_list(bdd_dict* d)
+    : dict_(d)
+  {
+  }
+
+  int
+  bdd_dict::annon_free_list::extend(int n)
+  {
+    assert(dict_);
+    int b = dict_->allocate_variables(n);
+
+    free_annonymous_list_of_type::iterator i;
+    for (i = dict_->free_annonymous_list_of.begin();
+	 i != dict_->free_annonymous_list_of.end(); ++i)
+      if (&i->second != this)
+	i->second.insert(b, n);
+    return b;
+  }
+
 }
