@@ -570,6 +570,22 @@ namespace spot
 	// way it will be explored before the other during the model
 	// checking.
 	dest_map::const_iterator i = dests.find(constant::true_instance());
+	// conditions of the True arc, so when can remove them from
+	// all other arcs.  It might sounds that this is not needed
+	// when exprop is used, but it fact it is complementary.
+	//
+	// Consider
+	//   r(p U q) = p + q.a(p).r(X(p U g))
+	// with exprop the two outgoing arcs would be
+        //         p               q {Acc[p]}
+	//   pUg ----> T       pUg ----------> pUg
+	//
+	// where in fact we could output
+        //         p               q*!p {Acc[p]}
+	//   pUg ----> T       pUg -------------> pUg
+	//
+	// because there is no point in looping on pUg if we can go to T.
+	bdd cond_for_true = bddfalse;
 	if (i != dests.end())
 	  {
 	    // Transitions going to True are not expected to make any promises.
@@ -577,9 +593,10 @@ namespace spot
 	    prom_map::const_iterator j = i->second.find(bddtrue);
 	    assert(j != i->second.end());
 
+	    cond_for_true = j->second;
 	    tgba_explicit::transition* t =
 	      a->create_transition(now, constant::true_instance()->val_name());
-	    a->add_condition(t, d.bdd_to_formula(j->second));
+	    a->add_condition(t, d.bdd_to_formula(cond_for_true));
 	  }
 
 	// Register other transitions.
@@ -595,7 +612,8 @@ namespace spot
 		  {
 		    tgba_explicit::transition* t =
 		      a->create_transition(now, next);
-		    a->add_condition(t, d.bdd_to_formula(j->second));
+		    a->add_condition(t, d.bdd_to_formula(j->second
+							 - cond_for_true));
 		    d.conj_bdd_to_acc(a, j->first, t);
 		  }
 	      }
