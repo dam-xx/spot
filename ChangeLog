@@ -1,5 +1,7 @@
 2003-11-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* configure.ac, NEWS: Bump version to 0.0j.
+
 	* iface/gspn/eesrg.cc (tgba_succ_iterator_gspn_eesrg::step):
 	Skip unknown variables.
 

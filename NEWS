@@ -1,3 +1,12 @@
+New in spot 0.0j (2003-10-03):
+
+  * Use hash_map's instead of map's almost everywhere.
+  * New emptiness check, based on Couvreur's algorithm.
+  * LTL propositions can be put inside doublequotes to disambiguate
+    some constructions.
+  * Preliminary support for GreatSPN's EESRG.
+  * Various bug fixes.
+
 New in spot 0.0h (2003-08-18):
 
   * More python bindings:
