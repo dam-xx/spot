@@ -69,6 +69,18 @@ namespace spot
   /// \return The BDD formated as a string.
   std::string bdd_format_set(const bdd_dict* dict, bdd b);
 
+  /// \brief Print a BDD as a formula.
+  /// \param os The output stream.
+  /// \param dict The dictionary to use, to lookup variables.
+  /// \param b The BDD to print.
+  std::ostream& bdd_print_formula(std::ostream& os,
+				  const bdd_dict* dict, bdd b);
+  /// \brief Format a BDD as a formula.
+  /// \param dict The dictionary to use, to lookup variables.
+  /// \param b The BDD to print.
+  /// \return The BDD formated as a string.
+  std::string bdd_format_formula(const bdd_dict* dict, bdd b);
+
   /// \brief Print a BDD as a diagram in dotty format.
   /// \param os The output stream.
   /// \param dict The dictionary to use, to lookup variables.

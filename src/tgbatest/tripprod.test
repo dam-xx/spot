@@ -27,41 +27,41 @@ set -e
 
 cat >input1 <<EOF
 acc = p1;
-s1, s3, a, true;
-s1, s2, b, p1;
-s2, s1, !a, true;
-s2, s3, c,;
+s1, s3, "a", true;
+s1, s2, "b", p1;
+s2, s1, "!a", true;
+s2, s3, "c",;
 EOF
 
 cat >input2 <<EOF
 acc = p2 p3;
-s1, s2, b, p2;
-s2, s1, a, p3;
+s1, s2, "b", p2;
+s2, s1, "a", p3;
 EOF
 
 cat >input3 <<EOF
 acc = p4;
-s1, s2, a,;
-s1, s3, b,;
+s1, s2, "a",;
+s1, s3, "b",;
 s3, s2,, p4;
 s2, s3,, p4;
 EOF
 
 cat >expected <<EOF
 acc = "p1" "p2" "p3" "p4";
-"s1 * s1 * s1", "s3 * s2 * s2", a b,   "p1" "p2";
-"s1 * s1 * s1", "s2 * s2 * s2", a b,   "p1" "p2";
-"s1 * s1 * s1", "s3 * s2 * s3", a b,   "p1" "p2";
-"s1 * s1 * s1", "s2 * s2 * s3", b,   "p1" "p2";
-"s2 * s2 * s2", "s3 * s1 * s3", a c,   "p3" "p4";
-"s2 * s2 * s3", "s3 * s1 * s2", a c,   "p3" "p4";
+"s1 * s1 * s1", "s3 * s2 * s2", "(a & b)",   "p1" "p2";
+"s1 * s1 * s1", "s2 * s2 * s2", "(a & b)",   "p1" "p2";
+"s1 * s1 * s1", "s3 * s2 * s3", "(a & b)",   "p1" "p2";
+"s1 * s1 * s1", "s2 * s2 * s3", "b",   "p1" "p2";
+"s2 * s2 * s2", "s3 * s1 * s3", "(a & c)",   "p3" "p4";
+"s2 * s2 * s3", "s3 * s1 * s2", "(a & c)",   "p3" "p4";
 EOF
 
 ./tripprod input1 input2 input3 > stdout
 
 # Sort out some possible inversions in the output.
 # (The order is not guaranteed by SPOT.)
-perl -pe 's/c a/a c/g;s/b a/a b/g;s/("\w+") ("\w+")(?: ("\w+"))?(?: ("\w+"))?/@{[sort $1, $2, $3, $4]}/g' \
+perl -pe 's/("\w+") ("\w+")(?: ("\w+"))?(?: ("\w+"))?/@{[sort $1, $2, $3, $4]}/g;s/\(c & a\)/(a & c)/g;s/\(b & a\)/(a & b)/g' \
   stdout > tmp_ &&
   mv tmp_ stdout
 

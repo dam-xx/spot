@@ -23,6 +23,8 @@
 #include <cassert>
 #include "bddprint.hh"
 #include "ltlvisit/tostring.hh"
+#include "formula2bdd.hh"
+#include "ltlvisit/destroy.hh"
 
 namespace spot
 {
@@ -160,6 +162,23 @@ namespace spot
   {
     std::ostringstream os;
     bdd_print_set(os, d, b);
+    return os.str();
+  }
+
+  std::ostream&
+  bdd_print_formula(std::ostream& os, const bdd_dict* d, bdd b)
+  {
+    const ltl::formula* f = bdd_to_formula(b, d);
+    to_string(f, os);
+    destroy(f);
+    return os;
+  }
+
+  std::string
+  bdd_format_formula(const bdd_dict* d, bdd b)
+  {
+    std::ostringstream os;
+    bdd_print_formula(os, d, b);
     return os.str();
   }
 

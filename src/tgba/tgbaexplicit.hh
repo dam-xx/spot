@@ -55,13 +55,13 @@ namespace spot
     transition*
     create_transition(const std::string& source, const std::string& dest);
 
-    void add_condition(transition* t, ltl::formula* f);
-    void add_neg_condition(transition* t, ltl::formula* f);
+    void add_condition(transition* t, const ltl::formula* f);
+    void add_neg_condition(transition* t, const ltl::formula* f);
     /// This assumes that all variables in \a f are known from dict.
     void add_conditions(transition* t, bdd f);
-    void declare_accepting_condition(ltl::formula* f);
-    bool has_accepting_condition(ltl::formula* f) const;
-    void add_accepting_condition(transition* t, ltl::formula* f);
+    void declare_accepting_condition(const ltl::formula* f);
+    bool has_accepting_condition(const ltl::formula* f) const;
+    void add_accepting_condition(transition* t, const ltl::formula* f);
     /// This assumes that all accepting conditions in \a f are known from dict.
     void add_accepting_conditions(transition* t, bdd f);
     void complement_all_accepting_conditions();
@@ -84,8 +84,8 @@ namespace spot
     virtual bdd compute_support_variables(const spot::state* state) const;
 
     state* add_state(const std::string& name);
-    bdd get_condition(ltl::formula* f);
-    bdd get_accepting_condition(ltl::formula* f);
+    bdd get_condition(const ltl::formula* f);
+    bdd get_accepting_condition(const ltl::formula* f);
 
     typedef Sgi::hash_map<const std::string, tgba_explicit::state*,
 			  string_hash> ns_map;

@@ -27,6 +27,7 @@ tgbadir = $(pkgincludedir)/tgba
 tgba_HEADERS = \
   bdddict.hh \
   bddprint.hh \
+  formula2bdd.hh \
   public.hh \
   state.hh \
   statebdd.hh \
@@ -46,6 +47,7 @@ noinst_LTLIBRARIES = libtgba.la
 libtgba_la_SOURCES = \
   bdddict.cc \
   bddprint.cc \
+  formula2bdd.cc \
   statebdd.cc \
   succiterconcrete.cc \
   tgba.cc \

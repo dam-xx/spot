@@ -30,10 +30,10 @@ set -e
 
 cat >input1 <<EOF
 acc = p1;
-s1, s3, a,;
-s1, s2, b, p1;
-s2, s1, !a,;
-s2, s3, c,;
+s1, s3, "a",;
+s1, s2, "b", p1;
+s2, s1, "!a",;
+s2, s3, "c",;
 EOF
 
 ./mixprod 'F(a U b) & Xa' input1 >stdout

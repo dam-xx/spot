@@ -22,6 +22,7 @@
 %option noyywrap
 %option prefix="tgbayy"
 %option outfile="lex.yy.c"
+%x STATE_STRING
 
 %{
 #include <string>
@@ -50,12 +51,6 @@ eol      \n|\r|\n\r|\r\n
   yylloc->step ();
 %}
 
-\"[^\"]*\"		{
-			  yylval->str = new std::string(yytext + 1,
-			                                yyleng - 2);
-	                  return STRING;
-		        }
-
 acc[ \t]*=		return ACC_DEF;
 
 [a-zA-Z][a-zA-Z0-9_]*   {
@@ -67,7 +62,26 @@ acc[ \t]*=		return ACC_DEF;
 {eol}			yylloc->lines(yyleng); yylloc->step();
 [ \t]+			yylloc->step();
 
+\"			{
+			  yylval->str = new std::string;
+			  BEGIN(STATE_STRING);
+			}
+
 .			return *yytext;
+
+  /* Handle \" and \\ in strings.  */
+<STATE_STRING>{
+  \"                    {
+                          BEGIN(INITIAL);
+			  return STRING;
+                        }
+  \\["\\]               yylval->str->append(1, yytext[1]);
+  [^"\\]+               yylval->str->append (yytext, yyleng);
+  <<EOF>>		{
+  			  BEGIN(INITIAL);
+			  return UNTERMINATED_STRING;
+			}
+}
 
 %{
   /* Dummy use of yyunput to shut up a gcc warning.  */

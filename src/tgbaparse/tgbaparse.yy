@@ -40,6 +40,7 @@
 %{
 #include "ltlast/constant.hh"
 #include "ltlvisit/destroy.hh"
+#include "ltlparse/public.hh"
 
 /* tgbaparse.hh and parsedecl.hh include each other recursively.
    We mut ensure that YYSTYPE is declared (by the above %union)
@@ -55,9 +56,9 @@ using namespace spot::ltl;
 typedef std::pair<bool, spot::ltl::formula*> pair;
 %}
 
-%token <str> STRING
+%token <str> STRING UNTERMINATED_STRING
 %token <str> IDENT
-%type <str> strident
+%type <str> strident string
 %type <listp> cond_list
 %type <list> acc_list
 %token ACC_DEF
@@ -92,17 +93,37 @@ line: strident ',' strident ',' cond_list ',' acc_list ';'
        }
        ;
 
-strident: STRING | IDENT;
+string: STRING
+       | UNTERMINATED_STRING
+       {
+	 error_list.push_back(spot::tgba_parse_error(@1,
+						     "unterminated string"));
+       }
+
+strident: string | IDENT
 
 cond_list:
        {
 	 $$ = new std::list<pair>;
        }
-       | cond_list strident
+       | cond_list string§
        {
 	 if (*$2 != "")
 	   {
-	     $1->push_back(pair(false, parse_environment.require(*$2)));
+	     parse_error_list pel;
+	     formula* f = spot::ltl::parse(*$2, pel, parse_environment);
+	     for (parse_error_list::iterator i = pel.begin();
+		  i != pel.end(); ++i)
+	       {
+		 // Adjust the diagnostic to the current position.
+		 Location here = @2;
+		 here.begin.line += i->first.begin.line;
+		 here.begin.column += i->first.begin.column;
+		 here.end.line = here.begin.line + i->first.begin.line;
+		 here.end.column = here.begin.column + i->first.begin.column;
+		 error_list.push_back(spot::tgba_parse_error(here, i->second));
+	       }
+	     $1->push_back(pair(false, f));
 	   }
 	 delete $2;
 	 $$ = $1;

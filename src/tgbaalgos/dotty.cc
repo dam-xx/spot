@@ -60,8 +60,8 @@ namespace spot
     process_link(int in, int out, const tgba_succ_iterator* si)
     {
       os_ << "  " << in << " -> " << out << " [label=\"";
-      bdd_print_set(os_, automata_->get_dict(),
-		    si->current_condition()) << "\\n";
+      bdd_print_formula(os_, automata_->get_dict(),
+			si->current_condition()) << "\\n";
       bdd_print_set(os_, automata_->get_dict(),
 		    si->current_accepting_conditions()) << "\"]" << std::endl;
     }

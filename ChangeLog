@@ -1,5 +1,40 @@
 2003-11-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	Explicit automata can now have arbitrary logic formula on their
+	arcs.  ltl2tgba_fm benefits from this and join multiple arcs with
+	the same destination and acceptance conditions.
+	* src/tgba/formula2bdd.cc, src/tgba/formula2bdd.hh: New files.
+	* src/tgba/Makefile.am (tgba_HEADERS, libtgba_la_SOURCES): Add them.
+	* src/tgba/bddprint.cc, src/tgba/bddprint.hh (bdd_pring_formula,
+	bdd_format_formula): New functions.
+	* src/tgba/tgbaexplicit.hh (tgba_explicit::get_condition,
+	tgba_explicit::add_condition, tgba_explicit::add_neg_condition,
+	tgba_explicit::declare_accepting_condition,
+	tgba_explicit::has_accepting_condition,
+	tgba_explicit::get_accepting_condition,
+	tgba_explicit::add_accepting_condition): Take a const formula*.
+	* src/tgba/tgbaexplicit.cc (tgba_explicit::add_condition):
+	Rewrite using formula_to_bdd.
+	* src/tgbaalgos/dotty.cc (dotty_bfs::process_link): Use
+	bdd_print_formula to display conditions.
+	* src/tgbaalgos/save.cc (save_bfs::process_state): Likewise.
+	* src/tgbaalgos/ltl2tgba_fm.cc (translate_dict::bdd_to_formula):
+	New function.
+	(translate_dict::conj_bdd_to_atomic_props): Remove.
+	(ltl_to_tgba_fm): Factor successors on accepting conditions
+	and destinations, not conditions.  Use bdd_to_formula to translate
+	the conditions.
+	* src/tgbaparse/tgbaparse.yy: Expect conditions as a formula
+	in a string, call the LTL parser for this.
+	* src/tgbaparse/tgbascan.ll: Process \" and \\ escapes in
+	strings.
+	* src/tgbatest/emptchke.test, src/tgbatest/explicit.test,
+	src/tgbatest/explpro2.test, src/tgbatest/explpro3.test,
+	src/tgbatest/explprod.test, src/tgbatest/mixprod.test,
+	src/tgbatest/readsave.test, src/tgbatest/tgbaread.test,
+	src/tgbatest/tripprod.test: Adjust to new syntax for explicit
+	automata.
+
 	* src/misc/minato.hh (minato_isop(bdd,bdd)): New constructor variant.
 	(minato_isop::local_vars::vars): New attribute.
 	(minato_isop::local_vars::local_vars): Add the vars arguments.

@@ -77,8 +77,8 @@ namespace spot
 	{
 	  state* dest = si->current_state();
 	  os_ << "\"" << cur << "\", \""
-	      << automata_->format_state(dest) << "\", ";
-	  bdd_print_sat(os_, d, si->current_condition()) << ",";
+	      << automata_->format_state(dest) << "\", \"";
+	  bdd_print_formula(os_, d, si->current_condition()) << "\",";
 	  bdd_print_acc(os_, d, si->current_accepting_conditions());
 	  os_ << ";" << std::endl;
 	}

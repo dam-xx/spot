@@ -27,8 +27,8 @@ set -e
 
 cat >input <<'EOF'
 acc = c d;
-s1, "s2", a!b, c d;
-"s2", "state 3", a, c;
+s1, "s2", "a & !b", c d;
+"s2", "state 3", "a", c;
 "state 3", s1,,;
 EOF
 

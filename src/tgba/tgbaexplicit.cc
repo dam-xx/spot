@@ -23,6 +23,7 @@
 #include "ltlast/constant.hh"
 #include "ltlvisit/destroy.hh"
 #include "tgbaexplicit.hh"
+#include "tgba/formula2bdd.hh"
 #include <cassert>
 
 namespace spot
@@ -171,22 +172,23 @@ namespace spot
   }
 
   bdd
-  tgba_explicit::get_condition(ltl::formula* f)
+  tgba_explicit::get_condition(const ltl::formula* f)
   {
-    assert(dynamic_cast<ltl::atomic_prop*>(f));
+    assert(dynamic_cast<const ltl::atomic_prop*>(f));
     int v = dict_->register_proposition(f, this);
     ltl::destroy(f);
     return bdd_ithvar(v);
   }
 
   void
-  tgba_explicit::add_condition(transition* t, ltl::formula* f)
+  tgba_explicit::add_condition(transition* t, const ltl::formula* f)
   {
-    t->condition &= get_condition(f);
+    t->condition &= formula_to_bdd(f, dict_, this);
+    ltl::destroy(f);
   }
 
   void
-  tgba_explicit::add_neg_condition(transition* t, ltl::formula* f)
+  tgba_explicit::add_neg_condition(transition* t, const ltl::formula* f)
   {
     t->condition -= get_condition(f);
   }
@@ -199,7 +201,7 @@ namespace spot
   }
 
   void
-  tgba_explicit::declare_accepting_condition(ltl::formula* f)
+  tgba_explicit::declare_accepting_condition(const ltl::formula* f)
   {
     int v = dict_->register_accepting_variable(f, this);
     ltl::destroy(f);
@@ -234,15 +236,15 @@ namespace spot
   }
 
   bool
-  tgba_explicit::has_accepting_condition(ltl::formula* f) const
+  tgba_explicit::has_accepting_condition(const ltl::formula* f) const
   {
     return dict_->is_registered_accepting_variable(f, this);
   }
 
   bdd
-  tgba_explicit::get_accepting_condition(ltl::formula* f)
+  tgba_explicit::get_accepting_condition(const ltl::formula* f)
   {
-    ltl::constant* c = dynamic_cast<ltl::constant*>(f);
+    const ltl::constant* c = dynamic_cast<const ltl::constant*>(f);
     if (c)
       {
 	switch (c->val())
@@ -267,7 +269,7 @@ namespace spot
   }
 
   void
-  tgba_explicit::add_accepting_condition(transition* t, ltl::formula* f)
+  tgba_explicit::add_accepting_condition(transition* t, const ltl::formula* f)
   {
     bdd c = get_accepting_condition(f);
     t->accepting_conditions |= c;

@@ -208,6 +208,7 @@ namespace spot
 	      }
 	    else
 	      {
+		assert(bdd_low(b) == bddfalse);
 		b = high;
 	      }
 	    assert(b != bddfalse);
@@ -216,30 +217,21 @@ namespace spot
 	return ltl::multop::instance(ltl::multop::And, v);
       }
 
-      void
-      conj_bdd_to_atomic_props(tgba_explicit* a, bdd b,
-			       tgba_explicit::transition* t)
+      const formula*
+      bdd_to_formula(bdd f)
       {
-	assert(b != bddfalse);
-	while (b != bddtrue)
-	  {
-	    int var = bdd_var(b);
-	    ltl::formula* ap = var_to_formula(var);
-	    bdd high = bdd_high(b);
-	    if (high == bddfalse)
-	      {
-		a->add_neg_condition(t, ap);
-		b = bdd_low(b);
-	      }
-	    else
-	      {
-		a->add_condition(t, ap);
-		b = high;
-	      }
-	    assert(b != bddfalse);
-	  }
-      }
+	if (f == bddfalse)
+	  return ltl::constant::false_instance();
 
+	multop::vec* v = new multop::vec;
+
+	minato_isop isop(f);
+	bdd cube;
+	while ((cube = isop.next()) != bddfalse)
+	  v->push_back(conj_bdd_to_formula(cube));
+
+	return multop::instance(multop::Or, v);
+      }
 
       void
       conj_bdd_to_acc(tgba_explicit* a, bdd b, tgba_explicit::transition* t)
@@ -462,7 +454,7 @@ namespace spot
 
 	std::string now = to_string(f);
 
-	minato_isop isop(res);
+	minato_isop isop(res, d.next_set & d.a_set);
 	bdd cube;
 	while ((cube = isop.next()) != bddfalse)
 	  {
@@ -473,7 +465,8 @@ namespace spot
 
 	    tgba_explicit::transition* t = a->create_transition(now, next);
 
-	    d.conj_bdd_to_atomic_props(a, bdd_existcomp(cube, d.var_set), t);
+	    a->add_condition(t,
+			     d.bdd_to_formula(bdd_existcomp(cube, d.var_set)));
 	    d.conj_bdd_to_acc(a, bdd_existcomp(cube, d.a_set), t);
 
 	    if (formulae_seen.find(dest) == formulae_seen.end())
