@@ -29,7 +29,14 @@
 namespace spot
 {
   /// \brief Print reachable states in Spin never claim format.
-  std::ostream& never_claim_reachable(std::ostream& os, const tgba_tba_proxy* g, const ltl::formula* f=0);
+  ///
+  /// \param os The output stream to print on.
+  /// \param g The degeneralized automaton to output.
+  /// \param f The (optional) formula associated to the automaton.  If given
+  ///          it will be output as a comment.
+  std::ostream& never_claim_reachable(std::ostream& os,
+				      const tgba_tba_proxy* g,
+				      const ltl::formula* f = 0);
 }
 
 #endif // SPOT_TGBAALGOS_NEVERCLAIM_HH

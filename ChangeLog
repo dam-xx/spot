@@ -1,5 +1,12 @@
 2004-04-21  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/tgbaalgos/neverclaim.hh (never_claim_reachable): Document
+	arguments.
+	* src/tgbaalgos/neverclaim.cc (never_claim_bfs::state_is_accepting):
+	New method.
+	(never_claim_bfs::get_state_label, never_claim_bfs::process_state):
+	Use it.
+
 	* wrap/python/cgi/ltl2tgba.in: Use darker color and introduce
 	the new variable dot_bgcolor.
 
