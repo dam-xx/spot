@@ -37,6 +37,7 @@
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/gtec/ce.hh"
+#include "tgbaalgos/projrun.hh"
 
 
 void
@@ -266,8 +267,16 @@ main(int argc, char **argv)
 		      }
 #endif
 		    spot::tgba_run* run = ce->accepting_run();
-		    // FIXME: reimplement the projection
-		    spot::print_tgba_run(std::cout, prod, run);
+		    if (proj)
+		      {
+			spot::tgba_run* p = project_tgba_run(prod, model, run);
+			spot::print_tgba_run(std::cout, model, p);
+			delete p;
+		      }
+		    else
+		      {
+			spot::print_tgba_run(std::cout, prod, run);
+		      }
 		    ce->print_stats(std::cout);
 		    delete run;
 		    delete ce;
@@ -301,8 +310,16 @@ main(int argc, char **argv)
 		if (compute_counter_example)
 		  {
 		    spot::tgba_run* run = res->accepting_run();
-		    // FIXME: reimplement the projection
-		    spot::print_tgba_run(std::cout, prod, run);
+		    if (proj)
+		      {
+			spot::tgba_run* p = project_tgba_run(prod, model, run);
+			spot::print_tgba_run(std::cout, model, p);
+			delete p;
+		      }
+		    else
+		      {
+			spot::print_tgba_run(std::cout, prod, run);
+		      }
 		    delete run;
 		  }
 		else

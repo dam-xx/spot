@@ -36,6 +36,7 @@ tgbaalgos_HEADERS = \
   magic.hh \
   neverclaim.hh \
   powerset.hh \
+  projrun.hh \
   reachiter.hh \
   replayrun.hh \
   save.hh \
@@ -53,6 +54,7 @@ libtgbaalgos_la_SOURCES = \
   magic.cc \
   neverclaim.cc \
   powerset.cc \
+  projrun.cc \
   reachiter.cc \
   replayrun.cc \
   save.cc \

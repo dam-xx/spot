@@ -1,5 +1,10 @@
 2004-11-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/projrun.hh, src/tgbaalgos/projrun.cc: New files.
+	* src/tgbaalgos/Makefile.am (tgbaalgos_HEADERS,
+	libtgbaalgos_la_SOURCES): Add them.
+	* iface/gspn/ltlgspn.cc (main): Call project_tgba_run if -P.
+
 	* src/tgbaalgos/emptiness.cc,
 	src/tgbaalgos/emptiness.hh (print_tgba_run): Take the tgba*
 	argument before the tgba_run* argument (for consistency with
