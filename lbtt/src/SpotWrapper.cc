@@ -42,6 +42,7 @@
 
 const char SpotWrapper::SPOT_AND[]     = "&";
 const char SpotWrapper::SPOT_OR[]      = "|";
+const char SpotWrapper::SPOT_XOR[]     = "^";
 
 
 
@@ -88,7 +89,7 @@ void SpotWrapper::translateFormula
 		BinaryOperatorInfixWriter<SPOT_OR>,
 		BinaryOperatorInfixWriter<LtlImplication::infix_symbol>,
 		BinaryOperatorInfixWriter<LtlEquivalence::infix_symbol>,
-		BinaryOperatorInfixWriter<LtlXor::infix_symbol>,
+		BinaryOperatorInfixWriter<SPOT_XOR>,
 		BinaryOperatorInfixWriter<LtlUntil::infix_symbol>,
 		BinaryOperatorInfixWriter<LtlV::infix_symbol>,
 		WriterErrorReporter,

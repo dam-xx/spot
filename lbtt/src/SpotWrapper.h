@@ -70,6 +70,7 @@ private:
 
   static const char SPOT_AND[];                     /* Symbols for */
   static const char SPOT_OR[];                      /* operators.  */
+  static const char SPOT_XOR[];
 };
 
 
@@ -124,7 +125,7 @@ inline string SpotWrapper::commandLine
  *
  * ------------------------------------------------------------------------- */
 {
-  return (string(" ") + input_filename 
+  return (string(" ") + input_filename
 	  + " >" + string(command_line_arguments[4]));
 }
 
