@@ -1,4 +1,16 @@
-2004-05-30  Alexandre Duret-Lutz  <adl@gnu.org>
+2004-06-01  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/ltltest/inf.cc, src/ltltest/inf.test: Rename as ...
+	* src/ltltest/syntimpl.cc, src/ltltest/syntimpl.test: ... these.
+	* src/ltltest/Makefile.am: Adjust.
+	* src/ltlvisit/forminf.cc: Rename as...
+	* src/ltlvisit/syntimpl.cc: ... this.
+	* src/ltlvisit/syntimpl.hh: New file with definitions extracted
+	from ...
+	* src/ltlvisit/reducform.hh: ... this one.
+	* src/ltlvisit/Makefile.am, src/ltlvisit/reducform.cc: Adjust.
+
+2004-05-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlvisit/forminf.cc (form_eventual_universal_visitor,
 	inf_form_right_recurse_visitor, inf_form_left_recurse_visitor): Rename

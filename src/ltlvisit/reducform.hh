@@ -56,16 +56,6 @@ namespace spot
     /// Basic rewritings.
     formula* basic_reduce(const formula* f);
 
-    /// \brief Syntactic implication.
-    bool syntactic_implication(const formula* f1, const formula* f2);
-
-    /// \brief Syntactic implication.
-    ///
-    /// If right==false, true if !f1 < f2, false otherwise.
-    /// If right==true, true if f1 < !f2, false otherwise.
-    bool syntactic_implication_neg(const formula* f1, const formula* f2,
-				   bool right);
-
     /// \brief Check whether a formula is eventual.
     ///
     /// FIXME: Describe what eventual formulae are.  Cite paper.

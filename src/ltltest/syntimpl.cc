@@ -25,10 +25,9 @@
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/tunabbrev.hh"
 #include "ltlvisit/dump.hh"
-#include "ltlvisit/nenoform.hh"
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/tostring.hh"
-#include "ltlvisit/reducform.hh"
+#include "ltlvisit/syntimpl.hh"
 #include "ltlast/allnodes.hh"
 
 void

@@ -30,18 +30,17 @@ check_SCRIPTS = defs
 # Keep this sorted alphabetically.
 check_PROGRAMS = \
   equals \
-  inf \
   ltl2dot \
   ltl2text \
   lunabbrev \
   nenoform \
   reduc \
+  syntimpl \
   tostring \
   tunabbrev \
   tunenoform
 
 equals_SOURCES = equals.cc
-inf_SOURCES = inf.cc
 ltl2dot_SOURCES = readltl.cc
 ltl2dot_CPPFLAGS = $(AM_CPPFLAGS) -DDOTTY
 ltl2text_SOURCES = readltl.cc
@@ -50,6 +49,7 @@ lunabbrev_CPPFLAGS = $(AM_CPPFLAGS) -DLUNABBREV
 nenoform_SOURCES = equals.cc
 nenoform_CPPFLAGS = $(AM_CPPFLAGS) -DNENOFORM
 reduc_SOURCES = reduc.cc
+syntimpl_SOURCES = syntimpl.cc
 tostring_SOURCES = tostring.cc
 tunabbrev_SOURCES = equals.cc
 tunabbrev_CPPFLAGS = $(AM_CPPFLAGS) -DTUNABBREV
@@ -69,7 +69,7 @@ TESTS = \
   tunabbrev.test \
   nenoform.test \
   tunenoform.test \
-  inf.test \
+  syntimpl.test \
   reduc.test
 
 CLEANFILES = stdout expect parse.dot result.data
