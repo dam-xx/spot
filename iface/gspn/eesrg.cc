@@ -22,13 +22,29 @@
 #include <cstring>
 #include <map>
 #include <cassert>
-#include "eesrg.hh"
 #include <gspnlib.h>
+#include "eesrg.hh"
 #include "misc/bddlt.hh"
 #include <bdd.h>
 
 namespace spot
 {
+
+  namespace
+  {
+    static bdd*
+    bdd_realloc(bdd* t, int size, int new_size)
+    {
+      assert(new_size);
+      bdd* tmp = new bdd[new_size];
+
+      for(int i = 0; i < size; i++)
+	tmp[i] = t[i];
+
+      delete[] t;
+      return tmp;
+    }
+  }
 
   // state_gspn_eesrg
   //////////////////////////////////////////////////////////////////////
@@ -88,8 +104,6 @@ namespace spot
     const state* right_;
   }; // state_gspn_eesrg
 
-
-
   // tgba_gspn_eesrg_private_
   //////////////////////////////////////////////////////////////////////
 
@@ -148,7 +162,6 @@ namespace spot
       if (all_props)
 	delete[] all_props;
     }
-
   };
 
 
@@ -158,142 +171,73 @@ namespace spot
   class tgba_succ_iterator_gspn_eesrg: public tgba_succ_iterator
   {
   public:
-    tgba_succ_iterator_gspn_eesrg(State state,
-				  tgba_gspn_eesrg_private_* data,
-				  tgba_succ_iterator* operand)
-      : state_(state),
-	operand_(operand),
-	all_conds_(bddfalse),
-	successors_(0),
-	size_(0),
-	current_(0),
-	data_(data),
-	not_first_(false)
+    tgba_succ_iterator_gspn_eesrg(Succ_* succ_tgba,
+				  size_t size_tgba,
+				  bdd* bdd_arry,
+				  state** state_arry,
+				  size_t size_states,
+				  Props_* prop,
+				  int size_prop)
+      : successors_(succ_tgba),
+	size_succ_(size_tgba),
+	current_succ_(0),
+	bdd_array_(bdd_arry),
+	state_array_(state_arry),
+	size_states_(size_states),
+	props_(prop),
+	size_prop_(size_prop)
     {
     }
 
     virtual
     ~tgba_succ_iterator_gspn_eesrg()
     {
-      if (successors_)
-	succ_free(successors_);
-      if (operand_)
-	delete operand_;
-    }
 
-    void
-    step()
-    {
-      if (++current_ < size_)
-	return;
+      for(size_t i = 0; i < size_states_; i++)
+      	delete state_array_[i];
 
-      do
+      delete[] bdd_array_;
+      free(state_array_);
+
+      if (props_)
 	{
-	  if (successors_)
-	    {
-	      succ_free(successors_);
-	      successors_ = 0;
-	    }
-
-	  if (all_conds_ == bddfalse)
-	    {
-	      if (not_first_)
-		{
-		  assert(!operand_->done());
-		  operand_->next();
-		}
-	      else
-		{
-		  // operand_->first() has already been called from first().
-		  not_first_ = true;
-		}
-	      if (operand_->done())
-		return;
-	      all_conds_ = operand_->current_condition();
-	      outside_ = !all_conds_;
-	    }
-
-	  bdd cond = bdd_satone(all_conds_);
-	  cond = bdd_simplify(cond, cond | outside_);
-	  all_conds_ -= cond;
-
-	  // Translate COND into an array of properties.
-	  signed char* props = data_->all_props;
-	  memset(props, -1, data_->prop_count);
-	  while (cond != bddtrue)
-	    {
-	      int var = bdd_var(cond);
-
-	      bdd high = bdd_high(cond);
-	      int res;
-	      if (high == bddfalse)
-		{
-		  cond = bdd_low(cond);
-		  res = 0;
-		}
-	      else
-		{
-		  cond = high;
-		  res = 1;
-		}
-
-	      // It's OK if VAR is unknown from GreatSPN (it might
-	      // have been used to synchornize another automaton or
-	      // something), just skip it.
-	      tgba_gspn_eesrg_private_::prop_map::iterator i =
-		data_->prop_dict.find(var);
-	      if (i != data_->prop_dict.end())
-		props[i->second] = res;
-
-	      assert(cond != bddfalse);
-	    }
-
-	  succ(state_, props, &successors_, &size_);
-	  current_ = 0;
+	  for (int i = 0; i < size_prop_; i++)
+	    free(props_[i].arc);
+	  free(props_);
 	}
-      while (size_ == 0); 	// Repeat until we have a successor.
+
+      if (size_succ_ != 0)
+	succ_free(successors_);
+
     }
 
     virtual void
     first()
     {
-      size_ = 0;
-      all_conds_ = bddfalse;
-      operand_->first();
-      if (operand_->done())
-	{
-	  delete operand_;
-	  operand_ = 0;
-	  return;
-	}
-      if (successors_)
-	{
-	  delete successors_;
-	  successors_ = 0;
-	}
-      step();
+      if(!successors_)
+	return    ;
+      current_succ_=0;
     }
 
     virtual void
     next()
     {
-      assert(!done());
-      step();
+      current_succ_++;
     }
 
     virtual bool
     done() const
     {
-      return (size_ <= current_
-	      && all_conds_ == bddfalse
-	      && (!operand_ || operand_->done()));
+      return current_succ_ + 1 > size_succ_;
     }
 
     virtual state*
     current_state() const
     {
-      return new state_gspn_eesrg(successors_[current_],
-				  operand_->current_state());
+      return
+	new state_gspn_eesrg(successors_[current_succ_].succ_,
+			     (state_array_[successors_[current_succ_]
+					   .arc->curr_state])->clone());
     }
 
     virtual bdd
@@ -307,23 +251,24 @@ namespace spot
     {
       // There is no acceptance conditions in GSPN systems, so we just
       // return those from OPERAND_.
-      return operand_->current_acceptance_conditions();
+      // return operand_->current_acceptance_conditions();
+      // bdd * ac=(bdd *)successors_[current_succ_].arc->curr_acc_conds;
+      //return (*ac);
+      return bdd_array_[successors_[current_succ_].arc->curr_acc_conds];
     }
   private:
-    State state_;
-    // Iterator on the right operand
-    tgba_succ_iterator* operand_;
-    // All conditions of the current successor of the right operand
-    // (We will iterate on all conjunctions in this.)
-    bdd all_conds_;
-    bdd outside_;
+
     // All successors of STATE matching a selection conjunctions from
     // ALL_CONDS.
-    State* successors_;		/// array of successors
-    size_t size_;		/// size of successors_
-    size_t current_;		/// current position in successors_
-    tgba_gspn_eesrg_private_* data_;
-    bool not_first_;		/// Whether this is not the first step.
+    Succ_* successors_;		/// array of successors
+    size_t size_succ_;		/// size of successors_
+    size_t current_succ_;		/// current position in successors_
+
+    bdd * bdd_array_;
+    state** state_array_;
+    size_t size_states_;
+    Props_* props_;
+    int size_prop_;
   }; // tgba_succ_iterator_gspn_eesrg
 
 
@@ -393,16 +338,120 @@ namespace spot
   }
 
   tgba_succ_iterator*
-  tgba_gspn_eesrg::succ_iter(const state* state,
+  tgba_gspn_eesrg::succ_iter(const state* state_,
 			     const state* global_state,
 			     const tgba* global_automaton) const
   {
-    const state_gspn_eesrg* s = dynamic_cast<const state_gspn_eesrg*>(state);
+    const state_gspn_eesrg* s = dynamic_cast<const state_gspn_eesrg*>(state_);
     assert(s);
     (void) global_state;
     (void) global_automaton;
+
+    bdd all_conds_;
+    bdd outside_;
+    bdd cond;
+
+    Props_* props_ = 0;
+    int nb_arc_props = 0;
+    bdd* bdd_array = 0;
+    int size_bdd = 0;
+    state** state_array = 0;
+    size_t size_states = 0;
+
     tgba_succ_iterator* i = data_->operand->succ_iter(s->right());
-    return new tgba_succ_iterator_gspn_eesrg(s->left(), data_, i);
+
+    for (i->first(); !i->done(); i->next())
+      {
+	all_conds_ = i->current_condition();
+	outside_ = !all_conds_;
+
+	if (all_conds_ != bddfalse)
+	  {
+	    props_ = (Props_*) realloc(props_,
+				       (nb_arc_props + 1) * sizeof(Props_));
+
+	    props_[nb_arc_props].nb_conj = 0;
+	    props_[nb_arc_props].prop = 0;
+	    props_[nb_arc_props].arc =
+	      (Arc_Ident_*) malloc(sizeof(Arc_Ident_));
+
+	    bdd_array = bdd_realloc(bdd_array, size_bdd, size_bdd + 1);
+	    bdd_array[size_bdd] = i->current_acceptance_conditions();
+	    props_[nb_arc_props].arc->curr_acc_conds = size_bdd;
+	    size_bdd++;
+
+            state_array = (state**) realloc(state_array,
+					    (size_states + 1) * sizeof(state*));
+	    state_array[size_states] = i->current_state();
+	    props_[nb_arc_props].arc->curr_state  = size_states ;
+            size_states++;
+
+	    while (all_conds_ != bddfalse )
+	      {
+		cond = bdd_satone(all_conds_);
+		cond = bdd_simplify(cond, cond | outside_);
+		all_conds_ -= cond;
+
+		props_[nb_arc_props].prop =
+		  (signed char **) realloc(props_[nb_arc_props].prop,
+					   (props_[nb_arc_props].nb_conj + 1)
+					   * sizeof(signed char *));
+
+		props_[nb_arc_props].prop[props_[nb_arc_props].nb_conj]
+		  = (signed char*) calloc(data_->prop_count,
+					  sizeof(signed char));
+		memset(props_[nb_arc_props].prop[props_[nb_arc_props].nb_conj],
+		       -1, data_->prop_count);
+
+		while (cond != bddtrue)
+		  {
+		    int var = bdd_var(cond);
+		    bdd high = bdd_high(cond);
+		    int res;
+
+		    if (high == bddfalse)
+		      {
+			cond = bdd_low(cond);
+			res = 0;
+		      }
+		    else
+		      {
+			cond = high;
+			res = 1;
+		      }
+
+		    tgba_gspn_eesrg_private_::prop_map::iterator k
+		      = data_->prop_dict.find(var);
+
+		    if (k != data_->prop_dict.end())
+		      props_[nb_arc_props]
+			.prop[props_[nb_arc_props].nb_conj][k->second] = res;
+
+		    assert(cond != bddfalse);
+		  }
+		++props_[nb_arc_props].nb_conj;
+	      }
+	    ++nb_arc_props;
+	  }
+      }
+     Succ_* succ_tgba_ = 0;
+     size_t size_tgba_ = 0;
+     int j, conj;
+
+     succ(s->left(), props_ ,nb_arc_props, &succ_tgba_, &size_tgba_);
+
+     for (j = 0; j < nb_arc_props; j++)
+       {
+	 for (conj = 0 ; conj < props_[j].nb_conj ; conj++)
+	   free(props_[j].prop[conj]);
+	 free(props_[j].prop);
+       }
+
+     delete i;
+     return new tgba_succ_iterator_gspn_eesrg(succ_tgba_, size_tgba_,
+					      bdd_array, state_array,
+					      size_states, props_,
+					      nb_arc_props);
   }
 
   bdd

@@ -1,3 +1,11 @@
+2004-04-14  Soheib Baarir  <Souheib.Baarir@lip6.fr>
+
+	* iface/gspn/eesrg.cc (tgba_succ_iterator_gspn_eesrg,
+	state_gspn_eesrg): Compute the array of all successors of the
+	right state beforehand, pass it to Greatspn (left automata) at
+	once, let it compute the resulting synchronized arcs, and iterate
+	on that result.
+
 2004-04-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gtec/nsheap.hh (numbered_state_heap_factory,
