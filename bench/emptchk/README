@@ -176,20 +176,22 @@ This directory contains:
 ==========================
 
   Here are the short names for the algorithms used in the outputs.
+  ltl-*.sh tests use names from the left column, and pml-*.sh tests
+  use names from the right column.
 
-    Cou99
-    Cou99_shy-
-    Cou99_shy
-  > Cou99_rem
-  > Cou99_rem_shy-
-  > Cou99_rem_shy
-  > CVWY90
-    CVWY90_bsh
-  > GV04
-  > SE05
-    SE05_bsh
-  > Tau03
-  > Tau03_opt
+    Cou99               Cou99
+    Cou99_shy-          Cou99(shy !group)
+    Cou99_shy           Cou99(shy group)
+  > Cou99_rem           Cou99(poprem)
+  > Cou99_rem_shy-      Cou99(poprem shy !group)
+  > Cou99_rem_shy       Cou99(poprem shy group)
+  > CVWY90              CVWY90
+    CVWY90_bsh          CVWY90(bsh=4K)
+  > GV04                GV04
+  > SE05                SE05
+    SE05_bsh            SE05(bsh=4K)
+  > Tau03               Tau03
+  > Tau03_opt           Tau03_opt
 
   Only the algorithms marked with a `>' have been shown in the paper.
   `bsh' stands for `bit-state hashing'.
@@ -197,7 +199,7 @@ This directory contains:
   `Cou99_rem*' algorithms are using the `rem' field to remove
   the SCC without recomputing the SCC as described in the paper.
   The other `Cou99*' algorithms are not.  (Beware that in the paper
-  we showed the `Cou99_rem*' variants and called them `Cou99*'.)
+  we presented the `Cou99_rem*' variants and called them `Cou99*'.)
 
 
   The ltl-*.sh tests output look as follows:

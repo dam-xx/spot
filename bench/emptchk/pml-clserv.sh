@@ -34,13 +34,13 @@ do
   echo "  $model"
   echo "+++++++++++++++++++++"
 
-  cat $FORMULAE |
+  cat "$FORMULAE" |
   while read formula; do
     echo "-----------------------------------------------------------"
     # echo "###  formula: $formula"
-    cat $ALGORITHMS |
+    cat "$ALGORITHMS" |
     while read algo; do
-      $LTL2TGBA -0 -e$algo $opts -Pmodels/$model "$formula"
+      "$LTL2TGBA" -0 -e"$algo" $opts -Pmodels/$model "$formula"
     done
   done
 done

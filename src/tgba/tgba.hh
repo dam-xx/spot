@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -188,7 +188,7 @@ namespace spot
     virtual bdd all_acceptance_conditions() const = 0;
 
     /// The number of acceptance conditions.
-    virtual int number_of_acceptance_conditions() const;
+    virtual unsigned int number_of_acceptance_conditions() const;
 
     /// \brief Return the conjuction of all negated acceptance
     /// variables.

@@ -38,14 +38,7 @@
 #include "tgbaalgos/lbtt.hh"
 #include "tgba/tgbatba.hh"
 #include "tgba/tgbaproduct.hh"
-#include "tgbaalgos/gv04.hh"
-#include "tgbaalgos/magic.hh"
 #include "tgbaalgos/reducerun.hh"
-#include "tgbaalgos/se05.hh"
-#include "tgbaalgos/tau03.hh"
-#include "tgbaalgos/tau03opt.hh"
-#include "tgbaalgos/gtec/gtec.hh"
-#include "tgbaalgos/gtec/ce.hh"
 #include "tgbaparse/public.hh"
 #include "tgbaalgos/dupexp.hh"
 #include "tgbaalgos/neverclaim.hh"
@@ -133,27 +126,12 @@ syntax(char* prog)
 	    << "(implies -f)" << std::endl
 	    << std::endl
 	    << "Where ALGO should be one of:" << std::endl
-	    << "  Cou99 (the default)" << std::endl
-	    << "  Cou99_shy-" << std::endl
-	    << "  Cou99_shy" << std::endl
-	    << "  Cou99_rem" << std::endl
-	    << "  Cou99_rem_shy-" << std::endl
-	    << "  Cou99_rem_shy" << std::endl
-	    << "  CVWY90" << std::endl
-	    << "  CVWY90_repeated" << std::endl
-	    << "  CVWY90_bsh[(heap size in Mo - 10Mo by default)]"
-            << std::endl
-	    << "  CVWY90_bsh_repeated[(heap size in MB - 10MB"
-            << " by default)]" << std::endl
-	    << "  GV04" << std::endl
-	    << "  SE05" << std::endl
-	    << "  SE05_repeated" << std::endl
-	    << "  SE05_bsh[(heap size in MB - 10MB by default)]"
-            << std::endl
-	    << "  SE05_bsh_repeated[(heap size in MB - 10MB"
-            << " by default)]" << std::endl
-	    << "  Tau03" << std::endl
-	    << "  Tau03_opt" << std::endl;
+	    << "  Cou99(OPTIONS) (the default)" << std::endl
+	    << "  CVWY90(OPTIONS)" << std::endl
+	    << "  GV04(OPTIONS)" << std::endl
+	    << "  SE05(OPTIONS)" << std::endl
+	    << "  Tau03(OPTIONS)" << std::endl
+	    << "  Tau03_opt(OPTIONS)" << std::endl;
   exit(2);
 }
 
@@ -165,22 +143,15 @@ main(int argc, char** argv)
   bool debug_opt = false;
   bool paper_opt = false;
   enum { NoDegen, DegenTBA, DegenSBA } degeneralize_opt = NoDegen;
-  bool degeneralize_maybe = false;
   bool fm_opt = false;
   bool fm_exprop_opt = false;
   bool fm_symb_merge_opt = true;
   bool file_opt = false;
   int output = 0;
   int formula_index = 0;
-  std::string echeck_algo;
-  enum { None, Couvreur, Couvreur2, MagicSearch, Se05Search,
-	 Tau03Search, Tau03OptSearch, Gv04 } echeck = None;
+  const char* echeck_algo = 0;
+  spot::emptiness_check_instantiator* echeck_inst = 0;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
-  bool couv_group = true;
-  bool poprem = false;
-  bool search_many = false;
-  bool bit_state_hashing = false;
-  int heap_size = 10*1024*1024;
   bool expect_counter_example = false;
   bool from_file = false;
   int reduc_aut = spot::Reduce_None;
@@ -237,29 +208,37 @@ main(int argc, char** argv)
 	}
       else if (!strncmp(argv[formula_index], "-e", 2))
         {
-          if (argv[formula_index][2] != 0)
-            {
-              char *p = strchr(argv[formula_index], '(');
-              if (p && sscanf(p+1, "%d)", &heap_size) == 1)
-                *p = '\0';
-              echeck_algo = argv[formula_index] + 2;
-            }
-          else
-            echeck_algo = "Cou99";
+	  echeck_algo = 2 + argv[formula_index];
+	  if (!*echeck_algo)
+	    echeck_algo = "Cou99";
+
+	  const char* err;
+	  echeck_inst =
+	    spot::emptiness_check_instantiator::construct(echeck_algo, &err);
+	  if (!echeck_inst)
+	    {
+	      std::cerr << "Failed to parse argument of -e near `"
+			<< err <<  "'" << std::endl;
+	      exit(2);
+	    }
           expect_counter_example = true;
           output = -1;
         }
       else if (!strncmp(argv[formula_index], "-E", 2))
         {
-          if (argv[formula_index][2] != 0)
-            {
-              char *p = strchr(argv[formula_index], '(');
-              if (p && sscanf(p+1, "%d)", &heap_size) == 1)
-                *p = '\0';
-              echeck_algo = argv[formula_index] + 2;
-            }
-          else
-            echeck_algo = "Cou99";
+	  const char* echeck_algo = 2 + argv[formula_index];
+	  if (!*echeck_algo)
+	    echeck_algo = "Cou99";
+
+	  const char* err;
+	  echeck_inst =
+	    spot::emptiness_check_instantiator::construct(echeck_algo, &err);
+	  if (!echeck_inst)
+	    {
+	      std::cerr << "Failed to parse argument of -e near `"
+			<< err <<  "'" << std::endl;
+	      exit(2);
+	    }
           expect_counter_example = false;
           output = -1;
         }
@@ -416,109 +395,8 @@ main(int argc, char** argv)
 	}
     }
 
-  if (echeck_algo != "")
-    {
-      if (echeck_algo == "Cou99")
-	{
-	  echeck = Couvreur;
-	}
-      else if (echeck_algo == "Cou99_shy")
-	{
-	  echeck = Couvreur2;
-	  couv_group = true;
-	}
-      else if (echeck_algo == "Cou99_shy-")
-	{
-	  echeck = Couvreur2;
-	  couv_group = false;
-	}
-      else if (echeck_algo == "Cou99_rem")
-	{
-	  echeck = Couvreur;
-	  poprem = true;
-	}
-      else if (echeck_algo == "Cou99_rem_shy")
-	{
-	  echeck = Couvreur2;
-	  couv_group = true;
-	  poprem = true;
-	}
-      else if (echeck_algo == "Cou99_rem_shy-")
-	{
-	  echeck = Couvreur2;
-	  couv_group = false;
-	  poprem = true;
-	}
-      else if (echeck_algo == "CVWY90")
-	{
-	  echeck = MagicSearch;
-	  degeneralize_maybe = true;
-	}
-      else if (echeck_algo == "CVWY90_repeated")
-	{
-	  echeck = MagicSearch;
-	  degeneralize_maybe = true;
-	  search_many = true;
-	}
-      else if (echeck_algo == "CVWY90_bsh")
-	{
-	  echeck = MagicSearch;
-	  degeneralize_maybe = true;
-          bit_state_hashing = true;
-	}
-      else if (echeck_algo == "CVWY90_bsh_repeated")
-	{
-	  echeck = MagicSearch;
-	  degeneralize_maybe = true;
-          bit_state_hashing = true;
-	  search_many = true;
-	}
-      else if (echeck_algo == "SE05")
-	{
-	  echeck = Se05Search;
-	  degeneralize_maybe = true;
-	}
-      else if (echeck_algo == "SE05_repeated")
-	{
-	  echeck = Se05Search;
-	  degeneralize_maybe = true;
-	  search_many = true;
-	}
-      else if (echeck_algo == "SE05_bsh")
-	{
-	  echeck = Se05Search;
-	  degeneralize_maybe = true;
-          bit_state_hashing = true;
-	}
-      else if (echeck_algo == "SE05_bsh_repeated")
-	{
-	  echeck = Se05Search;
-	  degeneralize_maybe = true;
-          bit_state_hashing = true;
-	  search_many = true;
-	}
-      else if (echeck_algo == "Tau03")
-	{
-	  echeck = Tau03Search;
-	}
-      else if (echeck_algo == "Tau03_opt")
-	{
-	  echeck = Tau03OptSearch;
-	}
-      else if (echeck_algo == "GV04")
-	{
-	  echeck = Gv04;
-	  degeneralize_maybe = true;
-	}
-      else
-	{
-	  std::cerr << "unknown emptiness-check: " << echeck_algo << std::endl;
-	  syntax(argv[0]);
-	}
-    }
-
   if ((graph_run_opt || graph_run_tgba_opt)
-      && (echeck_algo == "" || !expect_counter_example))
+      && (!echeck_inst || !expect_counter_example))
     {
       std::cerr << argv[0] << ": error: -g and -G require -e." << std::endl;
       exit(1);
@@ -601,9 +479,11 @@ main(int argc, char** argv)
 
       spot::tgba_tba_proxy* degeneralized = 0;
 
-      if (degeneralize_maybe
+      unsigned int n_acc = a->number_of_acceptance_conditions();
+      if (echeck_inst
 	  && degeneralize_opt == NoDegen
-	  && a->number_of_acceptance_conditions() > 1)
+	  && n_acc > 1
+	  && echeck_inst->max_acceptance_conditions() < n_acc)
 	degeneralize_opt = DegenTBA;
       if (degeneralize_opt == DegenTBA)
 	a = degeneralized = new spot::tgba_tba_proxy(a);
@@ -681,9 +561,12 @@ main(int argc, char** argv)
       if (system)
         {
           a = product = product_to_free = new spot::tgba_product(system, a);
-          if (degeneralize_maybe
-              && degeneralize_opt == NoDegen
-              && product->number_of_acceptance_conditions() > 1)
+
+	  unsigned int n_acc = a->number_of_acceptance_conditions();
+	  if (echeck_inst
+	      && degeneralize_opt == NoDegen
+	      && n_acc > 1
+	      && echeck_inst->max_acceptance_conditions() < n_acc)
             degeneralize_opt = DegenTBA;
           if (degeneralize_opt == DegenTBA)
             a = product = product_degeneralized =
@@ -692,6 +575,24 @@ main(int argc, char** argv)
             a = product = product_degeneralized =
                                             new spot::tgba_sba_proxy(product);
         }
+
+      if (echeck_inst
+	  && (a->number_of_acceptance_conditions()
+	      < echeck_inst->min_acceptance_conditions()))
+	{
+	  if (!paper_opt)
+	    {
+	      std::cerr << echeck_algo << " requires at least "
+			<< echeck_inst->min_acceptance_conditions()
+			<< " acceptance conditions." << std::endl;
+	      exit(1);
+	    }
+	  else
+	    {
+	      std::cout << std::endl;
+	      exit(0);
+	    }
+	}
 
       switch (output)
 	{
@@ -744,70 +645,18 @@ main(int argc, char** argv)
 	  assert(!"unknown output option");
 	}
 
-      spot::option_map o;
-      o.set("poprem", poprem);
-      o.set("group", couv_group);
-
-      spot::emptiness_check* ec = 0;
-      switch (echeck)
+      if (echeck_inst)
 	{
-	case None:
-	  break;
-
-	case Couvreur:
-	  ec = new spot::couvreur99_check(a, o);
-	  break;
-
-	case Couvreur2:
-	  ec = new spot::couvreur99_check_shy(a, o);
-	  break;
-
-        case MagicSearch:
-          if (bit_state_hashing)
-            ec = spot::bit_state_hashing_magic_search(a, heap_size);
-          else
-            ec = spot::explicit_magic_search(a);
-          break;
-
-        case Se05Search:
-          if (bit_state_hashing)
-            ec = spot::bit_state_hashing_se05_search(a, heap_size);
-          else
-            ec = spot::explicit_se05_search(a);
-          break;
-
-	case Tau03Search:
-          if (a->number_of_acceptance_conditions() == 0)
-            {
-              if (!paper_opt)
-                std::cout << "To apply Tau03, the automaton must have at"
-                          << " least one accepting condition. Try with another"
-                          << " algorithm." << std::endl;
-              else
-                std::cout << std::endl;
-            }
-          else
-            {
-              ec = spot::explicit_tau03_search(a);
-            }
-          break;
-	case Tau03OptSearch:
-          ec = spot::explicit_tau03_opt_search(a);
-	  break;
-	case Gv04:
-	  ec = spot::explicit_gv04_check(a);
-	  break;
-	}
-
-      if (ec)
-	{
+	  spot::emptiness_check* ec = echeck_inst->instantiate(a);
+	  bool search_many = echeck_inst->options().get("repeated");
+	  assert(ec);
 	  do
 	    {
 	      spot::emptiness_check_result* res = ec->check();
               if (paper_opt)
                 {
                   std::ios::fmtflags old = std::cout.flags();
-                  std::cout << std::left << std::setw(20)
+                  std::cout << std::left << std::setw(25)
                             << echeck_algo << ", ";
                   spot::tgba_statistics a_size =
                                         spot::stats_reachable(ec->automaton());
@@ -841,17 +690,17 @@ main(int argc, char** argv)
                   if (!graph_run_opt && !graph_run_tgba_opt)
                     ec->print_stats(std::cout);
                   if (expect_counter_example != !!res &&
-                          (!bit_state_hashing || !expect_counter_example))
+		      (!expect_counter_example || ec->safe()))
                     exit_code = 1;
 
                   if (!res)
                     {
                       std::cout << "no accepting run found";
-                      if (bit_state_hashing && expect_counter_example)
+                      if (!ec->safe() && expect_counter_example)
                         {
                           std::cout << " even if expected" << std::endl;
-                          std::cout << "this is maybe due to the use of the bit"
-                                    << " state hashing technic" << std::endl;
+                          std::cout << "this may be due to the use of the bit"
+                                    << " state hashing technique" << std::endl;
                           std::cout << "you can try to increase the heap size "
                                     << "or use an explicit storage"
                                     << std::endl;
@@ -913,6 +762,7 @@ main(int argc, char** argv)
       delete degeneralized;
       delete aut_red;
       delete to_free;
+      delete echeck_inst;
     }
   else
     {

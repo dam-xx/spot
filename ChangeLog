@@ -1,3 +1,15 @@
+2005-02-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/ltl2tgba.cc: Simplify using
+	emptiness_check_instantiator.
+	* src/tgba/tgba.cc, src/tgba/tgba.hh
+	(tgba::number_of_acceptance_conditions): Return an unsigned.
+	* bench/emptchk/algorithms, bench/emptchk/README,
+	src/tgbatest/emptchk.test, src/tgbatest/emptchke.test: Adjust
+	references to algorithms.
+	* bench/emptchk/pml-clserv.sh, bench/emptchk/pml-eeaean.sh: Quote
+	variables properly.
+
 2005-02-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/emptiness.hh, src/tgbaalgos/emptiness.cc

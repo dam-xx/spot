@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -29,8 +29,8 @@ expect_ce()
 {
   run 0 ./ltl2tgba -e -X "$1"
   run 0 ./ltl2tgba -e -D -X "$1"
-  run 0 ./ltl2tgba -eCou99_shy -X "$1"
-  run 0 ./ltl2tgba -eCou99_shy -D -X "$1"
+  run 0 ./ltl2tgba -e'Cou99(shy)' -X "$1"
+  run 0 ./ltl2tgba -e'Cou99(shy)' -D -X "$1"
   run 0 ./ltl2tgba -eCVWY90 -X "$1"
 }
 

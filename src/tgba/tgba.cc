@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -76,13 +76,13 @@ namespace spot
     return "";
   }
 
-  int
+  unsigned int
   tgba::number_of_acceptance_conditions() const
   {
     if (num_acc_ < 0)
       {
 	bdd all = all_acceptance_conditions();
-	int n = 0;
+	unsigned int n = 0;
 	while (all != bddfalse)
 	  {
 	    ++n;

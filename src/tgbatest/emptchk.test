@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -37,23 +37,23 @@ expect_ce()
   expect_ce_do -e -D "$1"
   expect_ce_do -e -f "$1"
   expect_ce_do -e -f -D "$1"
-  expect_ce_do -eCou99_shy "$1"
-  expect_ce_do -eCou99_shy -D "$1"
-  expect_ce_do -eCou99_shy -f "$1"
-  expect_ce_do -eCou99_shy -f -D "$1"
+  expect_ce_do -e'Cou99(shy)' "$1"
+  expect_ce_do -e'Cou99(shy)' -D "$1"
+  expect_ce_do -e'Cou99(shy)' -f "$1"
+  expect_ce_do -e'Cou99(shy)' -f -D "$1"
   expect_ce_do -eCVWY90 "$1"
   expect_ce_do -eCVWY90 -f "$1"
-  run 0 ./ltl2tgba -eCVWY90_bsh "$1"
-  run 0 ./ltl2tgba -eCVWY90_bsh -f "$1"
+  run 0 ./ltl2tgba -e'CVWY90(bsh=10M)' "$1"
+  run 0 ./ltl2tgba -e'CVWY90(bsh=10M)' -f "$1"
   run 0 ./ltl2tgba -eSE05 "$1"
   run 0 ./ltl2tgba -eSE05 -f "$1"
-  run 0 ./ltl2tgba -eSE05_bsh "$1"
-  run 0 ./ltl2tgba -eSE05_bsh -f "$1"
+  run 0 ./ltl2tgba -e'SE05(bsh=10M)' "$1"
+  run 0 ./ltl2tgba -e'SE05(bsh=10M)' -f "$1"
   run 0 ./ltl2tgba -eTau03_opt -f "$1"
   run 0 ./ltl2tgba -eGV04 -f "$1"
   # Expect multiple accepting runs
-  test `./ltl2tgba -eCVWY90_repeated "$1" | grep Prefix: | wc -l` -ge $2
-  test `./ltl2tgba -eSE05_repeated "$1" | grep Prefix: | wc -l` -ge $2
+  test `./ltl2tgba -e'CVWY90(repeated)' "$1" | grep Prefix: | wc -l` -ge $2
+  test `./ltl2tgba -e'SE05(repeated)' "$1" | grep Prefix: | wc -l` -ge $2
 }
 
 expect_no()
@@ -62,23 +62,23 @@ expect_no()
   run 0 ./ltl2tgba -E -D "$1"
   run 0 ./ltl2tgba -E -f "$1"
   run 0 ./ltl2tgba -E -f -D "$1"
-  run 0 ./ltl2tgba -ECou99_shy "$1"
-  run 0 ./ltl2tgba -ECou99_shy -D "$1"
-  run 0 ./ltl2tgba -ECou99_shy -f "$1"
-  run 0 ./ltl2tgba -ECou99_shy -f -D "$1"
+  run 0 ./ltl2tgba -E'Cou99(shy)' "$1"
+  run 0 ./ltl2tgba -E'Cou99(shy)' -D "$1"
+  run 0 ./ltl2tgba -E'Cou99(shy)' -f "$1"
+  run 0 ./ltl2tgba -E'Cou99(shy)' -f -D "$1"
   run 0 ./ltl2tgba -ECVWY90 "$1"
   run 0 ./ltl2tgba -ECVWY90 -f "$1"
-  run 0 ./ltl2tgba -ECVWY90_bsh "$1"
-  run 0 ./ltl2tgba -ECVWY90_bsh -f "$1"
+  run 0 ./ltl2tgba -E'CVWY90(bsh=10M)' "$1"
+  run 0 ./ltl2tgba -E'CVWY90(bsh=10M)' -f "$1"
   run 0 ./ltl2tgba -ESE05 "$1"
   run 0 ./ltl2tgba -ESE05 -f "$1"
-  run 0 ./ltl2tgba -ESE05_bsh "$1"
-  run 0 ./ltl2tgba -ESE05_bsh -f "$1"
+  run 0 ./ltl2tgba -E'SE05(bsh=10M)' "$1"
+  run 0 ./ltl2tgba -E'SE05(bsh=10M)' -f "$1"
   run 0 ./ltl2tgba -ETau03_opt -f "$1"
   run 0 ./ltl2tgba -EGV04 -f "$1"
-  test `./ltl2tgba -eCVWY90_repeated "!($1)" |
+  test `./ltl2tgba -e'CVWY90(repeated)' "!($1)" |
         grep Prefix: | wc -l` -ge $2
-  test `./ltl2tgba -eSE05_repeated "!($1)" |
+  test `./ltl2tgba -e'SE05(repeated)' "!($1)" |
         grep Prefix: | wc -l` -ge $2
 }
 
