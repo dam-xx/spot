@@ -55,9 +55,8 @@ run()
   exitcode=0
   if test -n "$VALGRIND"; then
     exec 6>valgrind.err
-    # No --leak-check=yes for now, as it causes parserr.test to fail.
     GLIBCPP_FORCE_NEW=1 \
-    $VALGRIND --logfile-fd=6 -q "$@" || exitcode=$?
+    $VALGRIND --leak-check=yes --logfile-fd=6 -q "$@" || exitcode=$?
     cat valgrind.err 1>&2
     test -z "`sed 1q valgrind.err`" || exit 50
     rm -f valgrind.err

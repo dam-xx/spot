@@ -79,6 +79,9 @@ using namespace spot::ltl;
 
 %type <ltl> result ltl_formula subformula
 
+%destructor { delete $$; } ATOMIC_PROP
+%destructor { spot::ltl::destroy($$); } result ltl_formula subformula
+
 %%
 result:       ltl_formula END_OF_INPUT
 	      { result = $$ = $1;
