@@ -1,5 +1,11 @@
 2004-01-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/powerset.cc, src/tgbaalgos/powerset.hh: New files.
+	* src/tgbaalgos/Makefile.am: Add them.
+	* src/tgbatest/powerset.cc: New file.
+	* src/tgbatest/Makefile.am: Construct powerset and expldot from
+	powerset.cc.
+
 	* src/tgbaalgos/reachiter.cc (tgba_reachable_iterator::run)
 	Reuse s->second to avoid a hash lookup.
 	* src/tgbaalgos/save.cc (save_bfs::process_state): Delete dest.
