@@ -1,5 +1,6 @@
 2003-07-30  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* iface/gspn/dcswaveltl.test, iface/gspn/ltlgspn.cc: New files.
 	* iface/gspn/Makefile.am (TESTS): Add dcswaveltl.test.
 	(ltlgspn_rg_LDADD, ltlgspn_srg_LDADD, ltlgspn_rg_SOURCES)
 	(ltlgspn_srg_SOURCES): New variables.
