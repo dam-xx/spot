@@ -49,4 +49,4 @@ perl -ne 'BEGIN { $sum1 = 0; $sum2 = 0; }
 $sum1 += $1;
 $sum2 += $2;
 END { print $sum2 * 100 / $sum1; print "\n"; }
-' < result.test
+' < result.data

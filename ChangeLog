@@ -1,5 +1,7 @@
 2004-05-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltltest/reduc.test: Typo.
+
 	* src/ltlparse/ltlparse.yy (OP_POST_NEG, OP_POST_POS): New tokens.
 	(subformula): Recognize `ATOMIC_PROP OP_POST_POS' and
 	`ATOMIC_PROP OP_POST_NEG'.
