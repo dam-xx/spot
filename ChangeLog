@@ -1,5 +1,7 @@
 2005-01-29  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* bench/emptchk/formulae.ltl: New file.
+
 	* src/tgbaalgos/gtec/gtec.hh (couvreur99_check): Document poprem.
 
 	* bench/emptchk/README: Make clearer that spin is needed.
