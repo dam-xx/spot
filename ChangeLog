@@ -1,5 +1,12 @@
 2004-05-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/misc/bddalloc.cc (bdd_allocator::varnum): Suppress.
+	(bdd_allocator::bdd_allocator): Adjust.
+	(bdd_allocator::extvarnum): Always call bdd_varnum(), so that
+	it doesn't matter if the number of variable has been augmented
+	externally.
+	* src/misc/bddalloc.hh (bdd_allocator::varnum): Suppress.
+
 	* src/ltlvisit/formlength.cc: Fix style to please sanity checks.
 
 	* src/ltlvisit/lunabbrev.cc: Fix style to please sanity checks.

@@ -26,10 +26,9 @@
 namespace spot
 {
   bool bdd_allocator::initialized = false;
-  int bdd_allocator::varnum = 2;
 
   bdd_allocator::bdd_allocator()
-    : lvarnum(varnum)
+    : lvarnum(bdd_varnum())
   {
     initialize();
     fl.push_front(pos_lenght_pair(0, lvarnum));
@@ -46,14 +45,15 @@ namespace spot
     // to tune this.  By the meantime, we take the typical values
     // for large examples advocated by the BuDDy manual.
     bdd_init(1000000, 10000);
-    bdd_setvarnum(varnum);
+    bdd_setvarnum(2);
   }
 
   void
   bdd_allocator::extvarnum(int more)
   {
-    // If varnum has been extended from another allocator, use
-    // the new variables.
+    int varnum = bdd_varnum();
+    // If varnum has been extended from another allocator (or
+    // externally), use the new variables.
     if (lvarnum < varnum)
       {
 	more -= varnum - lvarnum;

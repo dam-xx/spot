@@ -44,7 +44,6 @@ namespace spot
     using free_list::dump_free_list;
   protected:
     static bool initialized; ///< Whether the BDD library has been initialized.
-    static int varnum; ///< number of variables in use in the BDD library.
     int lvarnum; ///< number of variables in use in this allocator.
   private:
     /// Require more variables.
