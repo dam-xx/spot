@@ -1,5 +1,16 @@
 2003-07-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba.cc (ltl_trad_visitor::visit(unop::G)): Do
+	not create Now/Next variable when G is the root of the formula.
+	(ltl_trad_visitor::ltl_trad_visitor): Take a root argument.
+	(ltl_trad_visitor::recurse): Create a new visitor, do not copy
+	the current one.
+	(ltl_to_tgba): Build ltl_trad_visitor with root = true.
+
+	* src/tgbaalgos/ltl2tgba.cc (ltl_trad_visitor::visit(unop::X)):
+	Remove FIXME about handling X(a U b) and X(a R b) better, it's
+	done naturally.
+
 	* src/tgbatest/spotlbtt.test: Make 100 rounds.
 
 	* src/tgba/succiterconcrete.cc (tgba_succ_iterator_concrete::next):

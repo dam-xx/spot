@@ -19,8 +19,8 @@ namespace spot
   class ltl_trad_visitor: public const_visitor
   {
   public:
-    ltl_trad_visitor(tgba_bdd_concrete_factory& fact)
-      : fact_(fact)
+    ltl_trad_visitor(tgba_bdd_concrete_factory& fact, bool root = false)
+      : fact_(fact), root_(root)
     {
     }
 
@@ -88,12 +88,22 @@ namespace spot
 	  }
 	case unop::G:
 	  {
+	    bdd child = recurse(node->child());
+	    // If G occurs at the top of the formula we don't
+	    // need Now/Next variables.  We just constrain
+	    // the relation so that the child always happens.
+	    // This saves 2 BDD variables.
+	    if (root_)
+	      {
+		fact_.add_relation(child);
+		res_ = child;
+		return;
+	      }
 	    // Gx  <=>  x && XGx
 	    int v = fact_.create_state(node);
 	    bdd now = fact_.ithvar(v);
 	    bdd next = fact_.ithvar(v + 1);
-	    fact_.add_relation(bdd_apply(now, recurse(node->child()) & next,
-					 bddop_biimp));
+	    fact_.add_relation(bdd_apply(now, child & next, bddop_biimp));
 	    res_ = now;
 	    return;
 	  }
@@ -104,7 +114,6 @@ namespace spot
 	  }
 	case unop::X:
 	  {
-	    // FIXME: Can be smarter on X(a U b) and X(a R b).
 	    int v = fact_.create_state(node->child());
 	    bdd now = fact_.ithvar(v);
 	    bdd next = fact_.ithvar(v + 1);
@@ -201,7 +210,7 @@ namespace spot
     bdd
     recurse(const formula* f)
     {
-      ltl_trad_visitor v(*this);
+      ltl_trad_visitor v(fact_);
       f->accept(v);
       return v.result();
     }
@@ -209,6 +218,7 @@ namespace spot
   private:
     bdd res_;
     tgba_bdd_concrete_factory& fact_;
+    bool root_;
   };
 
   tgba_bdd_concrete
@@ -224,7 +234,7 @@ namespace spot
 
     // Traverse the formula and draft the automaton in a factory.
     tgba_bdd_concrete_factory fact;
-    ltl_trad_visitor v(fact);
+    ltl_trad_visitor v(fact, true);
     f2->accept(v);
     ltl::destroy(f2);
     fact.finish();
