@@ -1,3 +1,7 @@
+2004-12-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/ltl2tgba.cc: Add option -P.
+
 2004-12-14  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/ndfs_result.hh: Define the trace output stream.

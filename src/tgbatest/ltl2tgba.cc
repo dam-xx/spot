@@ -35,6 +35,7 @@
 #include "tgbaalgos/dotty.hh"
 #include "tgbaalgos/lbtt.hh"
 #include "tgba/tgbatba.hh"
+#include "tgba/tgbaproduct.hh"
 #include "tgbaalgos/gv04.hh"
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/reducerun.hh"
@@ -82,6 +83,8 @@ syntax(char* prog)
 	    << "  -N    display the never clain for Spin "
 	    << "(implies -D)" << std::endl
             << "  -p    branching postponement (implies -f)" << std::endl
+	    << "  -Pfile  multiply the formula with the automaton from `file'."
+	    << std::endl
 	    << "  -r    display the relation BDD, not the reachability graph"
 	    << std::endl
 	    << "  -r1   reduce formula using basic rewriting" << std::endl
@@ -178,6 +181,9 @@ main(int argc, char** argv)
   bool opt_reduce = false;
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* unobservables = 0;
+  spot::tgba_explicit* system = 0;
+  spot::tgba* product = 0;
+  spot::bdd_dict* dict = new spot::bdd_dict();
 
   for (;;)
     {
@@ -268,6 +274,16 @@ main(int argc, char** argv)
 	{
 	  post_branching = true;
 	  fm_opt = true;
+	}
+      else if (!strncmp(argv[formula_index], "-P", 2))
+	{
+	  spot::tgba_parse_error_list pel;
+	  system = spot::tgba_parse(argv[formula_index] + 2,
+				     pel, dict, env, debug_opt);
+	  if (spot::format_tgba_parse_errors(std::cerr, pel))
+	    return 2;
+	  system->merge_transitions();
+	  std::clog << argv[formula_index] + 2 << " read" << std::endl;
 	}
       else if (!strcmp(argv[formula_index], "-r"))
 	{
@@ -458,8 +474,8 @@ main(int argc, char** argv)
 	}
     }
 
-  if ((graph_run_opt || graph_run_tgba_opt) &&
-              (echeck_algo == "" || !expect_counter_example))
+  if ((graph_run_opt || graph_run_tgba_opt)
+      && (echeck_algo == "" || !expect_counter_example))
     {
       std::cerr << argv[0] << ": error: -g and -G require -e." << std::endl;
       exit(1);
@@ -493,8 +509,6 @@ main(int argc, char** argv)
     {
       input = argv[formula_index];
     }
-
-  spot::bdd_dict* dict = new spot::bdd_dict();
 
   spot::ltl::formula* f = 0;
   if (!from_file)
@@ -618,6 +632,9 @@ main(int argc, char** argv)
 	  a = expl = tgba_dupexp_dfs(a);
 	  break;
 	}
+
+      if (system)
+	a = product = new spot::tgba_product(system, a);
 
       switch (output)
 	{
@@ -785,6 +802,8 @@ main(int argc, char** argv)
 
       if (f)
         spot::ltl::destroy(f);
+      delete product;
+      delete system;
       delete expl;
       delete degeneralized;
       delete aut_red;
