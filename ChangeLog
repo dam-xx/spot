@@ -1,5 +1,8 @@
 2004-11-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* configure.ac (AM_INIT_AUTOMAKE): Use option tar-ustar, we have
+	filenames longer than 99 bytes.
+
 	* wrap/python/tests/run.in: Do not override PYTHONPATH, just add
 	to it.
 	Report from Akim Demaille.

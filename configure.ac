@@ -22,7 +22,7 @@
 AC_PREREQ([2.59])
 AC_INIT([spot], [0.0y])
 AC_CONFIG_AUX_DIR([tools])
-AM_INIT_AUTOMAKE([gnits nostdinc 1.8])
+AM_INIT_AUTOMAKE([1.9 gnits nostdinc tar-ustar])
 
 # If the user didn't supplied a CFLAGS value,
 # set an empty one to prevent autoconf to stick -O2 -g here.
