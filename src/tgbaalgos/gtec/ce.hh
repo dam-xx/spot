@@ -43,15 +43,10 @@ namespace spot
     void print_stats(std::ostream& os) const;
 
   protected:
-    /// Called by couvreur99_check_result to find a path which traverses all
+    /// Called by accepting_run() to find a cycle which traverses all
     /// acceptance conditions in the accepted SCC.
-    void accepting_path (const explicit_connected_component* scc,
+    void accepting_cycle(const explicit_connected_component* scc,
 			 const state* start, bdd acc_to_traverse);
-
-    /// Complete a cycle that caraterise the period of the counter
-    /// example.  Append a sequence to the path given by accepting_path.
-    void complete_cycle(const explicit_connected_component* scc,
-			const state* from, const state* to);
 
   private:
     const couvreur99_check_status* ecs_;

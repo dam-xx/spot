@@ -1,5 +1,12 @@
 2004-11-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/gtec/ce.cc (couvreur99_check_result::accepting_path):
+	Rewrite as ...
+	(couvreur99_check_result::accepting_cycle): ... this less complex
+	implementation.
+	(couvreur99_check_result::complete_cycle): Delete.
+	* src/tgbatest/emptchke.test: More explicit examples.
+
 	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Do not leak
 	the initial state when no valid outgoing transition is found.
 

@@ -166,8 +166,8 @@ namespace spot
 	  }
       }
 
-    accepting_path(scc[comp_size - 1], run_->prefix.back().s,
-		   scc[comp_size - 1]->condition);
+    accepting_cycle(scc[comp_size - 1], run_->prefix.back().s,
+		    scc[comp_size - 1]->condition);
     run_->prefix.pop_back(); // this state belongs to the cycle.
 
     for (int j = comp_size - 1; 0 <= j; --j)
@@ -187,79 +187,6 @@ namespace spot
     return run_;
   }
 
-  void
-  couvreur99_check_result::complete_cycle(const explicit_connected_component*
-					  scc,
-					  const state* from,
-					  const state* to)
-  {
-    // If by chance our cycle already ends on the state we have
-    // to reach back, we are done.
-    if (from == to
-	&& !run_->cycle.empty())
-      return;
-
-    // Records backlinks to parent state during the BFS.
-    // (This also stores the propositions of this link.)
-    std::map<const state*, tgba_run::step, state_ptr_less_than> father;
-
-    // BFS queue.
-    std::deque<const state*> todo;
-
-    // Initial state.
-    todo.push_back(from);
-
-    while (!todo.empty())
-      {
-	const state* src = todo.front();
-	todo.pop_front();
-	tgba_succ_iterator* i = ecs_->aut->succ_iter(src);
-	for (i->first(); !i->done(); i->next())
-	  {
-	    const state* dest = i->current_state();
-
-	    // Do not escape this SCC or visit a state already visited.
-	    const state* h_dest = scc->has_state(dest);
-	    if (!h_dest)
-	      {
-		delete dest;
-		continue;
-	      }
-	    if (father.find(h_dest) != father.end())
-	      continue;
-
-	    bdd cond = i->current_condition();
-	    bdd acc = i->current_acceptance_conditions();
-	    tgba_run::step s = { src, cond, acc };
-
-	    // If we have reached our destination, unwind the path
-	    // and populate RUN_->CYCLE.
-	    if (h_dest == to)
-	      {
-		tgba_run::steps p;
-
-		while (s.s != from)
-		  {
-		    p.push_front(s);
-		    s = father[s.s];
-		  }
-		p.push_front(s);
-		run_->cycle.splice(run_->cycle.end(), p);
-
-		// Exit the BFS, but release all iterators first.
-		todo.clear();
-		break;
-	      }
-
-	    // Common case: record backlinks and continue BFS.
-	    todo.push_back(h_dest);
-	    father[h_dest] = s;
-	  }
-	delete i;
-      }
-  }
-
-
   namespace
   {
     struct triplet
@@ -278,146 +205,91 @@ namespace spot
   }
 
   void
-  couvreur99_check_result::accepting_path(const explicit_connected_component*
-					  scc,
-					  const state* start, bdd
-					  acc_to_traverse)
+  couvreur99_check_result::accepting_cycle(const explicit_connected_component*
+					   scc,
+					   const state* start, bdd
+					   acc_to_traverse)
   {
-    // State seen during the DFS.
-    typedef Sgi::hash_set<const state*,
-                          state_ptr_hash, state_ptr_equal> set_type;
-    set_type seen;
-    // DFS stack.
-    std::stack<triplet> todo;
-
-    while (acc_to_traverse != bddfalse)
+    // Compute an accepting cycle using successive BFS that are
+    // restarted from the point reached after we have discovered a
+    // transition with a new acceptance conditions.
+    //
+    // This idea is taken from Product<T>::findWitness in LBTT 1.1.2.
+    const state* substart = start;
+    do
       {
-	// Initial state.
-	{
-	  tgba_succ_iterator* i = ecs_->aut->succ_iter(start);
-	  i->first();
-	  todo.push(triplet(start, i, bddfalse));
-	  seen.insert(start);
-	}
+	// Records backlinks to parent state during the BFS.
+	// (This also stores the propositions of this link.)
+	std::map<const state*, tgba_run::step, state_ptr_less_than> father;
 
-	// The path being explored currently.
-	tgba_run::steps path;
-	// The best path seen so far.
-	tgba_run::steps best_path;
-	// The end state of the base path.
-	const state* best_end = 0;
-	// The acceptance conditions traversed by BEST_PATH.
-	bdd best_acc = bddfalse;
+	// BFS queue.
+	std::deque<const state*> todo;
+
+	// Initial state.
+	todo.push_back(substart);
 
 	while (!todo.empty())
 	  {
-	    tgba_succ_iterator* iter = todo.top().iter;
-	    const state* s = todo.top().s;
-
-	    // Nothing more to explore, backtrack.
-	    if (iter->done())
+	    const state* src = todo.front();
+	    todo.pop_front();
+	    tgba_succ_iterator* i = ecs_->aut->succ_iter(src);
+	    for (i->first(); !i->done(); i->next())
 	      {
-		todo.pop();
-		delete iter;
-		seen.erase(s);
-		if (!todo.empty())
+		const state* dest = i->current_state();
+
+		// Do not escape this SCC
+		const state* h_dest = scc->has_state(dest);
+		if (!h_dest)
 		  {
-		    assert(!path.empty());
-		    path.pop_back();
+		    delete dest;
+		    continue;
 		  }
-		continue;
-	      }
 
-	    // We must not escape the current SCC.
-	    const state* dest = iter->current_state();
-	    const state* h_dest = scc->has_state(dest);
-	    if (!h_dest)
-	      {
-		delete dest;
-		iter->next();
-		continue;
-	      }
+		bdd cond = i->current_condition();
+		bdd acc = i->current_acceptance_conditions();
+		tgba_run::step s = { src, cond, acc };
 
-	    bdd acc = iter->current_acceptance_conditions() | todo.top().acc;
-	    tgba_run::step st = { s, iter->current_condition(),
-				  iter->current_acceptance_conditions() };
-	    path.push_back(st);
-
-	    // Advance iterator for next step.
-	    iter->next();
-
-	    if (seen.find(h_dest) == seen.end())
-	      {
-		// A new state: continue the DFS.
-		tgba_succ_iterator* di = ecs_->aut->succ_iter(h_dest);
-		di->first();
-		todo.push(triplet(h_dest, di, acc));
-		seen.insert(h_dest);
-		continue;
-	      }
-
-	    // We have completed a full cycle.
-
-	    // If we already have a best path, let see if the current
-	    // one is better.
-	    if (!best_path.empty())
-	      {
-		// When comparing the merits of two paths, only the
-		// acceptance conditions we are trying the traverse
-		// are important.
-		bdd acc_restrict = acc & acc_to_traverse;
-		bdd best_acc_restrict = best_acc & acc_to_traverse;
-
-		// If the best path and the current one traverse the
-		// same acceptance conditions, we keep the shorter
-		// path.  Otherwise, we keep the path which has the
-		// more acceptance conditions.
-		if (best_acc_restrict == acc_restrict)
+		// If this new step diminish the number of acceptance
+		// conditions, record the path so far and start a new
+		// BFS for the remaining acceptance conditions.
+		//
+		// If we have already collected all acceptance conditions,
+		// we stop if we cycle back to the start of the cycle.
+		bdd less_acc = acc_to_traverse - acc;
+		if (less_acc != acc_to_traverse
+		    || (acc_to_traverse == bddfalse
+			&& h_dest == start))
 		  {
-		    if (best_path.size() <= path.size())
-		      goto backtrack_path;
+		    acc_to_traverse = less_acc;
+
+		    tgba_run::steps p;
+
+		    while (s.s != substart)
+		      {
+			p.push_front(s);
+			s = father[s.s];
+		      }
+		    p.push_front(s);
+		    run_->cycle.splice(run_->cycle.end(), p);
+
+		    // Exit this BFS, and start a new one at h_dest.
+		    todo.clear();
+		    substart = h_dest;
+		    break;
 		  }
-		else
+
+		// Common case: record backlinks and continue BFS
+		// for unvisited states.
+		if (father.find(h_dest) == father.end())
 		  {
-		    // `best_acc_restrict >> acc_restrict' is true
-		    // when the set of acceptance conditions of
-		    // best_acc_restrict is included in the set of
-		    // acceptance conditions of acc_restrict.
-		    //
-		    // FIXME: It would be better to count the number
-		    // of acceptance conditions.
-		    if (bddtrue != (best_acc_restrict >> acc_restrict))
-		      goto backtrack_path;
+		    todo.push_back(h_dest);
+		    father[h_dest] = s;
 		  }
 	      }
-
-	    // The current path the best one.
-	    best_path = path;
-	    best_acc = acc;
-	    best_end = h_dest;
-
-	  backtrack_path:
-	    // Continue exploration from parent to find better paths.
-	    // (Do not pop PATH if ITER is done, because that will be
-	    // done at the top of the loop, among other things.)
-	    if (!iter->done())
-	      path.pop_back();
+	    delete i;
 	  }
-
-	// Append our best path to the run_->cycle.
-	for (tgba_run::steps::iterator it = best_path.begin();
-	     it != best_path.end(); ++it)
-	  run_->cycle.push_back(*it);
-
-	// Prepare to find another path for the remaining acceptance
-	// conditions.
-	acc_to_traverse -= best_acc;
-	start = best_end;
       }
-
-    // Complete the path so that it goes back to its beginning,
-    // forming a cycle.
-    complete_cycle(scc, start, run_->prefix.back().s);
+    while (acc_to_traverse != bddfalse || substart != start);
   }
 
   void

@@ -25,6 +25,15 @@
 
 set -e
 
+expect_ce()
+{
+  run 0 ./ltl2tgba -e -X "$1"
+  run 0 ./ltl2tgba -e -D -X "$1"
+  run 0 ./ltl2tgba -ecouvreur99_shy -X "$1"
+  run 0 ./ltl2tgba -ecouvreur99_shy -D -X "$1"
+  run 0 ./ltl2tgba -emagic_search -X "$1"
+}
+
 cat >input <<'EOF'
 acc = c d;
 s1, "s2", "a & !b", c d;
@@ -32,6 +41,70 @@ s1, "s2", "a & !b", c d;
 "state 3", s1,,;
 EOF
 
-run 0 ./ltl2tgba -e -X input
-run 0 ./ltl2tgba -ecouvreur99_shy -X input
-run 0 ./ltl2tgba -emagic_search -X input
+expect_ce input
+
+#       ________
+#      /        v
+#    >a--->d--->g
+#    /^   /^   /^
+#   L |  L |  L |{A}
+#  b->c e->f h->i
+#
+cat >input <<'EOF'
+acc = A;
+a, b, "1",;
+b, c, "1",;
+c, a, "1",;
+a, d, "1",;
+d, e, "1",;
+e, f, "1",;
+f, d, "1",;
+d, g, "1",;
+g, h, "1",;
+h, i, "1",;
+i, g, "1", A;
+a, g, "1",;
+EOF
+
+expect_ce input
+
+#        v
+#     d->a
+#     ^  |
+#     |  v
+#     c<-b<-.
+#     ^  |A |B
+#    B|  v  |
+#     `--e->f
+#
+# The arcs are ordered so that Couvreur99 succeed after exploring
+# the following subgraph (which is one accepting SCC):
+#
+#        v
+#     d->a
+#     ^  |
+#     |  v
+#     c<-b<-.
+#        |A |B
+#        v  |
+#        e->f
+#
+# However when computing a counter-example the greedy BFS algorithm
+# will fail to return the minimal a->b->e->f->b run.  Indeed it first
+# walks through a->b->e (which gives acceptance condition A), and
+# prefer to continue with e->c (because it gives acceptance condition B),
+# and finally closes the cycle with c->d->a
+#
+cat >input <<'EOF'
+acc = A B;
+a, b, "1",;
+b, c, "1",;
+c, d, "1",;
+d, a, "1",;
+b, e, "1", A;
+e, f, "1",;
+f, b, "1", B;
+e, c, "1", B;
+EOF
+
+expect_ce input
