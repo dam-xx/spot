@@ -195,6 +195,7 @@ namespace spot
       {
 	os << "ERROR: The cycle's acceptance conditions ("
 	   << bdd_format_accset(a->get_dict(), all_acc) << ") do not"
+	   << std::endl
 	   << "match those of the automata ("
 	   << bdd_format_accset(a->get_dict(), expected_all_acc)
 	   << std::endl;

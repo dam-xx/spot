@@ -1,5 +1,7 @@
 2004-11-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Add missing std::endl.
+
 	* tgbaalgos/reachiter.hh, tgbaalgos/reachiter.cc
 	(tgba_reachable_iterator::process_link): Take the state* as arguments
 	in addition to the state numbers.
