@@ -4,22 +4,24 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 tgbaalgosdir = $(pkgincludedir)/tgbaalgos
 
 tgbaalgos_HEADERS = \
-  reachiter.hh \
   dotty.hh \
+  dupexp.hh \
+  emptinesscheck.hh \
   lbtt.hh \
   ltl2tgba_fm.hh \
   ltl2tgba_lacim.hh \
   magic.hh \
-  emptinesscheck.hh \
+  reachiter.hh \
   save.hh
 
 noinst_LTLIBRARIES = libtgbaalgos.la
 libtgbaalgos_la_SOURCES = \
-  reachiter.cc \
   dotty.cc \
+  dupexp.cc \
+  emptinesscheck.cc \
   lbtt.cc \
   ltl2tgba_fm.cc \
   ltl2tgba_lacim.cc \
   magic.cc \
-  emptinesscheck.cc \
+  reachiter.cc \
   save.cc

@@ -1,4 +1,5 @@
 AM_CPPFLAGS = -I$(srcdir)/..
+AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 LDADD = ../ltlparse/libltlparse.la \
 	../ltlvisit/libltlvisit.la \
 	../ltlenv/libltlenv.la \

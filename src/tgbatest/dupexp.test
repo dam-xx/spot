@@ -1,0 +1,30 @@
+#!/bin/sh
+
+. ./defs
+
+set -e
+
+run()
+{
+  ./ltl2tgba -f -s "$1" >output1
+  ./ltl2tgba -f -S "$1" >output2
+  test `wc -l <output1` = `wc -l <output2`
+
+  ./ltl2tgba -s "$1" >output1
+  ./ltl2tgba -S "$1" >output2
+  test `wc -l <output1` = `wc -l <output2`
+}
+
+run 'a'
+run 'a U b'
+run 'X a'
+run 'a & b & c'
+run 'a | b | (c U (d & (g U (h ^ i))))'
+run 'Xa & (b U !a) & (b U !a)'
+run 'Fa & Xb & GFc & Gd'
+run 'Fa & Xa & GFc & Gc'
+run 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+run '!((FF a) <=> (F x))'
+run '!((FF a) <=> (F a))'
+run 'Xa && (!a U b) && !b && X!b'
+run '(a U !b) && Gb'

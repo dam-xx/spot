@@ -36,9 +36,13 @@ namespace spot
 
     void add_condition(transition* t, ltl::formula* f);
     void add_neg_condition(transition* t, ltl::formula* f);
+    /// This assumes that all variables in \a f are known from dict.
+    void add_conditions(transition* t, bdd f);
     void declare_accepting_condition(ltl::formula* f);
     bool has_accepting_condition(ltl::formula* f) const;
     void add_accepting_condition(transition* t, ltl::formula* f);
+    /// This assumes that all accepting conditions in \a f are known from dict.
+    void add_accepting_conditions(transition* t, bdd f);
     void complement_all_accepting_conditions();
 
     // tgba interface

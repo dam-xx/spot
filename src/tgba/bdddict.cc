@@ -41,6 +41,20 @@ namespace spot
     return num;
   }
 
+  void
+  bdd_dict::register_propositions(bdd f, const void* for_me)
+  {
+    if (f == bddtrue || f == bddfalse)
+      return;
+
+    vf_map::iterator i = var_formula_map.find(bdd_var(f));
+    assert(i != var_formula_map.end());
+    var_refs[i->first].insert(for_me);
+
+    register_propositions(bdd_high(f), for_me);
+    register_propositions(bdd_low(f), for_me);
+  }
+
   int
   bdd_dict::register_state(const ltl::formula* f, const void* for_me)
   {
@@ -87,6 +101,21 @@ namespace spot
     var_refs[num].insert(for_me);
     return num;
   }
+
+  void
+  bdd_dict::register_accepting_variables(bdd f, const void* for_me)
+  {
+    if (f == bddtrue || f == bddfalse)
+      return;
+
+    vf_map::iterator i = acc_formula_map.find(bdd_var(f));
+    assert(i != acc_formula_map.end());
+    var_refs[i->first].insert(for_me);
+
+    register_accepting_variables(bdd_high(f), for_me);
+    register_accepting_variables(bdd_low(f), for_me);
+  }
+
 
   void
   bdd_dict::register_all_variables_of(const void* from_other,

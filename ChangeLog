@@ -1,5 +1,25 @@
 2003-11-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltltest/Makefile.am (AM_CXXFLAGS): New variable.
+	* tgba/bdddict.hh (bdd_dict::register_propositions,
+	bdd_dict::register_accepting_variables): New methods.
+	* src/bdddict.cc: Likewise.
+	* tgba/tgbaexplicit.cc (tgba_explicit::add_conditions,
+	tgba_explicit::add_accepting_conditions): New methods.
+	(tgba_explicit::get_init_state): Add an "empty" initial
+	state to empty automata.
+	* tgba/tgbaexplicit.hh: (tgba_explicit::add_conditions,
+	tgba_explicit::add_accepting_conditions): New methods.
+	* tgbaalgos/Makefiles.am (tgbaalgos_HEADERS, libtgbaalgos_la_SOURCES):
+	Add dupexp.hh and dupexp.cc.
+	* tgbaalgos/dupexp.hh, tgbaalgos/dupexp.cc: New files.
+	* tgbatest/Makefile.am (AM_CXXFLAGS): New variable.
+	(check_SCRIPTS): Add dupexp.test.
+	(CLEANFILES): Add output1 and output2.
+	* tgbatest/dupexp.test: New file.
+	* tgbatest/ltl2tgba.cc: Handle -s and -S.
+	* tgbatest/tgbaread.cc: Remove unused variable exit_code.
+
 	* src/ltlparse/ltlscan.ll: Include ltlparse/parsedecl.hh,
 	not parsedecl.hh.
 	* src/tgbaparse/tgbascan.ll: Likewise, include tgbaparse/parsedecl.hh.

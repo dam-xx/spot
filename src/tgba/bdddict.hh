@@ -54,6 +54,15 @@ namespace spot
     ///   to convert this to a BDD.
     int register_proposition(const ltl::formula* f, const void* for_me);
 
+    /// \brief Register BDD variables as atomic propositions.
+    ///
+    /// Register all variables occurring in \a f as atomic propositions
+    /// used by \a for_me.  This assumes that these atomic propositions
+    /// are already known from the dictionary (i.e., they have already
+    /// been registered by register_proposition() for another
+    /// automaton).
+    void register_propositions(bdd f, const void* for_me);
+
     /// \brief Register a couple of Now/Next variables
     ///
     /// Return (and maybe allocate) two BDD variables for a state
@@ -78,6 +87,15 @@ namespace spot
     /// \return The variable number.  Use bdd_ithvar() or bdd_nithvar()
     ///   to convert this to a BDD.
     int register_accepting_variable(const ltl::formula* f, const void* for_me);
+
+    /// \brief Register BDD variables as accepting variables.
+    ///
+    /// Register all variables occurring in \a f as accepting variables
+    /// used by \a for_me.  This assumes that these accepting variables
+    /// are already known from the dictionary (i.e., they have already
+    /// been registered by register_accepting_variable() for another
+    /// automaton).
+    void register_accepting_variables(bdd f, const void* for_me);
 
     /// \brief Duplicate the variable usage of another object.
     ///

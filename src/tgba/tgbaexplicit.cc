@@ -119,7 +119,7 @@ namespace spot
 
 	// The first state we add is the inititial state.
 	// It can also be overridden with set_init_state().
-	if (! init_)
+	if (!init_)
 	  init_ = s;
 
 	return s;
@@ -168,6 +168,13 @@ namespace spot
   tgba_explicit::add_neg_condition(transition* t, ltl::formula* f)
   {
     t->condition -= get_condition(f);
+  }
+
+  void
+  tgba_explicit::add_conditions(transition* t, bdd f)
+  {
+    dict_->register_propositions(f, this);
+    t->condition &= f;
   }
 
   void
@@ -245,9 +252,25 @@ namespace spot
     t->accepting_conditions |= c;
   }
 
+  void
+  tgba_explicit::add_accepting_conditions(transition* t, bdd f)
+  {
+    bdd sup = bdd_support(f);
+    dict_->register_accepting_variables(sup, this);
+    while (sup != bddtrue)
+      {
+	neg_accepting_conditions_ &= bdd_nithvar(bdd_var(sup));
+	sup = bdd_high(sup);
+      }
+    t->accepting_conditions |= f;
+  }
+
   state*
   tgba_explicit::get_init_state() const
   {
+    // Fix empty automata by adding a lone initial state.
+    if (!init_)
+      const_cast<tgba_explicit*>(this)->add_state("empty");
     return new state_explicit(init_);
   }
 

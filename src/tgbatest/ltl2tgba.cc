@@ -14,6 +14,7 @@
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/emptinesscheck.hh"
 #include "tgbaparse/public.hh"
+#include "tgbaalgos/dupexp.hh"
 
 void
 syntax(char* prog)
@@ -45,6 +46,10 @@ syntax(char* prog)
 	    << "  -r   display the relation BDD, not the reachability graph"
 	    << std::endl
 	    << "  -R   same as -r, but as a set" << std::endl
+	    << "  -s   convert to explicit automata, and number states "
+	    << "in DFS order" << std::endl
+	    << "  -S   convert to explicit automata, and number states "
+	    << "in BFS order" << std::endl
 	    << "  -t   display reachable states in LBTT's format" << std::endl
 	    << "  -v   display the BDD variables used by the automaton"
 	    << std::endl
@@ -65,6 +70,7 @@ main(int argc, char** argv)
   int output = 0;
   int formula_index = 0;
   enum { None, Couvreur, MagicSearch } echeck = None;
+  enum { NoneDup, BFS, DFS } dupexp = NoneDup;
   bool magic_many = false;
   bool expect_counter_example = false;
   bool from_file = false;
@@ -142,6 +148,14 @@ main(int argc, char** argv)
 	{
 	  output = 3;
 	}
+      else if (!strcmp(argv[formula_index], "-s"))
+	{
+	  dupexp = DFS;
+	}
+      else if (!strcmp(argv[formula_index], "-S"))
+	{
+	  dupexp = BFS;
+	}
       else if (!strcmp(argv[formula_index], "-t"))
 	{
 	  output = 6;
@@ -217,6 +231,19 @@ main(int argc, char** argv)
       spot::tgba_tba_proxy* degeneralized = 0;
       if (degeneralize_opt)
 	a = degeneralized = new spot::tgba_tba_proxy(a);
+
+      spot::tgba_explicit* expl = 0;
+      switch (dupexp)
+	{
+	case NoneDup:
+	  break;
+	case BFS:
+	  a = expl = tgba_dupexp_bfs(a);
+	  break;
+	case DFS:
+	  a = expl = tgba_dupexp_dfs(a);
+	  break;
+	}
 
       switch (output)
 	{
@@ -305,6 +332,8 @@ main(int argc, char** argv)
 	  break;
 	}
 
+      if (expl)
+	delete expl;
       if (degeneralize_opt)
 	delete degeneralized;
 

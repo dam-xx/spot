@@ -1,4 +1,5 @@
 AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
+AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 LDADD = ../libspot.la
 
 check_SCRIPTS = defs
@@ -40,10 +41,11 @@ TESTS = \
   explpro3.test \
   tripprod.test \
   mixprod.test \
+  dupexp.test \
   emptchk.test \
   emptchke.test \
   spotlbtt.test
 
 EXTRA_DIST = $(TESTS)
 
-CLEANFILES = input input1 input2 input3 stdout expected config
+CLEANFILES = input input1 input2 input3 stdout expected config output1 output2

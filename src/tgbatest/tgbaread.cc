@@ -15,8 +15,6 @@ syntax(char* prog)
 int
 main(int argc, char** argv)
 {
-  int exit_code = 0;
-
   if (argc < 2)
     syntax(argv[0]);
 
