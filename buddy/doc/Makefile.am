@@ -1,1 +1,1 @@
-EXTRA_DIST = bddnotes.ps buddy.ps tech.txt
+EXTRA_DIST = bddnotes.ps buddy.pdf tech.txt

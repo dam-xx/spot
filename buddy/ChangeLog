@@ -1,5 +1,9 @@
 2003-08-06  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* doc/Makefile.am (EXTRA_DIST): Replace buddy.ps by buddy.pdf
+	(the latter has been rebuilt and on Jørn's request it explicitly
+	mentions the differences with the 2.2 manual).
+
 	* src/bddop.c (bdd_forallcomp, bdd_uniquecomp): Fix documentation.
 
 2003-07-17  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
