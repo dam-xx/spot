@@ -173,6 +173,76 @@ namespace spot
   }
 
   void
+  bdd_dict::unregister_variable(int var, const void* me)
+  {
+    vr_map::iterator i = var_refs.find(var);
+    assert(i != var_refs.end());
+    unregister_variable(i, me);
+  }
+
+  void
+  bdd_dict::unregister_variable(vr_map::iterator& cur, const void* me)
+  {
+    ref_set& s = cur->second;
+    ref_set::iterator si = s.find(me);
+    if (si == s.end())
+      return;
+    s.erase(si);
+    if (! s.empty())
+      return;
+
+    // ME was the last user of this variable.
+    // Let's free it.  First, we need to find
+    // if this is a Now, a Var, or an Acc variable.
+    int var = cur->first;
+    int n = 1;
+    const ltl::formula* f = 0;
+    vf_map::iterator vi = var_formula_map.find(var);
+    if (vi != var_formula_map.end())
+      {
+	f = vi->second;
+	var_map.erase(f);
+	var_formula_map.erase(vi);
+      }
+    else
+      {
+	vi = now_formula_map.find(var);
+	if (vi != now_formula_map.end())
+	  {
+	    f = vi->second;
+	    now_map.erase(f);
+	    now_formula_map.erase(vi);
+	    n = 2;
+	    bdd_setpair(next_to_now, var + 1, var + 1);
+	    bdd_setpair(now_to_next, var, var);
+	  }
+	else
+	  {
+	    vi = acc_formula_map.find(var);
+	    if (vi != acc_formula_map.end())
+	      {
+		f = vi->second;
+		acc_map.erase(f);
+		acc_formula_map.erase(vi);
+	      }
+	    else
+	      {
+		free_annonymous_list_of_type::iterator i;
+		for (i = free_annonymous_list_of.begin();
+		     i != free_annonymous_list_of.end(); ++i)
+		  i->second.remove(var, n);
+	      }
+	  }
+      }
+    // Actually release the associated BDD variables, and the
+    // formula itself.
+    release_variables(var, n);
+    if (f)
+      ltl::destroy(f);
+    var_refs.erase(cur);
+  }
+
+  void
   bdd_dict::unregister_all_my_variables(const void* me)
   {
     vr_map::iterator i;
@@ -181,62 +251,7 @@ namespace spot
 	// Increment i++ now, we will possibly erase
 	// the current node (which would invalidate the iterator).
 	vr_map::iterator cur = i++;
-
-	ref_set& s = cur->second;
-	ref_set::iterator si = s.find(me);
-	if (si == s.end())
-	  continue;
-	s.erase(si);
-	if (! s.empty())
-	  continue;
-	// ME was the last user of this variable.
-	// Let's free it.  First, we need to find
-	// if this is a Now, a Var, or an Acc variable.
-	int var = cur->first;
-	int n = 1;
-	const ltl::formula* f;
-	vf_map::iterator vi = var_formula_map.find(var);
-	if (vi != var_formula_map.end())
-	  {
-	    f = vi->second;
-	    var_map.erase(f);
-	    var_formula_map.erase(vi);
-	  }
-	else
-	  {
-	    vi = now_formula_map.find(var);
-	    if (vi != now_formula_map.end())
-	      {
-		f = vi->second;
-		now_map.erase(f);
-		now_formula_map.erase(vi);
-		n = 2;
-		bdd_setpair(next_to_now, var + 1, var + 1);
-		bdd_setpair(now_to_next, var, var);
-	      }
-	    else
-	      {
-		vi = acc_formula_map.find(var);
-		if (vi != acc_formula_map.end())
-		  {
-		    f = vi->second;
-		    acc_map.erase(f);
-		    acc_formula_map.erase(vi);
-		  }
-		else
-		  {
-		    free_annonymous_list_of_type::iterator i;
-		    for (i = free_annonymous_list_of.begin();
-			 i != free_annonymous_list_of.end(); ++i)
-		      i->second.remove(var, n);
-		  }
-	      }
-	  }
-	// Actually release the associated BDD variables, and the
-	// formula itself.
-	release_variables(var, n);
-	ltl::destroy(f);
-	var_refs.erase(cur);
+	unregister_variable(cur, me);
       }
     free_annonymous_list_of.erase(me);
   }

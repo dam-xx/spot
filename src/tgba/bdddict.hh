@@ -135,10 +135,13 @@ namespace spot
     /// is deleted if \a from_other is still alive.
     void register_all_variables_of(const void* from_other, const void* for_me);
 
-    /// \brief Release the variables used by object.
+    /// \brief Release all variables used by an object.
     ///
     /// Usually called in the destructor if \a me.
     void unregister_all_my_variables(const void* me);
+
+    /// \brief Release a variable used by \a me.
+    void unregister_variable(int var, const void* me);
 
     /// @{
     /// Check whether formula \a f has already been registered by \a by_me.
@@ -164,6 +167,7 @@ namespace spot
     typedef Sgi::hash_map<int, ref_set> vr_map;
     vr_map var_refs;
 
+    void unregister_variable(vr_map::iterator& cur, const void* me);
 
     class annon_free_list : public spot::free_list
     {

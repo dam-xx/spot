@@ -1,3 +1,12 @@
+2004-03-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/misc/freelist.cc (free_list::remove): Work around
+	invalidated iterators.
+	* tgba/bdddict.cc (unregister_variable): New methods,
+	extracted from ...
+	(bdd_dict::unregister_all_my_variables): ... here.
+	* tgba/bdddict.hh (unregister_variable): Declare them.
+
 2004-03-23  Alexandre DURET-LUTZ  <adl@src.lip6.fr>
 
 	* src/misc/freelist.hh (free_list::remove, free_list::insert): New

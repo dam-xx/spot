@@ -131,13 +131,15 @@ namespace spot
   void
   free_list::remove(int base, int n)
   {
-    free_list_type::iterator cur;
+    free_list_type::iterator cur = fl.begin();
     int end = base + n;
-    for (cur = fl.begin(); cur != fl.end() && cur->first <= end; ++cur)
+    while (cur != fl.end() && cur->first <= end)
       {
 	int cend = cur->first + cur->second;
+	// Remove may invalidate the current iterator, so advance it first.
+	free_list_type::iterator old = cur++;
 	if (cend >= end)
-	  remove(cur, base, std::max(n, cend - base));
+	  remove(old, base, std::max(n, cend - base));
       }
   }
 
