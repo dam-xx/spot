@@ -114,7 +114,7 @@ namespace spot
 	    // are also in other accepting sets.
 	    bdd fout = bdd_relprod(as, !current_acc_, data_.acc_set);
 	    bdd as_fout = as & !fout;
-	    // Then, pick the remaining term that are exactly in all 
+	    // Then, pick the remaining term that are exactly in all
 	    // required accepting sets.
 	    bdd all = bddtrue;
 	    bdd acc = current_acc_;

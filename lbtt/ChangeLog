@@ -4,7 +4,7 @@
 	* src/SpotWrapper.hh (SpotWrapper::SPOT_XOR): Declare.
 	* src/SpotWrapper.cc (SpotWrapper::SPOT_XOR): Define.
 	(SpotWrapper::translateFormula): Use SPOT_XOR.
-	
+
 2003-07-09  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	I want $? = 1 whenever some test fails.
