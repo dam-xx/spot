@@ -1,3 +1,8 @@
+2004-10-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Do not assert
+	that the true state has only one link when unobs is used.
+
 2004-10-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/evtgbatest/Makefile.am (CLEANFILES): New variable.

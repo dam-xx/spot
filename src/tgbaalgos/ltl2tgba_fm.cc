@@ -854,18 +854,20 @@ namespace spot
 	bdd cond_for_true = bddfalse;
 	if (i != dests.end())
 	  {
-	    // There should be only one transition going to 1 (true) ...
-	    assert(i->second.size() == 1);
-	    prom_map::const_iterator j = i->second.begin();
-	    // ... and it is not expected to make any promises.
-	    assert(j->first == bddtrue);
-
-	    cond_for_true = j->second;
 	    // When translating LTL for an event-based logic with
-	    // unobservable events, the 1 state should accept even
-	    // unobservable events.
+	    // unobservable events, the 1 state should accept all events,
+	    // even unobservable events.
 	    if (unobs && f == constant::true_instance())
 	      cond_for_true = all_events;
+	    else
+	      {
+		// There should be only one transition going to 1 (true) ...
+		assert(i->second.size() == 1);
+		prom_map::const_iterator j = i->second.begin();
+		// ... and it is not expected to make any promises.
+		assert(j->first == bddtrue);
+		cond_for_true = j->second;
+	      }
 	    tgba_explicit::transition* t =
 	      a->create_transition(now, constant::true_instance()->val_name());
 	    a->add_condition(t, d.bdd_to_formula(cond_for_true));
