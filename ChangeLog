@@ -1,5 +1,7 @@
 2004-02-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* configure.ac, NEWS: Bump version to 0.0p.
+
 	* wrap/python/cgi/ltl2tgba.in: Fix <table> setting to cope
 	with IE, Safari, konqueror, ... None of these support
 	rules="groups" frame="border" properly (Mozilla is OK).

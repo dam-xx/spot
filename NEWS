@@ -1,4 +1,11 @@
-New in spot 0.0o:
+New in spot 0.0p (2004-02-03):
+
+  * In ltl_to_tgba_fm:
+    - identify states with identical symbolic expansions
+      (i.e., identical continuations)
+    - use Acc[b] as acceptance condition for Fb, not Acc[Fb].
+  * Update and speed-up the cgi script.
+  * Improve degeneralization.
 
 New in spot 0.0n (2004-01-13):
 
