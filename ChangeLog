@@ -1,5 +1,10 @@
 2003-05-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/Makefile.am (SUBDIRS): Add tgbaalgos.
+	(libspot_la_LIBADD): Add tgba/libtgbaalgos.
+	* src/tgbaalgos/Makefile.am: New file.
+	* configure.ac: Output src/tgbaalgos/Makefile.
+
 	* src/tgba/bddprint.hh, src/tgba/bddprint.cc: New files.
 	* src/tgba/Makefile.am (libtgba_la_SOURCES): Add them.
 	* src/tgba/public.hh: Include bddprint.hh.
@@ -20,6 +25,7 @@
 
 	* src/Makefile.am (SUBDIRS): Add tgba.
 	(libspot_la_LIBADD): Add tgba/libtgba.la.
+	* configure.ac: Output src/tgba/Makefile.
 	* src/tgba/Makefile.am, src/tgba/bddfactory.cc,
 	src/tgba/bddfactory.hh, src/tgba/dictunion.cc,
 	src/tgba/dictunion.hh, src/tgba/ltl2tgba.cc, src/tgba/ltl2tgba.hh,
