@@ -26,6 +26,10 @@
 
 namespace spot
 {
+
+  /// \addtogroup tgba_misc
+  /// @{
+
   struct tgba_statistics
   {
     unsigned transitions;
@@ -34,6 +38,8 @@ namespace spot
 
   /// \brief Compute statistics for an automata.
   tgba_statistics stats_reachable(const tgba* g);
+
+  /// @}
 }
 
 #endif // SPOT_TGBAALGOS_STATS_HH

@@ -32,6 +32,9 @@
 namespace spot
 {
 
+  /// \addtogroup tgba_reduction
+  /// @{
+
   /// Options for reduce.
   enum reduce_tgba_options
     {
@@ -327,6 +330,7 @@ namespace spot
 
   };
 
+  /// @}
 }
 
 #endif

@@ -27,7 +27,8 @@
 
 namespace spot
 {
-  /// Build a spot::tgba_bdd_concrete from an LTL formula.
+  /// \brief Build a spot::tgba_bdd_concrete from an LTL formula.
+  /// \ingroup tgba_ltl
   ///
   /// This is based on the following paper.
   /// \verbatim

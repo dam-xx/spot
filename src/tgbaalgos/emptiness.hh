@@ -32,7 +32,7 @@ namespace spot
   class tgba;
   struct tgba_run;
 
-  /// \addtogroup emptiness_check Emptiness-check
+  /// \addtogroup emptiness_check Emptiness-checks
   /// \ingroup tgba_algorithms
   ///
   /// All emptiness-check algorithms follow the same interface.

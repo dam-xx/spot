@@ -218,11 +218,26 @@ namespace spot
   /// \addtogroup tgba_representation TGBA representations
   /// \ingroup tgba
 
-  /// \addtogroup tgba_on_the_fly_algorithms TGBA on-the-fly algorithms
-  /// \ingroup tgba
-
   /// \addtogroup tgba_algorithms TGBA algorithms
   /// \ingroup tgba
+
+  /// \addtogroup tgba_on_the_fly_algorithms TGBA on-the-fly algorithms
+  /// \ingroup tgba_algorithms
+
+  /// \addtogroup tgba_io Input/Output of TGBA
+  /// \ingroup tgba_algorithms
+
+  /// \addtogroup tgba_ltl Translating LTL formulae into TGBA
+  /// \ingroup tgba_algorithms
+
+  /// \addtogroup tgba_generic Algorithm patterns
+  /// \ingroup tgba_algorithms
+
+  /// \addtogroup tgba_reduction TGBA simplifications
+  /// \ingroup tgba_algorithms
+
+  /// \addtogroup tgba_misc Miscellaneous algorithms on TGBA
+  /// \ingroup tgba_algorithms
 }
 
 #endif // SPOT_TGBA_TGBA_HH

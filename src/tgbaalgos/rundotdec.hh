@@ -31,6 +31,7 @@
 namespace spot
 {
   /// \brief Highlight a spot::tgba_run on a spot::tgba.
+  /// \ingroup tgba_dotty
   ///
   /// An instance of this class can be passed to spot::dotty_reachable.
   class tgba_run_dotty_decorator: public dotty_decorator

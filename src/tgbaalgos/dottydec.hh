@@ -30,7 +30,11 @@ namespace spot
   class tgba;
   class tgba_succ_iterator;
 
-  /// Choose state and link styles for spot::dotty_reachable.
+  /// \addtogroup tgba_dotty Decorating the dot output
+  /// \ingroup tgba_io
+
+  /// \brief Choose state and link styles for spot::dotty_reachable.
+  /// \ingroup tgba_dotty
   class dotty_decorator
   {
   public:

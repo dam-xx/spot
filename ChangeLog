@@ -1,5 +1,16 @@
 2004-11-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgba/tgba.hh, src/tgbaalgos/dotty.hh,
+	src/tgbaalgos/dottydec.hh, src/tgbaalgos/dupexp.hh,
+	src/tgbaalgos/emptiness.hh, src/tgbaalgos/lbtt.hh,
+	src/tgbaalgos/ltl2tgba_fm.hh, src/tgbaalgos/ltl2tgba_lacim.hh,
+	src/tgbaalgos/neverclaim.hh, src/tgbaalgos/powerset.hh,
+	src/tgbaalgos/projrun.hh, src/tgbaalgos/randomgraph.hh,
+	src/tgbaalgos/reachiter.hh, src/tgbaalgos/reductgba_sim.hh,
+	src/tgbaalgos/replayrun.hh, src/tgbaalgos/rundotdec.hh
+	src/tgbaalgos/save.hh, src/tgbaalgos/stats.hh,
+	src/tgbaparse/public.hh: Add Doxygen groups for TGBA algorithms.
+
 	* src/ltlast/atomic_prop.hh, src/ltlast/binop.hh,
 	src/ltlast/constant.hh, src/ltlast/formula.hh,
 	src/ltlast/multop.hh, src/ltlast/refformula.hh,
@@ -12,7 +23,6 @@
 	src/ltlvisit/lunabbrev.hh, src/ltlvisit/nenoform.hh: Add Doxygen
 	groups for LTL algorithms and types.
 	* doc/Makefile.am (fast-doc): New target.
-
 
 	* src/misc/hashfunc.hh: Include cstddef to define size_t, and guard
 	the file for multiple inclusions.

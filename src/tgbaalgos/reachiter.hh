@@ -30,6 +30,7 @@
 namespace spot
 {
   /// \brief Iterate over all reachable states of a spot::tgba.
+  /// \ingroup tgba_generic
   class tgba_reachable_iterator
   {
   public:
@@ -92,6 +93,7 @@ namespace spot
 
   /// \brief An implementation of spot::tgba_reachable_iterator that browses
   /// states depth first.
+  /// \ingroup tgba_generic
   class tgba_reachable_iterator_depth_first : public tgba_reachable_iterator
   {
   public:
@@ -106,6 +108,7 @@ namespace spot
 
   /// \brief An implementation of spot::tgba_reachable_iterator that browses
   /// states breadth first.
+  /// \ingroup tgba_generic
   class tgba_reachable_iterator_breadth_first : public tgba_reachable_iterator
   {
   public:

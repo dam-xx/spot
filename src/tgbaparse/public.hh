@@ -32,6 +32,9 @@
 
 namespace spot
 {
+  /// \addtogroup tgba_io
+  /// @{
+
   /// \brief A parse diagnostic with its location.
   typedef std::pair<yy::Location, std::string> tgba_parse_error;
   /// \brief A list of parser diagnostics, as filled by parse.
@@ -67,6 +70,8 @@ namespace spot
   /// \return \c true iff any diagnostic was output.
   bool format_tgba_parse_errors(std::ostream& os,
 				tgba_parse_error_list& error_list);
+
+  /// @}
 }
 
 #endif // SPOT_TGBAPARSE_PUBLIC_HH

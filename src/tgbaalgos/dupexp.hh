@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -26,11 +26,13 @@
 
 namespace spot
 {
-  /// Build an explicit automata from all states of \a aut, numbering
-  /// states in bread first order as they are processed.
+  /// \brief Build an explicit automata from all states of \a aut,
+  /// numbering states in bread first order as they are processed.
+  /// \ingroup tgba_misc
   tgba_explicit* tgba_dupexp_bfs(const tgba* aut);
-  /// Build an explicit automata from all states of \a aut, numbering
-  /// states in depth first order as they are processed.
+  /// \brief Build an explicit automata from all states of \a aut,
+  /// numbering states in depth first order as they are processed.
+  /// \ingroup tgba_misc
   tgba_explicit* tgba_dupexp_dfs(const tgba* aut);
 }
 

@@ -31,6 +31,7 @@ namespace spot
   class tgba;
 
   /// \brief Construct a tgba randomly.
+  /// \ingroup tgba_misc
   ///
   /// \param n The number of states wanted in the automata.  All states
   ///          will be connected, and there will be no dead state.

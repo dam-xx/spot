@@ -30,6 +30,10 @@ namespace spot
   class tgba;
 
   /// \brief Print reachable states in dot format.
+  /// \ingroup tgba_io
+  /// The \a dd argument allows to customize the output in various
+  /// ways.  See \ref tgba_dotty "this page" for a list of available
+  /// decorators.
   std::ostream&
   dotty_reachable(std::ostream& os,
 		  const tgba* g,

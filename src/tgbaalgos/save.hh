@@ -28,6 +28,7 @@
 namespace spot
 {
   /// \brief Save reachable states in text format.
+  /// \ingroup tgba_io
   std::ostream& tgba_save_reachable(std::ostream& os, const tgba* g);
 }
 

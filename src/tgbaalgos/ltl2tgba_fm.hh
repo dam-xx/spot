@@ -29,6 +29,7 @@
 namespace spot
 {
   /// \brief Build a spot::tgba_explicit* from an LTL formula.
+  /// \ingroup tgba_ltl
   ///
   /// This is based on the following paper.
   /// \verbatim

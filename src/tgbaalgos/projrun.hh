@@ -30,6 +30,7 @@ namespace spot
   class tgba;
 
   /// \brief Project a tgba_run on a tgba.
+  /// \ingroup tgba_run
   ///
   /// If a tgba_run has been generated on a product, or any other
   /// on-the-fly algorithm with tgba operands,
