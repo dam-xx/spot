@@ -1,3 +1,9 @@
+2004-03-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm) <exprop>: Do not
+	blindly enumerate all combinations of atomic properties; initially
+	set all_props to the set of all possibly satisfiable combinations.
+
 2004-02-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* lbtt/src/Makefile.am (lbtt_translate_SOURCES): Fix leftover

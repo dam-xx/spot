@@ -497,7 +497,7 @@ namespace spot
 	// with same source/destination and acceptance conditions.  This
 	// is the goal of the `dests' hash.
 	//
-	// Note that this is still not optimal.  For instance it us
+	// Note that this is still not optimal.  For instance it is
 	// better to encode `f U g' as
 	//     r(f U g) = g + a(g).r(X(f U g)).f.!g
 	// because that leads to a deterministic automaton.  In order
@@ -512,9 +512,19 @@ namespace spot
 	typedef Sgi::hash_map<const formula*, prom_map, ptr_hash<formula> >
 	  dest_map;
 	dest_map dests;
+
 	// Compute all outgoing arcs.
-	bdd all_props = bddtrue;
+
+	// If EXPROP is set, we will refine the symbolic
+	// representation of the successors for all combinations of
+	// the atomic properties involved in the formula.
+	// VAR_SET is the set of these properties.
 	bdd var_set = bdd_existcomp(bdd_support(res), d.var_set);
+	// ALL_PROPS is the combinations we have yet to consider.
+	// We used to start with `all_props = bddtrue', but it is
+	// more efficient to start with the set of all satisfiable
+	// variables combinations.
+	bdd all_props = bdd_existcomp(res, d.var_set);
 	while (all_props != bddfalse)
 	  {
 	    bdd one_prop_set =
