@@ -24,7 +24,7 @@
 #include <fstream>
 #include <string>
 #include "ltlvisit/destroy.hh"
-#include "ltlvisit/reducform.hh"
+#include "ltlvisit/reduce.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"

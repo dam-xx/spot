@@ -34,7 +34,7 @@ ltlvisit_HEADERS = \
   lunabbrev.hh \
   nenoform.hh \
   postfix.hh \
-  reducform.hh \
+  reduce.hh \
   syntimpl.hh \
   tostring.hh \
   tunabbrev.hh
@@ -50,7 +50,7 @@ libltlvisit_la_SOURCES = \
   lunabbrev.cc \
   nenoform.cc \
   postfix.cc \
-  reducform.cc \
+  reduce.cc \
   syntimpl.cc \
   tostring.cc \
   tunabbrev.cc

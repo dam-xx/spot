@@ -1,5 +1,11 @@
 2004-06-23  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/ltlvisit/reducform.hh, src/ltlvisit/reducform.cc: Rename to ...
+	* src/ltlvisit/reduce.hh, src/ltlvisit/reduce.cc: ... this, to match
+	the function name.
+	* ltltest/equals.cc, ltltest/reduc.cc, ltlvisit/Makefile.am,
+	tgbatest/ltl2tgba.cc, tgbatest/reductgba.cc: Adjust filenames.
+
 	* src/ltlvisit/basicreduce.cc (basic_reduce_visitor::visit(binop*)):
 	Factorize.
 

@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_LTLVISIT_REDUCFORM_HH
-# define SPOT_LTLVISIT_REDUCFORM_HH
+#ifndef SPOT_LTLVISIT_REDUCE_HH
+# define SPOT_LTLVISIT_REDUCE_HH
 
 #include "ltlast/formula.hh"
 #include "ltlast/visitor.hh"
@@ -80,4 +80,4 @@ namespace spot
   }
 }
 
-#endif //  SPOT_LTLVISIT_REDUCFORM_HH
+#endif //  SPOT_LTLVISIT_REDUCE_HH
