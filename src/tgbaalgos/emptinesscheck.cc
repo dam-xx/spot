@@ -85,7 +85,7 @@ namespace spot
     while (!todo.empty())
       {
 	pair_state_iter step = todo.top();
-	if ((step.second)->done())
+	if (step.second->done())
 	  {
 	    todo.pop();
 	    assert(!root_component.empty());
@@ -96,16 +96,15 @@ namespace spot
 	    if (comp_tmp.index == i_0->second)
 	      {
 		// The current node is a root of a Strong Connected Component.
-		emptiness_check::remove_component(step.first);
+		remove_component(step.first);
 		assert(!arc_accepting.empty());
 		arc_accepting.pop();
-		assert(root_component.size() == arc_accepting.size());
 	      }
 	    else
 	      {
 		root_component.push(comp_tmp);
-		assert(root_component.size() == arc_accepting.size());
 	      }
+	    assert(root_component.size() == arc_accepting.size());
 	  }
 	else
 	  {
@@ -355,7 +354,7 @@ namespace spot
 	    iter_s->first();
 	    for (iter_s->first(); !iter_s->done(); iter_s->next())
 	      {
-		const state* curr_state = (started_.second)->current_state();
+		const state* curr_state = started_.second->current_state();
 		if (comp_path.has_state(curr_state))
 		  {
 		    if (curr_state->compare(to_state) == 0)
@@ -369,8 +368,7 @@ namespace spot
 						 complete_map[curr_father].second));
 			    curr_father = complete_map[curr_father].first;
 			  }
-			emptiness_check::period.splice(period.end(),
-							tmp_comp);
+			period.splice(period.end(), tmp_comp);
 			todo_complete.clear();
 			break;
 		      }
@@ -479,13 +477,12 @@ namespace spot
       }
     for (cycle_path::iterator it = best_lst.begin();
 	 it != best_lst.end(); ++it)
-      emptiness_check::period.push_back(*it);
+      period.push_back(*it);
 
     if (best_acc != to_accept)
       {
 	bdd rec_to_acc = to_accept - best_acc;
-	emptiness_check::accepting_path(comp_path, period.back().first,
-					rec_to_acc);
+	accepting_path(comp_path, period.back().first, rec_to_acc);
       }
     else
       {
