@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -77,6 +77,7 @@ namespace spot
 	visit(const multop* mo)
 	{
 	  unsigned mos = mo->size();
+	  ++result_;
 	  for (unsigned i = 0; i < mos; ++i)
 	    result_ += length(mo->nth(i));
 	}

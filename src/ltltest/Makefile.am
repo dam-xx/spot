@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -21,10 +21,7 @@
 
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
-LDADD = ../ltlparse/libltlparse.la \
-	../ltlvisit/libltlvisit.la \
-	../ltlenv/libltlenv.la \
-	../ltlast/libltlast.la
+LDADD = ../libspot.la
 
 check_SCRIPTS = defs
 # Keep this sorted alphabetically.
@@ -41,6 +38,9 @@ check_PROGRAMS = \
   tunabbrev \
   tunenoform
 
+noinst_PROGRAMS = \
+  randltl
+
 equals_SOURCES = equals.cc
 ltl2dot_SOURCES = readltl.cc
 ltl2dot_CPPFLAGS = $(AM_CPPFLAGS) -DDOTTY
@@ -49,6 +49,7 @@ lunabbrev_SOURCES = equals.cc
 lunabbrev_CPPFLAGS = $(AM_CPPFLAGS) -DLUNABBREV
 nenoform_SOURCES = equals.cc
 nenoform_CPPFLAGS = $(AM_CPPFLAGS) -DNENOFORM
+randltl_SOURCES = randltl.cc
 reduc_SOURCES = reduc.cc
 reduccmp_SOURCES = equals.cc
 reduccmp_CPPFLAGS = $(AM_CPPFLAGS) -DREDUC
@@ -60,7 +61,7 @@ tunenoform_SOURCES = equals.cc
 tunenoform_CPPFLAGS = $(AM_CPPFLAGS) -DNENOFORM -DTUNABBREV
 
 
-EXTRA_DIST = $(TESTS) formulae.txt
+EXTRA_DIST = $(TESTS)
 
 # Ordered by strength of the test.  Test basic features first.
 TESTS = \
@@ -76,4 +77,4 @@ TESTS = \
   reduc.test \
   reduccmp.test
 
-CLEANFILES = stdout expect parse.dot result.data
+CLEANFILES = stdout expect parse.dot result.data formulae

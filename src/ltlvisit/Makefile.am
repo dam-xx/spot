@@ -1,4 +1,4 @@
-## Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -35,6 +35,7 @@ ltlvisit_HEADERS = \
   lunabbrev.hh \
   nenoform.hh \
   postfix.hh \
+  randomltl.hh \
   reduce.hh \
   simpfg.hh \
   syntimpl.hh \
@@ -53,6 +54,7 @@ libltlvisit_la_SOURCES = \
   lunabbrev.cc \
   nenoform.cc \
   postfix.cc \
+  randomltl.cc \
   reduce.cc \
   simpfg.cc \
   syntimpl.cc \

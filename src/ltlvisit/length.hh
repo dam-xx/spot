@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -33,7 +33,10 @@ namespace spot
     ///
     /// The length of a formula is the number of atomic properties,
     /// constants, and operators (logical and temporal) occurring in
-    /// the formula.
+    /// the formula.  spot::ltl::multops count only for 1, even if
+    /// they have more than two operands (e.g. <code>a | b | c</code>
+    /// has length 4, because <code>|</code> is represented once
+    /// internally).
     int length(const formula* f);
   }
 }
