@@ -25,7 +25,7 @@
 #include "tgbaexplicit.hh"
 #include "tgbaalgos/reachiter.hh"
 #include "tgbaalgos/gtec/explscc.hh"
-#include "tgbaalgos/gtec/status.hh"
+#include "tgbaalgos/gtec/nsheap.hh"
 
 #include <list>
 
