@@ -44,10 +44,10 @@ namespace spot
   ///   publisher     = {Universit{\'e} du Qu{\'e}bec {\`a} Montr{\'e}al},
   ///   editor        = {Pierre Leroux}
   /// }
+  /// \endverbatim
   /// \param f The formula to translate into an automata.
   /// \param dict The spot::bdd_dict the constructed automata should use.
-  /// \return A spot::tgba_bdd_concrete that recognize the language of \a f.
-  /// \endverbatim
+  /// \return A spot::tgba_bdd_concrete that recognizes the language of \a f.
   tgba_bdd_concrete* ltl_to_tgba_lacim(const ltl::formula* f, bdd_dict* dict);
 }
 

@@ -1,3 +1,8 @@
+2004-08-11  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba_fm.hh, src/tgbaalgos/ltl2tgba_lacim.hh:
+	Typos in Doxygen comments.
+
 2004-08-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlvisit/apcollect.hh: Fix include guard.  Report from Denis.
