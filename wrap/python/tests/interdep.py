@@ -1,4 +1,5 @@
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# -*- mode: python; coding: iso-8859-1 -*-
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #

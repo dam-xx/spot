@@ -1,5 +1,10 @@
 2004-02-02  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* wrap/python/tests/bddnqueen.py, wrap/python/tests/interdep.py,
+	wrap/python/tests/ltl2tgba.py, wrap/python/tests/ltlparse.py,
+	wrap/python/tests/ltlsimple.py: Specify coding system to
+	accommodate newer Python versions.
+
 	* src/misc/bddalloc.hh: Make all methods public.
 	* wrap/python/spot.i: Include misc/bddalloc.hh and misc/minato.hh.
 	* wrap/python/tests/minato.py: New file.
