@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -191,7 +191,7 @@ namespace spot
 	case binop::R:
 	  {
 	    /*
-	       f1 R f2 <=> f2 & (f1 | X(f1 U f2))
+	       f1 R f2 <=> f2 & (f1 | X(f1 R f2))
 	       In other words:
 		   now <=> f2 & (f1 | next)
 	    */
