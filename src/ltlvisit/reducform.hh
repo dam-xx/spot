@@ -29,13 +29,15 @@ namespace spot
 {
   namespace ltl
   {
-    enum option {Base,
-		 Inf,
-		 InfBase,
-		 EventualUniversal,
-		 EventualUniversalBase,
-		 InfEventualUniversal,
-		 BRI};
+
+    enum reduce_options
+      {
+	Reduce_None = 0,
+	Reduce_Basics = 1,
+	Reduce_Syntactic_Implications = 2,
+	Reduce_Eventuality_And_Universality = 4,
+	Reduce_All = -1U
+      };
 
     /// \brief Reduce a formula \a f using Basic rewriting, implies
     /// relation, and class of eventuality and univerality formula.
@@ -47,14 +49,10 @@ namespace spot
     /// Inf for spot::ltl::reduce_inf_form,
     /// EventualUniversal for spot::ltl::reduce_eventuality_universality_form,
     /// BRI for spot::ltl::reduce_form.
-    formula* reduce(const formula* f, option opt = BRI);
+    formula* reduce(const formula* f, int opt = Reduce_All);
 
     /// Implement basic rewriting.
     formula* basic_reduce_form(const formula* f);
-
-    /// Implement rewritings rules using implies relation,
-    /// and class of eventuality and univerality formula.
-    formula* reduce_form(const formula* f, option o = BRI);
 
     /// Detect easy case of implies.
     /// True if f1 < f2, false otherwise.

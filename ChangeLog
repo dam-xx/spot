@@ -1,5 +1,13 @@
 2004-05-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlvisit/reducform.hh (option): Rename as ...
+	(reduce_options): ... this, and use it as a bit field so
+	option can be combined easily.
+	(reduce): Adjust argument.
+	(reduce_form): Remove, not needed anymore.
+	* src/ltlvisit/reducform.cc, src/ltltest/reduc.cc,
+	src/tgbatest/ltl2tgba.cc: Adjust.
+
 	* src/sanity/style.test: Catch {.*{ and }.*}.
 	* src/sanity/80columns.test: Untabify files.
 	* iface/gspn/ltlgspn.cc, src/ltlvisit/basereduc.cc: Fix long lines.

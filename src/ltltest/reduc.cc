@@ -44,29 +44,31 @@ main(int argc, char** argv)
   if (argc < 3)
     syntax(argv[0]);
 
-  spot::ltl::option o;
+  int o = spot::ltl::Reduce_None;
   switch (atoi(argv[1]))
     {
     case 0:
-      o = spot::ltl::Base;
+      o = spot::ltl::Reduce_Basics;
       break;
     case 1:
-      o = spot::ltl::Inf;
+      o = spot::ltl::Reduce_Syntactic_Implications;
       break;
     case 2:
-      o = spot::ltl::EventualUniversal;
+      o = spot::ltl::Reduce_Eventuality_And_Universality;
       break;
     case 3:
-      o = spot::ltl::BRI;
+      o = spot::ltl::Reduce_All;
       break;
     case 4:
-      o = spot::ltl::InfBase;
+      o = spot::ltl::Reduce_Basics | spot::ltl::Reduce_Syntactic_Implications;
       break;
     case 5:
-      o = spot::ltl::EventualUniversalBase;
+      o = (spot::ltl::Reduce_Basics
+	   | spot::ltl::Reduce_Eventuality_And_Universality);
       break;
     case 6:
-      o = spot::ltl::InfEventualUniversal;
+      o = (spot::ltl::Reduce_Syntactic_Implications
+	   | spot::ltl::Reduce_Eventuality_And_Universality);
       break;
     default:
       return 2;

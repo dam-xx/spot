@@ -36,9 +36,9 @@ namespace spot
     {
     public:
 
-      reduce_form_visitor(option o)
+      reduce_form_visitor(int opt)
+	: opt_(opt)
       {
-	this->o = o;
       }
 
       virtual ~reduce_form_visitor()
@@ -61,17 +61,7 @@ namespace spot
       void
       visit(constant* c)
       {
-	switch (c->val())
-	  {
-	  case constant::True:
-	    result_ = constant::true_instance();
-	    return;
-	  case constant::False:
-	    result_ = constant::false_instance();
-	    return;
-	  }
-	/* Unreachable code.  */
-	assert(0);
+	result_ = c;
       }
 
       void
@@ -90,14 +80,16 @@ namespace spot
 	    return;
 
 	  case unop::F:
-	    /* If f is class of eventuality then F(f)=f.  */
-	    if (!is_eventual(result_) || o == Inf || o == InfBase)
+	    /* If f is a pure eventuality formula then F(f)=f.  */
+	    if (!(opt_ & Reduce_Eventuality_And_Universality)
+		|| !is_eventual(result_))
 	      result_ = unop::instance(unop::F, result_);
 	    return;
 
 	  case unop::G:
-	    /* If f is class of universality then G(f)=f.  */
-	    if (!is_universal(result_) || o == Inf || o == InfBase)
+	    /* If f is a pure universality formula then G(f)=f.  */
+	    if (!(opt_ & Reduce_Eventuality_And_Universality)
+		|| !is_universal(result_))
 	      result_ = unop::instance(unop::G, result_);
 	    return;
 	  }
@@ -110,9 +102,9 @@ namespace spot
       {
 	formula* f2 = recurse(bo->second());
 
-	/* If b is of class eventuality then a U b = b.
-	   If b is of class universality then a R b = b. */
-	if ((o != Inf) && (o != InfBase)
+	/* If b is a pure eventuality formula then a U b = b.
+	   If b is a pure universality formula a R b = b. */
+	if ((opt_ & Reduce_Eventuality_And_Universality)
 	    && ((is_eventual(f2) && ((bo->op()) == binop::U))
 		|| (is_universal(f2) && ((bo->op()) == binop::R))))
 	  {
@@ -122,7 +114,7 @@ namespace spot
 	/* case of implies */
 	formula* f1 = recurse(bo->first());
 
-	if (o != EventualUniversal && o != EventualUniversalBase)
+	if (opt_ & Reduce_Syntactic_Implications)
 	  {
 	    bool inf = inf_form(f1, f2);
 	    bool infinv = inf_form(f2, f1);
@@ -206,7 +198,7 @@ namespace spot
 	for (unsigned i = 0; i < mos; ++i)
 	  res->push_back(recurse(mo->nth(i)));
 
-	if (o != EventualUniversal && o != EventualUniversalBase)
+	if (opt_ & Reduce_Syntactic_Implications)
 	  {
 	    switch (mo->op())
 	      {
@@ -297,82 +289,52 @@ namespace spot
       formula*
       recurse(formula* f)
       {
-	return reduce_form(f, o);
+	return reduce(f, opt_);
       }
 
     protected:
       formula* result_;
-      option o;
+      int opt_;
     };
 
     formula*
-    reduce_form(const formula* f, option o)
+    reduce(const formula* f, int opt)
     {
-      formula* ftmp1 = NULL;
-      formula* ftmp2 = NULL;
-      reduce_form_visitor v(o);
+      formula* f1;
+      formula* f2;
 
-      if (o == BRI || o == InfBase ||
-	  o == EventualUniversalBase)
+      f1 = unabbreviate_logic(f);
+      f2 = negative_normal_form(f1);
+      destroy(f1);
+
+      if (opt & Reduce_Basics)
 	{
-	  ftmp1 = basic_reduce_form(f);
-	  const_cast<formula*>(ftmp1)->accept(v);
-	  ftmp2 = basic_reduce_form(v.result());
-	  destroy(ftmp1);
-	  destroy(v.result());
-
-	  return ftmp2;
+	  f1 = basic_reduce_form(f2);
+	  destroy(f2);
+	  f2 = f1;
 	}
-      else
+      if (opt & (Reduce_Syntactic_Implications
+		 | Reduce_Eventuality_And_Universality))
 	{
-	  const_cast<formula*>(f)->accept(v);
-	  return v.result();
+	  reduce_form_visitor v(opt);
+	  f2->accept(v);
+	  f1 = v.result();
+	  destroy(f2);
+	  f2 = f1;
+
+	  // Run basic_reduce_form again.
+	  //
+	  // Consider `F b & g'   were g is an eventual formula rewritten
+	  // as `g = F c'  Then basic_reduce_form with rewrite it
+	  // as F(b & c).
+	  if (opt & Reduce_Basics)
+	    {
+	      f1 = basic_reduce_form(f2);
+	      destroy(f2);
+	      f2 = f1;
+	    }
 	}
-
-      /* unreachable code */
-      assert(0);
-    }
-
-    formula*
-    reduce(const formula* f, option o)
-    {
-      formula* ftmp1;
-      formula* ftmp2;
-      formula* ftmp3;
-
-      ftmp1 = unabbreviate_logic(f);
-      ftmp2 = negative_normal_form(ftmp1);
-
-      switch (o)
-	{
-	case Base:
-	  ftmp3 = basic_reduce_form(ftmp2);
-	  break;
-	case Inf:
-	  ftmp3 = reduce_form(ftmp2, o);
-	  break;
-	case InfBase:
-	  ftmp3 = reduce_form(ftmp2, o);
-	  break;
-	case EventualUniversal:
-	  ftmp3 = reduce_form(ftmp2, o);
-	  break;
-	case EventualUniversalBase:
-	  ftmp3 = reduce_form(ftmp2, o);
-	  break;
-	case InfEventualUniversal:
-	  ftmp3 = reduce_form(ftmp2, o);
-	  break;
-	case BRI:
-	  ftmp3 = reduce_form(ftmp2, o);
-	  break;
-	default:
-	  assert(0);
-	}
-      destroy(ftmp1);
-      destroy(ftmp2);
-
-      return ftmp3;
+      return f2;
     }
   }
 }

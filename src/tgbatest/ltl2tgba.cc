@@ -120,10 +120,7 @@ main(int argc, char** argv)
   bool magic_many = false;
   bool expect_counter_example = false;
   bool from_file = false;
-  bool reduc_r1 = false;
-  bool reduc_r2 = false;
-  bool reduc_r3 = false;
-  bool reduc_r4 = false;
+  int redopt = spot::ltl::Reduce_None;
   bool post_branching = false;
   bool fair_loop_approx = false;
 
@@ -223,6 +220,22 @@ main(int argc, char** argv)
 	{
 	  output = 1;
 	}
+      else if (!strcmp(argv[formula_index], "-r1"))
+	{
+	  redopt |= spot::ltl::Reduce_Basics;
+	}
+      else if (!strcmp(argv[formula_index], "-r2"))
+	{
+	  redopt |= spot::ltl::Reduce_Syntactic_Implications;
+	}
+      else if (!strcmp(argv[formula_index], "-r3"))
+	{
+	  redopt |= spot::ltl::Reduce_Eventuality_And_Universality;
+	}
+      else if (!strcmp(argv[formula_index], "-r4"))
+	{
+	  redopt |= spot::ltl::Reduce_All;
+	}
       else if (!strcmp(argv[formula_index], "-R"))
 	{
 	  output = 3;
@@ -260,22 +273,6 @@ main(int argc, char** argv)
 	{
 	  fm_opt = true;
 	  fm_symb_merge_opt = false;
-	}
-      else if (!strcmp(argv[formula_index], "-r1"))
-	{
-	  reduc_r1 = true;
-	}
-      else if (!strcmp(argv[formula_index], "-r2"))
-	{
-	  reduc_r2 = true;
-	}
-      else if (!strcmp(argv[formula_index], "-r3"))
-	{
-	  reduc_r3 = true;
-	}
-      else if (!strcmp(argv[formula_index], "-r4"))
-	{
-	  reduc_r4 = true;
 	}
       else
 	{
@@ -339,29 +336,11 @@ main(int argc, char** argv)
 	}
       else
 	{
-
-	  spot::ltl::formula* ftmp = f;
-	  if (reduc_r4)
+	  if (redopt != spot::ltl::Reduce_None)
 	    {
-	      f = spot::ltl::reduce(f);
-	    }
-	  else if (reduc_r1 | reduc_r2 | reduc_r3)
-	    {
-	      spot::ltl::option o = spot::ltl::BRI;
-	      if (reduc_r1 & !reduc_r2 & !reduc_r3)
-		o = spot::ltl::Base;
-	      if (!reduc_r1 & reduc_r2 & !reduc_r3)
-		o = spot::ltl::EventualUniversal;
-	      if (reduc_r1 & reduc_r2 & !reduc_r3)
-		o = spot::ltl::EventualUniversalBase;
-	      if (!reduc_r1 & !reduc_r2 & reduc_r3)
-		o = spot::ltl::Inf;
-	      if (reduc_r1 & !reduc_r2 & reduc_r3)
-		o = spot::ltl::InfBase;
-	      if (!reduc_r1 & reduc_r2 & reduc_r3)
-		o = spot::ltl::InfEventualUniversal;
-
-	      f = spot::ltl::reduce(f, o);
+	      spot::ltl::formula* t = spot::ltl::reduce(f, redopt);
+	      spot::ltl::destroy(f);
+	      f = t;
 	    }
 
 	  if (fm_opt)
@@ -371,11 +350,6 @@ main(int argc, char** argv)
 					       fair_loop_approx);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
-
-	  if (reduc_r1 || reduc_r2 || reduc_r3 || reduc_r4)
-	    {
-	      spot::ltl::destroy(ftmp);
-	    }
 	}
 
       spot::tgba_tba_proxy* degeneralized = 0;
