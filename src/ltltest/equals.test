@@ -6,7 +6,7 @@
 
 check()
 {
-  ./equals "$2" "$3" 
+  ./equals "$2" "$3"
   test $? != $1 && exit 1;
 }
 

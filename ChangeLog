@@ -1,5 +1,8 @@
 2003-05-16  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/ltlvisit/dotty.cc: Rewrite to display formulae as
+	graphs rather than trees, to show how nodes are shared.
+
 	* src/ltlvisit/dump.hh (dump): Return the passed ostream.
 	* src/ltlvisit/dump.cc (dump): Likewise.
 	* src/ltlvisit/dotty.hh (dotty): Likewise.

@@ -2,17 +2,17 @@
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
 
-
 namespace spot
 {
   namespace ltl
   {
 
-    class dotty_visitor : public spot::ltl::const_visitor
+    class dotty_visitor : public const_visitor
     {
     public:
-      dotty_visitor(std::ostream& os = std::cout)
-	: os_(os), label_("i")
+      typedef std::map<const formula*, int> map;
+      dotty_visitor(std::ostream& os, map& m)
+	: os_(os), father_(-1), node_(m)
       {
       }
 
@@ -22,82 +22,89 @@ namespace spot
       }
 
       void
-      visit(const spot::ltl::atomic_prop* ap)
+      visit(const atomic_prop* ap)
       {
-	draw_node_(ap->name());
+	draw_node_(ap, ap->name());
       }
 
       void
-      visit(const spot::ltl::constant* c)
+      visit(const constant* c)
       {
-	draw_node_(c->val_name());
+	draw_node_(c, c->val_name());
       }
 
       void
-      visit(const spot::ltl::binop* bo)
+      visit(const binop* bo)
       {
-	draw_rec_node_(bo->op_name());
-	std::string label = label_;
-
-	label_ += "l";
-	draw_link_(label, label_);
-	bo->first()->accept(*this);
-	label_ = draw_link_(label, label + "r");
-	bo->second()->accept(*this);
+	if (draw_node_(bo, bo->op_name(), true))
+	  {
+	    dotty_visitor v(*this);
+	    bo->first()->accept(v);
+	    bo->second()->accept(*this);
+	  }
       }
 
       void
-      visit(const spot::ltl::unop* uo)
+      visit(const unop* uo)
       {
-	draw_rec_node_(uo->op_name());
-	label_ = draw_link_(label_, label_ + "c");
-	uo->child()->accept(*this);
+	if (draw_node_(uo, uo->op_name(), true))
+	  uo->child()->accept(*this);
       }
 
       void
-      visit(const spot::ltl::multop* mo)
+      visit(const multop* mo)
       {
-	draw_rec_node_(mo->op_name());
-
+	if (!draw_node_(mo, mo->op_name(), true))
+	  return;
 	unsigned max = mo->size();
-	std::string label = label_;
 	for (unsigned n = 0; n < max; ++n)
 	  {
-	    // FIXME: use `n' as a string for label names.
-	    label_ = draw_link_(label, label_ + "m");
-	    mo->nth(n)->accept(*this);
+	    dotty_visitor v(*this);
+	    mo->nth(n)->accept(v);
 	  }
       }
     private:
       std::ostream& os_;
-      std::string label_;
+      int father_;
+      map& node_;
 
-      const std::string&
-      draw_link_(const std::string& in, const std::string& out)
+      bool
+      draw_node_(const formula* f, const std::string& str, bool rec = false)
       {
-	os_ << "  " << in << " -> " << out << ";" << std::endl;
-	return out;
+	map::iterator i = node_.find(f);
+	int node;
+	bool node_exists = false;
+	if (i != node_.end())
+	  {
+	    node = i->second;
+	    node_exists = true;
+	  }
+	else
+	  {
+	    node = node_.size();
+	    node_[f] = node;
+	  }
+	// the link
+	if (father_ >= 0)
+	  os_ << "  " << father_ << " -> " << node << ";" << std::endl;
+	father_ = node;
+	// the node
+	if (node_exists)
+	  return false;
+	os_ << "  " << node
+	    << " [label=\"" << str << "\"";
+	if (rec)
+	  os_ << ", shabe=box";
+	os_ << "];" << std::endl;
+	return true;
       }
-
-      void
-      draw_rec_node_(const char* str) const
-      {
-	os_ << "  " << label_ << " [label=\"" << str << "\", shabe=box];"
-	    << std::endl;
-      }
-
-      void
-      draw_node_(const std::string& str) const
-      {
-	os_ << "  " << label_ << " [label=\"" << str << "\"];" << std::endl;
-      }
-
     };
 
     std::ostream&
     dotty(const formula* f, std::ostream& os)
     {
-      dotty_visitor v(os);
+      dotty_visitor::map m;
+      dotty_visitor v(os, m);
       os << "digraph G {" << std::endl;
       f->accept(v);
       os << "}" << std::endl;
