@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -60,6 +60,7 @@ namespace spot
 	      const tgba* global_automaton = 0) const;
     virtual bdd_dict* get_dict() const;
     virtual std::string format_state(const state* state) const;
+    virtual state* project_state(const state* s, const tgba* t) const;
     virtual bdd all_acceptance_conditions() const;
     virtual bdd neg_acceptance_conditions() const;
   protected:

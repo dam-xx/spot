@@ -1,3 +1,8 @@
+2004-01-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* iface/gspn/eesrg.cc (tgba_gspn_eesrg::project_state): New method.
+	* iface/gspn/eesrg.hh: Likewise.
+
 2004-01-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/powerset.cc, src/tgbaalgos/powerset.hh: New files.

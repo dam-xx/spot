@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -454,6 +454,16 @@ namespace spot
       }
     free(str);
     return os.str() + " * " + data_->operand->format_state(s->right());
+  }
+
+  state*
+  tgba_gspn_eesrg::project_state(const state* s, const tgba* t) const
+  {
+    const state_gspn_eesrg* s2 = dynamic_cast<const state_gspn_eesrg*>(s);
+    assert(s2);
+    if (t == this)
+      return s2->clone();
+    return data_->operand->project_state(s2->right(), t);
   }
 
   bdd
