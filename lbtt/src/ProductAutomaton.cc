@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -864,12 +864,15 @@ void ProductAutomaton::findAcceptingExecution
 			all_acceptance_sets_on_path = false;
 		    }
 		    
+		    deque<StateIdPair, ALLOC(StateIdPair) > cycle_fragment;
 		    while (state != bfs_root)
 		    {
-		      cycle.push_back(make_pair(buchiState(state),
-						systemState(state)));
+		      cycle_fragment.push_back(make_pair(buchiState(state),
+							 systemState(state)));
 		      state = shortest_path_predecessor[state];
 		    }
+		    cycle.insert(cycle.begin(), cycle_fragment.begin(),
+				 cycle_fragment.end());
 
 		    bfs_root = (*predecessor)->targetNode();
 		    visited.clear(nodes.size());
@@ -887,13 +890,16 @@ void ProductAutomaton::findAcceptingExecution
 	    backward_search_queue.pop_front();
 	  }
 
+	  deque<StateIdPair, ALLOC(StateIdPair) > cycle_fragment;
 	  while (state != bfs_root)
 	  {
-	    cycle.push_back(make_pair(buchiState(state),
-				      systemState(state)));
+	    cycle_fragment.push_back(make_pair(buchiState(state),
+					       systemState(state)));
 	    state = shortest_path_predecessor[state];
 	  }
 
+	  cycle.insert(cycle.begin(), cycle_fragment.begin(),
+		       cycle_fragment.end());
 	  cycle.push_back(make_pair(buchiState(search_start_state),
 				    systemState(search_start_state)));
 

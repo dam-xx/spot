@@ -1,3 +1,35 @@
+2003-07-18  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* UserCommands.cc (printAutomatonAnalysisResults): Ensure that
+	the states in a witness for the nonemptiness of two Bûchi
+	automata are distinct to prevent the truth valuation for the
+	atomic propositions from being defined multiple times in any
+	state of the witness.
+
+	* Version 1.0.2 released.
+	
+2003-07-17  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* NeverClaimAutomaton.cc (ParseErrorException::ParseErrorException):
+	Fix a string buffer overflow.
+
+	* ProductAutomaton.cc (findAcceptingExecution): Concatenate
+	fragments of an accepting cycle in the correct order. (Thanks to
+	Joachim Klein for pointing out an example uncovering the bug
+	in previous releases.)
+
+2002-11-04  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+	
+	* StatDisplay.cc (printCollectiveStats): If using more than five
+	formula operators (but the total number of operators is not
+	a multiple of 5), insert an empty line in the output before the
+	last row of the operator distribution table.
+
+2002-10-21  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+	
+	* BitArray.cc (BitArray::find): Fix bug in testing whether
+	all accessed bytes were zero.
+	
 2002-10-01  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* Version 1.0.1 released.

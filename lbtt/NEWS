@@ -1,5 +1,5 @@
-lbtt NEWS -- history of user-visible changes.   01 Oct 2002
-Copyright (C) 2002 Heikki Tauriainen
+lbtt NEWS -- history of user-visible changes.   18 Jul 2003
+Copyright (C) 2003 Heikki Tauriainen
 
    Permission is granted to anyone to make or distribute verbatim copies
    of this document as received, in any medium, provided that the
@@ -11,6 +11,16 @@ Copyright (C) 2002 Heikki Tauriainen
    changed them.
 
 Please send bug reports to <heikki.tauriainen@hut.fi>.
+
+Version 1.0.2
+
+* Bug fix release.
+
+* The official WWW home page of the tool is now located at
+  <http://www.tcs.hut.fi/Software/lbtt/>.  From there you can also
+  access the FormulaOptions block generator for lbtt configuration
+  files.  The generator has limited support for specifying relative
+  (instead of absolute) priorities for the LTL operators.
 
 Version 1.0.1
 

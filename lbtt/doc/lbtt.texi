@@ -14,12 +14,14 @@
 This file documents how to use the LTL-to-B@"uchi
 translator testbench @command{lbtt}.
      
-Copyright @copyright{} 2001 Heikki Tauriainen
+Copyright @copyright{} 2003 Heikki Tauriainen
 @ifinfo
 @email{heikki.tauriainen@@hut.fi}
 @end ifinfo
 @ifnotinfo
+@ifnothtml
 <@email{heikki.tauriainen@@hut.fi}>
+@end ifnothtml
 @end ifnotinfo
 
 @ifhtml     
@@ -66,11 +68,11 @@ under the above conditions for modified versions.
 @author Heikki Tauriainen <@email{heikki.tauriainen@@hut.fi}>
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001 Heikki Tauriainen
+Copyright @copyright{} 2003 Heikki Tauriainen
 <@email{heikki.tauriainen@@hut.fi}>
 
 The latest version of this manual can be obtained from@*
-<@url{http://www.tcs.hut.fi/%7Ehtauriai/lbtt/}>.
+<@url{http://www.tcs.hut.fi/Software/lbtt/}>.
 
 Permission is granted to make and distribute verbatim
 copies of this manual provided the copyright notice and
@@ -101,7 +103,7 @@ under the above conditions for modified versions.
 for translating propositional linear temporal logic formulas into
 B@"uchi automata.
 
-This is edition 1.0.0 of the @command{lbtt} documentation. This edition
+This is edition 1.0.1 of the @command{lbtt} documentation. This edition
 applies to @command{lbtt} versions 1.0.x.
 
 @command{lbtt} is free software, you may change and redistribute it
@@ -203,12 +205,12 @@ formulas as input and then performing simple consistency checks on the
 resulting automata to test whether the translators seem to operate correctly
 in practice. (See
 @ifnottex
-@ref{[Tau00]}
+@ref{[TH02]}
 @end ifnottex
 @iftex
-[Tau00]
+[TH02]
 @end iftex
-for a description of the theory behind the testing methods.) If the tests
+for more information on the theory behind the testing methods.) If the tests
 suggest an implementation
 error in a translator, @command{lbtt} can generate sample data which causes
 a test failure and which may also be useful for debugging the
@@ -239,6 +241,13 @@ A short description of each test is also included
 together with the outline of @command{lbtt}'s testing procedure. However, the
 chapter is not intended to be a thorough introduction to the theoretical
 background of the different tests; see, for example,
+@ifnottex
+@ref{[TH02]}
+@end ifnottex
+@iftex
+[TH02]
+@end iftex
+or
 @ifnottex
 @ref{[Tau00]}
 @end ifnottex
@@ -3821,10 +3830,10 @@ originally based on the algorithm presented in
 @end iftex
 See
 @ifinfo
-@url{http://netlib.bell-labs.com/netlib/spin/whatispin.html}
+@url{http://spinroot.com/spin/whatispin.html}
 @end ifinfo
 @ifnotinfo
-<@uref{http://netlib.bell-labs.com/netlib/spin/whatispin.html}>
+<@uref{http://spinroot.com/spin/whatispin.html}>
 @end ifnotinfo
 for more information.
 
@@ -3947,18 +3956,24 @@ pages 247---263. Springer-Verlag, 2000.
 
 @item @anchor{[Tau00]} [Tau00]
 H. Tauriainen. Automated testing of B@"uchi automata translators
-for linear temporal logic. Technical report A66, Laboratory for Theoretical
+for linear temporal logic. Research report A66, Laboratory for Theoretical
 Computer Science, Helsinki University of Technology, Espoo, Finland,
 2000. Available on the WWW at
 @ifinfo
-@url{http://www.tcs.hut.fi/Publications/reports/A66abstract.html}
+@url{http://www.tcs.hut.fi/Publications/info/bibdb.HUT-TCS-A66.shtml}
 @end ifinfo
 @ifhtml
-<@uref{http://www.tcs.hut.fi/Publications/reports/A66abstract.html}>.
+<@uref{http://www.tcs.hut.fi/Publications/info/bibdb.HUT-TCS-A66.shtml}>.
 @end ifhtml
 @iftex
-<@url{http://www.tcs.hut.fi/Publications/reports/ A66abstract.html}>.
+<@url{http://www.tcs.hut.fi/Publications/info/ bibdb.HUT-TCS-A66.shtml}>.
 @end iftex
+
+@item @anchor{[TH02]} [TH02]
+H. Tauriainen and K. Heljanko. Testing LTL formula translation into B@"uchi
+automata.
+@i{International Journal on Software Tools for Technology Transfer (STTT)}
+4(1):57---70, 2002.
 
 @item @anchor{[Var96]} [Var96]
 M.@: Y.@: Vardi. An automata-theoretic approach to linear temporal logic.

@@ -1,7 +1,7 @@
-lbtt version 1.0.1
+lbtt version 1.0.2
 ------------------
 
-lbtt is a tool for testing programs which translate formulas
+lbtt is a tool for testing programs that translate formulas
 expressed in propositional linear temporal logic (LTL) into
 Büchi automata.  The goal of the tool is to assist in the
 correct implementation of LTL-to-Büchi translation algorithms
@@ -11,7 +11,7 @@ for very basic profiling of different LTL-to-Büchi translators
 to evaluate their performance.
 
 The latest version of the program is available at
-<http://www.tcs.hut.fi/%7Ehtauriai/lbtt/>.
+<http://www.tcs.hut.fi/Software/lbtt/>.
 
 lbtt is free software, you may change and redistribute it under
 the terms of the GNU General Public License.  lbtt comes with
@@ -82,4 +82,4 @@ Documentation:
 
     The documentation is also available in various formats
     at the program's home page at
-    <http://www.tcs.hut.fi/%7Ehtauriai/lbtt/>.
+    <http://www.tcs.hut.fi/Software/lbtt/>.

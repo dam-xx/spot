@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -912,6 +912,8 @@ void printCollectiveStats(ostream& stream, int indent)
 
     if (number_of_symbols_printed % 5 != 0)
     {
+      if (number_of_symbols_printed > 5)
+	estream << '\n';
       estream << ind + "       operator  " + symbol_name_string + '\n'
                  + ind + "              #  " + symbol_number_string + '\n'
 	         + ind + "      #/formula  " + symbol_distribution_string

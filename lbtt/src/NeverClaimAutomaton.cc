@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -312,7 +312,7 @@ ParseErrorException::ParseErrorException
   else
   {
     string space_string(msg.substr(0, error_pos));
-    for (string::size_type c = 0; c < msg.length(); c++)
+    for (string::size_type c = 0; c < space_string.length(); c++)
       if (space_string[c] != ' ' && space_string[c] != '\t')
 	space_string[c] = ' ';
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -378,7 +378,7 @@ unsigned long int BitArray::find(const unsigned long int max_count) const
   for (i = 0; i < bsize && bits[i] == 0; ++i)
     ;
 
-  if (i == max_count)
+  if (i == bsize)
     return max_count;
 
   unsigned char c = bits[i];

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -965,53 +965,73 @@ void printAutomatonAnalysisResults
      *  intersection automaton from the result.
      */
 
-    deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) > prefix;
-    deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) > cycle;
     vector<StateSpace::size_type, ALLOC(StateSpace::size_type) > path;
 
-    while (!execution.first.empty())
-    {
-      prefix.push_back(execution.first.front().first);
-      path.push_back(execution.first.front().first);
-      execution.first.pop_front();
-    }
+    for (deque<BuchiAutomaton::StateIdPair,
+	       ALLOC(BuchiAutomaton::StateIdPair) >::const_iterator
+	   state = execution.first.begin();
+	 state != execution.first.end();
+	 ++state)
+      path.push_back(state->first);
 
-    while (!execution.second.empty())
-    {
-      cycle.push_back(execution.second.front().first);
-      path.push_back(execution.second.front().first);
-      execution.second.pop_front();
-    }
+    const vector<StateSpace::size_type, ALLOC(StateSpace::size_type) >
+      ::size_type loop_pos = path.size();
+
+    for (deque<BuchiAutomaton::StateIdPair,
+	       ALLOC(BuchiAutomaton::StateIdPair) >::const_iterator
+	   state = execution.second.begin();
+	 state != execution.second.end();
+	 ++state)
+      path.push_back(state->first);
 
     /*
      *  Construct an execution accepted by both of the automata. This is done
      *  by giving suitable truth assignments for the atomic propositions in
-     *  selected states of the state space to which the intersection automaton
-     *  was converted.
+     *  'path.size()' states, where `path' corresponds to an accepting run of
+     *  the intersection automaton. (The state space representing the
+     *  intersection automaton is reused for this purpose, since it is not
+     *  needed any longer.) In addition, `prefix' and `cycle' (required for
+     *  displaying the execution) are built to refer to the reused states.
      */
 
-    GraphEdgeContainer::const_iterator transition;
+    deque<StateSpace::size_type, ALLOC(StateSpace::size_type) > prefix, cycle;
 
-    path.push_back(cycle.front());
+    /*
+     *  Ensure that the state space is large enough to contain the execution
+     *  (the execution may pass several times through a state in the
+     *  intersection automaton).
+     */
+
+    if (automaton_as_statespace.size() < path.size())
+      automaton_as_statespace.expand
+	(path.size() - automaton_as_statespace.size());
+
+    path.push_back(path[loop_pos]); /* use the first state of the cycle as a
+				     * temporary sentinel element
+				     */
 
     for (vector<StateSpace::size_type, ALLOC(StateSpace::size_type) >
 	   ::size_type state = 0;
 	 state + 1 < path.size();
-	 state++)
+	 ++state)
     {
+      GraphEdgeContainer::const_iterator transition;
+
       for (transition = (*a)[path[state]].edges().begin();
 	   (*transition)->targetNode() != path[state + 1];
 	   ++transition)
 	;
 
-      automaton_as_statespace[path[state]].positiveAtoms()
+      automaton_as_statespace[state].positiveAtoms()
 	= static_cast<BuchiAutomaton::BuchiTransition*>(*transition)
             ->guard().findPropositionalModel
 	        (configuration.formula_options.formula_generator.
 		   number_of_available_variables);
+
+      (state < loop_pos ? prefix : cycle).push_back(state);
     }
 
-    path.pop_back();
+    path.pop_back(); /* remove the sentinel element */
 
     delete a;
     a = 0;
@@ -1038,40 +1058,25 @@ void printAutomatonAnalysisResults
     deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) >
       aut_cycle;
 
-    const deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) >*
-      original_execution_states;
-    deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) >*
-      new_execution_states;
-
     for (int i = 0; i < 2; i++)
     {
       aut_prefix.clear();
       aut_cycle.clear();
 
-      for (int j = 0; j < 2; j++)
-      {
-	if (j == 0)
-	{
-	  original_execution_states = &prefix;
-	  new_execution_states = &aut_prefix;
-	}
-	else
-	{
-	  original_execution_states = &cycle;
-	  new_execution_states = &aut_cycle;
-	}
+      deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) >*
+	new_execution_states = &aut_prefix;
 
-	for (deque<BuchiAutomaton::size_type,
-                   ALLOC(BuchiAutomaton::size_type) >::const_iterator
-	       execution_state = original_execution_states->begin();
-	   execution_state != original_execution_states->end();
-	   ++execution_state)
-	{
-	  new_execution_states->push_back
-	    (i == 0
-	     ? intersection_state_mapping[*execution_state].first
-	     : intersection_state_mapping[*execution_state].second);
-	}
+      for (vector<StateSpace::size_type, ALLOC(StateSpace::size_type) >
+	     ::size_type state_id = 0;
+	   state_id < path.size();
+	   ++state_id)
+      {
+	if (state_id == loop_pos)
+	  new_execution_states = &aut_cycle;
+	new_execution_states->push_back
+	  (i == 0
+	   ? intersection_state_mapping[path[state_id]].first
+	   : intersection_state_mapping[path[state_id]].second);
       }
 
       synchronizePrefixAndCycle(aut_prefix, aut_cycle);
@@ -1083,13 +1088,27 @@ void printAutomatonAnalysisResults
 			      automaton_stats[i].buchi_automaton));
     }
 
+    /*
+     *  Normalize the state identifiers in `path' to refer to the states that
+     *  give the valuations for atomic propositions along the execution.
+     */
+
+    for (vector<StateSpace::size_type, ALLOC(StateSpace::size_type) >
+	   ::size_type state = 0;
+	 state < path.size();
+	 ++state)
+      path[state] = state;
+
+    /*
+     *  Display a proof or a refutation for the formula in the execution.
+     */
+
     estream << string(indent + 2, ' ')
 	       + "Analysis of the positive formula in the execution M:\n";
 
     Ltl::PathEvaluator path_evaluator;
     bool result = path_evaluator.evaluate
-      (*round_info.formulae[formula], automaton_as_statespace, path,
-       prefix.size());
+      (*round_info.formulae[formula], automaton_as_statespace, path, loop_pos);
 
     path_evaluator.print(stream, indent + 4);
 
