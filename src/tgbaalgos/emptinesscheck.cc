@@ -8,7 +8,6 @@
 namespace spot
 {
   typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
-  typedef std::pair<pair_state_iter, bdd> triplet;
 
   emptiness_check::connected_component::connected_component(int i)
   {
@@ -451,112 +450,145 @@ namespace spot
       }
   }
 
-  // FIXME: Derecursive this function.
-  void
-  emptiness_check::accepting_path(const connected_component_set& comp_path,
-				  const state* start_path, bdd to_accept)
+
+  namespace
   {
-    hash_type seen_priority;
-    std::stack<triplet> todo_path;
-    tgba_succ_iterator* t_s_i = aut_->succ_iter(start_path);
-    t_s_i->first();
-    todo_path.push(triplet(pair_state_iter(start_path, t_s_i), bddfalse));
-    bdd tmp_acc = bddfalse;
-    bdd best_acc = bddfalse;
-    cycle_path tmp_lst;
-    cycle_path best_lst;
-    bool ok = false;
-    seen_priority[start_path] = h[start_path];
-    while (!todo_path.empty())
+    struct triplet
+    {
+      const state* s;		// Current state.
+      tgba_succ_iterator* iter;	// Iterator to successor of the current state.
+      bdd acc;			// All acceptance conditions traversed by
+				// the path so far.
+
+      triplet (const state* s, tgba_succ_iterator* iter, bdd acc)
+	: s(s), iter(iter), acc(acc)
       {
-	triplet step_ = todo_path.top();
-	tgba_succ_iterator* iter_ = step_.first.second;
-	if (iter_->done())
+      }
+    };
+
+  }
+
+  void
+  emptiness_check::accepting_path(const connected_component_set& scc,
+				  const state* start, bdd acc_to_traverse)
+  {
+    // State seen during the DFS.
+    connected_component_set::set_type seen;
+    // DFS stack.
+    std::stack<triplet> todo;
+
+    while (acc_to_traverse != bddfalse)
+      {
+	// Initial state.
+	{
+	  tgba_succ_iterator* i = aut_->succ_iter(start);
+	  i->first();
+	  todo.push(triplet(start, i, bddfalse));
+	  seen.insert(start);
+	}
+
+	// The path being explored currently.
+	cycle_path path;
+	// The best path seen so far.
+	cycle_path best_path;
+	// The acceptance conditions traversed by BEST_PATH.
+	bdd best_acc = bddfalse;
+
+	while (!todo.empty())
 	  {
-	    todo_path.pop();
-	    seen_priority.erase(step_.first.first);
-	    tmp_lst.pop_back();
-	  }
-	else
-	  {
-	    state* curr_state = iter_->current_state();
-	    if (comp_path.has_state(curr_state))
+	    tgba_succ_iterator* iter = todo.top().iter;
+	    const state* s = todo.top().s;
+
+	    // Nothing more to explore, backtrack.
+	    if (iter->done())
 	      {
-		hash_type::iterator i = seen_priority.find(curr_state);
-		if (i == seen_priority.end())
+		todo.pop();
+		delete iter;
+		seen.erase(s);
+		path.pop_back();
+		continue;
+	      }
+
+	    const state* dest = iter->current_state();
+
+	    // We must not escape the current SCC.
+	    if (!scc.has_state(dest))
+	      {
+		delete dest;
+		iter->next();
+		continue;
+	      }
+
+	    dest = h_filt(dest);
+	    bdd acc = iter->current_accepting_conditions() | todo.top().acc;
+	    path.push_back(state_proposition(dest, iter->current_condition()));
+
+	    // Advance iterator for next step.
+	    iter->next();
+
+	    if (seen.find(dest) == seen.end())
+	      {
+		// A new state: continue the DFS.
+		tgba_succ_iterator* di = aut_->succ_iter(dest);
+		di->first();
+		todo.push(triplet(dest, di, acc));
+		seen.insert(dest);
+		continue;
+	      }
+
+	    // We have completed a full cycle.
+
+	    // If we already have a best path, let see if the current
+	    // one is better.
+	    if (best_path.size())
+	      {
+		// When comparing the merits of two paths, only the
+		// acceptance conditions we are trying the traverse
+		// are important.
+		bdd acc_restrict = acc & acc_to_traverse;
+		bdd best_acc_restrict = best_acc & acc_to_traverse;
+
+		// If the best path and the current one traverse the
+		// same acceptance conditions, we keep the shorter
+		// path.  Otherwise, we keep the path which has the
+		// more acceptance conditions.
+		if (best_acc_restrict == acc_restrict)
 		  {
-		    tgba_succ_iterator* c_iter = aut_->succ_iter(curr_state);
-		    bdd curr_bdd =
-		      iter_->current_accepting_conditions() | step_.second;
-		    c_iter->first();
-		    todo_path.push(triplet(pair_state_iter(curr_state, c_iter),
-					   curr_bdd));
-		    tmp_lst.push_back(state_proposition(curr_state,
-							iter_->current_condition()));
-		    seen_priority[curr_state] = h[curr_state];
+		    if (best_path.size() <= path.size())
+		      continue;
 		  }
 		else
 		  {
-		    if (ok)
-		      {
-			bdd last_ = iter_->current_accepting_conditions();
-			bdd prop_ = iter_->current_condition();
-			tmp_lst.push_back(state_proposition(curr_state, prop_));
-			tmp_acc = last_ | step_.second;
-			bdd curr_in = tmp_acc & to_accept;
-			bdd best_in = best_acc & to_accept;
-			if (curr_in == best_in)
-			  {
-			    if (tmp_lst.size() < best_lst.size())
-			      {
-				cycle_path tmp(tmp_lst);
-				best_lst = tmp;
-			      }
-			  }
-			else
-			  {
-			    if (bddtrue == (best_in >> curr_in))
-			      {
-				cycle_path tmp(tmp_lst);
-				best_lst = tmp;
-				best_acc = tmp_acc;
-			      }
-			  }
-		      }
-		    else
-		      {
-			bdd last_ = iter_->current_accepting_conditions();
-			bdd prop_ = iter_->current_condition();
-		        tmp_acc = last_ | step_.second;
-			tmp_lst.push_back(state_proposition(curr_state,
-							    prop_));
-			cycle_path tmp(tmp_lst);
-			best_lst = tmp;
-			best_acc = tmp_acc;
-			ok = true;
-		      }
+		    // `best_acc_restrict >> acc_restrict' is true
+		    // when the set of acceptance conditions of
+		    // best_acc_restrict is included in the set of
+		    // acceptance conditions of acc_restrict.
+		    //
+		    // FIXME: It would be better to count the number
+		    // of accepting conditions.
+		    if (bddtrue != (best_acc_restrict >> acc_restrict))
+		      continue;
 		  }
 	      }
-	    iter_->next();
-	  }
-      }
-    for (cycle_path::iterator it = best_lst.begin();
-	 it != best_lst.end(); ++it)
-      period.push_back(*it);
 
-    if (best_acc != to_accept)
-      {
-	bdd rec_to_acc = to_accept - best_acc;
-	accepting_path(comp_path, period.back().first, rec_to_acc);
-      }
-    else
-      {
-	if (!period.empty())
-	  {
-	    /// The path contains all accepting conditions. Then we
-	    ///complete the cycle in this SCC by calling complete_cycle.
-	    complete_cycle(comp_path, period.back().first, suffix.back());
+	    // The current path the best one.
+	    best_path = path;
+	    best_acc = acc;
 	  }
+
+	// Append our best path to the period.
+	for (cycle_path::iterator it = best_path.begin();
+	     it != best_path.end(); ++it)
+	  period.push_back(*it);
+
+	// Prepare to find another path for the remaining acceptance
+	// conditions.
+	acc_to_traverse -= best_acc;
+	start = period.back().first;
       }
+
+    // Complete the path so that it goes back to its beginning,
+    // forming a cycle.
+    complete_cycle(scc, start, suffix.back());
   }
 }

@@ -102,12 +102,12 @@ namespace spot
     /// Called by counter_example to find a path which traverses all
     /// accepting conditions in the accepted SCC.
     void accepting_path (const connected_component_set& comp_path,
-			 const state* start_path, bdd to_accept);
+			 const state* start_path, bdd acc_to_traverse);
 
     /// Complete a cycle that caraterise the period of the counter
     /// example.  Append a sequence to the path given by accepting_path.
     void complete_cycle(const connected_component_set& comp_path,
-			const state* from_state,const state* to_state);
+			const state* from_state, const state* to_state);
   };
 }
 #endif // SPOT_EMPTINESS_CHECK_HH
