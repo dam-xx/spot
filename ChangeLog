@@ -1,3 +1,15 @@
+2003-06-17  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/tgbaproduct.cc (state_bdd_product::state_bdd_product):
+	New constructor.
+	* src/tgba/tgbaproduct.hh (state_bdd_product::state_bdd_product):
+	New constructor.
+	* tgbatest/tripprod.cc, tgbatest/tripprod.test: New files.
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Add explprod.
+	(tripprod_SOURCES): New variable.
+	(CLEANFILES): Add input3.
+	(TESTS): Add tripprod.test.
+
 2003-06-16  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/tgbabddprod.cc, src/tgba/tgbabddprod.hh: Rename as ...
@@ -46,6 +58,7 @@
 	* tgba/tgbaexplicit.cc (state_explicit::clone): New method.
 	* src/tgba/tgbaexplicit.cc (tgba_explicit::get_condition,
 	tgba_explicit::get_promise): Call ltl::destroy on existing formulae.
+	* tgbatest/explprod.cc, tgbatest/explprod.test: New files.
 	* tgbatest/Makefile.am (check_PROGRAMS): Add explprod.
 	(explprod_SOURCES): New variable.
 	(TESTS): Add explprod.test.

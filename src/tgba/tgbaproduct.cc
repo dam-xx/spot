@@ -9,6 +9,13 @@ namespace spot
   ////////////////////////////////////////////////////////////
   // state_bdd_product
 
+  state_bdd_product::state_bdd_product(const state_bdd_product& o)
+    : state_bdd(o.as_bdd()),
+      left_(o.left()->clone()),
+      right_(o.right()->clone())
+  {
+  }
+
   state_bdd_product::~state_bdd_product()
   {
     delete left_;

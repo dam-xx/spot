@@ -10,7 +10,7 @@
 void
 syntax(char* prog)
 {
-  std::cerr << prog << " file1 file2" << std::endl;
+  std::cerr << prog << " file1 file2 file3" << std::endl;
   exit(2);
 }
 
@@ -19,7 +19,7 @@ main(int argc, char** argv)
 {
   int exit_code = 0;
 
-  if (argc != 3)
+  if (argc != 4)
     syntax(argv[0]);
 
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
@@ -31,10 +31,15 @@ main(int argc, char** argv)
   spot::tgba_explicit* a2 = spot::tgba_parse(argv[2], pel2, env);
   if (spot::format_tgba_parse_errors(std::cerr, pel2))
     return 2;
+  spot::tgba_parse_error_list pel3;
+  spot::tgba_explicit* a3 = spot::tgba_parse(argv[3], pel3, env);
+  if (spot::format_tgba_parse_errors(std::cerr, pel3))
+    return 2;
 
   {
     spot::tgba_product p(*a1, *a2);
-    spot::tgba_save_reachable(std::cout, p);
+    spot::tgba_product p2(p, *a3);
+    spot::tgba_save_reachable(std::cout, p2);
   }
 
   assert(spot::ltl::unop::instance_count() == 0);
@@ -43,6 +48,7 @@ main(int argc, char** argv)
   assert(spot::ltl::atomic_prop::instance_count() != 0);
   delete a1;
   delete a2;
+  delete a3;
   assert(spot::ltl::atomic_prop::instance_count() == 0);
   return exit_code;
 }

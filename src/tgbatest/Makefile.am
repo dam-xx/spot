@@ -10,16 +10,18 @@ check_PROGRAMS = \
   ltl2tgba \
   ltlprod \
   bddprod \
-  explprod
+  explprod \
+  tripprod
 
-bddprod_SOURCES = ltlprod.cc
+bddprod_SOURCES  = ltlprod.cc
 bddprod_CXXFLAGS = -DBDD_CONCRETE_PRODUCT
 explicit_SOURCES = explicit.cc
 explprod_SOURCES = explprod.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
-ltlprod_SOURCES = ltlprod.cc
+ltlprod_SOURCES  = ltlprod.cc
 readsave_SOURCES = readsave.cc
 tgbaread_SOURCES = tgbaread.cc
+tripprod_SOURCES = tripprod.cc
 
 TESTS = \
   explicit.test \
@@ -28,8 +30,9 @@ TESTS = \
   ltl2tgba.test \
   ltlprod.test \
   bddprod.test \
-  explprod.test
+  explprod.test \
+  tripprod.test
 
 EXTRA_DIST = $(TESTS)
 
-CLEANFILES = input input1 input2 stdout expected
+CLEANFILES = input input1 input2 input3 stdout expected

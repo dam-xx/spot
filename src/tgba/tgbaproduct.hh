@@ -26,6 +26,9 @@ namespace spot
     {
     }
 
+    /// Copy constructor
+    state_bdd_product(const state_bdd_product& o);
+
     virtual ~state_bdd_product();
 
     state*
