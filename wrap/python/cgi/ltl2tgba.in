@@ -191,8 +191,8 @@ LTL-to-B&uuml;chi translator</H1>""" % extra_header
 
 formula = form.getfirst('formula', '')
 
-color_fm = "#D3AEF8"
-color_lacim = "#F8AED3"
+color_fm = "#DFC6F8"
+color_lacim = "#F8C6DF"
 
 options_common = [
     ('show_formula_png',    'draw the formula',                            0),
@@ -433,7 +433,10 @@ if show_degen_png:
 if show_never_claim:
     print '<H3>Never claim (for degeneralized automaton)</H3>'
     print '<PRE>'
-    spot.never_claim_reachable(spot.get_cout(), degen)
+    s = spot.ostringstream()
+    spot.never_claim_reachable(s, degen, f)
+    print cgi.escape(s.str())
+    del s
     print '</PRE>'
     sys.stdout.flush()
 
