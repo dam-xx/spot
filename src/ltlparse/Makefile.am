@@ -1,7 +1,7 @@
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-lib_LTLIBRARIES = libltlparse.la
+noinst_LTLIBRARIES = libltlparse.la
 
 LTLPARSE_YY = ltlparse.yy
 FROM_LTLPARSE_YY_MAIN = ltlparse.cc

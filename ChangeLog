@@ -1,5 +1,13 @@
 2003-04-30  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltlvisit/Makefile.am (lib_LTLIBRARIES): Rename as ...
+	(noinst_LTLIBRARIES): ... this.
+	* src/ltlenv/Makefile.am, src/ltlast/Makefile.am, 
+	src/ltlparse/Makefile.am: Likewise.
+	* src/Makefile.am (lib_LTLIBRARIES, libspot_la_SOURCES, 
+	libspot_la_LIBADD): New variable.   Build a libspot.la library
+	from all the sub-libraries.
+
 	* m4/pypath.m4: New file.
 	* Makefile.am (SUBDIRS): Add wrap.
 	* wrap/Makefile.am: New file.
