@@ -289,4 +289,19 @@ namespace spot
     return neg_acceptance_conditions_;
   }
 
+  std::string
+  tgba_product::transition_annotation(const tgba_succ_iterator* t) const
+  {
+    const tgba_succ_iterator_product* i =
+      dynamic_cast<const tgba_succ_iterator_product*>(t);
+    assert(i);
+    std::string left = left_->transition_annotation(i->left_);
+    std::string right = right_->transition_annotation(i->right_);
+    if (left == "")
+      return right;
+    if (right == "")
+      return left;
+    return "<" + left + ", " + right + ">";
+  }
+
 }

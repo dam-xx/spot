@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -106,6 +106,7 @@ namespace spot
     bdd current_cond_;
     bdd left_neg_;
     bdd right_neg_;
+    friend class tgba_product;
   };
 
   /// \brief A lazy product.  (States are computed on the fly.)
@@ -130,6 +131,9 @@ namespace spot
     virtual bdd_dict* get_dict() const;
 
     virtual std::string format_state(const state* state) const;
+
+    virtual std::string
+    transition_annotation(const tgba_succ_iterator* t) const;
 
     virtual state* project_state(const state* s, const tgba* t) const;
 

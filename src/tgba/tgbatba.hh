@@ -65,6 +65,9 @@ namespace spot
 
     virtual state* project_state(const state* s, const tgba* t) const;
 
+    virtual std::string
+    transition_annotation(const tgba_succ_iterator* t) const;
+
     virtual bdd all_acceptance_conditions() const;
     virtual bdd neg_acceptance_conditions() const;
 

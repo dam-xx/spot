@@ -138,6 +138,16 @@ namespace spot
     /// who owns the state.
     virtual std::string format_state(const state* state) const = 0;
 
+    /// \brief Return a possible annotation for the transition
+    /// pointed to by the iterator.
+    ///
+    /// Implementing this function is optional; the default annotation
+    /// it the empty string.
+    ///
+    /// \param t a non-done tgba_succ_iterator for this automata
+    virtual std::string
+    transition_annotation(const tgba_succ_iterator* t) const;
+
     /// \brief Project a state on an automata.
     ///
     /// This converts \a s, into that corresponding spot::state for \a

@@ -191,6 +191,7 @@ namespace spot
       const iterator expected_;
       const iterator end_;
       const bdd the_acceptance_cond_;
+      friend class tgba_tba_proxy;
     };
 
   } // anonymous
@@ -315,6 +316,15 @@ namespace spot
       dynamic_cast<const state_tba_proxy*>(state);
     assert(s);
     return a_->support_variables(s->real_state());
+  }
+
+  std::string
+  tgba_tba_proxy::transition_annotation(const tgba_succ_iterator* t) const
+  {
+    const tgba_tba_proxy_succ_iterator* i =
+      dynamic_cast<const tgba_tba_proxy_succ_iterator*>(t);
+    assert(i);
+    return a_->transition_annotation(i->it_);
   }
 
 }

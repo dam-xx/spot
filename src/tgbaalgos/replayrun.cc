@@ -27,6 +27,19 @@
 
 namespace spot
 {
+  namespace
+  {
+    void
+    print_annotation(std::ostream& os, const tgba* a,
+		     const tgba_succ_iterator* i)
+    {
+      std::string s = a->transition_annotation(i);
+      if (s == "")
+	return;
+      os << " " << s;
+    }
+  }
+
   bool
   replay_tgba_run(std::ostream& os, const tgba* a, const tgba_run* run)
   {
@@ -66,6 +79,8 @@ namespace spot
 
     for (; i != l->end(); ++serial)
       {
+	// Keep track of the serial associated to each state so we
+	// can note duplicate states and make the replay easier to read.
 	state_map::iterator o = seen.find(s);
 	std::ostringstream msg;
 	if (o != seen.end())
@@ -140,8 +155,9 @@ namespace spot
 	    for (j->first(); !j->done(); j->next())
 	      {
 		const state* s2 = j->current_state();
-		os << "  * "
-		   << "label=" << bdd_format_formula(a->get_dict(),
+		os << "  *";
+		print_annotation(os, a, j);
+		os << " label=" << bdd_format_formula(a->get_dict(),
 						     j->current_condition())
 		   << " and acc="
 		   << bdd_format_accset(a->get_dict(),
@@ -152,7 +168,9 @@ namespace spot
 	    delete j;
 	    return false;
 	  }
-	os << "transition with label="
+	os << "transition";
+	print_annotation(os, a, j);
+	os << " with label="
 	   << bdd_format_formula(a->get_dict(), label)
 	   << " and acc=" << bdd_format_accset(a->get_dict(), acc)
 	   << std::endl;

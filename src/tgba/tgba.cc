@@ -69,4 +69,10 @@ namespace spot
     return 0;
   }
 
+  std::string
+  tgba::transition_annotation(const tgba_succ_iterator*) const
+  {
+    return "";
+  }
+
 }
