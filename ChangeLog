@@ -1,7 +1,12 @@
 2003-06-19  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/tgbabddconcrete.cc (set_init_state, succ_iter):
+	Revert the change from 2003-06-12, it needs more work (the 
+	automaton generated on Xa&(b U !a) was bogus, with that
+	patch).
+
 	* src/tgbatest/ltl2tgba.cc: Handle the -o and -r options.
-	
+
 	* src/tgbatest/tripprod.test, src/tgbatest/explprod.test,
 	src/tgbatest/readsave.test: Adjust to reflect yesterday's
 	bddprint.cc change.
