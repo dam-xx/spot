@@ -4,6 +4,7 @@
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/tunabbrev.hh"
 #include "ltlvisit/dump.hh"
+#include "ltlvisit/nenoform.hh"
 
 void
 syntax(char *prog)
@@ -34,10 +35,17 @@ main(int argc, char **argv)
 #ifdef LUNABBREV
   f1 = spot::ltl::unabbreviate_logic(f1);
   spot::ltl::dump(*f1, std::cout);
+  std::cout << std::endl;
 #endif
 #ifdef TUNABBREV
   f1 = spot::ltl::unabbreviate_ltl(f1);
   spot::ltl::dump(*f1, std::cout);
+  std::cout << std::endl;
+#endif
+#ifdef NENOFORM
+  f1 = spot::ltl::negative_normal_form(f1);
+  spot::ltl::dump(*f1, std::cout);
+  std::cout << std::endl;
 #endif
 
   if (equals(f1, f2))

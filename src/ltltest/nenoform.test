@@ -1,0 +1,49 @@
+#! /bin/sh
+
+# Check for the negative_normal_form visitor
+
+. ./defs || exit 1
+
+check()
+{
+  ./nenoform "$1" "$2" || exit 1
+}
+
+# A few things that do not change
+check 'a' 'a'
+check '1' '1'
+check '0' '0'
+check '!a' '!a'
+check 'a U b' 'a U b'
+check 'a & b' 'a & b'
+check 'a & b' 'b & a'
+check 'a & !b & c' 'c & a & !b'
+check 'a & b & c' 'b & c & a'
+check 'Xa & b & Xa' 'b & Xa & b'
+check 'a & b' 'b & a & b'
+check 'a & !b' '!b & a & a'
+check 'a & b & (Xc |(f U !g)| e)' 'b & a & a & (Xc | e |(f U !g)| e | Xc) & b'
+check 'GFa => FGb' 'GFa => FGb'
+
+# Basic rewritings
+check '!!a' 'a'
+check '!!!!!a' '!a'
+check '!Xa' 'X!a'
+check '!Fa' 'G!a'
+check '!Ga' 'F!a'
+check '!(a ^ b)' 'a <=> b'
+check '!(a <=> b)' '(((a) ^ (b)))'
+check '!(a => b)' 'a&!b'
+check '!(!a => !b)' '!a&b'
+check '!(a U b)' '!a R !b'
+check '!(a R b)' '!a U !b'
+check '!(!a R !b)' 'a U b'
+check '!(a & b & c & d & b)' '!a | !b | !c | !d'
+check '!(a | b | c | d)' '!a & !b & !c & !d'
+
+# Nested rewritings
+check '!(a U (!b U ((a & b & c) R d)))' '!a R (b R ((!a | !b | !c) U !d))'
+check '!(GF a => FG b)' 'GFa & GF!b'
+
+# Success.
+:

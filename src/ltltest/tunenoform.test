@@ -1,0 +1,21 @@
+#! /bin/sh
+
+# Check for unabbreviate_ltl + negative_normal_form visitors
+
+. ./defs || exit 1
+
+check()
+{
+  ./tunenoform "$1" "$2" || exit 1
+}
+
+check '!(a ^ b)' '(a|!b) & (!a|b)'
+check '!(a <=> b)' '(a|b) & (!a|!b)'
+check '!(a => b)' 'a&!b'
+check '!(!a => !b)' '!a&b'
+check '!Fa' 'false R !a'
+check '!G!a' 'true U a'
+check '!(GF a => FG b)' '(0 R (1 U a)) & (0 R (1 U !b))'
+
+# Success.
+:

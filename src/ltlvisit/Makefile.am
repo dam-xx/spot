@@ -11,5 +11,7 @@ libltlvisit_a_SOURCES = \
   equals.hh \
   lunabbrev.hh \
   lunabbrev.cc \
+  nenoform.hh \
+  nenoform.cc \
   tunabbrev.hh \
   tunabbrev.cc

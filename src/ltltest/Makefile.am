@@ -4,7 +4,17 @@ LDADD = ../ltlparse/libltlparse.a \
         ../ltlast/libltlast.a 
 
 check_SCRIPTS = defs
-check_PROGRAMS = ltl2dot ltl2text equals lunabbrev tunabbrev
+
+# Keep this sorted alphabetically.
+check_PROGRAMS = \
+  equals \
+  ltl2dot \
+  ltl2text \
+  lunabbrev \
+  nenoform \
+  tunabbrev \
+  tunenoform
+
 ltl2dot_SOURCES = readltl.cc
 ltl2dot_CPPFLAGS = $(AM_CPPFLAGS) -DDOTTY
 ltl2text_SOURCES = readltl.cc
@@ -13,8 +23,21 @@ lunabbrev_SOURCES = equals.cc
 lunabbrev_CPPFLAGS = $(AM_CPPFLAGS) -DLUNABBREV
 tunabbrev_SOURCES = equals.cc
 tunabbrev_CPPFLAGS = $(AM_CPPFLAGS) -DTUNABBREV
+nenoform_SOURCES = equals.cc
+nenoform_CPPFLAGS = $(AM_CPPFLAGS) -DNENOFORM
+tunenoform_SOURCES = equals.cc
+tunenoform_CPPFLAGS = $(AM_CPPFLAGS) -DNENOFORM -DTUNABBREV
 
 EXTRA_DIST = $(TESTS)
-TESTS = parse.test parseerr.test equals.test lunabbrev.test tunabbrev.test
+
+# Ordered by strength of the test.  Test basic features first.
+TESTS = \
+  parse.test \
+  parseerr.test \
+  equals.test \
+  lunabbrev.test \
+  tunabbrev.test \
+  nenoform.test \
+  tunenoform.test
 
 CLEANFILES = stdout expect parse.dot

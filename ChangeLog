@@ -1,5 +1,15 @@
 2003-04-17  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltlvisit/nenoform.hh, src/ltlvisit/nenoform.cc: New files.
+	* src/ltlvisit/Makefile.am (libltlvisit_a_SOURCES): Add them.
+	* src/ltltest/equals.cc (main) [NENOFORM]: Call negative_normal_form.
+	* src/ltltest/nenoform.test, src/ltltest/tunenoform.test: New files.
+	* src/ltltest/Makefile.am (check_PROGRAMS): Add nenoform and
+	tunenoform.
+	(nenoform_SOURCES, nenoform_CPPFLAGS, tunenoform_SOURCES, 
+	tunenoform_CPPFLAGS): New variables.
+	(TESTS): Add nenoform.test and tunenoform.test.
+
 	* src/ltlvisit/lunabbrev.hh: Fix include guard.
 
 2003-04-16  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
