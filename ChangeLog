@@ -1,5 +1,8 @@
 2005-02-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/tau03opt.cc (tau03_opt_search): Add options "weights"
+	and "redweights" (on by default).
+
 	* src/tgbaalgos/tau03opt.cc (tau03_opt_search): Do not
 	account for the size of condition_stack.
 

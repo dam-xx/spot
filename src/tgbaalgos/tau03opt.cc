@@ -68,7 +68,9 @@ namespace spot
           current_weight(a->neg_acceptance_conditions()),
           h(size),
           all_acc(a->all_acceptance_conditions()),
-	  use_condition_stack(o.get("condstack"))
+	  use_condition_stack(o.get("condstack")),
+	  use_weights(o.get("weights", 1)),
+	  use_red_weights(use_weights && o.get("redweights", 1))
       {
       }
 
@@ -165,6 +167,10 @@ namespace spot
 
       /// Whether to use the "condition stack".
       bool use_condition_stack;
+      /// Whether to use weights to abort earlier.
+      bool use_weights;
+      /// Whether to use weights in the red dfs.
+      bool use_red_weights;
 
       bool dfs_blue()
       {
@@ -186,7 +192,8 @@ namespace spot
                 if (c_prime.is_white())
                   {
                     trace << "  It is white, go down" << std::endl;
-                    current_weight += acc;
+		    if (use_weights)
+		      current_weight += acc;
                     inc_states();
                     h.add_new_state(s_prime, CYAN, current_weight);
                     push(st_blue, s_prime, label, acc);
@@ -195,9 +202,11 @@ namespace spot
                   {
                     typename heap::color_ref c = h.get_color_ref(f.s);
                     assert(!c.is_white());
-                    if (c_prime.get_color() == CYAN &&
-                      ((current_weight - c_prime.get_weight()) |
-                          c.get_acc() | acc | c_prime.get_acc()) == all_acc)
+                    if (c_prime.get_color() == CYAN
+			&& all_acc == ((current_weight - c_prime.get_weight())
+				       | c.get_acc()
+				       | acc
+				       | c_prime.get_acc()))
                       {
                         trace << "  It is cyan and acceptance condition "
                               << "is reached, report cycle" << std::endl;
@@ -234,7 +243,8 @@ namespace spot
                 trace << "  All the successors have been visited" << std::endl;
                 stack_item f_dest(f);
                 pop(st_blue);
-                current_weight -= f_dest.acc;
+		if (use_weights)
+		  current_weight -= f_dest.acc;
                 typename heap::color_ref c_prime = h.get_color_ref(f_dest.s);
                 assert(!c_prime.is_white());
                 c_prime.set_color(BLUE);
@@ -302,8 +312,11 @@ namespace spot
                     delete s_prime;
                   }
 		else if (c_prime.get_color() == CYAN &&
-			 ((current_weight - c_prime.get_weight()) |
-			  c_prime.get_acc() | acu) == all_acc)
+			 (all_acc == ((use_red_weights ?
+				       (current_weight - c_prime.get_weight())
+				       : bddfalse)
+				      | c_prime.get_acc()
+				      | acu)))
 		  {
 		    trace << "  It is cyan and acceptance condition "
 			  << "is reached, report cycle" << std::endl;
