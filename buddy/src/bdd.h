@@ -1,5 +1,5 @@
 /*========================================================================
-	       Copyright (C) 1996-2002 by Jorn Lind-Nielsen
+	       Copyright (C) 1996-2003 by Jorn Lind-Nielsen
 			    All rights reserved
 
     Permission is hereby granted, without written agreement and without
@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bdd.h,v 1.5 2003/07/17 14:09:04 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bdd.h,v 1.6 2003/08/06 14:19:29 aduret Exp $
   FILE:  bdd.h
   DESCR: C,C++ User interface for the BDD package
   AUTH:  Jorn Lind
