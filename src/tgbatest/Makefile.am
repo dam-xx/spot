@@ -6,7 +6,6 @@ check_SCRIPTS = defs
 check_PROGRAMS = \
   bddprod \
   explicit \
-  emptinesscheckexplicit \
   explprod \
   ltl2tgba \
   ltlprod \
@@ -18,7 +17,6 @@ check_PROGRAMS = \
 # Keep this sorted alphabetically.
 bddprod_SOURCES  = ltlprod.cc
 bddprod_CXXFLAGS = -DBDD_CONCRETE_PRODUCT
-emptinesscheckexplicit_SOURCES = emptinesscheckexplicit.cc
 explicit_SOURCES = explicit.cc
 explprod_SOURCES = explprod.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
@@ -43,7 +41,7 @@ TESTS = \
   tripprod.test \
   mixprod.test \
   emptchk.test \
-  emptinesscheckexplicit.test \
+  emptchke.test \
   spotlbtt.test
 
 EXTRA_DIST = $(TESTS)

@@ -1,5 +1,15 @@
 2003-10-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	Merge emptinesscheckexplicit into ltl2tgba.
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Remove
+	emptinesscheckexplicit.
+	(emptinesscheckexplicit_SOURCES): Remove.
+	(TESTS): Replace emptinesscheckexplicit.test by emptchke.test.
+	* src/tgbatest/emptinesscheckexplicit.cc,
+	src/tgbatest/emptinesscheckexplicit.test: Delete.
+	* src/tgbatest/empchke.test: New file.
+	* src/tgbatest/ltl2tgba.cc: Add support for -X.
+
 	Merge emptiness-checks tests into ltl2tgba.
 	* src/tgbatest/Makefile (check_PRORGRAMS): Remove
 	emptinesscheck and ltlmagic.

@@ -13,12 +13,14 @@
 #include "tgba/tgbatba.hh"
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/emptinesscheck.hh"
+#include "tgbaparse/public.hh"
 
 void
 syntax(char* prog)
 {
   std::cerr << "Usage: "<< prog << " [OPTIONS...] formula" << std::endl
             << "       "<< prog << " -F [OPTIONS...] file" << std::endl
+            << "       "<< prog << " -X [OPTIONS...] file" << std::endl
 	    << std::endl
 	    << "Options:" << std::endl
 	    << "  -a   display the accepting_conditions BDD, not the "
@@ -45,6 +47,8 @@ syntax(char* prog)
 	    << "  -R   same as -r, but as a set" << std::endl
 	    << "  -t   display reachable states in LBTT's format" << std::endl
 	    << "  -v   display the BDD variables used by the automaton"
+	    << std::endl
+	    << "  -X   do compute an automaton, read it from a file"
 	    << std::endl;
   exit(2);
 }
@@ -63,6 +67,7 @@ main(int argc, char** argv)
   enum { None, Couvreur, MagicSearch } echeck = None;
   bool magic_many = false;
   bool expect_counter_example = false;
+  bool from_file = false;
 
   for (;;)
     {
@@ -145,6 +150,10 @@ main(int argc, char** argv)
 	{
 	  output = 5;
 	}
+      else if (!strcmp(argv[formula_index], "-X"))
+	{
+	  from_file = true;
+	}
       else
 	{
 	  break;
@@ -174,24 +183,36 @@ main(int argc, char** argv)
     }
 
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
-  spot::ltl::parse_error_list pel;
-  spot::ltl::formula* f = spot::ltl::parse(input, pel, env, debug_opt);
-
-  exit_code = spot::ltl::format_parse_errors(std::cerr, input, pel);
-
   spot::bdd_dict* dict = new spot::bdd_dict();
-  if (f)
+
+  spot::ltl::formula* f = 0;
+  if (!from_file)
+    {
+      spot::ltl::parse_error_list pel;
+      f = spot::ltl::parse(input, pel, env, debug_opt);
+      exit_code = spot::ltl::format_parse_errors(std::cerr, input, pel);
+    }
+  if (f || from_file)
     {
       spot::tgba_bdd_concrete* concrete = 0;
       spot::tgba* to_free = 0;
       spot::tgba* a = 0;
 
-      if (fm_opt)
-	to_free = a = spot::ltl_to_tgba_fm(f, dict);
+      if (from_file)
+	{
+	  spot::tgba_parse_error_list pel;
+	  to_free = a = spot::tgba_parse(input, pel, dict, env, debug_opt);
+	  if (spot::format_tgba_parse_errors(std::cerr, pel))
+	    return 2;
+	}
       else
-	to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
-
-      spot::ltl::destroy(f);
+	{
+	  if (fm_opt)
+	    to_free = a = spot::ltl_to_tgba_fm(f, dict);
+	  else
+	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
+	  spot::ltl::destroy(f);
+	}
 
       spot::tgba_tba_proxy* degeneralized = 0;
       if (degeneralize_opt)

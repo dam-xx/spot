@@ -11,4 +11,5 @@ s1, "s2", a!b, c d;
 "state 3", s1,,;
 EOF
 
-./emptinesscheckexplicit input > stdout
+./ltl2tgba -e -X input
+./ltl2tgba -m -X input
