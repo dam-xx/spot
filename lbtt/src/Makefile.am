@@ -50,7 +50,7 @@ lbtt_SOURCES = \
   UserCommands.cc \
   UserCommands.h
 
-EXTRA_lbtt_SOURCES = gnu-getopt.h Config-parse.h
+EXTRA_lbtt_SOURCES = gnu-getopt.h
 lbtt_LDADD = $(LIBOBJS) $(READLINELIBS)
 
 lbtt_translate_SOURCES = \
@@ -78,5 +78,5 @@ lbtt_translate_SOURCES = \
   translate.cc \
   TranslatorInterface.h
 
-EXTRA_lbtt_translate_SOURCES = gnu-getopt.h NeverClaim-parse.h
+EXTRA_lbtt_translate_SOURCES = gnu-getopt.h
 lbtt_translate_LDADD = $(LIBOBJS)
