@@ -61,7 +61,7 @@ namespace spot
       {
 	os << "  " << a->format_state(i->s) << std::endl;
 	os << "  |  ";
-	bdd_print_set(os, d, i->label);
+	bdd_print_formula(os, d, i->label);
 	os << "\t";
 	bdd_print_accset(os, d, i->acc);
 	os << std::endl;
@@ -72,7 +72,7 @@ namespace spot
       {
 	os << "  " << a->format_state(i->s) << std::endl;
 	os << "  |  ";
-	bdd_print_set(os, d, i->label);
+	bdd_print_formula(os, d, i->label);
 	os << "\t";
 	bdd_print_accset(os, d, i->acc);
 	os << std::endl;

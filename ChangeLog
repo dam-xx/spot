@@ -1,3 +1,8 @@
+2004-11-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/emptiness.cc (print_tgba_run): Output the
+	labels as formulae rather than bdd sets.
+
 2004-11-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gtec/ce.cc (couvreur99_check_result::accepting_path):
