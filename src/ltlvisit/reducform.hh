@@ -74,24 +74,6 @@ namespace spot
     /// FIXME: Describe what universal formulae are.  Cite paper.
     bool is_universal(const formula* f);
 
-    /// Type the first node of a formula.
-    class node_type_form_visitor : public const_visitor
-    {
-    public:
-      enum type { Atom, Const, Unop, Binop, Multop };
-      node_type_form_visitor();
-      virtual ~node_type_form_visitor(){};
-      type result() const;
-      void visit(const atomic_prop* ap);
-      void visit(const constant* c);
-      void visit(const unop* uo);
-      void visit(const binop* bo);
-      void visit(const multop* mo);
-    protected:
-      type result_;
-    };
-    node_type_form_visitor::type node_type(const formula* f);
-
     /// Whether a formula starts with GF.
     bool is_GF(const formula* f);
     /// Whether a formula starts with FG.

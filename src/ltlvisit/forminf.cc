@@ -58,53 +58,6 @@ namespace spot
       return false;
     }
 
-    node_type_form_visitor::node_type_form_visitor(){}
-
-    node_type_form_visitor::type
-    node_type_form_visitor::result() const
-    {
-      return result_;
-    }
-
-    void
-    node_type_form_visitor::visit(const atomic_prop*)
-    {
-      result_ = node_type_form_visitor::Atom;
-    }
-
-    void
-    node_type_form_visitor::visit(const constant*)
-    {
-      result_ = node_type_form_visitor::Const;
-    }
-
-    void
-    node_type_form_visitor::visit(const unop*)
-    {
-      result_ = node_type_form_visitor::Unop;
-    }
-
-    void
-    node_type_form_visitor::visit(const binop*)
-    {
-      result_ = node_type_form_visitor::Binop;
-    }
-
-    void
-    node_type_form_visitor::visit(const multop*)
-    {
-      result_ = node_type_form_visitor::Multop;
-    }
-
-    node_type_form_visitor::type
-    node_type(const formula* f)
-    {
-      node_type_form_visitor v;
-      assert(f != NULL);
-      const_cast<formula*>(f)->accept(v);
-      return v.result();
-    }
-
     class form_eventual_universal_visitor : public const_visitor
     {
     public:
@@ -578,7 +531,8 @@ namespace spot
       return false;
     }
 
-    bool infneg_form(const formula* f1, const formula* f2, int n)
+    bool
+    infneg_form(const formula* f1, const formula* f2, int n)
     {
       const formula* ftmp1;
       const formula* ftmp2;

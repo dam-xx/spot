@@ -144,14 +144,15 @@ namespace spot
 		    return;
 		  }
 		/* a < b => a U (b U c) = (b U c) */
-		if (node_type(f2) == node_type_form_visitor::Binop
-		    && dynamic_cast<binop*>(f2)->op() == binop::U
-		    && inf_form(f1, dynamic_cast<binop*>(f2)->first()))
-		  {
-		    result_ = f2;
-		    destroy(f1);
-		    return;
-		  }
+		{
+		  binop* bo = dynamic_cast<binop*>(f2);
+		  if (bo && bo->op() == binop::U && inf_form(f1, bo->first()))
+		    {
+		      result_ = f2;
+		      destroy(f1);
+		      return;
+		    }
+		}
 		break;
 
 	      case binop::R:
@@ -170,16 +171,16 @@ namespace spot
 		    return;
 		  }
 		/* b < a => a R (b R c) = b R c */
-		if (node_type(f2) == node_type_form_visitor::Binop
-		    && dynamic_cast<binop*>(f2)->op() == binop::R
-		    && inf_form(dynamic_cast<binop*>(f2)->first(), f1))
-		  {
-		    result_ = f2;
-		    destroy(f1);
-		    return;
-		  }
+		{
+		  binop* bo = dynamic_cast<binop*>(f2);
+		  if (bo && bo->op() == binop::R && inf_form(bo->first(), f1))
+		    {
+		      result_ = f2;
+		      destroy(f1);
+		      return;
+		    }
+		}
 		break;
-
 	      }
 	  }
 	result_ = binop::instance(bo->op(), f1, f2);

@@ -44,6 +44,9 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
     grep '[	 ]if (.*).*;' $tmp &&
       diag 'if body should be on another line.'
 
+    grep '[	 ]else.*;' $tmp &&
+      diag 'else body should be on another line.'
+
     grep '[	 ]while(' $tmp &&
       diag 'Missing space after "while"'
 
@@ -103,6 +106,12 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
 
     grep '{.*{' $tmp &&
       diag 'No two { on the same line.'
+
+    grep -e 'delete[	 ]*[(][^(]*[)];' $tmp &&
+      diag 'No useless parentheses after delete.'
+
+    grep -e 'return[	 ]*[(][^(]*[)];' $tmp &&
+      diag 'No useless parentheses after delete.'
 
     $fail && echo "$file" >>failures
   done
