@@ -13,4 +13,3 @@ libtgbaalgos_la_SOURCES = \
   dotty.cc \
   ltl2tgba.cc \
   save.cc
-
