@@ -1,5 +1,7 @@
 2003-07-12  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* m4/lbtt.m4: Run lbtt-translate, not lbtt.
+
 	* iface/gspn/gspn.cc: Include cassert.
 
 2003-07-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
