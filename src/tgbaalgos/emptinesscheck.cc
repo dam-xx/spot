@@ -293,9 +293,6 @@ namespace spot
     father_map father;
 
     state_sequence seq;
-    state_sequence tmp_lst;
-    state_sequence best_lst;
-    bdd tmp_acc = bddfalse;
 
     state* start_state = aut_->get_init_state();
     if (comp_size != 1)
