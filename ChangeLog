@@ -1,3 +1,9 @@
+2003-06-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/ltlparse/ltlscan.ll: Use ltlyy as %prefix.
+	* src/ltlparse/parsedecl.hh (YY_DECL): Rename yylex to ltlyylex.
+	* src/ltlparse/ltlparse.yy: Define yylex as ltlyylex.
+
 2003-06-03  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* src/tgba/dictunion.cc, src/tgba/ltl2tgba.cc,

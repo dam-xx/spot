@@ -26,6 +26,11 @@ extern spot::ltl::formula* result;
    before parsedecl.hh uses it. */
 #include "parsedecl.hh"
 using namespace spot::ltl;
+
+/* Ugly hack so that Bison use ltlyylex, not yylex.  
+   (%name-prefix doesn't work for the lalr1.cc skeleton
+   at the time of writing.)  */
+#define yylex ltlyylex
 %}
 
 /* Logical operators.  */
@@ -55,31 +60,31 @@ using namespace spot::ltl;
 
 %%
 result:       ltl_formula END_OF_INPUT
-              { result = $$ = $1;
+	      { result = $$ = $1;
 		YYACCEPT;
 	      }
 	    | many_errors END_OF_INPUT
-              { error_list.push_back(parse_error(@1,
+	      { error_list.push_back(parse_error(@1,
 				      "couldn't parse anything sensible"));
-	        result = $$ = 0;
+		result = $$ = 0;
 		YYABORT;
 	      }
 	    | END_OF_INPUT
-              { error_list.push_back(parse_error(@1, "empty input"));
-	        result = $$ = 0;
+	      { error_list.push_back(parse_error(@1, "empty input"));
+		result = $$ = 0;
 		YYABORT;
 	      }
 
 many_errors_diagnosed : many_errors
-              { error_list.push_back(parse_error(@1,
+	      { error_list.push_back(parse_error(@1,
 				     "unexpected input ignored")); }
 
 ltl_formula: subformula
-              { $$ = $1; }
+	      { $$ = $1; }
 	    | many_errors_diagnosed subformula
-              { $$ = $2; }
+	      { $$ = $2; }
 	    | ltl_formula many_errors_diagnosed
-              { $$ = $1; }
+	      { $$ = $1; }
 
 many_errors: error
 	    | many_errors error
@@ -105,91 +110,91 @@ subformula: ATOMIC_PROP
 		  delete $1;
 	      }
 	    | CONST_TRUE
-              { $$ = constant::true_instance(); }
+	      { $$ = constant::true_instance(); }
 	    | CONST_FALSE
-              { $$ = constant::false_instance(); }
+	      { $$ = constant::false_instance(); }
 	    | PAR_OPEN subformula PAR_CLOSE
 	      { $$ = $2; }
 	    | PAR_OPEN error PAR_CLOSE
-              { error_list.push_back(parse_error(@$,
-                 "treating this parenthetical block as false"));
-	        $$ = constant::false_instance();
+	      { error_list.push_back(parse_error(@$,
+		 "treating this parenthetical block as false"));
+		$$ = constant::false_instance();
 	      }
 	    | PAR_OPEN subformula many_errors PAR_CLOSE
-              { error_list.push_back(parse_error(@3,
+	      { error_list.push_back(parse_error(@3,
 				      "unexpected input ignored"));
-	        $$ = $2;
+		$$ = $2;
 	      }
 	    | OP_NOT subformula
 	      { $$ = unop::instance(unop::Not, $2); }
-            | subformula OP_AND subformula
+	    | subformula OP_AND subformula
 	      { $$ = multop::instance(multop::And, $1, $3); }
-            | subformula OP_AND error
-              {
+	    | subformula OP_AND error
+	      {
 		destroy($1);
-	        error_list.push_back(parse_error(@2,
+		error_list.push_back(parse_error(@2,
 				     "missing right operand for OP_AND"));
 		$$ = constant::false_instance();
 	      }
 	    | subformula OP_OR subformula
 	      { $$ = multop::instance(multop::Or, $1, $3); }
-            | subformula OP_OR error
-              {
+	    | subformula OP_OR error
+	      {
 		destroy($1);
-	        error_list.push_back(parse_error(@2,
+		error_list.push_back(parse_error(@2,
 				     "missing right operand for OP_OR"));
 		$$ = constant::false_instance();
 	      }
 	    | subformula OP_XOR subformula
 	      { $$ = binop::instance(binop::Xor, $1, $3); }
-            | subformula OP_XOR error
-              {
+	    | subformula OP_XOR error
+	      {
 		destroy($1);
-	        error_list.push_back(parse_error(@2,
+		error_list.push_back(parse_error(@2,
 				     "missing right operand for OP_XOR"));
 		$$ = constant::false_instance();
 	      }
 	    | subformula OP_IMPLIES subformula
 	      { $$ = binop::instance(binop::Implies, $1, $3); }
-            | subformula OP_IMPLIES error
-              {
+	    | subformula OP_IMPLIES error
+	      {
 		destroy($1);
-	        error_list.push_back(parse_error(@2,
+		error_list.push_back(parse_error(@2,
 				     "missing right operand for OP_IMPLIES"));
 		$$ = constant::false_instance();
 	      }
-            | subformula OP_EQUIV subformula
+	    | subformula OP_EQUIV subformula
 	      { $$ = binop::instance(binop::Equiv, $1, $3); }
-            | subformula OP_EQUIV error
-              {
+	    | subformula OP_EQUIV error
+	      {
 		destroy($1);
-	        error_list.push_back(parse_error(@2,
+		error_list.push_back(parse_error(@2,
 				     "missing right operand for OP_EQUIV"));
 		$$ = constant::false_instance();
 	      }
-            | subformula OP_U subformula
+	    | subformula OP_U subformula
 	      { $$ = binop::instance(binop::U, $1, $3); }
-            | subformula OP_U error
-              {
+	    | subformula OP_U error
+	      {
 		destroy($1);
-	        error_list.push_back(parse_error(@2,
+		error_list.push_back(parse_error(@2,
 				     "missing right operand for OP_U"));
 		$$ = constant::false_instance();
 	      }
-            | subformula OP_R subformula
+	    | subformula OP_R subformula
 	      { $$ = binop::instance(binop::R, $1, $3); }
-            | subformula OP_R error
-              {
+	    | subformula OP_R error
+	      {
 		destroy($1);
-	        error_list.push_back(parse_error(@2,
+		error_list.push_back(parse_error(@2,
 				     "missing right operand for OP_R"));
 		$$ = constant::false_instance();
 	      }
-            | OP_F subformula
+	    | OP_F subformula
 	      { $$ = unop::instance(unop::F, $2); }
-            | OP_G subformula
+	    | OP_G subformula
 	      { $$ = unop::instance(unop::G, $2); }
-            | OP_X subformula
+	    | OP_X subformula
 	      { $$ = unop::instance(unop::X, $2); }
 //	    | subformula many_errors
 //              { error_list->push_back(parse_error(@2,

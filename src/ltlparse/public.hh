@@ -9,7 +9,7 @@
 # include <utility>
 # include <iostream>
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
@@ -33,12 +33,12 @@ namespace spot
     /// was parsed succesfully, check \a error_list for emptiness.
     ///
     /// \warning This function is not reentrant.
-    formula* parse(const std::string& ltl_string, 
+    formula* parse(const std::string& ltl_string,
 		   parse_error_list& error_list,
 		   environment& env = default_environment::instance(),
 		   bool debug = false);
 
-    
+
     /// \brief Format diagnostics produced by spot::ltl::parse.
     /// \param os Where diagnostics should be output.
     /// \param ltl_string The string that were parsed.

@@ -1,4 +1,6 @@
 %option noyywrap
+%option prefix="ltlyy"
+%option outfile="lex.yy.c"
 
 %{
 #include <string>
