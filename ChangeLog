@@ -1,5 +1,9 @@
 2004-02-02  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* wrap/python/cgi/ltl2tgba.in (default_translator): Default
+	to trans_fm.
+	(translators): Show trans_fm before trans_lacim.
+
 	* wrap/python/cgi/ltl2tgba.in (print_stats): New function.  Call
 	it to display the size of the generalized and degeneralized
 	automata.

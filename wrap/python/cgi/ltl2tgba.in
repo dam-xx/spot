@@ -103,10 +103,10 @@ options = [
     ('show_lbtt',           'convert automaton for LBTT',                  0),
     ]
 
-default_translator = 'trans_lacim';
+default_translator = 'trans_fm';
 translators = [
-    ('trans_lacim',     'Convreur/LaCIM'),
     ('trans_fm',        'Convreur/FM'),
+    ('trans_lacim',     'Convreur/LaCIM'),
     ]
 
 print """<FORM action="%s" method="post"><P>
