@@ -1,5 +1,20 @@
 2003-04-16  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltlvisit/tunabbrev.cc, src/ltlvisit/tunabbrev.hh: New files.
+	* src/ltlvisit/Makefile.am (libltlvisit_a_SOURCES): Add them.
+	* src/ltltest/tunabbrev.test: New file.
+	* src/ltltest/lunabbrev.test: Fix comment.
+	* src/ltltest/Makefile.am (TESTS): Add tunabbrev.test.
+	(check_PROGRAMS): Add tunabbrev.
+	(tunabbrev_SOURCES, tunabbrev_CPPFLAGS): New variables.
+	* src/ltltest/equals.cc (main) [TUNABBREV]: Call unabbreviate_ltl.
+	* src/ltlvisit/lunabbrev.hh (unabbreviate_logic_visitor::recurse):
+	New virtual function.
+	* src/ltlvisit/lunabbrev.cc (unabbreviate_logic_visitor::recurse):
+	Likewise.
+	(unabbreviate_logic_visitor::visit): Use it instead of calling 
+	unabbreviate_logic directly.
+
 	* src/ltlvisit/lunabbrev.hh: Add missing include guard.
 
 	* src/ltlvisit/lunabbrev.cc, src/ltlvisit/lunabbrev.hh: New files.

@@ -34,14 +34,14 @@ namespace spot
     void 
     unabbreviate_logic_visitor::visit(const unop* uo)
     {
-      result_ = new unop(uo->op(), unabbreviate_logic(uo->child()));
+      result_ = new unop(uo->op(), recurse(uo->child()));
     }
     
     void 
     unabbreviate_logic_visitor::visit(const binop* bo)
     {
-      formula* f1 = unabbreviate_logic(bo->first());
-      formula* f2 = unabbreviate_logic(bo->second());
+      formula* f1 = recurse(bo->first());
+      formula* f2 = recurse(bo->second());
       switch (bo->op())
 	{
 	  /* f1 ^ f2  ==  (f1 & !f2) | (f2 & !f1) */
@@ -82,9 +82,14 @@ namespace spot
       unsigned mos = mo->size();
       for (unsigned i = 0; i < mos; ++i)
 	{
-	  res->add(unabbreviate_logic(mo->nth(i)));
+	  res->add(recurse(mo->nth(i)));
 	}
       result_ = res;
+    }
+
+    formula* unabbreviate_logic_visitor::recurse(const formula* f)
+    {
+      return unabbreviate_logic(f);
     }
 
     formula* 

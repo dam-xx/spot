@@ -10,4 +10,6 @@ libltlvisit_a_SOURCES = \
   equals.cc \
   equals.hh \
   lunabbrev.hh \
-  lunabbrev.cc
+  lunabbrev.cc \
+  tunabbrev.hh \
+  tunabbrev.cc

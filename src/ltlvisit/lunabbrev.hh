@@ -24,7 +24,9 @@ namespace spot
       void visit(const multop* mo);
       void visit(const constant* c);
 	
-    private:
+      virtual formula* recurse(const formula* f);
+      
+    protected:
       formula* result_;
     };
 

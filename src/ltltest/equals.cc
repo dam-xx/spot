@@ -2,6 +2,7 @@
 #include "ltlparse/public.hh"
 #include "ltlvisit/equals.hh"
 #include "ltlvisit/lunabbrev.hh"
+#include "ltlvisit/tunabbrev.hh"
 #include "ltlvisit/dump.hh"
 
 void
@@ -32,6 +33,10 @@ main(int argc, char **argv)
 
 #ifdef LUNABBREV
   f1 = spot::ltl::unabbreviate_logic(f1);
+  spot::ltl::dump(*f1, std::cout);
+#endif
+#ifdef TUNABBREV
+  f1 = spot::ltl::unabbreviate_ltl(f1);
   spot::ltl::dump(*f1, std::cout);
 #endif
 

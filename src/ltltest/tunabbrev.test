@@ -1,19 +1,18 @@
 #! /bin/sh
 
-# Check for the unabbreviate_logic visitor
+# Check for the unabbreviate_ltl visitor
 
 . ./defs || exit 1
 
 check()
 {
-  ./lunabbrev "$1" "$2" || exit 1
+  ./tunabbrev "$1" "$2" || exit 1
 }
 
 # A few things that do not change
 check 'a' 'a'
 check '1' '1'
 check '0' '0'
-check 'G a ' ' G a'
 check 'a U b' 'a U b'
 check 'a & b' 'a & b'
 check 'a & b' 'b & a'
@@ -24,12 +23,17 @@ check 'a & b' 'b & a & b'
 check 'a & b' 'b & a & a'
 check 'a & b & (c |(f U g)| e)' 'b & a & a & (c | e |(f U g)| e | c) & b'
 
-# other formulae that do change
+# same as in lunabbrev.test:
 check 'a ^ b' '(a & !b) | (!a & b)'
 check 'a ^ Xb' '(!Xb & a) | (!a & Xb) | (Xb & !a)'
-check 'GF a => F G(b)' '!GFa | F Gb'
 check '!a <-> Xb' '(Xb & !a) | (!!a & !Xb)'
 check '(a ^ b) | (b ^ c)' '(c & !b) | (!c & b) | (a & !b) | (!a & b)'
+
+# LTL unabbreviations:
+check 'G a ' 'false R a'
+check 'GF a => F G(b)' '!(false R (true U a)) | (true U (false V b))'
+check 'GGGGa' 'false V (false V (false V (false V a)))'
+check 'FFFfalse' 'true U ((true) U (true U (false)))'
 
 # Success.
 :
