@@ -48,13 +48,15 @@ namespace spot
     {
       bdd condition;
       bdd acceptance_conditions;
-      state* dest;
+      const state* dest;
     };
 
     void set_init_state(const std::string& state);
 
     transition*
     create_transition(const std::string& source, const std::string& dest);
+    transition*
+    create_transition(state* source, const state* dest);
 
     void add_condition(transition* t, const ltl::formula* f);
     /// This assumes that all variables in \a f are known from dict.

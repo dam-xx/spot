@@ -65,8 +65,15 @@ namespace spot
   ///   note	= {Reprint of Master's thesis}
   /// }
   /// \endverbatim
-  /// The only difference is that labels are on transitions, and that
-  /// acceptance conditions are handled.  Otherwise the logic is the same.
+  ///
+  /// Although the intent is similar, there are some differences with
+  /// between the above published algorithm and this implementation .
+  /// First labels are on transitions, and acceptance conditions are
+  /// generated too.  Second, the number of successors of a node is
+  /// chosen in \f$[1,n]\f$ following a normal distribution with mean
+  /// \f$1+(n-1)d\f$ and variance \f$(n-1)d(1-d)\f$.  (This is less
+  /// accurate, but faster than considering all possible \a n
+  /// successors one by one.)
   tgba*
   random_graph(int n, float d,
 	       const ltl::atomic_prop_set* ap, bdd_dict* dict,

@@ -111,6 +111,8 @@ syntax(char* prog)
   std::cerr << "Usage: "<< prog << " [OPTIONS...] PROPS..." << std::endl
 	    << std::endl
 	    << "Options:" << std::endl
+	    << "  -0      suppress default output, just generate the graph"
+	    << " in memory" << std::endl
 	    << "  -a N F  number of acceptance conditions and probability that"
 	    << " one is true" << std::endl
 	    << "            [0 0.0]" << std::endl
@@ -334,6 +336,7 @@ main(int argc, char** argv)
   int opt_n = 20;
   float opt_t = 0.5;
 
+  bool opt_0 = false;
   bool opt_z = false;
   bool opt_Z = false;
 
@@ -357,7 +360,11 @@ main(int argc, char** argv)
 
   while (++argn < argc)
     {
-      if (!strcmp(argv[argn], "-a"))
+      if (!strcmp(argv[argn], "-0"))
+	{
+	  opt_0 = true;
+	}
+      else if (!strcmp(argv[argn], "-a"))
 	{
 	  if (argc < argn + 3)
 	    syntax(argv[0]);
@@ -459,7 +466,7 @@ main(int argc, char** argv)
 	{
 	  if (opt_dot)
 	    dotty_reachable(std::cout, a);
-	  else
+	  else if (!opt_0)
 	    tgba_save_reachable(std::cout, a);
 	}
       else

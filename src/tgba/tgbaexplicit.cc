@@ -159,19 +159,22 @@ namespace spot
     init_ = s;
   }
 
+  tgba_explicit::transition*
+  tgba_explicit::create_transition(state* source, const state* dest)
+  {
+    transition* t = new transition;
+    t->dest = dest;
+    t->condition = bddtrue;
+    t->acceptance_conditions = bddfalse;
+    source->push_back(t);
+    return t;
+  }
 
   tgba_explicit::transition*
   tgba_explicit::create_transition(const std::string& source,
 				   const std::string& dest)
   {
-    tgba_explicit::state* s = add_state(source);
-    tgba_explicit::state* d = add_state(dest);
-    transition* t = new transition;
-    t->dest = d;
-    t->condition = bddtrue;
-    t->acceptance_conditions = bddfalse;
-    s->push_back(t);
-    return t;
+    return create_transition(add_state(source), add_state(dest));
   }
 
   void
@@ -243,7 +246,7 @@ namespace spot
 	for (t1 = i->second->begin(); t1 != i->second->end(); ++t1)
 	  {
 	    bdd acc = (*t1)->acceptance_conditions;
-	    state* dest = (*t1)->dest;
+	    const state* dest = (*t1)->dest;
 
 	    // Find another transition with the same destination and
 	    // acceptance conditions.

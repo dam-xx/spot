@@ -27,6 +27,8 @@
 #include <sstream>
 #include <list>
 #include <set>
+#include <iterator>
+#include "misc/hash.hh"
 
 namespace spot
 {
@@ -51,14 +53,29 @@ namespace spot
 
     void
     random_labels(tgba_explicit* aut,
-		  const std::string& src, const std::string& dest,
-		  const std::list<int>& props, float t,
+		  tgba_explicit::state* src, const tgba_explicit::state* dest,
+		  int* props, int props_n, float t,
 		  const std::list<bdd>& accs, float a)
     {
+      int val = 0;
+      int size = 0;
       bdd p = bddtrue;
-      for (std::list<int>::const_iterator i = props.begin();
-	   i != props.end(); ++i)
-	p &= (drand() < t ? bdd_ithvar : bdd_nithvar)(*i);
+      while (props_n)
+	{
+	  if (size == 8 * sizeof(int))
+	    {
+	      p &= bdd_ibuildcube(val, size, props);
+	      props += size;
+	      val = 0;
+	      size = 0;
+	    }
+	  val <<= 1;
+	  val |= (drand() < t);
+	  ++size;
+	  --props_n;
+	}
+      if (size > 0)
+	p &= bdd_ibuildcube(val, size, props);
 
       bdd ac = bddfalse;
       for (std::list<bdd>::const_iterator i = accs.begin();
@@ -80,10 +97,15 @@ namespace spot
   {
     tgba_explicit* res = new tgba_explicit(dict);
 
-    std::list<int> props;
+    int props_n = ap->size();
+    int* props = new int[props_n];
+
+    int pi = 0;
     for (ltl::atomic_prop_set::const_iterator i = ap->begin();
 	 i != ap->end(); ++i)
-      props.push_back(dict->register_proposition(*i, res));
+      props[pi++] = dict->register_proposition(*i, res);
+
+    std::vector<tgba_explicit::state*> states(n);
 
     std::list<bdd> accs;
     bdd allneg = bddtrue;
@@ -99,56 +121,82 @@ namespace spot
     for (std::list<bdd>::iterator i = accs.begin(); i != accs.end(); ++i)
       *i &= bdd_exist(allneg, *i);
 
-    typedef std::set<std::string> node_set;
+
+    // Using Sgi::hash_set instead of std::set for these sets is 3
+    // times slower (tested on a 50000 nodes example).
+    typedef std::set<tgba_explicit::state*> node_set;
     node_set nodes_to_process;
     node_set unreachable_nodes;
 
-    nodes_to_process.insert(st(0));
+    nodes_to_process.insert(states[0] = res->add_state(st(0)));
 
     for (int i = 1; i < n; ++i)
-      unreachable_nodes.insert(st(i));
+      unreachable_nodes.insert(states[i] = res->add_state(st(i)));
+
+    // We want to connect each node to a number of successors between
+    // 1 and n (with probability d).  This follow
+    barand<nrand> bin(n - 1, d);
 
     while (!nodes_to_process.empty())
       {
-	std::string src = *nodes_to_process.begin();
+	tgba_explicit::state* src = *nodes_to_process.begin();
 	nodes_to_process.erase(nodes_to_process.begin());
 
-	if (!unreachable_nodes.empty())
+	// Choose a random number of successors (at least one), using
+	// a binomial distribution.
+	int nsucc = 1 + bin.rand();
+
+	// Connect to NSUCC randomly chosen successors.  We want at
+	// least one unreachable successors among these if there are
+	// some.
+	bool saw_unreachable = false;
+	int possibilities = n;
+	while (nsucc--)
 	  {
-	    // Pick a random unreachable node.
-	    int index = mrand(unreachable_nodes.size());
-	    node_set::const_iterator i;
-	    for (i = unreachable_nodes.begin(); index; ++i, --index)
-	      assert(i != unreachable_nodes.end());
-
-	    // Link it from src.
-	    random_labels(res, src, *i, props, t, accs, a);
-
-	    nodes_to_process.insert(*i);
-	    unreachable_nodes.erase(i);
-	  }
-	// Randomly link node to another node (including itself).
-	for (int i = 0; i < n; ++i)
-	  {
-	    if (drand() >= d)
-	      continue;
-
-	    std::string dest = st(i);
-
-	    random_labels(res, src, dest, props, t, accs, a);
-
-	    node_set::iterator j = unreachable_nodes.find(dest);
-	    if (j != unreachable_nodes.end())
+	    if (nsucc == 0
+		&& !saw_unreachable
+		&& !unreachable_nodes.empty())
 	      {
-		nodes_to_process.insert(dest);
-		unreachable_nodes.erase(j);
+		// Pick a random unreachable node.
+		int index = mrand(unreachable_nodes.size());
+		node_set::const_iterator i = unreachable_nodes.begin();
+		std::advance(i, index);
+
+		// Link it from src.
+		random_labels(res, src, *i, props, props_n, t, accs, a);
+
+		nodes_to_process.insert(*i);
+		unreachable_nodes.erase(i);
+		break;
+	      }
+	    else
+	      {
+		// Pick a random node.
+		int index = mrand(possibilities--);
+		tgba_explicit::state* dest = states[index];
+
+		// Permute the state with states[possibilities], so we
+		// cannot pick it again.
+		states[index] = states[possibilities];
+		states[possibilities] = dest;
+
+		random_labels(res, src, dest, props, props_n, t, accs, a);
+
+		node_set::iterator j = unreachable_nodes.find(dest);
+		if (j != unreachable_nodes.end())
+		  {
+		    nodes_to_process.insert(dest);
+		    unreachable_nodes.erase(j);
+		    saw_unreachable = true;
+		  }
 	      }
 	  }
-
-	// Avoid dead ends.
-	if (res->add_state(src)->empty())
-	  random_labels(res, src, src, props, t, accs, a);
+	// The node must have at least one successor.
+	assert(!src->empty());
       }
+    // All nodes must be reachable.
+    assert(unreachable_nodes.empty());
+    delete[] props;
     return res;
   }
 

@@ -1,5 +1,11 @@
 2004-12-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgba/tgbaexplicit.cc, src/tgba/tgbaexplicit.hh
+	(tgba_explicit::create_transition(state*, const state*)): New function.
+	* src/tgbaalgos/randomgraph.cc, src/tgbaalgos/randomgraph.hh:
+	(random_graph): Revamp the algorithm to call rand() less often.
+	* src/tgbatest/randtgba.cc: Add option -0 to easy profiling.
+
 	* src/misc/random.hh: Add include guard.
 
 2004-12-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
