@@ -1,7 +1,20 @@
 #!/bin/sh
 
-# If we are running from make check (srcdir is set), and VERBOSE is
+# If we are running from make check (srcdir is set) and VERBOSE is
 # unset, be quiet.
 test -n "$srcdir" && test -z "$VERBOSE" && exec >/dev/null 2>&1
 
-PYTHONPATH=..:@srcdir@/.. exec @PYTHON@ ${1+"$@"}
+if test -z "$1"; then
+  echo "Usage: ./run something" 2>&1
+  exit 1
+fi
+
+case $1 in
+  *.py)
+    PYTHONPATH=..:@srcdir@/.. exec @PYTHON@ "$@";;
+  *.test)
+    sh -x "$@";;
+  *)
+    echo "Unknown extension" 2>&1
+    exit 2;;
+esac

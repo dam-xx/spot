@@ -24,7 +24,7 @@ del op, c
 print 'op2 =', op2
 
 op3 = spot.multop.instance(spot.multop.And, b,
-                           spot.multop.instance(spot.multop.And, c2, a))
+			   spot.multop.instance(spot.multop.And, c2, a))
 del a, b, c2
 
 print 'op3 =', op3

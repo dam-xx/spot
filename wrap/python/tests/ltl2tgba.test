@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+# We don't check the output, but just running these might be enough to
+# trigger assertions.
+
+./run ltl2tgba.py a
+./run ltl2tgba.py 'a U b'
+./run ltl2tgba.py 'X a'
+./run ltl2tgba.py 'a & b & c'
+./run ltl2tgba.py 'a | b | (c U (d & (g U (h ^ i))))'
+./run ltl2tgba.py 'Xa & (b U !a) & (b U !a)'
+./run ltl2tgba.py 'Fa & Xb & GFc & Gd'
+./run ltl2tgba.py 'Fa & Xa & GFc & Gc'
+./run ltl2tgba.py 'Fc & X(a | Xb) & GF(a | Xb) & Gc'

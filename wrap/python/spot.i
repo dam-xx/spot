@@ -27,7 +27,27 @@
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/tunabbrev.hh"
 
+#include "tgba/bdddict.hh"
+#include "tgba/bddprint.hh"
+#include "tgba/state.hh"
+#include "tgba/succiter.hh"
+#include "tgba/tgba.hh"
+#include "tgba/statebdd.hh"
+#include "tgba/tgbabddcoredata.hh"
+#include "tgba/succiterconcrete.hh"
+#include "tgba/tgbabddconcrete.hh"
+#include "tgba/tgbaexplicit.hh"
+#include "tgba/tgbaproduct.hh"
+#include "tgba/tgbatba.hh"
+
+#include "tgbaalgos/ltl2tgba.hh"
+#include "tgbaalgos/dotty.hh"
+#include "tgbaalgos/lbtt.hh"
+#include "tgbaalgos/magic.hh"
+#include "tgbaalgos/save.hh"
+
 using namespace spot::ltl;
+using namespace spot;
 %}
 
 %include "ltlast/formula.hh"
@@ -53,6 +73,27 @@ using namespace spot::ltl;
 %include "ltlvisit/tostring.hh"
 %include "ltlvisit/tunabbrev.hh"
 
+// Help SWIG with namespace lookups.
+#define ltl spot::ltl
+%include "tgba/bdddict.hh"
+%include "tgba/bddprint.hh"
+%include "tgba/state.hh"
+%include "tgba/succiter.hh"
+%include "tgba/tgba.hh"
+%include "tgba/statebdd.hh"
+%include "tgba/tgbabddcoredata.hh"
+%include "tgba/succiterconcrete.hh"
+%include "tgba/tgbabddconcrete.hh"
+%include "tgba/tgbaexplicit.hh"
+%include "tgba/tgbaproduct.hh"
+%include "tgba/tgbatba.hh"
+
+%include "tgbaalgos/ltl2tgba.hh"
+%include "tgbaalgos/dotty.hh"
+%include "tgbaalgos/lbtt.hh"
+%include "tgbaalgos/magic.hh"
+%include "tgbaalgos/save.hh"
+#undef ltl
 
 %extend spot::ltl::formula {
 
@@ -98,4 +139,5 @@ print_on(std::ostream& on, const std::string& what)
 {
   on << what;
 }
+
 %}
