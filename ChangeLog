@@ -1,3 +1,10 @@
+2003-10-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* m4/debug.m4, m4/devel.m4, m4/gccoptim.m4, m4/ndebug.m4: New files.
+	* Makefile.am (EXTRA_DIST): Add them.
+	* configure.ac: Call adl_ENABLE_DEVEL, adl_ENABLE_DEBUG, ad_GCC_OPTIM,
+	and adl_NDEBUG.
+
 2003-09-30  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/state.hh (state_ptr_less_than, state_ptr_equal):

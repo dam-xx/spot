@@ -3,6 +3,7 @@ AC_INIT([spot], [0.0i])
 AC_CONFIG_AUX_DIR([tools])
 AM_INIT_AUTOMAKE([foreign nostdinc check-news 1.7.3])
 
+adl_ENABLE_DEVEL
 adl_CHECK_PYTHON
 
 AC_PROG_CXX
@@ -19,6 +20,9 @@ AX_CHECK_GSPNLIB
 AC_PROG_LIBTOOL
 
 CF_GXX_WARNINGS
+adl_ENABLE_DEBUG
+ad_GCC_OPTIM
+adl_NDEBUG
 
 AC_CHECK_PROG([DOT], [dot], [dot])
 
