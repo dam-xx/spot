@@ -27,10 +27,12 @@ evtgbaalgosdir = $(pkgincludedir)/evtgbaalgos
 evtgbaalgos_HEADERS = \
   dotty.hh \
   reachiter.hh \
-  save.hh
+  save.hh \
+  tgba2evtgba.hh
 
 noinst_LTLIBRARIES = libevtgbaalgos.la
 libevtgbaalgos_la_SOURCES = \
   dotty.cc \
   reachiter.cc \
-  save.cc
+  save.cc \
+  tgba2evtgba.cc

@@ -1,5 +1,14 @@
 2004-10-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/evtgbaalgos/tgba2evtgba.cc, src/evtgbaalgos/tgba2evtgba.hh:
+	New files.
+	* src/evtgbaalgos/Makefile.am (evtgbaalgos_HEADERS,
+	libevtgbaalgos_la_SOURCES): Add them.
+	* src/evtgbatest/ltl2evtgba.cc, src/evtgbatest/ltl2evtgba.test:
+	New files.
+	* src/evtgbatest/Makefile.am (check_PROGRAMS, TESTS): Add them.
+	(ltl2evtgba_SOURCES): New variable.
+
 	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Do not assert
 	that the true state has only one link when unobs is used.
 

@@ -26,11 +26,13 @@ LDADD = ../libspot.la
 check_SCRIPTS = defs
 # Keep this sorted alphabetically.
 check_PROGRAMS = \
+  ltl2evtgba \
   explicit \
   product \
   readsave
 
 # Keep this sorted alphabetically.
+ltl2evtgba_SOURCES = ltl2evtgba.cc
 explicit_SOURCES = explicit.cc
 product_SOURCES = product.cc
 readsave_SOURCES = readsave.cc
@@ -40,7 +42,8 @@ readsave_SOURCES = readsave.cc
 TESTS = \
   explicit.test \
   readsave.test \
-  product.test
+  product.test \
+  ltl2evtgba.test
 
 EXTRA_DIST = $(TESTS)
 CLEANFILES = input1 input2 input3 stdout expected
