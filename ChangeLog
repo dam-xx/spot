@@ -1,5 +1,9 @@
 2003-08-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* wrap/python/spot.i: Declare spot::tgba::get_init_state,
+	spot::tgba::succ_iter, and spot::tgba_succ_iterator::current_state
+	as constructors.
+
 	* wrap/python/Makefile.am (lib_LTLIBRARIES)
 	(libspotswigpy_la_SOURCES, libspotswigpy_la_CFLAGS)
 	(libspotswigpy_la_LDFLAGS): New variables.

@@ -76,6 +76,9 @@ using namespace spot;
 %include "ltlvisit/tunabbrev.hh"
 
 %feature("new") spot::ltl_to_tgba;
+%feature("new") spot::tgba::get_init_state;
+%feature("new") spot::tgba::succ_iter;
+%feature("new") spot::tgba_succ_iterator::current_state;
 
 // Help SWIG with namespace lookups.
 #define ltl spot::ltl
