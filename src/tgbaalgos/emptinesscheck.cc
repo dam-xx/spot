@@ -188,16 +188,15 @@ namespace spot
   emptiness_check::print_result(std::ostream& os, const spot::tgba* aut,
 				const tgba* restrict) const
   {
-    os << "======================" << std::endl;
     os << "Prefix:" << std::endl;
-    os << "======================" << std::endl;
     const bdd_dict* d = aut->get_dict();
     for (state_sequence::const_iterator i_se = suffix.begin();
 	 i_se != suffix.end(); ++i_se)
       {
+	os << "  ";
 	if (restrict)
 	  {
-	    os << restrict->format_state(aut->project_state((*i_se), restrict))
+	    os << restrict->format_state(aut->project_state(*i_se, restrict))
 	       << std::endl;
 	  }
 	else
@@ -205,23 +204,22 @@ namespace spot
 	    os << aut->format_state((*i_se)) << std::endl;
 	  }
       }
-    os << "======================" << std::endl;
     os << "Cycle:" <<std::endl;
-    os << "======================" << std::endl;
     for (cycle_path::const_iterator it = period.begin();
 	 it != period.end(); ++it)
       {
+	os << "  ";
 	if (restrict)
 	  {
-	    os << "     | " << bdd_format_set(d, (*it).second) <<std::endl ;
-	    os << restrict->format_state(aut->project_state((*it).first,
+	    os << "    | " << bdd_format_set(d, it->second) <<std::endl ;
+	    os << restrict->format_state(aut->project_state(it->first,
 							    restrict))
 	       << std::endl;
 	  }
 	else
 	  {
-	    os << "     | " << bdd_format_set(d, (*it).second) <<std::endl ;
-	    os << aut->format_state((*it).first) << std::endl;
+	    os << "    | " << bdd_format_set(d, it->second) <<std::endl ;
+	    os << aut->format_state(it->first) << std::endl;
 	  }
       }
     return os;
@@ -261,7 +259,7 @@ namespace spot
     for (seen::iterator iter_map = seen_state_num.begin();
 	 iter_map != seen_state_num.end(); ++iter_map)
       {
-	q_index = (*iter_map).second;
+	q_index = iter_map->second;
 	tmp_int = 0;
 	if (q_index > 0)
 	  {
@@ -269,9 +267,9 @@ namespace spot
 		   && (vec_component[tmp_int].index <= q_index))
 	      tmp_int = tmp_int+1;
 	    if (tmp_int < comp_size)
-	      vec_component[tmp_int - 1].state_set.insert((*iter_map).first);
+	      vec_component[tmp_int - 1].state_set.insert(iter_map->first);
 	    else
-	      vec_component[comp_size - 1].state_set.insert((*iter_map).first);
+	      vec_component[comp_size - 1].state_set.insert(iter_map->first);
 	  }
       }
 

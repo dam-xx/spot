@@ -1,5 +1,8 @@
 2003-10-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::print_result):
+	Indent output as in the magic search.
+
 	* src/tgbatest/spotlbtt.test: Add notice about long run time.
 
 	Merge emptinesscheckexplicit into ltl2tgba.
