@@ -24,7 +24,6 @@
 
 #include <cassert>
 #include <map>
-#include <string>
 
 namespace spot
 {
@@ -51,7 +50,7 @@ namespace spot
 
   protected:
     typedef unsigned (unsigned_statistics::*unsigned_fun_)() const;
-    typedef std::map<std::string, unsigned_fun_> stats_map_;
+    typedef std::map<const char*, unsigned_fun_> stats_map_;
     stats_map_ stats_;
   };
 
