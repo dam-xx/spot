@@ -1,3 +1,10 @@
+2004-11-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* iface/gspn/ltlgspn.cc (main): Adjust to recent changes to
+	src/tgbaalgos/magic.cc, call explicit_magic_search() instead of
+	building a spot::magic_search.
+	* iface/gspn/udcseltl.test: Adjust to new output of print_tgba_run().
+
 2004-11-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/Makefile.am (TESTS): Remove non-existing magic.test

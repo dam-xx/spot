@@ -302,9 +302,9 @@ main(int argc, char **argv)
 	case Magic:
 	  {
 	    spot::tgba_tba_proxy* d  = new spot::tgba_tba_proxy(prod);
-	    spot::magic_search ms(d);
+	    spot::emptiness_check* ec = spot::explicit_magic_search(d);
 
-	    spot::emptiness_check_result* res = ms.check();
+	    spot::emptiness_check_result* res = ec->check();
 	    if (res)
 	      {
 		if (compute_counter_example)
@@ -331,6 +331,7 @@ main(int argc, char **argv)
 	      {
 		std::cout << "empty" << std::endl;
 	      }
+	    delete ec;
 	    delete d;
 	  }
 	}
