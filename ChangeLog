@@ -1,5 +1,7 @@
 2005-02-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* bench/emptchk/README: Timing info from Denis.
+
 	* src/tgbatest/randtgba.cc (main): Skip empty lines.
 	(syntax): Categorize options.
 

@@ -161,7 +161,9 @@ This directory contains:
      - pml-eeaean.sh
 
      Beware that the two ltl-*.sh tests are very long (each of them
-     run 13 emptiness-check algorithms against 18000 state-spaces!)
+     run 13 emptiness-check algorithms against 18000 product-spaces!).
+     Running ltl-random.sh took 4 hours on a 3GHz Intel Pentium 4,
+     and ltl-human.sh took 9 hours.
 
      You can speed up the pml-*.sh tests by removing some algorithms
      from the `algorithms' file.
