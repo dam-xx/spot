@@ -42,7 +42,9 @@ namespace spot
     virtual ~tgba_explicit();
     virtual spot::state* get_init_state() const;
     virtual tgba_succ_iterator*
-    succ_iter(const spot::state* state) const;
+    succ_iter(const spot::state* local_state,
+	      const spot::state* global_state = 0,
+	      const tgba* global_automaton = 0) const;
     virtual bdd_dict* get_dict() const;
     virtual std::string format_state(const spot::state* state) const;
 
@@ -50,6 +52,9 @@ namespace spot
     virtual bdd neg_accepting_conditions() const;
 
   protected:
+    virtual bdd compute_support_conditions(const spot::state* state) const;
+    virtual bdd compute_support_variables(const spot::state* state) const;
+
     state* add_state(const std::string& name);
     bdd get_condition(ltl::formula* f);
     bdd get_accepting_condition(ltl::formula* f);

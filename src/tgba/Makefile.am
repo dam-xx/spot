@@ -26,6 +26,7 @@ libtgba_la_SOURCES = \
   bddprint.cc \
   statebdd.cc \
   succiterconcrete.cc \
+  tgba.cc \
   tgbabddconcrete.cc \
   tgbabddconcretefactory.cc \
   tgbabddconcreteproduct.cc \

@@ -90,11 +90,17 @@ namespace spot
     tgba_gspn& operator=(const tgba_gspn& other);
     virtual ~tgba_gspn();
     virtual state* get_init_state() const;
-    virtual tgba_succ_iterator* succ_iter(const state* state) const;
+    virtual tgba_succ_iterator*
+    succ_iter(const state* local_state,
+	      const state* global_state = 0,
+	      const tgba* global_automaton = 0) const;
     virtual bdd_dict* get_dict() const;
     virtual std::string format_state(const state* state) const;
     virtual bdd all_accepting_conditions() const;
     virtual bdd neg_accepting_conditions() const;
+  protected:
+    virtual bdd compute_support_conditions(const spot::state* state) const;
+    virtual bdd compute_support_variables(const spot::state* state) const;
   private:
     tgba_gspn_private_* data_;
   };

@@ -1,6 +1,45 @@
 2003-07-17  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
-	* iface/gspn/gspn.cc (EVENT_TRUE): Override temporarily..
+	Now succ_iter() can fetch extra information from
+	the root of a product to reduce its number of successors.
+	* src/tgba/Makefile.am (libtgba_la_SOURCES): Add tgba.cc.
+	* src/tgba/tgba.hh (tgba::succ_iter): Add the global_state and
+	global_automaton arguments.
+	(tgba::support_conditions, tgba::support_variables,
+	tgba::compute_support_conditions, tgba::compute_support_variables):
+	New functions.
+	(tgba::last_support_conditions_input_,
+	tgba::last_support_conditions_output_,
+	tgba::last_support_variables_input_,
+	tgba::last_support_variables_output_): New attributes.
+	* src/tgba/tgbabddconcrete.cc (tgba_bdd_concrete::succ_iter):
+	Handle the two new arguments.
+	(tgba_bdd_concrete::compute_support_conditions,
+	tgba_bdd_concrete::compute_support_variables): Implement them.
+	* src/tgba/tgbabddconcrete.hh: Adjust.
+	* src/tgba/tgbaexplicit.cc (tgba_explicit::succ_iter):	Ignore
+	the two new arguments.
+	(tgba_explicit::compute_support_conditions,
+	tgba_explicit::compute_support_variables): Implement them.
+	* src/tgba/tgbaexplicit.hh: Adjust.
+	* src/tgba/tgbaproduct.cc (tgba_product::succ_iter): Handle the 
+	two new arguments.
+	(tgba_product::compute_support_conditions,
+	tgba_product::compute_support_variables): Implement them.
+	* src/tgba/tgbaproduct.hh: Adjust.
+	* iface/gspn/gspn.cc (tgba_gspn_private_::last_state_cond_input,
+	tgba_gspn_private_::last_state_cond_output,
+	(tgba_gspn_private_::tgba_gspn_private_): Set last_state_cond_input.
+	(tgba_gspn_private_::~tgba_gspn_private_): Delete
+	last_state_cond_input.
+	(tgba_gspn_private_::state_conds): New function, eved out
+	from tgba_gspn::succ_iter.
+	(tgba_gspn::succ_iter): Use it.  Use the two new arguments.
+	(tgba_gspn::compute_support_conditions,
+	tgba_gspn::compute_support_variables): New functions.
+	* iface/gspn/gspn.hh: Adjust.
+
+	* iface/gspn/gspn.cc (EVENT_TRUE): Override temporarily.
 	(tgba_gspn::succ_iter): Fix usage of cube.
 
 2003-07-16  Alexandre Duret-Lutz  <aduret@src.lip6.fr>

@@ -5,7 +5,7 @@
 #include "gspn.hh"
 #include "ltlvisit/destroy.hh"
 
-// FIXME: Override signed definition of EVENT_TRUE until this is fixed 
+// FIXME: Override signed definition of EVENT_TRUE until this is fixed
 // in gspnlib.h.
 #undef EVENT_TRUE
 #define EVENT_TRUE 0U
@@ -27,74 +27,6 @@ namespace spot
       throw gspn_exeption("finalize()", res);
   }
 
-
-  // tgba_gspn_private_
-  //////////////////////////////////////////////////////////////////////
-
-  struct tgba_gspn_private_
-  {
-    int refs;			// reference count
-
-    bdd_dict* dict;
-    typedef std::pair<AtomicPropKind, bdd> ab_pair;
-    typedef std::map<AtomicProp, ab_pair> prop_map;
-    prop_map prop_dict;
-    AtomicProp *all_indexes;
-    size_t index_count;
-
-    tgba_gspn_private_(bdd_dict* dict, const gspn_environment& env)
-      : refs(0), dict(dict)
-    {
-      const gspn_environment::prop_map& p = env.get_prop_map();
-
-      try
-	{
-	  for (gspn_environment::prop_map::const_iterator i = p.begin();
-	       i != p.end(); ++i)
-	    {
-	      int var = dict->register_proposition(i->second, this);
-	      AtomicProp index;
-	      int err = prop_index(i->first.c_str(), &index);
-	      if (err)
-		throw gspn_exeption("prop_index()", err);
-	      AtomicPropKind kind;
-	      err = prop_kind(index, &kind);
-	      if (err)
-		throw gspn_exeption("prop_kind()", err);
-
-	      prop_dict[index] = ab_pair(kind, bdd_ithvar(var));
-	    }
-
-	  index_count = prop_dict.size();
-	  all_indexes = new AtomicProp[index_count];
-
-	  unsigned idx = 0;
-	  for (prop_map::const_iterator i = prop_dict.begin();
-	       i != prop_dict.end(); ++i)
-	    all_indexes[idx++] = i->first;
-	}
-      catch (...)
-	{
-	  // If an exception occurs during the loop, we need to clean
-	  // all BDD variables which have been registered so far.
-	  dict->unregister_all_my_variables(this);
-	}
-    }
-
-    tgba_gspn_private_::~tgba_gspn_private_()
-    {
-      dict->unregister_all_my_variables(this);
-    }
-
-    bdd index_to_bdd(AtomicProp index) const
-    {
-      if (index == EVENT_TRUE)
-	return bddtrue;
-      prop_map::const_iterator i = prop_dict.find(index);
-      assert(i != prop_dict.end());
-      return i->second.second;
-    }
-  };
 
   // state_gspn
   //////////////////////////////////////////////////////////////////////
@@ -135,6 +67,110 @@ namespace spot
   private:
     State state_;
   }; // state_gspn
+
+
+  // tgba_gspn_private_
+  //////////////////////////////////////////////////////////////////////
+
+  struct tgba_gspn_private_
+  {
+    int refs;			// reference count
+
+    bdd_dict* dict;
+    typedef std::pair<AtomicPropKind, bdd> ab_pair;
+    typedef std::map<AtomicProp, ab_pair> prop_map;
+    prop_map prop_dict;
+    AtomicProp *all_indexes;
+    size_t index_count;
+    const state_gspn* last_state_conds_input;
+    bdd last_state_conds_output;
+
+
+    tgba_gspn_private_(bdd_dict* dict, const gspn_environment& env)
+      : refs(0), dict(dict), last_state_conds_input(0)
+    {
+      const gspn_environment::prop_map& p = env.get_prop_map();
+
+      try
+	{
+	  for (gspn_environment::prop_map::const_iterator i = p.begin();
+	       i != p.end(); ++i)
+	    {
+	      int var = dict->register_proposition(i->second, this);
+	      AtomicProp index;
+	      int err = prop_index(i->first.c_str(), &index);
+	      if (err)
+		throw gspn_exeption("prop_index()", err);
+	      AtomicPropKind kind;
+	      err = prop_kind(index, &kind);
+	      if (err)
+		throw gspn_exeption("prop_kind()", err);
+
+	      prop_dict[index] = ab_pair(kind, bdd_ithvar(var));
+	    }
+
+	  index_count = prop_dict.size();
+	  all_indexes = new AtomicProp[index_count];
+
+	  unsigned idx = 0;
+	  for (prop_map::const_iterator i = prop_dict.begin();
+	       i != prop_dict.end(); ++i)
+	    all_indexes[idx++] = i->first;
+	}
+      catch (...)
+	{
+	  // If an exception occurs during the loop, we need to clean
+	  // all BDD variables which have been registered so far.
+	  dict->unregister_all_my_variables(this);
+	}
+    }
+
+    tgba_gspn_private_::~tgba_gspn_private_()
+    {
+      dict->unregister_all_my_variables(this);
+      if (last_state_conds_input)
+	delete last_state_conds_input;
+    }
+
+    bdd index_to_bdd(AtomicProp index) const
+    {
+      if (index == EVENT_TRUE)
+	return bddtrue;
+      prop_map::const_iterator i = prop_dict.find(index);
+      assert(i != prop_dict.end());
+      return i->second.second;
+    }
+
+    bdd state_conds(const state_gspn* s)
+    {
+      // Use cached value if possible.
+      if (!last_state_conds_input ||
+	  last_state_conds_input->compare(s) != 0)
+	{
+	  // Build the BDD of the conditions available on this state.
+	  unsigned char* cube = 0;
+	  // This is temporary. We ought to ask only what we need.
+	  AtomicProp* want = all_indexes;
+	  size_t count = index_count;
+	  int res = satisfy(s->get_state(), want, &cube, count);
+	  if (res)
+	    throw gspn_exeption("satisfy()", res);
+	  assert(cube);
+	  last_state_conds_output = bddtrue;
+	  for (size_t i = 0; i < count; ++i)
+	    {
+	      bdd v = index_to_bdd(want[i]);
+	      last_state_conds_output &= cube[i] ? v : !v;
+	    }
+	  satisfy_free(cube);
+
+	  if (last_state_conds_input)
+	    delete last_state_conds_input;
+	  last_state_conds_input = s->clone();
+	}
+      return last_state_conds_output;
+    }
+  };
 
 
   // tgba_succ_iterator_gspn
@@ -302,29 +338,44 @@ namespace spot
   }
 
   tgba_succ_iterator*
-  tgba_gspn::succ_iter(const state* state) const
+  tgba_gspn::succ_iter(const state* state,
+		       const state* global_state,
+		       const tgba* global_automaton) const
   {
     const state_gspn* s = dynamic_cast<const state_gspn*>(state);
     assert(s);
-
-    // Build the BDD of the conditions available on this state.
-    unsigned char* cube = 0;
-    // This is temporary. We ought to ask only what we need.
-    AtomicProp* want = data_->all_indexes;
-    size_t count = data_->index_count;
-    int res = satisfy(s->get_state(), want, &cube, count);
-    if (res)
-      throw gspn_exeption("satisfy()", res);
-    assert(cube);
-    bdd state_conds = bddtrue;
-    for (size_t i = 0; i < count; ++i)
-      {
-	bdd v = data_->index_to_bdd(want[i]);
-	state_conds &= cube[i] ? v : !v;
-      }
-    satisfy_free(cube);
-
+    (void) global_state;
+    (void) global_automaton;
+    // FIXME: Should pass global_automaton->support_variables(state)
+    // to state_conds.
+    bdd state_conds = data_->state_conds(s);
     return new tgba_succ_iterator_gspn(state_conds, s->get_state(), data_);
+  }
+
+  bdd
+  tgba_gspn::compute_support_conditions(const spot::state* state) const
+  {
+    const state_gspn* s = dynamic_cast<const state_gspn*>(state);
+    assert(s);
+    return data_->state_conds(s);
+  }
+
+  bdd
+  tgba_gspn::compute_support_variables(const spot::state* state) const
+  {
+    // FIXME: At the time of writing, only tgba_gspn calls
+    // support_variables on the root of a product to gather the
+    // variables used by all other automata and let GPSN compute only
+    // these.  Because support_variables() is recursive over the
+    // product treee, tgba_gspn::support_variables should not output
+    // all the variables known by GSPN; this would ruin the sole
+    // purpose of this function.
+    // However this works because we assume there is at most one
+    // tgba_gspn automata in a product (a legitimate assumption
+    // since the GSPN API is not re-entrant) and only this automata
+    // need to call support_variables (now _this_ is shady).
+    (void) state;
+    return bddtrue;
   }
 
   bdd_dict*

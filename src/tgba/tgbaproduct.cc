@@ -171,16 +171,51 @@ namespace spot
   }
 
   tgba_product_succ_iterator*
-  tgba_product::succ_iter(const state* state) const
+  tgba_product::succ_iter(const state* local_state,
+			  const state* global_state,
+			  const tgba* global_automaton) const
   {
-    const state_bdd_product* s = dynamic_cast<const state_bdd_product*>(state);
+    const state_bdd_product* s =
+      dynamic_cast<const state_bdd_product*>(local_state);
     assert(s);
 
-    tgba_succ_iterator* li = left_->succ_iter(s->left());
-    tgba_succ_iterator* ri = right_->succ_iter(s->right());
+    // If global_automaton is not specified, THIS is the root of a
+    // product tree.
+    if (! global_automaton)
+      {
+	global_automaton = this;
+	global_state = local_state;
+      }
+
+    tgba_succ_iterator* li = left_->succ_iter(s->left(),
+					      global_state, global_automaton);
+    tgba_succ_iterator* ri = right_->succ_iter(s->right(),
+					       global_state, global_automaton);
     return new tgba_product_succ_iterator(li, ri,
 					  left_->neg_accepting_conditions(),
 					  right_->neg_accepting_conditions());
+  }
+
+  bdd
+  tgba_product::compute_support_conditions(const state* in) const
+  {
+    const state_bdd_product* s =
+      dynamic_cast<const state_bdd_product*>(in);
+    assert(s);
+    bdd lsc = left_->support_conditions(s->left());
+    bdd rsc = right_->support_conditions(s->right());
+    return lsc & rsc;
+  }
+
+  bdd
+  tgba_product::compute_support_variables(const state* in) const
+  {
+    const state_bdd_product* s =
+      dynamic_cast<const state_bdd_product*>(in);
+    assert(s);
+    bdd lsc = left_->support_variables(s->left());
+    bdd rsc = right_->support_variables(s->right());
+    return lsc & rsc;
   }
 
   bdd_dict*

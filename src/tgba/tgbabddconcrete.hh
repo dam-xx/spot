@@ -21,12 +21,12 @@ namespace spot
     /// \brief Construct a tgba_bdd_concrete with known initial state.
     tgba_bdd_concrete(const tgba_bdd_factory& fact, bdd init);
 
-    ~tgba_bdd_concrete();
+    virtual ~tgba_bdd_concrete();
 
     /// \brief Set the initial state.
-    void set_init_state(bdd s);
+    virtual void set_init_state(bdd s);
 
-    state_bdd* get_init_state() const;
+    virtual state_bdd* get_init_state() const;
 
     /// \brief Get the initial state directly as a BDD.
     ///
@@ -39,9 +39,12 @@ namespace spot
     /// \endcode
     bdd get_init_bdd() const;
 
-    tgba_succ_iterator_concrete* succ_iter(const state* state) const;
+    virtual tgba_succ_iterator_concrete*
+    succ_iter(const state* local_state,
+	      const state* global_state = 0,
+	      const tgba* global_automaton = 0) const;
 
-    std::string format_state(const state* state) const;
+    virtual std::string format_state(const state* state) const;
 
     bdd_dict* get_dict() const;
 
@@ -56,6 +59,9 @@ namespace spot
     virtual bdd neg_accepting_conditions() const;
 
   protected:
+    virtual bdd compute_support_conditions(const state* state) const;
+    virtual bdd compute_support_variables(const state* state) const;
+
     tgba_bdd_core_data data_;	///< Core data associated to the automaton.
     bdd init_;			///< Initial state.
   private:

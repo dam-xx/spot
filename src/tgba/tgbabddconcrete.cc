@@ -71,12 +71,44 @@ namespace spot
   }
 
   tgba_succ_iterator_concrete*
-  tgba_bdd_concrete::succ_iter(const state* state) const
+  tgba_bdd_concrete::succ_iter(const state* state,
+			       const state* global_state,
+			       const tgba* global_automaton) const
   {
     const state_bdd* s = dynamic_cast<const state_bdd*>(state);
     assert(s);
     bdd succ_set = data_.relation & s->as_bdd();
+    // If we are in a product, inject the local conditions of
+    // all other automata to limit the number of successors.
+    if (global_automaton)
+      {
+	bdd varused = bdd_support(succ_set);
+	bdd global_conds = global_automaton->support_conditions(global_state);
+	succ_set = bdd_appexcomp(succ_set, global_conds, bddop_and, varused);
+      }
     return new tgba_succ_iterator_concrete(data_, succ_set);
+  }
+
+  bdd
+  tgba_bdd_concrete::compute_support_conditions(const state* st) const
+  {
+    const state_bdd* s = dynamic_cast<const state_bdd*>(st);
+    assert(s);
+    return bdd_relprod(s->as_bdd(), data_.relation, data_.notvar_set);
+  }
+
+  bdd
+  tgba_bdd_concrete::compute_support_variables(const state* st) const
+  {
+    const state_bdd* s = dynamic_cast<const state_bdd*>(st);
+    assert(s);
+    bdd succ_set = data_.relation & s->as_bdd();
+    // bdd_support must be called BEFORE bdd_exist
+    // because bdd_exist(bdd_support((a&Next[f])|(!a&Next[g])),Next[*])
+    // is obviously not the same as bdd_support(a|!a).
+    // In other words: we can reuse compute_support_conditions() for
+    // this computation.
+    return bdd_exist(bdd_support(succ_set), data_.notvar_set);
   }
 
   std::string

@@ -206,12 +206,44 @@ namespace spot
   }
 
   tgba_succ_iterator*
-  tgba_explicit::succ_iter(const spot::state* state) const
+  tgba_explicit::succ_iter(const spot::state* state,
+			   const spot::state* global_state,
+			   const tgba* global_automaton) const
   {
     const state_explicit* s = dynamic_cast<const state_explicit*>(state);
     assert(s);
+    (void) global_state;
+    (void) global_automaton;
     return new tgba_explicit_succ_iterator(s->get_state(),
 					   all_accepting_conditions());
+  }
+
+  bdd
+  tgba_explicit::compute_support_conditions(const spot::state* in) const
+  {
+    const state_explicit* s = dynamic_cast<const state_explicit*>(in);
+    assert(s);
+    const state* st = s->get_state();
+
+    bdd res = bddtrue;
+    tgba_explicit::state::const_iterator i;
+    for (i = st->begin(); i != st->end(); ++i)
+      res |= (*i)->condition;
+    return res;
+  }
+
+  bdd
+  tgba_explicit::compute_support_variables(const spot::state* in) const
+  {
+    const state_explicit* s = dynamic_cast<const state_explicit*>(in);
+    assert(s);
+    const state* st = s->get_state();
+
+    bdd res = bddtrue;
+    tgba_explicit::state::const_iterator i;
+    for (i = st->begin(); i != st->end(); ++i)
+      res &= bdd_support((*i)->condition);
+    return res;
   }
 
   bdd_dict*
