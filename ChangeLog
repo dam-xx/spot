@@ -1,5 +1,9 @@
 2005-04-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaparse/tgbaparse.yy (acc_list): Do not explicitly delete
+	an undeclared acceptance condition.
+	* src/tgbaalgos/save.cc (print_acc): Unquote atomic propositions.
+
 	* bench/emptchk/Makefile.am: Create reduced versions of the graphs.
 	* bench/emptchk/pml2tgba.pl: Add option -r.
 	* bench/emptchk/pml-clserv.sh, bench/emptchk/pml-eeaean.sh:

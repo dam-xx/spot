@@ -179,9 +179,9 @@ acc_list:
 	     if (! result->has_acceptance_condition(f))
 	       {
 		 error_list.push_back(spot::tgba_parse_error(@2,
-			 "undeclared acceptance condition"));
+			 "undeclared acceptance condition `" + *$2 + "'"));
 		 destroy(f);
-		 delete $2;
+		 // $2 will be destroyed on error recovery.
 		 YYERROR;
 	       }
 	     $1->push_back(f);

@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,6 +23,7 @@
 #include "save.hh"
 #include "tgba/bddprint.hh"
 #include "ltlvisit/tostring.hh"
+#include "ltlast/atomic_prop.hh"
 #include "reachiter.hh"
 #include "misc/escape.hh"
 
@@ -84,8 +85,16 @@ namespace spot
 		    bdd_dict::vf_map::const_iterator vi =
 		      d->acc_formula_map.find(v);
 		    assert(vi != d->acc_formula_map.end());
+		    std::string s = ltl::to_string(vi->second);
+		    if (dynamic_cast<const ltl::atomic_prop*>(vi->second)
+			&& s[0] == '"')
+		      {
+			// Unquote atomic propositions.
+			s.erase(s.begin());
+			s.resize(s.size() - 1);
+		      }
 		    os_ << " \"";
-		    escape_str(os_, ltl::to_string(vi->second)) << "\"";
+		    escape_str(os_, s) << "\"";
 		    break;
 		  }
 		cube = bdd_low(cube);
