@@ -1,3 +1,7 @@
+2003-10-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlparse/ltlscan.ll: Allow doubly quoted atomic propositions.
+
 2003-10-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* iface/gspn/udcsltl.test, iface/gspn/udcseltl.test,

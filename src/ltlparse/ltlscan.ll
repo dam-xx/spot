@@ -20,7 +20,7 @@
 
 static const char *to_parse = 0;
 static size_t to_parse_size = 0;
-  
+
 void
 flex_set_buffer(const char *buf)
 {
@@ -40,8 +40,8 @@ flex_set_buffer(const char *buf)
 ")"			return PAR_CLOSE;
 
 "!"			return OP_NOT;
-  /* & and | come from Spin.  && and || from LTL2BA.  
-     /\, \/, and xor are from LBTT. 
+  /* & and | come from Spin.  && and || from LTL2BA.
+     /\, \/, and xor are from LBTT.
   */
 "||"|"|"|"+"|"\\/"	return OP_OR;
 "&&"|"&"|"."|"*"|"/\\"	return OP_AND;
@@ -59,16 +59,22 @@ flex_set_buffer(const char *buf)
 "1"|"true"		return CONST_TRUE;
 "0"|"false"		return CONST_FALSE;
 
-[ \t\n]+		/* discard whitespace */ yylloc->step (); 
+[ \t\n]+		/* discard whitespace */ yylloc->step ();
 
   /* An Atomic proposition cannot start with the letter
      used by a unary operator (F,G,X), unless this
      letter is followed by a digit in which case we assume
      it's an ATOMIC_PROP (even though F0 could be seen as Ffalse, we
      don't).  */
-[a-zA-EH-WYZ_][a-zA-Z0-9_]* | 
-[FGX][0-9_][a-zA-Z0-9_]* { 
-		  yylval->str = new std::string(yytext); 
+[a-zA-EH-WYZ_][a-zA-Z0-9_]* |
+[FGX][0-9_][a-zA-Z0-9_]* {
+		  yylval->str = new std::string(yytext);
+	          return ATOMIC_PROP;
+		}
+
+  /* Atomic propositions can also be inclosed in double quotes.  */
+\"[^\"]*\"	{
+		  yylval->str = new std::string(yytext + 1, yyleng - 2);
 	          return ATOMIC_PROP;
 		}
 
