@@ -1,4 +1,9 @@
 2004-11-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/minimizerun.cc: Shut up a GCC warning when assert
+	are disabled.
+
+2004-11-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 	    Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/minimizerun.hh, src/tgbaalgos/minimizerun.cc: New

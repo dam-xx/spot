@@ -140,6 +140,7 @@ namespace spot
         const state* s = shpath.search(segment_next->clone(), res->cycle);
         ss.clear();
         assert(s->compare(segment_start) == 0);
+	(void)s;
       }
 
     // Compute the prefix: it's the shortest path from the initial
