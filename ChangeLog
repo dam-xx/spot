@@ -1,5 +1,9 @@
 2005-02-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/tau03opt.cc (tau03_opt_search): Implement the
+	"condition heuristic".  Suggested by Heikki Tauriainen.
+	* src/tgbatest/randtgba.cc: Test it.
+
 	* src/tgbatest/randtgba.cc: Remplace the -O option by -A, reading
 	all algorithms from a file.  Use the emptiness_check_instantiator
 	syntax as name in the output.

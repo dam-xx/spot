@@ -76,6 +76,7 @@ const char* default_algos[] = {
   "SE05(bsh=4K)",
   "Tau03",
   "Tau03_opt",
+  "Tau03_opt(condstack)",
   0
 };
 

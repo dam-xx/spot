@@ -41,6 +41,7 @@
 #endif
 
 #include <cassert>
+#include <stack>
 #include "misc/hash.hh"
 #include "tgba/tgba.hh"
 #include "emptiness.hh"
@@ -66,7 +67,8 @@ namespace spot
         : emptiness_check(a, o),
           current_weight(a->neg_acceptance_conditions()),
           h(size),
-          all_acc(a->all_acceptance_conditions())
+          all_acc(a->all_acceptance_conditions()),
+	  use_condition_stack(o.get("condstack"))
       {
       }
 
@@ -160,6 +162,9 @@ namespace spot
 
       /// The unique accepting condition of the automaton \a a.
       bdd all_acc;
+
+      /// Whether to use the "condition stack".
+      bool use_condition_stack;
 
       bool dfs_blue()
       {
@@ -266,9 +271,15 @@ namespace spot
         return false;
       }
 
-      bool dfs_red(const bdd& acu)
+      bool
+      dfs_red(bdd acu)
       {
         assert(!st_red.empty());
+
+	// These are useful only when USE_CONDITION_STACK is set.
+	typedef std::pair<bdd, unsigned> cond_level;
+	std::stack<cond_level> condition_stack;
+	unsigned depth = 1;
 
         while (!st_red.empty())
           {
@@ -290,30 +301,38 @@ namespace spot
                     trace << "  It is white, pop it" << std::endl;
                     delete s_prime;
                   }
-                 else if (c_prime.get_color() == CYAN &&
-                     ((current_weight - c_prime.get_weight()) |
-                                c_prime.get_acc() | acu) == all_acc)
-                  {
-                    trace << "  It is cyan and acceptance condition "
-                          << "is reached, report cycle" << std::endl;
-                    c_prime.cumulate_acc(acu);
-                    push(st_red, s_prime, label, acc);
-                    return true;
-                  }
-                else if ((c_prime.get_acc() & acu) != acu)
-                  {
-                    trace << "  It is cyan or blue and propagation "
-                          << "is needed, go down"
-                          << std::endl;
-                    c_prime.cumulate_acc(acu);
-                    push(st_red, s_prime, label, acc);
-                  }
-                else
-                  {
-                    trace << "  It is cyan or blue and no propagation "
-                          << "is needed , pop it" << std::endl;
-                    h.pop_notify(s_prime);
-                  }
+		else if (c_prime.get_color() == CYAN &&
+			 ((current_weight - c_prime.get_weight()) |
+			  c_prime.get_acc() | acu) == all_acc)
+		  {
+		    trace << "  It is cyan and acceptance condition "
+			  << "is reached, report cycle" << std::endl;
+		    c_prime.cumulate_acc(acu);
+		    push(st_red, s_prime, label, acc);
+		    return true;
+		  }
+		else if ((c_prime.get_acc() & acu) != acu)
+		  {
+		    trace << "  It is cyan or blue and propagation "
+			  << "is needed, go down"
+			  << std::endl;
+		    c_prime.cumulate_acc(acu);
+		    push(st_red, s_prime, label, acc);
+		    if (use_condition_stack)
+		      {
+			bdd old = acu;
+			acu = c_prime.get_acc();
+			condition_stack.push(cond_level(acu - old, depth));
+			inc_depth();
+		      }
+		    ++depth;
+		  }
+		else
+		  {
+		    trace << "  It is cyan or blue and no propagation "
+			  << "is needed , pop it" << std::endl;
+		    h.pop_notify(s_prime);
+		  }
               }
             else // Backtrack
               {
@@ -321,8 +340,21 @@ namespace spot
                       << std::endl;
                 h.pop_notify(f.s);
                 pop(st_red);
+		--depth;
+		if (use_condition_stack)
+		  {
+		    while (!condition_stack.empty()
+			   && condition_stack.top().second == depth)
+		      {
+			acu -= condition_stack.top().first;
+			condition_stack.pop();
+			dec_depth();
+		      }
+		  }
               }
           }
+	assert(depth == 0);
+	assert(condition_stack.empty());
         return false;
       }
 
