@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddop.c,v 1.3 2003/05/07 12:23:19 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddop.c,v 1.4 2003/05/07 12:36:54 aduret Exp $
   FILE:  bddop.c
   DESCR: BDD operators
   AUTH:  Jorn Lind
@@ -2355,7 +2355,7 @@ DESCR   {* Iterates through all legal variable assignments (those
            that make the BDD come true) for the  bdd {\tt r} and
 	   calls the callback handler {\tt handler} for each of them.
 	   The array passed to {\tt handler} contains one entry for
-	   each of the globaly defined variables. Each entry is either
+	   each of the globally defined variables. Each entry is either
 	   0 if the variable is false, 1 if it is true, and -1 if it
 	   is a don't care.
 
