@@ -49,7 +49,8 @@ EOF
 run 0 ./explprod input1 input2 > stdout
 # Sort out some possible inversions in the output.
 # (The order is not guaranteed by SPOT.)
-perl -pe 's/("\w+") ("\w+")(?: ("\w+"))?/@{[sort $1, $2, $3]}/g;s/\(c & a\)/(a & c)/g;s/\(b & a\)/(a & b)/g' \
+perl -pe 's/("\w+") ("\w+")(?: ("\w+"))?/@{[sort $1, $2, $3]}/g;
+          s/\(c & a\)/(a & c)/g;s/\(b & a\)/(a & b)/g' \
   stdout > tmp_ && mv tmp_ stdout
 
 cat stdout

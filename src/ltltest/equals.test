@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -39,7 +39,8 @@ run 0 ./equals 'a & b & c' 'b & c & a'
 run 0 ./equals 'a && b & a' 'b & a & b'
 run 0 ./equals 'a & b' 'b & a & b'
 run 0 ./equals 'a & b' 'b & a & a'
-run 0 ./equals 'a & b & (c |(f U g)|| e)' 'b & a & a & (c | e |(f U g)| e | c) & b'
+run 0 ./equals 'a & b & (c |(f U g)|| e)' \
+               'b & a & a & (c | e |(f U g)| e | c) & b'
 run 0 ./equals 'a & a' 'a'
 
 # other formulae which are not
@@ -51,7 +52,8 @@ run 1 ./equals 'a => b' 'a U b'
 run 1 ./equals 'a R b' 'a U b'
 run 1 ./equals 'a & b & c' 'c & a'
 run 1 ./equals 'b & c' 'c & a & b'
-run 1 ./equals 'a & b & (c |(f U g)| e)' 'b & a & a & (c | e |(g U g)| e | c) & b'
+run 1 ./equals 'a & b & (c |(f U g)| e)' \
+               'b & a & a & (c | e |(g U g)| e | c) & b'
 
 # Precedence
 run 0 ./equals 'a & b ^ c | d' 'd | c ^ b & a'

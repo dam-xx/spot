@@ -56,7 +56,8 @@ check 'a U b c' 'binop(U, AP(a), AP(b))'
 check 'a &&& b' 'multop(And, constant(0), AP(b))'
 # (check multop merging while we are at it)
 check 'a & b & c & d e' 'multop(And, AP(a), AP(b), AP(c), AP(d))'
-check 'a & (b | c) & d should work' 'multop(And, AP(a), multop(Or, AP(b), AP(c)), AP(d))'
+check 'a & (b | c) & d should work' \
+      'multop(And, AP(a), multop(Or, AP(b), AP(c)), AP(d))'
 
 # Binop recovery
 check 'a U' 'constant(0)'

@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -42,7 +42,7 @@ namespace spot
 	      return true;
       return false;
     }
-    
+
     bool
     is_FG(const formula* f)
     {
@@ -58,47 +58,47 @@ namespace spot
     nb_term_multop(const formula* f)
     {
       if ((const multop*)f == NULL) return -1;
-      
+
       unsigned mos = ((const multop*)(f))->size();
       return mos;
     }
 
-    
+
     node_type_form_visitor::node_type_form_visitor(){}
-    
+
     node_type_form_visitor::type
     node_type_form_visitor::result() const { return result_;}
-    
+
     void
-    node_type_form_visitor::visit(const atomic_prop* ap){ 
+    node_type_form_visitor::visit(const atomic_prop* ap){
       if (ap == NULL);
       result_ = node_type_form_visitor::Atom;
     }
-      
+
     void
-    node_type_form_visitor::visit(const constant* c){ 
+    node_type_form_visitor::visit(const constant* c){
       if (c == NULL);
       result_ = node_type_form_visitor::Const;
     }
-      
+
     void
     node_type_form_visitor::visit(const unop* uo){
-      if (uo == NULL); 
+      if (uo == NULL);
       result_ = node_type_form_visitor::Unop;
     }
-      
+
     void
-    node_type_form_visitor::visit(const binop* bo){ 
+    node_type_form_visitor::visit(const binop* bo){
       if (bo == NULL);
       result_ = node_type_form_visitor::Binop;
     }
-      
+
     void
-    node_type_form_visitor::visit(const multop* mo){ 
+    node_type_form_visitor::visit(const multop* mo){
       if (mo == NULL);
       result_ = node_type_form_visitor::Multop;
     }
-      
+
     node_type_form_visitor::type node_type(const formula* f)
     {
       node_type_form_visitor v;
@@ -110,41 +110,41 @@ namespace spot
     class form_eventual_universal_visitor : public const_visitor
     {
     public:
-      
+
       form_eventual_universal_visitor()
       {
 	eventual = false; // faux au départ
 	universal = false;
       }
-    
+
       virtual ~form_eventual_universal_visitor()
       {
       }
 
-      bool 
+      bool
       is_eventual() const
       {
 	return eventual;
       }
-    
-      bool 
+
+      bool
       is_universal() const
       {
 	return universal;
       }
-    
+
       void
       visit(const atomic_prop* ap)
       {
 	if (ap);
       }
-      
+
       void
       visit(const constant* c)
       {
 	if (c->val());
       }
-      
+
       void
       visit(const unop* uo)
       {
@@ -156,7 +156,7 @@ namespace spot
 	    eventual = recurse_ev(f1);
 	    universal = recurse_un(f1);
 	    return;
-	  case unop::F: 
+	  case unop::F:
 	    eventual = true;
 	    return;
 	  case unop::G:
@@ -166,7 +166,7 @@ namespace spot
 	/* Unreachable code.  */
 	assert(0);
       }
-      
+
       void
       visit(const binop* bo)
       {
@@ -191,13 +191,13 @@ namespace spot
 	/* Unreachable code.  */
 	assert(0);
       }
-      
+
       void
       visit(const multop* mo)
       {
 	if (mo == NULL);
 	unsigned mos = mo->size();
-	
+
 	eventual = true;
 	universal = true;
 	for (unsigned i = 0; i < mos; ++i){
@@ -213,7 +213,7 @@ namespace spot
 	  }
 	}
       }
-      
+
       bool
       recurse_ev(const formula* f)
       {
@@ -235,7 +235,7 @@ namespace spot
       bool universal;
     };
 
-    
+
     bool is_eventual(const formula* f)
     {
       form_eventual_universal_visitor v;
@@ -249,19 +249,19 @@ namespace spot
       const_cast<formula*>(f)->accept(v);
       return v.is_universal();
     }
-    
+
     /////////////////////////////////////////////////////////////////////////
 
     class inf_form_right_recurse_visitor : public const_visitor
     {
     public:
-      
+
       inf_form_right_recurse_visitor(const formula *f)
       {
 	this->f = f;
 	result_ = false; // faux au départ
       }
-    
+
       virtual ~inf_form_right_recurse_visitor()
       {
       }
@@ -278,19 +278,19 @@ namespace spot
 	return false;
       }
       */
-      int 
+      int
       result() const
       {
 	return result_;
       }
-    
+
       void
       visit(const atomic_prop* ap)
       {
-	if ((const atomic_prop*)f == ap) 
+	if ((const atomic_prop*)f == ap)
 	  result_ = true;
       }
-      
+
       void
       visit(const constant* c)
       {
@@ -304,7 +304,7 @@ namespace spot
 	    return;
 	  }
       }
-      
+
       void
       visit(const unop* uo)
       {
@@ -316,7 +316,7 @@ namespace spot
 	    return;
 	  case unop::X:// à gérer !!
 	    return;
-	  case unop::F: 
+	  case unop::F:
 	    // F(a) = true U a
 	    result_ = inf_form(f,f1);
 	    return;
@@ -331,7 +331,7 @@ namespace spot
 	/* Unreachable code.  */
 	assert(0);
       }
-      
+
       void
       visit(const binop* bo)
       {
@@ -355,7 +355,7 @@ namespace spot
 	/* Unreachable code.  */
 	assert(0);
       }
-      
+
       void
       visit(const multop* mo)
       {
@@ -377,7 +377,7 @@ namespace spot
 	    break;
 	  }
       }
-      
+
       bool
       recurse(const formula* f1, const formula* f2)
       {
@@ -397,34 +397,35 @@ namespace spot
     class inf_form_left_recurse_visitor : public const_visitor
     {
     public:
-      
+
       inf_form_left_recurse_visitor(const formula *f)
       {
 	this->f = f;
 	result_ = false;
       }
-    
+
       virtual ~inf_form_left_recurse_visitor()
       {
       }
 
       bool special_case(const formula* f2)
       {
-	if ((node_type(f) == node_type_form_visitor::Binop) 
+	if ((node_type(f) == node_type_form_visitor::Binop)
 	    && (node_type(f2) == node_type_form_visitor::Binop))
 	  if (((const binop*)f)->op() == ((const binop*)f2)->op())
 	    if (inf_form(((const binop*)f2)->first(),((const binop*)f)->first())
-		&& inf_form(((const binop*)f2)->second(),((const binop*)f)->second()) )
+		&& inf_form(((const binop*)f2)->second(),
+			    ((const binop*)f)->second()))
 	      return true;
 	return false;
       }
 
-      int 
+      int
       result() const
       {
 	return result_;
       }
-    
+
       void
       visit(const atomic_prop* ap)
       {
@@ -432,7 +433,7 @@ namespace spot
 	const_cast<formula*>(f)->accept(v);
 	result_ = v.result();
       }
-      
+
       void
       visit(const constant* c)
       {
@@ -450,7 +451,7 @@ namespace spot
 	/* Unreachable code.  */
 	assert(0);
       }
-      
+
       void
       visit(const unop* uo)
       {
@@ -469,7 +470,7 @@ namespace spot
 		result_ = inf_form(f1,((const unop*)f)->child());
 	      }
 	    return;
-	  case unop::F: 
+	  case unop::F:
 	    // F(a) = true U a
 	    tmp = binop::instance(binop::U,constant::true_instance(),clone(f1));
 	    if (this->special_case(tmp)){
@@ -483,7 +484,8 @@ namespace spot
 	    return;
 	  case unop::G:
 	    // F(a) = false R a
-	    tmp = binop::instance(binop::R,constant::false_instance(),clone(f1));
+	    tmp = binop::instance(binop::R,
+				  constant::false_instance(), clone(f1));
 	    if (this->special_case(tmp)){
 	      result_ = true;
 	      spot::ltl::destroy(tmp);
@@ -497,17 +499,17 @@ namespace spot
 	/* Unreachable code.  */
 	assert(0);
       }
-            
+
       void
       visit(const binop* bo)
       {
-	
+
 	if (this->special_case(bo))
 	  {
 	    result_ = true;
 	    return;
 	  }
-	
+
 	const formula* f1 = bo->first();
 	const formula* f2 = bo->second();
 	switch (bo->op())
@@ -520,7 +522,7 @@ namespace spot
 	    if ( (inf_form(f1,f)) && (inf_form(f2,f)) )
 	      result_ = true;
 	    return;
-	  case binop::R: 
+	  case binop::R:
 	    if ( (inf_form(f2,f)) )
 	      result_ = true;
 	    return;
@@ -528,7 +530,7 @@ namespace spot
 	/* Unreachable code.  */
 	assert(0);
       }
-      
+
       void
       visit(const multop* mo)
       {
@@ -550,7 +552,7 @@ namespace spot
 	    break;
 	  }
       }
-      
+
     protected:
       bool result_; // true if f1 < f, 1 otherwise.
       const formula* f;
@@ -558,19 +560,19 @@ namespace spot
 
     bool inf_form(const formula* f1, const formula* f2)
     {
-      // f1 and f2 are unabbreviate 
+      // f1 and f2 are unabbreviate
       if (f1 == f2) return true;
       inf_form_left_recurse_visitor v1(f2);
       inf_form_right_recurse_visitor v2(f1);
-		
-      if ( (node_type(f1) == node_type_form_visitor::Const) && 
+
+      if ( (node_type(f1) == node_type_form_visitor::Const) &&
 	   (node_type(f2) == node_type_form_visitor::Const) )
 	if ( (((const constant*)f2)->val() == constant::True) ||
 	     (((const constant*)f1)->val() == constant::False) )
 	  {
 	    return true;
 	  }
-      
+
       const_cast<formula*>(f1)->accept(v1);
       if (v1.result()) {
 	return true;
@@ -580,38 +582,39 @@ namespace spot
       if (v2.result()) {
 	return true;
       }
-      
+
       return false;
     }
-        
+
     bool infneg_form(const formula* f1, const formula* f2, int n)
     {
       const formula* ftmp1;
       const formula* ftmp2;
-      const formula* ftmp3 = unop::instance(unop::Not,(n == 0)? clone(f1) : clone(f2));
+      const formula* ftmp3 = unop::instance(unop::Not,
+					    (n == 0)? clone(f1) : clone(f2));
       const formula* ftmp4 = spot::ltl::negative_normal_form((n == 0)? f2 : f1);
       const formula* ftmp5;
       const formula* ftmp6;
       bool retour;
-      
+
       ftmp2 = spot::ltl::unabbreviate_logic(ftmp3);
       ftmp1 = spot::ltl::negative_normal_form(ftmp2);
-      
+
       ftmp5 = spot::ltl::unabbreviate_logic(ftmp4);
       ftmp6 = spot::ltl::negative_normal_form(ftmp5);
-      
+
       if (n == 0)
 	retour = inf_form(ftmp1, ftmp6);
-      else 
+      else
 	retour = inf_form(ftmp6, ftmp1);
-      
+
       spot::ltl::destroy(ftmp1);
       spot::ltl::destroy(ftmp2);
       spot::ltl::destroy(ftmp3);
       spot::ltl::destroy(ftmp4);
       spot::ltl::destroy(ftmp5);
       spot::ltl::destroy(ftmp6);
-      
+
       return retour;
     }
 

@@ -185,7 +185,8 @@ Algorithm
 Algorithm
 {
    Name = "Spot (Couvreur -- FM exprop), fake, LTL simplifications by ltl2ba"
-   Path = "${LBTT_TRANSLATE} --spot '${srcdir}/ltl2baw.pl --spot=\"-f -x -T\" -F'"
+   Path =
+    "${LBTT_TRANSLATE} --spot '${srcdir}/ltl2baw.pl --spot=\"-f -x -T\" -F'"
    Enabled = no
 }
 
