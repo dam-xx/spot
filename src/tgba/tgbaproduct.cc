@@ -104,6 +104,7 @@ namespace spot
       {
 	delete right_;
 	right_ = 0;
+	return;
       }
     next_non_false_();
   }

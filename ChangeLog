@@ -1,5 +1,8 @@
 2003-07-03  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/tgbaproduct.cc (tgba_product_succ_iterator::first):
+	Simplify, do not call next_non_false_() either side is done.
+
 	* src/tgba/succiter.hh (tgba_succ_iterator::current_condition):
 	State that this is a boolean function.
 	* src/tgba/succiterconcrete.hh
