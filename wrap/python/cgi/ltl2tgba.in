@@ -170,7 +170,7 @@ def render_automaton(basename, automata, dont_run_dot):
     if dont_run_dot:
         print ('<p>' + dont_run_dot + ''' to be rendered on-line.  However
 you may download the <a href="''' + cgi.escape(basename)
-               + '.txt">source in dot format</a> en render it yourself.')
+               + '.txt">source in dot format</a> and render it yourself.')
     else:
         render_dot(basename)
 
@@ -205,7 +205,7 @@ options_common = [
     ]
 options_debug = [
     ('show_parse',          'show traces during parsing',                  0),
-    ('show_dictionnay',     'print BDD dictionary',                        0),
+    ('show_dictionnary',    'print BDD dictionary',                        0),
     ]
 options_trans_fm = [
     ('opt_exprop',          'optimize determinism',                        1),
@@ -243,9 +243,9 @@ propositions, and parentheses for grouping.<BR>Identifiers cannot
 start with the letter of a prefix operator (<code>F</code>,
 <code>G</code>, or <code>X</code>): for instance <code>GFa</code>
 means <code>G(F(a))</code>.  Use <code>"GFa"</code> if you really want
-to refer to <code>GFa</code> as a proposition.<br>Conversly, infix
+to refer to <code>GFa</code> as a proposition.<br>Conversely, infix
 letter operators are not assumed to be operators if they are part of
-an indentifier: <code>aUb</code> is an atomic proposition, unlike
+an identifier: <code>aUb</code> is an atomic proposition, unlike
 <code>a&nbsp;U&nbsp;b</code> and <code>(a)U(b)</code></p>
 
 <table border="1"><tr><td>
@@ -452,7 +452,7 @@ if show_never_claim:
     print '</PRE>'
     sys.stdout.flush()
 
-if show_dictionnay:
+if show_dictionnary:
     print '<H3>BDD dictionary</H3>'
     print '<pre>'
     sys.stdout.flush()

@@ -1,3 +1,7 @@
+2004-05-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* wrap/python/cgi/ltl2tgba.in: Typos.
+
 2004-05-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/sanity/style.test: Catch `;'-not-followed-by-space.
