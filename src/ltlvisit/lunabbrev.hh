@@ -1,3 +1,6 @@
+#ifndef SPOT_LTLVISIT_UNABBREV_HH
+# define SPOT_LTLVISIT_UNABBREV_HH
+
 #include "ltlast/formula.hh"
 #include "ltlast/visitor.hh"
 
@@ -28,3 +31,5 @@ namespace spot
     formula* unabbreviate_logic(const formula* f);
   }
 }
+
+#endif //  SPOT_LTLVISIT_UNABBREV_HH

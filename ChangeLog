@@ -1,5 +1,7 @@
 2003-04-16  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltlvisit/lunabbrev.hh: Add missing include guard.
+
 	* src/ltlvisit/lunabbrev.cc, src/ltlvisit/lunabbrev.hh: New files.
 	* src/ltlvisit/Makefile.am (libltlvisit_a_SOURCES): Add them.
 	* src/ltlast/multop.cc (multop::multop(type)): New constructor.
