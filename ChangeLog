@@ -1,3 +1,8 @@
+2004-11-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* misc/random.cc, misc/random.hh: New files.
+	* src/misc/Makefile.am (misc_HEADERS, libmisc_la_SOURCES): Add them.
+
 2004-11-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/evtgbaparse/public.hh (evtgba_parse): Fix doxygen comments.
