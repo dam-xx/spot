@@ -99,12 +99,16 @@ namespace spot
 	    // cube = (!ab & Acc[a])
 	    bdd prop = bdd_exist(cube, data_.acc_set);
 	    // prop = (!a)&b
-	    bdd acc = bdd_forall(bdd_restrict(as, prop), data_.var_set);
+	    current_acc_ = bdd_forall(bdd_restrict(as, prop), data_.var_set);
 	    // acc = (Acc[a] | Acc[b])
-	    bdd all = as & acc;
+	    bdd all = as & current_acc_;
 	    // all = (a | (!a)&b) & (Acc[a] | Acc[b])
 	    current_ = bdd_exist(all, data_.acc_set) & dest;
 	    // current_ = (a | (!a)&b) & (Next...)
+	  }
+	else
+	  {
+	    current_acc_ = bddfalse;
 	  }
 
 	assert(current_ != bddfalse);
@@ -142,10 +146,7 @@ namespace spot
   tgba_succ_iterator_concrete::current_accepting_conditions()
   {
     assert(!done());
-    return bdd_exist(bdd_forall(bdd_restrict(data_.accepting_conditions,
-					     current_),
-				data_.var_set),
-		     data_.notacc_set);
+    return current_acc_;
   }
 
 }
