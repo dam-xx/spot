@@ -34,9 +34,6 @@ check()
 # trigger assertions.
 
 # No reduction
-check 0 'Fa & Xb & GFc & Gd'
-check 0 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
-
 check 1 a
 check 1 'a U b'
 check 1 'X a'
@@ -57,6 +54,9 @@ check 1 'a U Fb'
 #check 0 a
 #check 0 'a U b'
 #check 0 'a U Fb'
+
+#check 0 'Fa & Xb & GFc & Gd'
+#check 0 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
 
 #check 3 a
 #check 3 'a U b'

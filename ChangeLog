@@ -1,6 +1,6 @@
 2004-06-17  Thomas Martinez  <martinez@src.lip6.fr>
 
-	* src/ltltest/reduccmp.test: Wrong test are removed.
+	* src/tgbatest/reductgba.test, src/ltltest/reduccmp.test: Wrong test are removed.
 
 2004-06-17  Thomas Martinez  <martinez@src.lip6.fr>
 
