@@ -580,6 +580,8 @@ main(int argc, char** argv)
       if (formula)
 	a = product = new spot::tgba_product(formula, a);
 
+      int real_n_acc = a->number_of_acceptance_conditions();
+
       if (!opt_ec)
 	{
 	  if (opt_dot)
@@ -590,7 +592,7 @@ main(int argc, char** argv)
       else
 	{
 	  spot::tgba* degen = 0;
-	  if (opt_degen && opt_n_acc != 1)
+	  if (opt_degen && real_n_acc != 1)
 	    degen = new spot::tgba_tba_proxy(a);
 
 	  int n_alg = sizeof(ec_algos) / sizeof(*ec_algos);
@@ -605,7 +607,7 @@ main(int argc, char** argv)
 	      spot::emptiness_check_result* res;
 	      if (opt_O && strcmp(opt_O, ec_algos[i].name))
 		continue;
-	      ec = cons_emptiness_check(i, a, degen, opt_n_acc);
+	      ec = cons_emptiness_check(i, a, degen, real_n_acc);
 	      if (!ec)
 		continue;
 	      ++n_ec;
@@ -620,7 +622,7 @@ main(int argc, char** argv)
 		    break;
 		  delete res;
 		  delete ec;
-		  ec = cons_emptiness_check(i, a, degen, opt_n_acc);
+		  ec = cons_emptiness_check(i, a, degen, real_n_acc);
 		}
 	      tm_ec.stop(algo);
 	      const spot::ec_statistics* ecs =
@@ -747,7 +749,6 @@ main(int argc, char** argv)
 
       delete product;
       delete r;
-      delete formula;
 
       if (opt_ec)
 	{
@@ -756,6 +757,7 @@ main(int argc, char** argv)
 	}
     }
   while (opt_ec);
+  delete formula;
 
   if (!ec_stats.empty())
     {
