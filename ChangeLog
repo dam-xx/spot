@@ -1,6 +1,10 @@
+2003-07-12  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* iface/gspn/gspn.cc: Include cassert.
+
 2003-07-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
-	* src/tgbaalgos/ltl2tgba.cc (ltl_trad_visitor::visit(multop)): 
+	* src/tgbaalgos/ltl2tgba.cc (ltl_trad_visitor::visit(multop)):
 	Forward root_ to children of And.
 	(ltl_trad_visitor::recurse): Take a root argument.
 

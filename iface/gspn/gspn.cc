@@ -1,5 +1,6 @@
 #include <sstream>
 #include <map>
+#include <cassert>
 #include "gspnlib.h"
 #include "gspn.hh"
 #include "ltlvisit/destroy.hh"
@@ -10,18 +11,18 @@ namespace spot
 
   // tgba_gspn_private_
   //////////////////////////////////////////////////////////////////////
-  
+
   struct tgba_gspn_private_ : public bdd_factory
   {
     int refs;			// reference count
 
     tgba_bdd_dict dict;
     typedef std::pair<AtomicPropKind, bdd> ab_pair;
-    typedef std::map<AtomicProp, ab_pair> prop_map;    
+    typedef std::map<AtomicProp, ab_pair> prop_map;
     prop_map prop_dict;
     AtomicProp *all_indexes;
     size_t index_count;
-    
+
     tgba_gspn_private_(const gspn_environment& env)
       : refs(0)
     {
@@ -34,7 +35,7 @@ namespace spot
 	  i->second->ref();
 	  dict.var_map[i->second] = var;
 	  dict.var_formula_map[var] = i->second;
-	  
+
 	  AtomicProp index;
 	  int err = prop_index(i->first.c_str(), &index);
 	  if (err)
@@ -43,18 +44,18 @@ namespace spot
 	  err = prop_kind(index, &kind);
 	  if (err)
 	    throw gspn_exeption(err);
-	  
+
 	  prop_dict[index] = ab_pair(kind, ithvar(var));
 	}
       // If an exception occurs during the loop, dict will
       // be cleaned and that will dereferenciate the formula
       // it contains.  No need to handle anything explicitely.
-      
+
       index_count = prop_dict.size();
       all_indexes = new AtomicProp[index_count];
 
       unsigned idx = 0;
-      for (prop_map::const_iterator i = prop_dict.begin(); 
+      for (prop_map::const_iterator i = prop_dict.begin();
 	   i != prop_dict.end(); ++i)
 	all_indexes[idx++] = i->first;
     }
@@ -85,7 +86,7 @@ namespace spot
     {
     }
 
-    virtual int 
+    virtual int
     compare(const state* other) const
     {
       const state_gspn* o = dynamic_cast<const state_gspn*>(other);
@@ -97,7 +98,7 @@ namespace spot
     {
       return new state_gspn(get_state());
     }
-    
+
     State
     get_state() const
     {
@@ -107,7 +108,7 @@ namespace spot
   private:
     State state_;
   }; // state_gspn
-  
+
 
   // tgba_succ_iterator_gspn
   //////////////////////////////////////////////////////////////////////
@@ -124,7 +125,7 @@ namespace spot
 	data_(data)
     {
       AtomicProp want[] = { EVENT_TRUE };
-      int res = succ(state, want, sizeof(want) / sizeof(*want), 
+      int res = succ(state, want, sizeof(want) / sizeof(*want),
 		     &successors_, &size_);
       if (res)
 	throw res;
@@ -133,46 +134,46 @@ namespace spot
       // there is no successor,
       assert(size_> 0);
     }
-    
-    virtual 
+
+    virtual
     ~tgba_succ_iterator_gspn()
     {
       succ_free(successors_);
     }
-    
-    virtual void 
+
+    virtual void
     first()
     {
       current_ = 0;
     }
-    
-    virtual void 
+
+    virtual void
     next()
     {
       assert(!done());
       ++current_;
     }
 
-    virtual bool 
+    virtual bool
     done() const
     {
       return current_ >= size_;
     }
 
-    virtual state* 
+    virtual state*
     current_state() const
     {
       return new state_gspn(successors_[current_].s);
     }
 
-    virtual bdd 
+    virtual bdd
     current_condition() const
     {
       bdd p = data_->index_to_bdd(successors_[current_].p);
       return state_conds_ & p;
     }
-    
-    virtual bdd 
+
+    virtual bdd
     current_accepting_conditions() const
     {
       // There is no accepting conditions in GSPN systems.
@@ -208,8 +209,8 @@ namespace spot
     props_[prop_str] = ltl::atomic_prop::instance(prop_str, *this);
     return true;
   }
-  
-  ltl::formula* 
+
+  ltl::formula*
   gspn_environment::require(const std::string& prop_str)
   {
     prop_map::iterator i = props_.find(prop_str);
@@ -220,14 +221,14 @@ namespace spot
   }
 
   /// Get the name of the environment.
-  const std::string& 
+  const std::string&
   gspn_environment::name()
   {
     static std::string name("gspn environment");
-    return name;    
+    return name;
   }
-  
-  const gspn_environment::prop_map& 
+
+  const gspn_environment::prop_map&
   gspn_environment::get_prop_map() const
   {
     return props_;
@@ -265,7 +266,7 @@ namespace spot
     new (this) tgba_gspn(other);
     return *this;
   }
-  
+
   state* tgba_gspn::get_init_state() const
   {
     State s;
@@ -275,7 +276,7 @@ namespace spot
     return new state_gspn(s);
   }
 
-  tgba_succ_iterator* 
+  tgba_succ_iterator*
   tgba_gspn::succ_iter(const state* state) const
   {
     const state_gspn* s = dynamic_cast<const state_gspn*>(state);
@@ -283,7 +284,7 @@ namespace spot
 
     // Build the BDD of the conditions available on this state.
     unsigned char* cube = 0;
-    int res = satisfy(s->get_state(), 
+    int res = satisfy(s->get_state(),
 		      data_->all_indexes, &cube, data_->index_count);
     if (res)
       throw res;
@@ -294,17 +295,17 @@ namespace spot
 	state_conds &= data_->index_to_bdd(cube[i]);
       }
     satisfy_free(cube);
-    
+
     return new tgba_succ_iterator_gspn(state_conds, s->get_state(), data_);
   }
 
-  const tgba_bdd_dict& 
+  const tgba_bdd_dict&
   tgba_gspn::get_dict() const
   {
     return data_->dict;
   }
 
-  std::string 
+  std::string
   tgba_gspn::format_state(const state* state) const
   {
     const state_gspn* s = dynamic_cast<const state_gspn*>(state);
@@ -315,14 +316,14 @@ namespace spot
     return os.str();
   }
 
-  bdd 
+  bdd
   tgba_gspn::all_accepting_conditions() const
   {
     // There is no accepting conditions in GSPN systems.
     return bddfalse;
   }
-  
-  bdd 
+
+  bdd
   tgba_gspn::neg_accepting_conditions() const
   {
     // There is no accepting conditions in GSPN systems.
