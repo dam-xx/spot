@@ -10,42 +10,32 @@ check()
   test $? != $1 && exit 1;
 }
 
-check0()
-{
-  check 0 "$@"
-}
-
-check1()
-{
-  check 1 "$@"
-}
-
 # A few things which are equal
-check0 'a' 'a'
-check0 '1' '1'
-check0 '0' '0'
-check0 'a => b' 'a => b'
-check0 'G a ' ' G a'
-check0 'a U b' 'a U b'
-check0 'a & b' 'a & b'
-check0 'a & b' 'b & a'
-check0 'a & b & c' 'c & a & b'
-check0 'a & b & c' 'b & c & a'
-check0 'a & b & a' 'b & a & b'
-check0 'a & b' 'b & a & b'
-check0 'a & b' 'b & a & a'
-check0 'a & b & (c |(f U g)| e)' 'b & a & a & (c | e |(f U g)| e | c) & b'
+check 0 'a' 'a'
+check 0 '1' '1'
+check 0 '0' '0'
+check 0 'a => b' 'a => b'
+check 0 'G a ' ' G a'
+check 0 'a U b' 'a U b'
+check 0 'a & b' 'a & b'
+check 0 'a & b' 'b & a'
+check 0 'a & b & c' 'c & a & b'
+check 0 'a & b & c' 'b & c & a'
+check 0 'a & b & a' 'b & a & b'
+check 0 'a & b' 'b & a & b'
+check 0 'a & b' 'b & a & a'
+check 0 'a & b & (c |(f U g)| e)' 'b & a & a & (c | e |(f U g)| e | c) & b'
 
 # other formulae which are not
-check1 'a' 'b'
-check1 '1' '0'
-check1 'a => b' 'b => a'
-check1 'a => b' 'a <=> b'
-check1 'a => b' 'a U b'
-check1 'a R b' 'a U b'
-check1 'a & b & c' 'c & a'
-check1 'b & c' 'c & a & b'
-check1 'a & b & (c |(f U g)| e)' 'b & a & a & (c | e |(g U g)| e | c) & b'
+check 1 'a' 'b'
+check 1 '1' '0'
+check 1 'a => b' 'b => a'
+check 1 'a => b' 'a <=> b'
+check 1 'a => b' 'a U b'
+check 1 'a R b' 'a U b'
+check 1 'a & b & c' 'c & a'
+check 1 'b & c' 'c & a & b'
+check 1 'a & b & (c |(f U g)| e)' 'b & a & a & (c | e |(g U g)| e | c) & b'
 
 # Success.
 :
