@@ -450,6 +450,15 @@ namespace spot
 
     std::set<const formula*> formulae_seen;
     std::set<const formula*> formulae_to_translate;
+    // Map a representation of successors to a canonical formula.
+    // We do this because many formulae (such as `aR(bRc)' and
+    // `aR(bRc).aR(bRc)') are equivalent, and are trivially identified
+    // by looking at the set of successors.
+    typedef std::map<bdd, const formula*, bdd_less_than> succ_to_formula;
+    succ_to_formula canonical_succ;
+
+    translate_dict d;
+    ltl_trad_visitor v(d);
 
     formulae_seen.insert(f2);
     formulae_to_translate.insert(f2);
@@ -465,8 +474,6 @@ namespace spot
 	formulae_to_translate.erase(formulae_to_translate.begin());
 
 	// Translate it into a BDD to simplify it.
-	translate_dict d;
-	ltl_trad_visitor v(d);
 	f->accept(v);
 	bdd res = v.result();
 
@@ -511,12 +518,32 @@ namespace spot
 	bdd cube;
 	while ((cube = isop.next()) != bddfalse)
 	  {
-	    formula* dest =
+	    const formula* dest =
 	      d.conj_bdd_to_formula(bdd_existcomp(cube, d.next_set));
 
-	    bdd promises = bdd_existcomp(cube, d.a_set);
+	    // If we already know a state with the same successors,
+	    // use it in lieu of the current one.  (See the comments
+	    // for canonical_succ.)  We need to do this only for new
+	    // destinations.
+	    if (formulae_seen.find(dest) == formulae_seen.end())
+	      {
+		dest->accept(v);
+		bdd succbdd = v.result();
+		succ_to_string::iterator cs = canonical_succ.find(succbdd);
+		if (cs != canonical_succ.end())
+		  {
+		    destroy(dest);
+		    dest = clone(cs->second);
+		  }
+		else
+		  {
+		    canonical_succ[succbdd] = dest;
+		  }
+	      }
 
+	    bdd promises = bdd_existcomp(cube, d.a_set);
 	    bdd conds = bdd_existcomp(cube, d.var_set);
+
 	    dest_map::iterator i = dests.find(dest);
 	    if (i == dests.end())
 	      {
