@@ -1,5 +1,5 @@
-Bootstraping:
-=============
+Bootstraping from CVS:
+======================
 
 Some files in SPOT's source tree are generated.  They are distributed
 so that users do not need to tools to rebuild them, but we don't keep
@@ -9,12 +9,12 @@ conflicts.
 Here are the tools you need to bootstrap the CVS tree, or more
 generally if you plan to regenerate some of the generated files.
 
-  GNU Autoconf 2.57
-  GNU Automake 1.8
-  GNU Flex (the version probably doesn't matter much, we used 2.5.4)
-  The CVS version of GNU Bison (called 1.875b at the time of writing)
-  SWIG 1.3.19
-  Doxygen 1.3.5
+  GNU Autoconf >= 2.57
+  GNU Automake >= 1.8
+  GNU Flex (the version probably doesn't matter much, we used 2.5.31)
+  The CVS version of GNU Bison (called 1.875c at the time of writing)
+  SWIG 1.3.21
+  Doxygen >= 1.3.5
 
 Bootstrap the CVS tree by running
 
