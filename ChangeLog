@@ -1,5 +1,11 @@
 2003-11-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/eesrg.cc (tgba_succ_iterator_gspn_eesrg::step): Fix
+	the iteration logic.
+	(tgba_succ_iterator_gspn_eesrg::tgba_succ_iterator_gspn_eesrg): Make
+	sure not to free successors_ twice.
+	(tgba_succ_iterator_gspn_eesrg::done): Fix definition.
+
 	* iface/gspn/eesrg.cc (tgba_gspn_eesrg::get_init_state): Do not
 	call get_init_state(), use 0 instead.
 	(tgba_gspn_eesrg::format_state): Handle the case where s->left() == 0.

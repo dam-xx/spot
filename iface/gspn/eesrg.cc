@@ -169,31 +169,34 @@ namespace spot
     virtual
     ~tgba_succ_iterator_gspn_eesrg()
     {
+      // If the iterator is done, successors_ has already
+      // been freed from step().  (We can't use 0 do indicate
+      // this, because successor_==0 means something else to step().)
+      if (successors_ && !done())
+	succ_free(successors_);
       if (operand_)
 	delete operand_;
-      if (successors_)
-	succ_free(successors_);
     }
-
 
     void
     step()
     {
-      if (current_ < size_)
-	{
-	  ++current_;
-	  return;
-	}
+      if (++current_ < size_)
+	return;
 
       if (successors_)
 	succ_free(successors_);
-      current_ = 0;
 
       if (all_conds_ == bddfalse)
 	{
 	  // SUCCESSORS_ is 0 when step() is called from first().
 	  if (successors_)
-	    operand_->next();
+	    {
+	      assert(!operand_->done());
+	      operand_->next();
+	    }
+	  if (operand_->done())
+	    return;
 	  all_conds_ = operand_->current_condition();
 	  outside_ = !all_conds_;
 	}
@@ -234,6 +237,7 @@ namespace spot
 	}
 
       succ(state_, props, &successors_, &size_);
+      current_ = 0;
     }
 
     virtual void
@@ -268,8 +272,7 @@ namespace spot
     {
       return (size_ <= current_
 	      && all_conds_ == bddfalse
-	      && operand_
-	      && operand_->done());
+	      && (!operand_ || operand_->done()));
     }
 
     virtual state*
