@@ -1,5 +1,8 @@
 2004-10-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltltest/reduc.test: Do source ./defs.  Revert mistaken
+	change from 2004-09-13.
+
 	* src/tgbatest/explicit.test: Typo.
 
 2004-10-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
