@@ -1,3 +1,7 @@
+2004-09-14  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/ltltest/reduc.test (FICH): bad file name.
+
 2004-09-13  Thomas Martinez  <martinez@src.lip6.fr>
 
 	* src/tgbaalgos/nesteddfsgen.hh src/tgbaalgos/nesteddfsgen.cc:

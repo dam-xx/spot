@@ -26,8 +26,7 @@
 
 set -e
 
-#FICH=${1-$srcdir/formulae.txt}
-FICH=${1-$srcdir/formules3.ltl}
+FICH=${1-$srcdir/formulae.txt}
 
 for opt in 0 1 2 3; do
   rm -f result.data
