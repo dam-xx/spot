@@ -5,7 +5,8 @@ gspndir = $(pkgincludedir)/gspn
 
 gspn_HEADERS = \
   common.hh \
-  gspn.hh
+  gspn.hh \
+  eesrg.hh
 
 lib_LTLIBRARIES = libspotgspn.la libspotgspneesrg.la
 libspotgspn_la_LIBADD = $(top_builddir)/src/libspot.la

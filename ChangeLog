@@ -1,3 +1,8 @@
+2003-11-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* iface/gspn/Makefile.am (gspn_HEADERS): Add eesrg.hh.
+	Reported by Soheib Baarir.
+
 2003-10-31  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* README: More build instructions.
