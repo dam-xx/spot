@@ -4,7 +4,7 @@
 
 %{
 #include <string>
-#include "parsedecl.hh"
+#include "ltlparse/parsedecl.hh"
 
 /* Hack Flex so we read from a string instead of reading from a file.  */
 #define YY_INPUT(buf, result, max_size)					\

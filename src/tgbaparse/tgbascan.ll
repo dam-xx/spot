@@ -4,7 +4,7 @@
 
 %{
 #include <string>
-#include "parsedecl.hh"
+#include "tgbaparse/parsedecl.hh"
 
 #define YY_USER_ACTION \
   yylloc->columns(yyleng);
@@ -29,8 +29,8 @@ eol      \n|\r|\n\r|\r\n
   yylloc->step ();
 %}
 
-\"[^\"]*\"		{ 
-			  yylval->str = new std::string(yytext + 1, 
+\"[^\"]*\"		{
+			  yylval->str = new std::string(yytext + 1,
 			                                yyleng - 2);
 	                  return STRING;
 		        }
@@ -42,9 +42,9 @@ acc[ \t]*=		return ACC_DEF;
 	                  return IDENT;
 		        }
 
-			/* discard whitespace */ 
+			/* discard whitespace */
 {eol}			yylloc->lines(yyleng); yylloc->step();
-[ \t]+			yylloc->step(); 
+[ \t]+			yylloc->step();
 
 .			return *yytext;
 

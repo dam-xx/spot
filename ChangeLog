@@ -1,3 +1,9 @@
+2003-11-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlparse/ltlscan.ll: Include ltlparse/parsedecl.hh,
+	not parsedecl.hh.
+	* src/tgbaparse/tgbascan.ll: Likewise, include tgbaparse/parsedecl.hh.
+
 2003-11-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::complete_cycle):
