@@ -31,6 +31,7 @@ namespace spot
 
   couvreur99_check::couvreur99_check(const tgba* a,
 				     const numbered_state_heap_factory* nshf)
+    : emptiness_check(a)
   {
     ecs_ = new couvreur99_check_status(a, nshf);
   }

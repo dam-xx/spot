@@ -50,9 +50,8 @@ namespace spot
       /// \pre The automaton \a a must have at most one accepting
       /// condition (i.e. it is a TBA).
       magic_search(const tgba *a, size_t size)
-        : ec_statistics(),
+        : emptiness_check(a),
           h(size),
-          a(a),
           all_cond(a->all_acceptance_conditions())
       {
         assert(a->number_of_acceptance_conditions() <= 1);
@@ -88,7 +87,7 @@ namespace spot
         if (st_red.empty())
           {
             assert(st_blue.empty());
-            const state* s0 = a->get_init_state();
+            const state* s0 = a_->get_init_state();
             inc_states();
             h.add_new_state(s0, BLUE);
             push(st_blue, s0, bddfalse, bddfalse);
@@ -146,7 +145,7 @@ namespace spot
                         const bdd& label, const bdd& acc)
       {
         inc_depth();
-        tgba_succ_iterator* i = a->succ_iter(s);
+        tgba_succ_iterator* i = a_->succ_iter(s);
         i->first();
         st.push_front(stack_item(s, i, label, acc));
       }
@@ -171,9 +170,6 @@ namespace spot
       /// State targeted by the red dfs.
       const state* target;
 
-      /// The automata to check.
-      const tgba* a;
-
       /// The unique accepting condition of the automaton \a a.
       bdd all_cond;
 
@@ -184,14 +180,14 @@ namespace spot
             stack_item& f = st_blue.front();
 #           ifdef TRACE
             std::cout << "DFS_BLUE treats: "
-                      << a->format_state(f.s) << std::endl;
+                      << a_->format_state(f.s) << std::endl;
 #           endif
             if (!f.it->done())
               {
                 const state *s_prime = f.it->current_state();
 #               ifdef TRACE
                 std::cout << "  Visit the successor: "
-                          << a->format_state(s_prime) << std::endl;
+                          << a_->format_state(s_prime) << std::endl;
 #               endif
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
@@ -256,7 +252,7 @@ namespace spot
                     // functionnality, the test can be ommited.
 #                   ifdef TRACE
                     std::cout << "  It is blue and the arc from "
-                              << a->format_state(st_blue.front().s)
+                              << a_->format_state(st_blue.front().s)
                               << " to it is accepting, start a red dfs"
                               << std::endl;
 #                   endif
@@ -290,14 +286,14 @@ namespace spot
             stack_item& f = st_red.front();
 #           ifdef TRACE
             std::cout << "DFS_RED treats: "
-                      << a->format_state(f.s) << std::endl;
+                      << a_->format_state(f.s) << std::endl;
 #           endif
             if (!f.it->done())
               {
                 const state *s_prime = f.it->current_state();
 #               ifdef TRACE
                 std::cout << "  Visit the successor: "
-                          << a->format_state(s_prime) << std::endl;
+                          << a_->format_state(s_prime) << std::endl;
 #               endif
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
@@ -354,7 +350,7 @@ namespace spot
       {
       public:
         result(magic_search& ms)
-          : ms_(ms)
+          : emptiness_check_result(ms.automaton()), ms_(ms)
         {
         }
         virtual tgba_run* accepting_run()

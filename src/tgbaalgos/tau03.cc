@@ -52,9 +52,8 @@ namespace spot
     public:
       /// \brief Initialize the search algorithm on the automaton \a a
       tau03_search(const tgba *a, size_t size)
-        : ec_statistics(),
+        : emptiness_check(a),
           h(size),
-          a(a),
           all_cond(a->all_acceptance_conditions())
       {
         assert(a->number_of_acceptance_conditions() > 0);
@@ -86,12 +85,12 @@ namespace spot
         if (!st_blue.empty())
             return 0;
         assert(st_red.empty());
-        const state* s0 = a->get_init_state();
+        const state* s0 = a_->get_init_state();
         inc_states();
         h.add_new_state(s0, BLUE);
         push(st_blue, s0, bddfalse, bddfalse);
         if (dfs_blue())
-          return new emptiness_check_result;
+          return new emptiness_check_result(a_);
         return 0;
       }
 
@@ -126,7 +125,7 @@ namespace spot
                         const bdd& label, const bdd& acc)
       {
         inc_depth();
-        tgba_succ_iterator* i = a->succ_iter(s);
+        tgba_succ_iterator* i = a_->succ_iter(s);
         i->first();
         st.push_front(stack_item(s, i, label, acc));
       }
@@ -148,9 +147,6 @@ namespace spot
       /// by the last dfs visiting it.
       heap h;
 
-      /// The automata to check.
-      const tgba* a;
-
       /// The unique accepting condition of the automaton \a a.
       bdd all_cond;
 
@@ -161,14 +157,14 @@ namespace spot
             stack_item& f = st_blue.front();
 #           ifdef TRACE
             std::cout << "DFS_BLUE treats: "
-                      << a->format_state(f.s) << std::endl;
+                      << a_->format_state(f.s) << std::endl;
 #           endif
             if (!f.it->done())
               {
                 const state *s_prime = f.it->current_state();
 #               ifdef TRACE
                 std::cout << "  Visit the successor: "
-                          << a->format_state(s_prime) << std::endl;
+                          << a_->format_state(s_prime) << std::endl;
 #               endif
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
@@ -204,15 +200,15 @@ namespace spot
 #               endif
                 typename heap::color_ref c = h.get_color_ref(f.s);
                 assert(!c.is_white());
-                tgba_succ_iterator* i = a->succ_iter(f.s);
+                tgba_succ_iterator* i = a_->succ_iter(f.s);
                 for (i->first(); !i->done(); i->next())
                   {
                    inc_transitions();
                    const state *s_prime = i->current_state();
 #ifdef              TRACE
                     std::cout << "DFS_BLUE rescanning the arc from "
-                              << a->format_state(f.s) << "  to "
-                              << a->format_state(s_prime) << std::endl;
+                              << a_->format_state(f.s) << "  to "
+                              << a_->format_state(s_prime) << std::endl;
 #                   endif
                     bdd label = i->current_condition();
                     bdd acc = i->current_acceptance_conditions();
@@ -223,15 +219,15 @@ namespace spot
                       {
 #                       ifdef TRACE
                         std::cout << "  ";
-                        bdd_print_acc(std::cout, a->get_dict(), acu);
+                        bdd_print_acc(std::cout, a_->get_dict(), acu);
                         std::cout << " is not included in ";
-                        bdd_print_acc(std::cout, a->get_dict(),
-                                                  c_prime.get_acc());
+                        bdd_print_acc(std::cout, a_->get_dict(),
+				      c_prime.get_acc());
                         std::cout << std::endl;
                         std::cout << "  Start a red dfs from "
-                                  << a->format_state(s_prime)
+                                  << a_->format_state(s_prime)
                                   << " propagating: ";
-                        bdd_print_acc(std::cout, a->get_dict(), acu);
+                        bdd_print_acc(std::cout, a_->get_dict(), acu);
                         std::cout << std::endl;
 #                       endif
                         c_prime.cumulate_acc(acu);
@@ -271,14 +267,14 @@ namespace spot
             stack_item& f = st_red.front();
 #ifdef      TRACE
             std::cout << "DFS_RED treats: "
-                      << a->format_state(f.s) << std::endl;
+                      << a_->format_state(f.s) << std::endl;
 #           endif
             if (!f.it->done())
               {
                 const state *s_prime = f.it->current_state();
 #ifdef          TRACE
                 std::cout << "  Visit the successor: "
-                          << a->format_state(s_prime) << std::endl;
+                          << a_->format_state(s_prime) << std::endl;
 #               endif
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();

@@ -27,7 +27,7 @@ namespace spot
   couvreur99_check_result::couvreur99_check_result
   (const couvreur99_check_status* ecs,
    const explicit_connected_component_factory* eccf)
-    : ecs_(ecs), eccf_(eccf)
+    : emptiness_check_result(ecs->aut), ecs_(ecs), eccf_(eccf)
   {
   }
 

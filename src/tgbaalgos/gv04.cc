@@ -52,9 +52,6 @@ namespace spot
 
     struct gv04: public emptiness_check, public ec_statistics
     {
-      // The automata to check.
-      const tgba* a;
-
       // The unique accepting condition of the automaton \a a,
       // or bddfalse if there is no.
       bdd accepting;
@@ -73,7 +70,7 @@ namespace spot
       bool violation;		// Whether an accepting run was found.
 
       gv04(const tgba *a)
-	: a(a), accepting(a->all_acceptance_conditions())
+	: emptiness_check(a), accepting(a->all_acceptance_conditions())
       {
 	assert(a->number_of_acceptance_conditions() <= 1);
       }
@@ -97,19 +94,19 @@ namespace spot
       {
 	top = dftop = -1;
 	violation = false;
-	push(a->get_init_state(), false);
+	push(a_->get_init_state(), false);
 
 	while (!violation && dftop >= 0)
 	  {
 	    trace << "Main iteration (top = " << top
 		  << ", dftop = " << dftop
-		  << ", s = " << a->format_state(stack[dftop].s)
+		  << ", s = " << a_->format_state(stack[dftop].s)
 		  << ")" << std::endl;
 
 	    tgba_succ_iterator* iter = stack[dftop].lasttr;
 	    if (!iter)
 	      {
-		iter = stack[dftop].lasttr = a->succ_iter(stack[dftop].s);
+		iter = stack[dftop].lasttr = a_->succ_iter(stack[dftop].s);
 		iter->first();
 	      }
 	    else
@@ -129,7 +126,7 @@ namespace spot
 		inc_transitions();
 
 		trace << " Next successor: s_prime = "
-		      << a->format_state(s_prime)
+		      << a_->format_state(s_prime)
 		      << (acc ? " (with accepting link)" : "");
 
 		hash_type::const_iterator i = h.find(s_prime);
@@ -169,7 +166,7 @@ namespace spot
       void
       push(const state* s, bool accepting)
       {
-	trace << "  push(s = " << a->format_state(s)
+	trace << "  push(s = " << a_->format_state(s)
 	      << ", accepting = " << accepting << ")" << std::endl;
 
 	h[s] = ++top;
@@ -244,7 +241,7 @@ namespace spot
 	gv04& data;
 
 	result(gv04& data)
-	  : data(data)
+	  : emptiness_check_result(data.automaton()), data(data)
 	{
 	}
 
@@ -269,7 +266,7 @@ namespace spot
 	  for (int i = 0; i <= data.top; ++i)
 	    {
 	      trace << "state " << i << " ("
-		    << data.a->format_state(data.stack[i].s)
+		    << data.a_->format_state(data.stack[i].s)
 		    << ") has lowlink = " << data.stack[i].lowlink << std::endl;
 	    }
 #endif
@@ -306,7 +303,7 @@ namespace spot
 	    int scc_root;
 
 	    first_bfs(const gv04& data, int scc_root)
-	      : bfs_steps(data.a), data(data), scc_root(scc_root)
+	      : bfs_steps(data.automaton()), data(data), scc_root(scc_root)
 	    {
 	    }
 

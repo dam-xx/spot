@@ -73,6 +73,11 @@ namespace spot
   class emptiness_check_result
   {
   public:
+    emptiness_check_result(const tgba* a)
+      : a_(a)
+    {
+    }
+
     /// \brief Return a run accepted by the automata passed to
     /// the emptiness check.
     ///
@@ -86,13 +91,33 @@ namespace spot
     /// is no counter-example; the mere existence of an instance of
     /// this class asserts the existence of a counter-example).
     virtual tgba_run* accepting_run();
+
+    /// The automaton on which an accepting_run() was found.
+    const tgba*
+    automaton() const
+    {
+      return a_;
+    }
+  protected:
+    const tgba* a_;		///< The automaton.
   };
 
   /// Common interface to emptiness check algorithms.
   class emptiness_check
   {
   public:
+    emptiness_check(const tgba* a)
+      : a_(a)
+    {
+    }
     virtual ~emptiness_check();
+
+    /// The automaton that this emptiness-check inspects.
+    const tgba*
+    automaton() const
+    {
+      return a_;
+    }
 
     /// \brief Check whether the automaton contain an accepting run.
     ///
@@ -108,6 +133,9 @@ namespace spot
 
     /// Print statistics, if any.
     virtual std::ostream& print_stats(std::ostream& os) const;
+
+  protected:
+    const tgba* a_;		///< The automaton.
   };
 
   /// @}
