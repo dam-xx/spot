@@ -5,10 +5,10 @@ namespace spot
   namespace ltl
   {
 
-    atomic_prop*
+    formula*
     default_environment::require(const std::string& s)
     {
-      return new atomic_prop(s);
+      return new atomic_prop(s, *this);
     }
 
     const std::string&

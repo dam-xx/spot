@@ -3,6 +3,7 @@
 
 #include <string>
 #include "formula.hh"
+#include "ltlenv/environment.hh"
 
 namespace spot
 {
@@ -12,15 +13,17 @@ namespace spot
     class atomic_prop : public formula
     {
     public:
-      atomic_prop(std::string name);
+      atomic_prop(const std::string& name, environment& env);
       virtual ~atomic_prop();
 
       virtual void accept(visitor& visitor);
       virtual void accept(const_visitor& visitor) const;
 
       const std::string& name() const;
+      environment& env() const;
     private:
       std::string name_;
+      environment* env_;
     };
 
   }

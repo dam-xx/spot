@@ -27,7 +27,7 @@ namespace spot
       void 
       visit(const atomic_prop* ap)
       {
-	formula* f = new atomic_prop(ap->name());
+	formula* f = new atomic_prop(ap->name(), ap->env());
 	if (negated_)
 	  result_ = new unop(unop::Not, f);
 	else

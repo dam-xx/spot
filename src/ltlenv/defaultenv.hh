@@ -2,6 +2,7 @@
 # define SPOT_LTLENV_DEFAULT_ENVIRONMENT_HH
 
 # include "environment.hh"
+# include "ltlast/atomic_prop.hh"
 
 namespace spot
 {
@@ -11,7 +12,7 @@ namespace spot
     class default_environment : public environment
     {
     public:
-      virtual atomic_prop* require(const std::string& prop_str);
+      virtual formula* require(const std::string& prop_str);
       virtual const std::string& name();
 
       /* This class is a singleton.  */

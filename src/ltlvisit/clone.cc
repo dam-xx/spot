@@ -22,7 +22,7 @@ namespace spot
     void 
     clone_visitor::visit(const atomic_prop* ap)
     {
-      result_ = new atomic_prop(ap->name());
+      result_ = new atomic_prop(ap->name(), ap->env());
     }
 
     void 

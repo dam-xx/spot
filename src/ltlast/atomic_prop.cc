@@ -6,8 +6,8 @@ namespace spot
   namespace ltl
   {
  
-    atomic_prop::atomic_prop(std::string name)
-      : name_(name)
+    atomic_prop::atomic_prop(const std::string& name, environment& env)
+      : name_(name), env_(&env)
     {
     }
 
@@ -32,5 +32,12 @@ namespace spot
     {
       return name_;
     }
+    
+    environment& 
+    atomic_prop::env() const
+    {
+      return *env_;
+    }
+
   }
 }

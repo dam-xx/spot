@@ -1,5 +1,17 @@
 2003-04-17  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltlenv/environment.hh (require): Return a formula, not
+	an atomic_prop.
+	* src/ltlast/atomic_prop.hh (atomic_prop): New argument env.
+	(environment_): New member.
+	(env): New method.
+	* src/ltlast/atomic_prop.cc (atomic_prop, env): Likewise.
+	* src/ltlenv/defaultenv.cc (require): Pass *this as the
+	environment argument to atomic_prop.
+	* src/ltlvisit/clone.cc (visit(const atomic_prop*)): Also copy 
+	the environment.
+	* src/ltlvisit/nenoform.cc (visit(const atomic_prop*)): Likewise.
+	
 	* configure.ac: Output src/ltlenv/Makefile.
 	* src/ltlenv/Makefile.am, src/ltlenv/defaultenv.cc,
 	src/ltlenv/defaultenv.hh, src/ltlenv/environment.hh: New files.
