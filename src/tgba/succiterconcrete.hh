@@ -42,8 +42,8 @@ namespace spot
 			///         atomic proposition and Next variables.
     bdd current_state_;	///< \brief Current successor, as a
 			///         conjunction of Now variables.
-    bdd current_acc_;   ///< \brief Accepting condition for the current
-                        ///         transition.
+    bdd current_acc_;   ///< \brief Accepting conditions for the current
+			///         transition.
   };
 }
 
