@@ -1,5 +1,8 @@
 2004-01-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/ltleesrg.cc: Emptinesscheck the full product, not
+	the control automaton.
+
 	* iface/gspn/eesrg.cc (tgba_gspn_eesrg::project_state): New method.
 	* iface/gspn/eesrg.hh: Likewise.
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -69,12 +69,12 @@ main(int argc, char **argv)
       {
 	spot::tgba_gspn_eesrg a(dict, env, prod);
 
-	spot::emptiness_check ec(prod);
+	spot::emptiness_check ec(&a);
 	bool res = ec.check();
 	if (!res)
 	  {
 	    ec.counter_example();
-	    ec.print_result(std::cout, prod);
+	    ec.print_result(std::cout, &a);
 	    exit(1);
 	  }
 	else
