@@ -83,7 +83,9 @@ TESTS = \
   emptchk.test \
   emptchke.test \
   dfs.test \
+  emptchkr.test \
   spotlbtt.test
+XFAIL_TESTS = emptchkr.test
 
 EXTRA_DIST = $(TESTS) ltl2baw.pl
 

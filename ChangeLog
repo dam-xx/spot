@@ -1,5 +1,9 @@
 2004-11-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* tgbatest/randtgba.cc: Add options -e and -r.
+	* tgbatest/emptchkr.test: New file.
+	* src/tgbatest/Makefile.am (TESTS, XFAIL_TESTS): Add emptchkr.test.
+
 	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Fix a memory leak
 	if debug==false.
 
