@@ -24,9 +24,19 @@
 #include "tgba/tgba.hh"
 #include "tgba/bddprint.hh"
 #include "tgba/tgbaexplicit.hh"
+#include "tgbaalgos/gtec/gtec.hh"
+#include "tgbaalgos/gv04.hh"
+#include "tgbaalgos/magic.hh"
+#include "tgbaalgos/se05.hh"
+#include "tgbaalgos/tau03.hh"
+#include "tgbaalgos/tau03opt.hh"
 
 namespace spot
 {
+
+  // tgba_run
+  //////////////////////////////////////////////////////////////////////
+
   tgba_run::~tgba_run()
   {
     for (steps::const_iterator i = prefix.begin(); i != prefix.end(); ++i)
@@ -50,6 +60,20 @@ namespace spot
 	cycle.push_back(s);
       }
   }
+
+  tgba_run&
+  tgba_run::operator=(const tgba_run& run)
+  {
+    if (&run != this)
+      {
+	this->~tgba_run();
+	new(this) tgba_run(run);
+      }
+    return *this;
+  }
+
+  // print_tgba_run
+  //////////////////////////////////////////////////////////////////////
 
   std::ostream&
   print_tgba_run(std::ostream& os,
@@ -82,17 +106,8 @@ namespace spot
     return os;
   }
 
-  tgba_run&
-  tgba_run::operator=(const tgba_run& run)
-  {
-    if (&run != this)
-      {
-	this->~tgba_run();
-	new(this) tgba_run(run);
-      }
-    return *this;
-  }
-
+  // emptiness_check_result
+  //////////////////////////////////////////////////////////////////////
 
   tgba_run*
   emptiness_check_result::accepting_run()
@@ -120,6 +135,9 @@ namespace spot
   {
   }
 
+
+  // emptiness_check
+  //////////////////////////////////////////////////////////////////////
 
   emptiness_check::~emptiness_check()
   {
@@ -156,6 +174,110 @@ namespace spot
   {
     return os;
   }
+
+  // emptiness_check_instantiator
+  //////////////////////////////////////////////////////////////////////
+
+  namespace
+  {
+
+    spot::emptiness_check*
+    couvreur99_cons(const spot::tgba* a, spot::option_map o)
+    {
+      return spot::couvreur99(a, o);
+    }
+
+    struct ec_algo
+    {
+      const char* name;
+      spot::emptiness_check* (*construct)(const spot::tgba*,
+					  spot::option_map);
+      unsigned int min_acc;
+      unsigned int max_acc;
+    };
+
+    ec_algo ec_algos[] =
+      {
+	{ "Cou99",     couvreur99_cons,                     0, -1U },
+	{ "CVWY90",    spot::magic_search,                  0,   1 },
+	{ "GV04",      spot::explicit_gv04_check,           0,   1 },
+	{ "SE05",      spot::se05,                          0,   1 },
+	{ "Tau03",     spot::explicit_tau03_search,         1, -1U },
+	{ "Tau03_opt", spot::explicit_tau03_opt_search,     0, -1U },
+      };
+  }
+
+  emptiness_check_instantiator::emptiness_check_instantiator(option_map o,
+							     void* i)
+    : o_(o), info_(i)
+  {
+  }
+
+  unsigned int
+  emptiness_check_instantiator::min_acceptance_conditions() const
+  {
+    return static_cast<ec_algo*>(info_)->min_acc;
+  }
+
+  unsigned int
+  emptiness_check_instantiator::max_acceptance_conditions() const
+  {
+    return static_cast<ec_algo*>(info_)->max_acc;
+  }
+
+  emptiness_check*
+  emptiness_check_instantiator::instantiate(const tgba* a) const
+  {
+    return static_cast<ec_algo*>(info_)->construct(a, o_);
+  }
+
+  emptiness_check_instantiator*
+  emptiness_check_instantiator::construct(const char* name, const char** err)
+  {
+    // Skip spaces.
+    while (*name && strchr(" \t\n", *name))
+      ++name;
+
+    const char* opt_str = strchr(name, '(');
+    option_map o;
+    if (opt_str)
+      {
+	const char* opt_start = opt_str + 1;
+	const char* opt_end = strchr(opt_start, ')');
+	if (!opt_end)
+	  {
+	    *err = opt_start;
+	    return 0;
+	  }
+	std::string opt(opt_start, opt_end);
+
+	const char* res = o.parse_options(opt.c_str());
+	if (res)
+	  {
+	    *err  = opt.c_str() - res + opt_start;
+	    return 0;
+	  }
+      }
+
+    if (!opt_str)
+      opt_str = name + strlen(name);
+
+    // Ignore spaces before `(' (or trailing spaces).
+    while (opt_str > name && strchr(" \t\n", *--opt_str))
+      continue;
+    std::string n(name, opt_str + 1);
+
+
+    ec_algo* info = ec_algos;
+    for (unsigned i = 0; i < sizeof(ec_algos)/sizeof(*ec_algos); ++i, ++info)
+      if (n == info->name)
+	return new emptiness_check_instantiator(o, info);
+    *err = name;
+    return 0;
+  }
+
+  // tgba_run_to_tgba
+  //////////////////////////////////////////////////////////////////////
 
   namespace
   {

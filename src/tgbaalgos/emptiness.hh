@@ -188,6 +188,57 @@ namespace spot
     option_map o_;		///< The options
   };
 
+
+  // Dynamically create emptiness checks.  Given their name and options.
+  class emptiness_check_instantiator
+  {
+  public:
+    /// \brief Create an emptiness-check instantiator, given the name
+    /// of an emptiness check.
+    ///
+    /// \a name should have the form \c "name" or \c "name(options)".
+    ///
+    /// On error, the function returns 0.  If the name of the algorithm
+    /// was unknown, \c *err will be set to \c name.  If some fragment of
+    /// the options could not be parsed, \c *err will point to that
+    /// fragment.
+    static emptiness_check_instantiator* construct(const char* name,
+						   const char** err);
+
+    /// Actually instantiate the emptiness check, for \a a.
+    emptiness_check* instantiate(const tgba* a) const;
+
+    /// Accessor to the options.
+    /// @{
+    const option_map&
+    options() const
+    {
+      return o_;
+    }
+
+    option_map&
+    options()
+    {
+      return o_;
+    }
+    /// @}
+
+    /// \brief Minimum number of acceptance conditions supported by
+    /// the emptiness check.
+    unsigned int min_acceptance_conditions() const;
+
+    /// \brief Maximum number of acceptance conditions supported by
+    /// the emptiness check.
+    ///
+    /// \return \c -1U if no upper bound exists.
+    unsigned int max_acceptance_conditions() const;
+  private:
+    emptiness_check_instantiator(option_map o, void* i);
+    option_map o_;
+    void *info_;
+  };
+
+
   /// @}
 
   /// \addtogroup emptiness_check_algorithms Emptiness-check algorithms

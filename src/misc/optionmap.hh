@@ -70,6 +70,9 @@ namespace spot
     /// or \a def otherwise.
     int set(const char* option, int val, int def = 0);
 
+    /// Acquire all the settings of \a o.
+    void set(const option_map& o);
+
     /// \brief Get a reference to the current value of \a option.
     int& operator[](const char* option);
 

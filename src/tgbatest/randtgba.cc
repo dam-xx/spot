@@ -53,77 +53,43 @@
 
 #include "tgbaalgos/emptiness.hh"
 #include "tgbaalgos/emptiness_stats.hh"
-#include "tgbaalgos/gtec/gtec.hh"
-#include "tgbaalgos/gv04.hh"
-#include "tgbaalgos/magic.hh"
 #include "tgbaalgos/reducerun.hh"
-#include "tgbaalgos/se05.hh"
-#include "tgbaalgos/tau03.hh"
-#include "tgbaalgos/tau03opt.hh"
 #include "tgbaalgos/replayrun.hh"
-
-spot::emptiness_check*
-couvreur99_cons(const spot::tgba* a, spot::option_map o)
-{
-  return spot::couvreur99(a, o);
-}
 
 struct ec_algo
 {
   const char* name;
   const char* options;
-  spot::emptiness_check* (*construct)(const spot::tgba*, spot::option_map o);
-  unsigned int min_acc;
-  unsigned int max_acc;
+  spot::emptiness_check_instantiator* inst;
 };
 
 ec_algo ec_algos[] =
   {
-    { "Cou99",          "!poprem",
-                        couvreur99_cons,                     0, -1U },
-    { "Cou99_shy-",     "!poprem shy !group",
-                        couvreur99_cons,                     0, -1U },
-    { "Cou99_shy",      "!poprem shy group",
-                        couvreur99_cons,                     0, -1U },
-    { "Cou99_rem",      "poprem",
-                        couvreur99_cons,                     0, -1U },
-    { "Cou99_rem_shy-", "poprem shy !group",
-                        couvreur99_cons,                     0, -1U },
-    { "Cou99_rem_shy",  "poprem shy group",
-                        couvreur99_cons,                     0, -1U },
-    { "CVWY90",         0,
-                        spot::magic_search,                  0,   1 },
-    { "CVWY90_bsh",     "bsh=4K",
-                        spot::magic_search,                  0,   1 },
-    { "GV04",           0,
-                        spot::explicit_gv04_check,           0,   1 },
-    { "SE05",           0,
-                        spot::se05,                          0,   1 },
-    { "SE05_bsh",       "bsh=4K",
-                        spot::se05,                          0,   1 },
-    { "Tau03",          0,
-                        spot::explicit_tau03_search,         1, -1U },
-    { "Tau03_opt",      0,
-                        spot::explicit_tau03_opt_search,     0, -1U },
+    { "Cou99",          "Cou99(!poprem)",            0 },
+    { "Cou99_shy-",     "Cou99(!poprem shy !group)", 0 },
+    { "Cou99_shy",      "Cou99(!poprem shy group)",  0 },
+    { "Cou99_rem",      "Cou99(poprem)",             0 },
+    { "Cou99_rem_shy-", "Cou99(poprem shy !group)",  0 },
+    { "Cou99_rem_shy",  "Cou99(poprem shy group)",   0 },
+    { "CVWY90",         "CVWY90",                    0 },
+    { "CVWY90_bsh",     "CVWY90(bsh=4K)",            0 },
+    { "GV04",           "GV04",                      0 },
+    { "SE05",           "SE05",                      0 },
+    { "SE05_bsh",       "SE05(bsh=4K)",              0 },
+    { "Tau03",          "Tau03",                     0 },
+    { "Tau03_opt",      "Tau03_opt",                 0 },
   };
-
-spot::option_map options;
 
 spot::emptiness_check*
 cons_emptiness_check(int num, const spot::tgba* a,
 		     const spot::tgba* degen, unsigned int n_acc)
 {
-  spot::option_map o = options;
-  if (ec_algos[num].options)
-    {
-      const char* err = o.parse_options(ec_algos[num].options);
-      assert(!err);
-      (void)err;
-    }
-  if (n_acc < ec_algos[num].min_acc || n_acc > ec_algos[num].max_acc)
+  spot::emptiness_check_instantiator* inst = ec_algos[num].inst;
+  if (n_acc < inst->min_acceptance_conditions()
+      || n_acc > inst->max_acceptance_conditions())
     a = degen;
   if (a)
-    return ec_algos[num].construct(a, o);
+    return inst->instantiate(a);
   return 0;
 }
 
@@ -602,6 +568,8 @@ main(int argc, char** argv)
   spot::tgba* formula = 0;
   spot::tgba* product = 0;
 
+  spot::option_map options;
+
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* ap = new spot::ltl::atomic_prop_set;
   spot::bdd_dict* dict = new spot::bdd_dict();
@@ -806,6 +774,23 @@ main(int argc, char** argv)
   std::set<int> failed_seeds;
   int init_opt_ec = opt_ec;
   spot::ltl::atomic_prop_set* apf = new spot::ltl::atomic_prop_set;
+
+  if (opt_ec)
+    {
+      for (unsigned i = 0; i < sizeof(ec_algos) / sizeof(*ec_algos); ++i)
+	{
+	  const char* err;
+	  ec_algos[i].inst =
+	    spot::emptiness_check_instantiator::construct(ec_algos[i].options,
+							  &err);
+	  if (ec_algos[i].inst == 0)
+	    {
+	      std::cerr << "Parse error after `" << err << "'" << std::endl;
+	      exit(1);
+	    }
+	  ec_algos[i].inst->options().set(options);
+	}
+    }
 
   do
     {

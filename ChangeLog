@@ -1,5 +1,11 @@
 2005-02-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptiness.hh, src/tgbaalgos/emptiness.cc
+	(emptiness_check_instantiator): New class.
+	* src/misc/optionmap.hh (set (const option_map&)): New method.
+	* src/tgbatest/randtgba.cc: Create every emptiness check via
+	emptiness_check_instantiator.
+
 	* src/tgbaalgos/emptiness.hh,
 	src/tgbaalgos/emptiness.cc (emptiness_check::safe): New method.
 	* src/tgbaalgos/magic.cc, src/tgbaalgos/magic.hh,

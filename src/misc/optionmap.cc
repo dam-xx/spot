@@ -134,6 +134,14 @@ namespace spot
     return old;
   }
 
+  void
+  option_map::set(const option_map& o)
+  {
+    for (std::map<std::string, int>::const_iterator it = o.options_.begin();
+	 it != o.options_.end(); ++it)
+      options_[it->first] = it->second;
+  }
+
   int&
   option_map::operator[](const char* option)
   {
