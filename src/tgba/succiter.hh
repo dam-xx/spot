@@ -11,8 +11,8 @@ namespace spot
   /// This class provides the basic functionalities required to
   /// iterate over the successors of a state, as well as querying
   /// transition labels.  Because transitions are never explicitely
-  /// encoded, labels (conditions and promises) can only be queried
-  /// while iterating over the successors.
+  /// encoded, labels (conditions and accepting conditions) can only
+  /// be queried while iterating over the successors.
   class tgba_succ_iterator
   {
   public:
@@ -63,8 +63,7 @@ namespace spot
     /// Note that the same state may occur at different points
     /// in the iteration.  These actually correspond to the same
     /// destination.  It just means there were several transitions,
-    /// with different conditions or promises, leading to the
-    /// same state.
+    /// with different conditions, leading to the same state.
     virtual state* current_state() = 0;
     /// \brief Get the condition on the transition leading to this successor.
     virtual bdd current_condition() = 0;

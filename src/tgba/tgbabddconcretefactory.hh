@@ -56,8 +56,8 @@ namespace spot
     /// \brief Perfom final computations before the relation can be used.
     ///
     /// This function should be called after all propositions, state,
-    /// promise, and constraints have been declared, and before calling
-    /// get_code_data() or get_dict().
+    /// accepting conditions, and constraints have been declared, and
+    /// before calling get_code_data() or get_dict().
     void finish();
 
   private:

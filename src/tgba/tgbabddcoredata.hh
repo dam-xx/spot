@@ -19,36 +19,37 @@ namespace spot
 
     /// \brief encodes the accepting conditions
     ///
-    /// \c a \c U \c b, or \c F \c b, both imply that \c b
-    /// should be verified eventually.  We encode this with generalized
-    /// Büchi acceptating conditions.  An accepting set, called Acc[b],
-    /// hold all the state that do not promise to verify \c b eventually.
-    /// (I.e., all the states that contain \c b, or do not conatain
-    /// \c a \c U \c b, or \c F \c b.)
+    /// <tt>a U b</tt>, or <tt>F b</tt>, both imply that \c b should
+    /// be verified eventually.  We encode this with generalized Büchi
+    /// acceptating conditions.  An accepting set, called
+    /// <tt>Acc[b]</tt>, hold all the state that do not promise to
+    /// verify \c b eventually.  (I.e., all the states that contain \c
+    /// b, or do not contain <tt>a U b</tt>, or <tt>F b</tt>.)
     ///
     /// The spot::succ_iter::current_accepting_conditions() method
-    /// will return the Acc[x] variables of the accepting sets
-    /// in which a transition is.  Actually we never return Acc[x]
-    /// alone, but Acc[x] and all other accepting variables negated.
+    /// will return the \c Acc[x] variables of the accepting sets
+    /// in which a transition is.  Actually we never return \c Acc[x]
+    /// alone, but \c Acc[x] and all other accepting variables negated.
     ///
-    /// So if there is three accepting set \c a, \c b, and \c c, and
-    /// a transition is in set \c a, we'll return \c Acc[a]&!Acc[b]&!Acc[c].
-    /// If the transition is in both \c a and \c b, we'll return
-    /// \c (Acc[a]\&!Acc[b]\&!Acc[c]) \c | \c (!Acc[a]\&Acc[b]\&!Acc[c]).
+    /// So if there is three accepting set \c a, \c b, and \c c, and a
+    /// transition is in set \c a, we'll return <tt>
+    /// Acc[a]&!Acc[b]&!Acc[c]</tt>. If the transition is in both \c
+    /// a and \c b, we'll return <tt>(Acc[a]\&!Acc[b]\&!Acc[c]) \c | \c
+    /// (!Acc[a]\&Acc[b]\&!Acc[c])</tt>.
     ///
     /// Accepting conditions are attributed to transitions and are
     /// only concerned by atomic propositions (which label the
     /// transitions) and Next variables (the destination).  Typically,
-    /// a transition should bear the variable Acc[b] if it doesn't
-    /// check for `b' and have a destination of the form \c a \c U \c
-    /// b, or \c F \c b.
+    /// a transition should bear the variable \c Acc[b] if it doesn't
+    /// check for `b' and have a destination of the form <tt>a U b</tt>, 
+    /// or <tt>F b</tt>.
     ///
     /// To summarize, \c accepting_conditions contains three kinds of
     /// variables:
     /// \li "Next" variables, that encode the destination state,
     /// \li atomic propositions, which are things to verify before going on
     ///     to the next state,
-    /// \li promise variables.
+    /// \li "Acc" variables.
     bdd accepting_conditions;
 
     /// The set of all accepting conditions used by the Automaton.

@@ -12,7 +12,7 @@ namespace spot
   {
     std::set<const ltl::formula*> now;
     std::set<const ltl::formula*> var;
-    std::set<const ltl::formula*> prom;
+    std::set<const ltl::formula*> acc;
 
     tgba_bdd_dict::fv_map::const_iterator i;
 
@@ -28,21 +28,21 @@ namespace spot
     for (i = r.var_map.begin(); i != r.var_map.end(); ++i)
       var.insert(i->first);
 
-    // Merge promises.
+    // Merge accepting conditions.
     for (i = l.acc_map.begin(); i != l.acc_map.end(); ++i)
-      prom.insert(i->first);
+      acc.insert(i->first);
     for (i = r.acc_map.begin(); i != r.acc_map.end(); ++i)
-      prom.insert(i->first);
+      acc.insert(i->first);
 
     // Ensure we have enough BDD variables.
     int have = bdd_extvarnum(0);
-    int want = now.size() * 2 + var.size() + prom.size();
+    int want = now.size() * 2 + var.size() + acc.size();
     if (have < want)
       bdd_setvarnum(want);
 
     // Fill in the "defragmented" union dictionary.
 
-    // FIXME: Make some experiments with ordering of prom/var/now variables.
+    // FIXME: Make some experiments with ordering of acc/var/now variables.
     // Maybe there is one order that usually produces smaller BDDs?
 
     // Next BDD variable to use.
@@ -51,7 +51,7 @@ namespace spot
     tgba_bdd_dict res;
 
     std::set<const ltl::formula*>::const_iterator f;
-    for (f = prom.begin(); f != prom.end(); ++f)
+    for (f = acc.begin(); f != acc.end(); ++f)
       {
 	clone(*f);
 	res.acc_map[*f] = v;
