@@ -1,5 +1,8 @@
 2004-12-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaparse/tgbaparse.yy: Cache parsed formulae to speedup
+	reading of TGBAs with lots of identical conditions.
+
 	* src/tgba/bdddict.hh (bdd_dict) <fv_map, vf_map, ref_set,
 	vr_map, free_annonymous_list_of_type>: Redeclare as std::map,
 	instead of Sgi::hash_map.  It proved to be faster.

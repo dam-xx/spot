@@ -24,9 +24,10 @@
 #include "public.hh"
 %}
 
-%parse-param {spot::tgba_parse_error_list &error_list}
-%parse-param {spot::ltl::environment &parse_environment}
-%parse-param {spot::tgba_explicit* &result}
+%parse-param {spot::tgba_parse_error_list& error_list}
+%parse-param {spot::ltl::environment& parse_environment}
+%parse-param {spot::tgba_explicit*& result}
+%parse-param {formula_cache& fcache}
 %debug
 %error-verbose
 %union
@@ -41,6 +42,7 @@
 #include "ltlast/constant.hh"
 #include "ltlvisit/destroy.hh"
 #include "ltlparse/public.hh"
+#include <map>
 
 /* tgbaparse.hh and parsedecl.hh include each other recursively.
    We mut ensure that YYSTYPE is declared (by the above %union)
@@ -54,17 +56,23 @@ using namespace spot::ltl;
 #define yylex tgbayylex
 
 typedef std::pair<bool, spot::ltl::formula*> pair;
+
+/* Cache parsed formulae.  Labels on arcs are frequently identical and
+   it would be a waste of time to parse them to formula* over and
+   over, and to register all their atomic_propositions in the
+   bdd_dict.  Keep the bdd result around so we can reuse it.  */
+typedef std::map<std::string, bdd> formula_cache;
 %}
 
 %token <str> STRING UNTERMINATED_STRING
 %token <str> IDENT
 %type <str> strident string
-%type <f> condition
+%type <str> condition
 %type <list> acc_list
 %token ACC_DEF
 
-%destructor { delete $$; } STRING UNTERMINATED_STRING IDENT strident string
-%destructor { spot::ltl::destroy($$); } condition
+%destructor { delete $$; } STRING UNTERMINATED_STRING IDENT
+                           strident string condition
 %destructor {
   for (std::list<spot::ltl::formula*>::iterator i = $$->begin();
        i != $$->end(); ++i)
@@ -86,7 +94,39 @@ line: strident ',' strident ',' condition ',' acc_list ';'
        {
 	 spot::tgba_explicit::transition* t
 	   = result->create_transition(*$1, *$3);
-	 result->add_condition(t, $5);
+	 if ($5)
+	   {
+	     formula_cache::const_iterator i = fcache.find(*$5);
+	     if (i == fcache.end())
+	       {
+		 parse_error_list pel;
+		 formula* f = spot::ltl::parse(*$5, pel, parse_environment);
+		 for (parse_error_list::iterator i = pel.begin();
+		      i != pel.end(); ++i)
+		   {
+		     // Adjust the diagnostic to the current position.
+		     Location here = @1;
+		     here.begin.line += i->first.begin.line;
+		     here.begin.column += i->first.begin.column;
+		     here.end.line =
+		       here.begin.line + i->first.begin.line;
+		     here.end.column =
+		       here.begin.column + i->first.begin.column;
+		     error_list.push_back(spot::tgba_parse_error(here,
+								 i->second));
+		   }
+		 if (f)
+		   result->add_condition(t, f);
+		 else
+		   result->add_conditions(t, bddfalse);
+		 fcache[*$5] = t->condition;
+	       }
+	     else
+	       {
+		 t->condition = i->second;
+	       }
+	     delete $5;
+	   }
 	 std::list<formula*>::iterator i;
 	 for (i = $7->begin(); i != $7->end(); ++i)
 	   result->add_acceptance_condition(t, *i);
@@ -107,25 +147,11 @@ strident: string | IDENT
 
 condition:
        {
-	 $$ = constant::true_instance();
+	 $$ = 0
        }
        | string
        {
-	 parse_error_list pel;
-	 formula* f = spot::ltl::parse(*$1, pel, parse_environment);
-	 for (parse_error_list::iterator i = pel.begin();
-	      i != pel.end(); ++i)
-	   {
-	     // Adjust the diagnostic to the current position.
-	     Location here = @1;
-	     here.begin.line += i->first.begin.line;
-	     here.begin.column += i->first.begin.column;
-	     here.end.line = here.begin.line + i->first.begin.line;
-	     here.end.column = here.begin.column + i->first.begin.column;
-	     error_list.push_back(spot::tgba_parse_error(here, i->second));
-	   }
-	 delete $1;
-	 $$ = f ? f : constant::false_instance();
+	 $$ = $1;
        }
        ;
 
@@ -198,8 +224,10 @@ namespace spot
 			    std::string("Cannot open file ") + name));
 	return 0;
       }
+    formula_cache fcache;
     tgba_explicit* result = new tgba_explicit(dict);
-    tgbayy::Parser parser(debug, yy::Location(), error_list, env, result);
+    tgbayy::Parser parser(debug, yy::Location(), error_list,
+			  env, result, fcache);
     parser.parse();
     tgbayyclose();
     return result;
