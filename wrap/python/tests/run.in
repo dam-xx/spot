@@ -30,12 +30,14 @@ test -n "$srcdir" && test -z "$VERBOSE" && exec >/dev/null 2>&1
 # path of dependent libraries in each library).
 modpath='../.libs:@top_builddir@/src/.libs:@top_builddir@/buddy/src/.libs'
 
+pypath='..:@srcdir@/..:$PYTHONPATH'
+
 test -z "$1" &&
-  PYTHONPATH='..:@srcdir@/..' DYLD_LIBRARY_PATH=$modpath exec @PYTHON@
+  PYTHONPATH=$pypath DYLD_LIBRARY_PATH=$modpath exec @PYTHON@
 
 case $1 in
   *.py)
-    PYTHONPATH='..:@srcdir@/..' DYLD_LIBRARY_PATH=$modpath exec @PYTHON@ "$@";;
+    PYTHONPATH=$pypath DYLD_LIBRARY_PATH=$modpath exec @PYTHON@ "$@";;
   *.test)
     exec sh -x "$@";;
   *)
