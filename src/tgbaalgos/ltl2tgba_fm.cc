@@ -431,9 +431,14 @@ namespace spot
 	formulae_to_translate.erase(formulae_to_translate.begin());
 
 	// Translate it into a BDD to simplify it.
+	// FIXME: Currently the same formula can be converted into a
+	// BDD twice.  Once in the symb_merge block below, and then
+	// once here.
 	f->accept(v);
 	bdd res = v.result();
-	canonical_succ[res] = f;
+	succ_to_formula::iterator cs = canonical_succ.find(res);
+	if (cs == canonical_succ.end())
+	  canonical_succ[res] = clone(f);
 
 	std::string now = to_string(f);
 
@@ -514,7 +519,7 @@ namespace spot
 		      }
 		    else
 		      {
-			canonical_succ[succbdd] = dest;
+			canonical_succ[succbdd] = clone(dest);
 		      }
 		  }
 
@@ -539,9 +544,10 @@ namespace spot
 	// way it will be explored before the other during the model
 	// checking.
 	dest_map::const_iterator i = dests.find(constant::true_instance());
-	// conditions of the True arc, so when can remove them from
-	// all other arcs.  It might sounds that this is not needed
-	// when exprop is used, but it fact it is complementary.
+	// COND_FOR_TRUE is the conditions of the True arc, so when
+	// can remove them from all other arcs.  It might sounds that
+	// this is not needed when exprop is used, but in fact it is
+	// complementary.
 	//
 	// Consider
 	//   f = r(X(1) R p) = p.(1 + r(X(1) R p))
@@ -615,6 +621,9 @@ namespace spot
     for (std::set<const formula*>::iterator i = formulae_seen.begin();
 	 i != formulae_seen.end(); ++i)
       destroy(*i);
+    for (succ_to_formula::iterator i = canonical_succ.begin();
+     	 i != canonical_succ.end(); ++i)
+      destroy(i->second);
 
     // Turn all promises into real acceptance conditions.
     a->complement_all_acceptance_conditions();

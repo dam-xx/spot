@@ -1,3 +1,12 @@
+2004-05-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Clone and then
+	free all formulae entered into canonical_succ, to avoid errors
+	when a formula is entered into canonical_succ but not into
+	formulae_seen.
+	* src/tgbatest/ltl2tgba.test: Add a new test, and check with -f.
+	Report from Thomas Martinez.
+
 2004-04-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac, NEWS: Bump version to 0.0u.

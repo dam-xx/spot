@@ -25,17 +25,25 @@
 
 set -e
 
+check ()
+{
+  run 0 ./ltl2tgba "$1"
+  run 0 ./ltl2tgba -f "$1"
+}
+
 # We don't check the output, but just running these might be enough to
 # trigger assertions.
 
-run 0 ./ltl2tgba a
-run 0 ./ltl2tgba 'a U b'
-run 0 ./ltl2tgba 'X a'
-run 0 ./ltl2tgba 'a & b & c'
-run 0 ./ltl2tgba 'a | b | (c U (d & (g U (h ^ i))))'
-run 0 ./ltl2tgba 'Xa & (b U !a) & (b U !a)'
-run 0 ./ltl2tgba 'Fa & Xb & GFc & Gd'
-run 0 ./ltl2tgba 'Fa & Xa & GFc & Gc'
-run 0 ./ltl2tgba 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
-run 0 ./ltl2tgba 'a R (b R c)'
-run 0 ./ltl2tgba '(a U b) U (c U d)'
+check a
+check 'a U b'
+check 'X a'
+check 'a & b & c'
+check 'a | b | (c U (d & (g U (h ^ i))))'
+check 'Xa & (b U !a) & (b U !a)'
+check 'Fa & Xb & GFc & Gd'
+check 'Fa & Xa & GFc & Gc'
+check 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+check 'a R (b R c)'
+check '(a U b) U (c U d)'
+
+check '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
