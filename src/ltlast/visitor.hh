@@ -2,29 +2,44 @@
 # define SPOT_LTLAST_VISITOR_HH
 
 #include "predecl.hh"
-#include "misc/const_sel.hh"
 
 namespace spot {
   namespace ltl {
     
-    template <bool WantConst>
-    struct generic_visitor
+    /// \brief Formula visitor that can modify the formula.
+    ///
+    /// Writing visitors is the prefered way 
+    /// to traverse a formula, since it doesn't
+    /// involve any cast.
+    ///
+    /// If you do not need to modify the visited formula, inherit from
+    /// spot::ltl:const_visitor instead.
+    struct visitor 
     {
-      virtual void visit(typename const_sel<atomic_prop, WantConst>::t* node) 
-	= 0;
-
-      virtual void visit(typename const_sel<constant, WantConst>::t* node) 
-	= 0;
-
-      virtual void visit(typename const_sel<binop, WantConst>::t* node) = 0;
-      
-      virtual void visit(typename const_sel<unop, WantConst>::t* node) = 0;
-
-      virtual void visit(typename const_sel<multop, WantConst>::t* node) = 0;
+      virtual void visit(atomic_prop* node) = 0;
+      virtual void visit(constant* node) = 0;
+      virtual void visit(binop* node) = 0;
+      virtual void visit(unop* node) = 0;
+      virtual void visit(multop* node) = 0;
     };
 
-    struct visitor : public generic_visitor<false> {};
-    struct const_visitor : public generic_visitor<true> {};
+    /// \brief Formula visitor that cannot modify the formula.
+    ///
+    /// Writing visitors is the prefered way 
+    /// to traverse a formula, since it doesn't
+    /// involve any cast.
+    ///
+    /// If you want to modify the visited formula, inherit from
+    /// spot::ltl:visitor instead.
+    struct const_visitor 
+    {
+      virtual void visit(const atomic_prop* node) = 0;
+      virtual void visit(const constant* node) = 0;
+      virtual void visit(const binop* node) = 0;
+      virtual void visit(const unop* node) = 0;
+      virtual void visit(const multop* node) = 0;
+    };
+
 
   }
 }

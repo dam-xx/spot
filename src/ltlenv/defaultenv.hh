@@ -9,13 +9,19 @@ namespace spot
   namespace ltl
   {
 
+    /// \brief A laxist environment.
+    ///
+    /// The environment recognize all atomic propositions.
+    ///
+    /// This is a singleton.  Use default_environment::instance()
+    /// to obtain the instance.
     class default_environment : public environment
     {
     public:
       virtual formula* require(const std::string& prop_str);
       virtual const std::string& name();
 
-      /* This class is a singleton.  */
+      /// Get the sole instance of spot::ltl::default_environment.
       static default_environment& instance();
     protected:
       default_environment();

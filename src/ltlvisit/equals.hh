@@ -5,8 +5,12 @@ namespace spot
 {
   namespace ltl
   {
-    // This visitor is public, because it's convenient
-    // to derive from it and override part of its methods.
+    /// \brief Check for equality between two formulae.
+    ///
+    /// This visitor is public, because it's convenient
+    /// to derive from it and override some of its methods.
+    /// But if you just want the functionality, consider using
+    /// spot::ltl::equals instead.
     class equals_visitor : public const_visitor
     {
     public:
@@ -28,7 +32,14 @@ namespace spot
       bool result_;
 	      
     };
-
+    
+    /// \brief Check whether two formulae are syntaxically equal.
+    /// \return \c true iff \a f1 equals \a f2.
+    ///
+    /// This tests for syntaxic equality rather than semantic equality.
+    /// Two formulae are equals of their abstract syntax tree are equals.
+    /// ltl::multop children can be permuted or repeated without
+    /// impact on the result of this comparison.
     bool equals(const formula* f1, const formula* f2);
   }
 }

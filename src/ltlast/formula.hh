@@ -8,6 +8,10 @@ namespace spot
   namespace ltl 
   {
 
+    /// \brief An LTL formula.
+    /// 
+    /// The only way you can work with a formula is to 
+    /// build a spot::ltl::visitor or spot::ltl::const_visitor.
     class formula 
     {
     public:

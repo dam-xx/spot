@@ -8,8 +8,12 @@ namespace spot
 {
   namespace ltl
   {
-    // This visitor is public, because it's convenient
-    // to derive from it and override part of its methods.
+    /// \brief Clone a formula.
+    ///
+    /// This visitor is public, because it's convenient
+    /// to derive from it and override part of its methods.
+    /// But if you just want the functionality, consider using
+    /// spot::ltl::clone instead.
     class clone_visitor : public const_visitor
     {
     public:
@@ -30,6 +34,7 @@ namespace spot
       formula* result_;
     };
 
+    /// \brief Clone a formula.
     formula* clone(const formula* f);
   }
 }

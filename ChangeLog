@@ -1,5 +1,17 @@
 2003-04-18  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltlast/atomic_prop.hh, src/ltlast/binop.hh,
+	src/ltlast/constant.hh, src/ltlast/formula.hh,
+	src/ltlast/multop.hh, src/ltlast/unop.hh, src/ltlast/visitor.hh,
+	src/ltlenv/defaultenv.hh, src/ltlenv/environment.hh,
+	src/ltlparse/public.hh, src/ltlvisit/clone.hh,
+	src/ltlvisit/dotty.hh, src/ltlvisit/dump.hh,
+	src/ltlvisit/equals.hh, src/ltlvisit/lunabbrev.hh,
+	src/ltlvisit/nenoform.hh, src/ltlvisit/tunabbrev.hh: Add 
+	Doxygen comments.
+	* src/visitor.hh: Do not use const_sel.  This clarify
+	the code and helps Doxygen.
+
 	* configure.ac: Output doc/Doxyfile and doc/Makefile.
 	* doc/Makefile.am, doc/Doxyfile.in: New files.
 	* Makefile.am (SUBDIRS): Add doc.

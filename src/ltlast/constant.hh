@@ -7,7 +7,8 @@ namespace spot
 {
   namespace ltl
   {
-    
+
+    /// A constant (True or False)
     class constant : public formula
     {
     public:
@@ -19,10 +20,9 @@ namespace spot
       virtual void accept(visitor& v);
       virtual void accept(const_visitor& v) const;
 
-      const formula* child() const;
-      formula* child();
-
+      /// Return the value of the constant.
       type val() const;
+      /// Return the value of the constant as a string.
       const char* val_name() const;
 
     private:

@@ -8,9 +8,20 @@ namespace spot
 {
   namespace ltl
   {
-    /* Return the negative normal form of F, i.e., all negations
-       of the formula are pushed in front of the atomic propositions.
-       If NEGATED is true, return the normal form of !F instead.  */
+    /// \brief Build the negative normal form of \a f.
+    /// 
+    /// All negations of the formula are pushed in front of the 
+    /// atomic propositions.
+    ///
+    /// \param f The formula to normalize.
+    /// \param negated If \c true, return the negative normal form of
+    ///        \c !f
+    ///
+    /// Note that this will not remove abbreviated operators.  If you
+    /// want to remove abbreviations, call spot::ltl::unabbreviate_logic
+    /// or spot::ltl::unabbreviate_ltl first.  (Calling these functions
+    /// after spot::ltl::negative_normal_form would likely produce a
+    /// formula which is not in negative normal form.)
     formula* negative_normal_form(const formula* f, bool negated = false);
   }
 }
