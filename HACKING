@@ -130,7 +130,8 @@ Formating
     a = b;
     a <<= (3 + 5) * 3 + f(67 + (really ? 45 : 0));
 
-  * No space after prefix unary operators, or befor postfix unary operators:
+  * No space after prefix unary operators, or before postfix unary
+    operators:
 
     if (!test && y++ != 0)
       {
