@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -25,19 +25,19 @@
 
 set -e
 
-cat >input <<EOF
+cat >input <<\EOF
 acc = c d;
 s1, "s2", "a&!b", c d;
-"s2", "state 3", "a", c;
+"s2", "state 3", "\"F\\G\"", c;
 "state 3", s1,,;
 EOF
 
 ./readsave input > stdout
 
-cat >expected <<EOF
+cat >expected <<\EOF
 acc = "c" "d";
 "s1", "s2", "(a & !b)", "c" "d";
-"s2", "state 3", "a", "c";
+"s2", "state 3", "\"F\\G\"", "c";
 "state 3", "s1", "1",;
 EOF
 

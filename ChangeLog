@@ -1,5 +1,13 @@
 2004-01-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlvisit/tostring.cc
+	(to_string_visitor::visit(const atomic_prop*)): Quote propositions
+	that start with F, G, or X.
+	* src/ltltest/tostring.test: Test quoted propositions.
+	* src/tgbaalgos/save.cc (save_bfs::process_state): Escape " and \
+	characters in formulae.
+	* src/tgbatest/readsave.test: Test for this.
+
 	* src/tgbaalgos/reachiter.hh: Typos in comments.
 
 	* iface/gspn/eesrg.cc (tgba_gspn_eesrg::all_acceptance_conditions,

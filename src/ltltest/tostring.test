@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -25,7 +25,7 @@
 
 . ./defs || exit 1
 
-set -e 
+set -e
 
 run 0 ./tostring 'a'
 run 0 ./tostring '1'
@@ -42,3 +42,4 @@ run 0 ./tostring 'b & a & a & (c | e |(f U g)| e | c) & b'
 run 0 ./tostring 'a <=> b'
 run 0 ./tostring 'a & b & (c |(f U g)| e)'
 run 0 ./tostring 'b & a & a & (c | e |(g U g)| e | c) & b'
+run 0 ./tostring 'F"F1"&G"G"&X"X"'

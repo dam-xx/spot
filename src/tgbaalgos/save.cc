@@ -78,7 +78,23 @@ namespace spot
 	  state* dest = si->current_state();
 	  os_ << "\"" << cur << "\", \""
 	      << automata_->format_state(dest) << "\", \"";
-	  bdd_print_formula(os_, d, si->current_condition()) << "\",";
+	  std::string s = bdd_format_formula(d, si->current_condition());
+	  // Escape " and \ characters in s.
+	  for (std::string::const_iterator i = s.begin();
+	       i != s.end(); ++i)
+	    switch (*i)
+	      {
+	      case '\\':
+		os_ << "\\\\";
+		break;
+	      case '"':
+		os_ << "\\\"";
+		break;
+	      default:
+		os_ << *i;
+		break;
+	      }
+	  os_ << "\",";
 	  bdd_print_acc(os_, d, si->current_acceptance_conditions());
 	  os_ << ";" << std::endl;
 	  delete dest;
