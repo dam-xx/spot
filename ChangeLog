@@ -1,5 +1,9 @@
 2004-06-23  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/tgba/tgbatba.cc (tgba_tba_proxy::format_state): Use
+	bdd_format_accset to print the acceptance condition part of the state.
+	That produces more readable output.
+
 	* wrap/python/cgi/ltl2tgba.in: Add "Formula Simplications" options.
 	* wrap/python/spot.i: Wrap src/ltlvisite/reduce.hh.
 

@@ -258,8 +258,10 @@ namespace spot
   {
     const state_tba_proxy* s = dynamic_cast<const state_tba_proxy*>(state);
     assert(s);
-    return a_->format_state(s->real_state()) + "("
-      + bdd_format_set(get_dict(), s->acceptance_cond()) + ")";
+    std::string a = bdd_format_accset(get_dict(), s->acceptance_cond());
+    if (a != "")
+      a = " " + a;
+    return a_->format_state(s->real_state()) + a;
   }
 
   state*
