@@ -1,4 +1,4 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -35,7 +35,7 @@ $(srcdir)/stamp: $(srcdir)/Doxyfile.in $(top_srcdir)/configure.ac
 	$(DOXYGEN)
 	touch $@
 
-spot.html: $(srcdir)/stamp
+$(srcdir)/spot.html: $(srcdir)/stamp
 spot.latex: $(srcdir)/stamp
 
 $(srcdir)/spotref.pdf: $(srcdir)/stamp
@@ -43,4 +43,5 @@ $(srcdir)/spotref.pdf: $(srcdir)/stamp
 	  && texi2dvi --pdf refman.tex \
 	  && cd .. && mv -f spot.latex/refman.pdf $@
 
-EXTRA_DIST = $(srcdir)/stamp spot.html mainpage.dox $(srcdir)/spotref.pdf
+EXTRA_DIST = $(srcdir)/stamp $(srcdir)/spot.html \
+	mainpage.dox $(srcdir)/spotref.pdf
