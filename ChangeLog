@@ -1,5 +1,10 @@
 2005-01-31  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/explicit.test, src/tgbatest/explpro2.test,
+	src/tgbatest/explprod.test, src/tgbatest/tripprod.test,
+	src/evtgbatest/explicit.test: Do not reorder the output.
+	It's pointless since 2005-01-20.
+
 	* configure.ac, NEWS: Bump version to 0.1a.
 
 	* configure.ac, NEWS: Bump version to 0.1.
