@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.c,v 1.2 2003/05/05 13:45:07 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.c,v 1.3 2003/05/12 09:30:19 aduret Exp $
   FILE:  kernel.c
   DESCR: implements the bdd kernel functions.
   AUTH:  Jorn Lind
@@ -803,7 +803,7 @@ const char *bdd_errstring(int e)
 void bdd_default_errhandler(int e)
 {
    fprintf(stderr, "BDD error: %s\n", bdd_errstring(e));
-   exit(1);
+   abort();
 }
 
 
