@@ -1,5 +1,7 @@
 2003-10-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/spotlbtt.test: Add notice about long run time.
+
 	Merge emptinesscheckexplicit into ltl2tgba.
 	* src/tgbatest/Makefile.am (check_PROGRAMS): Remove
 	emptinesscheckexplicit.
