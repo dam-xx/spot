@@ -133,7 +133,8 @@ namespace spot
       }
 
       void
-      process_link(int, int out, const tgba_succ_iterator* si)
+      process_link(const state*, int,
+		   const state*, int out, const tgba_succ_iterator* si)
       {
 	body_ << out - 1 << " ";
 	acs_.split(body_, si->current_acceptance_conditions());

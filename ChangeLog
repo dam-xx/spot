@@ -1,3 +1,7 @@
+2004-11-04  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/lbtt.cc (lbtt_bfs::process_link): Adjust prototype.
+
 2004-11-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/dottydec.cc, src/tgbaalgos/dottydec.hh,
@@ -10,7 +14,7 @@
 	dotty_bfs::process_link): Use the decorator.
 	* src/tgbatest/ltl2tgba.cc: Graph the accepting run if the -g option
 	is given.
-	* src/tgbatest/emptchk.test: Exercize -g.
+	* src/tgbatest/emptchk.test: Exercise -g.
 
 	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Add missing std::endl.
 
