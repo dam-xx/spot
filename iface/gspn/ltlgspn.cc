@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -35,7 +35,7 @@ syntax(char* prog)
   std::cerr << "Usage: "<< prog
 	    << " [OPTIONS...] model formula props..."   << std::endl
 	    << std::endl
-	    << "  -c  compute a counter example" << std::endl
+	    << "  -c  compute an example" << std::endl
 	    << "      (instead of just checking for emptiness)" << std::endl
 	    << std::endl
 	    << "  -e  use Couvreur's emptiness-check (default)" << std::endl
@@ -43,8 +43,8 @@ syntax(char* prog)
 	    << std::endl
             << "  -l  use Couvreur's LaCIM algorithm for translation (default)"
 	    << std::endl
-            << "  -f  use Couvreur's FM algorithm for translation"
-	    << std::endl;
+            << "  -f  use Couvreur's FM algorithm for translation" << std::endl
+	    << "  -P  do not project example on model" << std::endl;
   exit(2);
 }
 
@@ -56,6 +56,7 @@ main(int argc, char **argv)
       enum { Couvreur, Magic } check = Couvreur;
       enum { Lacim, Fm } trans = Lacim;
       bool compute_counter_example = false;
+      bool proj = true;
 
       spot::gspn_environment env;
 
@@ -80,6 +81,10 @@ main(int argc, char **argv)
 	  else if (!strcmp(argv[formula_index], "-f"))
 	    {
 	      trans = Fm;
+	    }
+	  else if (!strcmp(argv[formula_index], "-P"))
+	    {
+	      proj = 0;
 	    }
 	  else
 	    {
@@ -135,7 +140,7 @@ main(int argc, char **argv)
 		if (compute_counter_example)
 		  {
 		    ec.counter_example();
-		    ec.print_result(std::cout, model);
+		    ec.print_result(std::cout, proj ? model : 0);
 		  }
 		else
 		  {
@@ -157,7 +162,7 @@ main(int argc, char **argv)
 	    if (ms.check())
 	      {
 		if (compute_counter_example)
-		  ms.print_result (std::cout, model);
+		  ms.print_result (std::cout, proj ? model : 0);
 		else
 		  std::cout << "non-empty" << std::endl;
 		exit(1);
