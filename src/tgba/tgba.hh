@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -87,7 +87,7 @@ namespace spot
     /// \param global_state In a product, the state of the global
     /// product automaton.  Otherwise, 0.  Like \a locale_state,
     /// \a global_state is not adopted by \c succ_iter.
-    /// \param global_automaton In a product, the state of the global
+    /// \param global_automaton In a product, the global
     /// product automaton.  Otherwise, 0.
     virtual tgba_succ_iterator*
     succ_iter(const state* local_state,

@@ -68,6 +68,14 @@ namespace spot
     virtual bdd all_acceptance_conditions() const;
     virtual bdd neg_acceptance_conditions() const;
 
+    /// \brief Whether the state is accepting.
+    ///
+    /// A particularity of a spot::tgba_tba_proxy automaton is that
+    /// when a state has an outgoing accepting arc, all its outgoing
+    /// arcs are accepting.  The state itself can therefore be
+    /// considered accepting.  This is useful to many algorithms
+    /// working on degeneralized automata with state acceptance
+    /// conditions.
     bool state_is_accepting(const state* state) const;
 
     typedef std::list<bdd> cycle_list;
