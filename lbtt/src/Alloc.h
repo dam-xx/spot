@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -30,7 +30,7 @@
 
 #ifdef HAVE_OBSTACK_H
 
-/* GNU libc 2.3's copy of obstack.h uses a definition of __INT_TO_PTR 
+/* GNU libc 2.3's copy of obstack.h uses a definition of __INT_TO_PTR
    which does not compile in C++.  Fortunately it will not override
    an existing definition.  */
 #if __GLIBC__ == 2 && __GLIBC_MINOR__ == 3
