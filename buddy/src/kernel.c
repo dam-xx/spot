@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.c,v 1.4 2003/05/20 08:22:36 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.c,v 1.5 2003/05/22 15:07:27 aduret Exp $
   FILE:  kernel.c
   DESCR: implements the bdd kernel functions.
   AUTH:  Jorn Lind
@@ -133,7 +133,8 @@ static char *errorstrings[BDD_ERRNUM] =
   "Bad size argument",
   "Mismatch in bitvector size",
   "Illegal shift-left/right parameter",
-  "Division by zero" };
+  "Division by zero",
+  "Unmergeable rewritings."};
 
 
 /*=== OTHER INTERNAL DEFINITIONS =======================================*/

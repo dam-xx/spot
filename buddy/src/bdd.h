@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bdd.h,v 1.3 2003/05/19 15:58:44 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bdd.h,v 1.4 2003/05/22 15:07:27 aduret Exp $
   FILE:  bdd.h
   DESCR: C,C++ User interface for the BDD package
   AUTH:  Jorn Lind
@@ -264,6 +264,7 @@ extern void     bdd_gbc(void);
 extern int      bdd_scanset(BDD, int**, int*);
 extern BDD      bdd_makeset(int *, int);
 extern bddPair* bdd_copypair(bddPair*);
+extern bddPair* bdd_mergepairs(bddPair*, bddPair*);
 extern bddPair* bdd_newpair(void);
 extern int      bdd_setpair(bddPair*, int, int);
 extern int      bdd_setpairs(bddPair*, int*, int*, int);
@@ -410,7 +411,9 @@ extern const BDD bddtrue;
 #define BVEC_SHIFT (-21)   /* Illegal shift-left/right parameter */
 #define BVEC_DIVZERO (-22) /* Division by zero */
 
-#define BDD_ERRNUM 24
+#define BDD_INVMERGE (-23) /* Merging clashing rewriting rules */
+
+#define BDD_ERRNUM 25
 
 /*************************************************************************
    If this file is included from a C++ compiler then the following

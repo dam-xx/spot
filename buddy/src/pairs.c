@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/pairs.c,v 1.6 2003/05/22 12:07:52 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/pairs.c,v 1.7 2003/05/22 15:07:27 aduret Exp $
   FILE:  pairs.c
   DESCR: Pair management for BDD package.
   AUTH:  Jorn Lind
@@ -203,12 +203,66 @@ bddPair *bdd_copypair(bddPair *from)
    if (p == NULL)
      return NULL;
 
-   memcpy(p->result, from->result, bddvarnum * sizeof(*p->result));
+   for (n=0 ; n<bddvarnum ; n++)
+     p->result[n] = bdd_addref(from->result[n]);
 
    p->id = update_pairsid();
    p->last = from->last;
 
    bdd_register_pair(p);
+   return p;
+}
+
+/*
+NAME    {* bdd\_mergepairs *}
+SECTION {* kernel *}
+SHORT   {* merge two pair tables *}
+PROTO   {* bddPair *bdd_mergepairs(bddPair *left, bddPairs *right) *}
+DESCR   {* Create a table of pairs that can be used to perform the
+	   rewritings of both {\tt left} and {\tt right}.  This cannot work if
+	   the two tables contain incompatible rewrite pairs (for instance
+	   if left rewrite 1 to 2, and right rewrite 1 to 3).
+
+	   This function allocates a new table. The
+	   table can be freed by a call to {\tt bdd\_freepair}. *}
+RETURN  {* Returns a new table of pairs. *}
+ALSO    {* bdd\_newpair, bdd\_freepair, bdd\_replace, bdd\_setpair, bdd\_setpairs *}
+*/
+bddPair *bdd_mergepairs(bddPair *left, bddPair *right)
+{
+   int n;
+   bddPair *p;
+
+   p = bdd_copypair(left);
+   if (p == NULL)
+     return NULL;
+
+   for (n=0; n<bddvarnum; n++)
+     {
+       bdd nl = bdd_ithvar(n);
+
+       /* If P performs no rewriting for N, blindly use that of RIGHT.  */
+       if (nl == p->result[n])
+	 {
+	   bdd_delref(p->result[n]);
+	   p->result[n] = bdd_addref(right->result[n]);
+	 }
+       else
+	 /* If P rewrites N, make sure RIGHT doesn't rewrite it, or that
+	    it rewrites it to the same variable.  */
+	 if (nl != right->result[n] && right->result[n] != p->result[n])
+	   {
+	     bdd_freepair(p);
+	     bdd_error(BDD_INVMERGE);
+	     return NULL;
+	   }
+     }
+
+   if (p->last < right->last)
+     p->last = right->last;
+
+   /* We don't have to update the ID, because this pair was not
+      used since bdd_copypair were called. */
    return p;
 }
 
