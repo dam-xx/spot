@@ -1,5 +1,13 @@
 2004-12-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgba/bdddict.hh (bdd_dict) <fv_map, vf_map, ref_set,
+	vr_map, free_annonymous_list_of_type>: Redeclare as std::map,
+	instead of Sgi::hash_map.  It proved to be faster.
+	* src/tgbaalgos/ltl2tgba_fm.cc (translate_dict) <fv_map, vf_map>:
+	Use the same definition as in bdd_dict.
+	* tgbaalgos/reachiter.hh, tgbaalgos/replayrun.cc: Explicitly
+	include misc/hash.hh.
+
 	Adjust Swig rules for Swig 1.3.24 (and probably 1.3.23 too).
 	Compiling the runtime in a separate modules is no longer required,
 	and actually it does not work anymore...

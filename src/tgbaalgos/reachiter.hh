@@ -22,7 +22,7 @@
 #ifndef SPOT_TGBAALGOS_REACHITER_HH
 # define SPOT_TGBAALGOS_REACHITER_HH
 
-#include <map>
+#include "misc/hash.hh"
 #include "tgba/tgba.hh"
 #include <stack>
 #include <deque>

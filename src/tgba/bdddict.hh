@@ -22,9 +22,9 @@
 #ifndef SPOT_TGBA_BDDDICT_HH
 # define SPOT_TGBA_BDDDICT_HH
 
-#include "misc/hash.hh"
 #include <list>
 #include <set>
+#include <map>
 #include <iosfwd>
 #include <bdd.h>
 #include "ltlast/formula.hh"
@@ -43,10 +43,9 @@ namespace spot
     ~bdd_dict();
 
     /// Formula-to-BDD-variable maps.
-    typedef Sgi::hash_map<const ltl::formula*, int,
-			  ptr_hash<ltl::formula> > fv_map;
+    typedef std::map<const ltl::formula*, int> fv_map;
     /// BDD-variable-to-formula maps.
-    typedef Sgi::hash_map<int, const ltl::formula*> vf_map;
+    typedef std::map<int, const ltl::formula*> vf_map;
 
     fv_map now_map;		///< Maps formulae to "Now" BDD variables
     vf_map now_formula_map;	///< Maps "Now" BDD variables to formulae
@@ -164,8 +163,8 @@ namespace spot
 
   protected:
     /// BDD-variable reference counts.
-    typedef Sgi::hash_set<const void*, ptr_hash<void> > ref_set;
-    typedef Sgi::hash_map<int, ref_set> vr_map;
+    typedef std::set<const void*> ref_set;
+    typedef std::map<int, ref_set> vr_map;
     vr_map var_refs;
 
     void unregister_variable(vr_map::iterator& cur, const void* me);
@@ -187,8 +186,7 @@ namespace spot
 #endif
 
     /// List of unused anonymous variable number for each automaton.
-    typedef Sgi::hash_map<const void*, annon_free_list,
-                          ptr_hash<void> > free_annonymous_list_of_type;
+    typedef std::map<const void*, annon_free_list> free_annonymous_list_of_type;
     free_annonymous_list_of_type free_annonymous_list_of;
 
   private:

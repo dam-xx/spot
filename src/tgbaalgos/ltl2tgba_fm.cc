@@ -72,11 +72,8 @@ namespace spot
 
       bdd_dict* dict;
 
-      /// Formula-to-BDD-variable maps.
-      typedef Sgi::hash_map<const formula*, int,
-			    ptr_hash<formula> > fv_map;
-      /// BDD-variable-to-formula maps.
-      typedef Sgi::hash_map<int, const formula*> vf_map;
+      typedef bdd_dict::fv_map fv_map;
+      typedef bdd_dict::vf_map vf_map;
 
       fv_map next_map;	       ///< Maps "Next" variables to BDD variables
       vf_map next_formula_map; ///< Maps BDD variables to "Next" variables
