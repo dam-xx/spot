@@ -203,6 +203,11 @@ options_common = [
     ('show_never_claim',    'output Spin never claim',                     0),
     ('show_lbtt',           'convert automaton for LBTT',                  0),
     ]
+options_reduce = [
+    ('reduce_basics',       'basic rewritings',                            1),
+    ('reduce_syntimpl',     'syntactic implication',                       1),
+    ('reduce_eventuniv',    'eventuality and universality',                1),
+    ]
 options_debug = [
     ('show_parse',          'show traces during parsing',                  0),
     ('show_dictionnary',    'print BDD dictionary',                        0),
@@ -339,6 +344,7 @@ for opt, desc, color in translators:
     add_options('', 0, color, globals()['options_' + opt])
 
 add_options("Common Options", 1, '', options_common)
+add_options("Formula Simplications", 1, '', options_reduce)
 add_options("Debugging Options", 1, '', options_debug)
 
 print '<TABLE>'
@@ -351,6 +357,8 @@ for d in range(depth):
     for i in width:
         if d < len(column[i]):
             print column[i][d]
+        else:
+            print '<TD></TD>'
     print '</TR>'
 print '</TABLE>'
 
@@ -393,6 +401,25 @@ if show_formula_png:
     spot.dotty(outfile, f)
     del outfile
     render_dot(imgprefix + '-f')
+
+opt = spot.Reduce_None
+if reduce_basics:
+    opt = opt + spot.Reduce_Basics
+if reduce_syntimpl:
+    opt = opt + spot.Reduce_Syntactic_Implications
+if reduce_eventuniv:
+    opt = opt + spot.Reduce_Eventuality_And_Universality
+if opt != spot.Reduce_None:
+    f2 = spot.reduce(f, opt)
+    spot.destroy(f)
+    f = f2
+    print "<p>Reduced formula is<code>", f, "</code></p>"
+
+    if show_formula_png:
+        outfile = spot.ofstream(imgprefix + '-f2.txt')
+        spot.dotty(outfile, f)
+        del outfile
+        render_dot(imgprefix + '-f2')
 
 print '<H2>Automaton</H2>'
 
