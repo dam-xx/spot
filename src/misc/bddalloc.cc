@@ -20,7 +20,11 @@ namespace spot
     if (initialized)
       return;
     initialized = true;
-    bdd_init(50000, 5000);
+    // The values passed to bdd_init should depends on the problem
+    // the library is solving.  It would be nice to allow users
+    // to tune this.  By the meantime, we take the typical values
+    // for large examples advocated by the BuDDy manual.
+    bdd_init(1000000, 10000);
     bdd_setvarnum(varnum);
   }
 
