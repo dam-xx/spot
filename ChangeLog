@@ -1,5 +1,8 @@
 2004-09-13  Thomas Martinez  <martinez@src.lip6.fr>
 
+	* src/tgbaalgos/nesteddfsgen.hh src/tgbaalgos/nesteddfsgen.cc:
+	New algorithm for emptiness check.
+
 	* src/tgbatest/spotlbtt.test,
 	src/tgbatest/reductgba.cc,
 	src/tgbatest/ltl2tgba.cc:
