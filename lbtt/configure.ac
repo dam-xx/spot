@@ -1,11 +1,11 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.53])
-AC_INIT([lbtt], [1.0.3], [heikki.tauriainen@hut.fi])
-AC_REVISION([Revision: 1.3])
+AC_PREREQ([2.59])
+AC_INIT([lbtt], [1.1.0], [heikki.tauriainen@hut.fi])
+AC_REVISION([Revision: 1.4])
 AC_CONFIG_SRCDIR([src/main.cc])
+AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
-AM_CONFIG_HEADER([config.h])
 
 
 
@@ -18,31 +18,68 @@ AC_PROG_CXXCPP
 AM_PROG_LEX
 AC_PROG_YACC
 
-# Check whether the user has explicitly disabled the test for the availability
-# of the GNU readline library.
+
+
+# Check whether the user has explicitly disabled support for the GNU readline
+# library.
 
 readline=yes
+readline_includedir=
+readline_libdir=
 
-AC_ARG_WITH([readline],
-            [AC_HELP_STRING([--without-readline],
-                            [disable check for the GNU readline library])],
-            [if test x"${withval}" = xno; then readline=no; fi])
+AC_ARG_WITH(
+  [readline],
+  [AS_HELP_STRING(
+     [--without-readline],
+     [disable support for the GNU readline library (default enable)])],
+  [if test x"${withval}" = xno; then readline=no; fi])
+
+AC_ARG_WITH(
+  [readline-prefix],
+  [AS_HELP_STRING(
+     [--with-readline-prefix=DIR],
+     [location where GNU readline is installed (optional)])],
+  [readline_includedir="${withval}/include"
+   readline_libdir="${withval}/lib"])
+
+AC_ARG_WITH(
+  [readline-includes],
+  [AS_HELP_STRING(
+     [--with-readline-includes=DIR],
+     [location where GNU readline headers are installed (optional)])],
+  [readline_includedir="${withval}"])
+
+AC_ARG_WITH(
+  [readline-libs],
+  [AS_HELP_STRING(
+     [--with-readline-libs=DIR],
+     [location where GNU readline libraries are installed (optional)])],
+  [readline_libdir="${withval}"])
+
+old_CPPFLAGS=${CPPFLAGS}
+old_LDFLAGS=${LDFLAGS}
+
+if test -n "${readline_includedir}"; then
+  CPPFLAGS="${CPPFLAGS} -I${readline_includedir}"
+fi
+if test -n "${readline_libdir}"; then
+  LDFLAGS="${LDFLAGS} -L${readline_libdir}"
+fi
 
 
 
 # Check for the availability of headers.
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS([fcntl.h])
+AC_CHECK_HEADERS([libintl.h fcntl.h sys/times.h])
+AC_HEADER_SYS_WAIT
 
 # Check for the availability of the GNU readline headers.
 
 if test "${readline}" = yes; then
   rl_history_h="readline/history.h"
   rl_readline_h="readline/readline.h"
-  AC_CHECK_HEADERS([${rl_history_h} ${rl_readline_h}],
-                   [],
-                   [readline=no])
+  AC_CHECK_HEADERS([${rl_history_h} ${rl_readline_h}], [], [readline=no])
 fi
 
 AC_LANG([C++])
@@ -51,29 +88,42 @@ AC_LANG([C++])
 # version of this header that cannot be compiled using g++; enable a workaround
 # if necessary.
 
-AC_CHECK_HEADERS([obstack.h],
-                 [AC_MSG_CHECKING([whether obstack.h compilation workaround is needed])
-                  AC_TRY_COMPILE([#include <obstack.h>],
-                                 [#if __GLIBC__ == 2 && __GLIBC_MINOR__ == 3
-                                  obstack_alloc(0, 0);
-                                  #endif],
-                                 [AC_MSG_RESULT([no])],
-                                 [AC_MSG_RESULT([yes])
-                                  AC_DEFINE([GLIBC_OBSTACK_WORKAROUND],
-                                            [1],
-                                            [Define to 1 to enable an obstack.h C++ compilation workaround for GNU libc 2.3.])])])
+AC_CHECK_HEADERS(
+  [obstack.h],
+  [AC_MSG_CHECKING([whether obstack.h compilation workaround is needed])
+   old_cxxflags=${CXXFLAGS}
+   CXXFLAGS="${CXXFLAGS} -Werror"
+   AC_COMPILE_IFELSE(
+     [AC_LANG_PROGRAM(
+        [[#include <obstack.h>]],
+        [[
+          #ifdef __GLIBC__ == 2 && __GLIBC_MINOR__ = 3
+          obstack_alloc(0, 0);
+          #endif
+        ]])],
+     [AC_MSG_RESULT([no])],
+     [AC_MSG_RESULT([yes])
+      AC_DEFINE(
+        [GLIBC_OBSTACK_WORKAROUND],
+        [1],
+        [Define to 1 to enable an obstack.h C++ compilation workaround for GNU libc 2.3.])])
+   CXXFLAGS=${old_cxxflags}])
 
 # Check for the availablility of the sstream or strstream header.
 
-AC_CHECK_HEADERS([sstream],
-                 [],
-                 [AC_CHECK_HEADERS([strstream],
-                                   [],
-                                   [AC_MSG_ERROR([missing one or more standard C++ headers])])])
+AC_CHECK_HEADERS(
+  [sstream],
+  [],
+  [AC_CHECK_HEADERS(
+     [strstream],
+     [],
+     [AC_MSG_ERROR([missing one or more standard C++ headers])])])
 
 
 
 # Checks for typedefs, structures, and compiler characteristics.
+
+AC_GNU_SOURCE
 
 # Check for the availability of the slist header (an extension to the C++
 # Standard Template Library). (In GCC 3.x the header is in the ext/
@@ -82,30 +132,35 @@ AC_CHECK_HEADERS([sstream],
 AC_MSG_CHECKING([for slist])
 for slist_header in slist ext/slist no; do
   if test "${slist_header}" != no; then
-    AC_TRY_CPP([#include <${slist_header}>], [break])
+    AC_PREPROC_IFELSE(
+      [AC_LANG_SOURCE([[#include <${slist_header}>]])],
+      [break])
   fi
 done
 
 # Try to determine the C++ namespace in which the class slist resides.
-# (For example, GCC versions 3.1, 3.1.1 and 3.2 put slist into the
-# __gnu_cxx namespace.)
+# (For example, GCC versions >= 3.1 put slist into the __gnu_cxx namespace.)
 
 if test "${slist_header}" != no; then
   for slist_namespace in std __gnu_cxx error; do
     if test "${slist_namespace}" != error; then
-      AC_TRY_LINK([#include <${slist_header}>],
-                  [${slist_namespace}::slist<int> s;],
-                  [break])
+      AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM(
+           [[#include <${slist_header}>]],
+           [[${slist_namespace}::slist<int> s;]])],
+        [break])
     fi
   done
   if test "${slist_namespace}" != error; then
     AC_MSG_RESULT([header <${slist_header}>, typename ${slist_namespace}::slist])
-    AC_DEFINE([HAVE_SLIST],
-              [1],
-              [Define to 1 if you have the <slist> or <ext/slist> header file.])
-    AC_DEFINE_UNQUOTED([SLIST_NAMESPACE],
-                       [${slist_namespace}],
-                       [Define as the name of the C++ namespace containing slist.])
+    AC_DEFINE(
+      [HAVE_SLIST],
+      [1],
+      [Define to 1 if you have the <slist> or <ext/slist> header file.])
+    AC_DEFINE_UNQUOTED(
+      [SLIST_NAMESPACE],
+      [${slist_namespace}],
+      [Define as the name of the C++ namespace containing slist.])
     AC_SUBST([INCLUDE_SLIST_HEADER], ["#include <${slist_header}>"])
   else
     slist_header=no
@@ -114,26 +169,20 @@ fi
 
 if test "${slist_header}" = no; then
   AC_MSG_RESULT([no])
-
-# Check for the availability of the single_client_alloc memory allocator
-# available in some compilers supporting the SGI extensions to the Standard
-# template library (for example, pre-3.0 versions of gcc). This check is not
-# needed if no suitable slist header was found above, since in that case the
-# compiler does not support the SGI extensions.
-
-else
-  AC_MSG_CHECKING([for single_client_alloc])
-  AC_TRY_LINK([#include <${slist_header}>],
-              [using namespace std;
-               ${slist_namespace}::slist<int, single_client_alloc> s;],
-              [AC_MSG_RESULT([yes])
-               AC_DEFINE([HAVE_SINGLE_CLIENT_ALLOC],
-                         [1],
-                         [Define if your C++ compiler supports the single_client_allocator memory allocator.])],
-              [AC_MSG_RESULT([no])])
 fi
 
 AC_LANG(C)
+
+AC_CHECK_TYPES(
+  [unsigned long long int],
+  [AC_DEFINE(
+     [BIGUINT],
+     [unsigned long long int],
+     [Define to an unsigned integer type supported by your compiler.])],
+  [AC_DEFINE(
+     [BIGUINT],
+     [unsigned long int],
+     [Define to an unsigned integer type supported by your compiler.])])
 
 AC_C_CONST
 AC_C_INLINE
@@ -142,12 +191,14 @@ AC_C_INLINE
 
 # Checks for library functions.
 
-AC_TYPE_SIGNAL
-AC_CHECK_FUNCS([mkdir strchr strtod strtol strtoul getopt_long isatty])
+AC_CHECK_FUNCS(
+  [strchr strtod strtol strtoul strerror mkdir mkstemp open read write close popen pclose pipe fork execvp getpid waitpid alarm sigaction sigprocmask sigemptyset sigaddset times sysconf],
+  [],
+  [AC_MSG_ERROR([missing one of the library functions required for compilation])])
+AC_CHECK_FUNCS([strsignal isatty getopt_long])
 if test x"${ac_cv_func_getopt_long}" = xno; then
   AC_LIBOBJ([getopt])
   AC_LIBOBJ([getopt1])
-  AC_CHECK_HEADERS([libintl.h])
   AC_CHECK_FUNCS([memset])
 fi
 
@@ -159,24 +210,35 @@ if test "${readline}" = yes; then
   for READLINELIBS in "-lreadline" "-lreadline -lcurses" "-lreadline -ltermcap" error; do
     if test "${READLINELIBS}" != error; then
       LIBS="${oldlibs} ${READLINELIBS}"
-      AC_TRY_LINK([#include <stdio.h>
-                   #include <${rl_history_h}>
-                   #include <${rl_readline_h}>],
-                  [using_history(); readline(""); add_history("");],
-                  [break])
+      AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM(
+           [[
+             #include <stdio.h>
+             #include <${rl_history_h}>
+             #include <${rl_readline_h}>
+           ]],
+           [[using_history(); readline(""); add_history("");]])],
+        [break])
     fi
   done
   LIBS=${oldlibs}
   if test "${READLINELIBS}" != error; then
-    AC_DEFINE([HAVE_READLINE],
-              [1],
-              [Define if you have the GNU readline library.])
+    AC_DEFINE(
+      [HAVE_READLINE],
+      [1],
+      [Define if you have the GNU readline library.])
     AC_SUBST([READLINELIBS])
     AC_MSG_RESULT([${READLINELIBS}])
   else
     AC_MSG_RESULT([no suitable libraries found, readline support disabled])
     READLINELIBS=""
+    readline=no
   fi
+fi
+
+if test "${readline}" = no; then
+  CPPFLAGS=${old_CPPFLAGS}
+  LDFLAGS=${old_LDFLAGS}
 fi
 
 # Check for the availability of the `rand48' family of random number
@@ -184,17 +246,20 @@ fi
 
 have_rand48=yes
 
-AC_CHECK_FUNCS([srand48 lrand48 seed48],
-               [],
-               [have_rand48=no
-                AC_CHECK_FUNCS([rand srand],
-                               [],
-                               [AC_MSG_ERROR([missing library functions for random number generation])])])
+AC_CHECK_FUNCS(
+  [srand48 lrand48 seed48],
+  [],
+  [have_rand48=no
+   AC_CHECK_FUNCS(
+     [rand srand],
+     [],
+     [AC_MSG_ERROR([missing library functions for random number generation])])])
 
 if test "${have_rand48}" = yes; then
-  AC_DEFINE([HAVE_RAND48],
-            [1],
-            [Define if you have the `rand48' family of random number generation functions.])
+  AC_DEFINE(
+    [HAVE_RAND48],
+    [1],
+    [Define if you have the `rand48' family of random number generation functions.])
 fi
 
 
