@@ -1,3 +1,25 @@
+2003-10-06  Rachid REBIHA  <rebiha@nyx>
+
+	* iface/gspn/ltlgspn.cc: We call tgba_emptiness_check before
+	counter_example. And we print the prefix and the periode of
+	counter_example's result.
+
+	* src/tgbatest/emptinesscheckexplicit.cc (main):
+	We call tgba_emptiness_check before counter_example.
+	* src/tgbatest/emptinesscheck.cc (main):
+	We call tgba_emptiness_check before counter_example.
+
+	* src/tgbaalgos/emptinesscheck.hh (spot):
+	(spot::print_result): New methode to print the prefix and the
+	periode of counter_example's result.
+
+	* src/tgbaalgos/emptinesscheck.cc (spot): counter_example doesn't
+	call tgba_emptiness_check. counter_example must be executed after
+	calling tgba_emptiness_check.  Remove tgba_emptiness_check calls.
+	(print_result): New methode to print the prefix and the
+	periode of counter_example's result.  Remove most of all std::cout
+	during execution of emptiness_check's methodes.
+
 2003-10-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/udcsfm.test, iface/gspn/udcsefm.test: New files.

@@ -124,6 +124,7 @@ main(int argc, char** argv)
 	  std::cout << print_emptiness_check_ans(emptiness) << std::endl;
 	  break;
 	case 7:
+	  emptiness = empty_check->tgba_emptiness_check(a);
 	  empty_check->counter_example(a);
      	  break;
 	default:

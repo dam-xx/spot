@@ -49,9 +49,10 @@ main(int argc, char **argv)
       {
 	spot::emptiness_check empty_check;
 	bool res = empty_check.tgba_emptiness_check(prod);
-	if (!res)
+        if (!res)
 	  {
 	    empty_check.counter_example(prod);
+std::cout << empty_check.print_result(std::cout, prod, model);
 	    exit(1);
 	  }
 	else

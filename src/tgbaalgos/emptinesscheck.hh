@@ -11,10 +11,12 @@
 #include <list>
 #include <vector>
 #include <set>
+#include <utility>
+#include <ostream>
 
+ /// \brief Emptiness check on spot::tgba
 namespace spot
 {
-  /// \brief Emptiness check on spot::tgba
 
   class connected_component
   {
@@ -64,10 +66,10 @@ virtual
     /// this function remove all accessible state from a given
     /// state. In other words, it removes the strongly connected
     /// component that contents this state.
+ /// \brief Emptiness check on spot::tgba
     void
     remove_component(const tgba& aut, seen& state_map, const spot::state* start_delete);
 
- /// \brief Emptiness check on spot::tgba
   /// This is based on the following papers.
   /// \verbatim
   /// @InProceedings{   couvreur.00.lacim,
@@ -112,6 +114,10 @@ virtual
     void
  counter_example(const spot::tgba* aut_counter);
 
+std::ostream&
+    print_result(std::ostream& os, const spot::tgba* aut, const tgba* restrict = 0) const;
+
+
     std::stack <bdd> arc_accepting;
     std::stack <connected_component> root_component;
     seen seen_state_num;
@@ -120,7 +126,6 @@ virtual
   private:
     std::stack <pair_state_iter> todo;
     std::vector<state_sequence> vec_sequence;
-
     /// This function is called by counter_example to find a path
     /// which contents all accepting conditions in the accepted SCC (get all the
     /// accepting conditions).
@@ -134,6 +139,8 @@ virtual
     //of the counter example.  Append a sequence to the path given by  accepting_path.
     void
     complete_cycle(const spot::tgba* aut_counter, const connected_component& comp_path, const state* from_state,const state* to_state);
+
+
   };
 }
 #endif // SPOT_EMPTINESS_CHECK_HH

@@ -21,7 +21,6 @@ main(int argc, char** argv)
 
   bool debug = false;
   int filename_index = 1;
-  bool emptiness = false;
 
   if (!strcmp(argv[1], "-d"))
     {
@@ -40,6 +39,7 @@ main(int argc, char** argv)
 
   if (spot::format_tgba_parse_errors(std::cerr, pel))
     return 2;
+bool emptiness  = empty_check.tgba_emptiness_check(a);
   empty_check.counter_example(a);
   delete a;
   return 0;

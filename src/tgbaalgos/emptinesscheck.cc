@@ -14,6 +14,9 @@
 #include <stdio.h>
 #include <vector>
 #include <set>
+#include <iterator>
+#include <utility>
+#include <ostream>
 
 namespace spot
 {
@@ -53,13 +56,14 @@ namespace spot
     return aut->all_accepting_conditions() == condition;
   }
 
-  void
-    emptiness_check::remove_component(const tgba& aut, seen& state_map, const spot::state* start_delete)
-    {
     /// \brief Remove all the nodes accessible from the given node start_delete.
     ///
     /// The removed graphe is the subgraphe containing nodes store
     ///intable state_map with order -1.
+
+  void
+    emptiness_check::remove_component(const tgba& aut, seen& state_map, const spot::state* start_delete)
+    {
 
     std::stack<spot::tgba_succ_iterator*> to_remove;
     state_map[start_delete] = -1;
@@ -89,17 +93,19 @@ namespace spot
   emptiness_check::~emptiness_check()
     {
     }
+
 emptiness_check::emptiness_check()
     {
     }
 
-  bool
-  emptiness_check::tgba_emptiness_check(const spot::tgba* aut_check)
-  {
     /// \brief On-the-fly emptiness check.
     ///
     /// The algorithm used here is adapted from Jean-Michel Couvreur's
     /// Probataf tool.
+  bool
+  emptiness_check::tgba_emptiness_check(const spot::tgba* aut_check)
+  {
+
     int nbstate = 1;
     state* init = aut_check->get_init_state();
     seen_state_num[init] = 1;
@@ -180,33 +186,69 @@ emptiness_check::emptiness_check()
 		if (aut_check->all_accepting_conditions() == comp.condition)
 		  {
 		    /// A failure SCC is find, the automata is not empty.
-		    spot::bdd_print_dot(std::cout, aut_check->get_dict(),comp.condition);
+		    //spot::bdd_print_dot(std::cout, aut_check->get_dict(),comp.condition);
 		    root_component.push(comp);
-		    return false;
+		    std::cout << "CONSISTENT AUTOMATA" << std::endl;
+      		    return false;
 		  }
 		root_component.push(comp);
 		assert(root_component.size() == arc_accepting.size());
 	      }
 	  }
       }
-    spot::bdd_print_dot(std::cout, aut_check->get_dict(),aut_check->all_accepting_conditions());
     /// The automata is empty.
+      std::cout << "EMPTY LANGUAGE" << std::endl;
     return true;
   }
 
 
+std::ostream&
+  emptiness_check::print_result(std::ostream& os, const spot::tgba* aut, const tgba* restrict ) const
+  {
+    os << "======================" << std::endl;
+    os << "Prefix:" << std::endl;
+    os << "======================" << std::endl;
+     const bdd_dict* d = aut->get_dict();
+    for (state_sequence::const_iterator i_se = seq_counter.begin(); i_se != seq_counter.end(); i_se++)
+	    {
+	      if (restrict)
+		{
+	      os << "*****Projected STATE :" << restrict->format_state(aut->project_state((*i_se), restrict)) << "*****" << std::endl;
+		}
+	      else
+		{
+	      os << "*****print STATE :" << aut->format_state((*i_se)) << "*****" << std::endl;
+		}
+	    }
+    os << "======================" << std::endl;
+    os << "Cycle:" <<std::endl;
+    os << "======================" << std::endl;
+    for (cycle_path::const_iterator it = periode.begin(); it != periode.end(); it++)
+	    {
+	      if (restrict)
+		{
+		  os << "     | " << bdd_format_set(d, (*it).second) <<std::endl ;
+     		  os << "*****Projected STATE :" << restrict->format_state(aut->project_state((*it).first, restrict)) << "*****" << std::endl;
+		}
+	      else
+		{
+	      os << "     | " << bdd_format_set(d, (*it).second) <<std::endl ;
+	      os << "*****print STATE :" << aut->format_state((*it).first) << "*****" << std::endl;
+      		}
+	    }
+ return os;
+  }
+
+      /// \brief Build a possible prefixe and period for a counter example.
   void
     emptiness_check::counter_example(const spot::tgba* aut_counter)
     {
-      /// \brief Build a possible prefixe and period for a counter example.
-      bool emptiness = tgba_emptiness_check(aut_counter);
       std::deque <pair_state_iter> todo_trace;
       typedef std::map <const spot::state*, const spot::state*, spot::state_ptr_less_than> path_state;
       path_state path_map;
 
-      if (!emptiness){
+        if (!root_component.empty()){
 	int comp_size = root_component.size();
-	std::cout << "*****COUNTER-EXAMPLE*****" << comp_size << std::endl;
 	typedef std::vector<connected_component> vec_compo;
 	vec_compo vec_component;
 	vec_component.resize(comp_size);
@@ -215,19 +257,14 @@ emptiness_check::emptiness_check()
 	state_sequence tmp_lst;
 	state_sequence best_lst;
 	bdd tmp_acc = bddfalse;
- std::stack <pair_state_iter> todo_accept;
+	std::stack <pair_state_iter> todo_accept;
 
 	for (int j = comp_size -1; j >= 0; j--)
 	  {
 	    vec_component[j] = root_component.top();
-spot::bdd_print_dot(std::cout, aut_counter->get_dict(),root_component.top().condition);
 	    root_component.pop();
 	  }
 
-	for (int p = 0; p < comp_size; p++)
-	  {
-	    std::cout << "*****" <<  vec_component[p].index << "*****" << std::endl;
-	  }
 	int q_index;
 	int tmp_int = 0;
 	/// Fill the SCC in the stack root_component.
@@ -250,19 +287,6 @@ spot::bdd_print_dot(std::cout, aut_counter->get_dict(),root_component.top().cond
 		    vec_component[comp_size-1].state_set.insert((*iter_map).first);
 		  }
 	      }
-	  }
-
-	for (int m = 0; m < comp_size; m++)
-	  {
-	    std::cout << "*****CONNECTED COMPONENT :" <<vec_component[m].index << "*****" << std::endl;
-	    for (connected_component::set_of_state::iterator i_seq = vec_component[m].state_set.begin(); i_seq != vec_component[m].state_set.end(); i_seq++)
-	      {
-		std::cout << "*****STATE :" << aut_counter->format_state(*i_seq) << "*****" << std::endl;
-		seen::iterator i_1 = seen_state_num.find((*i_seq));
-		assert(i_1 != seen_state_num.end());
-		std::cout << "***** NUM :" << seen_state_num[*i_seq] << "*****" << std::endl;
-	      }
-	    std::cout << "_________________________________" << std::endl;
 	  }
 
 	state* start_state = aut_counter->get_init_state();
@@ -328,51 +352,30 @@ connected_component::set_of_state::iterator iter_set = vec_component[k+1].state_
 	  {
 	    seq_counter.push_front(start_state);
 	  }
-	//	vec_sequence[0].push_front(start_state);
   for (int n_ = 0; n_ < comp_size-1; n_++)
     {
       for (state_sequence::iterator it = vec_sequence[n_].begin(); it != vec_sequence[n_].end(); it++)
 	    {
 	      seq_counter.push_back(*it);
 	    }
-      //  seq_counter.splice(seq_counter.end(), vec_sequence[n_]);
     }
   seq_counter.unique();
-  for (state_sequence::iterator i_se = seq_counter.begin(); i_se != seq_counter.end(); i_se++)
-	    {
-	      std::cout << "*****STATE :" << aut_counter->format_state(*i_se) << "*****" << std::endl;
-	      std::cout << "***** NUM :" << seen_state_num[(*i_se)] << "*****" << std::endl;
-	    }
-
-  std::cout << "ACCEPTING PATH BEGIN " << std::endl;
-  /// Call accepting_path to build the period of the counter example.
   emptiness_check::accepting_path(aut_counter, vec_component[comp_size-1], seq_counter.back(),vec_component[comp_size-1].condition);
-std::cout << "ACCEPTING PATH END " << std::endl;
-
-      }
-      else
+  }
+    else
 	{
-	  std::cout << "Nothings in vec_sequence " << std::endl;
-	  std::cout << "******************************************" << std::endl;
-	  std::cout << "*****SEEN STATE NUM :" << "*****" << std::endl;
-	  for (seen::iterator i_sd = seen_state_num.begin(); i_sd != seen_state_num.end(); i_sd++)
-	    {
-	      std::cout << "*****STATE :" << aut_counter->format_state((*i_sd).first) << "*****" << std::endl;
-	      std::cout << "***** NUM :" << seen_state_num[(*i_sd).first] << "*****" << std::endl;
-	      }
-	  std::cout << "_________________________________" << std::endl;
+	  std::cout << "EMPTY LANGUAGE NO COUNTER EXEMPLE" << std::endl;
 	}
     }
 
+     /// \brief complete the path build by accepting_path to get the
+     ///period (cycle).
  void
    emptiness_check::complete_cycle(const spot::tgba* aut_counter, const connected_component& comp_path, const state* from_state,const state* to_state)
    {
-     /// \brief complete the path build by accepting_path to get the
-     ///period (cycle).
      if (seen_state_num[from_state] != seen_state_num[to_state])
        {
-	 std::cout << "COMPLETE CYCLE BEGIN" << std::endl;
-	 std::map <const spot::state*, state_proposition, spot::state_ptr_less_than> complete_map;
+      	 std::map <const spot::state*, state_proposition, spot::state_ptr_less_than> complete_map;
 	 std::deque <pair_state_iter> todo_complete;
 	 spot::tgba_succ_iterator* ite = aut_counter->succ_iter(from_state);
 	 todo_complete.push_back(pair_state_iter(from_state, ite));
@@ -394,10 +397,8 @@ std::cout << "ACCEPTING PATH END " << std::endl;
 			 const state* curr_father = started_.first;
 			 bdd curr_condition = iter_s->current_condition();
 			 tmp_comp.push_front(state_proposition(curr_state, curr_condition));
-			 // tmp_comp.push_front(state_proposition(curr_father, complete_map[curr_father].second));
 			 while (curr_father->compare(from_state) != 0)
 			   {
-			     //emptiness_check::periode.push_front(state_proposition(curr_father, complete_map[curr_father].second));
 			     tmp_comp.push_front(state_proposition(curr_father, complete_map[curr_father].second));
 			     curr_father = complete_map[curr_father].first;
 			   }
@@ -413,18 +414,15 @@ std::cout << "ACCEPTING PATH END " << std::endl;
 		   }
 	       }
 	   }
-	 //     emptiness_check::periode = state_prop;
        }
-     std::cout << "END COMPLETE CYCLE " << std::endl;
    }
 
-
-void
-  emptiness_check::accepting_path(const spot::tgba* aut_counter, const connected_component& comp_path, const spot::state* start_path, bdd to_accept)
-  {
     /// \Brief build recursively a path in the accepting SCC to get
     ///all accepting conditions. This path is the first part of the
     ///period.
+void
+  emptiness_check::accepting_path(const spot::tgba* aut_counter, const connected_component& comp_path, const spot::state* start_path, bdd to_accept)
+  {
     seen seen_priority;
     std::stack<triplet> todo_path;
     tgba_succ_iterator* t_s_i = aut_counter->succ_iter(start_path);
@@ -436,72 +434,46 @@ void
     cycle_path best_lst;
     bool ok = false;
     seen_priority[start_path] = seen_state_num[start_path];
-    for (seen::iterator i_ss = seen_priority.begin(); i_ss != seen_priority.end(); i_ss++)
-      {
-	std::cout << "*****STATE :" << aut_counter->format_state((*i_ss).first) << "*****" << std::endl;
-	std::cout << "***** NUM :" << seen_priority[(*i_ss).first] << "*****" << std::endl;
-      }
     while (!todo_path.empty())
       {
 	triplet step_ = todo_path.top();
 	tgba_succ_iterator* iter_ = (step_.first).second;
-	std::cout << "WHILE BEGIN " << iter_ << std::endl;
 	if (iter_->done())
 	  {
-	    std::cout << "IF BEGIN " << std::endl;
 	    todo_path.pop();
 	    seen_priority.erase((step_.first).first);
-	  for (seen::iterator i_ss = seen_priority.begin(); i_ss != seen_priority.end(); i_ss++)
-	 {
-       std::cout << "*****STATE :" << aut_counter->format_state((*i_ss).first) << "*****" << std::endl;
-	std::cout << "***** NUM :" << seen_priority[(*i_ss).first] << "*****" << std::endl;
-	    }
-	    //seen_priority.[(step_.first).first] = -2;
-	    //delete(tmp_lst.back().first);
 	    tmp_lst.pop_back();
-	    std::cout << "IF END " << std::endl;
 	  }
 	else
 	  {
-	    std::cout << "ELSE BEGIN " << std::endl;
 	    state* curr_state = iter_->current_state();
 	    connected_component::set_of_state::iterator it_set = comp_path.state_set.find(curr_state);
 	    if (it_set != comp_path.state_set.end())
 	      {
-		std::cout << "IN COMPONENT " << std::endl;
 		seen::iterator i = seen_priority.find(curr_state);
 		if (i == seen_priority.end())
 		  {
-		 std::cout << "NOT IN MAP " << std::endl;
-		 std::cout <<"STATE:" << aut_counter->format_state(curr_state) << "*****" << std::endl;
-		 // spot::bdd_print_dot(std::cout, aut_counter->get_dict(),aut_counter->succ_iter(curr_state)->current_accepting_conditions());
 		 tgba_succ_iterator* c_iter = aut_counter->succ_iter(curr_state);
 		 bdd curr_bdd =  bdd_apply(iter_->current_accepting_conditions(), step_.second, bddop_or);
-		 std::cout << "*****TODO PATH PUSH STATE : BEFORE" << aut_counter->format_state((todo_path.top().first).first) << "*****" << std::endl;
 		 c_iter->first();
 		 todo_path.push(triplet(pair_state_iter(curr_state, c_iter), curr_bdd));
-std::cout << "*****TODO PATH PUSH STATE : AFTER" << aut_counter->format_state((todo_path.top().first).first) << "*****" << std::endl;
-		    tmp_lst.push_back(state_proposition(curr_state, iter_->current_condition()));
-		    seen_priority[curr_state] = seen_state_num[curr_state];
+		 tmp_lst.push_back(state_proposition(curr_state, iter_->current_condition()));
+		 seen_priority[curr_state] = seen_state_num[curr_state];
 		  }
 		else
 		  {
-		    std::cout << "IN MAP " << std::endl;
 		    if (ok)
 		      {
-			std::cout << "NOT FIRST TIME " << std::endl;
 			bdd last_ = iter_->current_accepting_conditions();
 			bdd prop_ = iter_->current_condition();
 			tmp_lst.push_back(state_proposition(curr_state, prop_));
 			tmp_acc = bdd_apply(last_, step_.second, bddop_or);
-//			tmp_lst.push_back(state_proposition(curr_state->clone(), last_));
 			bdd curr_in = bdd_apply(tmp_acc, to_accept, bddop_and);
 			bdd best_in = bdd_apply(best_acc, to_accept, bddop_and);
 			if (curr_in == best_in)
 			  {
 			    if (tmp_lst.size() < best_lst.size())
 			      {
-				std::cout << "tmp_lst.size() < best_lst.size() " << std::endl;
 				cycle_path tmp(tmp_lst);
 				best_lst = tmp;
 				spot::bdd_print_dot(std::cout, aut_counter->get_dict(),step_.second);
@@ -519,7 +491,6 @@ std::cout << "*****TODO PATH PUSH STATE : AFTER" << aut_counter->format_state((t
 		      }
 		    else
 		      {
-			std::cout << "FIRST TIME " << std::endl;
 			bdd last_ = iter_->current_accepting_conditions();
 			bdd prop_ = iter_->current_condition();
 		        tmp_acc = bdd_apply(last_, step_.second, bddop_or);
@@ -532,46 +503,26 @@ std::cout << "*****TODO PATH PUSH STATE : AFTER" << aut_counter->format_state((t
 		  }
 	      }
 	    iter_->next();
-	    std::cout << "ELSE END " << std::endl;
+
 	  }
       }
     for (cycle_path::iterator it = best_lst.begin(); it != best_lst.end(); it++)
 	    {
 	      emptiness_check::periode.push_back(*it);
 	    }
-    //  emptiness_check::periode.splice(periode.end(), best_lst);
-     std::cout <<  "POINTEUR:" << periode.back().first << "*STATE :" << aut_counter->format_state( periode.back().first) << "*****" << std::endl;
     if (best_acc != to_accept)
       {
-	std::cout << "IN RECURSE " << std::endl;
 	bdd rec_to_acc = bdd_apply(to_accept, !best_acc, bddop_and);
-	std::cout << "BEST_ACC " << std::endl;
-	spot::bdd_print_dot(std::cout, aut_counter->get_dict(),best_acc);
-	std::cout << "TO_ACCEPT " << std::endl;
-	spot::bdd_print_dot(std::cout, aut_counter->get_dict(),to_accept);
-	std::cout << "TO_ACCEPT - BEST_ACC " << std::endl;
-	spot::bdd_print_dot(std::cout, aut_counter->get_dict(),rec_to_acc);
 	emptiness_check::accepting_path(aut_counter, comp_path, periode.back().first, rec_to_acc);
-	std::cout << "IN RECURSE " << std::endl;
       }
     else
       {
 	bdd rec_to_acc = bdd_apply(to_accept, !best_acc, bddop_and);
-	std::cout << "TO_ACCEPT - BEST_ACC " << std::endl;
-	spot::bdd_print_dot(std::cout, aut_counter->get_dict(),rec_to_acc);
 	if (!periode.empty())
 	  {
-
-	    std::cout << "IN COMPLETE CYCLE " << std::endl;
-	    /// The paht contains all accepting conditions. Then we
+	    /// The path contains all accepting conditions. Then we
 	    ///complete the cycle in this SCC by calling complete_cycle.
 	complete_cycle(aut_counter, comp_path, periode.back().first, seq_counter.back());
-	for (cycle_path::iterator it = periode.begin(); it != periode.end(); it++)
-	    {
-	      std::cout << "*****STATE :" << aut_counter->format_state((*it).first) << "*****" << std::endl;
-	      std::cout << "PROPOSITION TRANSITION :" << std::endl;
-	      spot::bdd_print_dot(std::cout, aut_counter->get_dict(), (*it).second);
-	    }
 	  }
       }
   }
