@@ -440,7 +440,7 @@ namespace spot
      size_t size_tgba_ = 0;
      int j, conj;
 
-     succ(s->left(), props_ ,nb_arc_props, &succ_tgba_, &size_tgba_);
+     succ(s->left(), props_, nb_arc_props, &succ_tgba_, &size_tgba_);
 
      for (j = 0; j < nb_arc_props; j++)
        {
@@ -580,7 +580,11 @@ namespace spot
 	      && old_state->left()
 	      && new_state->left())
 	    if (spot_inclusion(new_state->left(), old_state->left()))
-	      return (*i);
+	      {
+		if (*i != s)
+		  delete s;
+		return *i;
+	      }
 	}
       return 0;
     }
@@ -732,6 +736,7 @@ namespace spot
     hash_type h;		///< Map of visited states.
 
     friend class numbered_state_heap_eesrg_const_iterator;
+    friend class emptiness_check_shy_eesrg;
   };
 
 
@@ -784,6 +789,7 @@ namespace spot
     const numbered_state_heap_eesrg_semi::hash_type& h;
   };
 
+
   numbered_state_heap_const_iterator*
   numbered_state_heap_eesrg_semi::iterator() const
   {
@@ -824,6 +830,79 @@ namespace spot
   };
 
 
+  class emptiness_check_shy_eesrg : public emptiness_check_shy
+  {
+  public:
+    emptiness_check_shy_eesrg(const tgba* a)
+      : emptiness_check_shy(a,
+			    numbered_state_heap_eesrg_factory_semi::instance())
+    {
+    }
+
+  protected:
+    virtual int*
+    find_state(const state* s)
+    {
+      typedef numbered_state_heap_eesrg_semi::hash_type hash_type;
+      hash_type& h = dynamic_cast<numbered_state_heap_eesrg_semi*>(ecs_->h)->h;
+
+      hash_type::iterator i;
+      for (i = h.begin(); i != h.end(); ++i)
+	{
+	  const state_gspn_eesrg* old_state =
+	    dynamic_cast<const state_gspn_eesrg*>(i->first);
+	  const state_gspn_eesrg* new_state =
+	    dynamic_cast<const state_gspn_eesrg*>(s);
+	  assert(old_state);
+	  assert(new_state);
+
+	  if ((old_state->right())->compare(new_state->right()) == 0)
+	    {
+	      if (old_state->left() == new_state->left())
+		break;
+
+	      if (old_state->left() && new_state->left())
+		{
+		  if (i->second == -1)
+		    {
+		      if (spot_inclusion(new_state->left(), old_state->left()))
+			break;
+		    }
+		  else
+		    {
+		      if (spot_inclusion(old_state->left(), new_state->left()))
+			{
+			  State* succ_tgba_ = NULL;
+			  size_t size_tgba_ = 0;
+			  succ_queue& queue = todo.top().second;
+
+			  Diff_succ(old_state->left(), new_state->left(),
+				    &succ_tgba_, &size_tgba_);
+
+			  for (size_t i = 0; i < size_tgba_; i++)
+			    {
+			      state_gspn_eesrg* s =
+				new state_gspn_eesrg
+				  (succ_tgba_[i],
+				   old_state->right()->clone());
+			      queue.push_back(successor(queue.begin()->acc, s));
+			    }
+			  if (size_tgba_ != 0)
+			    diff_succ_free(succ_tgba_);
+			  break;
+			}
+		    }
+		}
+	    }
+	}
+      if (i == h.end())
+	return 0;
+      return &i->second;
+    }
+  };
+
+
+
   emptiness_check*
   emptiness_check_eesrg_semi(const tgba* eesrg_automata)
   {
@@ -841,6 +920,13 @@ namespace spot
       new emptiness_check_shy
         (eesrg_automata,
 	 numbered_state_heap_eesrg_factory_semi::instance());
+  }
+
+  emptiness_check*
+  emptiness_check_eesrg_shy(const tgba* eesrg_automata)
+  {
+    assert(dynamic_cast<const tgba_gspn_eesrg*>(eesrg_automata));
+    return new emptiness_check_shy_eesrg(eesrg_automata);
   }
 
   counter_example*

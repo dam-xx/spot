@@ -237,43 +237,21 @@ namespace spot
   emptiness_check_shy::emptiness_check_shy(const tgba* a,
 					   const numbered_state_heap_factory*
 					   nshf)
-    : emptiness_check(a, nshf)
+    : emptiness_check(a, nshf), num(1)
   {
+    // Setup depth-first search from the initial state.
+    todo.push(pair_state_successors(0, succ_queue()));
+    todo.top().second.push_front(successor(bddtrue,
+					   ecs_->aut->get_init_state()));
   }
 
   emptiness_check_shy::~emptiness_check_shy()
   {
   }
 
-  struct successor {
-    bdd acc;
-    const spot::state* s;
-    successor(bdd acc, const spot::state* s): acc(acc), s(s) {}
-  };
-
   bool
   emptiness_check_shy::check()
   {
-    // We use five main data in this algorithm:
-    // * emptiness_check::root, a stack of strongly connected components (SCC),
-    // * emptiness_check::h, a hash of all visited nodes, with their order,
-    //   (it is called "Hash" in Couvreur's paper)
-    // * arc, a stack of acceptance conditions between each of these SCC,
-    std::stack<bdd> arc;
-    // * num, the number of visited nodes.  Used to set the order of each
-    //   visited node,
-    int num = 1;
-    // * todo, the depth-first search stack.  This holds pairs of the
-    //   form (STATE, SUCCESSORS) where SUCCESSORS is a list of
-    //   (ACCEPTANCE_CONDITIONS, STATE) pairs.
-    typedef std::list<successor> succ_queue;
-    typedef std::pair<const state*, succ_queue> pair_state_successors;
-    std::stack<pair_state_successors> todo;
-
-    // Setup depth-first search from the initial state.
-    todo.push(pair_state_successors(0, succ_queue()));
-    todo.top().second.push_front(successor(bddtrue,
-					   ecs_->aut->get_init_state()));
 
     for (;;)
       {
@@ -288,7 +266,7 @@ namespace spot
 	succ_queue::iterator q = queue.begin();
 	while (q != queue.end())
 	  {
-	    int* i = ecs_->h->find(q->s);
+	    int* i = find_state(q->s);
 	    if (!i)
 	      {
 		// Skip unknown states.
@@ -414,4 +392,11 @@ namespace spot
 	delete iter;
       }
   }
+
+  int*
+  emptiness_check_shy::find_state(const state* s)
+  {
+    return ecs_->h->find(s);
+  }
+
 }

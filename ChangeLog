@@ -1,3 +1,17 @@
+2004-04-15  Soheib Baarir  <Souheib.Baarir@lip6.fr>
+	    Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* iface/gspn/eesrg.cc (connected_component_eesrg::has_state):
+	Free filtered states.
+	(emptiness_check_shy_eesrg): New class.
+	(emptiness_check_eesrg_shy): New function.
+	* iface/gspn/eesrg.hh (emptiness_check_eesrg_shy): New function.
+	* iface/gspn/ltlgspn.cc (main) [EESRG]: Handle -e3, -e4, and -e5.
+	* * src/tgbaalgos/gtec/gtec.hh, src/tgbaalgos/gtec/gtec.cc
+	(emptiness_check_shy::check): Move arc, num, succ_queue, and todo
+	as attributes.
+	(emptiness_check_shy::find_state): New virtual function.
+
 2004-04-14  Soheib Baarir  <Souheib.Baarir@lip6.fr>
 	    Alexandre Duret-Lutz  <adl@src.lip6.fr>
 

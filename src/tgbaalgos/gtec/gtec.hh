@@ -111,6 +111,31 @@ namespace spot
     virtual ~emptiness_check_shy();
 
     virtual bool check();
+
+  protected:
+    struct successor {
+      bdd acc;
+      const spot::state* s;
+      successor(bdd acc, const spot::state* s): acc(acc), s(s) {}
+    };
+
+    // We use five main data in this algorithm:
+    // * emptiness_check::root, a stack of strongly connected components (SCC),
+    // * emptiness_check::h, a hash of all visited nodes, with their order,
+    //   (it is called "Hash" in Couvreur's paper)
+    // * arc, a stack of acceptance conditions between each of these SCC,
+    std::stack<bdd> arc;
+    // * num, the number of visited nodes.  Used to set the order of each
+    //   visited node,
+    int num;
+    // * todo, the depth-first search stack.  This holds pairs of the
+    //   form (STATE, SUCCESSORS) where SUCCESSORS is a list of
+    //   (ACCEPTANCE_CONDITIONS, STATE) pairs.
+    typedef std::list<successor> succ_queue;
+    typedef std::pair<const state*, succ_queue> pair_state_successors;
+    std::stack<pair_state_successors> todo;
+
+    virtual int* find_state(const state* s);
   };
 
 }

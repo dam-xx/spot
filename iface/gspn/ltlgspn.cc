@@ -53,7 +53,15 @@ syntax(char* prog)
 	    << "      (instead of just checking for emptiness)" << std::endl
 	    << std::endl
 	    << "  -e  use Couvreur's emptiness-check (default)" << std::endl
-	    << "  -e2 use Couvreur's emptiness-check variant" << std::endl
+	    << "  -e2 use Couvreur's emptiness-check's shy variant" << std::endl
+#ifdef EESRG
+	    << "  -e3 use semi-d. incl. Couvreur's emptiness-check"
+	    << std::endl
+	    << "  -e4 use semi-d. incl. Couvreur's emptiness-check's shy variant"
+	    << std::endl
+	    << "  -e5 use d. incl. Couvreur's emptiness-check's shy variant"
+	    << std::endl
+#endif
 	    << "  -m  degeneralize and perform a magic-search" << std::endl
 	    << std::endl
             << "  -l  use Couvreur's LaCIM algorithm for translation (default)"
@@ -68,7 +76,8 @@ main(int argc, char **argv)
   try
     {
       int formula_index = 1;
-      enum { Couvreur, Couvreur2, Magic } check = Couvreur;
+      enum { Couvreur, Couvreur2, Couvreur3,
+	     Couvreur4, Couvreur5, Magic } check = Couvreur;
       enum { Lacim, Fm } trans = Lacim;
       bool compute_counter_example = false;
       bool proj = true;
@@ -88,6 +97,18 @@ main(int argc, char **argv)
 	  else if (!strcmp(argv[formula_index], "-e2"))
 	    {
 	      check = Couvreur2;
+	    }
+	  else if (!strcmp(argv[formula_index], "-e3"))
+	    {
+	      check = Couvreur3;
+	    }
+	  else if (!strcmp(argv[formula_index], "-e4"))
+	    {
+	      check = Couvreur4;
+	    }
+	  else if (!strcmp(argv[formula_index], "-e5"))
+	    {
+	      check = Couvreur5;
 	    }
 	  else if (!strcmp(argv[formula_index], "-m"))
 	    {
@@ -169,20 +190,34 @@ main(int argc, char **argv)
 	{
 	case Couvreur:
 	case Couvreur2:
+	case Couvreur3:
+	case Couvreur4:
+	case Couvreur5:
 	  {
 	    spot::emptiness_check* ec;
 
-#ifndef EESRG
-	    if (check == Couvreur)
-	      ec = new spot::emptiness_check(prod);
-	    else
-	      ec = new spot::emptiness_check_shy(prod);
-#else
-	    if (check == Couvreur)
-	      ec = spot::emptiness_check_eesrg_semi(prod);
-	    else
-	      ec = spot::emptiness_check_eesrg_shy_semi(prod);
+	    switch (check)
+	      {
+	      case Couvreur:
+		ec = new spot::emptiness_check(prod);
+		break;
+	      case Couvreur2:
+		ec = new spot::emptiness_check_shy(prod);
+		break;
+#ifdef EESRG
+	      case Couvreur3:
+		ec = spot::emptiness_check_eesrg_semi(prod);
+		break;
+	      case Couvreur4:
+		ec = spot::emptiness_check_eesrg_shy_semi(prod);
+		break;
+	      case Couvreur5:
+		ec = spot::emptiness_check_eesrg_shy(prod);
+		break;
 #endif
+	      default:
+		assert(0);
+	      }
 
 	    bool res = ec->check();
 
