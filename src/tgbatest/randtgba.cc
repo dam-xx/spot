@@ -104,17 +104,17 @@ struct ec_algo
 
 ec_algo ec_algos[] =
   {
-    { "Cou99",          "poprem=0",
+    { "Cou99",          "!poprem",
                         couvreur99_cons,                     0, -1U, true },
-    { "Cou99_shy-",     "poprem=0,shy=1,group=0",
+    { "Cou99_shy-",     "!poprem shy !group",
                         couvreur99_cons,                     0, -1U, true },
-    { "Cou99_shy",      "poprem=0,shy=1,group=1",
+    { "Cou99_shy",      "!poprem shy group",
                         couvreur99_cons,                     0, -1U, true },
-    { "Cou99_rem",      "poprem=1",
+    { "Cou99_rem",      "poprem",
                         couvreur99_cons,                     0, -1U, true },
-    { "Cou99_rem_shy-", "poprem=1,shy=1,group=0",
+    { "Cou99_rem_shy-", "poprem shy !group",
                         couvreur99_cons,                     0, -1U, true },
-    { "Cou99_rem_shy",  "poprem=1,shy=1,group=1",
+    { "Cou99_rem_shy",  "poprem shy group",
                         couvreur99_cons,                     0, -1U, true },
     { "CVWY90",         0,
                         ms_cons,                             0,   1, true },
@@ -141,11 +141,9 @@ cons_emptiness_check(int num, const spot::tgba* a,
   spot::option_map o = options;
   if (ec_algos[num].options)
     {
-      char* x = strdup(ec_algos[num].options);
-      const char* err = o.parse_options(x);
+      const char* err = o.parse_options(ec_algos[num].options);
       assert(!err);
       (void)err;
-      free(x);
     }
   if (n_acc < ec_algos[num].min_acc || n_acc > ec_algos[num].max_acc)
     a = degen;

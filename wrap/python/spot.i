@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -36,6 +36,7 @@
 #include "misc/bddalloc.hh"
 #include "misc/minato.hh"
 #include "misc/modgray.hh"
+#include "misc/optionmap.hh"
 #include "misc/random.hh"
 
 #include "ltlast/formula.hh"
@@ -96,6 +97,7 @@ using namespace spot;
 %include "misc/version.hh"
 %include "misc/bddalloc.hh"
 %include "misc/minato.hh"
+%include "misc/optionmap.hh"
 %include "misc/random.hh"
 
 %feature("director") spot::loopless_modular_mixed_radix_gray_code;

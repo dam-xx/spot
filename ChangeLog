@@ -1,3 +1,14 @@
+2005-02-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/misc/optionmap.hh, src/misc/optionmap.cc
+	(option_map::parse_options): Rewrite.  Do not modify the input
+	string, allow !foo as a shorthand for foo=0, and support K and
+	M suffixes for values.
+	* src/tgbatest/randtgba.cc (cons_emptiness_check): Simplify.
+	* wrap/python/spot.i: Process optionmap.hh.
+	* wrap/python/tests/optionmap.py: New file.
+	* wrap/python/tests/Makefile.am (TESTS): Add it.
+
 2005-02-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/misc/optionmap.cc, src/misc/optionmap.hh (option_map::get,

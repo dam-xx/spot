@@ -25,40 +25,86 @@
 
 namespace spot
 {
-  namespace
-  {
-    bool
-    to_int(const char* s, int &i)
-    {
-      char* endptr;
-      int res = strtol(s, &endptr, 10);
-      if (*endptr)
-	return false;
-      i = res;
-      return true;
-    }
-  };
-
   const char*
-  option_map::parse_options(char* options)
+  option_map::parse_options(const char* options)
   {
-    char* opt = strtok(options, ", \t;");
-    while (opt)
+    while (*options)
       {
-	char* equal = strchr(opt, '=');
-	if (equal)
+	// Skip leading separators.
+	while (*options && strchr(" \t\n,;", *options))
+	  ++options;
+
+	// `!foo' is a shorthand for `foo=0'.
+	const char* negated = 0;
+	if (*options == '!')
 	  {
-	    *equal = 0;
-	    int val;
-	    if (!to_int(equal + 1, val))
-	      return opt;
-	    options_[opt] = val;
+	    // Skip spaces.
+	    while (*options && strchr(" \t\n", *options))
+	      ++options;
+	    negated = options++;
+	  }
+
+	if (!*options)
+	  {
+	    if (negated)
+	      return negated;
+	    else
+	      break;
+	  }
+
+	const char* name_start = options;
+
+	// Find the end of the name.
+	while (*options && !strchr(", \t\n;=", *options))
+	  ++options;
+
+	std::string name(name_start, options);
+
+	// Skip spaces.
+	while (*options && strchr(" \t\n", *options))
+	  ++options;
+
+	if (*options != '=')
+	  {
+	    options_[name] = (negated ? 0 : 1);
+	  }
+	else if (negated)
+	  {
+	    return negated;
 	  }
 	else
 	  {
-	    options_[opt] = 1;
+	    ++options;
+	    // Skip spaces.
+	    while (*options && strchr(" \t\n", *options))
+	      ++options;
+	    if (!*options)
+	      return name_start;
+
+	    char* val_end;
+	    int val = strtol(options, &val_end, 10);
+	    if (val_end == options)
+	      return name_start;
+
+	    if (*val_end == 'K')
+	      {
+		val *= 1024;
+		++val_end;
+	      }
+	    else if (*val_end == 'M')
+	      {
+		val *= 1024 * 1024;
+		++val_end;
+	      }
+	    else if (*val_end && !strchr(" \t\n,;", *val_end))
+	      {
+		return options;
+	      }
+
+	    options = val_end;
+
+	    options_[name] = val;
 	  }
-	opt = strtok(0, ", \t;");
       }
     return 0;
   }
@@ -74,7 +120,8 @@ namespace spot
       return it->second;
   }
 
-  int option_map::operator[](const char* option) const
+  int
+  option_map::operator[](const char* option) const
   {
     return get(option);
   }
