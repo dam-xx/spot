@@ -38,8 +38,6 @@ namespace spot
     class formula
     {
     public:
-      virtual ~formula();
-
       /// Entry point for vspot::ltl::visitor instances.
       virtual void accept(visitor& v) = 0;
       /// Entry point for vspot::ltl::const_visitor instances.
@@ -61,6 +59,8 @@ namespace spot
       static void unref(formula* f);
 
     protected:
+      virtual ~formula();
+
       /// \brief increment reference counter if any
       virtual void ref_();
       /// \brief decrement reference counter if any, return true when

@@ -1,3 +1,7 @@
+2004-11-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlast/formula.hh (ltl::formula::~formula): Make it protected.
+
 2004-10-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	A tgba can now annotate a transition (i.e., the position of a
