@@ -107,7 +107,7 @@ syntax(char* prog)
 	    << "  -t   display reachable states in LBTT's format" << std::endl
 	    << "  -v   display the BDD variables used by the automaton"
 	    << std::endl
-            << "  -x   try to produce a more deterministic automata "
+            << "  -x   try to produce a more deterministic automaton "
 	    << "(implies -f)" << std::endl
 	    << "  -X   do not compute an automaton, read it from a file"
 	    << std::endl

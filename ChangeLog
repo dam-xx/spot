@@ -1,5 +1,7 @@
 2004-08-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/ltl2tgba.cc (syntax): Typo.
+
 	* doc/Doxyfile.in (STRIP_FROM_PATH): Strip @srcdir@ so its
 	does not appear when listing mainpage.dox.
 
