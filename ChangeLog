@@ -1,5 +1,9 @@
 2004-11-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* configure.ac: Check for srand48 and drand48.
+	* src/misc/random.cc (srand, drand): Use srand48 and drand48 if
+	available.
+
 	* src/tgbaalgos/randomgraph.cc, src/tgbaalgos/randomgraph.hh: New files.
 	* src/tgbaalgos/Makefile.am (tgbaalgos_HEADERS)
 	(libtgbaalgos_la_SOURCES): Add them.

@@ -27,23 +27,29 @@ namespace spot
   void
   srand(unsigned int seed)
   {
+#if HAVE_SRAND48 && HAVE_DRAND48
+    ::srand48(seed);
+#else
     ::srand(seed);
+#endif
   }
 
   double
   drand()
   {
+#if HAVE_SRAND48 && HAVE_DRAND48
+    return ::drand48();
+#else
     double r = ::rand();
     return r / (1.0 + RAND_MAX);
+#endif
   }
 
   int
   mrand(int max)
   {
-    int res = static_cast<int>(max * drand());
-    return res;
+    return static_cast<int>(max * drand());
   }
-
 
   int
   rrand(int min, int max)
