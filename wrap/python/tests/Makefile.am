@@ -33,4 +33,5 @@ TESTS = \
   bddnqueen.py \
   ltl2tgba.test \
   interdep.py \
-  minato.py
+  minato.py \
+  modgray.py

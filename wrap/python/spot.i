@@ -19,7 +19,7 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-%module spot
+%module(directors="1") spot
 
 %include "std_string.i"
 %include "std_list.i"
@@ -35,6 +35,7 @@
 #include "misc/version.hh"
 #include "misc/bddalloc.hh"
 #include "misc/minato.hh"
+#include "misc/modgray.hh"
 
 #include "ltlast/formula.hh"
 #include "ltlast/refformula.hh"
@@ -90,6 +91,9 @@ using namespace spot;
 %include "misc/version.hh"
 %include "misc/bddalloc.hh"
 %include "misc/minato.hh"
+
+%feature("director") spot::loopless_modular_mixed_radix_gray_code;
+%include "misc/modgray.hh"
 
 %include "ltlast/formula.hh"
 %include "ltlast/refformula.hh"

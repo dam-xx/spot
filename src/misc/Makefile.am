@@ -31,6 +31,7 @@ misc_HEADERS = \
   freelist.hh \
   hash.hh \
   minato.hh \
+  modgray.hh \
   version.hh
 
 noinst_LTLIBRARIES = libmisc.la
@@ -39,4 +40,5 @@ libmisc_la_SOURCES = \
   escape.cc \
   freelist.cc \
   minato.cc \
+  modgray.cc \
   version.cc

@@ -1,3 +1,11 @@
+2004-10-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/misc/modgray.hh, src/misc/modgray.cc: New files.
+	* src/misc/Makefile.am (libmisc_la_SOURCES, misc_HEADERS): Add them.
+	* wrap/python/spot.i: Activate directors, and interface modgray.hh.
+	* wrap/python/tests/modgray.py: New file.
+	* wrap/python/tests/Makefile.am (TESTS): Add it.
+
 2004-10-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/gspn.cc, src/ltlvisit/basicreduce.cc,
