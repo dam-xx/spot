@@ -18,3 +18,5 @@ config.sub
 ltmain.sh
 ylwrap
 config.h.in
+config.h
+stamp-h1
