@@ -938,11 +938,13 @@ void generateBuchiAutomaton
 	  case 0 : /* child */
 	    close(error_pipe[0]);
 
-	    if (dup2(stdout_capture_fileno, STDOUT_FILENO) != -1
+	    if (setsid() != -1
+		&& dup2(stdout_capture_fileno, STDOUT_FILENO) != -1
 		&& dup2(stderr_capture_fileno, STDERR_FILENO) != -1)
 	      execvp(algorithm.parameters[0], algorithm.parameters);
 
-	    /* dup2 or exec failed: write the value of errno to error_pipe */
+	    /* setsid, dup2 or exec failed: write the value of errno to
+	     * error_pipe */
 
 	    write(error_pipe[1], static_cast<const void*>(&errno),
 		  sizeof(int));
@@ -993,7 +995,7 @@ void generateBuchiAutomaton
 		for (int attempts_to_terminate = 0; attempts_to_terminate < 4;
 		     ++attempts_to_terminate)
 		{
-		  kill(pid, sig);
+		  kill(-pid, sig);
 		  sleep(delay);
 		  if (waitpid(pid, &exitcode, WNOHANG) != 0)
 		  {
@@ -1081,14 +1083,14 @@ void generateBuchiAutomaton
 	throw Exception("could not terminate child process");
       }
 
-      if (error_number != 0) /* pipe, fork, dup2, execvp or waitpid failed */
+      if (error_number != 0) /* pipe, fork, setsid, dup2, execvp or waitpid
+			      * failed */
       {
 	stdout_capture_fileno = stderr_capture_fileno = -1;
 	ExecFailedException e;
 
 	if (configuration.global_options.translator_timeout > 0 && timeout)
-	  e.changeMessage("Timeout after " + toString(elapsed_time, 2)
-			  + " seconds (user time).");
+	  e.changeMessage("Automaton generation aborted due to timeout.");
 	else
 	  e.changeMessage("Execution of `" + string(algorithm.parameters[0])
 			  + "' failed (" + string(strerror(error_number))

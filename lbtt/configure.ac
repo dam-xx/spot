@@ -1,8 +1,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.59])
-AC_INIT([lbtt], [1.1.1], [heikki.tauriainen@hut.fi])
-AC_REVISION([Revision: 1.5])
+AC_INIT([lbtt], [1.1.2], [heikki.tauriainen@hut.fi])
+AC_REVISION([Revision: 1.6])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
@@ -191,7 +191,7 @@ AC_C_INLINE
 # Checks for library functions.
 
 AC_CHECK_FUNCS(
-  [strchr strtod strtol strtoul strerror mkdir mkstemp open read write close popen pclose pipe fork execvp getpid waitpid alarm sigaction sigprocmask sigemptyset sigaddset times sysconf],
+  [strchr strtod strtol strtoul strerror mkdir mkstemp open read write close popen pclose pipe fork execvp setsid getpid waitpid alarm sigaction sigprocmask sigemptyset sigaddset times sysconf],
   [],
   [AC_MSG_ERROR([missing one of the library functions required for compilation])])
 AC_CHECK_FUNCS([strsignal isatty getopt_long])

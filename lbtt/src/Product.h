@@ -524,8 +524,8 @@ public:
 						     */
 
 private:
-  const Graph<GraphEdgeContainer>::Edge* edge_1;    /* Components of the */
-  const Graph<GraphEdgeContainer>::Edge* edge_2;    /* transition.       */
+  GraphEdgeContainer::const_iterator edge_1;        /* Components of the */
+  GraphEdgeContainer::const_iterator edge_2;        /* transition.       */
 };
 
 
@@ -1598,7 +1598,7 @@ template <class Operations>
 inline Product<Operations>::ProductEdge::ProductEdge
   (const GraphEdgeContainer::const_iterator& e1,
    const GraphEdgeContainer::const_iterator& e2)
-  : edge_1(*e1), edge_2(*e2)
+  : edge_1(e1), edge_2(e2)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Constructor for class Product<Operations>::ProductEdge.
@@ -1643,7 +1643,7 @@ Product<Operations>::ProductEdge::firstComponent() const
  *
  * ------------------------------------------------------------------------- */
 {
-  return *edge_1;
+  return **edge_1;
 }
 
 /* ========================================================================= */
@@ -1662,7 +1662,7 @@ Product<Operations>::ProductEdge::secondComponent() const
  *
  * ------------------------------------------------------------------------- */
 {
-  return *edge_2;
+  return **edge_2;
 }
 
 /* ========================================================================= */
@@ -1679,7 +1679,7 @@ Product<Operations>::ProductEdge::targetNode() const
  *
  * ------------------------------------------------------------------------- */
 {
-  return product->stateId(edge_1->targetNode(), edge_2->targetNode());
+  return product->stateId((*edge_1)->targetNode(), (*edge_2)->targetNode());
 }
 
 
