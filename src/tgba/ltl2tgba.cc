@@ -1,6 +1,7 @@
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
 #include "tgbabddconcretefactory.hh"
+#include <cassert>
 
 #include "ltl2tgba.hh"
 

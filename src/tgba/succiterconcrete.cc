@@ -1,4 +1,5 @@
 #include "succiterconcrete.hh"
+#include <cassert>
 
 namespace spot
 {

@@ -1,5 +1,6 @@
 #include "tgbabddtranslatefactory.hh"
 #include "dictunion.hh"
+#include <cassert>
 
 namespace spot
 {

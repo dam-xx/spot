@@ -1,5 +1,6 @@
 #include "tgbabddconcrete.hh"
 #include "bddprint.hh"
+#include <cassert>
 
 namespace spot
 {

@@ -1,6 +1,7 @@
 #include "tgbabddprod.hh"
 #include "tgbabddtranslateproxy.hh"
 #include "dictunion.hh"
+#include <cassert>
 
 namespace spot
 {
@@ -14,7 +15,7 @@ namespace spot
     delete right_;
   }
 
-  int 
+  int
   state_bdd_product::compare(const state* other) const
   {
     const state_bdd_product* o = dynamic_cast<const state_bdd_product*>(other);
@@ -33,7 +34,7 @@ namespace spot
     : left_(left), right_(right)
   {
   }
-  
+
   void
   tgba_bdd_product_succ_iterator::step_()
   {
@@ -63,7 +64,7 @@ namespace spot
       }
   }
 
-  void 
+  void
   tgba_bdd_product_succ_iterator::first()
   {
     left_->first();
@@ -71,21 +72,21 @@ namespace spot
     next_non_false_();
   }
 
-  void 
+  void
   tgba_bdd_product_succ_iterator::next()
   {
     step_();
     next_non_false_();
   }
 
-  bool 
+  bool
   tgba_bdd_product_succ_iterator::done()
   {
     return right_->done();
   }
-  
-  
-  state_bdd* 
+
+
+  state_bdd*
   tgba_bdd_product_succ_iterator::current_state()
   {
     state_bdd* ls = dynamic_cast<state_bdd*>(left_->current_state());
@@ -94,13 +95,13 @@ namespace spot
     assert(rs);
     return new state_bdd_product(ls, rs);
   }
-  
-  bdd 
+
+  bdd
   tgba_bdd_product_succ_iterator::current_condition()
   {
     return current_cond_;
   }
-   
+
   bdd tgba_bdd_product_succ_iterator::current_promise()
   {
     return left_->current_promise() & right_->current_promise();
@@ -145,17 +146,17 @@ namespace spot
       delete right_;
   }
 
-  state* 
+  state*
   tgba_bdd_product::get_init_state() const
   {
     state_bdd* ls = dynamic_cast<state_bdd*>(left_->get_init_state());
     state_bdd* rs = dynamic_cast<state_bdd*>(right_->get_init_state());
     assert(ls);
     assert(rs);
-    return new state_bdd_product(ls, rs);    
+    return new state_bdd_product(ls, rs);
   }
 
-  tgba_bdd_product_succ_iterator* 
+  tgba_bdd_product_succ_iterator*
   tgba_bdd_product::succ_iter(const state* state) const
   {
     const state_bdd_product* s = dynamic_cast<const state_bdd_product*>(state);
@@ -166,21 +167,21 @@ namespace spot
     return new tgba_bdd_product_succ_iterator(li, ri);
   }
 
-  const tgba_bdd_dict& 
+  const tgba_bdd_dict&
   tgba_bdd_product::get_dict() const
   {
     return dict_;
   }
 
-  std::string 
+  std::string
   tgba_bdd_product::format_state(const state* state) const
   {
     const state_bdd_product* s = dynamic_cast<const state_bdd_product*>(state);
     assert(s);
-    return (left_->format_state(s->left()) 
-	    + " * " 
+    return (left_->format_state(s->left())
+	    + " * "
 	    + right_->format_state(s->right()));
   }
-  
-  
+
+
 }

@@ -1,3 +1,10 @@
+2003-06-03  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgba/dictunion.cc, src/tgba/ltl2tgba.cc,
+	src/tgba/succiterconcrete.cc, src/tgba/tgbabddconcrete.cc,
+	src/tgba/tgbabddprod.cc, src/tgba/tgbabddtranslatefactory.cc,
+	src/tgba/tgbabddtranslateproxy.cc: Include <cassert>.
+
 2003-06-02  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/tgbabdddict.cc, src/tgba/tgbabdddict.hh: New files.
@@ -92,7 +99,7 @@
 	not a bdd.
 	* src/tgba/tgbabddconcrete.cc: Likewise.
 
-	Initial code for TGBA (Transition Generalized BŽüchi Automata).
+	Initial code for TGBA (Transition Generalized Büchi Automata).
 	Contains tgba_bdd, a BDD-encoded TGBA, and ltl_to_tgba,
 	a LTL-to-TGBA translator using Couvreur's algorithm.
 

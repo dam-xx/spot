@@ -1,38 +1,39 @@
 #include "tgbabddtranslateproxy.hh"
 #include "bddprint.hh"
+#include <cassert>
 
 namespace spot
 {
 
   // tgba_bdd_translate_proxy_succ_iterator
   // --------------------------------------
-  
+
   tgba_bdd_translate_proxy_succ_iterator::
   tgba_bdd_translate_proxy_succ_iterator(tgba_succ_iterator_concrete* it,
 					 bddPair* rewrite)
     : iter_(it), rewrite_(rewrite)
   {
   }
-  
-  void 
+
+  void
   tgba_bdd_translate_proxy_succ_iterator::first()
   {
     iter_->first();
   }
-  
-  void 
+
+  void
   tgba_bdd_translate_proxy_succ_iterator::next()
   {
     iter_->next();
   }
-  
-  bool 
+
+  bool
   tgba_bdd_translate_proxy_succ_iterator::done()
   {
     return iter_->done();
   }
 
-  state_bdd* 
+  state_bdd*
   tgba_bdd_translate_proxy_succ_iterator::current_state()
   {
     state_bdd* s = iter_->current_state();
@@ -40,13 +41,13 @@ namespace spot
     return s;
   }
 
-  bdd 
+  bdd
   tgba_bdd_translate_proxy_succ_iterator::current_condition()
   {
     return bdd_replace(iter_->current_condition(), rewrite_);
   }
 
-  bdd 
+  bdd
   tgba_bdd_translate_proxy_succ_iterator::current_promise()
   {
     return bdd_replace(iter_->current_promise(), rewrite_);
@@ -56,7 +57,7 @@ namespace spot
   // tgba_bdd_translate_proxy
   // ------------------------
 
-  tgba_bdd_translate_proxy::tgba_bdd_translate_proxy(const tgba& from, 
+  tgba_bdd_translate_proxy::tgba_bdd_translate_proxy(const tgba& from,
 						     const tgba_bdd_dict& to)
     : from_(from), to_(to)
   {
@@ -97,8 +98,8 @@ namespace spot
     bdd_freepair(rewrite_from_);
     bdd_freepair(rewrite_to_);
   }
-  
-  state_bdd* 
+
+  state_bdd*
   tgba_bdd_translate_proxy::get_init_state() const
   {
     state_bdd* s = dynamic_cast<state_bdd*>(from_.get_init_state());
@@ -107,24 +108,24 @@ namespace spot
     return s;
   }
 
-  tgba_bdd_translate_proxy_succ_iterator* 
+  tgba_bdd_translate_proxy_succ_iterator*
   tgba_bdd_translate_proxy::succ_iter(const state* state) const
   {
     const state_bdd* s = dynamic_cast<const state_bdd*>(state);
     assert(s);
-    state_bdd s2(bdd_replace(s->as_bdd(), rewrite_from_));    
-    tgba_succ_iterator_concrete* it = 
+    state_bdd s2(bdd_replace(s->as_bdd(), rewrite_from_));
+    tgba_succ_iterator_concrete* it =
       dynamic_cast<tgba_succ_iterator_concrete*>(from_.succ_iter(&s2));
     assert(it);
     return new tgba_bdd_translate_proxy_succ_iterator(it, rewrite_to_);
   }
 
-  const tgba_bdd_dict& 
+  const tgba_bdd_dict&
   tgba_bdd_translate_proxy::get_dict() const
   {
     return to_;
   }
-  
+
   std::string
   tgba_bdd_translate_proxy::format_state(const state* state) const
   {
