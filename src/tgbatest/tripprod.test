@@ -24,12 +24,12 @@ s2, s3,, p4;
 EOF
 
 cat >expected <<EOF
-"s1 * s1 * s1", "s3 * s2 * s2", a b, p2;
-"s1 * s1 * s1", "s2 * s2 * s2", a b, p2 p1;
-"s2 * s2 * s2", "s3 * s1 * s3", c a, p3 p4;
-"s1 * s1 * s1", "s3 * s2 * s3", a b, p2;
-"s1 * s1 * s1", "s2 * s2 * s3", b, p2 p1;
-"s2 * s2 * s3", "s3 * s1 * s2", c a, p3 p4;
+"s1 * s1 * s1", "s3 * s2 * s2", a b, "p2";
+"s1 * s1 * s1", "s2 * s2 * s2", a b, "p2" "p1";
+"s2 * s2 * s2", "s3 * s1 * s3", c a, "p3" "p4";
+"s1 * s1 * s1", "s3 * s2 * s3", a b, "p2";
+"s1 * s1 * s1", "s2 * s2 * s3", b, "p2" "p1";
+"s2 * s2 * s3", "s3 * s1 * s2", c a, "p3" "p4";
 EOF
 
 ./tripprod input1 input2 input3 > stdout

@@ -1,3 +1,9 @@
+2003-06-19  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgbatest/tripprod.test, src/tgbatest/explprod.test,
+	src/tgbatest/readsave.test: Adjust to reflect yesterday's
+	bddprint.cc change.
+
 2003-06-18  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/bddprint.cc (print_handler): Quote promises

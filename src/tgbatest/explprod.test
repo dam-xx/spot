@@ -17,9 +17,9 @@ s2, s1, a, p3;
 EOF
 
 cat >expected <<EOF
-"s1 * s1", "s3 * s2", a b, p2;
-"s1 * s1", "s2 * s2", b, p2 p1;
-"s2 * s2", "s3 * s1", c a, p3;
+"s1 * s1", "s3 * s2", a b, "p2";
+"s1 * s1", "s2 * s2", b, "p2" "p1";
+"s2 * s2", "s3 * s1", c a, "p3";
 EOF
 
 ./explprod input1 input2 > stdout
