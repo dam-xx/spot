@@ -1,5 +1,7 @@
 2004-02-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* wrap/python/cgi/ltl2tgba.in: Present the options in a table.
+
 	* wrap/python/cgi/ltl2tgba.in: Remove the "print dot" options,
 	add a "dot source" source behind each picture instead.  Do
 	not run `dot' on big automata.

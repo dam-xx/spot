@@ -167,25 +167,34 @@ LTL-to-B&uuml;chi translator</H1>"""
 
 formula = form.getfirst('formula', '')
 
-options = [
-    ('opt_exprop',          'optimize determinism (FM only)',              1),
-    ('opt_symb_merge',
-     'merge states with same symbolic successor representation (FM only)', 1),
-    ('show_parse',          'show traces during parsing',                  0),
+
+
+options = [(
+    'Common options', 0, [
     ('show_formula_png',    'draw the formula',                            0),
     ('show_automaton_png',  'draw Büchi automaton',                        1),
     ('show_degen_png',      'draw degeneralized Büchi automaton',          0),
-    ('show_dictionnay',     'print BDD dictionary',                        0),
-    ('show_relation_set',
-     'print the transition relation as a BDD set (LaCIM only)',            0),
-    ('show_relation_png',
-     'draw the transition relation (LaCIM only)',                          0),
-    ('show_acceptance_set',
-     'print the acceptance relation as a BDD set (LaCIM only)',            0),
-    ('show_acceptance_png',
-     'draw the acceptance relation (LaCIM only)',                          0),
     ('show_lbtt',           'convert automaton for LBTT',                  0),
-    ]
+    ]), (
+    'Debugging options', 0, [
+    ('show_parse',          'show traces during parsing',                  0),
+    ('show_dictionnay',     'print BDD dictionary',                        0),
+    ]), (
+    'Couvreur/FM options', 1, [
+    ('opt_exprop',          'optimize determinism',                        1),
+    ('opt_symb_merge',
+     'merge states with same symbolic successor representation',           1),
+    ]), (
+    'Couvreur/Lacim options', 1, [
+    ('show_relation_set',
+     'print the transition relation as a BDD set',                         0),
+    ('show_relation_png',
+     'draw the transition relation',                                       0),
+    ('show_acceptance_set',
+     'print the acceptance relation as a BDD set',                         0),
+    ('show_acceptance_png',
+     'draw the acceptance relation',                                       0),
+    ])]
 
 default_translator = 'trans_fm';
 translators = [
@@ -193,10 +202,13 @@ translators = [
     ('trans_lacim',     'Convreur/LaCIM'),
     ]
 
-print """<FORM action="%s" method="post"><P>
+print ("""<FORM action="%s" method="post"><P>
 Formula to translate:
-<INPUT size=50 type="text"  name="formula" value="%s"><BR>
+<INPUT size=50 type="text"  name="formula" value="%s"><BR>"""
+       % (myself, cgi.escape(formula, True)))
 
+if not filled:
+    print """
 <p>Use alphanumeric identifiers or double-quoted strings for atomic
 propositions, and parentheses for grouping.<BR>Identifiers cannot
 start with the letter of a prefix operator (<code>F</code>,
@@ -258,10 +270,11 @@ an indentifier: <code>aUb</code> is an atomic proposition, unlike
     </tr>
 
   </tbody>
-</table></td></tr></table></p>
-Translator:<TABLE><TR><TD>""" % (myself, cgi.escape(formula, True))
+</table></td></tr></table></p>"""
 
+column = [[], []]
 
+column[0].append("<TH>Algorithm</TH>")
 trans = form.getfirst("trans", default_translator)
 for opt, desc, in translators:
     if trans == opt:
@@ -269,27 +282,43 @@ for opt, desc, in translators:
     else:
 	str = ""
     globals()[opt] = str
-    print '<INPUT type="radio" name="trans" value="%s" %s>%s<br>' % (opt, str,
-                                                                     desc)
+    s = '<TD><INPUT type="radio" name="trans" value="%s" %s>%s</TD>'
+    column[0].append(s % (opt, str, desc))
 
-print """</TD></TR></TABLE>
-Options:<TABLE><TR><TD>"""
+print """</TD></TR></TABLE><TABLE>"""
 
-for opt, desc, arg, in options:
-    if formula:
-	val = int(form.getfirst(opt, 0))
-    else:
-	val = arg
-    if val:
-	str = "checked"
-    else:
-	str = ""
-    globals()[opt] = val
-    print '<INPUT type="checkbox" name="%s" value="1" %s>%s<br>' % (opt, str,
-								    desc)
-print '</TD></TR></TABLE><INPUT type="submit" value="Send"></FORM>'
+for opt_group, opt_column, opt_list in options:
+    column[opt_column].append("<TH>" + opt_group + "</TH>")
+    for opt, desc, arg, in opt_list:
+        if formula:
+            val = int(form.getfirst(opt, 0))
+        else:
+            val = arg
+        if val:
+            str = " checked"
+        else:
+            str = ""
+        globals()[opt] = val
+        s = '<TD><INPUT type="checkbox" name="%s" value="1"%s>%s</TD>'
+        column[opt_column].append(s % (opt, str, desc))
+
+print '<TABLE>'
+width = range(len(column))
+depth = 0
+for i in width:
+    depth = max(len(column[i]), depth)
+for d in range(depth):
+    print '<TR>'
+    for i in width:
+        if d < len(column[i]):
+            print column[i][d]
+    print '</TR>'
+print '</TABLE>'
+
+print '<INPUT type="submit" value="Send"></FORM>'
 
 if not filled:
+    print_footer()
     sys.exit(0)
 
 reset_alarm()
