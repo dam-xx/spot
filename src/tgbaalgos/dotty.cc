@@ -60,7 +60,8 @@ namespace spot
       }
 
       void
-      process_link(int in, int out, const tgba_succ_iterator* si)
+      process_link(const state*, int in,
+		   const state*, int out, const tgba_succ_iterator* si)
       {
 	os_ << "  " << in << " -> " << out << " [label=\"";
 	escape_str(os_, bdd_format_formula(automata_->get_dict(),

@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -59,6 +59,13 @@ namespace spot
     /// This assumes that all variables in \a f are known from dict.
     void add_conditions(transition* t, bdd f);
     void declare_acceptance_condition(const ltl::formula* f);
+
+    /// \brief Copy the acceptance conditions of a tgba.
+    ///
+    /// If used, this function should be called before creating any
+    /// transition.
+    void copy_acceptance_conditions_of(const tgba *a);
+
     bool has_acceptance_condition(const ltl::formula* f) const;
     void add_acceptance_condition(transition* t, const ltl::formula* f);
     /// This assumes that all acceptance conditions in \a f are known from dict.

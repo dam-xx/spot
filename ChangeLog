@@ -1,3 +1,19 @@
+2004-11-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* tgbaalgos/reachiter.hh, tgbaalgos/reachiter.cc
+	(tgba_reachable_iterator::process_link): Take the state* as arguments
+	in addition to the state numbers.
+	* src/tgba/tgbaexplicit.hh, src/tgba/tgbaexplicit.cc
+	(tgba_explicit::copy_acceptance_conditions_of): New method.
+	* tgbaalgos/dupexp.cc (dupexp_iter::dupexp_iter): Call
+	copy_acceptance_conditions_of.
+	(dupexp_iter::process_state, duplex_iter::declare_state,
+	dupexp_iter::name_): Remove.
+	(dupexp_iter::process_link): Adjust prototype, and format
+	the state here rather than in process_state.
+	* tgbaalgos/stats.cc, tgbaalgos/dotty.cc: Adjust prototype
+	of process_link.
+
 2004-11-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlvisit/reduce.hh (is_eventual, is_universal): More doc.

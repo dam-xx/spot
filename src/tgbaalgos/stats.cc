@@ -42,7 +42,8 @@ namespace spot
       }
 
       void
-      process_link(int, int, const tgba_succ_iterator*)
+      process_link(const state*, int, const state*, int,
+		   const tgba_succ_iterator*)
       {
 	++s_.transitions;
       }

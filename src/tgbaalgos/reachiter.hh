@@ -63,16 +63,24 @@ namespace spot
     /// Called by run() to process a state.
     ///
     /// \param s The current state.
-    /// \param n An unique number assigned to \a s.
+    /// \param n A unique number assigned to \a s.
     /// \param si The spot::tgba_succ_iterator for \a s.
     virtual void process_state(const state* s, int n, tgba_succ_iterator* si);
     /// Called by run() to process a transition.
     ///
+    /// \param in_s The source state
     /// \param in The source state number.
+    /// \param out_s The destination state
     /// \param out The destination state number.
     /// \param si The spot::tgba_succ_iterator positionned on the current
     ///             transition.
-    virtual void process_link(int in, int out, const tgba_succ_iterator* si);
+    ///
+    /// The in_s and out_s states are owned by the
+    /// spot::tgba_reachable_iterator instance and destroyed when the
+    /// instance is destroyed.
+    virtual void process_link(const state* in_s, int in,
+			      const state* out_s, int out,
+			      const tgba_succ_iterator* si);
 
   protected:
     const tgba* automata_;	///< The spot::tgba to explore.

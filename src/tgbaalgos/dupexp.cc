@@ -36,6 +36,7 @@ namespace spot
       dupexp_iter(const tgba* a)
 	: T(a), out_(new tgba_explicit(a->get_dict()))
       {
+	out_->copy_acceptance_conditions_of(a);
       }
 
       tgba_explicit*
@@ -45,54 +46,23 @@ namespace spot
       }
 
       void
-      process_state(const state* s, int n, tgba_succ_iterator*)
+      process_link(const state* in_s, int in,
+		   const state* out_s, int out,
+		   const tgba_succ_iterator* si)
       {
-	std::ostringstream os;
-	os << "(#" << n << ") " << this->automata_->format_state(s);
-	name_[n] = os.str();
-      }
-
-      std::string
-      declare_state(const state* s, int n)
-      {
-	std::string str;
-	name_map_::const_iterator i = name_.find(n);
-	if (i == name_.end())
-	  {
-	    std::ostringstream os;
-	    os << "(#" << n << ") " << this->automata_->format_state(s);
-	    name_[n] = str = os.str();
-	  }
-	else
-	  {
-	    str = i->second;
-	  }
-	delete s;
-	return str;
-      }
-
-      void
-      process_link(int in, int out, const tgba_succ_iterator* si)
-      {
-	// We might need to format out before process_state is called.
-	name_map_::const_iterator i = name_.find(out);
-	if (i == name_.end())
-	  {
-	    const state* s = si->current_state();
-	    process_state(s, out, 0);
-	    delete s;
-	  }
+	std::ostringstream in_name;
+	in_name << "(#" << in << ") " << this->automata_->format_state(in_s);
+	std::ostringstream out_name;
+	out_name << "(#" << out << ") " << this->automata_->format_state(out_s);
 
 	tgba_explicit::transition* t =
-	  out_->create_transition(name_[in], name_[out]);
+	  out_->create_transition(in_name.str(), out_name.str());
 	out_->add_conditions(t, si->current_condition());
 	out_->add_acceptance_conditions(t, si->current_acceptance_conditions());
       }
 
     private:
       tgba_explicit* out_;
-      typedef std::map<int, std::string> name_map_;
-      std::map<int, std::string> name_;
     };
 
   } // anonymous

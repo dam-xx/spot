@@ -209,6 +209,16 @@ namespace spot
   }
 
   void
+  tgba_explicit::copy_acceptance_conditions_of(const tgba *a)
+  {
+    assert(neg_acceptance_conditions_ == bddtrue);
+    assert(all_acceptance_conditions_computed_ == false);
+    bdd f = a->neg_acceptance_conditions();
+    dict_->register_acceptance_variables(f, this);
+    neg_acceptance_conditions_ = f;
+  }
+
+  void
   tgba_explicit::complement_all_acceptance_conditions()
   {
     bdd all = all_acceptance_conditions();

@@ -67,11 +67,11 @@ namespace spot
 	      {
 		seen[current] = ++n;
 		add_state(current);
-		process_link(tn, n, si);
+		process_link(t, tn, current, n, si);
 	      }
 	    else
 	      {
-		process_link(tn, s->second, si);
+		process_link(t, tn, s->first, s->second, si);
 		delete current;
 	      }
 	  }
@@ -97,7 +97,9 @@ namespace spot
   }
 
   void
-  tgba_reachable_iterator::process_link(int, int, const tgba_succ_iterator*)
+  tgba_reachable_iterator::process_link(const state*, int,
+					const state*, int,
+					const tgba_succ_iterator*)
   {
   }
 
