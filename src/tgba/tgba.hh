@@ -20,12 +20,6 @@ namespace spot
   /// transitions), and a path can be accepted only if it traverse
   /// at least one transition of each set infinitely often.
   ///
-  /// Actually we do not really encode accepting sets but their
-  /// complement: promise sets.  Formulae such as 'a U b' and
-  /// 'F b' make the promise to fulfil 'b' enventually.  A path can
-  /// be accepted if for each promise it traverse infinitely often
-  /// a transition that does not make this promise.
-  ///
   /// Browsing such automaton can be achieved using two functions.
   /// \c get_init_state, and \c succ_iter.  The former returns
   /// the initial state while the latter allows to explore the
@@ -89,11 +83,11 @@ namespace spot
     virtual bdd all_accepting_conditions() const = 0;
 
     /// \brief Return the conjuction of all negated accepting
-    /// variables. 
+    /// variables.
     ///
-    /// For instance if the automaton uses variables \c Acc[a],
-    /// \c Acc[b] and \c Acc[c] to describe accepting sets,
-    /// this function should return \c !Acc[a]\&!Acc[b]\&!Acc[c].
+    /// For instance if the automaton uses variables <tt>Acc[a]</tt>,
+    /// <tt>Acc[b]</tt> and <tt>Acc[c]</tt> to describe accepting sets,
+    /// this function should return <tt>!Acc[a]\&!Acc[b]\&!Acc[c]</tt>.
     ///
     /// This is useful when making products: each operand conditions
     /// set should be augmented with the neg_accepting_conditions() of

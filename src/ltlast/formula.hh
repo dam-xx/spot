@@ -17,7 +17,9 @@ namespace spot
     public:
       virtual ~formula();
 
+      /// Entry point for vspot::ltl::visitor instances.
       virtual void accept(visitor& v) = 0;
+      /// Entry point for vspot::ltl::const_visitor instances.
       virtual void accept(const_visitor& v) const = 0;
 
       /// \brief clone this formula
@@ -29,7 +31,7 @@ namespace spot
       /// \brief increment reference counter if any
       virtual void ref_();
       /// \brief decrement reference counter if any, return true when
-      /// the instance must be delete (usually when the counter hits 0).
+      /// the instance must be deleted (usually when the counter hits 0).
       virtual bool unref_();
     };
 

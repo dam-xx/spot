@@ -41,7 +41,7 @@ namespace spot
     /// only concerned by atomic propositions (which label the
     /// transitions) and Next variables (the destination).  Typically,
     /// a transition should bear the variable \c Acc[b] if it doesn't
-    /// check for `b' and have a destination of the form <tt>a U b</tt>, 
+    /// check for `b' and have a destination of the form <tt>a U b</tt>,
     /// or <tt>F b</tt>.
     ///
     /// To summarize, \c accepting_conditions contains three kinds of
@@ -52,7 +52,7 @@ namespace spot
     /// \li "Acc" variables.
     bdd accepting_conditions;
 
-    /// The set of all accepting conditions used by the Automaton.
+    /// \brief The set of all accepting conditions used by the Automaton.
     ///
     /// The goal of the emptiness check is to ensure that
     /// a strongly connected component walks through each
@@ -79,10 +79,10 @@ namespace spot
     /// \brief The (positive) conjunction of all variables which are
     /// not atomic propositions.
     bdd notvar_set;
-    /// The (positive) conjunction of all variables which are not
+    /// \brief The (positive) conjunction of all variables which are not
     /// accepting conditions.
     bdd notacc_set;
-    /// The negative conjunction of all variables which are accepting
+    /// \brief The negative conjunction of all variables which are accepting
     /// conditions.
     bdd negacc_set;
 

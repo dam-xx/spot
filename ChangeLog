@@ -1,5 +1,9 @@
 2003-06-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/tgbabddcoredata.hh: Fix some Doxygen comments.
+	* src/ltlast/formula.hh: More Doxygen comments.
+	* src/tgba/tgba.hh: Use <tt> in Doxygen comments.
+
 	* doc/mainpage.dox: New file.
 	* doc/Makefile.am (EXTRA_DIST): Add mainpage.dox.
 	* doc/Doxyfile.in (INPUT): Add @srcdir@/mainpage.dox
