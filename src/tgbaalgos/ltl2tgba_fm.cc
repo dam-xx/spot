@@ -48,12 +48,12 @@ namespace spot
     //   "a" variables are promises (written "a" in the paper)
     //   "next" variables are X's operands (the "r_X" variables from the paper)
     //   "var" variables are atomic propositions.
-    class translate_dict: public bdd_allocator
+    class translate_dict
     {
     public:
 
-      translate_dict()
-	: bdd_allocator(),
+      translate_dict(bdd_dict* dict)
+	: dict(dict),
 	  a_set(bddtrue),
 	  var_set(bddtrue),
 	  next_set(bddtrue)
@@ -63,13 +63,12 @@ namespace spot
       ~translate_dict()
       {
 	fv_map::iterator i;
-	for (i = a_map.begin(); i != a_map.end(); ++i)
-	  destroy(i->first);
-	for (i = var_map.begin(); i != var_map.end(); ++i)
-	  destroy(i->first);
 	for (i = next_map.begin(); i != next_map.end(); ++i)
 	  destroy(i->first);
+	dict->unregister_all_my_variables(this);
       }
+
+      bdd_dict* dict;
 
       /// Formula-to-BDD-variable maps.
       typedef Sgi::hash_map<const formula*, int,
@@ -77,10 +76,6 @@ namespace spot
       /// BDD-variable-to-formula maps.
       typedef Sgi::hash_map<int, const formula*> vf_map;
 
-      fv_map a_map;	       ///< Maps formulae to "a" BDD variables
-      vf_map a_formula_map;    ///< Maps "a" BDD variables to formulae
-      fv_map var_map;	       ///< Maps atomic propisitions to BDD variables
-      vf_map var_formula_map;  ///< Maps BDD variables to atomic propisitions
       fv_map next_map;	       ///< Maps "Next" variables to BDD variables
       vf_map next_formula_map; ///< Maps BDD variables to "Next" variables
 
@@ -91,20 +86,7 @@ namespace spot
       int
       register_proposition(const formula* f)
       {
-	int num;
-	// Do not build a variable that already exists.
-	fv_map::iterator sii = var_map.find(f);
-	if (sii != var_map.end())
-	  {
-	    num = sii->second;
-	  }
-	else
-	  {
-	    f = clone(f);
-	    num = allocate_variables(1);
-	    var_map[f] = num;
-	    var_formula_map[num] = f;
-	  }
+	int num = dict->register_proposition(f, this);
 	var_set &= bdd_ithvar(num);
 	return num;
       }
@@ -112,20 +94,7 @@ namespace spot
       int
       register_a_variable(const formula* f)
       {
-	int num;
-	// Do not build an acceptance variable that already exists.
-	fv_map::iterator sii = a_map.find(f);
-	if (sii != a_map.end())
-	  {
-	    num = sii->second;
-	  }
-	else
-	  {
-	    f = clone(f);
-	    num = allocate_variables(1);
-	    a_map[f] = num;
-	    a_formula_map[num] = f;
-	  }
+	int num = dict->register_acceptance_variable(f, this);
 	a_set &= bdd_ithvar(num);
 	return num;
       }
@@ -143,7 +112,7 @@ namespace spot
 	else
 	  {
 	    f = clone(f);
-	    num = allocate_variables(1);
+	    num = dict->register_anonymous_variables(1, this);
 	    next_map[f] = num;
 	    next_formula_map[num] = f;
 	  }
@@ -155,24 +124,14 @@ namespace spot
       dump(std::ostream& os) const
       {
 	fv_map::const_iterator fi;
-	os << "Atomic Propositions:" << std::endl;
-	for (fi = var_map.begin(); fi != var_map.end(); ++fi)
-	  {
-	    os << "  " << fi->second << ": ";
-	    to_string(fi->first, os) << std::endl;
-	  }
-	os << "a Variables:" << std::endl;
-	for (fi = a_map.begin(); fi != a_map.end(); ++fi)
-	{
-	  os << "  " << fi->second << ": a[";
-	  to_string(fi->first, os) << "]" << std::endl;
-	}
 	os << "Next Variables:" << std::endl;
 	for (fi = next_map.begin(); fi != next_map.end(); ++fi)
 	{
 	  os << "  " << fi->second << ": Next[";
 	  to_string(fi->first, os) << "]" << std::endl;
 	}
+	os << "Shared Dict:" << std::endl;
+	dict->dump(os);
 	return os;
       }
 
@@ -182,11 +141,11 @@ namespace spot
 	vf_map::const_iterator isi = next_formula_map.find(var);
 	if (isi != next_formula_map.end())
 	  return clone(isi->second);
-	isi = a_formula_map.find(var);
-	if (isi != a_formula_map.end())
+	isi = dict->acc_formula_map.find(var);
+	if (isi != dict->acc_formula_map.end())
 	  return clone(isi->second);
-	isi = var_formula_map.find(var);
-	if (isi != var_formula_map.end())
+	isi = dict->var_formula_map.find(var);
+	if (isi != dict->var_formula_map.end())
 	  return clone(isi->second);
 	assert(0);
       }
@@ -455,7 +414,7 @@ namespace spot
     typedef std::map<bdd, const formula*, bdd_less_than> succ_to_formula;
     succ_to_formula canonical_succ;
 
-    translate_dict d;
+    translate_dict d(dict);
     ltl_trad_visitor v(d);
 
     formulae_seen.insert(f2);

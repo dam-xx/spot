@@ -1,5 +1,18 @@
 2004-03-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba_fm.cc (translate_dict): Reuse Acc and Var
+	variables from a shared bdd_dict.  Register Next variables as
+	anonymous variables.
+	(translate_dict::translate_dict, translate_dict::~translate_dict,
+	translate_dict::register_proposition,
+	translate_dict::register_a_variable,
+	translate_dict::register_next_variable,
+	translate_dict::dump, translate_dict::var_to_formula,
+	ltl_to_tgba_fm): Adjust.
+	(translate_dict::dict): New attribute.
+	(translate_dict::a_map, translate_dict::a_formula_map,
+	translate_dict::var_map, translate_dict::var_formula_map): Delete.
+
 	* src/misc/freelist.cc (free_list::remove): Work around
 	invalidated iterators.
 	* tgba/bdddict.cc (unregister_variable): New methods,
