@@ -1,5 +1,9 @@
 2004-02-02  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* wrap/python/cgi/ltl2tgba.in (render_dot): Render .png directly
+	with dot, without using convert.
+	* wrap/python/cgi/README: Do not mention convert.
+
 	* wrap/python/cgi/ltl2tgba.in (render_dot, render_automaton)
 	(render_bdd): New functions, extracted from the rest of the code.
 

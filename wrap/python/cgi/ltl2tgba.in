@@ -72,10 +72,8 @@ def print_stats(automaton):
     sys.stdout.flush()
 
 def render_dot(basename):
-    os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
-               basename + '.gif', basename + '.dot')
-    os.spawnlp(os.P_WAIT, 'convert', 'convert',
-               basename + '.gif', basename + '.png')
+    os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tpng', '-Gsize=14,14', '-o',
+               basename + '.png', basename + '.dot')
     print '<img src="' + basename + '.png">'
 
 def render_automaton(basename, automata):
