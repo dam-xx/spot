@@ -24,7 +24,6 @@
 set -e
 
 FORMULAE=$srcdir/models/eeaean.ltl
-ALGORITHMS=$srcdir/algorithms
 
 opts='-f -x -m'
 

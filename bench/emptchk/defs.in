@@ -37,3 +37,4 @@ test -f "$srcdir/defs.in" || {
 RANDTGBA='@top_builddir@/src/tgbatest/randtgba@EXEEXT@'
 LTL2TGBA='@top_builddir@/src/tgbatest/ltl2tgba@EXEEXT@'
 FORMULAE=$srcdir/formulae.ltl
+ALGORITHMS=$srcdir/algorithms

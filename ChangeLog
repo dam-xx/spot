@@ -1,5 +1,14 @@
 2005-02-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/randtgba.cc: Remplace the -O option by -A, reading
+	all algorithms from a file.  Use the emptiness_check_instantiator
+	syntax as name in the output.
+	* bench/emptchk/defs.in: DEfine ALGORITHMS here.
+	* bench/emptchk/ltl-human.sh, bench/emptchk/ltl-random.sh,
+	bench/emptchk/pml-clserv.sh, bench/emptchk/pml-clserv.sh: Use
+	$ALGORITHMS.
+	* src/misc/timer.cc: Truncate long keys in display.
+
 	* src/tgbatest/ltl2tgba.cc: Simplify using
 	emptiness_check_instantiator.
 	* src/tgba/tgba.cc, src/tgba/tgba.hh

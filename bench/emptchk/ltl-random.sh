@@ -29,12 +29,12 @@ echo "WITHOUT ADDITIONAL ACCEPTING CONDITIONS"
 
 for d in 0.001 0.002 0.01; do
   echo "density: $d"
-  $RANDTGBA -d $d $opts
+  $RANDTGBA -A "$ALGORITHMS" -d $d $opts
 done
 
 echo "WITH 3 ADDITIONAL ACCEPTING CONDITIONS"
 
 for d in 0.001 0.002 0.01; do
   echo "density: $d"
-  $RANDTGBA -a 3 0.0133333 -d $d $opts
+  $RANDTGBA -A "$ALGORITHMS" -a 3 0.0133333 -d $d $opts
 done
