@@ -1,5 +1,46 @@
 2003-05-15  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	Massage the AST so that identical sub-formula share the same
+	reference-counted formula*.  One can't call constructors for AST
+	items anymore, everything need to be acquired through instance()
+	class methods.
+
+	* src/ltlast/formula.cc, src/ltlast/refformula.cc,
+	src/ltlast/refformula.hh: New files.
+	* src/ltlast/Makefile.am (libltlast_la_SOURCES): Add them.
+	* src/ltlast/atomic_prop.cc, src/ltlast/atomic_prop.hh,
+	src/ltlast/unop.cc, src/ltlast/unop.hh,
+	src/ltlast/binop.cc, src/ltlast/binop.hh: Make the constructor
+	and destructor protected.  Define a static function `instance()'
+	to get an instance with specific argument.  Use a map called
+	`instances' to store all known instances.  Inherit from
+	ref_formula.
+	* src/ltlast/constant.hh, src/ltlast/constant.cc: Protect
+	the constructor and destructor.  Provide the false_instance()
+	and true_instance() functions instead.
+	* src/formula.hh (ref, unref, ref_, unref_): New methods.
+	* src/ltlast/multop.cc, src/ltlast/multop.hh: Protect
+	the constructor, destructor, as well as the add() method.
+	Provides the instance(), and add() class methods instead.
+	Store children_ as a pointer.
+	* src/ltlenv/defaultenv.cc (require): Adjust to
+	call atomic_prop::instance.
+	* src/ltlparse/ltlparse.yy: Adjust to call instance() functions
+	instead of constructors.
+	* src/ltltest/Makefile.am (LDADD): Tweak library ordering.
+	* src/ltlvisit/clone.hh (clone_visitor): Inherit from visitor,
+	not const_visitor, and adjust all prototypes appropriately.
+	* src/ltlvisit/clone.cc (clone_visitor): Likewise.
+	Call ref() or instance() methods instead of copy constructors.
+	* src/ltlvisit/equals.cc: Simplify atomic_prop and constant
+	cases.
+	* src/ltlvisit/lunabbrev.hh, src/ltlvisit/lunabbrev.cc,
+	src/ltlvisit/tunabbrev.hh, src/ltlvisit/tunabbrev.cc,
+	src/ltlvisit/nenoform.hh, src/ltlvisit/nenoform.cc: Use instance()
+	methods instead of constructor.  Make these children of visitor, not
+	const_visitor.
+	* src/ltltest/readltl.c (main): Do not delete the formula.
+
 	* src/ltlparse/ltlscan.ll (to_parse_size): Declare as size_t to
 	remove a warning with newer versions of Flex.
 

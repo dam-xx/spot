@@ -1,7 +1,7 @@
 #include "ltlast/allnodes.hh"
 #include "tunabbrev.hh"
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
@@ -13,8 +13,8 @@ namespace spot
     {
     }
 
-    void 
-    unabbreviate_ltl_visitor::visit(const unop* uo)
+    void
+    unabbreviate_ltl_visitor::visit(unop* uo)
     {
       switch (uo->op())
 	{
@@ -23,26 +23,26 @@ namespace spot
 	  this->super::visit(uo);
 	  return;
 	case unop::F:
-	  result_ = new binop(binop::U, 
-			      new constant(constant::True),
-			      recurse(uo->child()));
+	  result_ = binop::instance(binop::U,
+				    constant::true_instance(),
+				    recurse(uo->child()));
 	  return;
 	case unop::G:
-	  result_ = new binop(binop::R, 
-			      new constant(constant::False),
-			      recurse(uo->child()));
+	  result_ = binop::instance(binop::R,
+				    constant::false_instance(),
+				    recurse(uo->child()));
 	  return;
 	}
     }
-    
-    formula* 
-    unabbreviate_ltl_visitor::recurse(const formula* f)
+
+    formula*
+    unabbreviate_ltl_visitor::recurse(formula* f)
     {
       return unabbreviate_ltl(f);
     }
 
-    formula* 
-    unabbreviate_ltl(const formula* f)
+    formula*
+    unabbreviate_ltl(formula* f)
     {
       unabbreviate_ltl_visitor v;
       f->accept(v);

@@ -3,20 +3,32 @@
 
 #include "predecl.hh"
 
-namespace spot 
+namespace spot
 {
-  namespace ltl 
+  namespace ltl
   {
 
     /// \brief An LTL formula.
-    /// 
-    /// The only way you can work with a formula is to 
+    ///
+    /// The only way you can work with a formula is to
     /// build a spot::ltl::visitor or spot::ltl::const_visitor.
-    class formula 
+    class formula
     {
     public:
       virtual void accept(visitor& v) = 0;
       virtual void accept(const_visitor& v) const = 0;
+
+      /// \brief clone this formula
+      formula* ref();
+      /// \brief release formula
+      static void unref(formula* f);
+
+    protected:
+      /// \brief increment reference counter if any
+      virtual void ref_();
+      /// \brief decrement reference counter if any, return true when
+      /// the instance must be delete (usually when the counter hits 0).
+      virtual bool unref_();
     };
 
   }

@@ -9,7 +9,7 @@ namespace spot
     formula*
     default_environment::require(const std::string& s)
     {
-      return new atomic_prop(s, *this);
+      return atomic_prop::instance(s, *this);
     }
 
     const std::string&
@@ -23,7 +23,7 @@ namespace spot
     {
     }
 
-    default_environment& 
+    default_environment&
     default_environment::instance()
     {
       static default_environment* singleton = new default_environment();

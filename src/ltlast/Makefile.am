@@ -11,10 +11,12 @@ libltlast_la_SOURCES = \
   constant.cc \
   constant.hh \
   formula.hh \
+  formula.cc \
   multop.cc \
   multop.hh \
   predecl.hh \
+  refformula.cc \
+  refformula.hh \
   unop.cc \
   unop.hh \
   visitor.hh
-

@@ -5,7 +5,7 @@
 namespace spot
 {
   namespace ltl
-  {    
+  {
     constant::constant(type val)
       : val_(val)
     {
@@ -27,13 +27,13 @@ namespace spot
       v.visit(this);
     }
 
-    constant::type 
+    constant::type
     constant::val() const
     {
       return val_;
     }
 
-    const char* 
+    const char*
     constant::val_name() const
     {
       switch (val_)
@@ -48,5 +48,18 @@ namespace spot
       return 0;
     }
 
+    constant*
+    constant::false_instance()
+    {
+      static constant f(constant::False);
+      return &f;
+    }
+
+    constant*
+    constant::true_instance()
+    {
+      static constant t(constant::True);
+      return &t;
+    }
   }
 }

@@ -1,6 +1,7 @@
 #ifndef SPOT_LTLAST_BINOP_HH
 # define SPOT_LTLAST_BINOP_HH
 
+#include <map>
 #include "formula.hh"
 
 namespace spot
@@ -18,8 +19,9 @@ namespace spot
       /// are often nested we represent them as multops.
       enum type { Xor, Implies, Equiv, U, R };
 
-      binop(type op, formula* first, formula* second);
-      virtual ~binop();
+      /// Build an unary operator with operation \a op and
+      /// children \a first and \a second.
+      static binop* instance(type op, formula* first, formula* second);
 
       virtual void accept(visitor& v);
       virtual void accept(const_visitor& v) const;
@@ -37,6 +39,15 @@ namespace spot
       type op() const;
       /// Get the type of this operator, as a string.
       const char* op_name() const;
+
+    protected:
+      typedef std::pair<formula*, formula*> pairf;
+      typedef std::pair<type, pairf> pair;
+      typedef std::map<pair, formula*> map;
+      static map instances;
+
+      binop(type op, formula* first, formula* second);
+      virtual ~binop();
 
     private:
       type op_;

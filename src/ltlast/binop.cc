@@ -5,7 +5,7 @@
 namespace spot
 {
   namespace ltl
-  {    
+  {
     binop::binop(type op, formula* first, formula* second)
       : op_(op), first_(first), second_(second)
     {
@@ -45,19 +45,19 @@ namespace spot
       return second_;
     }
 
-    formula* 
+    formula*
     binop::second()
     {
       return second_;
     }
 
-    binop::type 
+    binop::type
     binop::op() const
     {
       return op_;
     }
 
-    const char* 
+    const char*
     binop::op_name() const
     {
       switch (op_)
@@ -76,6 +76,23 @@ namespace spot
       // Unreachable code.
       assert(0);
       return 0;
+    }
+
+    binop::map binop::instances;
+
+    binop*
+    binop::instance(type op, formula* first, formula* second)
+    {
+      pairf pf(first, second);
+      pair p(op, pf);
+      map::iterator i = instances.find(p);
+      if (i != instances.end())
+	{
+	  return static_cast<binop*>(i->second->ref());
+	}
+      binop* ap = new binop(op, first, second);
+      instances[p] = ap;
+      return static_cast<binop*>(ap->ref());
     }
 
   }

@@ -46,7 +46,6 @@ main(int argc, char** argv)
       spot::ltl::dump(*f, std::cout);
       std::cout << std::endl;
 #endif
-      delete f;
     }
   else
     {

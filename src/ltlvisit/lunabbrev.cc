@@ -1,7 +1,7 @@
 #include "ltlast/allnodes.hh"
 #include "lunabbrev.hh"
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
@@ -13,8 +13,8 @@ namespace spot
     {
     }
 
-    void 
-    unabbreviate_logic_visitor::visit(const binop* bo)
+    void
+    unabbreviate_logic_visitor::visit(binop* bo)
     {
       formula* f1 = recurse(bo->first());
       formula* f2 = recurse(bo->second());
@@ -22,43 +22,48 @@ namespace spot
 	{
 	  /* f1 ^ f2  ==  (f1 & !f2) | (f2 & !f1) */
 	case binop::Xor:
-	  result_ = new multop(multop::Or,
-			       new multop(multop::And, f1,
-					  new unop(unop::Not, f2)),
-			       new multop(multop::And, f2,
-					  new unop(unop::Not, f1)));
+	  result_ = multop::instance(multop::Or,
+				     multop::instance(multop::And, f1,
+						      unop::instance(unop::Not,
+								     f2)),
+				     multop::instance(multop::And, f2,
+						      unop::instance(unop::Not,
+								     f1)));
 	  return;
 	  /* f1 => f2  ==  !f1 | f2 */
 	case binop::Implies:
-	  result_ = new multop(multop::Or, new unop(unop::Not, f1), f2);
+	  result_ = multop::instance(multop::Or,
+				     unop::instance(unop::Not, f1), f2);
 	  return;
 	  /* f1 <=> f2  ==  (f1 & f2) | (!f1 & !f2) */
 	case binop::Equiv:
-	  result_ = new multop(multop::Or,
-			       new multop(multop::And, f1, f2),
-			       new multop(multop::And, 
-					  new unop(unop::Not, f1),
-					  new unop(unop::Not, f2)));
+	  result_ = multop::instance(multop::Or,
+				     multop::instance(multop::And, f1, f2),
+				     multop::instance(multop::And,
+						      unop::instance(unop::Not,
+								     f1),
+						      unop::instance(unop::Not,
+								     f2)));
 	  return;
 	  /* f1 U f2 == f1 U f2 */
 	  /* f1 R f2 == f1 R f2 */
 	case binop::U:
 	case binop::R:
-	  result_ = new binop(bo->op(), f1, f2);
+	  result_ = binop::instance(bo->op(), f1, f2);
 	  return;
 	}
       /* Unreachable code. */
       assert(0);
     }
 
-    formula* 
-    unabbreviate_logic_visitor::recurse(const formula* f)
+    formula*
+    unabbreviate_logic_visitor::recurse(formula* f)
     {
       return unabbreviate_logic(f);
     }
 
-    formula* 
-    unabbreviate_logic(const formula* f)
+    formula*
+    unabbreviate_logic(formula* f)
     {
       unabbreviate_logic_visitor v;
       f->accept(v);

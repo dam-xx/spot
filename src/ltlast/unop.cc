@@ -5,7 +5,7 @@
 namespace spot
 {
   namespace ltl
-  {    
+  {
     unop::unop(type op, formula* child)
       : op_(op), child_(child)
     {
@@ -39,13 +39,13 @@ namespace spot
       return child_;
     }
 
-    unop::type 
+    unop::type
     unop::op() const
     {
       return op_;
     }
 
-    const char* 
+    const char*
     unop::op_name() const
     {
       switch (op_)
@@ -62,6 +62,22 @@ namespace spot
       // Unreachable code.
       assert(0);
       return 0;
+    }
+
+    unop::map unop::instances;
+
+    unop*
+    unop::instance(type op, formula* child)
+    {
+      pair p(op, child);
+      map::iterator i = instances.find(p);
+      if (i != instances.end())
+	{
+	  return static_cast<unop*>(i->second->ref());
+	}
+      unop* ap = new unop(op, child);
+      instances[p] = ap;
+      return static_cast<unop*>(ap->ref());
     }
 
   }

@@ -2,13 +2,14 @@
 # define SPOT_LTLAST_MULTOP_HH
 
 #include <vector>
+#include <map>
 #include "formula.hh"
 
 namespace spot
 {
   namespace ltl
   {
-    
+
     /// \brief Multi-operand operators.
     ///
     /// These operators are considered commutative and associative.
@@ -17,25 +18,29 @@ namespace spot
     public:
       enum type { Or, And };
 
+
       /// \brief Build a spot::ltl::multop with no child.
       ///
       /// This has little value unless you call multop::add later.
-      multop(type op);
+      static multop* instance(type op);
+
       /// \brief Build a spot::ltl::multop with two children.
-      /// 
+      ///
       /// If one of the children itself is a spot::ltl::multop
       /// with the same type, it will be merged.  I.e., children
       /// if that child will be added, and that child itself will
       /// be destroyed.
-      multop(type op, formula* first, formula* second);
+      static multop* instance(type op, formula* first, formula* second);
+
       /// \brief Add another child to this operator.
       ///
       /// If \a f itself is a spot::ltl::multop with the same type, it
       /// will be merged.  I.e., children of \a f will be added, and
       /// that \a f will will be destroyed.
-      void add(formula* f);
-      
-      virtual ~multop();
+      ///
+      /// Note that this function overwrites the supplied ltl::multop pointer.
+      /// The old value is released and should not be used after this.
+      static void add(multop** m, formula* f);
 
       virtual void accept(visitor& v);
       virtual void accept(const_visitor& v) const;
@@ -56,9 +61,21 @@ namespace spot
       /// Get the type of this operator, as a string.
       const char* op_name() const;
 
+    protected:
+      typedef std::vector<formula*> vec;
+      typedef std::pair<type, vec*> pair;
+      typedef std::map<pair, formula*> map;
+      static map instances;
+
+      multop(type op, vec* v);
+      static multop* instance(type op, vec* v);
+      static vec* multop::add(type op, vec* v, formula* f);
+
+      virtual ~multop();
+
     private:
       type op_;
-      std::vector<formula*> children_;
+      vec* children_;
     };
 
   }

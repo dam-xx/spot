@@ -4,13 +4,13 @@
 #include "ltlast/formula.hh"
 #include "ltlast/visitor.hh"
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
     /// \brief Build the negative normal form of \a f.
-    /// 
-    /// All negations of the formula are pushed in front of the 
+    ///
+    /// All negations of the formula are pushed in front of the
     /// atomic propositions.
     ///
     /// \param f The formula to normalize.
@@ -22,7 +22,7 @@ namespace spot
     /// or spot::ltl::unabbreviate_ltl first.  (Calling these functions
     /// after spot::ltl::negative_normal_form would likely produce a
     /// formula which is not in negative normal form.)
-    formula* negative_normal_form(const formula* f, bool negated = false);
+    formula* negative_normal_form(formula* f, bool negated = false);
   }
 }
 

@@ -101,15 +101,15 @@ subformula: ATOMIC_PROP
 		  delete $1;
 	      }
 	    | CONST_TRUE
-              { $$ = new constant(constant::True); }
+              { $$ = constant::true_instance(); }
 	    | CONST_FALSE
-              { $$ = new constant(constant::False); }
+              { $$ = constant::false_instance(); }
 	    | PAR_OPEN subformula PAR_CLOSE
 	      { $$ = $2; }
 	    | PAR_OPEN error PAR_CLOSE
               { error_list.push_back(parse_error(@$,
                  "treating this parenthetical block as false"));
-	        $$ = new constant(constant::False);
+	        $$ = constant::false_instance();
 	      }
 	    | PAR_OPEN subformula many_errors PAR_CLOSE
               { error_list.push_back(parse_error(@3,
@@ -117,27 +117,27 @@ subformula: ATOMIC_PROP
 	        $$ = $2;
 	      }
 	    | OP_NOT subformula
-	      { $$ = new unop(unop::Not, $2); }
+	      { $$ = unop::instance(unop::Not, $2); }
             | subformula OP_AND subformula
-	      { $$ = new multop(multop::And, $1, $3); }
+	      { $$ = multop::instance(multop::And, $1, $3); }
 	    | subformula OP_OR subformula
-	      { $$ = new multop(multop::Or, $1, $3); }
+	      { $$ = multop::instance(multop::Or, $1, $3); }
 	    | subformula OP_XOR subformula
-	      { $$ = new binop(binop::Xor, $1, $3); }
+	      { $$ = binop::instance(binop::Xor, $1, $3); }
 	    | subformula OP_IMPLIES subformula
-	      { $$ = new binop(binop::Implies, $1, $3); }
+	      { $$ = binop::instance(binop::Implies, $1, $3); }
             | subformula OP_EQUIV subformula
-	      { $$ = new binop(binop::Equiv, $1, $3); }
+	      { $$ = binop::instance(binop::Equiv, $1, $3); }
             | subformula OP_U subformula
-	      { $$ = new binop(binop::U, $1, $3); }
+	      { $$ = binop::instance(binop::U, $1, $3); }
             | subformula OP_R subformula
-	      { $$ = new binop(binop::R, $1, $3); }
+	      { $$ = binop::instance(binop::R, $1, $3); }
             | OP_F subformula
-	      { $$ = new unop(unop::F, $2); }
+	      { $$ = unop::instance(unop::F, $2); }
             | OP_G subformula
-	      { $$ = new unop(unop::G, $2); }
+	      { $$ = unop::instance(unop::G, $2); }
             | OP_X subformula
-	      { $$ = new unop(unop::X, $2); }
+	      { $$ = unop::instance(unop::X, $2); }
 //	    | subformula many_errors
 //              { error_list->push_back(parse_error(@2,
 //		  "ignoring these unexpected trailing tokens"));

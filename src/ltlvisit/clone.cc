@@ -1,7 +1,7 @@
 #include "ltlast/allnodes.hh"
 #include "clone.hh"
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
@@ -18,52 +18,52 @@ namespace spot
     {
       return result_;
     }
-    
-    void 
-    clone_visitor::visit(const atomic_prop* ap)
+
+    void
+    clone_visitor::visit(atomic_prop* ap)
     {
-      result_ = new atomic_prop(ap->name(), ap->env());
+      result_ = ap->ref();
     }
 
-    void 
-    clone_visitor::visit(const constant* c)
+    void
+    clone_visitor::visit(constant* c)
     {
-      result_ = new constant(c->val());
+      result_ = c->ref();
     }
 
-    void 
-    clone_visitor::visit(const unop* uo)
+    void
+    clone_visitor::visit(unop* uo)
     {
-      result_ = new unop(uo->op(), recurse(uo->child()));
+      result_ = unop::instance(uo->op(), recurse(uo->child()));
     }
-    
-    void 
-    clone_visitor::visit(const binop* bo)
+
+    void
+    clone_visitor::visit(binop* bo)
     {
-      result_ = new binop(bo->op(), 
-			  recurse(bo->first()), recurse(bo->second()));
+      result_ = binop::instance(bo->op(),
+				recurse(bo->first()), recurse(bo->second()));
     }
-    
-    void 
-    clone_visitor::visit(const multop* mo)
+
+    void
+    clone_visitor::visit(multop* mo)
     {
-      multop* res = new multop(mo->op());
+      multop* res = multop::instance(mo->op());
       unsigned mos = mo->size();
       for (unsigned i = 0; i < mos; ++i)
 	{
-	  res->add(recurse(mo->nth(i)));
+	  multop::add(&res, recurse(mo->nth(i)));
 	}
       result_ = res;
     }
 
-    formula* 
-    clone_visitor::recurse(const formula* f)
+    formula*
+    clone_visitor::recurse(formula* f)
     {
       return clone(f);
     }
 
-    formula* 
-    clone(const formula* f)
+    formula*
+    clone(formula* f)
     {
       clone_visitor v;
       f->accept(v);

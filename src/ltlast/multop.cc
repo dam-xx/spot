@@ -6,42 +6,15 @@
 namespace spot
 {
   namespace ltl
-  {    
-    multop::multop(type op)
-      : op_(op)
+  {
+    multop::multop(type op, vec* v)
+      : op_(op), children_(v)
     {
-    }
-
-    multop::multop(type op, formula* first, formula* second)
-      : op_(op)
-    {
-      children_.reserve(2);
-      add(first);
-      add(second);
-    }
-    
-    void
-    multop::add(formula* f)
-    {
-      // If the formula we add is itself a multop for the same operator,
-      // merge its children with ours.
-      multop* p = dynamic_cast<multop*>(f);
-      if (p && p->op() == op())
-	{
-	  unsigned ps = p->size();
-	  for (unsigned i = 0; i < ps; ++i)
-	    children_.push_back(p->nth(i));
-	  // that sub-formula is now useless 
-	  delete f;
-	}
-      else
-	{
-	  children_.push_back(f);
-	}
     }
 
     multop::~multop()
     {
+      delete children_;
     }
 
     void
@@ -59,28 +32,28 @@ namespace spot
     unsigned
     multop::size() const
     {
-      return children_.size();
+      return children_->size();
     }
 
     const formula*
     multop::nth(unsigned n) const
     {
-      return children_[n];
+      return (*children_)[n];
     }
 
-    formula* 
+    formula*
     multop::nth(unsigned n)
     {
-      return children_[n];
+      return (*children_)[n];
     }
 
-    multop::type 
+    multop::type
     multop::op() const
     {
       return op_;
     }
 
-    const char* 
+    const char*
     multop::op_name() const
     {
       switch (op_)
@@ -93,6 +66,70 @@ namespace spot
       // Unreachable code.
       assert(0);
       return 0;
+    }
+
+    multop::map multop::instances;
+
+    multop*
+    multop::instance(type op, vec* v)
+    {
+      pair p(op, v);
+      map::iterator i = instances.find(p);
+      if (i != instances.end())
+	{
+	  delete v;
+	  return static_cast<multop*>(i->second->ref());
+	}
+      multop* ap = new multop(op, v);
+      instances[p] = ap;
+      return static_cast<multop*>(ap->ref());
+
+    }
+
+    multop*
+    multop::instance(type op)
+    {
+      return instance(op, new vec);
+    }
+
+    multop*
+    multop::instance(type op, formula* first, formula* second)
+    {
+      vec* v = new vec;
+      multop::add(op, v, first);
+      multop::add(op, v, second);
+      return instance(op, v);
+    }
+
+    multop::vec*
+    multop::add(type op, vec* v, formula* f)
+    {
+      // If the formula we add is itself a multop for the same operator,
+      // merge its children.
+      multop* p = dynamic_cast<multop*>(f);
+      if (p && p->op() == op)
+	{
+	  unsigned ps = p->size();
+	  for (unsigned i = 0; i < ps; ++i)
+	    v->push_back(p->nth(i));
+	  // that sub-formula is now useless
+	  formula::unref(f);
+	}
+      else
+	{
+	  v->push_back(f);
+	}
+      return v;
+    }
+
+    void
+    multop::add(multop** m, formula* f)
+    {
+      vec* v = new vec(*(*m)->children_);
+      type op = (*m)->op();
+      multop::add(op, v, f);
+      formula::unref(*m);
+      *m = instance(op, v);
     }
 
   }

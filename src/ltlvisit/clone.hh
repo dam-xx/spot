@@ -4,7 +4,7 @@
 #include "ltlast/formula.hh"
 #include "ltlast/visitor.hh"
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
@@ -14,28 +14,28 @@ namespace spot
     /// to derive from it and override part of its methods.
     /// But if you just want the functionality, consider using
     /// spot::ltl::clone instead.
-    class clone_visitor : public const_visitor
+    class clone_visitor : public visitor
     {
     public:
       clone_visitor();
       virtual ~clone_visitor();
 
       formula* result() const;
-      
-      void visit(const atomic_prop* ap);
-      void visit(const unop* uo);
-      void visit(const binop* bo);
-      void visit(const multop* mo);
-      void visit(const constant* c);
-	
-      virtual formula* recurse(const formula* f);
-      
+
+      void visit(atomic_prop* ap);
+      void visit(unop* uo);
+      void visit(binop* bo);
+      void visit(multop* mo);
+      void visit(constant* c);
+
+      virtual formula* recurse(formula* f);
+
     protected:
       formula* result_;
     };
 
     /// \brief Clone a formula.
-    formula* clone(const formula* f);
+    formula* clone(formula* f);
   }
 }
 

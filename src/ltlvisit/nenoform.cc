@@ -6,7 +6,7 @@ namespace spot
   namespace ltl
   {
 
-    class negative_normal_form_visitor : public const_visitor
+    class negative_normal_form_visitor : public visitor
     {
     public:
       negative_normal_form_visitor(bool negated)
@@ -14,7 +14,7 @@ namespace spot
       {
       }
 
-      virtual 
+      virtual
       ~negative_normal_form_visitor()
       {
       }
@@ -23,43 +23,43 @@ namespace spot
       {
 	return result_;
       }
-      
-      void 
-      visit(const atomic_prop* ap)
+
+      void
+      visit(atomic_prop* ap)
       {
-	formula* f = new atomic_prop(ap->name(), ap->env());
+	formula* f = ap->ref();
 	if (negated_)
-	  result_ = new unop(unop::Not, f);
+	  result_ = unop::instance(unop::Not, f);
 	else
 	  result_ = f;
       }
 
-      void 
-      visit(const constant* c)
+      void
+      visit(constant* c)
       {
 	if (! negated_)
 	  {
-	    result_ = new constant(c->val());
+	    result_ = c;
 	    return;
 	  }
 
 	switch (c->val())
 	  {
 	  case constant::True:
-	    result_ = new constant(constant::False);
+	    result_ = constant::false_instance();
 	    return;
 	  case constant::False:
-	    result_ = new constant(constant::True);
+	    result_ = constant::true_instance();
 	    return;
 	  }
 	/* Unreachable code.  */
 	assert(0);
       }
 
-      void 
-      visit(const unop* uo)
+      void
+      visit(unop* uo)
       {
-	const formula* f = uo->child();
+	formula* f = uo->child();
 	switch (uo->op())
 	  {
 	  case unop::Not:
@@ -67,63 +67,67 @@ namespace spot
 	    return;
 	  case unop::X:
 	    /* !Xa == X!a */
-	    result_ = new unop(unop::X, recurse(f));
+	    result_ = unop::instance(unop::X, recurse(f));
 	    return;
 	  case unop::F:
 	    /* !Fa == G!a */
-	    result_ = new unop(negated_ ? unop::G : unop::F, recurse(f));
+	    result_ = unop::instance(negated_ ? unop::G : unop::F, recurse(f));
 	    return;
 	  case unop::G:
 	    /* !Ga == F!a */
-	    result_ = new unop(negated_ ? unop::F : unop::G, recurse(f));
+	    result_ = unop::instance(negated_ ? unop::F : unop::G, recurse(f));
 	    return;
 	  }
 	/* Unreachable code.  */
 	assert(0);
       }
 
-      void 
-      visit(const binop* bo)
+      void
+      visit(binop* bo)
       {
-	const formula* f1 = bo->first();
-	const formula* f2 = bo->second();
+	formula* f1 = bo->first();
+	formula* f2 = bo->second();
 	switch (bo->op())
 	  {
 	  case binop::Xor:
 	    /* !(a ^ b) == a <=> b */
-	    result_ = new binop(negated_ ? binop::Equiv : binop::Xor,
-				recurse_(f1, false), recurse_(f2, false));
+	    result_ = binop::instance(negated_ ? binop::Equiv : binop::Xor,
+				      recurse_(f1, false),
+				      recurse_(f2, false));
 	    return;
 	  case binop::Equiv:
 	    /* !(a <=> b) == a ^ b */
-	    result_ = new binop(negated_ ? binop::Xor : binop::Equiv,
-				recurse_(f1, false), recurse_(f2, false));
+	    result_ = binop::instance(negated_ ? binop::Xor : binop::Equiv,
+				      recurse_(f1, false),
+				      recurse_(f2, false));
 	    return;
 	  case binop::Implies:
 	    if (negated_)
 	      /* !(a => b) == a & !b */
-	      result_ = new multop(multop::And,
-				   recurse_(f1, false), recurse_(f2, true));
+	      result_ = multop::instance(multop::And,
+					 recurse_(f1, false),
+					 recurse_(f2, true));
 	    else
-	      result_ = new binop(binop::Implies, recurse(f1), recurse(f2));
+	      result_ = binop::instance(binop::Implies,
+					recurse(f1), recurse(f2));
 	    return;
 	  case binop::U:
 	    /* !(a U b) == !a R !b */
-	    result_ = new binop(negated_ ? binop::R : binop::U,
-				recurse(f1), recurse(f2));
+	    result_ = binop::instance(negated_ ? binop::R : binop::U,
+				      recurse(f1), recurse(f2));
 	    return;
 	  case binop::R:
 	    /* !(a R b) == !a U !b */
-	    result_ = new binop(negated_ ? binop::U : binop::R,
-				recurse(f1), recurse(f2));
+	    result_ = binop::instance(negated_ ? binop::U : binop::R,
+				      recurse(f1), recurse(f2));
 	    return;
 	  }
 	/* Unreachable code.  */
 	assert(0);
       }
 
-      void 
-      visit(const multop* mo)
+      void
+      visit(multop* mo)
       {
 	/* !(a & b & c) == !a | !b | !c  */
 	/* !(a | b | c) == !a & !b & !c  */
@@ -138,32 +142,32 @@ namespace spot
 	      op = multop::And;
 	      break;
 	    }
-	multop* res = new multop(op);
+	multop* res = multop::instance(op);
 	unsigned mos = mo->size();
 	for (unsigned i = 0; i < mos; ++i)
-	  res->add(recurse(mo->nth(i)));
+	  multop::add(&res, recurse(mo->nth(i)));
 	result_ = res;
       }
-	
-      formula* 
-      recurse_(const formula* f, bool negated)
+
+      formula*
+      recurse_(formula* f, bool negated)
       {
 	return negative_normal_form(f, negated);
       }
 
-      formula* 
-      recurse(const formula* f)
+      formula*
+      recurse(formula* f)
       {
 	return recurse_(f, negated_);
       }
-      
+
     protected:
       formula* result_;
       bool negated_;
     };
 
-    formula* 
-    negative_normal_form(const formula* f, bool negated)
+    formula*
+    negative_normal_form(formula* f, bool negated)
     {
       negative_normal_form_visitor v(negated);
       f->accept(v);

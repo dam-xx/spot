@@ -2,7 +2,7 @@
 #include "equals.hh"
 #include "ltlast/allnodes.hh"
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
@@ -15,26 +15,22 @@ namespace spot
     {
     }
 
-    bool 
+    bool
     equals_visitor::result() const
     {
       return result_;
     }
-      
+
     void
     equals_visitor::visit(const atomic_prop* ap)
     {
-      const atomic_prop* p = dynamic_cast<const atomic_prop*>(f_);
-      if (p && p->name() == ap->name())
-	result_ = true;
+      result_ = f_ == ap;
     }
 
     void
     equals_visitor::visit(const constant* c)
     {
-      const constant* p = dynamic_cast<const constant*>(f_);
-      if (p && p->val() == c->val())
-	result_ = true;
+      result_ = f_ == c;
     }
 
     void
@@ -53,34 +49,34 @@ namespace spot
       const binop* p = dynamic_cast<const binop*>(f_);
       if (!p || p->op() != bo->op())
 	return;
-      
+
       // The current visitor will descend the left branch.
       // Build a second visitor for the right branch.
       equals_visitor v2(p->second());
       f_ = p->first();
-      
+
       bo->first()->accept(*this);
       if (result_ == false)
 	return;
-      
+
       bo->second()->accept(v2);
       result_ = v2.result();
     }
-    
+
     void
     equals_visitor::visit(const multop* m)
     {
       const multop* p = dynamic_cast<const multop*>(f_);
       if (!p || p->op() != m->op())
 	return;
-      
+
       // This check is a bit more complicated than other checks
       // because And(a, b, c) is equal to And(c, a, b, a).
-      
+
       unsigned m_size = m->size();
       unsigned p_size = p->size();
       std::vector<bool> p_seen(p_size, false);
-      
+
       for (unsigned nf = 0; nf < m_size; ++nf)
 	{
 	  unsigned np;
@@ -102,7 +98,7 @@ namespace spot
       // of `p'.  That doesn't means that both formula are equal.
       // Condider m = And(a, b, c) against p = And(c, d, a, b).
       // We should now check if any unmarked (accodring to p_seen)
-      // child of `p' has an counterpart in `m'.  Because `m' might 
+      // child of `p' has an counterpart in `m'.  Because `m' might
       // contain duplicate children, its faster to test that
       // unmarked children of `p' have a counterpart in marked children
       // of `p'.
@@ -111,25 +107,25 @@ namespace spot
 	  // Consider only unmarked children.
 	  if (p_seen[np])
 	    continue;
-	  
+
 	  // Compare with marked children.
 	  unsigned np2;
 	  const formula *pnth = p->nth(np);
 	  for (np2 = 0; np2 < p_size; ++np2)
 	    if (p_seen[np2] && equals(p->nth(np2), pnth))
 	      break;
-	  
+
 	  // No match?  Too bad.
-	  if (np2 == p_size) 
+	  if (np2 == p_size)
 	    return;
 	}
-      
+
       // The two formulas match.
       result_ = true;
     }
 
 
-    bool 
+    bool
     equals(const formula* f1, const formula* f2)
     {
       equals_visitor v(f1);

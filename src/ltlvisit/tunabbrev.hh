@@ -4,11 +4,11 @@
 #include "ltlast/formula.hh"
 #include "ltlvisit/lunabbrev.hh"
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
-    /// \brief Clone and rewrite a formula to remove most of the 
+    /// \brief Clone and rewrite a formula to remove most of the
     /// abbreviated LTL and logical operators.
     ///
     /// The rewriting performed on logical operator is
@@ -28,12 +28,12 @@ namespace spot
       unabbreviate_ltl_visitor();
       virtual ~unabbreviate_ltl_visitor();
 
-      void visit(const unop* uo);
+      void visit(unop* uo);
 
-      formula* recurse(const formula* f);
+      formula* recurse(formula* f);
     };
 
-    /// \brief Clone and rewrite a formula to remove most of the 
+    /// \brief Clone and rewrite a formula to remove most of the
     /// abbreviated LTL and logical operators.
     ///
     /// The rewriting performed on logical operator is
@@ -41,7 +41,7 @@ namespace spot
     ///
     /// This will also rewrite unary operators such as unop::F,
     /// and unop::G, using only binop::U, and binop::R.
-    formula* unabbreviate_ltl(const formula* f);
+    formula* unabbreviate_ltl(formula* f);
   }
 }
 
