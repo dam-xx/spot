@@ -1,10 +1,13 @@
 2003-07-07  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
-	* src/tgba/succiterconcrete.hh 
+	* iface/gspn/gspnlib.h: Fit 80 columns.
+	[__cplusplus]: Wrap everything under extern "C".
+
+	* src/tgba/succiterconcrete.hh
 	(tgba_succ_iterator_concrete::current_acc_): New attribute.
-	* src/tgba/succiterconcrete.cc 
+	* src/tgba/succiterconcrete.cc
 	(tgba_succ_iterator_concrete::next): Set current_acc_.
-	(tgba_succ_iterator_concrete::current_accepting_conditions): 
+	(tgba_succ_iterator_concrete::current_accepting_conditions):
 	Simply return it.
 
 	* configure.ac: Output iface/Makefile and iface/gspn/Makefile.
