@@ -8,7 +8,7 @@ namespace spot
   namespace ltl
   {
 
-    class dump_visitor : public spot::ltl::const_visitor
+    class dump_visitor : public const_visitor
     {
     public:
       dump_visitor(std::ostream& os = std::cout)
@@ -22,19 +22,19 @@ namespace spot
       }
 
       void
-      visit(const spot::ltl::atomic_prop* ap)
+      visit(const atomic_prop* ap)
       {
 	os_ << "AP(" << ap->name() << ")";
       }
 
       void
-      visit(const spot::ltl::constant* c)
+      visit(const constant* c)
       {
 	os_ << "constant(" << c->val_name() << ")";
       }
 
       void
-      visit(const spot::ltl::binop* bo)
+      visit(const binop* bo)
       {
 	os_ << "binop(" << bo->op_name() << ", ";
 	bo->first()->accept(*this);
@@ -44,7 +44,7 @@ namespace spot
       }
 
       void
-      visit(const spot::ltl::unop* uo)
+      visit(const unop* uo)
       {
 	os_ << "unop(" << uo->op_name() << ", ";
 	uo->child()->accept(*this);
@@ -52,7 +52,7 @@ namespace spot
       }
 
       void
-      visit(const spot::ltl::multop* mo)
+      visit(const multop* mo)
       {
 	os_ << "multop(" << mo->op_name() << ", ";
 	unsigned max = mo->size();

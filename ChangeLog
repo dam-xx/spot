@@ -1,3 +1,7 @@
+2003-07-08  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/ltlvisit/dump.cc: Strip useless spot::ltl:: prefixes.
+
 2003-07-07  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	First sketch of the GSPN wrapper objects.
