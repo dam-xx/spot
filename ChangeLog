@@ -1,5 +1,8 @@
 2003-10-31  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* README: More build instructions.
+	* HACKING: Update.
+
 	* doc/Makefile.am ($(srcdir)/spotref.pdf): Make sure to work in
 	$(srcdir).
 

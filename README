@@ -1,3 +1,55 @@
+Installation
+============
+
+Requirements
+------------
+
+Spot requires a complete installation of Python (version 2.0 or
+later).  Especially, Python's headers files should be installed.
+
+Spot also uses modified versions of BuDDy (a binary decision diagram),
+and LBTT (an LTL to Büchi test bench).  You do not need to install
+these yourself, they are included in this package (directories buddy/
+and lbtt/), and will built and installed alongside of Spot.
+
+
+Building and installing
+-----------------------
+
+Spot follows the traditional `./configure && make && make check &&
+make install' process.  People unfamiliar with the GNU Build System
+should read the file INSTALL for generic instructions.
+
+In additions to its usual options, ./configure will accept some
+flags specific to Spot:
+
+  --with-gspn=DIR
+    Turns on GreatSPN support.  DIR should designate the root of
+    GreatSPN source tree.  (./configure will then run
+    DIR/SOURCES/contrib/version.sh to find the GreatSPN build tree.)
+
+    GreatSPN had to be modified in order to be used as a library
+    (thanks Soheib Baarir and Yann Thierry-Mieg for this work), and
+    presently these modifications are only available on the GreatSPN
+    CVS repository hosted by the Università di Torino.
+
+  --with-included-buddy
+  --with-included-lbtt
+    Once you have installed Spot the first time.  Modified versions of
+    LBTT and BuDDy will be installed.  The next time you reconfigure
+    Spot, configure will detect that these versions are already
+    installed, and will attempt to use these installed versions
+    directly (this is in case you had to modify one of these yourself
+    for another purpose).  These two options will *force* the use,
+    build, and installation of the included versions of these package,
+    even when compatible versions are already installed.
+
+  --enable-devel
+    Enable debugging symbols, turn off aggressive optimizations, and
+    turn on assertions.  This options is effective by default in
+    development versions (version numbers ending with a letter).
+
+
 Layout of the source tree
 =========================
 
@@ -16,9 +68,9 @@ src/            Sources for libspot.
    tgbaparse/   Parser for explicit TGBAs.
    tgbatest/    Tests for tgba/, tgbaalgos/, and tgbaparse/.
 doc/	        Documentation for libspot.
-   spot.html/   HTML manual.
+   spot.html/   HTML reference manual.
    spot.latex/  Sources for the PDF manual. (No distributed, can be rebuilt.)
-   spotref.pdf  PDF manual.
+   spotref.pdf  PDF reference manual.
 wrap/	        Wrappers for other languages.
    python/      Python bindings for Spot and BuDDy
       tests/    Tests for these bindings
