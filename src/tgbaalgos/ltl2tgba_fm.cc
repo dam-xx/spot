@@ -524,65 +524,104 @@ namespace spot
       bool
       check(const formula* f)
       {
-	pfl_map::const_iterator i = pfl.find(f);
-	if (i != pfl.end())
+	pfl_map::const_iterator i = pfl_.find(f);
+	if (i != pfl_.end())
 	  return i->second;
 	ltl_possible_fair_loop_visitor v;
 	f->accept(v);
 	bool rel = v.result();
-	pfl[f] = rel;
+	pfl_[f] = rel;
 	return rel;
       }
 
     private:
       typedef Sgi::hash_map<const formula*, bool, ptr_hash<formula> > pfl_map;
-      pfl_map pfl;
+      pfl_map pfl_;
+    };
+
+    class formula_canonizer
+    {
+    public:
+      formula_canonizer(translate_dict& d)
+	: v_(d)
+      {
+	// For cosmetics, register 1 initially, so the algorithm will
+	// not register an equivalent formula first.
+	b2f_[bddtrue] = constant::true_instance();
+      }
+
+      ~formula_canonizer()
+      {
+	while (f2b_.size())
+	  {
+	    formula_to_bdd_map::iterator i = f2b_.begin();
+	    const formula* f = i->first;
+	    f2b_.erase(i);
+	    destroy(f);
+	  }
+      }
+
+      bdd
+      translate(const formula* f)
+      {
+	// Use the cached result if available.
+	formula_to_bdd_map::const_iterator i = f2b_.find(f);
+	if (i != f2b_.end())
+	  return i->second;
+
+	// Perform the actual translation.
+	f->accept(v_);
+	bdd res = v_.result();
+	f2b_[clone(f)] = res;
+
+	// Register the reverse mapping if it is not already done.
+	if (b2f_.find(res) == b2f_.end())
+	  b2f_[res] = f;
+	return res;
+      }
+
+      const formula*
+      canonize(const formula* f)
+      {
+	bdd b = translate(f);
+
+	bdd_to_formula_map::iterator i = b2f_.find(b);
+	// Since we have just translated the formula, it is necessary in b2f_.
+	assert(i != b2f_.end());
+
+	if (i->second != f)
+	  {
+	    destroy(f);
+	    f = clone(i->second);
+	  }
+	return f;
+      }
+
+    private:
+      ltl_trad_visitor v_;
+      // Map each formula to its associated bdd.  This speed things up when
+      // the same formula is translated several times, which especially
+      // occurs when canonize() is called repeatedly inside exprop.
+      typedef std::map<bdd, const formula*, bdd_less_than> bdd_to_formula_map;
+      bdd_to_formula_map b2f_;
+      // Map a representation of successors to a canonical formula.
+      // We do this because many formulae (such as `aR(bRc)' and
+      // `aR(bRc).(bRc)') are equivalent, and are trivially identified
+      // by looking at the set of successors.
+      typedef std::map<const formula*, bdd> formula_to_bdd_map;
+      formula_to_bdd_map f2b_;
     };
 
   }
 
   typedef std::map<bdd, bdd, bdd_less_than> prom_map;
   typedef Sgi::hash_map<const formula*, prom_map, ptr_hash<formula> > dest_map;
-  typedef std::map<bdd, const formula*, bdd_less_than> succ_to_formula;
 
   static void
-  fill_dests(translate_dict& d, bool symb_merge,
-	     std::set<const formula*>& formulae_seen,
-	     succ_to_formula& canonical_succ, ltl_trad_visitor& v,
-	     dest_map& dests, bdd label, formula* dest)
+  fill_dests(translate_dict& d, dest_map& dests, bdd label, const formula* dest)
   {
-    // If we already know a state with the same successors,
-    // use it in lieu of the current one.  (See the comments
-    // for canonical_succ.)  We need to do this only for new
-    // destinations.
-    if (symb_merge
-	&& formulae_seen.find(dest) == formulae_seen.end())
-      {
-	dest->accept(v);
-	bdd succbdd = v.result();
-	succ_to_formula::iterator cs =
-	  canonical_succ.find(succbdd);
-	if (cs != canonical_succ.end())
-	  {
-	    destroy(dest);
-	    dest = clone(cs->second);
-	  }
-	else
-	  {
-	    canonical_succ[succbdd] = clone(dest);
-	  }
-      }
-
     bdd conds = bdd_existcomp(label, d.var_set);
     bdd promises = bdd_existcomp(label, d.a_set);
-
-    // Clear the promises if the destination is the True state.
-    // (Normally this is already the case unless the fair_loop_approx
-    // optimization is used, because this can get confused by formulae
-    // like X(1): it doesn't know that X(1) is equivalent to 1, so it
-    // puts all promises on arcs going to X(1).)
-    if (dest == constant::true_instance())
-      promises = bddtrue;
 
     dest_map::iterator i = dests.find(dest);
     if (i == dests.end())
@@ -614,17 +653,9 @@ namespace spot
 
     std::set<const formula*> formulae_seen;
     std::set<const formula*> formulae_to_translate;
-    // Map a representation of successors to a canonical formula.
-    // We do this because many formulae (such as `aR(bRc)' and
-    // `aR(bRc).(bRc)') are equivalent, and are trivially identified
-    // by looking at the set of successors.
-    succ_to_formula canonical_succ;
-    // For cosmetics, register 1 initially, so the algorithm will not
-    // register an equivalent formula first.
-    canonical_succ[bddtrue] = constant::true_instance();
 
     translate_dict d(dict);
-    ltl_trad_visitor v(d);
+    formula_canonizer fc(d);
 
     // Compute the set of all promises occurring inside the formula.
     bdd all_promises = bddtrue;
@@ -649,14 +680,7 @@ namespace spot
 	formulae_to_translate.erase(formulae_to_translate.begin());
 
 	// Translate it into a BDD to simplify it.
-	// FIXME: Currently the same formula can be converted into a
-	// BDD twice.  Once in the symb_merge block in fill_dests,
-	// and then  once here.
-	f->accept(v);
-	bdd res = v.result();
-	succ_to_formula::iterator cs = canonical_succ.find(res);
-	if (cs == canonical_succ.end())
-	  canonical_succ[res] = clone(f);
+	bdd res = fc.translate(f);
 
 	std::string now = to_string(f);
 
@@ -709,7 +733,7 @@ namespace spot
 	      exprop ? bdd_satoneset(all_props, var_set, bddtrue) : bddtrue;
 	    all_props -= one_prop_set;
 
-	    typedef std::map<bdd, formula*, bdd_less_than> succ_map;
+	    typedef std::map<bdd, const formula*, bdd_less_than> succ_map;
 	    succ_map succs;
 
 	    minato_isop isop(res & one_prop_set);
@@ -718,12 +742,18 @@ namespace spot
 	      {
 		bdd label = bdd_exist(cube, d.next_set);
 		bdd dest_bdd = bdd_existcomp(cube, d.next_set);
-		formula* dest = d.conj_bdd_to_formula(dest_bdd);
+		const formula* dest = d.conj_bdd_to_formula(dest_bdd);
+
+		// If we already know a state with the same
+		// successors, use it in lieu of the current one.
+		if (symb_merge)
+		  dest = fc.canonize(dest);
 
 		// If the destination cannot possibly be part of a fair
 		// loop, make all possible promises.
 		if (fair_loop_approx
-		    && dest_bdd != bddtrue && !pflc.check(dest))
+		    && dest != constant::true_instance()
+		    && !pflc.check(dest))
 		  label &= all_promises;
 
 		// If we are not postponing the branching, we can
@@ -733,8 +763,7 @@ namespace spot
 		// second loop.
 		if (!branching_postponement)
 		  {
-		    fill_dests(d, symb_merge, formulae_seen, canonical_succ,
-			       v, dests, label, dest);
+		    fill_dests(d, dests, label, dest);
 		  }
 		else
 		  {
@@ -742,15 +771,16 @@ namespace spot
 		    if (si == succs.end())
 		      succs[label] = dest;
 		    else
-		      si->second = multop::instance(multop::Or,
-						    si->second, dest);
+		      si->second =
+			multop::instance(multop::Or,
+					 const_cast<formula*>(si->second),
+					 const_cast<formula*>(dest));
 		  }
 	      }
 	    if (branching_postponement)
 	      for (succ_map::const_iterator si = succs.begin();
 		   si != succs.end(); ++si)
-		fill_dests(d, symb_merge, formulae_seen, canonical_succ, v,
-			   dests, si->first, si->second);
+		fill_dests(d, dests, si->first, si->second);
 	  }
 
 	// Check for an arc going to 1 (True).  Register it first, that
@@ -834,9 +864,6 @@ namespace spot
     for (std::set<const formula*>::iterator i = formulae_seen.begin();
 	 i != formulae_seen.end(); ++i)
       destroy(*i);
-    for (succ_to_formula::iterator i = canonical_succ.begin();
-     	 i != canonical_succ.end(); ++i)
-      destroy(i->second);
 
     // Turn all promises into real acceptance conditions.
     a->complement_all_acceptance_conditions();

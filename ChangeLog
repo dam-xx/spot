@@ -1,5 +1,11 @@
 2004-05-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	Cache formula translations, and canonize formulae before doing
+	branching postponement.
+	* src/tgbaalgos/ltl2tgba_fm.cc (formula_canonizer): New class, with
+	bits extracted from fill_dests and ltl_to_tgba_fm.
+	(fill_dests, ltl_to_tgba_fm): Adjust to use formula_canonizer.
+
 	* src/tgbaalgos/ltl2tgba_fm.hh (ltl_to_tgba_fm): Add argument
 	fair_loop_approx.
 	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Implement the
