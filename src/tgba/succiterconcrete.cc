@@ -102,15 +102,27 @@ namespace spot
 	    current_acc_ = bdd_forall(bdd_restrict(as, prop), data_.var_set);
 	    // current_acc_ = (Acc[a] | Acc[b])
 	    assert(current_acc_ != bddfalse);
-	    // Find other transitions included in each of these
-	    // accepting sets.
+	    // Find other transitions included exactly in each of these
+	    // accepting sets and are not included in other sets.
+	    //   Consider
+	    //      !p.!Acc[g].Acc[f] + p.!Acc[g].Acc[f] + p.Acc[g].!Acc[f]
+	    //   if current_acc_ = !Acc[g].Acc[f] we
+	    //   want to compute !p, not (!p + p), because p really
+	    //   belongs to !Acc[g].Acc[f] + Acc[g].!Acc[f], not
+	    //   only !Acc[g].Acc[f].
+	    // So, first, filter out all transitions like p, which
+	    // are also in other accepting sets.
+	    bdd fout = bdd_relprod(as, !current_acc_, data_.acc_set);
+	    bdd as_fout = as & !fout;
+	    // Then, pick the remaining term that are exactly in all 
+	    // required accepting sets.
 	    bdd all = bddtrue;
 	    bdd acc = current_acc_;
 	    do
 	      {
 		bdd one_acc = bdd_satone(acc);
 		acc &= !one_acc;
-		all &= bdd_relprod(as, one_acc, data_.acc_set);
+		all &= bdd_relprod(as_fout, one_acc, data_.acc_set);
 	      }
 	    while (acc != bddfalse);
 	    // all = (a | (!a)&b) & (Acc[a] | Acc[b])

@@ -1,3 +1,10 @@
+2003-07-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/succiterconcrete.cc (tgba_succ_iterator_concrete::next):
+	Fix so that !p.!Acc[g].Acc[f] + p.!Acc[g].Acc[f] + p.Acc[g].!Acc[f]
+	is factored as !p.!Acc[g].Acc[f] + p.(!Acc[g].Acc[f] + Acc[g].!Acc[f]),
+	not !Acc[g].Acc[f] + p.Acc[g].!Acc[f].
+
 2003-07-09  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* lbtt/: New directory.  Contains a patched version of lbtt 1.0.1.
