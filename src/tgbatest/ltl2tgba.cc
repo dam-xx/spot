@@ -77,6 +77,12 @@ syntax(char* prog)
             << "  -p   branching postponement (implies -f)" << std::endl
 	    << "  -r   display the relation BDD, not the reachability graph"
 	    << std::endl
+	    << "  -r1  reduce formula using basic rewriting" << std::endl
+	    << "  -r2  reduce formula using class of eventuality and "
+	    << "and universality" << std::endl
+	    << "  -r3  reduce formula using implication between "
+	    << "sub-formulae" << std::endl
+	    << "  -r4  reduce formula using all rules" << std::endl
 	    << "  -R   same as -r, but as a set" << std::endl
 	    << "  -s   convert to explicit automata, and number states "
 	    << "in DFS order" << std::endl
@@ -92,17 +98,7 @@ syntax(char* prog)
 	    << "  -X   do not compute an automaton, read it from a file"
 	    << std::endl
 	    << "  -y   do not merge states with same symbolic representation "
-	    << "(implies -f)" << std::endl
-	    << "  -r1  to reduce formula using basic rewriting"
-	    << std::endl
-	    << "  -r2  to reduce formula using class of eventuality and "
-	    << "and universality"
-	    << std::endl
-	    << "  -r3  to reduce formula using implication between "
-	    << "two formula"
-	    << std::endl
-	    << "  -r4  to reduce formula using all rules"
-	    << std::endl;
+	    << "(implies -f)" << std::endl;
   exit(2);
 }
 
