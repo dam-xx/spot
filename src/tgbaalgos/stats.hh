@@ -36,7 +36,7 @@ namespace spot
     unsigned states;
   };
 
-  /// \brief Compute statistics for an automata.
+  /// \brief Compute statistics for an automaton.
   tgba_statistics stats_reachable(const tgba* g);
 
   /// @}

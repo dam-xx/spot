@@ -28,7 +28,7 @@
 
 namespace spot
 {
-  /// \defgroup tgba TGBA (Transition-based Genealized Büchi Automaton)
+  /// \defgroup tgba TGBA (Transition-based Generalized Büchi Automata)
   ///
   /// Spot is centered around the spot::tgba type.  This type and its
   /// cousins are listed \ref tgba_essentials "here".  This is an
@@ -162,7 +162,7 @@ namespace spot
     virtual std::string
     transition_annotation(const tgba_succ_iterator* t) const;
 
-    /// \brief Project a state on an automata.
+    /// \brief Project a state on an automaton.
     ///
     /// This converts \a s, into that corresponding spot::state for \a
     /// t.  This is useful when you have the state of a product, and

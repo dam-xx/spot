@@ -46,7 +46,7 @@ namespace spot
   ///   editor        = {Pierre Leroux}
   /// }
   /// \endverbatim
-  /// \param f The formula to translate into an automata.
+  /// \param f The formula to translate into an automaton.
   /// \param dict The spot::bdd_dict the constructed automata should use.
   /// \return A spot::tgba_bdd_concrete that recognizes the language of \a f.
   tgba_bdd_concrete* ltl_to_tgba_lacim(const ltl::formula* f, bdd_dict* dict);

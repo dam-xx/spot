@@ -50,7 +50,7 @@ namespace spot
   /// }
   /// \endverbatim
   ///
-  /// \param f The formula to translate into an automata.
+  /// \param f The formula to translate into an automaton.
   ///
   /// \param dict The spot::bdd_dict the constructed automata should use.
   ///
