@@ -126,7 +126,7 @@ namespace spot
           if (fi_needed_ != 0)
             os_ << "  fi;" << std::endl;
           os_ << get_state_label(s, n) << ": ";
-          os_ << "/* " << automata_->format_state(s) << " */" ;
+          os_ << "/* " << automata_->format_state(s) << " */";
           os_ << std::endl;
           os_ << "  if" << std::endl;
           os_ << "  :: (0) -> goto " << get_state_label(s, n) << std::endl;
@@ -160,7 +160,7 @@ namespace spot
     {
       if (in != accept_all_)
         {
-          os_ << "  :: (" ;
+          os_ << "  :: (";
           const ltl::formula* f = bdd_to_formula(si->current_condition(),
 						 automata_->get_dict());
           to_spin_string(f, os_);

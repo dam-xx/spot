@@ -90,6 +90,9 @@ while read file; do
    grep '[	 ]case.*:[^:].*;' $tmp &&
      diag 'Label should be on their own line.'
 
+   grep '[	 ];' $tmp &&
+     diag 'No space before semicolon.'
+
    $fail && echo "$file" >>failures
 done
 
