@@ -417,7 +417,11 @@ main(int argc, char** argv)
 							    std::cout,
 							    display_parity_game);
 	      else
-		assert(0);
+		{
+		  assert(0);
+		  // Please GCC so it does not think REL is unused.
+		  rel = 0;
+		}
 
 	      if (display_rel_sim)
 		aut_red->display_rel_sim(rel, std::cout);
