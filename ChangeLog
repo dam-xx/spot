@@ -1,3 +1,8 @@
+2003-07-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba.cc (ltl_trad_visitor::visit): Declare
+	accepting conditions w.r.t. to Now variables, not Next.
+
 2003-07-03  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/tgbaproduct.cc (tgba_product_succ_iterator::first):

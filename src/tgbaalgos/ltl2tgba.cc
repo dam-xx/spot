@@ -76,13 +76,13 @@ namespace spot
 	    fact_.add_relation(bdd_apply(now, x | next, bddop_biimp));
 	    /*
 	      `x | next', doesn't actually encode the fact that x
-	      should be fulfilled eventually.  We ensure
-	      this by creating a new generalized Büchi accepting set,
-	      Acc[x], and leave any transition going to NEXT without
-	      checking X out of this set.  Such accepting conditions
-	      are checked for during the emptiness check.
+	      should be fulfilled eventually.  We ensure this by
+	      creating a new generalized Büchi accepting set, Acc[x],
+	      and leave out of this set any transition going off NOW
+	      without checking X.  Such accepting conditions are
+	      checked for during the emptiness check.
 	    */
-	    fact_.declare_accepting_condition(x | !next, node->child());
+	    fact_.declare_accepting_condition(x | !now, node->child());
 	    res_ = now;
 	    return;
 	  }
@@ -152,7 +152,7 @@ namespace spot
 	      We declare an accepting condition for this purpose (see
 	      the comment in the unop::F case).
 	    */
-	    fact_.declare_accepting_condition(f2 | !next, node->second());
+	    fact_.declare_accepting_condition(f2 | !now, node->second());
 	    res_ = now;
 	    return;
 	  }
