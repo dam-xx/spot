@@ -20,11 +20,29 @@ namespace spot
     {
       const bdd_dict* d = automata_->get_dict();
       os_ << "acc =";
-      for (bdd_dict::fv_map::const_iterator ai = d->acc_map.begin();
-	   ai != d->acc_map.end(); ++ai)
+
+      bdd acc = automata_->all_accepting_conditions();
+      while (acc != bddfalse)
 	{
-	  os_ << " \"";
-	  ltl::to_string(ai->first, os_) << "\"";
+	  bdd cube = bdd_satone(acc);
+	  acc -= cube;
+	  while (cube != bddtrue)
+	    {
+	      assert(cube != bddfalse);
+	      // Display the first variable that is positive.
+	      // There should be only one per satisfaction.
+	      if (bdd_high(cube) != bddfalse)
+		{
+		  int v = bdd_var(cube);
+		  bdd_dict::vf_map::const_iterator vi =
+		    d->acc_formula_map.find(v);
+		  assert(vi != d->acc_formula_map.end());
+		  os_ << " \"";
+		  ltl::to_string(vi->second, os_) << "\"";
+		  break;
+		}
+	      cube = bdd_low(cube);
+	    }
 	}
       os_ << ";" << std::endl;
     }
@@ -37,7 +55,7 @@ namespace spot
       for (si->first(); !si->done(); si->next())
 	{
 	  state* dest = si->current_state();
-	  os_ << "\"" << cur << "\", \"" 
+	  os_ << "\"" << cur << "\", \""
 	      << automata_->format_state(dest) << "\", ";
 	  bdd_print_sat(os_, d, si->current_condition()) << ",";
 	  bdd_print_acc(os_, d, si->current_accepting_conditions());

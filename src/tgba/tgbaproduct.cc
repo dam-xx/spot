@@ -154,9 +154,9 @@ namespace spot
     right_acc_complement_ = bdd_exist(rna, bdd_support(lna));
 
     all_accepting_conditions_ = ((left_->all_accepting_conditions()
-				  & left_acc_complement_)
+				  & right_acc_complement_)
 				 | (right_->all_accepting_conditions()
-				    & right_acc_complement_));
+				    & left_acc_complement_));
     neg_accepting_conditions_ = lna & rna;
 
     dict_->register_all_variables_of(&left_, this);

@@ -1,3 +1,20 @@
+2003-08-29  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/tgbaexplicit.cc (tgba_explicit::all_accepting_conditions)
+	Compute all_accepting_conditions_ from neg_accepting_conditions_,
+	not by browsing the dictionary.  The dictionary also contains
+	accepting conditions from other automata...  This bug was a
+	consequence of the change from 2003-07-14.
+	* src/tgbaalgos/save.cc (save_bfs::start()): Likewise, do not
+	browse the dictionary to print accepting conditions.  Call
+	->all_accepting_conditions() instead.
+	* src/tgba/tgbaproduct.cc (tgba_product::tgba_product): Typo
+	from 2003-08-22 in the computation of all_accepting_conditions_.
+	* src/tgbatest/explpro3.test: New file.
+	* src/tgbatest/Makefile.am (TESTS): Add explpro3.test.
+	* src/tgbatest/explprod.test, src/tgbatest/explpro2.test,
+	 src/tgbatest/tripprod.test: Sort the output using Perl.
+
 2003-08-28  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	Rewrite all std::map<const formula*, ...> as
@@ -413,7 +430,7 @@
 	* iface/gspn/gspn.cc (EVENT_TRUE): Undefine.
 	(tgba_gspn_private_::~tgba_gspn_private_): Free all_indexes.
 	* iface/gspn/dottygspn.cc (main): Destroy the automaton before
-	its dictionnary.
+	its dictionary.
 
 2003-07-17  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 

@@ -39,6 +39,7 @@ TESTS = \
   bddprod.test \
   explprod.test \
   explpro2.test \
+  explpro3.test \
   tripprod.test \
   mixprod.test \
   ltlmagic.test \

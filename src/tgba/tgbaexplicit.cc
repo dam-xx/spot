@@ -307,11 +307,22 @@ namespace spot
     if (!all_accepting_conditions_computed_)
       {
 	bdd all = bddfalse;
-	bdd_dict::fv_map::const_iterator i;
-	for (i = dict_->acc_map.begin(); i != dict_->acc_map.end(); ++i)
+
+	// Build all_accepting_conditions_ from neg_accepting_conditions_
+	// I.e., transform !A & !B & !C into
+	//        A & !B & !C
+	//     + !A &  B & !C
+	//     + !A & !B &  C
+	bdd cur = neg_accepting_conditions_;
+	while (cur != bddtrue)
 	  {
-	    bdd v = bdd_ithvar(i->second);
+	    assert(cur != bddfalse);
+
+	    bdd v = bdd_ithvar(bdd_var(cur));
 	    all |= v & bdd_exist(neg_accepting_conditions_, v);
+
+	    assert(bdd_high(cur) != bddtrue);
+	    cur = bdd_low(cur);
 	  }
 	all_accepting_conditions_ = all;
 	all_accepting_conditions_computed_ = true;
