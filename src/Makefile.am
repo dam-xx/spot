@@ -38,3 +38,5 @@ libspot_la_LIBADD =  \
   tgba/libtgba.la \
   tgbaalgos/libtgbaalgos.la \
   tgbaparse/libtgbaparse.la
+# Dummy C++ source to cause C++ linking.
+nodist_EXTRA_libspot_la_SOURCES = _.cc
