@@ -5,10 +5,6 @@
 
 namespace spot
 {
-
-  const unsigned char seen_without_magic = 1;
-  const unsigned char seen_with_magic = 2;
-
   magic_search::magic_search(const tgba_tba_proxy* a)
     : a(a), x(0)
   {
