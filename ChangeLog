@@ -1,3 +1,8 @@
+2005-01-12  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/tgbatest/randtgba.cc: Add products with randomized formulae and
+        more statistics.
+
 2005-01-11  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gv04.cc (result): Implement the acss_statistics,
