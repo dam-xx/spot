@@ -1,14 +1,14 @@
 #ifndef SPOT_LTLAST_CONSTANT_HH
 # define SPOT_LTLAST_CONSTANT_HH
 
-#include "formulae.hh"
+#include "formula.hh"
 
 namespace spot
 {
   namespace ltl
   {
     
-    class constant : public formulae
+    class constant : public formula
     {
     public:
       enum type { False, True };
@@ -19,8 +19,8 @@ namespace spot
       virtual void accept(visitor& v);
       virtual void accept(const_visitor& v) const;
 
-      const formulae* child() const;
-      formulae* child();
+      const formula* child() const;
+      formula* child();
 
       type val() const;
       const char* val_name() const;

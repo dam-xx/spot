@@ -1,4 +1,4 @@
-#include "ltlast/formulae.hh"
+#include "ltlast/formula.hh"
 #include "ltlast/visitor.hh"
 
 namespace spot 
@@ -10,11 +10,11 @@ namespace spot
     class equals_visitor : public const_visitor
     {
     public:
-      equals_visitor(const formulae* f);
+      equals_visitor(const formula* f);
       virtual ~equals_visitor();
 
       // Return true iff the visitor has visited a
-      // formulae which is equal to `f'.
+      // formula which is equal to `f'.
       bool result() const;
       
       void visit(const atomic_prop* ap);
@@ -24,11 +24,11 @@ namespace spot
       void visit(const constant* c);
 	
     private:
-      const formulae* f_;
+      const formula* f_;
       bool result_;
 	      
     };
 
-    bool equals(const formulae* f1, const formulae* f2);
+    bool equals(const formula* f1, const formula* f2);
   }
 }

@@ -10,7 +10,7 @@ libltlast_a_SOURCES = \
   binop.hh \
   constant.cc \
   constant.hh \
-  formulae.hh \
+  formula.hh \
   multop.cc \
   multop.hh \
   predecl.hh \

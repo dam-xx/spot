@@ -10,7 +10,7 @@ namespace spot {
     struct unop;
     struct constant;
     struct binop;
-    struct formulae;
+    struct formula;
     struct multop;
   }
 }

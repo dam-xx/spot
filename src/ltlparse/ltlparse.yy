@@ -3,7 +3,7 @@
 #include "public.hh"
 #include "ltlast/allnodes.hh"
 
-extern spot::ltl::formulae* result;
+extern spot::ltl::formula* result;
 
 %}
 
@@ -13,7 +13,7 @@ extern spot::ltl::formulae* result;
 {
   int token;
   std::string* str;
-  spot::ltl::formulae* ltl;
+  spot::ltl::formula* ltl;
 }
 
 %{
@@ -58,10 +58,10 @@ namespace spot
 %token CONST_FALSE
 %token END_OF_INPUT
 
-%type <ltl> result ltl_formulae subformulae
+%type <ltl> result ltl_formula subformula
 
 %%
-result:       ltl_formulae END_OF_INPUT
+result:       ltl_formula END_OF_INPUT
               { result = $$ = $1; 
 		YYACCEPT;
 	      }
@@ -82,57 +82,57 @@ many_errors_diagnosed : many_errors
               { error_list->push_back(parse_error(@1, 
 				     "unexpected input ignored")); }
 
-ltl_formulae: subformulae
+ltl_formula: subformula
               { $$ = $1; }
-	    | many_errors_diagnosed subformulae
+	    | many_errors_diagnosed subformula
               { $$ = $2; }
-	    | ltl_formulae many_errors_diagnosed
+	    | ltl_formula many_errors_diagnosed
               { $$ = $1; }
 
 many_errors: error
 	    | many_errors error
 
-subformulae: ATOMIC_PROP
+subformula: ATOMIC_PROP
 	      { $$ = new atomic_prop(*$1); delete $1; }
 	    | CONST_TRUE
               { $$ = new constant(constant::True); }
 	    | CONST_FALSE
               { $$ = new constant(constant::False); }
-	    | PAR_OPEN subformulae PAR_CLOSE
+	    | PAR_OPEN subformula PAR_CLOSE
 	      { $$ = $2; }
 	    | PAR_OPEN error PAR_CLOSE
               { error_list->push_back(parse_error(@$, 
                  "treating this parenthetical block as false")); 
 	        $$ = new constant(constant::False);
 	      }
-	    | PAR_OPEN subformulae many_errors PAR_CLOSE
+	    | PAR_OPEN subformula many_errors PAR_CLOSE
               { error_list->push_back(parse_error(@3, 
 				      "unexpected input ignored")); 
 	        $$ = $2;
 	      }
-	    | OP_NOT subformulae
+	    | OP_NOT subformula
 	      { $$ = new unop(unop::Not, $2); }
-            | subformulae OP_AND subformulae
+            | subformula OP_AND subformula
 	      { $$ = new multop(multop::And, $1, $3); }
-	    | subformulae OP_OR subformulae
+	    | subformula OP_OR subformula
 	      { $$ = new multop(multop::Or, $1, $3); }
-	    | subformulae OP_XOR subformulae
+	    | subformula OP_XOR subformula
 	      { $$ = new binop(binop::Xor, $1, $3); }
-	    | subformulae OP_IMPLIES subformulae
+	    | subformula OP_IMPLIES subformula
 	      { $$ = new binop(binop::Implies, $1, $3); }
-            | subformulae OP_EQUIV subformulae
+            | subformula OP_EQUIV subformula
 	      { $$ = new binop(binop::Equiv, $1, $3); }
-            | subformulae OP_U subformulae
+            | subformula OP_U subformula
 	      { $$ = new binop(binop::U, $1, $3); }
-            | subformulae OP_R subformulae
+            | subformula OP_R subformula
 	      { $$ = new binop(binop::R, $1, $3); }
-            | OP_F subformulae
+            | OP_F subformula
 	      { $$ = new unop(unop::F, $2); }
-            | OP_G subformulae
+            | OP_G subformula
 	      { $$ = new unop(unop::G, $2); }
-            | OP_X subformulae
+            | OP_X subformula
 	      { $$ = new unop(unop::X, $2); }
-//	    | subformulae many_errors
+//	    | subformula many_errors
 //              { error_list->push_back(parse_error(@2, 
 //		  "ignoring these unexpected trailing tokens")); 
 //	        $$ = $1;
@@ -155,7 +155,7 @@ yy::Parser::error_()
   error_list->push_back(parse_error(location, message));
 }
 
-formulae* result = 0;
+formula* result = 0;
 
 namespace spot
 {
@@ -163,7 +163,7 @@ namespace spot
   {
     parse_error_list* error_list;
 
-    formulae*
+    formula*
     parse(const std::string& ltl_string, 
 	  parse_error_list& error_list,
 	  bool debug)

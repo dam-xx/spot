@@ -8,7 +8,7 @@ namespace spot
   namespace ltl 
   {
 
-    class formulae 
+    class formula 
     {
     public:
       virtual void accept(visitor& v) = 0;

@@ -2,22 +2,22 @@
 # define SPOT_LTLAST_MULTOP_HH
 
 #include <vector>
-#include "formulae.hh"
+#include "formula.hh"
 
 namespace spot
 {
   namespace ltl
   {
     
-    class multop : public formulae
+    class multop : public formula
     {
     public:
       enum type { Or, And };
 
       // A multop has at least two arguments.
-      multop(type op, formulae* first, formulae* second);
+      multop(type op, formula* first, formula* second);
       // More argument can be added.
-      void add(formulae* f);
+      void add(formula* f);
       
       virtual ~multop();
 
@@ -25,15 +25,15 @@ namespace spot
       virtual void accept(const_visitor& v) const;
 
       unsigned size() const;
-      const formulae* nth(unsigned n) const;
-      formulae* nth(unsigned n);
+      const formula* nth(unsigned n) const;
+      formula* nth(unsigned n);
 
       type op() const;
       const char* op_name() const;
 
     private:
       type op_;
-      std::vector<formulae*> children_;
+      std::vector<formula*> children_;
     };
 
   }

@@ -6,7 +6,7 @@
 void
 syntax(char *prog)
 {
-  std::cerr << prog << " [-d] formulae" << std::endl;
+  std::cerr << prog << " [-d] formula" << std::endl;
   exit(2);
 }
 
@@ -19,23 +19,23 @@ main(int argc, char **argv)
     syntax(argv[0]);
 
   bool debug = false;
-  int formulae_index = 1;
+  int formula_index = 1;
 
   if (!strcmp(argv[1], "-d"))
     {
       debug = true;
       if (argc < 3)
 	syntax(argv[0]);
-      formulae_index = 2;
+      formula_index = 2;
     }    
   
   spot::ltl::parse_error_list pel;
-  spot::ltl::formulae *f = spot::ltl::parse(argv[formulae_index], 
+  spot::ltl::formula *f = spot::ltl::parse(argv[formula_index], 
 					    pel, debug);
 
   spot::ltl::parse_error_list::iterator it;
   exit_code = 
-    spot::ltl::format_parse_errors(std::cerr, argv[formulae_index], pel);
+    spot::ltl::format_parse_errors(std::cerr, argv[formula_index], pel);
 
   if (f)
     {

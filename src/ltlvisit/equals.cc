@@ -6,7 +6,7 @@ namespace spot
 {
   namespace ltl
   {
-    equals_visitor::equals_visitor(const formulae* f)
+    equals_visitor::equals_visitor(const formula* f)
       : f_(f), result_(false)
     {
     }
@@ -84,7 +84,7 @@ namespace spot
       for (unsigned nf = 0; nf < m_size; ++nf)
 	{
 	  unsigned np;
-	  const formulae* mnth = m->nth(nf);
+	  const formula* mnth = m->nth(nf);
 	  for (np = 0; np < p_size; ++np)
 	    {
 	      if (equals(p->nth(np), mnth))
@@ -94,7 +94,7 @@ namespace spot
 		}
 	    }
 	  // We we haven't found mnth in any child of p, then
-	  // the two formulaes aren't equal.
+	  // the two formulas aren't equal.
 	  if (np == p_size)
 	    return;
 	}
@@ -114,7 +114,7 @@ namespace spot
 	  
 	  // Compare with marked children.
 	  unsigned np2;
-	  const formulae *pnth = p->nth(np);
+	  const formula *pnth = p->nth(np);
 	  for (np2 = 0; np2 < p_size; ++np2)
 	    if (p_seen[np2] && equals(p->nth(np2), pnth))
 	      break;
@@ -124,13 +124,13 @@ namespace spot
 	    return;
 	}
       
-      // The two formulaes match.
+      // The two formulas match.
       result_ = true;
     }
 
 
     bool 
-    equals(const formulae* f1, const formulae* f2)
+    equals(const formula* f1, const formula* f2)
     {
       equals_visitor v(f1);
       f2->accept(v);

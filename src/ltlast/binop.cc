@@ -6,7 +6,7 @@ namespace spot
 {
   namespace ltl
   {    
-    binop::binop(type op, formulae* first, formulae* second)
+    binop::binop(type op, formula* first, formula* second)
       : op_(op), first_(first), second_(second)
     {
     }
@@ -27,25 +27,25 @@ namespace spot
       v.visit(this);
     }
 
-    const formulae*
+    const formula*
     binop::first() const
     {
       return first_;
     }
 
-    formulae*
+    formula*
     binop::first()
     {
       return first_;
     }
 
-    const formulae*
+    const formula*
     binop::second() const
     {
       return second_;
     }
 
-    formulae* 
+    formula* 
     binop::second()
     {
       return second_;

@@ -69,7 +69,7 @@ namespace spot
     };
 
     void 
-    dump(const formulae& f, std::ostream& os)
+    dump(const formula& f, std::ostream& os)
     {
       dump_visitor v(os);
       f.accept(v);

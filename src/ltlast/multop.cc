@@ -7,7 +7,7 @@ namespace spot
 {
   namespace ltl
   {    
-    multop::multop(type op, formulae* first, formulae* second)
+    multop::multop(type op, formula* first, formula* second)
       : op_(op)
     {
       children_.reserve(2);
@@ -16,9 +16,9 @@ namespace spot
     }
     
     void
-    multop::add(formulae* f)
+    multop::add(formula* f)
     {
-      // If the formulae we add is itself a multop for the same operator,
+      // If the formula we add is itself a multop for the same operator,
       // merge its children with ours.
       multop* p = dynamic_cast<multop*>(f);
       if (p && p->op() == op())
@@ -26,7 +26,7 @@ namespace spot
 	  unsigned ps = p->size();
 	  for (unsigned i = 0; i < ps; ++i)
 	    children_.push_back(p->nth(i));
-	  // that sub-formulae is now useless 
+	  // that sub-formula is now useless 
 	  delete f;
 	}
       else
@@ -57,13 +57,13 @@ namespace spot
       return children_.size();
     }
 
-    const formulae*
+    const formula*
     multop::nth(unsigned n) const
     {
       return children_[n];
     }
 
-    formulae* 
+    formula* 
     multop::nth(unsigned n)
     {
       return children_[n];

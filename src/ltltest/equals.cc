@@ -5,7 +5,7 @@
 void
 syntax(char *prog)
 {
-  std::cerr << prog << " formulae1 formulae2" << std::endl;
+  std::cerr << prog << " formula1 formula2" << std::endl;
   exit(2);
 }
 
@@ -17,13 +17,13 @@ main(int argc, char **argv)
 
   
   spot::ltl::parse_error_list p1;
-  spot::ltl::formulae *f1 = spot::ltl::parse(argv[1], p1);
+  spot::ltl::formula *f1 = spot::ltl::parse(argv[1], p1);
 
   if (spot::ltl::format_parse_errors(std::cerr, argv[1], p1))
     return 2;
 
   spot::ltl::parse_error_list p2;
-  spot::ltl::formulae *f2 = spot::ltl::parse(argv[2], p2);
+  spot::ltl::formula *f2 = spot::ltl::parse(argv[2], p2);
 			
   if (spot::ltl::format_parse_errors(std::cerr, argv[2], p2))
     return 2;

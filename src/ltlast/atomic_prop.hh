@@ -2,14 +2,14 @@
 # define SPOT_LTLAST_ATOMIC_PROP_HH
 
 #include <string>
-#include "formulae.hh"
+#include "formula.hh"
 
 namespace spot
 {
   namespace ltl
   {
     
-    class atomic_prop : public formulae
+    class atomic_prop : public formula
     {
     public:
       atomic_prop(std::string name);

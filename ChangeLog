@@ -1,5 +1,12 @@
-2003-04-16  Alexandre DURET-LUTZ  <aduret@circe.lip6.fr>
+2003-04-16  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltlast/formulae.hh: Rename as ...
+	* src/ltlast/formula.hh: ... this.
+	* src/ltlast/Makefile.am (libltlast_a_SOURCES): Adjust.
+	* src/ltlast/formula.hh (formulae): Rename as ...
+	(formula): ... this.
+	Adjust all uses.
+	
 	* src/ltlparse/public.hh (format_parse_errors): New function.
 	* src/ltlparse/fmterror.cc: New file.
 	* src/ltlparse/Makefile.am (libltlparse_a_SOURCES): Add fmterror.cc.

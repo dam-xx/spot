@@ -6,7 +6,7 @@ namespace spot
 {
   namespace ltl
   {    
-    unop::unop(type op, formulae* child)
+    unop::unop(type op, formula* child)
       : op_(op), child_(child)
     {
     }
@@ -27,13 +27,13 @@ namespace spot
       v.visit(this);
     }
 
-    const formulae*
+    const formula*
     unop::child() const
     {
       return child_;
     }
 
-    formulae*
+    formula*
     unop::child()
     {
       return child_;
