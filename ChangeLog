@@ -1,5 +1,9 @@
 2005-02-07  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
+	* src/misc/optionmap.cc, src/misc/optionmap.hh: Typo (Hummm).
+
+2005-02-07  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
 	* src/misc/optionmap.cc, src/misc/optionmap.hh (option_map): New class.
 	* src/misc/Makefile.am: Add it.
 	* src/tgbaalgos/emptiness.cc, src/tgbaalgos/emptiness.hh: Add option

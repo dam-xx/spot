@@ -26,7 +26,8 @@
 
 namespace spot
 {
-  namespace {
+  namespace
+  {
     bool
     to_int(const char* s, int &i)
     {
@@ -45,7 +46,7 @@ namespace spot
 
   const char* option_map::parse_options(char* options)
   {
-      char* opt = strtok(options, "\t, ;");
+      char* opt = strtok(options, ", \t;");
       while (opt)
         {
           char* equal;
@@ -60,7 +61,7 @@ namespace spot
           else
             // default value if declared
             options_[opt] = 1;
-          opt = strtok(0, "\t, ;");
+          opt = strtok(0, ", \t;");
         }
       return 0;
   }

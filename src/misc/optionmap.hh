@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_MISC_OPTION_MAP_HH
-# define SPOT_MISC_OPTION_MAP_HH
+#ifndef SPOT_MISC_OPTIONMAP_HH
+# define SPOT_MISC_OPTIONMAP_HH
 
 #include <string>
 #include <map>
@@ -71,4 +71,4 @@ namespace spot
   };
 };
 
-#endif
+#endif // SPOT_MISC_OPTIONMAP_HH
