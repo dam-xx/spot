@@ -25,13 +25,19 @@
 # unset, be quiet.
 test -n "$srcdir" && test -z "$VERBOSE" && exec >/dev/null 2>&1
 
-test -z "$1" && PYTHONPATH=..:@srcdir@/.. exec @PYTHON@
+# Darwin needs some help in figuring out where non-installed libtool
+# libraries are (on this platform libtool encodes the expected final
+# path of dependent libraries in each library).
+modpath='../.libs:@top_builddir@/src/.libs:@top_builddir@/buddy/src/.libs'
+
+test -z "$1" &&
+  PYTHONPATH='..:@srcdir@/..' DYLD_LIBRARY_PATH=$modpath exec @PYTHON@
 
 case $1 in
   *.py)
-    PYTHONPATH=..:@srcdir@/.. exec @PYTHON@ "$@";;
+    PYTHONPATH='..:@srcdir@/..' DYLD_LIBRARY_PATH=$modpath exec @PYTHON@ "$@";;
   *.test)
-    sh -x "$@";;
+    exec sh -x "$@";;
   *)
     echo "Unknown extension" >&2
     exit 2;;

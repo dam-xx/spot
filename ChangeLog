@@ -1,5 +1,9 @@
 2004-11-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* wrap/python/tests/run.in: Define DYLD_LIBRARY_PATH so that
+	Darwin finds non-installed libraries.
+	Report from Akim Demaille.
+
 	* src/tgbatest/ltl2tgba.cc (syntax): Mention gv04 in help text.
 
 2004-11-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
