@@ -24,6 +24,7 @@
 #include <cassert>
 
 #include "lunabbrev.hh"
+#include "simpfg.hh"
 #include "nenoform.hh"
 #include "ltlvisit/destroy.hh"
 
@@ -515,33 +516,32 @@ namespace spot
     bool
     syntactic_implication_neg(const formula* f1, const formula* f2, bool right)
     {
-      const formula* ftmp1;
-      const formula* ftmp2;
-      const formula* ftmp3 = unop::instance(unop::Not,
-					    right ? clone(f2) : clone(f1));
-      const formula* ftmp4 = negative_normal_form(right ? f1 : f2);
-      const formula* ftmp5;
-      const formula* ftmp6;
-      bool result;
-
-      ftmp2 = unabbreviate_logic(ftmp3);
-      ftmp1 = negative_normal_form(ftmp2);
-
-      ftmp5 = unabbreviate_logic(ftmp4);
-      ftmp6 = negative_normal_form(ftmp5);
-
+      formula* l = clone(f1);
+      formula* r = clone(f2);
       if (right)
-	result = syntactic_implication(ftmp6, ftmp1);
+	r = unop::instance(unop::Not, r);
       else
-	result = syntactic_implication(ftmp1, ftmp6);
+	l = unop::instance(unop::Not, l);
 
-      destroy(ftmp1);
-      destroy(ftmp2);
-      destroy(ftmp3);
-      destroy(ftmp4);
-      destroy(ftmp5);
-      destroy(ftmp6);
+      formula* tmp = unabbreviate_logic(l);
+      destroy(l);
+      l = simplify_f_g(tmp);
+      destroy(tmp);
+      tmp = negative_normal_form(l);
+      destroy(l);
+      l = tmp;
 
+      tmp = unabbreviate_logic(r);
+      destroy(r);
+      r = simplify_f_g(tmp);
+      destroy(tmp);
+      tmp = negative_normal_form(r);
+      destroy(r);
+      r = tmp;
+
+      bool result = syntactic_implication(l, r);
+      destroy(l);
+      destroy(r);
       return result;
     }
   }

@@ -26,6 +26,7 @@
 #include <cassert>
 
 #include "lunabbrev.hh"
+#include "simpfg.hh"
 #include "nenoform.hh"
 #include "ltlvisit/destroy.hh"
 
@@ -293,8 +294,11 @@ namespace spot
       formula* f2;
 
       f1 = unabbreviate_logic(f);
-      f2 = negative_normal_form(f1);
+      f2 = simplify_f_g(f1);
       destroy(f1);
+      f1 = negative_normal_form(f2);
+      destroy(f2);
+      f2 = f1;
 
       if (opt & Reduce_Basics)
 	{

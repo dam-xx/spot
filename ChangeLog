@@ -1,5 +1,14 @@
 2004-06-23  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/ltlvisit/simpfg.cc, src/ltlvisit/simpfg.hh: New files,
+	extracted from ...
+	* src/ltlvisit/lunabbrev.cc: ... this one, which now work as documented
+	again.
+	* src/ltlvisit/reduce.cc, src/ltlvisit/syntimpl.cc: Adjust to call
+	simplify_f_g() in addition to unabbreviate_logic().
+	* src/ltlvisit/Makefile.am (ltlvisit_HEADERS, libltlvisit_la_SOURCES):
+	Add simpfg.cc and simpfg.hh.
+
 	* src/ltlvisit/reducform.hh, src/ltlvisit/reducform.cc: Rename to ...
 	* src/ltlvisit/reduce.hh, src/ltlvisit/reduce.cc: ... this, to match
 	the function name.

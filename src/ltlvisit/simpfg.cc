@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -21,7 +21,7 @@
 
 #include "ltlast/allnodes.hh"
 #include "ltlvisit/clone.hh"
-#include "lunabbrev.hh"
+#include "simpfg.hh"
 #include <cassert>
 
 namespace spot
@@ -29,53 +29,40 @@ namespace spot
   namespace ltl
   {
 
-    unabbreviate_logic_visitor::unabbreviate_logic_visitor()
+    simplify_f_g_visitor::simplify_f_g_visitor()
     {
     }
 
-    unabbreviate_logic_visitor::~unabbreviate_logic_visitor()
+    simplify_f_g_visitor::~simplify_f_g_visitor()
     {
     }
 
     void
-    unabbreviate_logic_visitor::visit(binop* bo)
+    simplify_f_g_visitor::visit(binop* bo)
     {
       formula* f1 = recurse(bo->first());
       formula* f2 = recurse(bo->second());
 
       switch (bo->op())
 	{
-	  /* f1 ^ f2  ==  (f1 & !f2) | (f2 & !f1) */
 	case binop::Xor:
-	  result_ = multop::instance(multop::Or,
-				     multop::instance(multop::And, clone(f1),
-						      unop::instance(unop::Not,
-								     f2)),
-				     multop::instance(multop::And, clone(f2),
-						      unop::instance(unop::Not,
-								     f1)));
-	  return;
-	  /* f1 => f2  ==  !f1 | f2 */
 	case binop::Implies:
-	  result_ = multop::instance(multop::Or,
-				     unop::instance(unop::Not, f1), f2);
-	  return;
-	  /* f1 <=> f2  ==  (f1 & f2) | (!f1 & !f2) */
 	case binop::Equiv:
-	  result_ = multop::instance(multop::Or,
-				     multop::instance(multop::And,
-						      clone(f1), clone(f2)),
-				     multop::instance(multop::And,
-						      unop::instance(unop::Not,
-								     f1),
-						      unop::instance(unop::Not,
-								     f2)));
-	  return;
-          /* f1 U f2 == f1 U f2 */
-	  /* f1 R f2 == f1 R f2 */
-   	case binop::U:
-	case binop::R:
 	  result_ = binop::instance(bo->op(), f1, f2);
+	  return;
+	  /* true U f2 == F(f2) */
+	case binop::U:
+	  if (f1 == constant::true_instance())
+	    result_ = unop::instance(unop::F, f2);
+	  else
+	    result_ = binop::instance(binop::U, f1, f2);
+	  return;
+	  /* false R f2 == G(f2) */
+	case binop::R:
+	  if (f1 == constant::false_instance())
+	    result_ = unop::instance(unop::G, f2);
+	  else
+	    result_ = binop::instance(binop::R, f1, f2);
 	  return;
 	}
       /* Unreachable code. */
@@ -83,15 +70,15 @@ namespace spot
     }
 
     formula*
-    unabbreviate_logic_visitor::recurse(formula* f)
+    simplify_f_g_visitor::recurse(formula* f)
     {
-      return unabbreviate_logic(f);
+      return simplify_f_g(f);
     }
 
     formula*
-    unabbreviate_logic(const formula* f)
+    simplify_f_g(const formula* f)
     {
-      unabbreviate_logic_visitor v;
+      simplify_f_g_visitor v;
       const_cast<formula*>(f)->accept(v);
       return v.result();
     }
