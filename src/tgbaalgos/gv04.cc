@@ -30,13 +30,12 @@
 
 #include <cassert>
 #include <utility>
-#include <map>
-#include <deque>
 #include "tgba/tgba.hh"
 #include "misc/hash.hh"
 #include "emptiness.hh"
 #include "emptiness_stats.hh"
 #include "gv04.hh"
+#include "bfssteps.hh"
 
 namespace spot
 {
@@ -242,6 +241,8 @@ namespace spot
 
       struct result: public emptiness_check_result
       {
+	gv04& data;
+
 	result(gv04& data)
 	  : data(data)
 	{
@@ -253,7 +254,7 @@ namespace spot
 	  tgba_run* res = new tgba_run;
 
 	  // Transitively update the lowlinks, so we can use them in
-	  // the BDS bellow.
+	  // the BFS bellow.
 	  for (int i = 0; i <= data.top; ++i)
 	    {
 	      int l = data.stack[i].lowlink;
@@ -293,179 +294,83 @@ namespace spot
 	      father = data.stack[father].pre;
 	    }
 
-	  // Construct the cycle in two phases.  A first BFS find the
+	  // Construct the cycle in two phases.  A first BFS finds the
 	  // shortest path from scc_root to an accepting transition.
 	  // A second BFS then search a path back to scc_root.  If
 	  // there is no acceptance conditions we just use the second
 	  // BFS to find a cycle around scc_root.
+
+	  struct first_bfs: bfs_steps
+	  {
+	    const gv04& data;
+	    int scc_root;
+
+	    first_bfs(const gv04& data, int scc_root)
+	      : bfs_steps(data.a), data(data), scc_root(scc_root)
+	    {
+	    }
+
+	    virtual const state*
+	    filter(const state* s)
+	    {
+	      // Do not escape the SCC
+	      hash_type::const_iterator j = data.h.find(s);
+	      if (// This state was never visited so far.
+		  j == data.h.end()
+		  // Or it was discarded
+		  || j->second >= data.stack.size()
+		  // Or it was discarded (but its stack slot reused)
+		  || data.stack[j->second].s->compare(s)
+		  // Or it is still on the stack but not in the SCC
+		  || data.stack[j->second].lowlink < scc_root)
+		{
+		  delete s;
+		  return 0;
+		}
+	      delete s;
+	      return j->first;
+	    }
+
+	    virtual bool
+	    match(tgba_run::step& step, const state*)
+	    {
+	      return step.acc != bddfalse;
+	    }
+	  };
+
+	  struct second_bfs: first_bfs
+	  {
+	    const state* target;
+	    second_bfs(const gv04& data, int scc_root, const state* target)
+	      : first_bfs(data, scc_root), target(target)
+	    {
+	    }
+
+	    virtual bool
+	    match(tgba_run::step&, const state* s)
+	    {
+	      return s == target;
+	    }
+	  };
+
 	  const state* bfs_start = data.stack[scc_root].s;
 	  const state* bfs_end = bfs_start;
 	  if (data.accepting != bddfalse)
 	    {
-	      trace << "1st BFS" << std::endl;
-
-	      // Records backlinks to parent state during the BFS.
-	      // (This also stores the propositions of this link.)
-	      std::map<const state*, tgba_run::step,
-		       state_ptr_less_than> father;
-	      // BFS queue.
-	      std::deque<const state*> todo;
-	      // Initial state.
-	      todo.push_back(bfs_start);
-
-	      while (!todo.empty())
-		{
-		  const state* src = todo.front();
-		  todo.pop_front();
-		  tgba_succ_iterator* i = data.a->succ_iter(src);
-		  for (i->first(); !i->done(); i->next())
-		    {
-		      const state* dest = i->current_state();
-
-		      trace << " state " << data.a->format_state(dest);
-
-		      // Do not escape the SCC
-		      hash_type::const_iterator j = data.h.find(dest);
-		      if (// This state was never visited so far.
-			  j == data.h.end()
-			  // Or it was discarded
-			  || j->second >= data.stack.size()
-			  // Or it was discarded (but its stack slot reused)
-			  || data.stack[j->second].s->compare(dest)
-			  // Or it is still on the stack but not in the SCC
-			  || data.stack[j->second].lowlink < scc_root)
-			{
-			  trace << " ignored" << std::endl;
-			  delete dest;
-			  continue;
-			}
-		      trace << " explored" << std::endl;
-		      delete dest;
-		      dest = j->first;
-
-		      bdd cond = i->current_condition();
-		      bdd acc = i->current_acceptance_conditions();
-		      tgba_run::step s = { src, cond, acc };
-
-		      if (acc != bddfalse)
-			{
-			  // Found it!
-
-			  tgba_run::steps p;
-			  while (s.s != bfs_start)
-			    {
-			      p.push_front(s);
-			      s = father[s.s];
-			    }
-			  p.push_front(s);
-			  res->cycle.splice(res->cycle.end(), p);
-			  // Exit this BFS, and start the next one at dest.
-			  todo.clear();
-			  bfs_start = dest;
-			  break;
-			}
-
-		      // Common case: record backlinks and continue BFS
-		      // for unvisited states.
-		      if (father.find(dest) == father.end())
-			{
-			  todo.push_back(dest);
-			  father[dest] = s;
-			}
-		    }
-		  delete i;
-		}
+	      first_bfs b1(data, scc_root);
+	      bfs_start = b1.search(bfs_start, res->cycle);
+	      assert(bfs_start);
 	    }
-	  // Second BFS.
 	  if (bfs_start != bfs_end || res->cycle.empty())
 	    {
-	      trace << "2nd BFS" << std::endl;
-
-	      // Records backlinks to parent state during the BFS.
-	      // (This also stores the propositions of this link.)
-	      std::map<const state*, tgba_run::step,
-		state_ptr_less_than> father;
-	      // BFS queue.
-	      std::deque<const state*> todo;
-	      // Initial state.
-	      todo.push_back(bfs_start);
-
-	      while (!todo.empty())
-		{
-		  const state* src = todo.front();
-		  todo.pop_front();
-		  tgba_succ_iterator* i = data.a->succ_iter(src);
-		  for (i->first(); !i->done(); i->next())
-		    {
-		      const state* dest = i->current_state();
-
-		      trace << " state " << data.a->format_state(dest);
-
-		      // Do not escape the SCC
-		      hash_type::const_iterator j = data.h.find(dest);
-		      if (// This state was never visited so far.
-			  j == data.h.end()
-			  // Or it was discarded
-			  || j->second >= data.stack.size()
-			  // Or it was discarded (but its stack slot reused)
-			  || data.stack[j->second].s->compare(dest)
-			  // Or it is still on the stack but not in the SCC
-			  || data.stack[j->second].lowlink < scc_root)
-			{
-			  trace << " ignored" << std::endl;
-			  delete dest;
-			  continue;
-			}
-		      trace << " explored" << std::endl;
-		      delete dest;
-		      dest = j->first;
-
-		      bdd cond = i->current_condition();
-		      bdd acc = i->current_acceptance_conditions();
-		      tgba_run::step s = { src, cond, acc };
-
-		      if (dest == bfs_end)
-			{
-			  // Found it!
-			  tgba_run::steps p;
-			  while (s.s != bfs_start)
-			    {
-			      p.push_front(s);
-			      s = father[s.s];
-			    }
-			  p.push_front(s);
-			  res->cycle.splice(res->cycle.end(), p);
-			  // Exit this BFS.
-			  todo.clear();
-			  break;
-			}
-
-		      // Common case: record backlinks and continue BFS
-		      // for unvisited states.
-		      if (father.find(dest) == father.end())
-			{
-			  todo.push_back(dest);
-			  father[dest] = s;
-			}
-		    }
-		  delete i;
-		}
+	      second_bfs b2(data, scc_root, bfs_end);
+	      bfs_start = b2.search(bfs_start, res->cycle);
+	      assert(bfs_start == bfs_end);
 	    }
 
-	  // Clone every state in the cycle before returning it.  (We
-	  // didn't do that before in the algorithm, because it's
-	  // easier to follow if every state manipulated in the BFS is
-	  // the instance in the hash table.)
-	  for (tgba_run::steps::iterator i = res->cycle.begin();
-	       i != res->cycle.end(); ++i)
-	    i->s = i->s->clone();
-
 	  assert(res->cycle.begin() != res->cycle.end());
-
 	  return res;
 	}
-
-	gv04& data;
       };
 
 

@@ -27,6 +27,7 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 tgbaalgosdir = $(pkgincludedir)/tgbaalgos
 
 tgbaalgos_HEADERS = \
+  bfssteps.hh \
   dotty.hh \
   dottydec.hh \
   dupexp.hh \
@@ -54,6 +55,7 @@ tgbaalgos_HEADERS = \
 
 noinst_LTLIBRARIES = libtgbaalgos.la
 libtgbaalgos_la_SOURCES = \
+  bfssteps.cc \
   dotty.cc \
   dottydec.cc \
   dupexp.cc \

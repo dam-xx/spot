@@ -1,3 +1,11 @@
+2004-11-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/bfssteps.hh, src/tgbaalgos/bfssteps.cc: New files.
+	* src/tgbaalgos/Makefile.am (tgbaalgos_HEADERS,
+	libtgbaalgos_la_SOURCES): Add them.
+	* src/tgbaalgos/gv04.cc (gv04::result::accepting_run): Use
+	the new bfs_steps class.
+
 2004-11-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gv04.cc (gv04::result): New struct to compute
