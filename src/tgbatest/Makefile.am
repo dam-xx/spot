@@ -23,6 +23,10 @@ AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 LDADD = ../libspot.la
 
+# This is the most used test program, and it's also useful
+# to run manually outside the test suite.  Always build it.
+noinst_PROGRAMS = ltl2tgba
+
 check_SCRIPTS = defs
 # Keep this sorted alphabetically.
 check_PROGRAMS = \
@@ -30,7 +34,6 @@ check_PROGRAMS = \
   explicit \
   expldot \
   explprod \
-  ltl2tgba \
   ltlprod \
   mixprod \
   powerset \

@@ -1,3 +1,10 @@
+2004-04-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Move ltl2tgba ...
+	(noinst_PROGRAMS): ... here.
+	* iface/gspn/Makefile.am (check_PROGRAMS): Rename as ...
+	(noinst_PROGRAMS): ... this.
+
 2004-04-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/explicit.test: Reorder bdd variable in output.

@@ -34,7 +34,7 @@ libspotgspn_la_SOURCES = \
   common.cc \
   gspn.cc
 
-check_PROGRAMS = \
+noinst_PROGRAMS = \
   dottygspn-rg \
   dottygspn-srg \
   ltlgspn-rg \
@@ -42,7 +42,7 @@ check_PROGRAMS = \
 
 if WITH_GSPN_SSP
 gspn_HEADERS += ssp.hh
-check_PROGRAMS += \
+noinst_PROGRAMS += \
   dottygspn-ssp \
   ltlgspn-ssp
 
