@@ -1,3 +1,8 @@
+2004-11-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Write to the
+	supplied stream, not std::cout.
+
 2004-11-15  Poitrenaud Denis  <denis@src.lip6.fr>
 
 	* src/tgbaalgos/magic.cc: Add a bit state hashing version.

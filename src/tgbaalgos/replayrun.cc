@@ -131,7 +131,7 @@ namespace spot
 		in = "cycle";
 		i = l->begin();
 		if (!debug)
-		  std::cout << "Cycle:" << std::endl;
+		  os << "Cycle:" << std::endl;
 	      }
 	    next = l->begin()->s;
 	  }
