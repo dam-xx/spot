@@ -1,3 +1,8 @@
+2004-03-23  Alexandre DURET-LUTZ  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::accepting_path)
+	Fix handling of PATH when backtracking.  Report from Soheib Baarir.
+
 2004-03-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	Move the free_list management into a separate class for reuse.

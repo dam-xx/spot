@@ -712,7 +712,11 @@ namespace spot
 		todo.pop();
 		delete iter;
 		seen.erase(s);
-		path.pop_back();
+		if (todo.size())
+		  {
+		    assert(path.size());
+		    path.pop_back();
+		  }
 		continue;
 	      }
 
@@ -762,7 +766,7 @@ namespace spot
 		if (best_acc_restrict == acc_restrict)
 		  {
 		    if (best_path.size() <= path.size())
-		      continue;
+		      goto backtrack_path;
 		  }
 		else
 		  {
@@ -774,13 +778,20 @@ namespace spot
 		    // FIXME: It would be better to count the number
 		    // of acceptance conditions.
 		    if (bddtrue != (best_acc_restrict >> acc_restrict))
-		      continue;
+		      goto backtrack_path;
 		  }
 	      }
 
 	    // The current path the best one.
 	    best_path = path;
 	    best_acc = acc;
+
+	  backtrack_path:
+	    // Continue exploration from parent to find better paths.
+	    // (Do not pop PATH if ITER is done, because that will be
+	    // done at the top of the loop, among other things.)
+	    if (!iter->done())
+	      path.pop_back();
 	  }
 
 	// Append our best path to the period.
