@@ -1,5 +1,7 @@
 2003-08-05  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* README: Update layout.
+
 	* wrap/python/cgi/Makefile.am, wrap/python/cgi/ltl2tgba.in,
 	wrap/python/cgi/README: New files.
 	* wrap/python/Makefile.am (SUBDIRS): Add cgi.
