@@ -281,10 +281,6 @@ main(int argc, char** argv)
 	{
 	  reduc_r4 = true;
 	}
-      else if (!strcmp(argv[formula_index], "-rd"))
-	{
-	  reduc_rd = true;
-	}
       else
 	{
 	  break;
@@ -372,9 +368,10 @@ main(int argc, char** argv)
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 
-	  if (reduc_r1 || reduc_r2 || reduc_r3 || reduc_r4) {
-	    spot::ltl::destroy(ftmp);
-	  }
+	  if (reduc_r1 || reduc_r2 || reduc_r3 || reduc_r4)
+	    {
+	      spot::ltl::destroy(ftmp);
+	    }
 	}
 
       spot::tgba_tba_proxy* degeneralized = 0;

@@ -1,5 +1,7 @@
 2004-05-14  Thomas Martinez  <martinez@src.lip6.fr>
 
+	* src/tgbatest/ltl2tgba.cc (main): Thinko.
+
 	* src/ltlvisit/basereduc.cc (spot): Correct some mistakes.
 	* src/ltlvisit/lunabbrev.cc (spot): Nothing change.
 	* src/tgbatest/ltl2tgba.cc (main): More option to reduce
