@@ -89,8 +89,8 @@ namespace spot
 	    /* X(f1 | GF(f2)) = X(f1) | GF(F2) */
 	    if (node_type(result_) == (node_type_form_visitor::Multop)) {
 	      if (dynamic_cast<multop*>(result_)->size() == 2) {
-		  if (is_GF(dynamic_cast<multop*>(result_)->nth(0)) ||
-		      is_FG(dynamic_cast<multop*>(result_)->nth(0))) {
+		if (is_GF(dynamic_cast<multop*>(result_)->nth(0))) {
+		  //|| is_FG(dynamic_cast<multop*>(result_)->nth(0))) {
 		    multop::vec* res = new multop::vec;
 		    res->push_back(unop::instance(unop::F, basic_reduce_form(dynamic_cast<multop*>(result_)->nth(1))));
 		    res->push_back(basic_reduce_form(dynamic_cast<multop*>(result_)->nth(0)));
@@ -99,8 +99,8 @@ namespace spot
 		    spot::ltl::destroy(f);
 		    return;
 		  }
-		  if (is_GF(dynamic_cast<multop*>(result_)->nth(1)) ||
-		      is_FG(dynamic_cast<multop*>(result_)->nth(1))) {
+		if (is_GF(dynamic_cast<multop*>(result_)->nth(1))) {
+		  //|| is_FG(dynamic_cast<multop*>(result_)->nth(1))) {
 		    multop::vec* res = new multop::vec;
 		    res->push_back(unop::instance(unop::F, basic_reduce_form(dynamic_cast<multop*>(result_)->nth(0))));
 		    res->push_back(basic_reduce_form(dynamic_cast<multop*>(result_)->nth(1)));
@@ -137,8 +137,8 @@ namespace spot
 	    if (node_type(result_) == (node_type_form_visitor::Multop)) {
 	      if (dynamic_cast<multop*>(result_)->op() == multop::And) {
 		if (dynamic_cast<multop*>(result_)->size() == 2) {
-		  if (is_GF(dynamic_cast<multop*>(result_)->nth(0)) ||
-		      is_FG(dynamic_cast<multop*>(result_)->nth(0))) {
+		  if (is_GF(dynamic_cast<multop*>(result_)->nth(0))) {
+		    //|| is_FG(dynamic_cast<multop*>(result_)->nth(0))) {
 		    multop::vec* res = new multop::vec;
 		    res->push_back(unop::instance(unop::F, basic_reduce_form(dynamic_cast<multop*>(result_)->nth(1))));
 		    res->push_back(basic_reduce_form(dynamic_cast<multop*>(result_)->nth(0)));
@@ -146,8 +146,8 @@ namespace spot
 		    result_ = multop::instance(multop::And, res);
 		    return;
 		  }
-		  if (is_GF(dynamic_cast<multop*>(result_)->nth(1)) ||
-		      is_FG(dynamic_cast<multop*>(result_)->nth(1))) {
+		  if (is_GF(dynamic_cast<multop*>(result_)->nth(1))) {
+		    //|| is_FG(dynamic_cast<multop*>(result_)->nth(1))) {
 		    multop::vec* res = new multop::vec;
 		    res->push_back(unop::instance(unop::F, basic_reduce_form(dynamic_cast<multop*>(result_)->nth(0))));
 		    res->push_back(basic_reduce_form(dynamic_cast<multop*>(result_)->nth(1)));
@@ -193,8 +193,8 @@ namespace spot
 	    if (node_type(result_) == (node_type_form_visitor::Multop)) {
 	      if (dynamic_cast<multop*>(f)->op() == multop::Or) {
 		if (dynamic_cast<multop*>(result_)->size() == 2) {
-		  if (is_GF(dynamic_cast<multop*>(result_)->nth(0)) ||
-		      is_FG(dynamic_cast<multop*>(result_)->nth(0))) {
+		  if (is_GF(dynamic_cast<multop*>(result_)->nth(0))) {
+		    //|| is_FG(dynamic_cast<multop*>(result_)->nth(0))) {
 		    multop::vec* res = new multop::vec;
 		    res->push_back(unop::instance(unop::G, basic_reduce_form(dynamic_cast<multop*>(result_)->nth(1))));
 		    res->push_back(basic_reduce_form(dynamic_cast<multop*>(result_)->nth(0)));
@@ -202,8 +202,8 @@ namespace spot
 		    result_ = multop::instance(multop::Or, res);
 		    return;
 		  }
-		  if (is_GF(dynamic_cast<multop*>(result_)->nth(1)) ||
-		      is_FG(dynamic_cast<multop*>(result_)->nth(1))) {
+		  if (is_GF(dynamic_cast<multop*>(result_)->nth(1))) {
+		    //|| is_FG(dynamic_cast<multop*>(result_)->nth(1))) {
 		    multop::vec* res = new multop::vec;
 		    res->push_back(unop::instance(unop::G, basic_reduce_form(dynamic_cast<multop*>(result_)->nth(0))));
 		    res->push_back(basic_reduce_form(dynamic_cast<multop*>(result_)->nth(1)));
@@ -450,7 +450,7 @@ namespace spot
 		  break;
 		}
 
-		/* GF(a) & GF(b) = GF(a & b)*/
+		/* GF(a) | GF(b) = GF(a | b)*/
 		if (is_GF(*i)) {
 		  tmpGF->push_back(spot::ltl::basic_reduce_form(dynamic_cast<unop*>(dynamic_cast<unop*>(*i)->child())->child()));
 		  break;
@@ -553,8 +553,8 @@ namespace spot
 							      multop::instance(mo->op(),tmpGF))));
 	if (tmpFG != NULL)
 	  if (tmpFG->size())
-	    tmpOther->push_back(unop::instance(unop::G,
-					       unop::instance(unop::F,
+	    tmpOther->push_back(unop::instance(unop::F,
+					       unop::instance(unop::G,
 							      multop::instance(mo->op(),tmpFG))));
 
 	result_ = multop::instance(op, tmpOther);

@@ -22,58 +22,14 @@
 #include "ltlast/allnodes.hh"
 #include "ltlvisit/clone.hh"
 #include "lunabbrev.hh"
-//#include "reducform.hh"
+#include "reducform.hh"
 #include <cassert>
 
 namespace spot
 {
   namespace ltl
   {
-   
-    class node_type_form_visitor : public const_visitor
-    {
-    public:
-      enum type { Atom, Const, Unop, Binop, Multop };
-      
-      node_type_form_visitor(){}
-      
-      type
-      result() const { return result_;}
-      
-      void
-      visit(const atomic_prop* ap){ 
-	if (ap == NULL);
-	result_ = node_type_form_visitor::Atom;
-      }
-      
-      void
-      visit(const constant* c){ 
-	if (c == NULL);
-	result_ = node_type_form_visitor::Const;
-      }
-      
-      void
-      visit(const unop* uo){
-	if (uo == NULL); 
-	result_ = node_type_form_visitor::Unop;
-      }
-      
-      void
-      visit(const binop* bo){ 
-	if (bo == NULL);
-	result_ = node_type_form_visitor::Binop;
-      }
-      
-      void
-      visit(const multop* mo){ 
-	if (mo == NULL);
-	result_ = node_type_form_visitor::Multop;
-      }
-      
-    protected:
-      type result_;
-    };
-    
+
     unabbreviate_logic_visitor::unabbreviate_logic_visitor()
     {
     }
@@ -82,37 +38,11 @@ namespace spot
     {
     }
 
-    /*
-    void
-    unabbreviate_logic_visitor::visit(unop* uo)
-    {
-      formula* f = uo->child();
-      switch (uo->op())
-	{
-	case unop::Not:
-	case unop::X:
-	  result_ = unop::instance(uo->op(),recurse(f));
-	  return;
-	case unop::F:
-	  result_ = binop::instance(binop::U,constant::true_instance(),recurse(f));
-	  return;
-	case unop::G:
-	  result_ = binop::instance(binop::R,constant::false_instance(),recurse(f));
-	  return;
-	}
-      // Unreachable code.
-      assert(0);
-    }
-    */
-
     void
     unabbreviate_logic_visitor::visit(binop* bo)
     {
       formula* f1 = recurse(bo->first());
       formula* f2 = recurse(bo->second());
-      
-      node_type_form_visitor v;
-      const_cast<formula*>(f1)->accept(v);
 
       switch (bo->op())
 	{
@@ -145,7 +75,7 @@ namespace spot
 
 	  /* true U f2 == F(f2) */
 	case binop::U:
-	  if ( v.result() == node_type_form_visitor::Const )
+	  if ( node_type(f1) == node_type_form_visitor::Const )
 	    if ( ((constant*)f1)->val() == constant::True ) {
 	      result_ = unop::instance(unop::F,f2);
 	      return;
@@ -155,7 +85,7 @@ namespace spot
 
 	  /* false R f2 == G(f2) */
 	case binop::R:
-	  if ( v.result() == node_type_form_visitor::Const )
+	  if ( node_type(f1) == node_type_form_visitor::Const )
 	    if ( ((constant*)f1)->val() == constant::False ) {
 	      result_ = unop::instance(unop::G,f2);
 	      return;

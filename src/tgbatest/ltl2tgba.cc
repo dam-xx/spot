@@ -93,7 +93,15 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -y   do not merge states with same symbolic representation "
 	    << "(implies -f)" << std::endl
-	    << "  -z   to reduce formula "
+	    << "  -r1  to reduce formula using basic rewriting"
+	    << std::endl
+	    << "  -r2  to reduce formula using class of eventuality and "
+	    << "and universality"
+	    << std::endl
+	    << "  -r3  to reduce formula using implication between "
+	    << "two formula"
+	    << std::endl
+	    << "  -r4  to reduce formula using all rules"
 	    << std::endl;
   exit(2);
 }
@@ -116,7 +124,10 @@ main(int argc, char** argv)
   bool magic_many = false;
   bool expect_counter_example = false;
   bool from_file = false;
-  bool reduc = false;
+  bool reduc_r1 = false;
+  bool reduc_r2 = false;
+  bool reduc_r3 = false;
+  bool reduc_r4 = false;
   bool post_branching = false;
   bool fair_loop_approx = false;
 
@@ -254,9 +265,25 @@ main(int argc, char** argv)
 	  fm_opt = true;
 	  fm_symb_merge_opt = false;
 	}
-      else if (!strcmp(argv[formula_index], "-z"))
+      else if (!strcmp(argv[formula_index], "-r1"))
 	{
-	  reduc = true;
+	  reduc_r1 = true;
+	}
+      else if (!strcmp(argv[formula_index], "-r2"))
+	{
+	  reduc_r2 = true;
+	}
+      else if (!strcmp(argv[formula_index], "-r3"))
+	{
+	  reduc_r3 = true;
+	}
+      else if (!strcmp(argv[formula_index], "-r4"))
+	{
+	  reduc_r4 = true;
+	}
+      else if (!strcmp(argv[formula_index], "-rd"))
+	{
+	  reduc_rd = true;
 	}
       else
 	{
@@ -322,8 +349,20 @@ main(int argc, char** argv)
 	{
 
 	  spot::ltl::formula* ftmp = f;
-	  if (reduc)
+	  if (reduc_r4)
 	    f = spot::ltl::reduce(f);
+	  else {
+	    if (reduc_r1 | reduc_r2 | reduc_r3) {
+	      spot::ltl::option o = spot::ltl::BRI;
+	      if (reduc_r1)
+		o = spot::ltl::Base;
+	      if (reduc_r2)
+		o = spot::ltl::EventualUniversal;
+	      if (reduc_r3)
+		o = spot::ltl::Inf;
+	      f = spot::ltl::reduce(f, o);
+	    }
+	  }
 
 	  if (fm_opt)
 	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt,
@@ -333,8 +372,9 @@ main(int argc, char** argv)
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 
-	  if (reduc)
+	  if (reduc_r1 || reduc_r2 || reduc_r3 || reduc_r4) {
 	    spot::ltl::destroy(ftmp);
+	  }
 	}
 
       spot::tgba_tba_proxy* degeneralized = 0;

@@ -30,6 +30,13 @@ set -e
 cat > config <<EOF
 Algorithm
 {
+   Name = "Spot (Couvreur -- LaCIM), reduction of formula"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r4 -F -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- LaCIM)"
    Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -t'"
    Enabled = yes
