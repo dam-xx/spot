@@ -18,14 +18,15 @@ This directory contains:
 
     An LTL formula to verify on these examples.
 
+* models/eeaean1.pml
 * models/eeaean2.pml
 
-    A variations of the leader election protocol with extinction from
+    Variations of the leader election protocol with extinction from
     Tel, Introduction to Distributed Algorithms, 1994, Chapter 7. The
     network in the model consists of three nodes. In Variant 1, the
     same node wins every time, in Variant 2, each node gets a turn at
-    winning the election.  This script was originally distributed
-    alongside with
+    winning the election.  These specifications were originally
+    distributed alongside
 
     @InProceedings{   schwoon.05.tacas,
       author        = {Stefan Schwoon and Javier Esparza},
@@ -39,6 +40,8 @@ This directory contains:
       publisher     = {Springer-Verlag},
       month         = apr
     }
+
+    We only presented results for the second model in the paper.
 
 * models/eeaean.ltl
 
@@ -134,10 +137,10 @@ This directory contains:
 
 * pml-eeaean.sh
 
-    Check models/eeaean2.pml against each formulae in
-    models/eeaean.ltl, using all the algorithms of the file
-    `algorihms'.  You should have run `make' before attempting to run
-    this script, so the state space are available.
+    Check models/eeaean1.pml and models/eeaean2.pml against each
+    formulae in models/eeaean.ltl, using all the algorithms of the
+    file `algorihms'.  You should have run `make' before attempting to
+    run this script, so the state space are available.
 
 
 =======

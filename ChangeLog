@@ -1,5 +1,13 @@
 2005-02-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* bench/emptchk/models/eeaean1.pml: New file, from schwoon.05.tacas.
+	* bench/emptchk/Makefile.am: Distribute models/eeaean1.pml
+	and build models/eeaean1.tgba.
+	* bench/emptchk/pml-eeaean.sh: Check models/eeaean1.pml.
+	* bench/emptchk/README: Adjust.
+	* bench/emptchk/defs.in (RANDTGBA, LTL2TGBA): These tools are in
+	the build tree, not the source tree...
+
 	These tests are huge, and are obsoleted by randtgba-based checks,
 	and by bench/emptchk/.
 	* src/tgbatest/tba_samples_from_spin.test: Delete.

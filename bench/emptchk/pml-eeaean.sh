@@ -28,7 +28,7 @@ ALGORITHMS=$srcdir/algorithms
 
 opts='-f -x -m'
 
-for model in eeaean2.tgba
+for model in eeaean1.tgba eeaean2.tgba
 do
   echo "+++++++++++++++++++++"
   echo "  $model"

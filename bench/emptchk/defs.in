@@ -34,6 +34,6 @@ test -f "$srcdir/defs.in" || {
    exit 1
 }
 
-RANDTGBA='@top_srcdir@/src/tgbatest/randtgba@EXEEXT@'
-LTL2TGBA='@top_srcdir@/src/tgbatest/ltl2tgba@EXEEXT@'
+RANDTGBA='@top_builddir@/src/tgbatest/randtgba@EXEEXT@'
+LTL2TGBA='@top_builddir@/src/tgbatest/ltl2tgba@EXEEXT@'
 FORMULAE=$srcdir/formulae.ltl
