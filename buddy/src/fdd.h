@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/fdd.h,v 1.1 2003/05/05 10:57:56 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/fdd.h,v 1.2 2003/05/05 13:45:07 aduret Exp $
   FILE:  fdd.h
   DESCR: Finite domain data with BDDs
   AUTH:  Jorn Lind

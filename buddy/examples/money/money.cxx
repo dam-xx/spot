@@ -1,4 +1,6 @@
 #include "bvec.h"
+#include <iostream>
+using namespace std;
 
 /* Find a solution to the send-more-money example
  * The problem is to assign values for the digits s,e,n,d,m,o,r,y

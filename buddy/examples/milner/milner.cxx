@@ -3,6 +3,8 @@
 #include <time.h>
 #include <math.h>
 #include "bdd.h"
+#include <iostream>
+using namespace std;
 
 int N;                // Number of cyclers
 bdd normvar;          // Current state variables

@@ -7,7 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <iostream>
 #include "bdd.h"
+
+using namespace std;
 
 int N;
 

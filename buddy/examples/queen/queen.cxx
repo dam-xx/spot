@@ -26,7 +26,9 @@
      
 **************************************************************************/
 #include <stdlib.h>
+#include <iostream>
 #include "bdd.h"
+using namespace std;
 
 int N;                /* Size of the chess board */
 bdd **X;              /* BDD variable array */

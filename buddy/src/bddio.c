@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddio.c,v 1.1 2003/05/05 10:57:56 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddio.c,v 1.2 2003/05/05 13:45:04 aduret Exp $
   FILE:  bddio.c
   DESCR: File I/O routines for BDD package
   AUTH:  Jorn Lind

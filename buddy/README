@@ -1,7 +1,7 @@
 ==========================================================================
                               *** BuDDy ***
                          Binary Decision Diagrams
-                           Library Package v2.2
+                           Library Package v2.2a
 --------------------------------------------------------------------------
                Copyright (C) 1996-2002 by Jorn Lind-Nielsen
                             All rights reserved
@@ -45,15 +45,38 @@
 --- INSTALLING ------------------------------------------------------
 ---------------------------------------------------------------------
 
-2) Edit the file "config" to specify your compiler options and
-where the package is to be installed.
+The following commands should build and install the library.
 
-3) type "make" to make the binary.
+  ./configure
+  make
+  make install
 
-4) type "make install" to copy the BDD files to their appropriate
-directories.
+`./configure' accepts many arguments to tune your installation.
+The following options are noteworthy:
 
-5) type "make examples" to make the examples
+  --includedir=/somewhere/include   
+    Specify where header files will be installed.
+
+  --libdir=/somewhere/lib    
+    Specify where libraries will be installed.
+
+  --disable-shared
+    Do not build the shared library for BuDDy.
+
+  --disable-static
+    Do not build the static library for BuDDy.
+
+  --enable-swap-count
+    Count number of fundamental variable swaps (for debugging)
+
+  --enable-cache-stats
+    Gather statistical information about operator and unique node 
+    caching (for debugging)
+
+Run `./configure --help' for a complete listing, and see
+the INSTALL file for generic intrustions.
+
+Run `make check' to build the examples.
 
 
 ---------------------------------------------------------------------
@@ -91,7 +114,8 @@ examples:      Example files
 doc:           Documentation.
   buddy.ps:    Package documentation.
   bddnotes.ps: BDD introduction notes.
-
+tools:         Tools used during the build.
+m4:            A couple of macros used to build ./configure.
 
 ---------------------------------------------------------------------
 --- FEEDBACK --------------------------------------------------------

@@ -1,5 +1,5 @@
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/examples/calculator/Attic/slist.h,v 1.1 2003/05/05 10:57:55 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/examples/calculator/Attic/slist.h,v 1.2 2003/05/05 13:44:55 aduret Exp $
   FILE:  slist.h
   DESCR: Single linked list
   AUTH:  Jorn Lind
@@ -28,7 +28,7 @@ protected:
       
    private:
       voidSListElem(void *d) { data=d; next=NULL; }
-      friend voidSList;
+      friend class voidSList;
    };
    
 public:
@@ -169,7 +169,7 @@ public:
       int operator==(ite x)                { return x.next==next; }
    private:
       voidSListElem *next;
-      friend SList<T>;
+      friend class SList<T>;
    };
 
    ~SList(void)          { for (ite x=first() ; x.more() ; x++) delete &(*x); }

@@ -6,7 +6,9 @@
  *    0 -> 1 -> 2 -> 3 -> 4 -> 5 -> -> 7 -> 0
  */
 
+#include <iostream>
 #include "fdd.h"
+using namespace std;
 
 /* Use the transition relation "transRel" to iterate through the statespace
  */

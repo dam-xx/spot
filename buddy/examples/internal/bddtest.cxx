@@ -1,6 +1,8 @@
 #include <iomanip>
 #include <stdlib.h>
 #include <bdd.h>
+#include <iostream>
+using namespace std;
 
 static const int varnum = 5;
 

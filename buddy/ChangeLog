@@ -1,0 +1,35 @@
+2003-05-05  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* configure.ac, Makefile.am, src/Makefile.am, doc/Makefile.am,
+	examples/Makefile.am, examples/Makefile.def, 
+	examples/adder/Makefile.am, examples/calculator/Makefile.am,
+	examples/cmilner/Makefile.am, examples/fdd/Makefile.am, 
+	examples/internal/Makefile.am, examples/milner/Makefile.am,
+	examples/money/Makefile.am, examples/queen/Makefile.am,
+	examples/solitar/Makefile.am, m4/debug.m4, m4/gccwarns.m4,
+	ChangeLog, INSTALL: New files.
+	* config, makefile, src/makefile, doc/makefile,
+	examples/adder/makefile, examples/calculator/makefile
+	examples/cmilner/makefile, examples/fdd/makefile,
+	examples/internal/makefile, examples/milner/makefile,
+	examples/money/makefile, examples/queen/makefile,
+	examples/solitare/makefile : Delete.
+	* examples/adder/adder.cxx, examples/fdd/statespace.cxx, 
+	examples/internal/bddtest.cxx, examples/milner/milner.cxx,
+	examples/money/money.cxx, examples/queen/queen.cxx, 
+	examples/solitare/solitare.cxx: Include iostream.
+	* examples/calculator/parser.y: Rename as ...
+	* examples/calculator/parser.yxx: ... this.  Remove spurious
+	comas in %token, %right, and %left arguments.
+	* examples/calculator/parser.h: Rename as ...
+	* examples/calculator/parser_.h: ... this, because the bison
+	rule with output parser.h (not tokens.h) from parser.y.
+	* examples/calculator/lexer.l: Rename as ...
+	* examples/calculator/lexer.lxx: ... this.  Include parser.h
+	instead of tokens.h.
+	* examples/calculator/slist.h 
+	(voidSList::voisSListElem, SList::ite): Fix friend usage.
+	* src/kernel.h (DEFAULT_CLOCK): Default to 60 if not already
+	defined.
+	* README: Update build instruction, and file listing.
+

@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/prime.c,v 1.1 2003/05/05 10:57:57 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/prime.c,v 1.2 2003/05/05 13:45:08 aduret Exp $
   FILE:  prime.c
   DESCR: Prime number calculations
   AUTH:  Jorn Lind

@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.h,v 1.1 2003/05/05 10:57:57 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.h,v 1.2 2003/05/05 13:45:07 aduret Exp $
   FILE:  kernel.h
   DESCR: Kernel specific definitions for BDD package
   AUTH:  Jorn Lind
@@ -167,7 +167,12 @@ extern bddCacheStat bddcachestats;
 #define BDDZERO 0
 
 #ifndef CLOCKS_PER_SEC
-#define CLOCKS_PER_SEC DEFAULT_CLOCK
+  /* Pass `CPPFLAGS=-DDEFAULT_CLOCK=1000' as an argument to ./configure
+     to override this setting.  */
+# ifndef DEFAULT_CLOCK
+#  define DEFAULT_CLOCK 60
+# endif
+# define CLOCKS_PER_SEC DEFAULT_CLOCK
 #endif
 
 #define DEFAULTMAXNODEINC 50000

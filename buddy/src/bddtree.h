@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddtree.h,v 1.1 2003/05/05 10:57:56 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddtree.h,v 1.2 2003/05/05 13:45:05 aduret Exp $
   FILE:  tree.h
   DESCR: Trees for BDD variables
   AUTH:  Jorn Lind

@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bdd.h,v 1.1 2003/05/05 10:57:56 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bdd.h,v 1.2 2003/05/05 13:45:04 aduret Exp $
   FILE:  bdd.h
   DESCR: C,C++ User interface for the BDD package
   AUTH:  Jorn Lind

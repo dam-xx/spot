@@ -2,7 +2,11 @@
 #include <time.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <iostream>
 #include "bdd.h"
+using std::cout;
+using std::endl;
+using std::flush;
 
 float dummyStateNum;  // Use to remove the number of states defined by the
                       // next-state variables
