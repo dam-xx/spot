@@ -1,5 +1,8 @@
 2004-10-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Verify the run is
+	accepting.
+
 	* src/tgbaalgos/gtec/ce.cc (couvreur99_check_result::accepting_path):
 	Initialize best_end to remove a spurious warning.
 

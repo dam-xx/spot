@@ -33,6 +33,9 @@ namespace spot
     int serial = 1;
     const tgba_run::steps* l;
     std::string in;
+    bdd all_acc = bddfalse;
+    bdd expected_all_acc = a->all_acceptance_conditions();
+    bool all_acc_seen = false;
 
     if (run->prefix.empty())
       {
@@ -135,8 +138,31 @@ namespace spot
 	   << " and acc=" << bdd_format_accset(a->get_dict(), acc)
 	   << std::endl;
 	delete j;
+
+	// Sum acceptance conditions.
+	if (l == &run->cycle && i != l->begin())
+	  {
+	    all_acc |= acc;
+	    if (!all_acc_seen && all_acc == expected_all_acc)
+	      {
+		all_acc_seen = true;
+		os << "all acceptance conditions ("
+		   << bdd_format_accset(a->get_dict(), all_acc)
+		   << ") have been seen"
+		   << std::endl;
+	      }
+	  }
       }
     delete s;
+    if (all_acc != expected_all_acc)
+      {
+	os << "ERROR: The cycle's acceptance conditions ("
+	   << bdd_format_accset(a->get_dict(), all_acc) << ") do not"
+	   << "match those of the automata ("
+	   << bdd_format_accset(a->get_dict(), expected_all_acc)
+	   << std::endl;
+	return false;
+      }
     return true;
   }
 }
