@@ -1,3 +1,8 @@
+2004-11-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/rundotdec.cc (tgba_run_dotty_decorator::link_decl):
+	Typo.
+
 2004-11-04  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/neverclaim.cc (never_claim_bfs::process_link):

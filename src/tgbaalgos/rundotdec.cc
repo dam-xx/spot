@@ -129,7 +129,7 @@ namespace spot
 	if (in_prefix || in_cycle)
 	  {
 	    std::string
-	      color = in_prefix ? (in_cycle ? "violet" : "blue" ) : "red";
+	      color = in_prefix ? (in_cycle ? "violet" : "blue") : "red";
 	    return ("[label=\"" + os.str() + label
 		    + "\", style=bold, color=" + color + "]");
 
