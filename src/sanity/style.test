@@ -34,7 +34,10 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
 
     fail=false
 
-    sed 's,//.*,,' < $file > $tmp
+    sed 's,[	 ]*//.*,,' < $file > $tmp
+
+    grep '[	 ]$' $tmp &&
+      diag 'Trailing space or tab.'
 
     grep '[	 ]if(' $tmp &&
       diag 'Missing space after "if"'

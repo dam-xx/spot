@@ -1,5 +1,8 @@
 2004-10-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/misc/version.cc: Fix trailing whitespace.
+	* src/sanity/style.test: Diagnose trailing whitespace.
+
 	* src/tgbatest/ltl2tgba.cc: Fix lines longer than 80 chars.
 	* src/sanity/80columns.test: Use expand to untabify, the previous
 	recipe was incomplete.
