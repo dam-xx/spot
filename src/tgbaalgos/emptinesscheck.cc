@@ -28,6 +28,29 @@ namespace spot
   {
   }
 
+  emptiness_check::~emptiness_check()
+  {
+    // Free keys in H.
+    hash_type::iterator i = h.begin();
+    while (i != h.end())
+      {
+	// Advance the iterator before deleting the key.
+	const state* s = i->first;
+	++i;
+	delete s;
+      }
+  }
+
+  const state*
+  emptiness_check::h_filt(const state* s) const
+  {
+    hash_type::const_iterator i = h.find(s);
+    assert(i != h.end());
+    if (s != i->first)
+      delete s;
+    return i->first;
+  }
+
   void
   emptiness_check::remove_component(const state* from)
   {
@@ -200,8 +223,16 @@ namespace spot
 	root.top().condition |= acc;
 
 	if (root.top().condition == aut_->all_accepting_conditions())
-	  // We have found an accepting SCC.
-	  return false;
+	  {
+	    // We have found an accepting SCC.
+	    // Release all iterators in TODO.
+	    while (!todo.empty())
+	      {
+		delete todo.top().second;
+		todo.pop();
+	      }
+	    return false;
+	  }
       }
     // This automaton recognize no word.
     return true;
@@ -254,6 +285,7 @@ namespace spot
   emptiness_check::counter_example()
   {
     assert(!root.empty());
+    assert(suffix.empty());
 
     int comp_size = root.size();
     // Transform the stack of connected component into an array.
@@ -282,102 +314,87 @@ namespace spot
 	scc[j - 1].state_set.insert(i->first);
       }
 
-    // seqs[i] is a sequence between SCC i and SCC i+1.
-    state_sequence* seqs = new state_sequence[comp_size - 1];
-    // FIFO for the breadth-first search.
-    std::deque<pair_state_iter> todo;
+    suffix.push_front(h_filt(aut_->get_init_state()));
 
-    // Record the father of each state, while performing the BFS.
-    typedef std::map<const state*, const state*,
-                     state_ptr_less_than> father_map;
-    father_map father;
-
-    state_sequence seq;
-
-    state* start_state = aut_->get_init_state();
-    if (comp_size != 1)
+    // We build a path trough each SCC in the stack.  For the
+    // first SCC, the starting state is the initial state of the
+    // automaton.  The destination state is the closest state
+    // from the next SCC.  This destination state becomes the
+    // starting state when building a path though the next SCC.
+    for (int k = 0; k < comp_size - 1; ++k)
       {
-	tgba_succ_iterator* i = aut_->succ_iter(start_state);
-	todo.push_back(pair_state_iter(start_state, i));
+	// FIFO for the breadth-first search.
+	// (we are looking for the closest state in the next SCC.)
+	std::deque<pair_state_iter> todo;
 
-	for (int k = 0; k < comp_size - 1; ++k)
+	// Record the father of each state, while performing the BFS.
+	typedef std::map<const state*, const state*,
+	                 state_ptr_less_than> father_map;
+	father_map father;
+
+	// Initial state of the BFS.
+	const state* start = suffix.back();
+	{
+	  tgba_succ_iterator* i = aut_->succ_iter(start);
+	  todo.push_back(pair_state_iter(start, i));
+	}
+
+	while (!todo.empty())
 	  {
-	    // We build a path trought all SCC in the stack: a
-	    // possible prefix for a counter example.
-	    while (!todo.empty())
-	      {
-		pair_state_iter started_from = todo.front();
-		todo.pop_front();
+	    const state* src = todo.front().first;
+	    tgba_succ_iterator* i = todo.front().second;
+	    todo.pop_front();
 
-		for (started_from.second->first();
-		     !started_from.second->done();
-		     started_from.second->next())
+	    for (i->first(); !i->done(); i->next())
+	      {
+		const state* dest = i->current_state();
+
+		// Are we leaving this SCC?
+		if (!scc[k].has_state(dest))
 		  {
-		    const state* curr_state =
-		      started_from.second->current_state();
-		    if (scc[k+1].has_state(curr_state))
+		    // If we have found a state in the next SCC.
+		    // Unwind the path and populate SUFFIX.
+		    if (scc[k+1].has_state(dest))
 		      {
-			const state* curr_father = started_from.first;
-			seq.push_front(curr_state);
-			seq.push_front(curr_father);
-			hash_type::iterator i_2 = h.find(curr_father);
-			assert(i_2 != h.end());
-			while (scc[k].index < i_2->second)
+			state_sequence seq;
+
+			seq.push_front(h_filt(dest));
+			while (src->compare(start))
 			  {
-			    assert(i_2->second != 1);
-			    assert(father.find(curr_father) != father.end());
-			    const state* f = father[curr_father];
-			    seq.push_front(f);
-			    curr_father = f;
-			    i_2 = h.find(curr_father);
-			    assert(i_2 != h.end());
+			    seq.push_front(src);
+			    src = father[src];
 			  }
-			seqs[k] = seq;
-			seq.clear();
-			todo.clear();
+			// Append SEQ to SUFFIX.
+			suffix.splice(suffix.end(), seq);
+			// Exit this BFS for this SCC.
+			while (!todo.empty())
+			  {
+			    delete todo.front().second;
+			    todo.pop_front();
+			  }
 			break;
 		      }
-		    else
-		      {
-			if (scc[k].has_state(curr_state))
-			  {
-			    father_map::iterator i_path =
-			      father.find(curr_state);
-			    hash_type::iterator i_seen = h.find(curr_state);
+		    // Restrict the BFS to state inside the SCC.
+		    delete dest;
+		    continue;
+		  }
 
-			    if (i_seen != h.end()
-				&& i_seen->second > 0
-				&& i_path == father.end())
-			      {
-				todo.
-				  push_back(pair_state_iter(curr_state,
-							    aut_->succ_iter(curr_state)));
-				father[curr_state] = started_from.first;
-			      }
-			  }
-		      }
+		dest = h_filt(dest);
+		if (father.find(dest) == father.end())
+		  {
+		    todo.push_back(pair_state_iter(dest,
+						   aut_->succ_iter(dest)));
+		    father[dest] = src;
 		  }
 	      }
-	    assert(!seqs[k].empty());
-	    todo.
-	      push_back(pair_state_iter(seqs[k].back(),
-					aut_->succ_iter(seqs[k].back())));
+	    delete i;
 	  }
       }
-    else
-      {
-	suffix.push_front(start_state);
-      }
-    for (int n_ = 0; n_ < comp_size - 1; ++n_)
-      for (state_sequence::iterator it = seqs[n_].begin();
-	   it != seqs[n_].end(); ++it)
-	suffix.push_back(*it);
-    suffix.unique();
+
     accepting_path(scc[comp_size - 1], suffix.back(),
 		   scc[comp_size - 1].condition);
 
     delete[] scc;
-    delete[] seqs;
   }
 
   void

@@ -1,5 +1,12 @@
 2003-10-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::h_filt,
+	emptiness_check::~emptiness_check) New methods.
+	(emptiness_check::check): Release all iterators in todo on exit.
+	(emptiness_check::counter_example): Rewrite the BFS logic.
+	* src/tgbaalgos/emptinesscheck.hh (emptiness_check::h_filt,
+	emptiness_check::~emptiness_check): New methods.
+
 	* src/tgba/tgbatba.cc
 	(tgba_tba_proxy_succ_iterator::~tgba_tba_proxy_succ_iterator):
 	Delete the proxied iterator.

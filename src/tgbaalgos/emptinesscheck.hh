@@ -60,6 +60,7 @@ namespace spot
     typedef std::list<state_proposition> cycle_path;
   public:
     emptiness_check(const tgba* a);
+    ~emptiness_check();
 
     /// This function returns true if the automata's language is empty,
     /// and builds a stack of SCC.
@@ -80,6 +81,13 @@ namespace spot
     typedef Sgi::hash_map<const state*, int,
 			  state_ptr_hash, state_ptr_equal> hash_type;
     hash_type h;		///< Map of visited states.
+
+    /// \brief Return a state which is equal to \a s, but is in \c h,
+    /// and free \a s if it is different.  Doing so simplify memory
+    /// management, because we don't have to track which state need
+    /// to be kept or deallocated: all key in \c h should last for
+    /// the whole life of the emptiness_check.
+    const state* h_filt(const state* s) const;
 
     /// \brief Remove a strongly component from the hash.
     ///
