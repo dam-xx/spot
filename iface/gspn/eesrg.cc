@@ -210,7 +210,12 @@ namespace spot
 	  int var = bdd_var(cond);
 	  tgba_gspn_eesrg_private_::prop_map::iterator i =
 	    data_->prop_dict.find(var);
-	  assert(i != data_->prop_dict.end());
+
+	  // It's OK if VAR is unknown from GreatSPN (it might have
+	  // been used to synchornize other automaton or something),
+	  // just skip it.
+	  if (i != data_->prop_dict.end())
+	    continue;
 
 	  bdd high = bdd_high(cond);
 	  if (high == bddfalse)
