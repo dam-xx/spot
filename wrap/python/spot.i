@@ -10,6 +10,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "misc/version.hh"
+
 #include "ltlast/formula.hh"
 #include "ltlast/refformula.hh"
 #include "ltlast/atomic_prop.hh"
@@ -55,6 +57,8 @@
 using namespace spot::ltl;
 using namespace spot;
 %}
+
+%include "misc/version.hh"
 
 %include "ltlast/formula.hh"
 %include "ltlast/refformula.hh"

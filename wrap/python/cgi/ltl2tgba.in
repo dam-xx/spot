@@ -224,4 +224,4 @@ del degen
 del concrete
 
 print '<hr>'
-print 'Spot @PACKAGE_VERSION@'
+print 'ltl2tgba.py @PACKAGE_VERSION@; Spot', spot.version()

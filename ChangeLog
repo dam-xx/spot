@@ -1,5 +1,10 @@
 2003-08-05  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/misc/version.hh, src/misc/version.cc: New files.
+	* src/misc/Makefile.am (libmisc_la_SOURCES, misc_HEADERS): Add them.
+	* wrap/python/spot.i: Include misc/version.hh.
+	* wrap/python/cgi/ltl2tgba.in: Print spot.version().
+
 	* README: Update layout.
 
 	* wrap/python/cgi/Makefile.am, wrap/python/cgi/ltl2tgba.in,

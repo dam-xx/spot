@@ -5,8 +5,10 @@ miscdir = $(pkgincludedir)/misc
 
 misc_HEADERS = \
   bddalloc.hh \
-  bddlt.hh
+  bddlt.hh \
+  version.hh
 
 noinst_LTLIBRARIES = libmisc.la
 libmisc_la_SOURCES = \
-  bddalloc.cc
+  bddalloc.cc \
+  version.cc
