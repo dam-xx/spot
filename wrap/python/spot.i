@@ -8,6 +8,7 @@
 %{
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include "ltlast/formula.hh"
 #include "ltlast/refformula.hh"
@@ -130,6 +131,13 @@ namespace std {
   {
   public:
      ofstream(const char *fn);
+     ~ofstream();
+  };
+  class ostringstream : public ostream
+  {
+  public:
+     ostringstream();
+     std::string str() const;
      ~ofstream();
   };
 }
