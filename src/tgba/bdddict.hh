@@ -34,6 +34,7 @@ namespace spot
 {
 
   /// Map BDD variables to formulae.
+  /// \ingroup tgba_essentials
   class bdd_dict: public bdd_allocator
   {
   public:

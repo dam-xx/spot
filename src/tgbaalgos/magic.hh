@@ -27,16 +27,20 @@
 
 namespace spot
 {
-  /// \brief Returns an emptiness checker on the spot::tgba automaton \a a. 
-  /// During the visit of \a a, the returned checker stores explicitely all 
+
+  /// \addtogroup emptiness_check_algorithms
+  /// @{
+
+  /// \brief Returns an emptiness checker on the spot::tgba automaton \a a.
+  /// During the visit of \a a, the returned checker stores explicitely all
   /// the traversed states.
   ///
   /// \pre The automaton \a a must have at most one accepting condition (i.e.
   /// it is a TBA).
   ///
-  /// The method \a check() of the returned checker can be called several times 
-  /// (until it returns a null pointer) to enumerate all the visited accepting 
-  /// paths. The implemented algorithm is the following. 
+  /// The method \a check() of the returned checker can be called several times
+  /// (until it returns a null pointer) to enumerate all the visited accepting
+  /// paths. The implemented algorithm is the following.
   ///
   /// \verbatim
   /// procedure check ()
@@ -77,7 +81,7 @@ namespace spot
   ///
   /// \verbatim
   ///  Article{         courcoubertis.92.fmsd,
-  ///    author        = {Costas Courcoubetis and Moshe Y. Vardi and Pierre 
+  ///    author        = {Costas Courcoubetis and Moshe Y. Vardi and Pierre
   ///                    Wolper and Mihalis Yannakakis},
   ///    title         = {Memory-Efficient Algorithm for the Verification of
   ///                    Temporal Properties},
@@ -90,7 +94,7 @@ namespace spot
   ///
   emptiness_check* explicit_magic_search(const tgba *a);
 
-  /// \brief Returns an emptiness checker on the spot::tgba automaton \a a. 
+  /// \brief Returns an emptiness checker on the spot::tgba automaton \a a.
   /// During the visit of \a a, the returned checker does not store explicitely
   /// the traversed states but uses the bit state hashing technic. However, the
   /// implemented algorithm is the same as the one of
@@ -103,24 +107,24 @@ namespace spot
   ///
   emptiness_check* bit_state_hashing_magic_search(const tgba *a, size_t size);
 
-  /// \brief Returns an emptiness check on the spot::tgba automaton \a a. 
-  /// During the visit of \a a, the returned checker stores explicitely all 
+  /// \brief Returns an emptiness check on the spot::tgba automaton \a a.
+  /// During the visit of \a a, the returned checker stores explicitely all
   /// the traversed states.
   ///
   /// \pre The automaton \a a must have at most one accepting condition (i.e.
   /// it is a TBA).
-  ///  
-  /// The method \a check() of the returned checker can be called several times 
-  /// (until it returns a null pointer) to enumerate all the visited accepting 
-  /// paths. The implemented algorithm is the following: 
-  /// 
+  ///
+  /// The method \a check() of the returned checker can be called several times
+  /// (until it returns a null pointer) to enumerate all the visited accepting
+  /// paths. The implemented algorithm is the following:
+  ///
   /// \verbatim
   /// procedure check ()
   /// begin
   ///   weight = 0;
   ///   call dfs_blue(s0);
   /// end;
-  ///  
+  ///
   /// procedure dfs_blue (s)
   /// begin
   ///   s.color = cyan;
@@ -134,8 +138,8 @@ namespace spot
   ///       if the edge (s,t) is accepting then
   ///         weight = weight - 1;
   ///       end if;
-  ///     else if t.color == cyan and 
-  ///             (the edge (s,t) is accepting or 
+  ///     else if t.color == cyan and
+  ///             (the edge (s,t) is accepting or
   ///              weight > t.weight) then
   ///       report cycle;
   ///     end if;
@@ -145,7 +149,7 @@ namespace spot
   ///   end for;
   ///   s.color = blue;
   /// end;
-  /// 
+  ///
   /// procedure dfs_red(s)
   /// begin
   ///   if s.color == cyan then
@@ -159,8 +163,8 @@ namespace spot
   ///   end for;
   /// end;
   /// \endverbatim
-  /// 
-  /// It is an adaptation to TBA (and a slight extension) of the one 
+  ///
+  /// It is an adaptation to TBA (and a slight extension) of the one
   /// presented in
   /// \verbatim
   ///  InProceedings{   schwoon.05.tacas,
@@ -183,7 +187,7 @@ namespace spot
   ///
   emptiness_check* explicit_se05_search(const tgba *a);
 
-  /// \brief Returns an emptiness checker on the spot::tgba automaton \a a. 
+  /// \brief Returns an emptiness checker on the spot::tgba automaton \a a.
   /// During the visit of \a a, the returned checker does not store explicitely
   /// the traversed states but uses the bit state hashing technic. However, the
   /// implemented algorithm is the same as the one of
@@ -196,6 +200,7 @@ namespace spot
   ///
   emptiness_check* bit_state_hashing_se05_search(const tgba *a, size_t size);
 
+  /// @}
 }
 
 #endif // SPOT_TGBAALGOS_MAGIC_HH

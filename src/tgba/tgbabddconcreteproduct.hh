@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -26,10 +26,11 @@
 
 namespace spot
 {
-  /// \brief Multiplies two tgba::tgba_bdd_concrete automata.
+  /// \brief Multiplies two spot::tgba_bdd_concrete automata.
+  /// \ingroup tgba_algorithms
   ///
-  /// This function build the resulting product, as another
-  /// tgba::tgba_bdd_concrete automaton.
+  /// This function builds the resulting product as another
+  /// spot::tgba_bdd_concrete automaton.
   tgba_bdd_concrete*
   product(const tgba_bdd_concrete* left, const tgba_bdd_concrete* right);
 }

@@ -29,43 +29,41 @@
 
 namespace spot
 {
-
-  /// An accepted run, for a tgba.
-  struct tgba_run
-  {
-    struct step {
-      const state* s;
-      bdd label;
-      bdd acc;
-    };
-
-    typedef std::list<step> steps;
-
-    steps prefix;
-    steps cycle;
-
-    ~tgba_run();
-    tgba_run()
-    {
-    };
-    tgba_run(const tgba_run& run);
-    tgba_run& operator=(const tgba_run& run);
-  };
-
   class tgba;
+  struct tgba_run;
 
-  /// \brief Display a tgba_run.
+  /// \addtogroup emptiness_check Emptiness-check
+  /// \ingroup tgba_algorithms
   ///
-  /// Output the prefix and cycle of the tgba_run \a run, even if it
-  /// does not corresponds to an actual run of the automaton \a a.
-  /// This is unlike replay_tgba_run(), which will ensure the run
-  /// actually exist in the automaton (and will display any transition
-  /// annotation).
+  /// All emptiness-check algorithms follow the same interface.
+  /// Basically once you have constructed an instance of
+  /// spot::emptiness_check (by instantiating a subclass, or calling a
+  /// functions construct such instance; see \ref
+  /// emptiness_check_algorithms "this list"), you should call
+  /// spot::emptiness_check::check() to check the automaton.
   ///
-  /// (\a a is used here only to format states and transitions.)
-  std::ostream& print_tgba_run(std::ostream& os,
-			       const tgba* a,
-			       const tgba_run* run);
+  /// If spot::emptiness_check::check() returns 0, then the automaton
+  /// was found empty.  Otherwise the automaton accepts some run.
+  /// (Beware that some algorithms---those using bit-state
+  /// hashing---may found the automaton to be empty even if it is not
+  /// actually empty.)
+  ///
+  /// When spot::emptiness_check::check() does not return 0, it
+  /// returns an instance of spot::emptiness_check_result.  You can
+  /// try to call spot::emptiness_check_result::accepting_run() to
+  /// obtain an accepting run.  For some emptiness-check algorithms,
+  /// spot::emptiness_check_result::accepting_run() will require some
+  /// extra computation.  Most emptiness-check algorithms are able to
+  /// return such an accepting run, however this is not mandatory and
+  /// spot::emptiness_check_result::accepting_run() can return 0 (this
+  /// does not means by anyway that no accepting run exist).
+  ///
+  /// The acceptance run returned by
+  /// spot::emptiness_check_result::accepting_run(), if any, is of
+  /// type spot::tgba_run.  \ref tgba_run "This page" gathers existing
+  /// operations on these objects.
+  ///
+  /// @{
 
   /// \brief The result of an emptiness check.
   ///
@@ -111,6 +109,53 @@ namespace spot
     /// Print statistics, if any.
     virtual std::ostream& print_stats(std::ostream& os) const;
   };
+
+  /// @}
+
+  /// \addtogroup emptiness_check_algorithms Emptiness-check algorithms
+  /// \ingroup emptiness_check
+
+
+  /// \addtogroup tgba_run TGBA runs and supporting functions
+  /// \ingroup emptiness_check
+  /// @{
+
+  /// An accepted run, for a tgba.
+  struct tgba_run
+  {
+    struct step {
+      const state* s;
+      bdd label;
+      bdd acc;
+    };
+
+    typedef std::list<step> steps;
+
+    steps prefix;
+    steps cycle;
+
+    ~tgba_run();
+    tgba_run()
+    {
+    };
+    tgba_run(const tgba_run& run);
+    tgba_run& operator=(const tgba_run& run);
+  };
+
+  /// \brief Display a tgba_run.
+  ///
+  /// Output the prefix and cycle of the tgba_run \a run, even if it
+  /// does not corresponds to an actual run of the automaton \a a.
+  /// This is unlike replay_tgba_run(), which will ensure the run
+  /// actually exist in the automaton (and will display any transition
+  /// annotation).
+  ///
+  /// (\a a is used here only to format states and transitions.)
+  std::ostream& print_tgba_run(std::ostream& os,
+			       const tgba* a,
+			       const tgba_run* run);
+  /// @}
+
 
 }
 

@@ -47,8 +47,10 @@ namespace spot
   };
 
 
-  class tgba_reduc: public tgba_explicit,
-		    public tgba_reachable_iterator_breadth_first
+  /// Explicit automata used in reductions.
+  /// \ingroup tgba_representation
+  class tgba_reduc:
+    public tgba_explicit, public tgba_reachable_iterator_breadth_first
   {
   public:
     tgba_reduc(const tgba* a,

@@ -31,6 +31,7 @@ namespace spot
 {
 
   /// \brief Abstract class for states.
+  /// \ingroup tgba_essentials
   class state
   {
   public:
@@ -76,6 +77,7 @@ namespace spot
   };
 
   /// \brief Strict Weak Ordering for \c state*.
+  /// \ingroup tgba_essentials
   ///
   /// This is meant to be used as a comparison functor for
   /// STL \c map whose key are of type \c state*.
@@ -98,6 +100,7 @@ namespace spot
   };
 
   /// \brief An Equivalence Relation for \c state*.
+  /// \ingroup tgba_essentials
   ///
   /// This is meant to be used as a comparison functor for
   /// Sgi \c hash_map whose key are of type \c state*.
@@ -121,6 +124,7 @@ namespace spot
   };
 
   /// \brief Hash Function for \c state*.
+  /// \ingroup tgba_essentials
   ///
   /// This is meant to be used as a hash functor for
   /// Sgi's \c hash_map whose key are of type \c state*.

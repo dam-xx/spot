@@ -1,3 +1,18 @@
+2004-11-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgba/bdddict.hh, src/tgba/state.hh, src/tgba/statebdd.hh,
+	src/tgba/succiter.hh, src/tgba/succiterconcrete.hh,
+	src/tgba/tgba.hh, src/tgba/tgbabddconcrete.hh,
+	src/tgba/tgbabddconcreteproduct.hh, src/tgba/tgbaexplicit.hh,
+	src/tgba/tgbaproduct.hh, src/tgba/tgbareduc.hh,
+	src/tgba/tgbatba.hh, src/tgbaalgos/emptiness.hh,
+	src/tgbaalgos/magic.hh, src/tgbaalgos/replayrun.hh,
+	src/tgbaalgos/gtec/gtec.hh, iface/gspn/ssp.hh: Introduce Doxygen
+	groups in the documentation.  Presently this only covers the
+	tgba/ directory, and the emptiness-check algorithms.
+	* doc/Doxyfile.in (EXCLUDE_PATTERNS): Skip Bison-generated files
+	in src/evtgbaparse/.
+
 2004-11-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgba/tgbatba.hh (tgba_sba_proxy): New class, with the

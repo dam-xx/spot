@@ -461,9 +461,9 @@ EXCLUDE_SYMLINKS       = NO
 # EXCLUDE_PATTERNS tag to specify one or more wildcard patterns to exclude
 # certain files from those directories.
 
-EXCLUDE_PATTERNS       = */tgbaparse/location.hh \
-                         */tgbaparse/stack.hh \
-                         */tgbaparse/position.hh \
+EXCLUDE_PATTERNS       = */*tgbaparse/location.hh \
+                         */*tgbaparse/stack.hh \
+                         */*tgbaparse/position.hh \
                          */*parse/*parse*.hh \
                          *test/*
 

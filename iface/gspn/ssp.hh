@@ -48,12 +48,16 @@ namespace spot
     const ltl::declarative_environment& env_;
   };
 
+  /// \defgroup emptiness_check_ssp Emptiness-check algorithms for SSP
+  /// \ingroup emptiness_check
+  /// @{
   couvreur99_check* couvreur99_check_ssp_semi(const tgba* ssp_automata);
   couvreur99_check* couvreur99_check_ssp_shy_semi(const tgba* ssp_automata);
   couvreur99_check* couvreur99_check_ssp_shy(const tgba* ssp_automata);
 
   couvreur99_check_result*
   counter_example_ssp(const couvreur99_check_status* status);
+  /// @}
 }
 
 #endif // SPOT_IFACE_GSPN_SSP_GSPN_SSP_HH

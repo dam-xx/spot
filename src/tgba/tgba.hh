@@ -28,7 +28,21 @@
 
 namespace spot
 {
+  /// \defgroup tgba TGBA (Transition-based Genealized Büchi Automaton)
+  ///
+  /// Spot is centered around the spot::tgba type.  This type and its
+  /// cousins are listed \ref tgba_essentials "here".  This is an
+  /// abstract interface.  Its implementations are either \ref
+  /// tgba_representation "concrete representations", or \ref
+  /// tgba_on_the_fly_algorithms "on-the-fly algorithms".  Other
+  /// algorithms that work on spot::tgba are \ref tgba_algorithms
+  /// "listed separately".
+
+  /// \addtogroup tgba_essentials Essential TGBA types
+  /// \ingroup tgba
+
   /// \brief A Transition-based Generalized Büchi Automaton.
+  /// \ingroup tgba_essentials
   ///
   /// The acronym TGBA (Transition-based Generalized Büchi Automaton)
   /// was coined by Dimitra Giannakopoulou and Flavio Lerda
@@ -201,6 +215,14 @@ namespace spot
     mutable int num_acc_;
   };
 
+  /// \addtogroup tgba_representation TGBA representations
+  /// \ingroup tgba
+
+  /// \addtogroup tgba_on_the_fly_algorithms TGBA on-the-fly algorithms
+  /// \ingroup tgba
+
+  /// \addtogroup tgba_algorithms TGBA algorithms
+  /// \ingroup tgba
 }
 
 #endif // SPOT_TGBA_TGBA_HH

@@ -27,6 +27,9 @@
 
 namespace spot
 {
+  /// \addtogroup emptiness_check_algorithms
+  /// @{
+
   /// \brief Check whether the language of an automate is empty.
   ///
   /// This is based on the following paper.
@@ -149,6 +152,7 @@ namespace spot
     virtual int* find_state(const state* s);
   };
 
+  /// @}
 }
 
 #endif // SPOT_TGBAALGOS_GTEC_GTEC_HH

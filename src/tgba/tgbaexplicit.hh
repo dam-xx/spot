@@ -34,6 +34,7 @@ namespace spot
   class tgba_explicit_succ_iterator;
 
   /// Explicit representation of a spot::tgba.
+  /// \ingroup tgba_representation
   class tgba_explicit: public tgba
   {
   public:
@@ -116,6 +117,7 @@ namespace spot
 
 
   /// States used by spot::tgba_explicit.
+  /// \ingroup tgba_representation
   class state_explicit : public spot::state
   {
   public:
@@ -139,6 +141,7 @@ namespace spot
 
 
   /// Successor iterators used by spot::tgba_explicit.
+  /// \ingroup tgba_representation
   class tgba_explicit_succ_iterator: public tgba_succ_iterator
   {
   public:

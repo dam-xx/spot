@@ -43,6 +43,8 @@ namespace spot
   /// \param debug if set the output will be more verbose and extra
   ///              debugging informations will be output on failure
   /// \return true iff the run could be completed
+  ///
+  /// \ingroup tgba_run
   bool replay_tgba_run(std::ostream& os, const tgba* a, const tgba_run* run,
 		       bool debug = false);
 }
