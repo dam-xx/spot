@@ -1,3 +1,10 @@
+2003-06-12  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/tgbabddconcrete.cc (set_init_state, succ_iter): Make
+	sure to compute the status of the most Now variables possible.
+	This helps to identify equivalant states.
+	(tgba_bdd_concrete): Call set_init_state.
+
 2003-06-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/ltl2tgba.cc (ltl_trad_visitor::visit): Handle F and G.
