@@ -304,7 +304,7 @@ namespace spot
 	// The best path seen so far.
 	tgba_run::steps best_path;
 	// The end state of the base path.
-	const state* best_end;
+	const state* best_end = 0;
 	// The acceptance conditions traversed by BEST_PATH.
 	bdd best_acc = bddfalse;
 
