@@ -24,9 +24,12 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <fstream>
+#include <string>
 #include <utility>
 #include <set>
 #include <string>
+#include "ltlparse/public.hh"
 #include "ltlvisit/apcollect.hh"
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/randomltl.hh"
@@ -142,8 +145,10 @@ syntax(char* prog)
 	    << "  -e N    compare result of all "
 	    << "emptiness checks on N randomly generated graphs" << std::endl
 	    << "  -f N    the size of the formula [15]" << std::endl
-	    << "  -F N    number of formulae to generate [1]" << std::endl
+	    << "  -F N    number of formulae to generate [0]" << std::endl
 	    << "  -g      output in dot format" << std::endl
+	    << "  -i FILE do not generate formulae, read them from FILE"
+            << std::endl
 	    << "  -l N    simplify formulae using all available reductions"
 	    << " and reject those" << std::endl
 	    << "            strictly smaller than N" << std::endl
@@ -403,11 +408,14 @@ struct ar_stat
 typedef std::map<std::string, ec_stat> ec_stats_type;
 ec_stats_type ec_stats;
 
-typedef std::map<std::string, ratio_stat> ratio_stats_type;
+typedef std::map<std::string, ratio_stat> ratio_stat_type;
+ratio_stat_type glob_ratio_stats;
+typedef std::map<int, ratio_stat_type > ratio_stats_type;
 ratio_stats_type ratio_stats;
 
 typedef std::map<std::string, acss_stat> acss_stats_type;
 acss_stats_type acss_stats;
+
 typedef std::map<std::string, ars_stat> ars_stats_type;
 ars_stats_type ars_stats;
 
@@ -483,6 +491,74 @@ print_ar_stats(ar_stats_type& ar_stats)
   std::cout << std::setiosflags(old);
 }
 
+void
+print_ratio_stats(int nbac, const ratio_stat_type& ratio_stats)
+{
+      std::cout << std::endl;
+      std::ios::fmtflags old = std::cout.flags();
+      std::cout << std::right << std::fixed << std::setprecision(1);
+
+      std::cout << "Ratios about emptiness checkers: ";
+      if (nbac >= 0)
+        std::cout << "(" << nbac << " acceptance conditions)";
+      std::cout << std::endl;
+      std::cout << std::setw(22) << ""
+		<< " |       % states        |    % transitions      |"
+		<< std::endl << std::setw(22) << "algorithm"
+		<< " |   min   < mean  < max |   min   < mean  < max |   n"
+		<< std::endl
+		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl;
+      for (ratio_stat_type::const_iterator i = ratio_stats.begin();
+	   i != ratio_stats.end(); ++i)
+	std::cout << std::setw(22) << i->first << " |"
+		  << std::setw(6) << i->second.min_ratio_states * 100.
+		  << " "
+		  << std::setw(8)
+		  << (static_cast<float>(i->second.tot_ratio_states) /
+                                                            i->second.n) * 100.
+		  << " "
+		  << std::setw(6) << i->second.max_ratio_states * 100.
+		  << " |"
+		  << std::setw(6) << i->second.min_ratio_transitions * 100.
+		  << " "
+		  << std::setw(8)
+		  << (static_cast<float>(i->second.tot_ratio_transitions) /
+                                                            i->second.n) * 100.
+		  << " "
+		  << std::setw(6) << i->second.max_ratio_transitions * 100.
+		  << " |"
+		  << std::setw(4) << i->second.n
+		  << std::endl;
+      std::cout << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl
+		<< std::setw(22) << ""
+		<< " |   % maximal depth     |"
+		<< std::endl
+                << std::setw(22) << "algorithm"
+		<< " |   min   < mean  < max |   n"
+		<< std::endl
+		<< std::setw(53) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl;
+      for (ratio_stat_type::const_iterator i = ratio_stats.begin();
+	   i != ratio_stats.end(); ++i)
+	std::cout << std::setw(22) << i->first << " |"
+		  << std::setw(6)
+		  << i->second.min_ratio_depth * 100.
+		  << " "
+		  << std::setw(8)
+		  << (static_cast<float>(i->second.tot_ratio_depth) /
+                                                          i->second.n) * 100.
+		  << " "
+		  << std::setw(6)
+		  << i->second.max_ratio_depth * 100.
+		  << " |"
+		  << std::setw(4) << i->second.n
+		  << std::endl;
+
+      std::cout << std::setiosflags(old);
+}
+
 spot::ltl::formula*
 generate_formula(const spot::ltl::random_ltl& rl, int opt_f, int opt_s,
                  int opt_l = 0, bool opt_u = false)
@@ -540,8 +616,10 @@ main(int argc, char** argv)
 {
   bool opt_dp = false;
   int opt_f = 15;
-  int opt_F = 1;
+  int opt_F = 0;
   char* opt_p = 0;
+  char* opt_i = 0;
+  std::istream *formula_file = 0;
   int opt_l = 0;
   bool opt_u = false;
 
@@ -621,6 +699,24 @@ main(int argc, char** argv)
 	  if (!opt_ec)
 	    opt_ec = 1;
 	}
+      else if (!strcmp(argv[argn], "-i"))
+        {
+          if (argc < argn + 2)
+            syntax(argv[0]);
+          opt_i = argv[++argn];
+          if (strcmp(opt_i, "-"))
+            {
+              formula_file = new std::ifstream(opt_i);
+              if (!(*formula_file))
+                {
+                  delete formula_file;
+                  std::cerr << "Failed to open " << opt_i << std::endl;
+                  exit(2);
+                }
+            }
+          else
+            formula_file = &std::cin;
+        }
       else if (!strcmp(argv[argn], "-n"))
 	{
 	  if (argc < argn + 2)
@@ -744,6 +840,7 @@ main(int argc, char** argv)
   spot::timer_map tm_ar;
   std::set<int> failed_seeds;
   int init_opt_ec = opt_ec;
+  spot::ltl::atomic_prop_set* apf = new spot::ltl::atomic_prop_set;
 
   do
     {
@@ -756,6 +853,39 @@ main(int argc, char** argv)
           formula = spot::ltl_to_tgba_fm(f, dict, true);
           spot::ltl::destroy(f);
         }
+      else if (opt_i)
+        {
+          if (formula_file->good())
+            {
+              std::string input;
+              std::getline(*formula_file, input, '\n');
+              spot::ltl::parse_error_list pel;
+              spot::ltl::formula* f = spot::ltl::parse(input, pel, env);
+              if (spot::ltl::format_parse_errors(std::cerr, input, pel))
+                break;
+              formula = spot::ltl_to_tgba_fm(f, dict, true);
+              spot::ltl::atomic_prop_set* tmp =
+                                            spot::ltl::atomic_prop_collect(f);
+              for (spot::ltl::atomic_prop_set::iterator i = tmp->begin();
+                                                        i != tmp->end(); ++i)
+                  apf->insert(
+                            dynamic_cast<spot::ltl::atomic_prop*>((*i)->ref()));
+              spot::ltl::destroy(f);
+              delete tmp;
+            }
+          else
+            {
+              if (formula_file->bad())
+                std::cerr << "Failed to read " << opt_i << std::endl;
+              else
+                std::cerr << "End of " << opt_i << std::endl;
+              break;
+            }
+        }
+
+     for (spot::ltl::atomic_prop_set::iterator i = ap->begin();
+                                                         i != ap->end(); ++i)
+         apf->insert(dynamic_cast<spot::ltl::atomic_prop*>((*i)->ref()));
 
       do
         {
@@ -766,7 +896,7 @@ main(int argc, char** argv)
             }
 
           spot::tgba* a;
-          spot::tgba* r = a = spot::random_graph(opt_n, opt_d, ap, dict,
+          spot::tgba* r = a = spot::random_graph(opt_n, opt_d, apf, dict,
                                                 opt_n_acc, opt_a, opt_t, &env);
 
           if (formula)
@@ -823,9 +953,13 @@ main(int argc, char** argv)
                     {
                       ec_stats[algo].count(ecs);
                       if (res)
-                        // Notice that ratios are computed w.r.t. the
-                        // generalized automaton a.
-                        ratio_stats[algo].count(ecs, a);
+                        {
+                          // Notice that ratios are computed w.r.t. the
+                          // generalized automaton a.
+                          int nba = a->number_of_acceptance_conditions();
+                          ratio_stats[nba][algo].count(ecs, a);
+                          glob_ratio_stats[algo].count(ecs, a);
+                        }
                     }
                   if (res)
                     {
@@ -962,8 +1096,12 @@ main(int argc, char** argv)
       if (opt_F)
         --opt_F;
       opt_ec = init_opt_ec;
+      for (spot::ltl::atomic_prop_set::iterator i = apf->begin();
+          i != apf->end(); ++i)
+        spot::ltl::destroy(*i);
+      apf->clear();
     }
-  while (opt_F);
+  while (opt_F || opt_i);
 
   if (!ec_stats.empty())
     {
@@ -1026,68 +1164,12 @@ main(int argc, char** argv)
       std::cout << std::setiosflags(old);
     }
 
-  if (!ratio_stats.empty())
+  if (!glob_ratio_stats.empty())
     {
-      std::cout << std::endl;
-      std::ios::fmtflags old = std::cout.flags();
-      std::cout << std::right << std::fixed << std::setprecision(1);
-
-      std::cout << "Ratios about emptiness checkers:" << std::endl;
-      std::cout << std::setw(22) << ""
-		<< " |       % states        |    % transitions      |"
-		<< std::endl << std::setw(22) << "algorithm"
-		<< " |   min   < mean  < max |   min   < mean  < max |   n"
-		<< std::endl
-		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl;
+      print_ratio_stats(-1, glob_ratio_stats);
       for (ratio_stats_type::const_iterator i = ratio_stats.begin();
-	   i != ratio_stats.end(); ++i)
-	std::cout << std::setw(22) << i->first << " |"
-		  << std::setw(6) << i->second.min_ratio_states * 100.
-		  << " "
-		  << std::setw(8)
-		  << (static_cast<float>(i->second.tot_ratio_states) /
-                                                            i->second.n) * 100.
-		  << " "
-		  << std::setw(6) << i->second.max_ratio_states * 100.
-		  << " |"
-		  << std::setw(6) << i->second.min_ratio_transitions * 100.
-		  << " "
-		  << std::setw(8)
-		  << (static_cast<float>(i->second.tot_ratio_transitions) /
-                                                            i->second.n) * 100.
-		  << " "
-		  << std::setw(6) << i->second.max_ratio_transitions * 100.
-		  << " |"
-		  << std::setw(4) << i->second.n
-		  << std::endl;
-      std::cout << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl
-		<< std::setw(22) << ""
-		<< " |   % maximal depth     |"
-		<< std::endl
-                << std::setw(22) << "algorithm"
-		<< " |   min   < mean  < max |   n"
-		<< std::endl
-		<< std::setw(53) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl;
-      for (ratio_stats_type::const_iterator i = ratio_stats.begin();
-	   i != ratio_stats.end(); ++i)
-	std::cout << std::setw(22) << i->first << " |"
-		  << std::setw(6)
-		  << i->second.min_ratio_depth * 100.
-		  << " "
-		  << std::setw(8)
-		  << (static_cast<float>(i->second.tot_ratio_depth) /
-                                                          i->second.n) * 100.
-		  << " "
-		  << std::setw(6)
-		  << i->second.max_ratio_depth * 100.
-		  << " |"
-		  << std::setw(4) << i->second.n
-		  << std::endl;
-
-      std::cout << std::setiosflags(old);
+           i != ratio_stats.end(); ++i)
+        print_ratio_stats(i->first, i->second);
     }
 
   if (!acss_stats.empty())
@@ -1196,7 +1278,13 @@ main(int argc, char** argv)
        i != ap->end(); ++i)
     spot::ltl::destroy(*i);
 
+  if (opt_i && strcmp(opt_i, "-"))
+    {
+      //formula_file->close();
+      delete formula_file;
+    }
   delete ap;
+  delete apf;
   delete dict;
   return exit_code;
 }

@@ -1,5 +1,11 @@
 2005-01-13  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
+	* src/tgbatest/randtgba.cc: Add products with formulae issued of a file
+	and more statistics.
+	* src/tgbatest/readsave.test: Undo previous change.
+
+2005-01-13  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
 	* src/tgbatest/readsave.test: Fix parameter of randtgba call.
 
 2005-01-12  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
