@@ -21,6 +21,32 @@
 	* src/translate.cc (main): Add the --spot option, and build
 	a SpotWrapper if required.
 
+2004-08-02  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* Version 1.1.2 released.
+
+2004-08-01  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* src/TestOperations.cc (generateBuchiAutomaton): Use
+	process groups to terminate the child process along with
+	all of its children (if any) on timeouts.
+	Do not write the time elapsed before a timeout into the
+	log file.
+
+	* configure.ac: Add test for the setsid library function.
+
+2004-07-31  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* src/Product.h (ProductEdge::edge_1, ProductEdge::edge_2):
+	Change type to GraphEdgeContainer::const_iterators to move all
+	edge dereference operations to member functions instead of the
+	class constructor (where dereferencing is not always safe).
+	(ProductEdge::ProductEdge, ProductEdge::firstComponent)
+	(ProductEdge::secondComponent, ProductEdge::targetNode):
+	Change member initialization and access accordingly.
+
+	* configure.ac, NEWS, README: Update version.
+
 2004-07-30  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* Version 1.1.1 released.
