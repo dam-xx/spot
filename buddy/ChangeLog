@@ -3,7 +3,6 @@
 	* src/pairs.c (bdd_mergepairs): New function.
 	(bdd_copypair): Revert 2003-05-20's change.  Use bdd_addref
 	to copy result variables.
-
 	* src/bdd.h (BDD_INVMERGE): New error code.
 	(bdd_mergepairs): Declare.
 	* src/kernel.c (errorstrings): Add string of BDDINV.
