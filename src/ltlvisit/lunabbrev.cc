@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -22,7 +22,6 @@
 #include "ltlast/allnodes.hh"
 #include "ltlvisit/clone.hh"
 #include "lunabbrev.hh"
-#include "reducform.hh"
 #include <cassert>
 
 namespace spot
@@ -72,25 +71,19 @@ namespace spot
 						      unop::instance(unop::Not,
 								     f2)));
 	  return;
-
 	  /* true U f2 == F(f2) */
 	case binop::U:
-	  if ( node_type(f1) == node_type_form_visitor::Const )
-	    if ( ((constant*)f1)->val() == constant::True ) {
-	      result_ = unop::instance(unop::F,f2);
-	      return;
-	    }
-	  result_ = binop::instance(bo->op(), f1, f2);
+	  if (f1 == constant::true_instance())
+	    result_ = unop::instance(unop::F, f2);
+	  else
+	    result_ = binop::instance(bo->op(), f1, f2);
 	  return;
-
 	  /* false R f2 == G(f2) */
 	case binop::R:
-	  if ( node_type(f1) == node_type_form_visitor::Const )
-	    if ( ((constant*)f1)->val() == constant::False ) {
-	      result_ = unop::instance(unop::G,f2);
-	      return;
-	    }
-	  result_ = binop::instance(bo->op(), f1, f2);
+	  if (f1 == constant::false_instance())
+	    result_ = unop::instance(unop::G, f2);
+	  else
+	    result_ = binop::instance(bo->op(), f1, f2);
 	  return;
 	}
       /* Unreachable code. */

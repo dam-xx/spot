@@ -1,5 +1,7 @@
 2004-05-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlvisit/lunabbrev.cc: Fix style to please sanity checks.
+
 	* src/tgbaalgos/neverclaim.cc: Fix them.
 	* sanity/style.test: Diagnose semicolons with leading spaces.
 
