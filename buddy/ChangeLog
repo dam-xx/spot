@@ -1,5 +1,6 @@
 2004-07-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* configure.ac: Call AC_LIBTOOL_WIN32_DLL
 	* src/Makefile.am (libbdd_la_LDFLAGS): Add -no-undefined.
 
 2004-07-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
