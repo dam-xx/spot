@@ -48,18 +48,22 @@ namespace spot
   /// }
   /// \endverbatim
   ///
-  /// If \a exprop is set, the algorithm will consider all properties
+  /// \param f The formula to translate into an automata.
+  ///
+  /// \param dict The spot::bdd_dict the constructed automata should use.
+  ///
+  /// \param exprop When set, the algorithm will consider all properties
   /// combinations possible on each state, in an attempt to reduce
   /// the non-determinism.  The automaton will have the same size as
   /// without this option, but because the transition will be more
   /// deterministic, the product automaton will be smaller (or, at worse,
   /// equal).
   ///
-  /// If \a symb_merge is set to false, states with the same symbolic
+  /// \param symb_merge When false, states with the same symbolic
   /// representation (these are equivalent formulae) will not be
   /// merged.
   ///
-  /// If \a branching_postponement is set, several transitions leaving
+  /// \param branching_postponement When set, several transitions leaving
   /// from the same state with the same label (i.e., condition + acceptance
   /// conditions) will be merged.  This correspond to an optimization
   /// described in the following paper.
@@ -81,9 +85,11 @@ namespace spot
   /// }
   /// \endverbatim
   ///
-  /// If \a fair_loop_approx is set, a really simple characterization of
+  /// \param fair_loop_approx When set, a really simple characterization of
   /// unstable state is used to suppress all acceptance conditions from
   /// incoming transitions.
+  ///
+  /// \return A spot::tgba_explicit that recognize the language of \a f.
   tgba_explicit* ltl_to_tgba_fm(const ltl::formula* f, bdd_dict* dict,
 				bool exprop = false, bool symb_merge = true,
 				bool branching_postponement = false,

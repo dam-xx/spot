@@ -1,3 +1,9 @@
+2004-08-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba_fm.hh (ltl_to_tgba_fm): Document all
+	parameters.
+	* src/tgbaalgos/ltl2tgba_lacim.hh (ltl_to_tgba_lacim): Likewise.
+
 2004-08-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac: Call AC_PROG_CC and AM_PROG_CC_C_O.

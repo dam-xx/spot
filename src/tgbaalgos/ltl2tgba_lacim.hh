@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -44,6 +44,9 @@ namespace spot
   ///   publisher     = {Universit{\'e} du Qu{\'e}bec {\`a} Montr{\'e}al},
   ///   editor        = {Pierre Leroux}
   /// }
+  /// \param f The formula to translate into an automata.
+  /// \param dict The spot::bdd_dict the constructed automata should use.
+  /// \return A spot::tgba_bdd_concrete that recognize the language of \a f.
   /// \endverbatim
   tgba_bdd_concrete* ltl_to_tgba_lacim(const ltl::formula* f, bdd_dict* dict);
 }
