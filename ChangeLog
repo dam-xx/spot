@@ -1,3 +1,9 @@
+2004-08-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* configure.ac: Call AC_PROG_CC and AM_PROG_CC_C_O.
+	* wrap/python/Makefile.am (_buddy_la_LDFLAGS): Move libspotswigpy.la ...
+	(_buddy_la_LIBADD): ... here.
+
 2004-08-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* lbtt/: Merge lbtt 1.1.2.

@@ -43,7 +43,8 @@ $(srcdir)/spot.py: $(srcdir)/spot.i
 	$(MAKE) $(AM_MAKEFLAGS) spot_wrap.cxx
 
 _buddy_la_SOURCES = $(srcdir)/buddy_wrap.cxx
-_buddy_la_LDFLAGS = -avoid-version -module $(BUDDY_LDFLAGS) libspotswigpy.la
+_buddy_la_LDFLAGS = -avoid-version -module $(BUDDY_LDFLAGS)
+_buddy_la_LIBADD = libspotswigpy.la
 
 $(srcdir)/buddy_wrap.cxx: $(srcdir)/buddy.i
 	swig -noruntime -c++ -python $(BUDDY_CPPFLAGS) $(srcdir)/buddy.i
