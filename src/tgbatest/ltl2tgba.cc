@@ -135,6 +135,7 @@ main(int argc, char** argv)
 
   bool debug_opt = false;
   bool degeneralize_opt = false;
+  bool degeneralize_maybe = false;
   bool fm_opt = false;
   bool fm_exprop_opt = false;
   bool fm_symb_merge_opt = true;
@@ -356,48 +357,48 @@ main(int argc, char** argv)
       else if (echeck_algo == "magic_search")
 	{
 	  echeck = MagicSearch;
-	  degeneralize_opt = true;
+	  degeneralize_maybe = true;
 	}
       else if (echeck_algo == "magic_search_repeated")
 	{
 	  echeck = MagicSearch;
-	  degeneralize_opt = true;
+	  degeneralize_maybe = true;
 	  magic_many = true;
 	}
       else if (echeck_algo == "bsh_magic_search")
 	{
 	  echeck = MagicSearch;
-	  degeneralize_opt = true;
+	  degeneralize_maybe = true;
           bit_state_hashing = true;
 	}
       else if (echeck_algo == "bsh_magic_search_repeated")
 	{
 	  echeck = MagicSearch;
-	  degeneralize_opt = true;
+	  degeneralize_maybe = true;
           bit_state_hashing = true;
 	  magic_many = true;
 	}
       else if (echeck_algo == "se05_search")
 	{
 	  echeck = Se05Search;
-	  degeneralize_opt = true;
+	  degeneralize_maybe = true;
 	}
       else if (echeck_algo == "se05_search_repeated")
 	{
 	  echeck = Se05Search;
-	  degeneralize_opt = true;
+	  degeneralize_maybe = true;
 	  magic_many = true;
 	}
       else if (echeck_algo == "bsh_se05_search")
 	{
 	  echeck = Se05Search;
-	  degeneralize_opt = true;
+	  degeneralize_maybe = true;
           bit_state_hashing = true;
 	}
       else if (echeck_algo == "bsh_se05_search_repeated")
 	{
 	  echeck = Se05Search;
-	  degeneralize_opt = true;
+	  degeneralize_maybe = true;
           bit_state_hashing = true;
 	  magic_many = true;
 	}
@@ -492,6 +493,9 @@ main(int argc, char** argv)
 	}
 
       spot::tgba_tba_proxy* degeneralized = 0;
+
+      if (degeneralize_maybe && a->number_of_acceptance_conditions() > 1)
+	degeneralize_opt = true;
       if (degeneralize_opt)
 	a = degeneralized = new spot::tgba_tba_proxy(a);
 
@@ -605,37 +609,31 @@ main(int argc, char** argv)
 	}
 
       spot::emptiness_check* ec = 0;
-      spot::tgba* ec_a = 0;
       switch (echeck)
 	{
 	case None:
 	  break;
 
 	case Couvreur:
-	  ec_a = a;
 	  ec = new spot::couvreur99_check(a);
 	  break;
 
 	case Couvreur2:
-	  ec_a = a;
 	  ec = new spot::couvreur99_check_shy(a);
 	  break;
 
         case MagicSearch:
-          ec_a = degeneralized;
           if (bit_state_hashing)
-            ec = spot::bit_state_hashing_magic_search(
-                                            degeneralized, heap_size);
+            ec = spot::bit_state_hashing_magic_search(a, heap_size);
           else
-            ec = spot::explicit_magic_search(degeneralized);
+            ec = spot::explicit_magic_search(a);
           break;
 
         case Se05Search:
-          ec_a = degeneralized;
           if (bit_state_hashing)
-            ec = spot::bit_state_hashing_se05_search(degeneralized, heap_size);
+            ec = spot::bit_state_hashing_se05_search(a, heap_size);
           else
-            ec = spot::explicit_se05_search(degeneralized);
+            ec = spot::explicit_se05_search(a);
           break;
 	}
 
@@ -677,13 +675,12 @@ main(int argc, char** argv)
 		      if (graph_run_opt)
 			{
 			  spot::tgba_run_dotty_decorator deco(run);
-			  spot::dotty_reachable(std::cout, ec_a, &deco);
+			  spot::dotty_reachable(std::cout, a, &deco);
 			}
 		      else
 			{
-			  spot::print_tgba_run(std::cout, ec_a, run);
-			  if (!spot::replay_tgba_run(std::cout, ec_a, run,
-						     true))
+			  spot::print_tgba_run(std::cout, a, run);
+			  if (!spot::replay_tgba_run(std::cout, a, run, true))
 			    exit_code = 1;
 			}
 		      delete run;

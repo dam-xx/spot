@@ -1,3 +1,11 @@
+2004-11-15  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgbatest/ltl2tgba.cc (main): For non-generalized emptiness
+	check, degeneralize the automaton only if it has too much
+	acceptance conditions.  This makes it easier to reproduce runs
+	of randtgba.
+	* src/tgbatest/emptchk.test: Adjust.
+
 2004-11-15  Poitrenaud Denis  <denis@src.lip6.fr>
 
 	* src/tgbaalgos/magic.cc: Fix a stupid bug.

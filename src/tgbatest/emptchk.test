@@ -72,14 +72,14 @@ expect_no()
   run 0 ./ltl2tgba -Ese05_search -f "$1"
   run 0 ./ltl2tgba -Ebsh_se05_search "$1"
   run 0 ./ltl2tgba -Ebsh_se05_search -f "$1"
-  test `./ltl2tgba -emagic_search_repeated "!($1)" | 
+  test `./ltl2tgba -emagic_search_repeated "!($1)" |
         grep Prefix: | wc -l` -ge $2
-  test `./ltl2tgba -ese05_search_repeated "!($1)" | 
+  test `./ltl2tgba -ese05_search_repeated "!($1)" |
         grep Prefix: | wc -l` -ge $2
 }
 
 expect_ce 'a' 1
-expect_ce 'a U b' 2
+expect_ce 'a U b' 1
 expect_ce 'X a' 1
 expect_ce 'a & b & c' 1
 expect_ce 'a | b | (c U (d & (g U (h ^ i))))' 2
@@ -90,4 +90,4 @@ expect_ce 'Fc & X(a | Xb) & GF(a | Xb) & Gc' 1
 expect_ce '!((FF a) <=> (F x))' 3
 expect_no '!((FF a) <=> (F a))' 4
 expect_no 'Xa && (!a U b) && !b && X!b' 5
-expect_no '(a U !b) && Gb' 4
+expect_no '(a U !b) && Gb' 3
