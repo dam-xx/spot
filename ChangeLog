@@ -1,5 +1,11 @@
 2004-02-02  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/tgbatest/explicit.cc, src/tgbatest/explprod.cc,
+	src/tgbatest/ltl2tgba.cc, src/tgbatest/ltlprod.cc,
+	src/tgbatest/mixprod.cc, src/tgbatest/powerset.cc,
+	src/tgbatest/readsave.cc, src/tgbatest/tgbaread.cc,
+	src/tgbatest/tripprod.cc: Add missing copyright license.
+
 	* wrap/python/cgi/ltl2tgba.in (render_dot): Render .png directly
 	with dot, without using convert.
 	* wrap/python/cgi/README: Do not mention convert.
