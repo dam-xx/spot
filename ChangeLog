@@ -1,3 +1,11 @@
+2004-02-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* wrap/python/spot.i (unblock_signal): New function.
+	* wrap/python/cgi/ltl2tgba.in (print_footer, alarm_handler)
+	(reset_alarm): New functions.  Kill the script and its
+	children if it runs for too long.
+	(render_dot): Call reset_alarm.
+
 2004-02-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac, NEWS: Bump version to 0.0p.

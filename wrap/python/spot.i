@@ -30,6 +30,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <signal.h>
 
 #include "misc/version.hh"
 #include "misc/bddalloc.hh"
@@ -205,6 +206,15 @@ void
 print_on(std::ostream& on, const std::string& what)
 {
   on << what;
+}
+
+int
+unblock_signal(int signum)
+{
+  sigset_t set;
+  sigemptyset(&set);
+  sigaddset(&set, signum);
+  return sigprocmask(SIG_UNBLOCK, &set, 0);
 }
 
 %}

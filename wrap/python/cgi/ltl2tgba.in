@@ -25,6 +25,7 @@ import sys
 import os
 import cgi
 import cgitb; cgitb.enable()
+import signal
 
 print "Content-Type: text/html"
 print
@@ -39,6 +40,43 @@ imgdir = 'spotimg'
 
 import spot
 import buddy
+
+def print_footer():
+    print '<hr>'
+    print 'ltl2tgba.py @PACKAGE_VERSION@; Spot', spot.version()
+
+# We want the script to kill itself whenever it run for more than 30
+# seconds.  `dot' can be very long at drawing huge graphs, and may
+# bring a web server to its knees.  Doing so also protects us from any
+# infinite loop in Spot.
+#
+# We use alarm(30) because 30 seconds ought to be enough for everyone.
+# We create a process group for the script and its children (dot).
+# Upon SIGALRM, we kill the whole process group.
+#
+# For all this to work, SIGALRM and SIGTERM must not be blocked.
+# Apache (at least in my tests with version 2.0.48) blocks them by
+# default.  I haven't figured a Python way to unblock them, so the
+# spot bindings supply unblock_signal(signum) for this purpose.
+
+def alarm_handler(signum, frame):
+    print """<p><font color="red">The script was aborted because
+it has been running for too long.</font>  Please try a shorter formula,
+or different options (not drawing automata usually helps).
+If you want to benchmark big formulae it is
+better to install Spot on your own computer.</p>"""
+    print_footer()
+    sys.stdout.flush()
+    os.kill(0, signal.SIGTERM)
+
+def reset_alarm():
+    signal.alarm(30)
+
+spot.unblock_signal(signal.SIGALRM)
+spot.unblock_signal(signal.SIGTERM)
+os.setpgrp()
+signal.signal(signal.SIGALRM, alarm_handler)
+reset_alarm()
 
 
 # Cleanup stale files from our image directory.
@@ -101,6 +139,7 @@ def print_stats(automaton):
 def render_dot(basename):
     os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tpng', '-Gsize=14,14', '-o',
                basename + '.png', basename + '.dot')
+    reset_alarm()
     print '<img src="' + basename + '.png">'
 
 def render_automaton(basename, automata):
@@ -210,9 +249,8 @@ an indentifier: <code>aUb</code> is an atomic proposition, unlike
     </tr>
     <tr>
       <td align="right">next:</td><td><code>X</code> <code>()</code></td>
-      <td align="right">equivalent:</td><td><code>&lt;-&gt;
-                                            </code> <code>&lt;=&gt;
-                                            </code></td>
+      <td align="right">equivalent:</td><td><code>&lt;-&gt;</code>
+                                            <code>&lt;=&gt;</code></td>
       <td></td><td></td>
       <td></td><td></td>
     </tr>
@@ -251,6 +289,8 @@ print '</TD></TR></TABLE><INPUT type="submit" value="Send"></FORM>'
 
 if not filled:
     sys.exit(0)
+
+reset_alarm()
 
 print "<hr><H1>Output</H1>"
 
@@ -395,5 +435,4 @@ spot.destroy(f)
 del degen
 del automaton
 
-print '<hr>'
-print 'ltl2tgba.py @PACKAGE_VERSION@; Spot', spot.version()
+print_footer()
