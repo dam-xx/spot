@@ -49,5 +49,11 @@ namespace spot
       return v.result();
     }
 
+    const formula*
+    unabbreviate_ltl(const formula* f)
+    {
+      return unabbreviate_ltl(const_cast<formula*>(f));
+    }
+
   }
 }

@@ -1,3 +1,12 @@
+2003-06-24  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/ltlvisit/nenoform.cc (negative_normal_form): New const variant.
+	* src/ltlvisit/nenoform.hh (negative_normal_form): New const variant.
+	* src/ltlvisit/lunabbrev.cc (unabbreviate_logic): New const variant.
+	* src/ltlvisit/lunabbrev.hh (unabbreviate_logic): New const variant.
+	* src/ltlvisit/tunabbrev.cc (unabbreviate_ltl): New const variant.
+	* src/ltlvisit/tunabbrev.hh (unabbreviate_ltl): New const variant.
+
 2003-06-23  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	Switch from "promises" to "accepting set".  Fix the definitions

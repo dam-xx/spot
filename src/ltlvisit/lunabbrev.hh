@@ -38,6 +38,10 @@ namespace spot
     /// binop::Equals, and binop::Xor, using only unop::Not, multop::Or,
     /// and multop::And.
     formula* unabbreviate_logic(formula* f);
+    /// \brief Clone rewrite a formula to remove most of the abbreviated
+    /// logical operators.
+    const formula* unabbreviate_logic(const formula* f);
+
   }
 }
 

@@ -42,6 +42,9 @@ namespace spot
     /// This will also rewrite unary operators such as unop::F,
     /// and unop::G, using only binop::U, and binop::R.
     formula* unabbreviate_ltl(formula* f);
+    /// \brief Clone and rewrite a formula to remove most of the
+    /// abbreviated LTL and logical operators.
+    const formula* unabbreviate_ltl(const formula* f);
   }
 }
 

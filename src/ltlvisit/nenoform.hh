@@ -23,6 +23,8 @@ namespace spot
     /// after spot::ltl::negative_normal_form would likely produce a
     /// formula which is not in negative normal form.)
     formula* negative_normal_form(formula* f, bool negated = false);
+    /// \brief Build the negative normal form of \a f.
+    const formula* negative_normal_form(const formula* f);
   }
 }
 

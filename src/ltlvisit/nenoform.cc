@@ -174,5 +174,11 @@ namespace spot
       f->accept(v);
       return v.result();
     }
+
+    const formula*
+    negative_normal_form(const formula* f)
+    {
+      return negative_normal_form(const_cast<formula*>(f));
+    }
   }
 }
