@@ -44,6 +44,7 @@
 #include "tgbaalgos/dotty.hh"
 #include "tgbaparse/public.hh"
 #include "misc/random.hh"
+#include "misc/optionmap.hh"
 #include "tgba/tgbatba.hh"
 #include "tgba/tgbaproduct.hh"
 #include "misc/timer.hh"
@@ -61,6 +62,7 @@
 #include "tgbaalgos/tau03opt.hh"
 #include "tgbaalgos/replayrun.hh"
 
+spot::option_map options;
 
 spot::emptiness_check*
 couvreur99_cons(const spot::tgba* a)
@@ -99,15 +101,27 @@ couvreur99_rem_shy_minus_cons(const spot::tgba* a)
 }
 
 spot::emptiness_check*
+ms_cons(const spot::tgba* a)
+{
+  return spot::explicit_magic_search(a, options);
+}
+
+spot::emptiness_check*
+se05_cons(const spot::tgba* a)
+{
+  return spot::explicit_se05_search(a, options);
+}
+
+spot::emptiness_check*
 bsh_ms_cons(const spot::tgba* a)
 {
-  return spot::bit_state_hashing_magic_search(a, 4096);
+  return spot::bit_state_hashing_magic_search(a, 4096, options);
 }
 
 spot::emptiness_check*
 bsh_se05_cons(const spot::tgba* a)
 {
-  return spot::bit_state_hashing_se05_search(a, 4096);
+  return spot::bit_state_hashing_se05_search(a, 4096, options);
 }
 
 struct ec_algo
@@ -127,10 +141,10 @@ ec_algo ec_algos[] =
     { "Cou99_rem",      couvreur99_rem_cons,                 0, -1U, true },
     { "Cou99_rem_shy-", couvreur99_rem_shy_minus_cons,       0, -1U, true },
     { "Cou99_rem_shy",  couvreur99_rem_shy_cons,             0, -1U, true },
-    { "CVWY90",         spot::explicit_magic_search,         0,   1, true },
+    { "CVWY90",         ms_cons,                             0,   1, true },
     { "CVWY90_bsh",     bsh_ms_cons,                         0,   1, false },
     { "GV04",           spot::explicit_gv04_check,           0,   1, true },
-    { "SE05",           spot::explicit_se05_search,          0,   1, true },
+    { "SE05",           se05_cons,                           0,   1, true },
     { "SE05_bsh",       bsh_se05_cons,                       0,   1, false },
     { "Tau03",          spot::explicit_tau03_search,         1, -1U, true },
     { "Tau03_opt",      spot::explicit_tau03_opt_search,     0, -1U, true },
@@ -196,8 +210,10 @@ syntax(char* prog)
 	    << "  -O ALGO run Only ALGO" << std::endl
 	    << "  -R N    repeat each emptiness-check and accepting run "
 	    << "computation N times" << std::endl
-	    << "  -r      compute and replay acceptance runs (implies -e)"
+	    << "  -r      compute and replay accepting runs (implies -e)"
 	    << std::endl
+	    << "  ar:MODE select the mode MODE for accepting runs computation "
+            << "(implies -r)" << std::endl
 	    << std::endl
 	    << "Where:" << std::endl
 	    << "  F      are floats between 0.0 and 1.0 inclusive" << std::endl
@@ -945,6 +961,15 @@ main(int argc, char** argv)
 	  opt_n_acc = to_int_nonneg(argv[++argn], "-a");
 	  opt_a = to_float_nonneg(argv[++argn], "-a");
 	}
+      else if (!strncmp(argv[argn], "ar:", 3))
+        {
+          if (options.parse_options(argv[argn]))
+            {
+              std::cerr << "Failed to parse " << argv[argn] << std::endl;
+              exit(2);
+            }
+
+        }
       else if (!strcmp(argv[argn], "-d"))
 	{
 	  if (argc < argn + 2)

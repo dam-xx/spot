@@ -35,6 +35,7 @@ misc_HEADERS = \
   ltstr.hh \
   minato.hh \
   modgray.hh \
+  optionmap.hh \
   random.hh \
   timer.hh \
   version.hh
@@ -47,6 +48,7 @@ libmisc_la_SOURCES = \
   freelist.cc \
   minato.cc \
   modgray.cc \
+  optionmap.cc \
   random.cc \
   timer.cc \
   version.cc

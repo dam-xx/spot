@@ -53,8 +53,8 @@ namespace spot
       ///
       /// \pre The automaton \a a must have at most one accepting
       /// condition (i.e. it is a TBA).
-      magic_search(const tgba *a, size_t size)
-        : emptiness_check(a),
+      magic_search(const tgba *a, size_t size, option_map o = option_map())
+        : emptiness_check(a, o),
           h(size),
           all_cond(a->all_acceptance_conditions())
       {
@@ -96,17 +96,17 @@ namespace spot
             h.add_new_state(s0, BLUE);
             push(st_blue, s0, bddfalse, bddfalse);
             if (dfs_blue())
-              return new ndfs_result<magic_search<heap>, heap>(*this);
+              return new magic_search_result(*this, options());
           }
         else
           {
             h.pop_notify(st_red.front().s);
             pop(st_red);
             if (!st_red.empty() && dfs_red())
-              return new ndfs_result<magic_search<heap>, heap>(*this);
+              return new magic_search_result(*this, options());
             else
               if (dfs_blue())
-                return new ndfs_result<magic_search<heap>, heap>(*this);
+                return new magic_search_result(*this, options());
           }
         return 0;
       }
@@ -314,6 +314,108 @@ namespace spot
         return false;
       }
 
+      class result_from_stack: public emptiness_check_result,
+        public acss_statistics
+      {
+      public:
+        result_from_stack(magic_search& ms)
+          : emptiness_check_result(ms.automaton()), ms_(ms)
+        {
+        }
+
+        virtual tgba_run* accepting_run()
+        {
+          assert(!ms_.st_blue.empty());
+          assert(!ms_.st_red.empty());
+
+          tgba_run* run = new tgba_run;
+
+          typename stack_type::const_reverse_iterator i, j, end;
+          tgba_run::steps* l;
+
+          l = &run->prefix;
+
+          i = ms_.st_blue.rbegin();
+          end = ms_.st_blue.rend(); --end;
+          j = i; ++j;
+          for (; i != end; ++i, ++j)
+            {
+              tgba_run::step s = { i->s->clone(), j->label, j->acc };
+              l->push_back(s);
+            }
+
+          l = &run->cycle;
+
+          j = ms_.st_red.rbegin();
+          tgba_run::step s = { i->s->clone(), j->label, j->acc };
+          l->push_back(s);
+
+          i = j; ++j;
+          end = ms_.st_red.rend(); --end;
+          for (; i != end; ++i, ++j)
+            {
+              tgba_run::step s = { i->s->clone(), j->label, j->acc };
+              l->push_back(s);
+            }
+
+          return run;
+        }
+
+        unsigned acss_states() const
+        {
+          return 0;
+        }
+      private:
+        magic_search& ms_;
+      };
+
+#     define FROM_STACK "ar:from_stack"
+
+      class magic_search_result: public emptiness_check_result
+      {
+      public:
+        magic_search_result(magic_search& m, option_map o = option_map())
+          : emptiness_check_result(m.automaton(), o), ms(m)
+        {
+          if (options()[FROM_STACK])
+            computer = new result_from_stack(ms);
+          else
+            computer = new ndfs_result<magic_search<heap>, heap>(ms);
+        }
+
+        virtual void options_updated(const option_map& old)
+        {
+          if (old[FROM_STACK] && !options()[FROM_STACK])
+            {
+              delete computer;
+              computer = new ndfs_result<magic_search<heap>, heap>(ms);
+            }
+          else if (!old[FROM_STACK] && options()[FROM_STACK])
+            {
+              delete computer;
+              computer = new result_from_stack(ms);
+            }
+        }
+
+        virtual ~magic_search_result()
+        {
+          delete computer;
+        }
+
+        virtual tgba_run* accepting_run()
+        {
+          return computer->accepting_run();
+        }
+
+        virtual const unsigned_statistics* statistics() const
+        {
+          return computer->statistics();
+        }
+
+      private:
+        emptiness_check_result* computer;
+        magic_search& ms;
+      };
     };
 
     class explicit_magic_search_heap
@@ -471,15 +573,15 @@ namespace spot
 
   } // anonymous
 
-  emptiness_check* explicit_magic_search(const tgba *a)
+  emptiness_check* explicit_magic_search(const tgba *a, option_map o)
   {
-    return new magic_search<explicit_magic_search_heap>(a, 0);
+    return new magic_search<explicit_magic_search_heap>(a, 0, o);
   }
 
-  emptiness_check* bit_state_hashing_magic_search(
-                            const tgba *a, size_t size)
+  emptiness_check* bit_state_hashing_magic_search(const tgba *a, size_t size,
+                                                  option_map o)
   {
-    return new magic_search<bsh_magic_search_heap>(a, size);
+    return new magic_search<bsh_magic_search_heap>(a, size, o);
   }
 
 }

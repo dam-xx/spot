@@ -27,7 +27,6 @@
 
 namespace spot
 {
-
   tgba_run::~tgba_run()
   {
     for (steps::const_iterator i = prefix.begin(); i != prefix.end(); ++i)

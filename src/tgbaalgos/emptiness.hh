@@ -22,9 +22,11 @@
 #ifndef SPOT_TGBAALGOS_EMPTINESS_HH
 # define SPOT_TGBAALGOS_EMPTINESS_HH
 
+#include <map>
 #include <list>
 #include <iosfwd>
 #include <bdd.h>
+#include "misc/optionmap.hh"
 #include "tgba/state.hh"
 #include "emptiness_stats.hh"
 
@@ -74,8 +76,13 @@ namespace spot
   class emptiness_check_result
   {
   public:
-    emptiness_check_result(const tgba* a)
-      : a_(a)
+    emptiness_check_result(const tgba* a, option_map o = option_map())
+      : a_(a), o_(o)
+    {
+    }
+
+    virtual
+    ~emptiness_check_result()
     {
     }
 
@@ -100,19 +107,43 @@ namespace spot
       return a_;
     }
 
+    /// Return the options parametrizing how the accepting run is computed.
+    const option_map&
+    options() const
+    {
+      return o_;
+    }
+
+    /// Modify the options parametrizing how the accepting run is computed.
+    const char*
+    parse_options(char* options)
+    {
+      option_map old(o_);
+      const char* s = o_.parse_options(options);
+      options_updated(old);
+      return s;
+    }
+
     /// Return statistics, if available.
     virtual const unsigned_statistics* statistics() const;
 
   protected:
+    /// React when options are modified.
+    virtual void options_updated(const option_map& old)
+    {
+      (void)old;
+    }
+
     const tgba* a_;		///< The automaton.
+    option_map o_;		///< The options
   };
 
   /// Common interface to emptiness check algorithms.
   class emptiness_check
   {
   public:
-    emptiness_check(const tgba* a)
-      : a_(a)
+    emptiness_check(const tgba* a, option_map o = option_map())
+      : a_(a), o_(o)
     {
     }
     virtual ~emptiness_check();
@@ -122,6 +153,23 @@ namespace spot
     automaton() const
     {
       return a_;
+    }
+
+    /// Return the options parametrizing how the emptiness check is realized.
+    const option_map&
+    options() const
+    {
+      return o_;
+    }
+
+    /// Modify the options parametrizing how the accepting run is realized.
+    const char*
+    parse_options(char* options)
+    {
+      option_map old(o_);
+      const char* s = o_.parse_options(options);
+      options_updated(old);
+      return s;
     }
 
     /// \brief Check whether the automaton contain an accepting run.
@@ -142,8 +190,15 @@ namespace spot
     /// Print statistics, if any.
     virtual std::ostream& print_stats(std::ostream& os) const;
 
+    /// React when options are modified.
+    virtual void options_updated(const option_map& old)
+    {
+      (void)old;
+    }
+
   protected:
     const tgba* a_;		///< The automaton.
+    option_map o_;		///< The options
   };
 
   /// @}

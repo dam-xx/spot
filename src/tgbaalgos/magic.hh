@@ -23,6 +23,7 @@
 # define SPOT_TGBAALGOS_MAGIC_HH
 
 #include <cstddef>
+#include "misc/optionmap.hh"
 
 namespace spot
 {
@@ -93,7 +94,8 @@ namespace spot
   ///  }
   /// \endverbatim
   ///
-  emptiness_check* explicit_magic_search(const tgba *a);
+  emptiness_check* explicit_magic_search(const tgba *a,
+                                         option_map o = option_map());
 
   /// \brief Returns an emptiness checker on the spot::tgba automaton \a a.
   ///
@@ -113,13 +115,17 @@ namespace spot
   /// }
   /// \endverbatim
   ///
-  /// Consequently, the detection of an acceptence cycle is not ensured. The
-  /// implemented algorithm is the same as the one of
+  /// Consequently, the detection of an acceptence cycle is not ensured.
+  ///
+  /// The size of the heap is limited to \n size bytes.
+  ///
+  /// The implemented algorithm is the same as the one of
   /// spot::explicit_magic_search.
   ///
   /// \sa spot::explicit_magic_search
   ///
-  emptiness_check* bit_state_hashing_magic_search(const tgba *a, size_t size);
+  emptiness_check* bit_state_hashing_magic_search(const tgba *a, size_t size,
+                                                  option_map o = option_map());
 
   /// @}
 }
