@@ -1,5 +1,9 @@
 2004-04-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltltest/defs.in, src/tgbatest/defs.in: Correctly set exitcode
+	when valgrind is not used.
+	Reported by Denis Poitrenaud.
+
 	* src/tgba/tgba.hh (tgba::succ_iter): Doco.
 	* src/tgba/tgbatba.hh (tgba_tba_proxy::state_is_accepting): Document
 	it.

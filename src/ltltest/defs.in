@@ -1,5 +1,5 @@
 # -*- shell-script -*-
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -61,7 +61,7 @@ run()
     test -z "`sed 1q valgrind.err`" || exit 50
     rm -f valgrind.err
   else
-    "$@" || exitcode $?
+    "$@" || exitcode=$?
   fi
   test $exitcode = $expected_exitcode || exit 1
 }

@@ -65,7 +65,7 @@ run()
     test -z "`sed 1q valgrind.err`" || exit 50
     rm -f valgrind.err
   else
-    "$@" || exitcode $?
+    "$@" || exitcode=$?
   fi
   test $exitcode = $expected_exitcode || exit 1
 }
