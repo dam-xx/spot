@@ -26,6 +26,9 @@ namespace spot
     /// \brief Dump all variables for debugging.
     /// \param os The output stream.
     std::ostream& dump(std::ostream& os) const;
+
+    /// Whether this dictionary contains \a other.
+    bool contains(const tgba_bdd_dict& other) const;
   };
 }
 

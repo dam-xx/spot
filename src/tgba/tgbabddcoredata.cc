@@ -46,7 +46,7 @@ namespace spot
   {
     bdd_freepair(next_to_now);
   }
-  
+
   void
   tgba_bdd_core_data::declare_now_next(bdd now, bdd next)
   {
@@ -57,14 +57,14 @@ namespace spot
     notvar_set &= both;
     notprom_set &= both;
   }
-  
+
   void
   tgba_bdd_core_data::declare_atomic_prop(bdd var)
   {
     notnow_set &= var;
     notprom_set &= var;
   }
-  
+
   void
   tgba_bdd_core_data::declare_promise(bdd prom)
   {

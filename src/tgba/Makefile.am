@@ -30,6 +30,8 @@ libtgba_la_SOURCES = \
   tgbabdddict.cc \
   tgbabdddict.hh \
   tgbabddfactory.hh \
+  tgbabddprod.cc \
+  tgbabddprod.hh \
   tgbabddtranslatefactory.cc \
   tgbabddtranslatefactory.hh \
   tgbabddtranslateproxy.cc \

@@ -29,4 +29,30 @@ namespace spot
       }
     return os;
   }
+
+  bool
+  tgba_bdd_dict::contains(const tgba_bdd_dict& other) const
+  {
+    fv_map::const_iterator i;
+    for (i = other.var_map.begin(); i != other.var_map.end(); ++i)
+      {
+	fv_map::const_iterator i2 = var_map.find(i->first);
+	if (i2 == var_map.end() || i->second != i2->second)
+	  return false;
+      }
+    for (i = other.now_map.begin(); i != other.now_map.end(); ++i)
+      {
+	fv_map::const_iterator i2 = now_map.find(i->first);
+	if (i2 == now_map.end() || i->second != i2->second)
+	  return false;
+      }
+    for (i = other.prom_map.begin(); i != other.prom_map.end(); ++i)
+      {
+	fv_map::const_iterator i2 = prom_map.find(i->first);
+	if (i2 == prom_map.end() || i->second != i2->second)
+	  return false;
+      }
+    return true;
+  }
+
 }
