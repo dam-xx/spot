@@ -12,6 +12,8 @@ namespace spot
   class tgba_bdd_concrete_factory: public bdd_factory, public tgba_bdd_factory
   {
   public:
+    tgba_bdd_concrete_factory();
+
     virtual ~tgba_bdd_concrete_factory();
 
     /// Create a state variable for formula \a f.
@@ -66,6 +68,8 @@ namespace spot
 
     typedef std::map<const ltl::formula*, bdd> acc_map_;
     acc_map_ acc_;		///< BDD associated to each accepting condition
+    bddPair *now_to_next_;	///< \brief Rewriting pairs to transform
+                                ///  Now variables into Next variables.
   };
 
 }

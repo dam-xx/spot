@@ -1,3 +1,13 @@
+2003-06-30  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/tgbabddconcretefactory.cc: 
+	(tgba_bdd_concrete_factory::tgba_bdd_concrete_factory): New.
+	(tgba_bdd_concrete_factory::create_state): Update now_to_next_.
+	(tgba_bdd_concrete_factory::finish): Constraint Next variables
+	in the relation.
+	* src/tgba/tgbabddconcretefactory.hh 
+	(tgba_bdd_concrete_factory::now_to_next_): New variable.
+
 2003-06-28  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	Fix errors reported by ICC.
