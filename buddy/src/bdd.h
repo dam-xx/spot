@@ -1,6 +1,6 @@
 /*========================================================================
-               Copyright (C) 1996-2002 by Jorn Lind-Nielsen
-                            All rights reserved
+	       Copyright (C) 1996-2002 by Jorn Lind-Nielsen
+			    All rights reserved
 
     Permission is hereby granted, without written agreement and without
     license or royalty fees, to use, reproduce, prepare derivative
@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bdd.h,v 1.2 2003/05/05 13:45:04 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bdd.h,v 1.3 2003/05/19 15:58:44 aduret Exp $
   FILE:  bdd.h
   DESCR: C,C++ User interface for the BDD package
   AUTH:  Jorn Lind
@@ -104,7 +104,7 @@ DESCR   {* The fields are \\[\baselineskip] \begin{tabular}{lp{10cm}}
   {\tt maxnodenum}   & user defined maximum number of bdd nodes \\
   {\tt freenodes}    & number of currently free nodes \\
   {\tt minfreenodes} & minimum number of nodes that should be left after a
-                       garbage collection. \\
+		       garbage collection. \\
   {\tt varnum}       & number of defined bdd variables \\
   {\tt cachesize}    & number of entries in the internal caches \\
   {\tt gbcnum}       & number of garbage collections done until now
@@ -200,7 +200,7 @@ SECTION {* operator *}
 SHORT   {* relational product *}
 PROTO   {* #define bdd_relprod(a,b,var) bdd_appex(a,b,bddop_and,var) *}
 DESCR   {* Calculates the relational product of {\tt a} and {\tt b} as
-           {\tt a AND b} with the variables in {\tt var} quantified out
+	   {\tt a AND b} with the variables in {\tt var} quantified out
 	   afterwards. *}
 RETURN  {* The relational product or {\tt bddfalse} on errors. *}
 ALSO    {* bdd\_appex *}
@@ -220,13 +220,13 @@ typedef void (*bdd2inthandler)(int,int);
 typedef int  (*bddsizehandler)(void);
 typedef void (*bddfilehandler)(FILE *, int);
 typedef void (*bddallsathandler)(char*, int);
-   
+
 extern bddinthandler  bdd_error_hook(bddinthandler);
 extern bddgbchandler  bdd_gbc_hook(bddgbchandler);
 extern bdd2inthandler bdd_resize_hook(bdd2inthandler);
 extern bddinthandler  bdd_reorder_hook(bddinthandler);
 extern bddfilehandler bdd_file_hook(bddfilehandler);
-   
+
 extern int      bdd_init(int, int);
 extern void     bdd_done(void);
 extern int      bdd_setvarnum(int);
@@ -263,6 +263,7 @@ extern BDD      bdd_delref(BDD);
 extern void     bdd_gbc(void);
 extern int      bdd_scanset(BDD, int**, int*);
 extern BDD      bdd_makeset(int *, int);
+extern bddPair* bdd_copypair(bddPair*);
 extern bddPair* bdd_newpair(void);
 extern int      bdd_setpair(bddPair*, int, int);
 extern int      bdd_setpairs(bddPair*, int*, int*, int);
@@ -310,7 +311,7 @@ extern int      bdd_anodecount(BDD *, int);
 extern int*     bdd_varprofile(BDD);
 extern double   bdd_pathcount(BDD);
 
-   
+
 /* In file "bddio.c" */
 
 extern void     bdd_printall(void);
@@ -395,7 +396,7 @@ extern const BDD bddtrue;
 #define BDD_BREAK (-9)    /* User called break */
 #define BDD_VARNUM (-10)  /* Different number of vars. for vector pair */
 #define BDD_NODES (-11)   /* Tried to set max. number of nodes to be fewer */
-                          /* than there already has been allocated */
+			  /* than there already has been allocated */
 #define BDD_OP (-12)      /* Unknown operator */
 #define BDD_VARSET (-13)  /* Illegal variable set */
 #define BDD_VARBLK (-14)  /* Bad variable block operation */
@@ -431,9 +432,9 @@ class bdd
    ~bdd(void)        { bdd_delref(root); }
 
    int id(void) const;
-   
+
    bdd operator=(const bdd &r);
-   
+
    bdd operator&(const bdd &r) const;
    bdd operator&=(const bdd &r);
    bdd operator^(const bdd &r) const;
@@ -451,7 +452,7 @@ class bdd
    bdd operator<<=(const bdd &r);
    int operator==(const bdd &r) const;
    int operator!=(const bdd &r) const;
-   
+
 private:
    BDD root;
 
@@ -506,7 +507,7 @@ private:
    friend int      bdd_anodecountpp(const bdd *, int);
    friend int*     bdd_varprofile(const bdd &);
    friend double   bdd_pathcount(const bdd &);
-   
+
    friend void   bdd_fprinttable(FILE *, const bdd &);
    friend void   bdd_printtable(const bdd &);
    friend void   bdd_fprintset(FILE *, const bdd &);
@@ -519,7 +520,7 @@ private:
    friend int    bdd_save(FILE*, const bdd &);
    friend int    bdd_fnload(char*, bdd &);
    friend int    bdd_load(FILE*, bdd &);
-   
+
    friend bdd    fdd_ithvarpp(int, int);
    friend bdd    fdd_ithsetpp(int);
    friend bdd    fdd_domainpp(int);

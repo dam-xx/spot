@@ -1,6 +1,6 @@
 /*========================================================================
-               Copyright (C) 1996-2002 by Jorn Lind-Nielsen
-                            All rights reserved
+	       Copyright (C) 1996-2002 by Jorn Lind-Nielsen
+			    All rights reserved
 
     Permission is hereby granted, without written agreement and without
     license or royalty fees, to use, reproduce, prepare derivative
@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/pairs.c,v 1.2 2003/05/05 13:45:08 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/pairs.c,v 1.3 2003/05/19 15:58:44 aduret Exp $
   FILE:  pairs.c
   DESCR: Pair management for BDD package.
   AUTH:  Jorn Lind
@@ -74,7 +74,7 @@ void bdd_pairs_done(void)
 static int update_pairsid(void)
 {
    pairsid++;
-   
+
    if (pairsid == (INT_MAX >> 2))
    {
       bddPair *p;
@@ -98,7 +98,7 @@ void bdd_register_pair(bddPair *p)
 void bdd_pairs_vardown(int level)
 {
    bddPair *p;
-   
+
    for (p=pairs ; p!=NULL ; p=p->next)
    {
       int tmp;
@@ -106,10 +106,29 @@ void bdd_pairs_vardown(int level)
       tmp = p->result[level];
       p->result[level] = p->result[level+1];
       p->result[level+1] = tmp;
-      
+
       if (p->last == level)
 	 p->last++;
    }
+}
+
+
+static bddPair *bdd_pairalloc()
+{
+   bddPair *p;
+   if ((p=(bddPair*)malloc(sizeof(bddPair))) == NULL)
+   {
+      bdd_error(BDD_MEMORY);
+      return NULL;
+   }
+
+   if ((p->result=(BDD*)malloc(sizeof(BDD)*bddvarnum)) == NULL)
+   {
+      free(p);
+      bdd_error(BDD_MEMORY);
+      return NULL;
+   }
+   return p;
 }
 
 
@@ -117,7 +136,7 @@ int bdd_pairs_resize(int oldsize, int newsize)
 {
    bddPair *p;
    int n;
-   
+
    for (p=pairs ; p!=NULL ; p=p->next)
    {
       if ((p->result=(BDD*)realloc(p->result,sizeof(BDD)*newsize)) == NULL)
@@ -137,7 +156,7 @@ SECTION {* kernel *}
 SHORT   {* creates an empty variable pair table *}
 PROTO   {* bddPair *bdd_newpair(void) *}
 DESCR   {* Variable pairs of the type {\tt bddPair} are used in
-           {\tt bdd\_replace} to define which variables to replace with
+	   {\tt bdd\_replace} to define which variables to replace with
 	   other variables. This function allocates such an empty table. The
 	   table can be freed by a call to {\em bdd\_freepair}. *}
 RETURN  {* Returns a new table of pairs. *}
@@ -147,26 +166,48 @@ bddPair *bdd_newpair(void)
 {
    int n;
    bddPair *p;
-   
-   if ((p=(bddPair*)malloc(sizeof(bddPair))) == NULL)
-   {
-      bdd_error(BDD_MEMORY);
-      return NULL;
-   }
 
-   if ((p->result=(BDD*)malloc(sizeof(BDD)*bddvarnum)) == NULL)
-   {
-      free(p);
-      bdd_error(BDD_MEMORY);
-      return NULL;
-   }
-
+   p = bdd_pairalloc();
+   if (p == NULL)
+     return NULL;
+     
    for (n=0 ; n<bddvarnum ; n++)
       p->result[n] = bdd_ithvar(bddlevel2var[n]);
 
    p->id = update_pairsid();
    p->last = -1;
-   
+
+   bdd_register_pair(p);
+   return p;
+}
+
+
+/*
+NAME    {* bdd\_copypair *}
+SECTION {* kernel *}
+SHORT   {* clone a pair table *}
+PROTO   {* bddPair *bdd_copypair(bddPair *from) *}
+DESCR   {* Duplicate the table of pairs {\tt from}.
+	   This function allocates the cloned table. The
+	   table can be freed by a call to {\em bdd\_freepair}. *}
+RETURN  {* Returns a new table of pairs. *}
+ALSO    {* bdd\_newpair, bdd\_freepair, bdd\_replace, bdd\_setpair, bdd\_setpairs *}
+*/
+bddPair *bdd_copypair(bddPair *from)
+{
+   int n;
+   bddPair *p;
+
+   p = bdd_pairalloc();
+   if (p == NULL)
+     return NULL;
+     
+   for (n=0 ; n<bddvarnum ; n++)
+      p->result[n] = from->result[n];
+
+   p->id = update_pairsid();
+   p->last = -1;
+
    bdd_register_pair(p);
    return p;
 }
@@ -180,7 +221,7 @@ SHORT   {* set one variable pair *}
 PROTO   {* int bdd_setpair(bddPair *pair, int oldvar, int newvar)
 int bdd_setbddpair(bddPair *pair, BDD oldvar, BDD newvar) *}
 DESCR   {* Adds the pair {\tt (oldvar,newvar)} to the table of pairs
-           {\tt pair}. This results in {\tt oldvar} being substituted
+	   {\tt pair}. This results in {\tt oldvar} being substituted
 	   with {\tt newvar} in a call to {\tt bdd\_replace}. In the first
 	   version {\tt newvar} is an integer representing the variable
 	   to be replaced with the old variable.
@@ -197,7 +238,7 @@ int bdd_setpair(bddPair *pair, int oldvar, int newvar)
 {
    if (pair == NULL)
       return 0;
-   
+
    if (oldvar < 0  ||  oldvar > bddvarnum-1)
       return bdd_error(BDD_VAR);
    if (newvar < 0  ||  newvar > bddvarnum-1)
@@ -206,10 +247,10 @@ int bdd_setpair(bddPair *pair, int oldvar, int newvar)
    bdd_delref( pair->result[bddvar2level[oldvar]] );
    pair->result[bddvar2level[oldvar]] = bdd_ithvar(newvar);
    pair->id = update_pairsid();
-   
+
    if (bddvar2level[oldvar] > pair->last)
       pair->last = bddvar2level[oldvar];
-      
+
    return 0;
 }
 
@@ -217,7 +258,7 @@ int bdd_setpair(bddPair *pair, int oldvar, int newvar)
 int bdd_setbddpair(bddPair *pair, int oldvar, BDD newvar)
 {
    int oldlevel;
-   
+
    if (pair == NULL)
       return 0;
 
@@ -225,14 +266,14 @@ int bdd_setbddpair(bddPair *pair, int oldvar, BDD newvar)
    if (oldvar < 0  ||  oldvar >= bddvarnum)
       return bdd_error(BDD_VAR);
    oldlevel = bddvar2level[oldvar];
-      
+
    bdd_delref( pair->result[oldlevel] );
    pair->result[oldlevel] = bdd_addref(newvar);
    pair->id = update_pairsid();
-   
+
    if (oldlevel > pair->last)
       pair->last = oldlevel;
-      
+
    return 0;
 }
 
@@ -245,7 +286,7 @@ SHORT   {* defines a whole set of pairs *}
 PROTO   {* int bdd_setpairs(bddPair *pair, int *oldvar, int *newvar, int size)
 int bdd_setbddpairs(bddPair *pair, int *oldvar, BDD *newvar, int size) *}
 DESCR   {* As for {\tt bdd\_setpair} but with {\tt oldvar} and {\tt newvar}
-           being arrays of variables (BDDs) of size {\tt size}. *}
+	   being arrays of variables (BDDs) of size {\tt size}. *}
 RETURN  {* Zero on success, otherwise a negative error code. *}
 ALSO    {* bdd\_newpair, bdd\_setpair, bdd\_replace, bdd\_compose *}
 */
@@ -254,11 +295,11 @@ int bdd_setpairs(bddPair *pair, int *oldvar, int *newvar, int size)
    int n,e;
    if (pair == NULL)
       return 0;
-   
+
    for (n=0 ; n<size ; n++)
       if ((e=bdd_setpair(pair, oldvar[n], newvar[n])) < 0)
 	 return e;
-   
+
    return 0;
 }
 
@@ -268,11 +309,11 @@ int bdd_setbddpairs(bddPair *pair, int *oldvar, BDD *newvar, int size)
    int n,e;
    if (pair == NULL)
       return 0;
-   
+
    for (n=0 ; n<size ; n++)
       if ((e=bdd_setbddpair(pair, oldvar[n], newvar[n])) < 0)
 	 return e;
-   
+
    return 0;
 }
 
@@ -283,16 +324,16 @@ SECTION {* kernel *}
 SHORT   {* frees a table of pairs *}
 PROTO   {* void bdd_freepair(bddPair *pair) *}
 DESCR   {* Frees the table of pairs {\tt pair} that has been allocated
-           by a call to {\tt bdd\_newpair}. *}
+	   by a call to {\tt bdd\_newpair}. *}
 ALSO    {* bdd\_replace, bdd\_newpair, bdd\_setpair, bdd\_resetpair *}
 */
 void bdd_freepair(bddPair *p)
 {
    int n;
-   
+
    if (p == NULL)
       return;
-   
+
    if (pairs != p)
    {
       bddPair *bp = pairs;
@@ -318,7 +359,7 @@ SECTION {* kernel *}
 SHORT   {* clear all variable pairs *}
 PROTO   {* void bdd_resetpair(bddPair *pair) *}
 DESCR   {* Resets the table of pairs {\tt pair} by setting all substitutions
-           to their default values (that is no change). *}
+	   to their default values (that is no change). *}
 ALSO    {* bdd\_newpair, bdd\_setpair, bdd\_freepair *}
 */
 void bdd_resetpair(bddPair *p)
@@ -332,4 +373,3 @@ void bdd_resetpair(bddPair *p)
 
 
 /* EOF */
-
