@@ -20,7 +20,7 @@
 # 02111-1307, USA.
 
 AC_PREREQ([2.57])
-AC_INIT([spot], [0.0k])
+AC_INIT([spot], [0.0l])
 AC_CONFIG_AUX_DIR([tools])
 AM_INIT_AUTOMAKE([nostdinc check-news 1.7.3])
 

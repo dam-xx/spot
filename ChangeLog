@@ -1,3 +1,9 @@
+2003-12-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* configure.ac, NEWS: Bump version to 0.0l.
+	* doc/Makefile.am ($(srcdir)/spotref.pdf): Do not assume spot.latex is
+	in the srcdir.
+
 2003-11-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaparse/tgbaparse.yy (cond_list): Simplify into...

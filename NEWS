@@ -1,3 +1,12 @@
+New in spot 0.0l (2003-11-01):
+
+  * Computation of prime implicants.  This simplify the output of
+    ltl_to_tgba_fm, and allows conditions to be output as some of
+    product in dot output.
+  * Optimize translation of GFy in ltl_to_tgba_fm.
+  * tgba_explicit supports arbitrary binary formulae on transitions
+    (only conjunctions were allowed).
+
 New in spot 0.0j (2003-10-03):
 
   * Use hash_map's instead of map's almost everywhere.
