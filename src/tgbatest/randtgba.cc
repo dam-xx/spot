@@ -152,48 +152,53 @@ syntax(char* prog)
 {
   std::cerr << "Usage: "<< prog << " [OPTIONS...] PROPS..." << std::endl
 	    << std::endl
-	    << "Options:" << std::endl
+	    << "General Options:" << std::endl
 	    << "  -0      suppress default output, just generate the graph"
 	    << " in memory" << std::endl
-	    << "  -1      produce minimal output (for our paper)"
+	    << "  -1      produce minimal output (for our paper)" << std::endl
+	    << "  -g      output graph in dot format" << std::endl
+	    << "  -s N    seed for the random number generator" << std::endl
+	    << "  -z      display statistics about emptiness-check algorithms"
 	    << std::endl
+	    << "  -Z      like -z, but print extra statistics after the run"
+	    << " of each algorithm" << std::endl
+	    << std::endl
+	    << "Graph Generation Options:" << std::endl
 	    << "  -a N F  number of acceptance conditions and probability that"
 	    << " one is true" << std::endl
 	    << "            [0 0.0]" << std::endl
 	    << "  -d F    density of the graph [0.2]" << std::endl
+	    << "  -n N    number of nodes of the graph [20]" << std::endl
+	    << "  -t F    probability of the atomic propositions to be true"
+	    << " [0.5]" << std::endl
+	    << std::endl
+	    << "LTL Formula Generation Options:" << std::endl
 	    << "  -dp     dump priorities, do not generate any formula"
 	    << std::endl
+	    << "  -f N    size of the formula [15]" << std::endl
+	    << "  -F N    number of formulae to generate [0]" << std::endl
+	    << "  -l N    simplify formulae using all available reductions"
+	    << " and reject those" << std::endl
+	    << "            strictly smaller than N" << std::endl
+	    << "  -i FILE do not generate formulae, read them from FILE"
+	    << std::endl
+	    << "  -p S    priorities to use" << std::endl
+	    << "  -u      generate unique formulae" << std::endl
+	    << std::endl
+	    << "Emptiness-Check Options:" << std::endl
 	    << "  -D      degeneralize TGBA for emptiness-check algorithms that"
 	    << " would" << std::endl
 	    << "            otherwise be skipped (implies -e)" << std::endl
 	    << "  -e N    compare result of all "
 	    << "emptiness checks on N randomly generated graphs" << std::endl
-	    << "  -f N    the size of the formula [15]" << std::endl
-	    << "  -F N    number of formulae to generate [0]" << std::endl
-	    << "  -g      output in dot format" << std::endl
-	    << "  -i FILE do not generate formulae, read them from FILE"
-            << std::endl
-	    << "  -l N    simplify formulae using all available reductions"
-	    << " and reject those" << std::endl
-	    << "            strictly smaller than N" << std::endl
 	    << "  -m      try to reduce runs, in a second pass (implies -r)"
-	    << std::endl
-	    << "  -n N    number of nodes of the graph [20]" << std::endl
+            << std::endl
 	    << "  -O ALGO run Only ALGO" << std::endl
-	    << "  -p S    priorities to use" << std::endl
-	    << "  -r      compute and replay acceptance runs (implies -e)"
-	    << std::endl
 	    << "  -R N    repeat each emptiness-check and accepting run "
 	    << "computation N times" << std::endl
-	    << "  -s N    seed for the random number generator" << std::endl
-	    << "  -t F    probability of the atomic propositions to be true"
-	    << " [0.5]" << std::endl
-	    << "  -u      generate unique formulae"
+	    << "  -r      compute and replay acceptance runs (implies -e)"
 	    << std::endl
-	    << "  -z      display statistics about computed accepting runs"
 	    << std::endl
-	    << "  -Z      like -z, but print extra statistics after the run"
-	    << " of each algorithm" << std::endl
 	    << "Where:" << std::endl
 	    << "  F      are floats between 0.0 and 1.0 inclusive" << std::endl
 	    << "  E      are floating values" << std::endl
@@ -201,7 +206,11 @@ syntax(char* prog)
 	    << "  N      are positive integers" << std::endl
 	    << "  PROPS  are the atomic properties to use on transitions"
 	    << std::endl
-	    << "Use -dp to see the list of KEYs." << std::endl;
+	    << "Use -dp to see the list of KEYs." << std::endl
+	    << std::endl
+	    << "When -F or -i is used, a random graph a synchronized with"
+	    << " each formula." << std::endl << "If -e N is additionally used"
+	    << " N random graphs are generated for each formula." << std::endl;
   exit(2);
 }
 
@@ -545,7 +554,7 @@ print_ec_stats(const ec_stats_type& ec_stats, bool opt_paper = false)
                 << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
                 << std::endl;
       for (ec_stats_type::const_iterator i = ec_stats.begin();
-            i != ec_stats.end(); ++i)
+	   i != ec_stats.end(); ++i)
         std::cout << std::setw(22) << i->first << " |"
                   << std::setw(6) << i->second.min_states
                   << " "
@@ -574,7 +583,7 @@ print_ec_stats(const ec_stats_type& ec_stats, bool opt_paper = false)
                 << std::setw(53) << std::setfill('-') << "" << std::setfill(' ')
                 << std::endl;
       for (ec_stats_type::const_iterator i = ec_stats.begin();
-            i != ec_stats.end(); ++i)
+	   i != ec_stats.end(); ++i)
         std::cout << std::setw(22) << i->first << " |"
                   << std::setw(6)
                   << i->second.min_max_depth
@@ -593,7 +602,7 @@ print_ec_stats(const ec_stats_type& ec_stats, bool opt_paper = false)
 
 void
 print_ar_stats(ar_stats_type& ar_stats, const std::string s,
-              bool opt_paper = false)
+	       bool opt_paper = false)
 {
   std::ios::fmtflags old = std::cout.flags();
   if (!opt_paper)
@@ -610,7 +619,7 @@ print_ar_stats(ar_stats_type& ar_stats, const std::string s,
                 << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
                 << std::endl;
       for (ar_stats_type::const_iterator i = ar_stats.begin();
-            i != ar_stats.end(); ++i)
+	   i != ar_stats.end(); ++i)
         std::cout << std::setw(22) << i->first << " |"
                   << std::setw(6) << i->second.min_prefix
                   << " "
@@ -633,13 +642,13 @@ print_ar_stats(ar_stats_type& ar_stats, const std::string s,
                 << std::setw(22) << ""
                 << " |          runs         |         total         |"
                 << std::endl <<
-                std::setw(22) << "algorithm"
+	std::setw(22) << "algorithm"
                 << " |   min   < mean  < max |  pre.   cyc.     runs |   n"
                 << std::endl
                 << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
                 << std::endl;
       for (ar_stats_type::const_iterator i = ar_stats.begin();
-            i != ar_stats.end(); ++i)
+	   i != ar_stats.end(); ++i)
         std::cout << std::setw(22) << i->first << " |"
                   << std::setw(6)
                   << i->second.min_run
@@ -665,8 +674,8 @@ print_ar_stats(ar_stats_type& ar_stats, const std::string s,
 
 void
 print_ec_ratio_stats(const std::string& s,
-                    const ec_ratio_stat_type& ec_ratio_stats,
-                    bool opt_paper = false)
+		     const ec_ratio_stat_type& ec_ratio_stats,
+		     bool opt_paper = false)
 {
   std::ios::fmtflags old = std::cout.flags();
   if (opt_paper)
@@ -675,16 +684,16 @@ print_ec_ratio_stats(const std::string& s,
       std::cout << "Ratios about empt. check (" << s << ")" << std::endl;
       std::cout << std::right << std::fixed << std::setprecision(1);
       for (ec_ratio_stat_type::const_iterator i = ec_ratio_stats.begin();
-          i != ec_ratio_stats.end(); ++i)
+	   i != ec_ratio_stats.end(); ++i)
         std::cout << std::setw(22)  << i->first
                   << " " << std::setw(8)
                   << (i->second.tot_states / i->second.n) * 100.
                   << " " << std::setw(8)
                   << (static_cast<float>(i->second.tot_transitions) /
-                                                        i->second.n) * 100.
+		      i->second.n) * 100.
                   << " " << std::setw(8)
                   << (static_cast<float>(i->second.tot_depth) /
-                                                        i->second.n) * 100.
+		      i->second.n) * 100.
                   << " " << std::setw(4)
                   << i->second.n
                   << std::endl;
@@ -705,7 +714,7 @@ print_ec_ratio_stats(const std::string& s,
                 << std::setw(79) << std::setfill('-') << ""
                 << std::setfill(' ') << std::endl;
       for (ec_ratio_stat_type::const_iterator i = ec_ratio_stats.begin();
-          i != ec_ratio_stats.end(); ++i)
+	   i != ec_ratio_stats.end(); ++i)
         std::cout << std::setw(22) << i->first << " |"
                   << std::setw(6) << i->second.min_states * 100.
                   << " "
@@ -734,7 +743,7 @@ print_ec_ratio_stats(const std::string& s,
                 << std::setw(53) << std::setfill('-') << ""
                 << std::setfill(' ') << std::endl;
       for (ec_ratio_stat_type::const_iterator i = ec_ratio_stats.begin();
-          i != ec_ratio_stats.end(); ++i)
+	   i != ec_ratio_stats.end(); ++i)
         std::cout << std::setw(22) << i->first << " |"
                   << std::setw(6)
                   << i->second.min_depth * 100.
@@ -789,7 +798,7 @@ print_acss_stats(const acss_stats_type& acss_stats, bool opt_paper = false)
 
 void
 print_acss_ratio_stats(const acss_ratio_stats_type& acss_ratio_stats,
-                      bool opt_paper = false)
+		       bool opt_paper = false)
 {
   std::ios::fmtflags old = std::cout.flags();
   if (opt_paper)
@@ -897,7 +906,7 @@ print_ars_stats(const ars_stats_type& ars_stats, bool opt_paper = false)
 
 void
 print_ars_ratio_stats(const ars_ratio_stats_type& ars_ratio_stats,
-                     bool opt_paper = false)
+		      bool opt_paper = false)
 {
   std::ios::fmtflags old = std::cout.flags();
   if (opt_paper)
@@ -1117,7 +1126,7 @@ main(int argc, char** argv)
           if (strcmp(opt_i, "-"))
             {
               formula_file = new std::ifstream(opt_i);
-              if (!(*formula_file))
+              if (!*formula_file)
                 {
                   delete formula_file;
                   std::cerr << "Failed to open " << opt_i << std::endl;
@@ -1257,7 +1266,7 @@ main(int argc, char** argv)
       if (opt_F)
         {
           spot::ltl::formula* f = generate_formula(rl, opt_f, opt_ec_seed,
-                                                  opt_l, opt_u);
+						   opt_l, opt_u);
           if (!f)
             exit(1);
           formula = spot::ltl_to_tgba_fm(f, dict, true);
@@ -1268,18 +1277,23 @@ main(int argc, char** argv)
           if (formula_file->good())
             {
               std::string input;
-              std::getline(*formula_file, input, '\n');
+              if (std::getline(*formula_file, input, '\n').fail())
+		break;
+	      else if (input == "")
+		break;
               spot::ltl::parse_error_list pel;
               spot::ltl::formula* f = spot::ltl::parse(input, pel, env);
               if (spot::ltl::format_parse_errors(std::cerr, input, pel))
-                break;
+		{
+		  exit_code = 1;
+		  break;
+		}
               formula = spot::ltl_to_tgba_fm(f, dict, true);
               spot::ltl::atomic_prop_set* tmp =
-                                            spot::ltl::atomic_prop_collect(f);
+		spot::ltl::atomic_prop_collect(f);
               for (spot::ltl::atomic_prop_set::iterator i = tmp->begin();
-                                                        i != tmp->end(); ++i)
-                  apf->insert(
-                            dynamic_cast<spot::ltl::atomic_prop*>((*i)->ref()));
+		   i != tmp->end(); ++i)
+		apf->insert(dynamic_cast<spot::ltl::atomic_prop*>((*i)->ref()));
               spot::ltl::destroy(f);
               delete tmp;
             }
@@ -1291,218 +1305,220 @@ main(int argc, char** argv)
             }
         }
 
-     for (spot::ltl::atomic_prop_set::iterator i = ap->begin();
-                                                         i != ap->end(); ++i)
-         apf->insert(dynamic_cast<spot::ltl::atomic_prop*>((*i)->ref()));
+      for (spot::ltl::atomic_prop_set::iterator i = ap->begin();
+	   i != ap->end(); ++i)
+	apf->insert(dynamic_cast<spot::ltl::atomic_prop*>((*i)->ref()));
 
       do
-        {
-          if (opt_ec)
-            {
-              if (!opt_paper)
-                std::cout << "seed: " << opt_ec_seed << std::endl;
-              spot::srand(opt_ec_seed);
-            }
+	{
+	  if (opt_ec)
+	    {
+	      if (!opt_paper)
+		std::cout << "seed: " << opt_ec_seed << std::endl;
+	      spot::srand(opt_ec_seed);
+	    }
 
-          spot::tgba* a;
-          spot::tgba* r = a = spot::random_graph(opt_n, opt_d, apf, dict,
-                                                opt_n_acc, opt_a, opt_t, &env);
+	  spot::tgba* a;
+	  spot::tgba* r = a = spot::random_graph(opt_n, opt_d, apf, dict,
+						 opt_n_acc, opt_a, opt_t, &env);
 
-          if (formula)
-            a = product = new spot::tgba_product(formula, a);
+	  if (formula)
+	    a = product = new spot::tgba_product(formula, a);
 
-          int real_n_acc = a->number_of_acceptance_conditions();
+	  int real_n_acc = a->number_of_acceptance_conditions();
 
-          if (!opt_ec)
-            {
-              if (opt_dot)
-                dotty_reachable(std::cout, a);
-              else if (!opt_0)
-                tgba_save_reachable(std::cout, a);
-            }
-          else
-            {
-              spot::tgba* degen = 0;
-              if (opt_degen && real_n_acc > 1)
-                degen = new spot::tgba_tba_proxy(a);
+	  if (!opt_ec)
+	    {
+	      if (opt_dot)
+		dotty_reachable(std::cout, a);
+	      else if (!opt_0)
+		tgba_save_reachable(std::cout, a);
+	    }
+	  else
+	    {
+	      spot::tgba* degen = 0;
+	      if (opt_degen && real_n_acc > 1)
+		degen = new spot::tgba_tba_proxy(a);
 
-              int n_alg = sizeof(ec_algos) / sizeof(*ec_algos);
-              int n_ec = 0;
-              int n_empty = 0;
-              int n_non_empty = 0;
-              int n_maybe_empty = 0;
+	      int n_alg = sizeof(ec_algos) / sizeof(*ec_algos);
+	      int n_ec = 0;
+	      int n_empty = 0;
+	      int n_non_empty = 0;
+	      int n_maybe_empty = 0;
 
-              for (int i = 0; i < n_alg; ++i)
-                {
-                  spot::emptiness_check* ec;
-                  spot::emptiness_check_result* res;
-                  if (opt_O && strcmp(opt_O, ec_algos[i].name))
-                    continue;
-                  ec = cons_emptiness_check(i, a, degen, real_n_acc);
-                  if (!ec)
-                    continue;
-                  ++n_ec;
-                  std::string algo = ec_algos[i].name;
-                  if (!opt_paper)
-                    {
-                      std::cout.width(32);
-                      std::cout << algo << ": ";
-                    }
-                  tm_ec.start(algo);
-                  for (int count = opt_R;;)
-                    {
-                      res = ec->check();
-                      if (count-- <= 0)
-                        break;
-                      delete res;
-                      delete ec;
-                      ec = cons_emptiness_check(i, a, degen, real_n_acc);
-                    }
-                  tm_ec.stop(algo);
-                  const spot::ec_statistics* ecs =
-                    dynamic_cast<const spot::ec_statistics*>(ec);
-                  if (opt_z && ecs)
-                    {
-                      ec_stats[algo].count(ecs);
-                      if (res)
-                        {
-                          // Notice that ratios are computed w.r.t. the
-                          // generalized automaton a.
-                          ec_ratio_stats[real_n_acc][algo].count(ecs, a);
-                          glob_ec_ratio_stats[algo].count(ecs, a);
-                        }
-                    }
-                  if (res)
-                    {
-                      if (!opt_paper)
-                        std::cout << "acc. run";
-                      ++n_non_empty;
-                      const spot::acss_statistics* acss =
-                        dynamic_cast<const spot::acss_statistics*>(res);
-                      if (opt_z && acss)
-                        {
-                          acss_stats[algo].count(acss);
-                          acss_ratio_stats[algo].count(acss, a);
-                        }
-                      if (opt_replay)
-                        {
-                          spot::tgba_run* run;
+	      for (int i = 0; i < n_alg; ++i)
+		{
+		  spot::emptiness_check* ec;
+		  spot::emptiness_check_result* res;
+		  if (opt_O && strcmp(opt_O, ec_algos[i].name))
+		    continue;
+		  ec = cons_emptiness_check(i, a, degen, real_n_acc);
+		  if (!ec)
+		    continue;
+		  ++n_ec;
+		  std::string algo = ec_algos[i].name;
+		  if (!opt_paper)
+		    {
+		      std::cout.width(32);
+		      std::cout << algo << ": ";
+		    }
+		  tm_ec.start(algo);
+		  for (int count = opt_R;;)
+		    {
+		      res = ec->check();
+		      if (count-- <= 0)
+			break;
+		      delete res;
+		      delete ec;
+		      ec = cons_emptiness_check(i, a, degen, real_n_acc);
+		    }
+		  tm_ec.stop(algo);
+		  const spot::ec_statistics* ecs =
+		    dynamic_cast<const spot::ec_statistics*>(ec);
+		  if (opt_z && ecs)
+		    {
+		      ec_stats[algo].count(ecs);
+		      if (res)
+			{
+			  // Notice that ratios are computed w.r.t. the
+			  // generalized automaton a.
+			  ec_ratio_stats[real_n_acc][algo].count(ecs, a);
+			  glob_ec_ratio_stats[algo].count(ecs, a);
+			}
+		    }
+		  if (res)
+		    {
+		      if (!opt_paper)
+			std::cout << "acc. run";
+		      ++n_non_empty;
+		      const spot::acss_statistics* acss =
+			dynamic_cast<const spot::acss_statistics*>(res);
+		      if (opt_z && acss)
+			{
+			  acss_stats[algo].count(acss);
+			  acss_ratio_stats[algo].count(acss, a);
+			}
+		      if (opt_replay)
+			{
+			  spot::tgba_run* run;
 
-                          const spot::ars_statistics* ars =
-                            dynamic_cast<const spot::ars_statistics*>(res);
+			  const spot::ars_statistics* ars =
+			    dynamic_cast<const spot::ars_statistics*>(res);
 
-                          tm_ar.start(algo);
-                          for (int count = opt_R;;)
-                            {
-                              run = res->accepting_run();
-                              if (opt_z && ars)
-                                {
-                                  // Count only the first run (the other way
-                                  // would be to divide the stats by opt_R).
-                                  ars_stats[algo].count(ars);
-                                  ars_ratio_stats[algo].count(ars, a);
-                                  ars = 0;
-                                }
-                              if (count-- <= 0 || !run)
-                                break;
-                              delete run;
-                            }
-                          if (!run)
-                            {
-                              tm_ar.cancel(algo);
-                              if (!opt_paper)
-                                std::cout << " exists, not computed";
-                            }
-                          else
-                            {
-                              tm_ar.stop(algo);
-                              std::ostringstream s;
-                              if (!spot::replay_tgba_run(s, res->automaton(),
-                                                        run))
-                                {
-                                  if (!opt_paper)
-                                    std::cout << ", but could not replay it "
-                                              << "(ERROR!)";
-                                  failed_seeds.insert(opt_ec_seed);
-                                }
-                              else
-                                {
-                                  if (!opt_paper)
-                                    std::cout << ", computed";
-                                  if (opt_z)
-                                    ar_stats[algo].count(run);
-                                }
-                              if (opt_z && !opt_paper)
-                                std::cout << " [" << run->prefix.size()
-                                          << "+" << run->cycle.size()
-                                          << "]";
+			  tm_ar.start(algo);
+			  for (int count = opt_R;;)
+			    {
+			      run = res->accepting_run();
+			      if (opt_z && ars)
+				{
+				  // Count only the first run (the other way
+				  // would be to divide the stats by opt_R).
+				  ars_stats[algo].count(ars);
+				  ars_ratio_stats[algo].count(ars, a);
+				  ars = 0;
+				}
+			      if (count-- <= 0 || !run)
+				break;
+			      delete run;
+			    }
+			  if (!run)
+			    {
+			      tm_ar.cancel(algo);
+			      if (!opt_paper)
+				std::cout << " exists, not computed";
+			    }
+			  else
+			    {
+			      tm_ar.stop(algo);
+			      std::ostringstream s;
+			      if (!spot::replay_tgba_run(s, res->automaton(),
+							 run))
+				{
+				  if (!opt_paper)
+				    std::cout << ", but could not replay it "
+					      << "(ERROR!)";
+				  failed_seeds.insert(opt_ec_seed);
+				}
+			      else
+				{
+				  if (!opt_paper)
+				    std::cout << ", computed";
+				  if (opt_z)
+				    ar_stats[algo].count(run);
+				}
+			      if (opt_z && !opt_paper)
+				std::cout << " [" << run->prefix.size()
+					  << "+" << run->cycle.size()
+					  << "]";
 
-                              if (opt_reduce)
-                                {
-                                  spot::tgba_run* redrun =
-                                    spot::reduce_run(res->automaton(), run);
-                                  if (!spot::replay_tgba_run(s,
-                                                    res->automaton(), redrun))
-                                    {
-                                      if (!opt_paper)
-                                        std::cout << ", but could not replay "
-                                                 << "its minimization (ERROR!)";
-                                      failed_seeds.insert(opt_ec_seed);
-                                    }
-                                  else
-                                    {
-                                      std::cout << ", reduced";
-                                      if (opt_z)
-                                        mar_stats[algo].count(redrun);
-                                    }
-                                  if (opt_z && !opt_paper)
-                                    {
-                                      std::cout << " [" << redrun->prefix.size()
-                                                << "+" << redrun->cycle.size()
-                                                << "]";
-                                    }
-                                  delete redrun;
-                                }
-                              delete run;
-                            }
-                        }
-                      if (!opt_paper)
-                        std::cout << std::endl;
-                      delete res;
-                    }
-                  else
-                    {
-                      if (ec_algos[i].safe)
-                        {
-                          if (!opt_paper)
-                            std::cout << "empty language" << std::endl;
-                          ++n_empty;
-                        }
-                      else
-                        {
-                          if (!opt_paper)
-                            std::cout << "maybe empty language" << std::endl;
-                          ++n_maybe_empty;
-                        }
+			      if (opt_reduce)
+				{
+				  spot::tgba_run* redrun =
+				    spot::reduce_run(res->automaton(), run);
+				  if (!spot::replay_tgba_run(s,
+							     res->automaton(),
+							     redrun))
+				    {
+				      if (!opt_paper)
+					std::cout
+					  << ", but could not replay "
+					  << "its minimization (ERROR!)";
+				      failed_seeds.insert(opt_ec_seed);
+				    }
+				  else
+				    {
+				      std::cout << ", reduced";
+				      if (opt_z)
+					mar_stats[algo].count(redrun);
+				    }
+				  if (opt_z && !opt_paper)
+				    {
+				      std::cout << " [" << redrun->prefix.size()
+						<< "+" << redrun->cycle.size()
+						<< "]";
+				    }
+				  delete redrun;
+				}
+			      delete run;
+			    }
+			}
+		      if (!opt_paper)
+			std::cout << std::endl;
+		      delete res;
+		    }
+		  else
+		    {
+		      if (ec_algos[i].safe)
+			{
+			  if (!opt_paper)
+			    std::cout << "empty language" << std::endl;
+			  ++n_empty;
+			}
+		      else
+			{
+			  if (!opt_paper)
+			    std::cout << "maybe empty language" << std::endl;
+			  ++n_maybe_empty;
+			}
 
-                    }
+		    }
 
-                  if (opt_Z && !opt_paper)
-                    ec->print_stats(std::cout);
-                  delete ec;
-                }
+		  if (opt_Z && !opt_paper)
+		    ec->print_stats(std::cout);
+		  delete ec;
+		}
 
-              assert(n_empty + n_non_empty + n_maybe_empty == n_ec);
+	      assert(n_empty + n_non_empty + n_maybe_empty == n_ec);
 
-              if ((n_empty == 0 && (n_non_empty + n_maybe_empty) != n_ec)
-                  || (n_empty != 0 && n_non_empty != 0))
-                {
-                  std::cout << "ERROR: not all algorithms agree" << std::endl;
-                  failed_seeds.insert(opt_ec_seed);
-                }
+	      if ((n_empty == 0 && (n_non_empty + n_maybe_empty) != n_ec)
+		  || (n_empty != 0 && n_non_empty != 0))
+		{
+		  std::cout << "ERROR: not all algorithms agree" << std::endl;
+		  failed_seeds.insert(opt_ec_seed);
+		}
 
-              delete degen;
-            }
+	      delete degen;
+	    }
 
           delete product;
           delete r;
@@ -1520,7 +1536,7 @@ main(int argc, char** argv)
         --opt_F;
       opt_ec = init_opt_ec;
       for (spot::ltl::atomic_prop_set::iterator i = apf->begin();
-          i != apf->end(); ++i)
+	   i != apf->end(); ++i)
         spot::ltl::destroy(*i);
       apf->clear();
     }
@@ -1534,7 +1550,7 @@ main(int argc, char** argv)
       print_ec_ratio_stats("all tests", glob_ec_ratio_stats, opt_paper);
       if (ec_ratio_stats.size() > 1)
         for (ec_ratio_stats_type::const_iterator i = ec_ratio_stats.begin();
-            i != ec_ratio_stats.end(); ++i)
+	     i != ec_ratio_stats.end(); ++i)
           {
             std::ostringstream s;
             s << "tests with " << i->first << " acceptance conditions";
@@ -1552,14 +1568,14 @@ main(int argc, char** argv)
     print_ars_stats(ars_stats, opt_paper);
 
   if (!ars_ratio_stats.empty())
-      print_ars_ratio_stats(ars_ratio_stats, opt_paper);
+    print_ars_ratio_stats(ars_ratio_stats, opt_paper);
 
   if (!ar_stats.empty())
     print_ar_stats(ar_stats, "Statistics about accepting runs:", opt_paper);
 
   if (!mar_stats.empty())
     print_ar_stats(mar_stats, "Statistics about reduced accepting runs:",
-                    opt_paper);
+		   opt_paper);
 
   if (!opt_paper && opt_z)
     {

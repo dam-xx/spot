@@ -1,3 +1,8 @@
+2005-02-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/randtgba.cc (main): Skip empty lines.
+	(syntax): Categorize options.
+
 2005-01-31  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/explicit.test, src/tgbatest/explpro2.test,
