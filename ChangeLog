@@ -1,3 +1,8 @@
+2004-11-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/ce.cc (couvreur99_check_result::accepting_run):
+	Remove spurious FIXME.
+
 2004-11-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/evtgbaalgos/save.cc (save_bfs::output_acc_set): Sort

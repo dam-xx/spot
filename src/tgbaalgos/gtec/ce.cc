@@ -75,7 +75,7 @@ namespace spot
     numbered_state_heap::state_index_p spi =
       ecs_->h->index(ecs_->aut->get_init_state());
     assert(spi.first);
-    /// FIXME: Should compute label and acceptance condition.
+    // This incomplete starting step will be overwritten later.
     tgba_run::step s = { spi.first, bddtrue, bddfalse };
     run_->prefix.push_front(s);
 
@@ -138,6 +138,7 @@ namespace spot
 			    t = father[t.s];
 			  }
 			assert(!run_->prefix.empty());
+			// Overwrite the incomplete starting step.
 			run_->prefix.back() = t;
 
 			// Append SEQ to RUN_->PREFIX.
