@@ -1,5 +1,7 @@
 2005-01-29  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* doc/mainpage.dox: More text, and a link to "Modules".
+
 	* src/tgbatest/ltl2tgba.cc (main): Silence the "filename.tgba read"
 	message if -0 is used.
 
