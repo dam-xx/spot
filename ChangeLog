@@ -1,3 +1,7 @@
+2004-10-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/evtgbatest/Makefile.am (CLEANFILES): New variable.
+
 2004-10-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	Preliminary support for Event-based GBA.

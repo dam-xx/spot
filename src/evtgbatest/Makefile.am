@@ -43,3 +43,4 @@ TESTS = \
   product.test
 
 EXTRA_DIST = $(TESTS)
+CLEANFILES = input1 input2 input3 stdout expected
