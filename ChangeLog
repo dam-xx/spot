@@ -1,5 +1,8 @@
 2004-11-04  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/neverclaim.cc (never_claim_bfs::process_link):
+	Adjust prototype.
+
 	* src/tgba/tgba.hh, src/tgba/tgba.cc
 	(tgba::number_of_acceptance_conditions): New method.
 	* src/tgbaalgos/lbtt.cc (lbtt_bfs::lbtt_bfs): Use it.

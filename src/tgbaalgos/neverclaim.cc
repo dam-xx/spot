@@ -158,7 +158,8 @@ namespace spot
        }
 
       void
-      process_link(int in, int out, const tgba_succ_iterator* si)
+      process_link(const state*, int in, const state*, int out,
+		   const tgba_succ_iterator* si)
       {
 	if (in != accept_all_)
 	  {
