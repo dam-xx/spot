@@ -1,5 +1,5 @@
-#ifndef SPOT_LTLVISIT_UNABBREV_HH
-# define SPOT_LTLVISIT_UNABBREV_HH
+#ifndef SPOT_LTLVISIT_LUNABBREV_HH
+# define SPOT_LTLVISIT_LUNABBREV_HH
 
 #include "ltlast/formula.hh"
 #include "ltlast/visitor.hh"
@@ -34,4 +34,4 @@ namespace spot
   }
 }
 
-#endif //  SPOT_LTLVISIT_UNABBREV_HH
+#endif // SPOT_LTLVISIT_LUNABBREV_HH

@@ -1,3 +1,7 @@
+2003-04-17  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
+
+	* src/ltlvisit/lunabbrev.hh: Fix include guard.
+
 2003-04-16  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
 	* src/ltlvisit/tunabbrev.cc, src/ltlvisit/tunabbrev.hh: New files.
