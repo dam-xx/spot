@@ -1,5 +1,30 @@
 2003-06-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/ltlast/Makefile.am (ltlastdir, ltlast_HEADERS): New variables.
+	(libltlast_la_SOURCES): Move all headers to ltlast_HEADERS.
+	* src/ltlenv/Makefile.am (ltlenvdir, ltlenv_HEADERS): New variables.
+	(libltlenv_la_SOURCES): Move all headers to ltlenv_HEADERS.
+	* src/ltlparse/Makefile.am (ltlparsedir, ltlparse_HEADERS): New
+	variables.
+	(libltlparse_la_SOURCES): Move all public headers to ltlparse_HEADERS.
+	* src/ltlvisit/Makefile.am (ltlvisitdir, ltlvisit_HEADERS): New
+	variables.
+	(libltlvisit_la_SOURCES): Move all headers to ltlparse_HEADERS.
+	* src/misc/Makefile.am (include_HEADERS): Rename as ..
+	(misc_HEADERS): ... this.
+	(miscdir): New variable.
+	* src/tgba/Makefile.am (tgbadir, tgba_HEADERS): New variables.
+	(libtgba_la_SOURCES): Move all headers to tgba_HEADERS.
+	* src/tgbaalgos/Makefile.am (tgbaalgosdir, tgbaalgos_HEADERS):
+	New variables.
+	(libtgbaalgos_la_SOURCES): Move all headers to tgbaalgos_HEADERS.
+	* src/tgbaparse/Makefile.am (tgbaparsedir, tgbaparse_HEADERS): New
+	variables.
+	(libtgbaparse_la_SOURCES): Move all public headers to
+	tgbaparse_HEADERS.
+	* src/tgbaparse/public.hh: Include ltlparse/location.hh, not
+	location.hh.
+
 	* doc/Makefile.am (stamp): Prefix $(srcdir) explicitely.
 
 	* m4/buddy.m4 (BUDDY_LDFLAGS): Use $(top_builddir), not $(top_srcdir).
@@ -621,7 +646,7 @@
 	* Makefile.am (EXTRA_DIST): Add m4/buddy.m4.
 	* configure.ac: Call AX_CHECK_BUDDY.
 
-2003-04-30  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
+2003-04-30  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltlvisit/Makefile.am (lib_LTLIBRARIES): Rename as ...
 	(noinst_LTLIBRARIES): ... this.
@@ -637,7 +662,7 @@
 	* wrap/spot.i: New file.  Preliminary bindings for Python.
 	* configure.ac: Call adl_CHECK_PYTHON and output wrap/Makefile.
 
-2003-04-29  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
+2003-04-29  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* configure.ac: Call AC_PROG_LIBTOOL.
 	* src/ltlast/Makefile.am, src/ltlenv/Makefile.am,
@@ -658,7 +683,7 @@
 	sure we always use paths relative to src/ in src/'s
 	subdirectories.
 
-2003-04-28  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
+2003-04-28  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltlparse/Makefile.am (CXXFLAGS): Turn on GCC warnings
 	now that CVS Bison is fixed.
@@ -671,7 +696,7 @@
 	* src/ltlvisit/tostring.hh: From ast to string New files.
 	* src/ltlvisit/tostring.cc: From ast to string New files.
 
-2003-04-18  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
+2003-04-18  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltlparse/Makefile.am (EXTRA_DIST): Distribute ltlparse.yy.
 	* src/ltlast/Makefile.am (libltlast_a_SOURCES): Add visitor.hh.
@@ -696,7 +721,7 @@
 	* src/ltltest/parse.test, src/ltltest/parseerr.test,
 	src/ltltest/equals.test: Use these operators..
 
-2003-04-17  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
+2003-04-17  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltltest/readltl.cc, src/ltltest/equals.cc: Cosmetics.
 
@@ -739,7 +764,7 @@
 
 	* src/ltlvisit/lunabbrev.hh: Fix include guard.
 
-2003-04-16  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
+2003-04-16  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltlvisit/tunabbrev.cc, src/ltlvisit/tunabbrev.hh: New files.
 	* src/ltlvisit/Makefile.am (libltlvisit_a_SOURCES): Add them.
@@ -797,7 +822,7 @@
 	same operator, merge its children with ours.
 	* src/ltltest/parseerr.test: Add two tests for multop merging.
 
-2003-04-15  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
+2003-04-15  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltlast/formulae.hh (formulae::equals): Remove.
 	* src/ltlast/unop.hh (unop::equals): Remove.

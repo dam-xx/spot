@@ -2,7 +2,7 @@
 # define SPOT_TGBAPARSE_PUBLIC_HH
 
 # include "tgba/tgbaexplicit.hh"
-# include "location.hh"
+# include "ltlparse/location.hh"
 # include "ltlenv/defaultenv.hh"
 # include <string>
 # include <list>

@@ -1,40 +1,45 @@
 AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-noinst_LTLIBRARIES = libtgba.la
-libtgba_la_SOURCES = \
-  bddfactory.cc \
+tgbadir = $(pkgincludedir)/tgba
+
+tgba_HEADERS = \
   bddfactory.hh \
-  bddprint.cc \
   bddprint.hh \
-  dictunion.cc \
   dictunion.hh \
-  ltl2tgba.cc \
   ltl2tgba.hh \
   public.hh \
   state.hh \
-  statebdd.cc \
   statebdd.hh \
   succiter.hh \
-  succiterconcrete.cc \
   succiterconcrete.hh \
   tgba.hh \
-  tgbabddconcrete.cc \
   tgbabddconcrete.hh \
-  tgbabddconcretefactory.cc \
   tgbabddconcretefactory.hh \
-  tgbabddconcreteproduct.cc \
   tgbabddconcreteproduct.hh \
-  tgbabddcoredata.cc \
   tgbabddcoredata.hh \
-  tgbabdddict.cc \
   tgbabdddict.hh \
   tgbabddfactory.hh \
-  tgbabddtranslatefactory.cc \
   tgbabddtranslatefactory.hh \
-  tgbaexplicit.cc \
   tgbaexplicit.hh \
-  tgbaproduct.cc \
   tgbaproduct.hh \
-  tgbatranslateproxy.cc \
   tgbatranslateproxy.hh
+
+noinst_LTLIBRARIES = libtgba.la
+libtgba_la_SOURCES = \
+  bddfactory.cc \
+  bddprint.cc \
+  dictunion.cc \
+  ltl2tgba.cc \
+  statebdd.cc \
+  succiterconcrete.cc \
+  tgbabddconcrete.cc \
+  tgbabddconcretefactory.cc \
+  tgbabddconcreteproduct.cc \
+  tgbabddcoredata.cc \
+  tgbabdddict.cc \
+  tgbabddtranslatefactory.cc \
+  tgbaexplicit.cc \
+  tgbaproduct.cc \
+  tgbatranslateproxy.cc
+

@@ -1,6 +1,8 @@
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
+ltlparsedir = $(pkgincludedir)/ltlparse
+
 noinst_LTLIBRARIES = libltlparse.la
 
 LTLPARSE_YY = ltlparse.yy
@@ -27,5 +29,9 @@ libltlparse_la_SOURCES = \
   fmterror.cc \
   $(FROM_LTLPARSE_YY) \
   ltlscan.ll \
-  parsedecl.hh \
-  public.hh
+  parsedecl.hh
+
+ltlparse_HEADERS = \
+  public.hh \
+  location.hh \
+  position.hh

@@ -1,2 +1,2 @@
-
-include_HEADERS = const_sel.hh
+miscdir = $(pkgincludedir)/misc
+misc_HEADERS = const_sel.hh

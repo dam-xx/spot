@@ -1,6 +1,11 @@
 AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
+tgbaparsedir = $(pkgincludedir)/tgbaparse
+
+tgbaparse_HEADERS = \
+  public.hh  
+
 noinst_LTLIBRARIES = libtgbaparse.la
 
 TGBAPARSE_YY = tgbaparse.yy
@@ -10,6 +15,7 @@ FROM_TGBAPARSE_YY_OTHERS = \
   position.hh \
   location.hh \
   tgbaparse.hh
+
 FROM_TGBAPARSE_YY = $(FROM_TGBAPARSE_YY_MAIN) $(FROM_TGBAPARSE_YY_OTHERS)
 
 BUILT_SOURCES = $(FROM_TGBAPARSE_YY)
@@ -27,5 +33,4 @@ libtgbaparse_la_SOURCES = \
   fmterror.cc \
   $(FROM_TGBAPARSE_YY) \
   tgbascan.ll \
-  parsedecl.hh \
-  public.hh
+  parsedecl.hh
