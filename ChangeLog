@@ -1,5 +1,13 @@
 2003-06-25  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/succiterconcrete.cc (tgba_succ_iterator_concrete::next):
+	Rewrite using bdd_satoneset.  This time it's for real.  (I hope.)
+	* src/tgba/succiterconcrete.hh (current_base_,
+	current_base_left_): Delete.
+	* tgba/tgbabddcoredata.hh (next_set): New variable.
+	* tgba/tgbabddcoredata.cc, tgba/tgbabddtranslatefactory.cc: Adjust
+	to update next_set.
+
 	* src/tgba/bddprint.hh, src/tgba/tgbabddconcretefactory.hh,
 	src/tgba/tgbaproduct.hh: Fix Doxygen comments.
 

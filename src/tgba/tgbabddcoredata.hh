@@ -62,6 +62,8 @@ namespace spot
 
     /// The conjunction of all Now variables, in their positive form.
     bdd now_set;
+    /// The conjunction of all Next variables, in their positive form.
+    bdd next_set;
     /// The conjunction of all Now variables, in their negated form.
     bdd negnow_set;
     /// \brief The (positive) conjunction of all variables which are

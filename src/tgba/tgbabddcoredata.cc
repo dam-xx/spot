@@ -3,20 +3,33 @@
 namespace spot
 {
   tgba_bdd_core_data::tgba_bdd_core_data()
-    : relation(bddtrue), accepting_conditions(bddfalse),
-      now_set(bddtrue), negnow_set(bddtrue),
-      notnow_set(bddtrue), notnext_set(bddtrue), var_set(bddtrue),
-      notvar_set(bddtrue), notacc_set(bddtrue), negacc_set(bddtrue),
+    : relation(bddtrue),
+      accepting_conditions(bddfalse),
+      now_set(bddtrue),
+      next_set(bddtrue),
+      negnow_set(bddtrue),
+      notnow_set(bddtrue),
+      notnext_set(bddtrue),
+      var_set(bddtrue),
+      notvar_set(bddtrue),
+      notacc_set(bddtrue),
+      negacc_set(bddtrue),
       next_to_now(bdd_newpair())
   {
   }
 
   tgba_bdd_core_data::tgba_bdd_core_data(const tgba_bdd_core_data& copy)
-    : relation(copy.relation), accepting_conditions(copy.accepting_conditions),
-      now_set(copy.now_set), negnow_set(copy.negnow_set),
-      notnow_set(copy.notnow_set), notnext_set(copy.notnext_set),
-      var_set(copy.var_set), notvar_set(copy.notvar_set),
-      notacc_set(copy.notacc_set), negacc_set(copy.negacc_set),
+    : relation(copy.relation),
+      accepting_conditions(copy.accepting_conditions),
+      now_set(copy.now_set),
+      next_set(copy.next_set),
+      negnow_set(copy.negnow_set),
+      notnow_set(copy.notnow_set),
+      notnext_set(copy.notnext_set),
+      var_set(copy.var_set),
+      notvar_set(copy.notvar_set),
+      notacc_set(copy.notacc_set),
+      negacc_set(copy.negacc_set),
       next_to_now(bdd_copypair(copy.next_to_now))
   {
   }
@@ -28,6 +41,7 @@ namespace spot
       accepting_conditions(left.accepting_conditions
 			   | right.accepting_conditions),
       now_set(left.now_set & right.now_set),
+      next_set(left.next_set & right.next_set),
       negnow_set(left.negnow_set & right.negnow_set),
       notnow_set(left.notnow_set & right.notnow_set),
       notnext_set(left.notnext_set & right.notnext_set),
@@ -59,6 +73,7 @@ namespace spot
   tgba_bdd_core_data::declare_now_next(bdd now, bdd next)
   {
     now_set &= now;
+    next_set &= next;
     negnow_set &= !now;
     notnext_set &= now;
     notnow_set &= next;

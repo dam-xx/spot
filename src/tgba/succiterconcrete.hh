@@ -17,8 +17,8 @@ namespace spot
     ///   conditions and accepting conditions, represented as a BDD.
     ///   The job of this iterator will be to enumerate the
     ///   satisfactions of that BDD and split them into destination
-    ///   states and conditions, and compute accepting conditions.  
-    /// \param d The core data of the automata.  
+    ///   states and conditions, and compute accepting conditions.
+    /// \param d The core data of the automata.
     ///   These contains sets of variables useful to split a BDD, and
     ///   compute accepting conditions.
     tgba_succ_iterator_concrete(const tgba_bdd_core_data& d, bdd successors);
@@ -42,10 +42,6 @@ namespace spot
 			///  atomic proposition and Next variables.
     bdd current_state_;	///< Current successor, as a
 			///  conjunction of Now variables.
-    bdd current_base_;	///< Current successor base.
-    bdd current_base_left_; ///< Used to lists all possible full satisfaction
-			    /// current_base_ which haven't been explored.
-
   };
 }
 
