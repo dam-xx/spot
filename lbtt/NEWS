@@ -1,4 +1,4 @@
-lbtt NEWS -- history of user-visible changes.   7 Jul 2004
+lbtt NEWS -- history of user-visible changes.   30 Jul 2004
 Copyright (C) 2004 Heikki Tauriainen
 
    Permission is granted to anyone to make or distribute verbatim copies
@@ -11,6 +11,11 @@ Copyright (C) 2004 Heikki Tauriainen
    changed them.
 
 Please send bug reports to <heikki.tauriainen@hut.fi>.
+
+Version 1.1.1
+
+* This release includes fixes to build problems with non-GNU
+  compilers on GNU libc systems and a few minor bug fixes.
 
 Version 1.1.0
 

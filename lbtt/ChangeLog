@@ -1,3 +1,25 @@
+2004-07-30  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* Version 1.1.1 released.
+
+2004-07-30  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* src/TestOperations.cc (generateBuchiAutomaton): Protect
+	against referencing a null pointer returned by strsignal on
+	some platforms.
+	(performBuchiIntersectionCheck): Handle product size
+	exceptions gracefully.  Skip redundant writes to an unopened
+	transcript file.
+
+	* configure.ac: Update version.
+	* NEWS: Update.
+	* README: Update.
+
+2004-07-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* configure.ac: Call AC_GNU_SOURCE to make glibc's strsignal
+	definition visible even to non-GNU compilers.
+
 2004-07-07  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* Version 1.1.0 released.

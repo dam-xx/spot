@@ -1,8 +1,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.59])
-AC_INIT([lbtt], [1.1.0], [heikki.tauriainen@hut.fi])
-AC_REVISION([Revision: 1.4])
+AC_INIT([lbtt], [1.1.1], [heikki.tauriainen@hut.fi])
+AC_REVISION([Revision: 1.5])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
@@ -70,6 +70,7 @@ fi
 
 # Check for the availability of headers.
 
+AC_GNU_SOURCE
 AC_HEADER_STDC
 AC_CHECK_HEADERS([libintl.h fcntl.h sys/times.h])
 AC_HEADER_SYS_WAIT
@@ -148,7 +149,7 @@ if test "${slist_header}" != no; then
            [[${slist_namespace}::slist<int> s;]])],
         [break])
     fi
-  done  
+  done
   if test "${slist_namespace}" != error; then
     AC_MSG_RESULT([header <${slist_header}>, typename ${slist_namespace}::slist])
     AC_DEFINE(
@@ -167,7 +168,6 @@ fi
 
 if test "${slist_header}" = no; then
   AC_MSG_RESULT([no])
-
 fi
 
 AC_LANG(C)

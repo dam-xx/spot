@@ -1114,11 +1114,14 @@ void generateBuchiAutomaton
 	if (WIFSIGNALED(exitcode))
 	{
           failure_reason += "aborted by signal "
-	                    + toString(WTERMSIG(exitcode))
+	                    + toString(WTERMSIG(exitcode));
+
 #ifdef HAVE_STRSIGNAL
-			    + " (" + strsignal(WTERMSIG(exitcode)) + ")"
+	  const char* signame = strsignal(WTERMSIG(exitcode));
+	  if (signame != 0)
+	    failure_reason += " (" + string(signame) + ")";
 #endif /* HAVE_STRSIGNAL */
-			    ;
+
 	  if (WTERMSIG(exitcode) == SIGINT || WTERMSIG(exitcode) == SIGQUIT)
 	    raise(WTERMSIG(exitcode));
 	}
@@ -1776,6 +1779,7 @@ void performBuchiIntersectionCheck()
 	printText("\n\n", 2);
 
 	if (round_info.transcript_file.is_open())
+	{
 	  writeToTranscript("User break during Büchi automata intersection "
 			    "emptiness check");
 	  round_info.transcript_file << string(8, ' ') + "(+) "
@@ -1783,8 +1787,32 @@ void performBuchiIntersectionCheck()
 	                                + ", (-) "
 	                                + configuration.algorithmString(alg_2)
 	                                + "\n\n";
+	}
 
 	throw;
+      }
+      catch (const ::Graph::Product< ::Graph::BuchiProduct>::SizeException&)
+      {
+	if (!printText(": aborted (product may be too large)", 4))
+	  printText(" [Product may be too large: (+)  "
+		    + configuration.algorithmString(alg_1)
+		    + ", (-)  "
+		    + configuration.algorithmString(alg_2)
+		    + "]",
+		    2,
+		    6);
+	printText("\n", 2);
+
+	if (round_info.transcript_file.is_open())
+	{
+	  writeToTranscript("Automata intersection emptiness check aborted "
+			    "(product may be too large)");
+	  round_info.transcript_file << string(8, ' ') + "(+) "
+	                                + configuration.algorithmString(alg_1)
+	                                + ", (-) "
+	                                + configuration.algorithmString(alg_2)
+	                                + "\n\n";
+	}
       }
       catch (const bad_alloc&)
       {
@@ -1799,6 +1827,7 @@ void performBuchiIntersectionCheck()
 	printText("\n", 2);
 
 	if (round_info.transcript_file.is_open())
+	{
 	  writeToTranscript("Out of memory during Büchi automata "
 			    "intersection emptiness check");
 	  round_info.transcript_file << string(8, ' ') + "(+) "
@@ -1806,6 +1835,7 @@ void performBuchiIntersectionCheck()
 	                                + ", (-) "
 	                                + configuration.algorithmString(alg_2)
 	                                + "\n\n";
+	}
       }
     }
   }
