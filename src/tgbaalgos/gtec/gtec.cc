@@ -234,6 +234,13 @@ namespace spot
     return ecs_;
   }
 
+  std::ostream&
+  couvreur99_check::print_stats(std::ostream& os) const
+  {
+    ecs_->print_stats(os);
+    return os;
+  }
+
   //////////////////////////////////////////////////////////////////////
 
   couvreur99_check_shy::couvreur99_check_shy(const tgba* a,

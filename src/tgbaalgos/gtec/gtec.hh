@@ -79,6 +79,8 @@ namespace spot
     /// Check whether the automaton's language is empty.
     virtual emptiness_check_result* check();
 
+    virtual std::ostream& print_stats(std::ostream& os) const;
+
     /// \brief Return the status of the emptiness-check.
     ///
     /// When check() succeed, the status should be passed along

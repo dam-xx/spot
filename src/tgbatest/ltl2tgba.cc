@@ -58,9 +58,10 @@ syntax(char* prog)
 	    << "  -A    same as -a, but as a set" << std::endl
 	    << "  -d    turn on traces during parsing" << std::endl
 	    << "  -D    degeneralize the automaton" << std::endl
-	    << "  -eALGO emptiness-check, expect and compute an accepting run"
+	    << "  -e[ALGO]  emptiness-check, expect and compute an "
+	    << "accepting run" << std::endl
+	    << "  -E[ALGO]  emptiness-check, expect no accepting run"
 	    << std::endl
-	    << "  -EALGO emptiness-check, expect no accepting run" << std::endl
             << "  -f    use Couvreur's FM algorithm for translation"
 	    << std::endl
             << "  -F    read the formula from the file" << std::endl
@@ -113,7 +114,7 @@ syntax(char* prog)
 	    << "(implies -f)" << std::endl
 	    << std::endl
 	    << "Where ALGO should be one of:" << std::endl
-	    << "  couvreur99" << std::endl
+	    << "  couvreur99 (the default)" << std::endl
 	    << "  couvreur99_shy" << std::endl
 	    << "  magic_search" << std::endl
 	    << "  magic_search_repeated" << std::endl;
@@ -560,6 +561,7 @@ main(int argc, char** argv)
 	  do
 	    {
 	      spot::emptiness_check_result* res = ec->check();
+	      ec->print_stats(std::cout);
 	      if (expect_counter_example != !!res)
 		exit_code = 1;
 
