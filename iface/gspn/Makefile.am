@@ -51,6 +51,9 @@ EXTRA_DIST = \
   examples/simple/simple.def \
   examples/simple/simple.net \
   examples/simple/simple.tobs \
+  examples/udcs/udcs.def \
+  examples/udcs/udcs.net \
+  examples/udcs/udcs.tobs \
   $(TESTS)
 
 TESTS = \
@@ -58,7 +61,10 @@ TESTS = \
   dcswave.test \
   dcswaveltl.test \
   dcswavefm.test \
-  dcswaveeltl.test
+  dcswaveeltl.test \
+  udcsltl.test \
+  udcseltl.test
+XFAIL_TESTS = udcseltl.test
 
 # Each test case depends on defs.
 check_SCRIPTS = defs

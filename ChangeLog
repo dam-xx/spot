@@ -1,5 +1,12 @@
 2003-10-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* iface/gspn/udcsltl.test, iface/gspn/udcseltl.test: New files
+	* iface/gspn/Makefile.am (TESTS): Add them.
+	(XFAIL_TESTS): Add udcseltl.test.
+	* iface/gspn/example/udcs/udcs.net, iface/gspn/example/udcs/udcs.def
+	iface/gspn/example/udcs/udcs.tobs: New files.
+	* iface/gspn/Makefile.am (EXTRA_DIST): Add them.
+
 	* iface/gspn/Makefile.am (check_PROGRAMS): Add eltlgspn-srg.
 	(eltlgspn_srg_SOURCES, eltlgspn_srg_LDADD, eltlgspn_srg_CPPFLAGS):
 	New variables.
