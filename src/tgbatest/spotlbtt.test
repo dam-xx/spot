@@ -72,6 +72,13 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- FM), fake, LTL simplifications by ltl2ba"
+   Path = "${LBTT_TRANSLATE} --spot '${srcdir}/ltl2baw.pl --spot=\"-f -T\" -F'"
+   Enabled = no
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM exprop)"
    Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -fx -t'"
    Enabled = yes
@@ -90,6 +97,112 @@ Algorithm
    Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -fx -T'"
    Enabled = no
 }
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM exprop), fake, LTL simplifications by ltl2ba"
+   Path = "${LBTT_TRANSLATE} --spot '${srcdir}/ltl2baw.pl --spot=\"-fx -T\" -F'"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Spin"
+   Path = "${LBTT_TRANSLATE} --spin spin"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "LBT"
+   Path = "${LBTT_TRANSLATE} --lbt lbt"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "LTL2BA"
+   Path = "${LBTT_TRANSLATE} --spin ltl2ba"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "LTL2BA, generalized fake"
+   Path = "${LBTT_TRANSLATE} --spot '${srcdir}/ltl2baw.pl -F'"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "LTL2BA without LTL and SCC simplifications"
+   Path = "${LBTT_TRANSLATE} --spin 'ltl2ba -l -c'"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "LTL2BA without LTL and SCC simplifications, generalized fake"
+   Path = "${LBTT_TRANSLATE} --spot '${srcdir}/ltl2baw.pl -l -c -F'"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Wring (GPVW)"
+   Path = "cd ~/src/wring2lbtt && ./wring2lbtt --0"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Wring (GPVW+)"
+   Path = "cd ~/src/wring2lbtt && ./wring2lbtt --1"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Wring (LTL2AUT)"
+   Path = "cd ~/src/wring2lbtt && ./wring2lbtt --2"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Wring (Wring RewRule)"
+   Path = "cd ~/src/wring2lbtt && ./wring2lbtt --3"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Wring (Wring RewRule+BoolOpt)"
+   Path = "cd ~/src/wring2lbtt && ./wring2lbtt --4"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Wring (Wring RewRule+BoolOpt+AutSempl)"
+   Path = "cd ~/src/wring2lbtt && ./wring2lbtt --5"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Wring (Wring BoolOpt)"
+   Path = "cd ~/src/wring2lbtt && ./wring2lbtt --6"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Wring (Wring RewRule+BoolOpt), degeneralized"
+   Path = "cd ~/src/wring2lbtt && ./wring2lbtt -d --4"
+   Enabled = no
+}
+
 
 GlobalOptions
 {
@@ -116,6 +229,8 @@ FormulaOptions
 
   AndPriority = 10
   OrPriority = 10
+  # XorPriority = 0
+  # EquivalencePriority = 0
 
   BeforePriority = 0
   StrongReleasePriority = 0

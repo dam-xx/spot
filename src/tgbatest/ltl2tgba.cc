@@ -229,17 +229,24 @@ main(int argc, char** argv)
 
   if (file_opt)
     {
-      std::ifstream fin(argv[formula_index]);
-      if (! fin)
+      if (strcmp(argv[formula_index], "-"))
 	{
-	  std::cerr << "Cannot open " << argv[formula_index] << std::endl;
-	  exit(2);
-	}
+	  std::ifstream fin(argv[formula_index]);
+	  if (! fin)
+	    {
+	      std::cerr << "Cannot open " << argv[formula_index] << std::endl;
+	      exit(2);
+	    }
 
-      if (! std::getline(fin, input, '\0'))
+	  if (! std::getline(fin, input, '\0'))
+	    {
+	      std::cerr << "Cannot read " << argv[formula_index] << std::endl;
+	      exit(2);
+	    }
+	}
+      else
 	{
-	  std::cerr << "Cannot read " << argv[formula_index] << std::endl;
-	  exit(2);
+	  std::getline(std::cin, input, '\0');
 	}
     }
   else
@@ -266,9 +273,11 @@ main(int argc, char** argv)
       if (from_file)
 	{
 	  spot::tgba_parse_error_list pel;
-	  to_free = a = spot::tgba_parse(input, pel, dict, env, debug_opt);
+	  spot::tgba_explicit* e;
+	  to_free = a = e = spot::tgba_parse(input, pel, dict, env, debug_opt);
 	  if (spot::format_tgba_parse_errors(std::cerr, pel))
 	    return 2;
+	  e->merge_transitions();
 	}
       else
 	{

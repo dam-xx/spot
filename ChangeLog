@@ -1,3 +1,14 @@
+2004-02-11  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/ltl2tgba.cc (syntax): Recognize "-" as input
+	filename for the formula.  Merge the transitions of automata
+	read with -X.
+	* src/tgbatest/spotlbtt.test: Add many disabled algorithms.
+	It is convenient to reuse the `config' file created by this
+	test when making statistics.
+	* src/tgbatest/ltl2baw.pl: New file.
+	* src/tgbatest/Makefile.am (EXTRA_DIST): Add ltl2baw.pl.
+
 2004-02-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* wrap/python/libpy.c: Update from Swig 1.3.21.
