@@ -216,7 +216,7 @@ if show_dictionnay:
     automaton.get_dict().dump(spot.get_cout())
     print '</pre>'
 
-if (type(automaton) == spot.tgba_bdd_concrete
+if (type(automaton) == spot.tgba_bdd_concretePtr
     and (show_relation_dot or show_relation_set or show_relation_gif)):
     print '<H3>Transition relation</H3>'
     if show_relation_dot:
@@ -236,7 +236,7 @@ if (type(automaton) == spot.tgba_bdd_concrete
                    imgprefix + '-b.gif', imgprefix + '-b.png')
 	print '<img src="' + imgprefix + '-b.png">'
 
-if (type(automaton) == spot.tgba_bdd_concrete
+if (type(automaton) == spot.tgba_bdd_concretePtr
     and (show_acceptance_dot or show_acceptance_set or show_acceptance_gif)):
     print '<H3>Acceptance relation</H3>'
     if show_acceptance_dot:

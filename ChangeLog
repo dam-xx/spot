@@ -1,5 +1,8 @@
 2003-08-22  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* wrap/python/cgi/ltl2tgba.in: Fix display of relations for
+	tgba_bdd_concrete automata.
+
 	Fix computation of product acceptance conditions, when the
 	two operands share some acceptance conditions.
 	* src/tgba/tgbaproduct.hh (tgba_product::left_acc_complement_,
