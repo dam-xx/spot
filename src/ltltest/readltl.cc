@@ -34,21 +34,8 @@ main(int argc, char **argv)
 					    pel, debug);
 
   spot::ltl::parse_error_list::iterator it;
-  for (it = pel.begin(); it != pel.end(); ++it)
-    {
-      std::cerr << ">>> " << argv[formulae_index] << std::endl;
-      unsigned n = 0;
-      yy::Location& l = it->first;
-      for (; n < 4 + l.begin.column; ++n)
-	std::cerr << ' ';
-      // Write at least one '^', even if begin==end.
-      std::cerr << '^';
-      ++n;
-      for (; n < 4 + l.end.column; ++n)
-	std::cerr << '^';
-      std::cerr << std::endl << it->second << std::endl << std::endl;
-      exit_code = 1;
-    }
+  exit_code = 
+    spot::ltl::format_parse_errors(std::cerr, argv[formulae_index], pel);
 
   if (f)
     {

@@ -21,6 +21,7 @@ $(FROM_LTLPARSE_YY_OTHERS): $(LTLPARSE_YY)
 	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) $(FROM_LTLPARSE_YY_MAIN)
 
 libltlparse_a_SOURCES = \
+  fmterror.cc \
   $(FROM_LTLPARSE_YY) \
   ltlscan.ll \
   parsedecl.hh \

@@ -1,5 +1,11 @@
 2003-04-16  Alexandre DURET-LUTZ  <aduret@circe.lip6.fr>
 
+	* src/ltlparse/public.hh (format_parse_errors): New function.
+	* src/ltlparse/fmterror.cc: New file.
+	* src/ltlparse/Makefile.am (libltlparse_a_SOURCES): Add fmterror.cc.
+	* src/ltltests/equals.cc, src/ltltests/readltl.cc: Simplify using
+	format_parse_errors.
+
 	* src/ltlvisit/equals.cc, src/ltlvisit/equals.hh: New files.
 	* src/ltlvisit/Makefile.am (libltlvisit_a_SOURCES): Add equals.hh
 	and equals.cc.

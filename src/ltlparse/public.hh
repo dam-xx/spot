@@ -6,6 +6,7 @@
 # include "location.hh"
 # include <list>
 # include <utility>
+# include <iostream>
 
 namespace spot 
 {
@@ -18,6 +19,11 @@ namespace spot
     formulae* parse(const std::string& ltl_string, 
 		    parse_error_list& error_list,
 		    bool debug = false);
+
+    // Return true iff any diagnostic was output to os.
+    bool format_parse_errors(std::ostream& os,
+			     const std::string& ltl_string,
+			     parse_error_list& error_list);
   }
 }
 
