@@ -30,6 +30,13 @@
 
 #ifdef HAVE_OBSTACK_H
 
+/* GNU libc 2.3's copy of obstack.h uses a definition of __INT_TO_PTR 
+   which does not compile in C++.  Fortunately it will not override
+   an existing definition.  */
+#if __GLIBC__ == 2 && __GLIBC_MINOR__ == 3
+# define __INT_TO_PTR(P) ((P) + (char *) 0)
+#endif
+
 #include <obstack.h>
 #include <cstdlib>
 #include <new>
@@ -118,7 +125,7 @@ inline void* ObstackAllocator::alloc(int size)
  *
  * ------------------------------------------------------------------------- */
 {
-  return obstack_alloc(&store, size);
+   return obstack_alloc(&store, size);
 }
 
 /* ========================================================================= */

@@ -368,7 +368,7 @@ static inline bool isLocked(int option)
 /* Punctuation symbols. */
 
 %token CFG_LBRACE CFG_RBRACE CFG_EQUALS
-%token CFG_BLOCK_ID, CFG_OPTION_ID
+%token CFG_BLOCK_ID CFG_OPTION_ID
 
 /* The `unknown' token. */
 

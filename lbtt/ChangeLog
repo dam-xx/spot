@@ -1,3 +1,9 @@
+2003-07-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/Config-parse.yy: Remove stray `,' in %token arguments.
+	* src/Alloc.h (__INT_TO_PTR): Redefine to work around glibc 2.3.
+	* doc/texinfo.tex: New upstream version.
+
 2002-10-01  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* Version 1.0.1 released.
@@ -6,21 +12,21 @@
 
 	* Alloc.h: Use preprocessor macro HAVE_SINGLE_CLIENT_ALLOC
 	instead of HAVE_SGI_STL in #ifdef conditionals.
-	
+
 	* BitArray.cc (BitArray::BitArray): Do not clear the allocated
 	array after initialization. All callers updated to reflect the
 	changed constructor semantics.
-	
+
 	* BitArray.cc (BitArray::bitwiseAnd, BitArray::bitwiseOr)
 	(BitArray::bitwiseXor): New functions.
 
 	* BitArray.cc (BitArray::equal, BitArray::subset)
 	(BitArray::count): Fix `&' operator precedence in comparisons.
-	
+
 	* BitArray.cc (BitArray::hammingDistance): Use the `bit_counts'
 	array to compute the result instead of scanning the array bit by
 	bit.
-	
+
 	* BitArray.cc: Documentation fixes.
 
 	* BitArray.h (BitArray::bitwiseAnd, BitArray::bitwiseOr)
@@ -44,7 +50,7 @@
 
 	* BuchiAutomaton.cc: Documentation fixes.
 
-	* BuchiAutomaton.h (BuchiAutomaton::regularize): Changed 
+	* BuchiAutomaton.h (BuchiAutomaton::regularize): Changed
 	semantics (see above).
 
 	* BuchiAutomaton.h
@@ -76,14 +82,14 @@
 	preprocessor macro SLIST_NAMESPACE.
 
 	* EdgeContainer.h: Remove uses of redundant preprocessor macros.
-	
+
 	* Graph.h: Renamed to Graph.h.in to implement the optional
 	inclusion of the slist header using an autoconf substitution
 	variable.
 
 	* Graph.h.in: Use HAVE_SLIST macro instead of HAVE_SGI_STL in
 	#ifdef conditionals.
-	
+
 	* Graph.h.in (Graph::Edge, Graph::Node): Make classes public (to
 	prevent warnings from Intel C++ Compiler).
 
@@ -140,7 +146,7 @@
 
 	* src/Makefile.am: Remove redundant references to @LEXLIB@ (the
 	sources are independent of any external lexer library).
-	
+
 	* NeverClaimAutomaton.cc (NeverClaimAutomaton::write): Add
 	detection for jumps to undefined never claim labels.
 
@@ -153,7 +159,7 @@
 	* ProductAutomaton.cc (ProductAutomaton::computeProduct):
 	Avoid creating a temporary Bitset object when checking the
 	enabledness of a product transition.
-	
+
 	* ProductAutomaton.cc (ProductAutomaton::findAcceptingExecution)
 	Use BitArrays instead of Bitsets.
 
@@ -179,12 +185,12 @@
 
 	* TestOperations.cc (performEmptinessCheck): Added a colon to
 	the end of the "Accepting cycles" message.
-	
+
 	* TestRoundInfo.h: Removed redundant inclusion of BitArray.h.
 
 	* translate.cc (main): Use autoconf-generated PACKAGE_VERSION
 	macro for displaying program version.
-	
+
 	* translate.cc (main): Fix bug in checking the number of
 	command line arguments.
 
@@ -195,7 +201,7 @@
 	against the internal model checking algorithm).
 
 	* version.h.in: Removed.
-	
+
 2001-11-12  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* Version 1.0.0 released.
