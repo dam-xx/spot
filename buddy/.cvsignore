@@ -6,3 +6,5 @@ tools
 config.log
 config.status
 libtool
+*.tar.gz
+autom4te.cache
