@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -70,7 +70,11 @@ for f in \
   'a U b U c U d U e U f U g U h U i U j U k U l U m' \
   '(ab * !Xad + ad U ab) & FG p12 /\ GF p13' \
   '((([]<>()p12))   )' \
-  'a R ome V anille'
+  'a R ome V anille' \
+  'p=0Uq=1' \
+  '((p=1Rq=1)+p=0)UXq=0' \
+  '((X(p2=0))U(X(p2=0)))+((Xp1=0)UFALSE)'
+
 do
   if ./ltl2text "$f"; then
     :

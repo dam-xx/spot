@@ -48,7 +48,9 @@ namespace spot
       visit(const atomic_prop* ap)
       {
 	std::string str = ap->name();
-	if (str[0] == 'F' || str[0] == 'G' || str[0] == 'X')
+	if (str[0] == 'F' || str[0] == 'G' || str[0] == 'X'
+	    || !strcasecmp(str.c_str(), "true")
+	    || !strcasecmp(str.c_str(), "false"))
 	  {
 	    os_ << '"' << str << '"';
 	  }

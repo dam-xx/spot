@@ -82,7 +82,7 @@ using namespace spot::ltl;
 %token <str> ATOMIC_PROP "atomic proposition" OP_NOT "not operator"
 %token CONST_TRUE "constant true" CONST_FALSE "constant false"
 %token END_OF_INPUT "end of formula"
-
+%token OP_POST_NEG "negative suffix" OP_POST_POS "positive suffix"
 
 /* Priorities.  */
 
@@ -97,8 +97,10 @@ using namespace spot::ltl;
 %nonassoc OP_F OP_G
 %nonassoc OP_X
 
-/* Not has the most important priority.  */
+/* Not has the most important priority after Wring's `=0' and `=1'.  */
 %nonassoc OP_NOT
+
+%nonassoc OP_POST_NEG OP_POST_POS
 
 %type <ltl> result subformula
 
@@ -151,6 +153,41 @@ subformula: ATOMIC_PROP
 		  }
 		else
 		  delete $1;
+	      }
+	    | ATOMIC_PROP OP_POST_POS
+	      {
+		$$ = parse_environment.require(*$1);
+		if (! $$)
+		  {
+		    std::string s = "unknown atomic proposition `";
+		    s += *$1;
+		    s += "' in environment `";
+		    s += parse_environment.name();
+		    s += "'";
+		    error_list.push_back(parse_error(@1, s));
+		    delete $1;
+		    YYERROR;
+		  }
+		else
+		  delete $1;
+	      }
+	    | ATOMIC_PROP OP_POST_NEG
+	      {
+		$$ = parse_environment.require(*$1);
+		if (! $$)
+		  {
+		    std::string s = "unknown atomic proposition `";
+		    s += *$1;
+		    s += "' in environment `";
+		    s += parse_environment.name();
+		    s += "'";
+		    error_list.push_back(parse_error(@1, s));
+		    delete $1;
+		    YYERROR;
+		  }
+		else
+		  delete $1;
+		$$ = unop::instance(unop::Not, $$);
 	      }
 	    | CONST_TRUE
 	      { $$ = constant::true_instance(); }

@@ -1,4 +1,4 @@
-/* Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -51,57 +51,87 @@ flex_set_buffer(const char* buf)
 
 %}
 
+%s not_prop
+
 %%
 
 %{
   yylloc->step();
 %}
 
-"("			return PAR_OPEN;
-")"			return PAR_CLOSE;
+"("				BEGIN(0); return PAR_OPEN;
+")"				BEGIN(not_prop); return PAR_CLOSE;
 
-"!"			return OP_NOT;
+  /* Must go before the other operators, because the F of FALSE
+     should not be mistaken with a unary F. */
+"1"|[tT][rR][uU][eE]		BEGIN(0); return CONST_TRUE;
+"0"|[fF][aA][lL][sS][eE]	BEGIN(0); return CONST_FALSE;
+
+
+
+"!"				BEGIN(0); return OP_NOT;
+
   /* & and | come from Spin.  && and || from LTL2BA.
      /\, \/, and xor are from LBTT.
   */
-"||"|"|"|"+"|"\\/"	return OP_OR;
-"&&"|"&"|"."|"*"|"/\\"	return OP_AND;
-"^"|"xor"		return OP_XOR;
-"=>"|"->"		return OP_IMPLIES;
-"<=>"|"<->"		return OP_EQUIV;
+"||"|"|"|"+"|"\\/"		BEGIN(0); return OP_OR;
+"&&"|"&"|"."|"*"|"/\\"		BEGIN(0); return OP_AND;
+"^"|"xor"			BEGIN(0); return OP_XOR;
+"=>"|"->"			BEGIN(0); return OP_IMPLIES;
+"<=>"|"<->"			BEGIN(0); return OP_EQUIV;
 
   /* <>, [], and () are used in Spin.  */
-"F"|"<>"		return OP_F;
-"G"|"[]"		return OP_G;
-"U"			return OP_U;
-"R"|"V"			return OP_R;
-"X"|"()"		return OP_X;
+"F"|"<>"			BEGIN(0); return OP_F;
+"G"|"[]"			BEGIN(0); return OP_G;
+"U"				BEGIN(0); return OP_U;
+"R"|"V"				BEGIN(0); return OP_R;
+"X"|"()"			BEGIN(0); return OP_X;
 
-"1"|"true"		return CONST_TRUE;
-"0"|"false"		return CONST_FALSE;
+"=0"				return OP_POST_NEG;
+"=1"				return OP_POST_POS;
 
-[ \t\n]+		/* discard whitespace */ yylloc->step ();
+[ \t\n]+			/* discard whitespace */ yylloc->step ();
 
   /* An Atomic proposition cannot start with the letter
      used by a unary operator (F,G,X), unless this
      letter is followed by a digit in which case we assume
      it's an ATOMIC_PROP (even though F0 could be seen as Ffalse, we
-     don't).  */
-[a-zA-EH-WYZ_][a-zA-Z0-9_]* |
-[FGX][0-9_][a-zA-Z0-9_]* {
-		  yylval->str = new std::string(yytext);
-	          return ATOMIC_PROP;
-		}
+     don't).
+  */
+<INITIAL>[a-zA-EH-WYZ_][a-zA-Z0-9_]* |
+<INITIAL>[FGX][0-9_][a-zA-Z0-9_]* |
+  /*
+     However if we have just parsed an atomic proposition, then we
+     are not expecting another atomic proposition, so we can be stricter
+     and disallow propositions that start with U, R and V.  If you wonder
+     why we do this, consider the Wring formula `p=0Uq=1'.  When p is
+     parsed, we enter the not_prop start condition, we remain into this
+     condition when `=0' is processed, and then because we are in this
+     condition we will not consider `Uq' as an atomic proposition but as
+     a `U' operator followed by a `q' atomic proposition.
+
+     We also disable atomic proposition that may look  a combination
+     of a binary operator followed by several unary operators.
+     E.g. UFXp.   This way, `p=0UFXp=1' will be parsed as `(p=0)U(F(X(p=1)))'.
+  */
+<not_prop>[a-zA-EH-QSTWYZ_][a-zA-EH-WYZ0-9_]* |
+<not_prop>[a-zA-EH-QSTWYZ_][a-zA-EH-WYZ0-9_][a-zA-Z0-9_]* {
+			  yylval->str = new std::string(yytext);
+			  BEGIN(not_prop);
+			  return ATOMIC_PROP;
+			}
 
   /* Atomic propositions can also be enclosed in double quotes.  */
-\"[^\"]*\"	{
-		  yylval->str = new std::string(yytext + 1, yyleng - 2);
-	          return ATOMIC_PROP;
-		}
+\"[^\"]*\"		{
+			  yylval->str = new std::string(yytext + 1,
+			                                yyleng - 2);
+			  BEGIN(not_prop);
+			  return ATOMIC_PROP;
+			}
 
-.		return *yytext;
+.			return *yytext;
 
-<<EOF>>		return END_OF_INPUT;
+<<EOF>>			return END_OF_INPUT;
 
 %{
   /* Dummy use of yyunput to shut up a gcc warning.  */

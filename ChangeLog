@@ -1,3 +1,15 @@
+2004-05-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlparse/ltlparse.yy (OP_POST_NEG, OP_POST_POS): New tokens.
+	(subformula): Recognize `ATOMIC_PROP OP_POST_POS' and
+	`ATOMIC_PROP OP_POST_NEG'.
+	* src/ltlparse/ltlscan.ll: Introduce the not_prop start condition,
+	to restrict the set of atomic propositions allowed in places
+	where they are not expected.  Make `true' and `false' case insensitive.
+	* src/ltltest/parse.test, src/ltltest/tostring.test: More cases.
+	* src/ltlvisit/tostring.cc (to_string_visitor): Quote atomic
+	propositions equal to "true" or "false".
+
 2004-05-11  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltltest/Makefile.am (TESTS): Run inf.test and reduc.test last.
