@@ -60,17 +60,17 @@ namespace spot
     }
 
     void
-    inc_depth()
+    inc_depth(int n = 1)
     {
-      ++depth_;
+      depth_ += n;
       if (depth_ > max_depth_)
 	max_depth_ = depth_;
     }
 
     void
-    dec_depth()
+    dec_depth(int n = 1)
     {
-      --depth_;
+      depth_ -= n;
     }
 
     int
@@ -89,6 +89,12 @@ namespace spot
     max_depth() const
     {
       return max_depth_;
+    }
+
+    int
+    depth() const
+    {
+      return depth_;
     }
 
   private :

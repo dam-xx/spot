@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -292,9 +292,10 @@ namespace spot
 	    if (spi.first == 0)
 	      delete q->s;
 	  }
+	dec_depth(todo.back().q.size());
 	todo.pop_back();
-	dec_depth();
       }
+    assert(depth() == 0);
   }
 
   emptiness_check_result*
@@ -316,7 +317,6 @@ namespace spot
 	    int index = todo.back().n;
 	    // Backtrack TODO.
 	    todo.pop_back();
-	    dec_depth();
 	    if (todo.empty())
 	      {
 		// This automaton recognizes no word.
@@ -341,6 +341,7 @@ namespace spot
 	// Pick one successor off the list.
 	successor succ = queue.front();
 	queue.pop_front();
+	dec_depth();
 
 	int& n = ecs_->h->index_and_insert(succ.s);
 	// Skip dead states.
@@ -373,7 +374,6 @@ namespace spot
 	ecs_->root.push(num);
 	arc.push(succ.acc);
 	todo.push_back(todo_item(succ.s, num));
-	inc_depth();
 	succ_queue* new_queue = &todo.back().q;
 	tgba_succ_iterator* iter = ecs_->aut->succ_iter(succ.s);
 	succ_queue::iterator merge_end;
@@ -389,6 +389,7 @@ namespace spot
 	    if (!i)
 	      {
 		new_queue->push_back(successor(acc, dest));
+		inc_depth();
 		continue;
 	      }
 	    // Skip dead states.
@@ -457,7 +458,6 @@ namespace spot
 		      }
 		    prev->q.splice(prev->q.end(), last->q);
 		    todo.pop_back();
-		    dec_depth();
 		  }
 		new_queue = &todo.back().q;
 	      }
@@ -477,6 +477,7 @@ namespace spot
 		bdd acc = old->acc;
 		// Delete other states.
 		new_queue->erase(old);
+		dec_depth();
 		// Delete dead states.
 		if (*i == -1)
 		  continue;
