@@ -40,10 +40,12 @@ flex_set_buffer(const char *buf)
 ")"			return PAR_CLOSE;
 
 "!"			return OP_NOT;
-  /* & and | come from Spin.  && and || from LTL2BA.  */
-"||"|"|"|"+"		return OP_OR;
-"&&"|"&"|"."|"*"	return OP_AND;
-"^"			return OP_XOR;
+  /* & and | come from Spin.  && and || from LTL2BA.  
+     /\, \/, and xor are from LBTT. 
+  */
+"||"|"|"|"+"|"\\/"	return OP_OR;
+"&&"|"&"|"."|"*"|"/\\"	return OP_AND;
+"^"|"xor"		return OP_XOR;
 "=>"|"->"		return OP_IMPLIES;
 "<=>"|"<->"		return OP_EQUIV;
 
@@ -62,7 +64,8 @@ flex_set_buffer(const char *buf)
   /* An Atomic proposition cannot start with the letter
      used by a unary operator (F,G,X), unless this
      letter is followed by a digit in which case we assume
-     it's an ATOMIC_PROP (even though F0 could be seen as Ffalse).  */
+     it's an ATOMIC_PROP (even though F0 could be seen as Ffalse, we
+     don't).  */
 [a-zA-EH-WYZ_][a-zA-Z0-9_]* | 
 [FGX][0-9_][a-zA-Z0-9_]* { 
 		  yylval->str = new std::string(yytext); 

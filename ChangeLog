@@ -1,5 +1,8 @@
 2003-07-29  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/ltlparse/ltlscan.ll: Allow /\, \/, and xor, used in LBTT.
+	* src/ltltest/parse.test: Test them.
+
 	* src/tgbaalgos/lbtt.cc: Typos.
 
 	* lbtt/: Upgrade to lbtt 1.0.2.
