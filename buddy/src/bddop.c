@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddop.c,v 1.5 2003/05/20 08:22:36 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddop.c,v 1.6 2003/05/22 12:09:20 aduret Exp $
   FILE:  bddop.c
   DESCR: BDD operators
   AUTH:  Jorn Lind
@@ -1426,7 +1426,7 @@ SECTION {* operator *}
 SHORT   {* coudert and Madre's restrict function *}
 PROTO   {* BDD bdd_simplify(BDD f, BDD d) *}
 DESCR   {* Tries to simplify the BDD {\tt f} by restricting it to the
-	   domaine covered by {\tt d}. No checks are done to see if the
+	   domain covered by {\tt d}. No checks are done to see if the
 	   result is actually smaller than the input. This can be done
 	   by the user with a call to {\tt bdd\_nodecount}. *}
 ALSO    {* bdd\_restrict *}
