@@ -27,10 +27,10 @@
 
 set -e
 
-./tunenoform '!(a ^ b)' '(a|!b) & (!a|b)'
-./tunenoform '!(a <=> b)' '(a|b) & (!a|!b)'
-./tunenoform '!(a => b)' 'a&!b'
-./tunenoform '!(!a => !b)' '!a&b'
-./tunenoform '!Fa' 'false R !a'
-./tunenoform '!G!a' 'true U a'
-./tunenoform '!(GF a => FG b)' '(0 R (1 U a)) & (0 R (1 U !b))'
+run 0 ./tunenoform '!(a ^ b)' '(a|!b) & (!a|b)'
+run 0 ./tunenoform '!(a <=> b)' '(a|b) & (!a|!b)'
+run 0 ./tunenoform '!(a => b)' 'a&!b'
+run 0 ./tunenoform '!(!a => !b)' '!a&b'
+run 0 ./tunenoform '!Fa' 'false R !a'
+run 0 ./tunenoform '!G!a' 'true U a'
+run 0 ./tunenoform '!(GF a => FG b)' '(0 R (1 U a)) & (0 R (1 U !b))'

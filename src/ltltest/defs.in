@@ -46,6 +46,26 @@ test -z "$VERBOSE" && exec >/dev/null 2>&1
 echo "== Running test $0"
 
 DOT='@DOT@'
+VALGRIND='@VALGRIND@'
+
+run()
+{
+  expected_exitcode=$1
+  shift
+  exitcode=0
+  if test -n "$VALGRIND"; then
+    exec 6>valgrind.err
+    # No --leak-check=yes for now, as it causes parserr.test to fail.
+    GLIBCPP_FORCE_NEW=1 \
+    $VALGRIND --logfile-fd=6 -q "$@" || exitcode=$?
+    cat valgrind.err 1>&2
+    test -z "`sed 1q valgrind.err`" || exit 50
+    rm -f valgrind.err
+  else
+    "$@" || exitcode $?
+  fi
+  test $exitcode = $expected_exitcode || exit 1
+}
 
 # Turn on shell traces when VERBOSE=x.
 if test "x$VERBOSE" = xx; then

@@ -80,7 +80,7 @@ do
   fi
 
   if test -n "$DOT"; then
-    ./ltl2dot "$f" > parse.dot
+    run 0 ./ltl2dot "$f" > parse.dot
     if $DOT -o /dev/null parse.dot; then
       rm -f parse.dot
     else

@@ -22,7 +22,7 @@
 AC_PREREQ([2.57])
 AC_INIT([spot], [0.0m])
 AC_CONFIG_AUX_DIR([tools])
-AM_INIT_AUTOMAKE([nostdinc check-news 1.7.3])
+AM_INIT_AUTOMAKE([gnits nostdinc 1.8])
 
 adl_ENABLE_DEVEL
 adl_CHECK_PYTHON
@@ -46,6 +46,7 @@ ad_GCC_OPTIM
 adl_NDEBUG
 
 AC_CHECK_PROG([DOT], [dot], [dot])
+AC_CHECK_PROG([VALGRIND], [valgrind], [valgrind])
 
 AC_CONFIG_FILES([
   Makefile

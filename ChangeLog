@@ -1,5 +1,16 @@
 2003-12-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltltest/defs.in (run): New function, run valgrind.
+	* src/ltltest/equals.test, src/ltltest/lunabbrev.test,
+	src/ltltest/nenoform.test, src/ltltest/parse.test,
+	src/ltltest/parseerr.test, src/ltltest/tostring.test,
+	src/ltltest/tunabbrev.test, src/ltltest/tunenoform.test: Use run().
+	* Makefile.am (EXTRA_DIST): Don't list the m4/*.m4 files,
+	Automake 1.8 find them automatically.
+	* configure.ac: Require Automake 1.8, in gnits mode, and check
+	for valgrind.
+	* THANKS: New empty file.
+
 	* doc/Doxyfile.in: Upgrade to Doxygen 1.3.5.  Build
 	documentation for iface/.
 	* dox/mainpage.dox: Fix reference to ltl_to_tgba.

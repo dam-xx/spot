@@ -28,26 +28,21 @@
 
 check()
 {
-  if ./ltl2text "$1" >stdout; then
-    echo "ltl2text unexpectedly parsed '$1' successfully"
-    rm -f stdout
-    exit 1
+  run 1 ./ltl2text "$1" >stdout
+  if test -n "$2"; then
+    echo "$2" >expect
   else
-    if test -n "$2"; then
-      echo "$2" >expect
-    else
-      : >expect
-    fi
-    if cmp stdout expect; then
-      :
-    else
-      echo "'$1' parsed as"
-      cat stdout
-      echo "instead of"
-      cat expect
-      rm -f stdout expect
-      exit 1
-    fi
+    : >expect
+  fi
+  if cmp stdout expect; then
+    :
+  else
+    echo "'$1' parsed as"
+    cat stdout
+    echo "instead of"
+    cat expect
+    rm -f stdout expect
+    exit 1
   fi
 }
 
