@@ -28,6 +28,7 @@ misc_HEADERS = \
   bddalloc.hh \
   bddlt.hh \
   escape.hh \
+  freelist.hh \
   hash.hh \
   minato.hh \
   version.hh
@@ -36,5 +37,6 @@ noinst_LTLIBRARIES = libmisc.la
 libmisc_la_SOURCES = \
   bddalloc.cc \
   escape.cc \
+  freelist.cc \
   minato.cc \
   version.cc

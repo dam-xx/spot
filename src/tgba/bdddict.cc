@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -269,9 +269,7 @@ namespace spot
 	to_string(fi->first, os) << "]" << std::endl;
       }
     os << "Free list:" << std::endl;
-    free_list_type::const_iterator i;
-    for (i = free_list.begin(); i != free_list.end(); ++i)
-      os << "  (" << i->first << ", " << i->second << ")";
+    dump_free_list(os);
     os << std::endl;
     return os;
   }

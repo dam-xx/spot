@@ -1,3 +1,19 @@
+2004-03-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	Move the free_list management into a separate class for reuse.
+
+	* src/misc/freelist.hh, src/misc/freelist.cc: New files.
+	* src/misc/Makefile.am (misc_HEADERS, libmisc_la_SOURCES): Add them.
+	* src/misc/bddalloc.hh (bdd_allocator): Inherit from free_list and
+	make dump_free_list visible.
+	* src/misc/bddalloc.cc (bdd_allocator::allocate_variables): Move
+	all the code into free_list::register_n() and
+	bdd_allocator::extend(), and call the former.
+	(bdd_allocator::release_variables): Move all the code into
+	free_list::release_n() and call it.
+	(bdd_allocator::extend): New method.
+	* src/tgba/bdddict.cc (bdd_dict::dump): Call dump_free_list;
+
 2004-03-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac, NEWS: Bump version to 0.0s.
