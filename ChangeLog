@@ -1,3 +1,18 @@
+2004-02-08  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	This should help getting accurate statistics (on both the
+	formula automaton and the synchronized product) from LBTT.
+	Idea from Jean-Michel Couvreur.
+
+	* src/tgbaalgos/lbtt.cc (nonacceptant_lbtt_bfs): New class.
+	(nonacceptant_lbtt_reachable): New function.
+	* src/tgbaalgos/lbtt.hh (nonacceptant_lbtt_reachable): New
+	function.
+	* src/tgbatest/ltl2tgba.cc (main): Call nonacceptant_lbtt_reachable
+	if the -T option is used.
+	* src/tgbatest/spotlbtt.test: Setup the -T variants, disabled by
+	default.
+
 2004-02-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/lbtt.hh: Typos.

@@ -44,6 +44,13 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- LaCIM), fake"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -T'"
+   Enabled = no
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM)"
    Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -t'"
    Enabled = yes
@@ -56,11 +63,21 @@ Algorithm
    Enabled = yes
 }
 
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM), fake"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -T'"
+   Enabled = no
+}
+
 GlobalOptions
 {
    Rounds = 100
    Interactive = Never
 #   Verbosity = 5
+#   ComparisonCheck = no
+#   ConsistencyCheck = no
+#   IntersectionCheck = no
 }
 
 FormulaOptions

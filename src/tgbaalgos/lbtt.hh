@@ -50,6 +50,23 @@ namespace spot
   /// \param g The automata to print.
   /// \param os Where to print.
   std::ostream& lbtt_reachable(std::ostream& os, const tgba* g);
+
+  /// \brief Print an LBTT automaton for statistics.
+  ///
+  /// Output \a g in LBTT's format but ignoring the acceptance
+  /// conditions, of all its transitions.  This produces an automaton
+  /// that has the same size as \a g, and whose synchronized product
+  /// with another automaton also has the same size.  This will also
+  /// declare as much acceptance conditions has there is in \a g (they
+  /// will just be never used).
+  ///
+  /// The produced automaton will not recognize any word (unless \a g
+  /// has no acceptance condition, in which case this function is a
+  /// no-op).
+  ///
+  /// The produced automaton is useful to obtain accurate statistics
+  /// from LBTT, without any size blow up of the automata.
+  std::ostream& nonacceptant_lbtt_reachable(std::ostream& os, const tgba* g);
 }
 
 #endif // SPOT_TGBAALGOS_LBTT_HH

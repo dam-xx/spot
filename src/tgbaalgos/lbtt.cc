@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,17 +19,18 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+#include "lbtt.hh"
 #include "misc/hash.hh"
 #include <map>
 #include <set>
 #include <string>
 #include <sstream>
 #include <functional>
-#include "tgba/tgba.hh"
 #include "save.hh"
 #include "tgba/bddprint.hh"
 #include "ltlvisit/tostring.hh"
 #include "tgba/bddprint.hh"
+#include "reachiter.hh"
 #include "misc/bddlt.hh"
 
 namespace spot
@@ -277,4 +278,64 @@ namespace spot
       }
     return os;
   }
+
+
+  class nonacceptant_lbtt_bfs : public tgba_reachable_iterator_breadth_first
+  {
+  public:
+    nonacceptant_lbtt_bfs(const tgba* a, std::ostream& os)
+      : tgba_reachable_iterator_breadth_first(a), os_(os), acc_count_(0)
+    {
+      // Count the number of acceptance_conditions.
+      bdd all = a->all_acceptance_conditions();
+      while (all != bddfalse)
+	{
+	  bdd one = bdd_satone(all);
+	  all -= one;
+	  ++acc_count_;
+	}
+    }
+
+    void
+    process_state(const state*, int n, tgba_succ_iterator*)
+    {
+      --n;
+      if (n == 0)
+	body_ << "0 1 -1" << std::endl;
+      else
+	body_ << "-1" << std::endl << n << " 0 -1" << std::endl;
+    }
+
+    void
+    process_link(int, int out, const tgba_succ_iterator* si)
+    {
+      --out;
+      std::string s =
+	bdd_to_lbtt(si->current_condition(), automata_->get_dict());
+      body_ << out << " " << s << std::endl;
+    }
+
+    void
+    end()
+    {
+      os_ << seen.size() << " " << acc_count_ << std::endl
+	  << body_.str() << "-1" << std::endl;
+    }
+
+  private:
+    std::ostream& os_;
+    std::ostringstream body_;
+    unsigned acc_count_;
+  };
+
+
+  std::ostream&
+  nonacceptant_lbtt_reachable(std::ostream& os, const tgba* g)
+  {
+    nonacceptant_lbtt_bfs b(g, os);
+    b.run();
+    return os;
+  }
+
+
 }

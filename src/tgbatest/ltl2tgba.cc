@@ -76,6 +76,8 @@ syntax(char* prog)
 	    << "  -S   convert to explicit automata, and number states "
 	    << "in BFS order" << std::endl
 	    << "  -t   display reachable states in LBTT's format" << std::endl
+	    << "  -T   display reachable states in LBTT's format w/o "
+	    << "acceptance conditions" << std::endl
 	    << "  -v   display the BDD variables used by the automaton"
 	    << std::endl
 	    << "  -X   do not compute an automaton, read it from a file"
@@ -197,6 +199,10 @@ main(int argc, char** argv)
 	{
 	  output = 6;
 	}
+      else if (!strcmp(argv[formula_index], "-T"))
+	{
+	  output = 7;
+	}
       else if (!strcmp(argv[formula_index], "-v"))
 	{
 	  output = 5;
@@ -317,6 +323,9 @@ main(int argc, char** argv)
 	  break;
 	case 6:
 	  spot::lbtt_reachable(std::cout, a);
+	  break;
+	case 7:
+	  spot::nonacceptant_lbtt_reachable(std::cout, a);
 	  break;
 	default:
 	  assert(!"unknown output option");
