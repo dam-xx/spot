@@ -34,7 +34,8 @@ tgbaalgos_HEADERS = \
   magic.hh \
   powerset.hh \
   reachiter.hh \
-  save.hh
+  save.hh \
+  stats.hh
 
 noinst_LTLIBRARIES = libtgbaalgos.la
 libtgbaalgos_la_SOURCES = \
@@ -47,4 +48,5 @@ libtgbaalgos_la_SOURCES = \
   magic.cc \
   powerset.cc \
   reachiter.cc \
-  save.cc
+  save.cc \
+  stats.cc

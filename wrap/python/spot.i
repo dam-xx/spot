@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -72,9 +72,11 @@
 #include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"
 #include "tgbaalgos/dotty.hh"
+#include "tgbaalgos/dupexp.hh"
 #include "tgbaalgos/lbtt.hh"
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/save.hh"
+#include "tgbaalgos/stats.hh"
 
 using namespace spot::ltl;
 using namespace spot;
@@ -110,6 +112,8 @@ using namespace spot;
 %feature("new") spot::tgba::get_init_state;
 %feature("new") spot::tgba::succ_iter;
 %feature("new") spot::tgba_succ_iterator::current_state;
+%feature("new") spot::tgba_dupexp_bfs;
+%feature("new") spot::tgba_dupexp_dfs;
 
 // Help SWIG with namespace lookups.
 #define ltl spot::ltl
@@ -129,9 +133,11 @@ using namespace spot;
 %include "tgbaalgos/ltl2tgba_lacim.hh"
 %include "tgbaalgos/ltl2tgba_fm.hh"
 %include "tgbaalgos/dotty.hh"
+%include "tgbaalgos/dupexp.hh"
 %include "tgbaalgos/lbtt.hh"
 %include "tgbaalgos/magic.hh"
 %include "tgbaalgos/save.hh"
+%include "tgbaalgos/stats.hh"
 #undef ltl
 
 %extend spot::ltl::formula {
