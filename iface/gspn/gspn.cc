@@ -387,9 +387,29 @@ namespace spot
   {
     const state_gspn* s = dynamic_cast<const state_gspn*>(state);
     assert(s);
-    // FIXME: We ought to ask GSPN to format the state.
     std::ostringstream os;
-    os << s->get_state();
+    char* str;
+    int err = print_state(s->get_state(), &str);
+    if (err)
+      throw gspn_exeption("print_state()", err);
+
+    // Rewrite all new lines as \\\n.
+    const char* pos = str;
+    while (*pos)
+      {
+	switch (*pos)
+	  {
+	    // Rewrite all new lines as \\n, and strip the last one.
+	  case '\n':
+	    if (pos[1])
+	      os << "\\n";
+	    break;
+	  default:
+	    os << *pos;
+	  }
+	++pos;
+      }
+    free(str);
     return os.str();
   }
 
