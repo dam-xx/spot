@@ -38,6 +38,7 @@ tgbaalgos_HEADERS = \
   ltl2tgba_fm.hh \
   ltl2tgba_lacim.hh \
   magic.hh \
+  ndfs_result.hh \
   neverclaim.hh \
   powerset.hh \
   projrun.hh \

@@ -1,3 +1,12 @@
+2004-12-13  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/tgbaalgos/ndfs_result.hh: New file factorizing the computation of
+	accepting runs for ndfs emptiness check algoritms.
+	* src/tgbaalgos/Makefile.am: Add it.
+	* src/tgbaalgos/magic.cc, src/tgbaalgos/se05.cc,
+	src/tgbaalgos/tau03.cc, src/tgbaalgos/tau03opt.cc: Remove the old
+	result classes and use the new one.
+
 2004-12-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gtec/status.hh

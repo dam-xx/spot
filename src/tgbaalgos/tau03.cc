@@ -20,7 +20,6 @@
 // 02111-1307, USA.
 
 /// FIXME: Add
-/// - the computation of a counter example if detected.
 /// - a bit-state hashing version.
 
 //#define TRACE
@@ -39,6 +38,7 @@
 #include "emptiness.hh"
 #include "emptiness_stats.hh"
 #include "tau03.hh"
+#include "ndfs_result.hh"
 
 namespace spot
 {
@@ -92,7 +92,7 @@ namespace spot
         h.add_new_state(s0, BLUE);
         push(st_blue, s0, bddfalse, bddfalse);
         if (dfs_blue())
-          return new emptiness_check_result(a_);
+          return new ndfs_result<tau03_search<heap>, heap>(*this);
         return 0;
       }
 
@@ -104,25 +104,22 @@ namespace spot
         return os;
       }
 
+      const heap& get_heap() const
+        {
+          return h;
+        }
+
+      const stack_type& get_st_blue() const
+        {
+          return st_blue;
+        }
+
+      const stack_type& get_st_red() const
+        {
+          return st_red;
+        }
+
     private:
-      struct stack_item
-      {
-        stack_item(const state* n, tgba_succ_iterator* i, bdd l, bdd a)
-          : s(n), it(i), label(l), acc(a) {};
-        /// The visited state.
-        const state* s;
-        /// Design the next successor of \a s which has to be visited.
-        tgba_succ_iterator* it;
-        /// The label of the transition traversed to reach \a s
-        /// (false for the first one).
-        bdd label;
-        /// The acceptance set of the transition traversed to reach \a s
-        /// (false for the first one).
-        bdd acc;
-      };
-
-      typedef std::list<stack_item> stack_type;
-
       void push(stack_type& st, const state* s,
                         const bdd& label, const bdd& acc)
       {
@@ -358,6 +355,18 @@ namespace spot
         {
         }
 
+      bool has_been_visited(const state*& s) const
+        {
+          hash_type::const_iterator it = h.find(s);
+          if (it == h.end())
+            return false;
+          else if (s != it->first)
+            {
+              delete s;
+              s = it->first;
+            }
+          return true;
+        }
     private:
 
       typedef Sgi::hash_map<const state*, std::pair<color, bdd>,

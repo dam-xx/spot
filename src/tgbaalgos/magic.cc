@@ -35,6 +35,7 @@
 #include "emptiness.hh"
 #include "emptiness_stats.hh"
 #include "magic.hh"
+#include "ndfs_result.hh"
 
 namespace spot
 {
@@ -95,17 +96,17 @@ namespace spot
             h.add_new_state(s0, BLUE);
             push(st_blue, s0, bddfalse, bddfalse);
             if (dfs_blue())
-              return new result(*this);
+              return new ndfs_result<magic_search<heap>, heap>(*this);
           }
         else
           {
             h.pop_notify(st_red.front().s);
             pop(st_red);
             if (!st_red.empty() && dfs_red())
-              return new result(*this);
+              return new ndfs_result<magic_search<heap>, heap>(*this);
             else
               if (dfs_blue())
-                return new result(*this);
+                return new ndfs_result<magic_search<heap>, heap>(*this);
           }
         return 0;
       }
@@ -124,25 +125,21 @@ namespace spot
         return os;
       }
 
+      const heap& get_heap() const
+        {
+          return h;
+        }
+
+      const stack_type& get_st_blue() const
+        {
+          return st_blue;
+        }
+
+      const stack_type& get_st_red() const
+        {
+          return st_red;
+        }
     private:
-
-      struct stack_item
-      {
-        stack_item(const state* n, tgba_succ_iterator* i, bdd l, bdd a)
-          : s(n), it(i), label(l), acc(a) {};
-        /// The visited state.
-        const state* s;
-        /// Design the next successor of \a s which has to be visited.
-        tgba_succ_iterator* it;
-        /// The label of the transition traversed to reach \a s
-        /// (false for the first one).
-        bdd label;
-        /// The acceptance set of the transition traversed to reach \a s
-        /// (false for the first one).
-        bdd acc;
-      };
-
-      typedef std::list<stack_item> stack_type;
 
       void push(stack_type& st, const state* s,
                         const bdd& label, const bdd& acc)
@@ -317,54 +314,6 @@ namespace spot
         return false;
       }
 
-      class result: public emptiness_check_result
-      {
-      public:
-        result(magic_search& ms)
-          : emptiness_check_result(ms.automaton()), ms_(ms)
-        {
-        }
-        virtual tgba_run* accepting_run()
-        {
-          assert(!ms_.st_blue.empty());
-          assert(!ms_.st_red.empty());
-
-          tgba_run* run = new tgba_run;
-
-          typename stack_type::const_reverse_iterator i, j, end;
-          tgba_run::steps* l;
-
-          l = &run->prefix;
-
-          i = ms_.st_blue.rbegin();
-          end = ms_.st_blue.rend(); --end;
-          j = i; ++j;
-          for (; i != end; ++i, ++j)
-            {
-              tgba_run::step s = { i->s->clone(), j->label, j->acc };
-              l->push_back(s);
-            }
-
-          l = &run->cycle;
-
-          j = ms_.st_red.rbegin();
-          tgba_run::step s = { i->s->clone(), j->label, j->acc };
-          l->push_back(s);
-
-          i = j; ++j;
-          end = ms_.st_red.rend(); --end;
-          for (; i != end; ++i, ++j)
-            {
-              tgba_run::step s = { i->s->clone(), j->label, j->acc };
-              l->push_back(s);
-            }
-
-          return run;
-        }
-      private:
-        magic_search& ms_;
-      };
-
     };
 
     class explicit_magic_search_heap
@@ -432,6 +381,19 @@ namespace spot
         {
         }
 
+      bool has_been_visited(const state*& s) const
+        {
+          hash_type::const_iterator it = h.find(s);
+          if (it==h.end())
+            return false;
+          if (s!=it->first)
+            {
+              delete s;
+              s = it->first;
+            }
+          return true;
+        }
+
     private:
 
       typedef Sgi::hash_map<const state*, color,
@@ -493,6 +455,12 @@ namespace spot
       void pop_notify(const state* s)
         {
           delete s;
+        }
+
+      bool has_been_visited(const state*& s) const
+        {
+          size_t ha = s->hash();
+          return color((h[ha%size] >> (ha%4)) & 3U) != WHITE;
         }
 
     private:
