@@ -4,7 +4,7 @@
 	* wrap/python/Makefile.am (EXTRA_DIST): Add it.
 	(python_PYTHON, MAINTAINERCLEANFILES): Add buddy.py.
 	(pyexec_LTLIBRARIES): Add _buddy.la.
-	(_buddy_la_SOURCES, _buddy_la_LDFLAGS, $(srcdir)/buddy_wrap.cxx) 
+	(_buddy_la_SOURCES, _buddy_la_LDFLAGS, $(srcdir)/buddy_wrap.cxx)
 	($(srcdir)/buddy.py): New.
 	* wrap/python/tests/bddnqueen.py: New file.
 	* wrap/python/tests/Makefile.am (TESTS): Add it.
