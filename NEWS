@@ -1,4 +1,25 @@
-New in spot 0.0u:
+New in spot 0.0v (2004-06-29):
+
+  * LTL formula simplifications using basic rewriting rules,
+    a-la Wring syntactic approximations, and Etessami's universal
+    and existential classes.
+     - Function reduce() in ltlvisit/reduce.hh is the main interface.
+     - Can be tested with the CGI script.
+  * TGBA simplifications using direct simulation, delayed simulation,
+    and SCC-based simplifications.  This is still experimental.
+  * The LTL parser will now read LTL formulae written using Wring's syntax.
+  * ltl2tgba_fm() now has options for on-the-fly fair-loop approximations,
+    and Modella-like branching-postponement.
+  * GreatSPN interface:
+     - The `declarative_environment' is now part of Spot itself rather than
+       part of the interface with GreatSPN.
+     - the RG and SRG interface can deal with dead markings in three
+       ways (omit deadlocks from the state graph, stutter on the deadlock
+       and consider as a regular behavior, or stutter and distinguish the
+       deadlock with a property).
+     - update SSP interface to Soheib Baarir latest work.
+  * Preliminary Python bindings for BuDDy's FDD and BVEC.
+  * Upgrade to BuDDy 2.3.
 
 New in spot 0.0t (2004-04-23):
 

@@ -1,3 +1,7 @@
+2004-06-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* configure.ac, NEWS: Bump version to 0.0v.
+
 2004-06-28  Thomas Martinez  <martinez@src.lip6.fr>
 
 	* src/tgbatest/reduccmp.test: Bug.
@@ -38,7 +42,7 @@
 	That produces more readable output.
 
 	* wrap/python/cgi/ltl2tgba.in: Add "Formula Simplications" options.
-	* wrap/python/spot.i: Wrap src/ltlvisite/reduce.hh.
+	* wrap/python/spot.i: Wrap src/ltlvisit/reduce.hh.
 
 	* src/ltlvisit/simpfg.cc, src/ltlvisit/simpfg.hh: New files,
 	extracted from ...
