@@ -1,3 +1,9 @@
+2003-05-05  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* m4/buddy.m4: New file.
+	* Makefile.am (EXTRA_DIST): Add m4/buddy.m4.
+	* configure.ac: Call AX_CHECK_BUDDY.
+
 2003-04-30  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
 	* src/ltlvisit/Makefile.am (lib_LTLIBRARIES): Rename as ...
