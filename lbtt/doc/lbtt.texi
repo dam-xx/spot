@@ -1,7 +1,7 @@
 \input texinfo   @c -*-texinfo-*-
 @c %**start of header
 @setfilename lbtt.info
-@settitle @command{lbtt} 
+@settitle @command{lbtt}
 @afourpaper
 @c %**end of header
 
@@ -13,8 +13,8 @@
 @end ifhtml
 This file documents how to use the LTL-to-B@"uchi
 translator testbench @command{lbtt}.
-     
-Copyright @copyright{} 2001 Heikki Tauriainen
+
+Copyright @copyright{} 2001, 2003 Heikki Tauriainen
 @ifinfo
 @email{heikki.tauriainen@@hut.fi}
 @end ifinfo
@@ -22,7 +22,7 @@ Copyright @copyright{} 2001 Heikki Tauriainen
 <@email{heikki.tauriainen@@hut.fi}>
 @end ifnotinfo
 
-@ifhtml     
+@ifhtml
 @html
 <blockquote>
 @end html
@@ -30,7 +30,7 @@ Copyright @copyright{} 2001 Heikki Tauriainen
 Permission is granted to make and distribute verbatim
 copies of this manual provided the copyright notice and
 this permission notice are preserved on all copies.
-     
+
 @ignore
 Permission is granted to process this file through TeX
 and print the results, provided the printed document
@@ -46,7 +46,7 @@ entitled ``GNU General Public License'' is included exactly
 as in the original, and provided that the entire resulting
 derived work is distributed under the terms of a
 permission notice identical to this one.
-     
+
 Permission is granted to copy and distribute
 translations of this manual into another language,
 under the above conditions for modified versions.
@@ -66,7 +66,7 @@ under the above conditions for modified versions.
 @author Heikki Tauriainen <@email{heikki.tauriainen@@hut.fi}>
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001 Heikki Tauriainen
+Copyright @copyright{} 2001, 2003  Heikki Tauriainen
 <@email{heikki.tauriainen@@hut.fi}>
 
 The latest version of this manual can be obtained from@*
@@ -75,7 +75,7 @@ The latest version of this manual can be obtained from@*
 Permission is granted to make and distribute verbatim
 copies of this manual provided the copyright notice and
 this permission notice are preserved on all copies.
-     
+
 Permission is granted to copy and distribute modified
 versions of this manual under the conditions for
 verbatim copying, provided also that the section
@@ -84,7 +84,7 @@ is included exactly as in the original, and provided
 that the entire resulting derived work is distributed
 under the terms of a permission notice identical to this
 one.
-     
+
 Permission is granted to copy and distribute
 translations of this manual into another language,
 under the above conditions for modified versions.
@@ -94,7 +94,7 @@ under the above conditions for modified versions.
 @end iftex
 
 @ifnottex
-@node Top, Copying, , (dir)
+@node Top, Copying, (dir), (dir)
 @top @command{lbtt}
 
 @command{lbtt} is a tool for testing implementations of algorithms
@@ -120,11 +120,8 @@ comes with NO WARRANTY. See @ref{Copying} for details.
 * Analyzing test results::      Working with @command{lbtt}'s internal
                                   commands.
 
-* Interfacing with @command{lbtt}::     Interfacing LTL-to-B@"uchi translators
+* Interfacing with lbtt::       Interfacing LTL-to-B@"uchi translators
                                   with @command{lbtt}.
-* The @command{lbtt-translate} utility::  An interface for two LTL-to-B@"uchi
-                                translators.
-
 * References::                  List of references.
 
 * Definitions::                 A reference of the formal definitions of
@@ -262,7 +259,7 @@ for more information.
                                   formulas in the same state space using
                                   an LTL-to-B@"uchi translator should
                                   give consistent results.
-* B@"uchi automata intersection emptiness check::
+* Buchi automata intersection emptiness check::
                                 The intersection of the languages
                                   accepted by two B@"uchi automata
                                   constructed from two complementary
@@ -603,7 +600,7 @@ pseudocode description of the algorithm used for generating random LTL
 formulas.
 @end ifnottex
 
-@node The formula generation algorithm, , Random LTL formulas, Random LTL formulas
+@node The formula generation algorithm,  , Random LTL formulas, Random LTL formulas
 
 @subsubsection The formula generation algorithm
 @cindex random LTL formula, generation algorithm
@@ -802,7 +799,7 @@ $$
 @end ifnottex
 
 @noindent
-where 
+where
 @iftex
 @tex
 $\it{op}'$
@@ -873,7 +870,7 @@ for more information.
 
 
 
-@node Random state spaces, , Random LTL formulas, Random input generation
+@node Random state spaces,  , Random LTL formulas, Random input generation
 @subsection Random state spaces
 
 @cindex state space
@@ -1010,7 +1007,7 @@ acceptable limits.
 
 
 
-@node Algorithm for generating connected graphs, , Random state spaces, Random state spaces
+@node Algorithm for generating connected graphs,  , Random state spaces, Random state spaces
 
 @subsubsection Algorithm for generating connected graphs
 @cindex random connected graph, generation algorithm
@@ -1119,16 +1116,10 @@ and the model checking result consistency check
 (@pxref{Model checking result consistency check})
 on the model checking results, and reports all detected failures.
 
-The B@"uchi automata intersection emptiness check
-@ifnottex
-(@pxref{B@"uchi automata intersection emptiness check})
-@end ifnottex
-@iftex
-(@pxref{Automata intersection emptiness check})
-@end iftex
-operates as follows
-(note that the LTL-to-B@"uchi translation phase is repeated in this figure
-only for completeness; in reality, @command{lbtt} performs this phase only
+The B@"uchi automata intersection emptiness check (@pxref{Buchi
+automata intersection emptiness check}) operates as follows (note that
+the LTL-to-B@"uchi translation phase is repeated in this figure only
+for completeness; in reality, @command{lbtt} performs this phase only
 once):
 @ifhtml
 @*
@@ -1198,7 +1189,7 @@ providing an additional implementation to include in the tests.
 
 
 
-@node Model checking result consistency check, B@"uchi automata intersection emptiness check, Model checking result cross-comparison test, Test methods
+@node Model checking result consistency check, Buchi automata intersection emptiness check, Model checking result cross-comparison test, Test methods
 @section Model checking result consistency check
 
 @cindex model checking result consistency check
@@ -1208,7 +1199,7 @@ LTL model checking tells whether any of the infinite paths starting from some
 state of a state space satisfies a given LTL formula. If there
 are no such paths beginning from the state, it follows that all infinite paths
 beginning from the state must then satisfy the @emph{negation} of the same
-formula. Since all state spaces used by @command{lbtt} always have at least 
+formula. Since all state spaces used by @command{lbtt} always have at least
 one path beginning from each state of the state space (guaranteed by the
 state space generation algorithms), at least
 one path beginning from any state must satisfy either the formula or its
@@ -1236,9 +1227,8 @@ section.
 @end iftex
 
 
-@node B@"uchi automata intersection emptiness check, , Model checking result consistency check, Test methods
-@section B@"uchi automata intersection emptiness check
-@anchor{Automata intersection emptiness check}
+@node Buchi automata intersection emptiness check,  , Model checking result consistency check, Test methods
+@section Buchi automata intersection emptiness check
 
 @cindex B@"uchi automata intersection emptiness check
 @cindex tests, B@"uchi automata intersection emptiness check
@@ -1352,21 +1342,21 @@ section specifying an LTL-to-B@"uchi translator. The other sections
 are optional and can be used to override the default testing parameters.
 
 @menu
-* @samp{Algorithm} section::           Each LTL-to-B@"uchi translator to be
+* Algorithm section::           Each LTL-to-B@"uchi translator to be
                                     tested requires a separate
                                     @samp{Algorithm} section in the
                                     configuration file.
-* @samp{GlobalOptions} section::       Options for changing the general
+* GlobalOptions section::       Options for changing the general
                                     behavior of @command{lbtt}.
-* @samp{FormulaOptions} section::      Options controlling the way random
+* FormulaOptions section::      Options controlling the way random
                                     LTL formulas are generated.
-* @samp{StateSpaceOptions} section::   Options controlling the way random
+* StateSpaceOptions section::   Options controlling the way random
                                     state spaces are generated.
-* Sample configuration file::     An example of a configuration file.
+* Sample configuration file::   An example of a configuration file.
 @end menu
 
 
-@node @samp{Algorithm} section, @samp{GlobalOptions} section, Configuration file, Configuration file
+@node Algorithm section, GlobalOptions section, Configuration file, Configuration file
 @subsection The @samp{Algorithm} section
 
 @cindex configuration file, @samp{Algorithm} section
@@ -1430,7 +1420,7 @@ which is used to run the translator.
 
 
 
-@node @samp{GlobalOptions} section, @samp{FormulaOptions} section, @samp{Algorithm} section, Configuration file
+@node GlobalOptions section, FormulaOptions section, Algorithm section, Configuration file
 @subsection The @samp{GlobalOptions} section
 
 @cindex configuration file, @samp{GlobalOption} section
@@ -1478,15 +1468,9 @@ The default value for this option is @samp{Always}.
 @cindex enabling and disabling tests
 @findex IntersectionCheck @r{[}GlobalOptions@r{]}
 @findex IntersectionTest @r{[}GlobalOptions@r{]}
-This option can be used to enable or disable the B@"uchi automata intersection
-emptiness check
-@ifnottex
-(@pxref{B@"uchi automata intersection emptiness check}).
-@end ifnottex
-@iftex
-(@pxref{Automata intersection emptiness check}).
-@end iftex
-The test is enabled by default.
+This option can be used to enable or disable the B@"uchi automata
+intersection emptiness check (@pxref{Buchi automata intersection
+emptiness check}).  The test is enabled by default.
 
 @item ModelCheck = Local @r{|} Global
 @findex ModelCheck @r{[}GlobalOptions@r{]}
@@ -1522,7 +1506,7 @@ the value results in more output. The default value is 3.
 
 
 
-@node @samp{FormulaOptions} section, @samp{StateSpaceOptions} section, @samp{GlobalOptions} section, Configuration file
+@node FormulaOptions section, StateSpaceOptions section, GlobalOptions section, Configuration file
 @subsection The @samp{FormulaOptions} section
 
 @cindex configuration file, @samp{FormulaOptions} section
@@ -1681,7 +1665,7 @@ The following table illustrates the effects of the
   -------------------------------------------------------------
   (p1 V ! p0)       @r{Yes}       Normal@r{/}NNF@r{:} (p1 V ! p0)
 
-  [] p0 -> <> p1    @r{Yes*}      Nor@r{:} [] p0 -> <> p1  
+  [] p0 -> <> p1    @r{Yes*}      Nor@r{:} [] p0 -> <> p1
                               NNF@r{:} (true U ! p0) \/ (true U p1)
 
   ! <> p0            @r{No}       Nor@r{:} ! <> p0
@@ -1787,7 +1771,7 @@ option has no effect if @samp{AbbreviatedOperators} is set to @samp{No}.)
 
 
 
-@node @samp{StateSpaceOptions} section, Sample configuration file, @samp{FormulaOptions} section, Configuration file
+@node StateSpaceOptions section, Sample configuration file, FormulaOptions section, Configuration file
 @subsection The @samp{StateSpaceOptions} section
 
 @cindex configuration file, @samp{StateSpaceOptions} section
@@ -1859,7 +1843,7 @@ the generated state spaces. The default value is 5.
 Usually this should probably be the same as the maximum number of
 different atomic propositions in the generated formulas
 @ifnottex
-(@pxref{@samp{FormulaOptions} section}).
+(@pxref{FormulaOptions section}).
 @end ifnottex
 @iftex
 (see the previous section).
@@ -1907,7 +1891,7 @@ in any state of the state space. Note: This option has no effect if
 @end table
 
 
-@node Sample configuration file, , @samp{StateSpaceOptions} section, Configuration file
+@node Sample configuration file,  , StateSpaceOptions section, Configuration file
 @subsection Sample configuration file
 
 @cindex configuration file, example
@@ -2013,7 +1997,7 @@ StatespaceOptions
 @end smallexample
 
 
-@node Command line options, , Configuration file, Invocation
+@node Command line options,  , Configuration file, Invocation
 @section Command line options
 
 This section lists the command line options that may be used when
@@ -2201,14 +2185,8 @@ between test rounds to wait for user input.
 @cindex enabling and disabling tests
 @vindex --intersectiontest
 @vindex --nointersectiontest
-These options enable or disable the B@"uchi automata intersection emptiness
-check
-@ifnottex
-(@pxref{B@"uchi automata intersection emptiness check}).
-@end ifnottex
-@iftex
-(@pxref{Automata intersection emptiness check}).
-@end iftex
+These options enable or disable the B@"uchi automata intersection
+emptiness check (@pxref{Buchi automata intersection emptiness check}).
 
 @item --localmodelcheck
 @vindex --localmodelcheck
@@ -2454,7 +2432,7 @@ them randomly.
 
 
 
-@node State space options, , LTL formula options, Command line options
+@node State space options,  , LTL formula options, Command line options
 @subsection State space options
 
 The following command line options affect the way in which @command{lbtt}
@@ -2634,8 +2612,8 @@ Program configuration:
     Atomic symbols in use (priority):
       false (5); propositions (90); true (5)
     Operators used for random LTL formula generation:
-      operator  !        /\       U        V        X        \/       
-      priority  10       20       20       20       10       20       
+      operator  !        /\       U        V        X        \/
+      priority  10       20       20       20       10       20
 @end smallexample
 
 @node Test round messages, Test statistics, Configuration information, Interpreting the output
@@ -2740,16 +2718,11 @@ of the formulas into a B@"uchi automaton correctly.
 
 @end enumerate
 
-The output of phases 4---8 will be repeated for each implementation included in
-the tests. After this @command{lbtt} proceeds to the model checking result
-cross-comparison test (@pxref{Model checking result cross-comparison test}) and
-the B@"uchi automata intersection emptiness test
-@ifnottex
-(@pxref{B@"uchi automata intersection emptiness check}).
-@end ifnottex
-@iftex
-(@pxref{Automata intersection emptiness check}).
-@end iftex
+The output of phases 4---8 will be repeated for each implementation
+included in the tests. After this @command{lbtt} proceeds to the model
+checking result cross-comparison test (@pxref{Model checking result
+cross-comparison test}) and the B@"uchi automata intersection
+emptiness test (@pxref{Buchi automata intersection emptiness check}).
 
 The model checking result cross-comparison test might result in the following
 output:
@@ -2806,7 +2779,7 @@ format specified above.
 
 
 
-@node Test statistics, , Test round messages, Interpreting the output
+@node Test statistics,  , Test round messages, Interpreting the output
 @section Test statistics
 
 @cindex tests, statistics
@@ -2876,14 +2849,9 @@ a single fixed state of each generated state space (called the ``initial''
 state of the state space).
 
 @item
-Number of failures in the B@"uchi automata intersection emptiness check
-@iftex
-(@pxref{Automata intersection emptiness check})
-@end iftex
-@ifnottex
-(@pxref{B@"uchi automata intersection emptiness check})
-@end ifnottex
-for each pair of implementations.
+Number of failures in the B@"uchi automata intersection emptiness
+check (@pxref{Buchi automata intersection emptiness check}) for each
+pair of implementations.
 @end itemize
 
 Note that the pairwise inconsistency results form a symmetric matrix (although
@@ -2899,7 +2867,7 @@ and all LTL formulas used in the tests.
 
 
 
-@node Analyzing test results, Interfacing with @command{lbtt}, Interpreting the output, Top
+@node Analyzing test results, Interfacing with lbtt, Interpreting the output, Top
 @chapter Analyzing test results
 
 This chapter documents how to use @command{lbtt}'s internal commands to
@@ -2912,7 +2880,7 @@ case a test failure is detected) between test rounds to wait for user input by
 showing a prompt of the form
 
 @smallexample
-  ** [Round 22 of 1000] >> 
+  ** [Round 22 of 1000] >>
 @end smallexample
 
 @menu
@@ -3190,7 +3158,7 @@ the output that is displayed.
 
 
 
-@node Failure analysis commands, , Data display commands, Analyzing test results
+@node Failure analysis commands,  , Data display commands, Analyzing test results
 @section Failure analysis commands
 
 The first part of this section introduces the commands available for
@@ -3208,12 +3176,7 @@ automata correctness tests. The second part describes the conventions that
 @cindex failure analysis, B@"uchi automata intersection check
 @cindex analyzing test failures, B@"uchi automata intersection emptiness check
 Analyze a failure in the B@"uchi automata intersection emptiness check
-@ifnottex
-(@pxref{B@"uchi automata intersection emptiness check}).
-@end ifnottex
-@iftex
-(@pxref{Automata intersection emptiness check}).
-@end iftex
+(@pxref{Buchi automata intersection emptiness check}).
 The two implementation identifiers select the B@"uchi automata for which
 to perform the analysis. The B@"uchi automata intersection emptiness
 check always involves automata constructed from the positive and the negative
@@ -3454,7 +3417,7 @@ which can be seen from the proof.
 
 
 
-@node Interfacing with @command{lbtt}, The @command{lbtt-translate} utility, Analyzing test results, Top
+@node Interfacing with lbtt, References, Analyzing test results, Top
 @chapter Interfacing LTL-to-B@"uchi translators with @command{lbtt}
 
 @cindex LTL-to-B@"uchi translators, interfacing with
@@ -3464,7 +3427,7 @@ This chapter gives the details on how to use @command{lbtt} for
 testing LTL-to-B@"uchi translation algorithm implementations that are not
 supported by the basic distribution. (See
 @ifnottex
-@ref{The @command{lbtt-translate} utility}
+@ref{The lbtt-translate utility}
 @end ifnottex
 @iftex
 the next chapter
@@ -3477,12 +3440,14 @@ LTL-to-B@"uchi translator implementations to @command{lbtt}.)
                                   LTL-to-B@"uchi translator.
 * Format for LTL formulas::     How @command{lbtt} passes LTL formulas
                                   to the translators.
-* B@"uchi automata::             How @command{lbtt} expects the translators
+* Buchi automata::            How @command{lbtt} expects the translators
                                   to present their output.
+* The lbtt-translate utility::  An interface for two LTL-to-B@"uchi
+                                  translators.
 @end menu
 
 
-@node Translator interface, Format for LTL formulas, Interfacing with @command{lbtt}, Interfacing with @command{lbtt}
+@node Translator interface, Format for LTL formulas, Interfacing with lbtt, Interfacing with lbtt
 @section Translator interface requirements
 
 @cindex LTL-to-B@"uchi translators, interface requirements
@@ -3505,7 +3470,7 @@ The translator executable should read its input (an LTL formula) from
 @var{input-file} and write its output (a B@"uchi automaton) into
 @var{output-file} (without removing the input file); see
 @ifnottex
-@ref{Format for LTL formulas} and @ref{B@"uchi automata}
+@ref{Format for LTL formulas} and @ref{Buchi automata}
 @end ifnottex
 @iftex
 the following two sections
@@ -3533,7 +3498,7 @@ Algorithm
 
 
 
-@node Format for LTL formulas, B@"uchi automata, Translator interface, Interfacing with @command{lbtt}
+@node Format for LTL formulas, Buchi automata, Translator interface, Interfacing with lbtt
 @section Input file format for LTL formulas
 
 @cindex LTL-to-B@"uchi translators, LTL formula input file format
@@ -3617,7 +3582,7 @@ line options (@pxref{Command line options}) to prevent
 
 
 
-@node B@"uchi automata, , Format for LTL formulas, Interfacing with @command{lbtt}
+@node Buchi automata, The lbtt-translate utility, Format for LTL formulas, Interfacing with lbtt
 @section Output file format for B@"uchi automata
 
 @cindex file formats, LTL-to-B@"uchi translator output file
@@ -3769,7 +3734,7 @@ The following example illustrates the file format.
 
 
 
-@node The @command{lbtt-translate} utility, References, Interfacing with @command{lbtt}, Top
+@node The lbtt-translate utility,  , Buchi automata, Interfacing with lbtt
 @section The @command{lbtt-translate} utility
 
 @cindex @command{lbtt-translate} (executable file)
@@ -3866,7 +3831,7 @@ see a short summary of available options.
 
 
 
-@node References, Definitions, The @command{lbtt-translate} utility, Top
+@node References, Definitions, Interfacing with lbtt, Top
 @unnumbered References
 
 @table @asis
@@ -3883,7 +3848,7 @@ Computing Systems (FM'99), volume I}, volume 1708 of
 @item @anchor{[DGV99]} [DGV99]
 M.@: Daniele, F.@: Giunchiglia and M.@: Y.@: Vardi. Improved automata
 generation for linear temporal logic. In @i{Proceedings of the 11th
-International Conference on Computer Aided Verification (CAV'99)}, volume 1633 
+International Conference on Computer Aided Verification (CAV'99)}, volume 1633
 of @i{Lecture Notes in Computer Science}, pages 249---260. Springer-Verlag,
 1999.
 
@@ -3986,7 +3951,7 @@ manipulates.
 * LTL formulas::                @command{lbtt} uses traditional semantics
                                   for propositional linear temporal
                                   logic.
-* Generalized B@"uchi automata:: The B@"uchi automata used by @command{lbtt}
+* Generalized Buchi automata::  The B@"uchi automata used by @command{lbtt}
                                   have one initial state, labels on
                                   transitions and zero or more
                                   acceptance conditions.
@@ -3995,7 +3960,7 @@ manipulates.
 @end menu
 
 
-@node LTL formulas, Generalized B@"uchi automata, Definitions, Definitions
+@node LTL formulas, Generalized Buchi automata, Definitions, Definitions
 @appendixsec LTL formulas
 
 @command{lbtt} uses the traditional definition for propositional linear
@@ -4375,7 +4340,7 @@ $(\varphi\;{\bf B}\;\psi) \equiv_{\rm def} \neg(\neg\varphi\;\bf{U}\;\psi)$
 
 
 
-@node Generalized B@"uchi automata, State spaces, LTL formulas, Definitions
+@node Generalized Buchi automata, State spaces, LTL formulas, Definitions
 @appendixsec Generalized B@"uchi automata
 
 @cindex B@"uchi automata, formal definition
@@ -4560,7 +4525,7 @@ $Q$,
 @end ifnottex
 the automaton may have many runs on the same input.
 
-A run 
+A run
 @iftex
 @tex
 $\langle q_0, q_1, q_2, \ldots\rangle$
@@ -4684,7 +4649,7 @@ of some states and then adjusting the transition labels appropriately.
 
 
 
-@node State spaces, , Generalized B@"uchi automata, Definitions
+@node State spaces,  , Generalized Buchi automata, Definitions
 @appendixsec State spaces
 
 @cindex state space, formal definition
@@ -4763,7 +4728,7 @@ propositions that hold in the state.
 @printindex ky
 
 
-@node Concept index, , User command index, Top
+@node Concept index,  , User command index, Top
 @unnumbered Concept index
 
 @printindex cp
