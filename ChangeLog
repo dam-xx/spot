@@ -1,5 +1,9 @@
 2003-12-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/ltleesrg.cc: New file.
+	* iface/gspn/Makefile.am (check_PROGRAMS): Add ltleesrg.
+	(ltleesrg_LDADD, ltleesrg_SOURCES): New variables.
+
 	* src/ltltest/defs.in (run): Reun valgrind with --leak-check=yes.
 	* src/ltlparse/ltlparse.yy: Add `%destructor's.
 

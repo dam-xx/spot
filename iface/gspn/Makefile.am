@@ -46,7 +46,8 @@ check_PROGRAMS = \
   dottygspn-srg \
   dottygspn-eesrg \
   ltlgspn-rg \
-  ltlgspn-srg
+  ltlgspn-srg \
+  ltleesrg
 
 dottygspn_rg_SOURCES = dottygspn.cc
 dottygspn_rg_LDADD = libspotgspn.la $(LIBGSPNRG_LDFLAGS)
@@ -62,6 +63,9 @@ ltlgspn_rg_LDADD = libspotgspn.la $(LIBGSPNRG_LDFLAGS)
 
 ltlgspn_srg_SOURCES = ltlgspn.cc
 ltlgspn_srg_LDADD = libspotgspn.la $(LIBGSPNSRG_LDFLAGS)
+
+ltleesrg_SOURCES = ltleesrg.cc
+ltleesrg_LDADD = libspotgspneesrg.la $(LIBGSPNESRG_LDFLAGS)
 
 EXTRA_DIST = \
   examples/DCSwave/DCSWave.def \
