@@ -150,6 +150,19 @@ namespace spot
     h[s] = index;
   }
 
+  int&
+  numbered_state_heap_hash_map::index_and_insert(const state*& s)
+  {
+    std::pair<hash_type::iterator, bool> r
+      = h.insert(hash_type::value_type(s, 0));
+    if (!r.second)
+      {
+	delete s;
+	s = r.first->first;
+      }
+    return r.first->second;
+  }
+
   int
   numbered_state_heap_hash_map::size() const
   {

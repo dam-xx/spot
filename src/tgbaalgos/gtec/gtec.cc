@@ -54,7 +54,7 @@ namespace spot
     // states from FROM have already been removed and there is no
     // point in calling remove_component.)
     numbered_state_heap::state_index_p spi = ecs_->h->index(from);
-    assert(spi.first);
+    assert(spi.first == from);
     assert(*spi.second != -1);
     *spi.second = -1;
     tgba_succ_iterator* i = ecs_->aut->succ_iter(from);
@@ -265,14 +265,36 @@ namespace spot
     : couvreur99_check(a, nshf), num(1), group_(group)
   {
     // Setup depth-first search from the initial state.
-    todo.push_back(pair_state_successors(0, succ_queue()));
+    todo.push_back(todo_item(0, 0));
     inc_depth();
-    todo.back().second.push_front(successor(bddtrue,
-					   ecs_->aut->get_init_state()));
+    todo.back().q.push_front(successor(bddtrue, ecs_->aut->get_init_state()));
   }
 
   couvreur99_check_shy::~couvreur99_check_shy()
   {
+  }
+
+  void
+  couvreur99_check_shy::clear_todo()
+  {
+    // We must delete all states appearing in TODO
+    // unless they are used as keys in H.
+    while (!todo.empty())
+      {
+	succ_queue& queue = todo.back().q;
+	for (succ_queue::iterator q = queue.begin();
+	     q != queue.end(); ++q)
+	  {
+	    // Delete the state if it is a clone of a
+	    // state in the heap...
+	    numbered_state_heap::state_index_p spi = ecs_->h->index(q->s);
+	    // ... or if it is an unknown state.
+	    if (spi.first == 0)
+	      delete q->s;
+	  }
+	todo.pop_back();
+	dec_depth();
+      }
   }
 
   emptiness_check_result*
@@ -283,125 +305,15 @@ namespace spot
 	assert(ecs_->root.size() == arc.size());
 
 	// Get the successors of the current state.
-	succ_queue& queue = todo.back().second;
-
-	// First, we process all successors that we have already seen.
-	// This is an idea from Soheib Baarir.  It helps to merge SCCs
-	// and get shorter traces faster.
-	succ_queue::iterator q = queue.begin();
-	while (q != queue.end())
-	  {
-	    numbered_state_heap::state_index_p sip = ecs_->h->find(q->s);
-	    int* i = sip.second;
-	    if (!i)
-	      {
-		// Skip unknown states.
-		++q;
-		continue;
-	      }
-
-	    // Skip states from dead SCCs.
-	    if (*i != -1)
-	      {
-		// Now this is the most interesting case.  We have
-		// reached a state S1 which is already part of a
-		// non-dead SCC.  Any such non-dead SCC has
-		// necessarily been crossed by our path to this
-		// state: there is a state S2 in our path which
-		// belongs to this SCC too.  We are going to merge
-		// all states between this S1 and S2 into this
-		// SCC.
-		//
-		// This merge is easy to do because the order of
-		// the SCC in ROOT is ascending: we just have to
-		// merge all SCCs from the top of ROOT that have
-		// an index greater to the one of the SCC of S2
-		// (called the "threshold").
-		int threshold = *i;
-		bdd acc = q->acc;
-		while (threshold < ecs_->root.top().index)
-		  {
-		    assert(!ecs_->root.empty());
-		    assert(!arc.empty());
-		    acc |= ecs_->root.top().condition;
-		    acc |= arc.top();
-		    ecs_->root.pop();
-		    arc.pop();
-		  }
-		// Note that we do not always have
-		//  threshold == ecs_->root.top().index
-		// after this loop, the SCC whose index is threshold
-		// might have been merged with a lower SCC.
-
-		// Accumulate all acceptance conditions into the
-		// merged SCC.
-		ecs_->root.top().condition |= acc;
-
-		// Have we found all acceptance conditions?
-		if (ecs_->root.top().condition
-		    == ecs_->aut->all_acceptance_conditions())
-		  {
-		    // Use this state to start the computation of an accepting
-		    // cycle.
-		    ecs_->cycle_seed = sip.first;
-
-		    /// q->s has already been freed by ecs_->h->find.
-		    queue.erase(q);
-		    // We have found an accepting SCC.  Clean up TODO.
-		    // We must delete all states of apparing in TODO
-		    // unless they are used as keys in H.
-		    while (!todo.empty())
-		      {
-			succ_queue& queue = todo.back().second;
-			for (succ_queue::iterator q = queue.begin();
-			     q != queue.end(); ++q)
-			  {
-			    // Delete the state if it is a clone of a
-			    // state in the heap...
-			    numbered_state_heap::state_index_p spi
-			      = ecs_->h->index(q->s);
-			    // ... or if it is an unknown state.
-			    if (spi.first == 0)
-			      delete q->s;
-			  }
-			todo.pop_back();
-			dec_depth();
-		      }
-                    set_states(ecs_->states());
-		    return new couvreur99_check_result(ecs_);
-		  }
-	      }
-	    // Remove that state from the queue, so we do not
-	    // recurse into it.
-	    succ_queue::iterator old = q++;
-	    queue.erase(old);
-	  }
-
-	// Group the pending successors of formed SCC of requested.
-	if (group_ && todo.back().first != 0)
-	  {
-	    int top_index = *ecs_->h->index(todo.back().first).second;
-	    if (ecs_->root.top().index < top_index)
-	      {
-		do
-		  {
-		    todo_list::reverse_iterator prev = todo.rbegin();
-		    todo_list::reverse_iterator last = prev++;
-		    prev->second.splice(prev->second.end(), last->second);
-		    todo.pop_back();
-		    dec_depth();
-		    top_index = *ecs_->h->index(todo.back().first).second;
-		  }
-		while (ecs_->root.top().index < top_index);
-		continue;
-	      }
-	  }
+	succ_queue& queue = todo.back().q;
 
 	// If there is no more successor, backtrack.
 	if (queue.empty())
 	  {
+
 	    // We have explored all successors of state CURR.
-	    const state* curr = todo.back().first;
+	    const state* curr = todo.back().s;
+	    int index = todo.back().n;
 	    // Backtrack TODO.
 	    todo.pop_back();
 	    dec_depth();
@@ -415,10 +327,8 @@ namespace spot
 	    // When backtracking the root of an SCC, we must also
 	    // remove that SCC from the ARC/ROOT stacks.  We must
 	    // discard from H all reachable states from this SCC.
-	    numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
-	    assert(spi.first);
 	    assert(!ecs_->root.empty());
-	    if (ecs_->root.top().index == *spi.second)
+	    if (ecs_->root.top().index == index)
 	      {
 		assert(!arc.empty());
 		arc.pop();
@@ -428,24 +338,167 @@ namespace spot
 	    continue;
 	  }
 
-	// Recurse.  (Finally!)
-
-	// Pick one successor off the list, and schedule its
-	// successors first on TODO.  Update the various hashes and
-	// stacks.
+	// Pick one successor off the list.
 	successor succ = queue.front();
 	queue.pop_front();
-	ecs_->h->insert(succ.s, ++num);
+
+	int& n = ecs_->h->index_and_insert(succ.s);
+	// Skip dead states.
+	if (n == -1)
+	  continue;
+	// If it is known, it is necessarily in the current condition.
+	if (n != 0)
+	  {
+	    assert(n >= ecs_->root.top().index);
+	    ecs_->root.top().condition |= succ.acc;
+
+	    // Have we found all acceptance conditions?
+	    if (ecs_->root.top().condition
+		== ecs_->aut->all_acceptance_conditions())
+	      {
+		// Use this state to start the computation of an accepting
+		// cycle.
+		ecs_->cycle_seed = succ.s;
+		// We have found an accepting SCC.  Clean up TODO.
+		clear_todo();
+		set_states(ecs_->states());
+		return new couvreur99_check_result(ecs_);
+	      }
+
+	    continue;
+	  }
+
+	// It is a new state.  Number it, and stack it.
+	n = ++num;
 	ecs_->root.push(num);
 	arc.push(succ.acc);
-	todo.push_back(pair_state_successors(succ.s, succ_queue()));
+	todo.push_back(todo_item(succ.s, num));
 	inc_depth();
-	succ_queue& new_queue = todo.back().second;
+	succ_queue* new_queue = &todo.back().q;
 	tgba_succ_iterator* iter = ecs_->aut->succ_iter(succ.s);
+	succ_queue::iterator merge_end;
+	bool merged = false;
 	for (iter->first(); !iter->done(); iter->next(), inc_transitions())
-	  new_queue.push_back(successor(iter->current_acceptance_conditions(),
-					iter->current_state()));
+	  {
+	    const state* dest = iter->current_state();
+	    bdd acc = iter->current_acceptance_conditions();
+
+	    numbered_state_heap::state_index_p sip = ecs_->h->find(dest);
+	    int* i = sip.second;
+	    // Add new states to the queue.
+	    if (!i)
+	      {
+		new_queue->push_back(successor(acc, dest));
+		continue;
+	      }
+	    // Skip dead states.
+	    if (*i == -1)
+	      continue;
+
+	    // Now this is the most interesting case.  We have
+	    // reached a state S1 which is already part of a
+	    // non-dead SCC.  Any such non-dead SCC has
+	    // necessarily been crossed by our path to this
+	    // state: there is a state S2 in our path which
+	    // belongs to this SCC too.  We are going to merge
+	    // all states between this S1 and S2 into this
+	    // SCC.
+	    //
+	    // This merge is easy to do because the order of
+	    // the SCC in ROOT is ascending: we just have to
+	    // merge all SCCs from the top of ROOT that have
+	    // an index greater to the one of the SCC of S2
+	    // (called the "threshold").
+	    int threshold = *i;
+	    while (threshold < ecs_->root.top().index)
+	      {
+		assert(!ecs_->root.empty());
+		assert(!arc.empty());
+		acc |= ecs_->root.top().condition;
+		acc |= arc.top();
+		ecs_->root.pop();
+		arc.pop();
+	      }
+	    // Note that we do not always have
+	    //   threshold == ecs_->root.top().index
+	    // after this loop, the SCC whose index is threshold
+	    // might have been merged with a lower SCC.
+
+	    // Accumulate all acceptance conditions into the
+	    // merged SCC.
+	    ecs_->root.top().condition |= acc;
+
+	    // Have we found all acceptance conditions?
+	    if (ecs_->root.top().condition
+		== ecs_->aut->all_acceptance_conditions())
+	      {
+		// Use this state to start the computation of an accepting
+		// cycle.
+		ecs_->cycle_seed = sip.first;
+
+		// We have found an accepting SCC.  Clean up TODO.
+		clear_todo();
+		set_states(ecs_->states());
+		delete iter;
+		return new couvreur99_check_result(ecs_);
+	      }
+	    // Group the pending successors of formed SCC if requested.
+	    if (group_)
+	      {
+		assert(todo.back().s != 0);
+		while (ecs_->root.top().index < todo.back().n)
+		  {
+		    todo_list::reverse_iterator prev = todo.rbegin();
+		    todo_list::reverse_iterator last = prev++;
+		    if (!merged)
+		      {
+			merge_end = last->q.begin();
+			merged = true;
+		      }
+		    prev->q.splice(prev->q.end(), last->q);
+		    todo.pop_back();
+		    dec_depth();
+		  }
+		new_queue = &todo.back().q;
+	      }
+	  }
 	delete iter;
+	if (merged)
+	  {
+	    succ_queue::iterator q = new_queue->begin();
+	    while (q != merge_end && q != new_queue->end())
+	      {
+		numbered_state_heap::state_index_p sip = ecs_->h->find(q->s);
+		succ_queue::iterator old = q++;
+		int* i = sip.second;
+		// Skip new states.
+		if (!i)
+		  continue;
+		bdd acc = old->acc;
+		// Delete other states.
+		new_queue->erase(old);
+		// Delete dead states.
+		if (*i == -1)
+		  continue;
+
+		// Merge existing states.
+		assert(n >= ecs_->root.top().index);
+		ecs_->root.top().condition |= acc;
+
+		// Have we found all acceptance conditions?
+		if (ecs_->root.top().condition
+		    == ecs_->aut->all_acceptance_conditions())
+		  {
+		    // Use this state to start the computation of an accepting
+		    // cycle.
+		    ecs_->cycle_seed = sip.first;
+		    // We have found an accepting SCC.  Clean up TODO.
+		    clear_todo();
+		    set_states(ecs_->states());
+		    return new couvreur99_check_result(ecs_);
+		  }
+	      }
+	  }
       }
   }
 

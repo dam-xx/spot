@@ -781,6 +781,19 @@ namespace spot
       return res;
     }
 
+    virtual int&
+    index_and_insert(const state*& s)
+    {
+      std::pair<hash_type::iterator, bool> r
+	= h.insert(hash_type::value_type(s, 0));
+      if (!r.second)
+	{
+	  delete s;
+	  s = r.first->first;
+	}
+      return r.first->second;
+    }
+
     virtual void
     insert(const state* s, int index)
     {
@@ -945,7 +958,7 @@ namespace spot
 			{
 			  State* succ_tgba_ = 0;
 			  size_t size_tgba_ = 0;
-			  succ_queue& queue = todo.back().second;
+			  succ_queue& queue = todo.back().q;
 
 			  Diff_succ(old_state->left(), new_state->left(),
 				    &succ_tgba_, &size_tgba_);

@@ -144,10 +144,24 @@ namespace spot
     // * todo, the depth-first search stack.  This holds pairs of the
     //   form (STATE, SUCCESSORS) where SUCCESSORS is a list of
     //   (ACCEPTANCE_CONDITIONS, STATE) pairs.
+
     typedef std::list<successor> succ_queue;
-    typedef std::pair<const state*, succ_queue> pair_state_successors;
-    typedef std::list<pair_state_successors> todo_list;
+
+    struct todo_item
+    {
+      const state* s;
+      int n;
+      succ_queue q;
+      todo_item(const state* s, int n)
+	: s(s), n(n)
+      {
+      }
+    };
+
+    typedef std::list<todo_item> todo_list;
     todo_list todo;
+
+    void clear_todo();
 
     // Whether successors should be grouped for states in the same
     // SCC.
