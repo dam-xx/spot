@@ -6,3 +6,4 @@ py-compile
 config.guess
 config.sub
 ltmain.sh
+compile

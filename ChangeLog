@@ -1,5 +1,8 @@
 2003-11-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* AUTHORS: New file.
+	* configure.ac (AM_INIT_AUTOMAKE): Remove `foreign' option.
+
 	* COPYING: New file.
 	* Makefile.am, configure.ac, doc/Makefile.am, iface/Makefile.am,
 	iface/gspn/Makefile.am, iface/gspn/common.cc,
