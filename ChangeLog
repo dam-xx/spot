@@ -1,5 +1,9 @@
 2004-07-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/reductgba_sim.hh (parity_game_graph_delayed,
+	reduc_tgba_sim): Fix warnings about Doxygen comment.
+	* src/ltlvisit/reduce.hh (reduce): Likewise.
+
 	* doc/footer.html: New file, link to RefDocComments on the wiki.
 	* doc/Doxyfile.in (HTML_FOOTER): Use footer.html.
 	* doc/Makefile.am (EXTRA_DIST): Add footer.html.

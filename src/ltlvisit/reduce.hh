@@ -49,7 +49,7 @@ namespace spot
     ///
     /// \param f the formula to reduce
     /// \param opt a conjonction of spot::ltl::reduce_options specifying
-    //             which optimizations to apply.
+    ///            which optimizations to apply.
     /// \return the reduced formula
     formula* reduce(const formula* f, int opt = Reduce_All);
 

@@ -52,7 +52,7 @@ namespace spot
   ///
   /// \param a the automata to reduce.
   /// \param opt a conjonction of spot::reduce_tgba_options specifying
-  //             which optimizations to apply.
+  ///             which optimizations to apply.
   /// \return the reduced automata.
   tgba* reduc_tgba_sim(const tgba* a, int opt = Reduce_All);
 
@@ -62,11 +62,11 @@ namespace spot
 						      int opt = -1);
 
   /// Compute a delayed simulation relation on state of tgba \a f.
-  // FIXME: This method is correct but she build sometime (when there are more
+  // FIXME: This method is correct but it builds sometime (when there are more
   // than one acceptance condition) only a part of the simulation relation.
   simulation_relation* get_delayed_relation_simulation(const tgba* a,
-						      std::ostream& os,
-						      int opt = -1);
+						       std::ostream& os,
+						       int opt = -1);
 
   /// To free a simulation relation.
   void free_relation_simulation(simulation_relation* rel);
@@ -256,26 +256,27 @@ namespace spot
     bool lead_2_acc_all_;
   };
 
-  /// Parity game graph which compute the delayed simulation relation
-  /// as explain in
-  /// @inproceedings{ icalp2001,
-  /// AUTHOR = {Etessami, Thomas Wilke, Rebecca A. Schuller},
-  /// TITLE = {Fair Simulation Relations, Parity Games, and State Space
-  ///          Reduction for Buchi Automata},
-  /// BOOKTITLE = {Automata, Languages and Programming,
-  /// 28th international collquium},
-  /// PAGES = {694--707},
-  /// YEAR = 2001,
-  /// EDITOR = {Orejas, Fernando and Spirakis, Paul G. and van Leeuwen, Jan},
-  /// VOLUME = 2076,
-  /// SERIES = {Lecture Notes in Computer Science},
-  /// ADDRESS = {Crete, Greece},
-  /// MONTH = JUL,
-  /// PUBLISHER = {Springer},
-  /// url = {citeseer.ist.psu.edu/472661.html}
-  /// }
 
-  class parity_game_graph_delayed : public parity_game_graph
+  /// Parity game graph which computes the delayed simulation relation
+  /// as explained in
+  /// \verbatim
+  /// @InProceedings{etessami.01.alp,
+  ///   author	= {Kousha Etessami and Thomas Wilke and Rebecca A. Schuller},
+  ///   title	= {Fair Simulation Relations, Parity Games, and State Space
+  /// 		  Reduction for Buchi Automata},
+  ///   booktitle = {Proceedings of the 28th international colloquium on
+  /// 		  Automata, Languages and Programming},
+  ///   pages	= {694--707},
+  ///   year	= {2001},
+  ///   editor	= {Fernando Orejas and Paul G. Spirakis and Jan van Leeuwen},
+  ///   volume	= {2076},
+  ///   series	= {Lecture Notes in Computer Science},
+  ///   address	= {Crete, Greece},
+  ///   month	= {July},
+  ///   publisher = {Springer-Verlag}
+  /// }
+  /// \endverbatim
+  class parity_game_graph_delayed: public parity_game_graph
   {
   public:
     parity_game_graph_delayed(const tgba* a);
