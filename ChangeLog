@@ -1,3 +1,9 @@
+2004-11-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/emptchkr.test: Try degeneralized automata.
+	* src/tgbatest/randtgba.cc (main): Pass the correct automaton to
+	minimize_run().
+
 2004-11-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltltest/equals.cc (main): Add option -E.

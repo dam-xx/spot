@@ -49,3 +49,4 @@ run 0 ./randtgba -e 100 -s 550 -r -m -a 4 0.2 -d 0.08
 # Bigger automata.  With valgrind this is slow, so we do less.
 run 0 ./randtgba -e 10 -s 0 -n 500 -r -m -a 1 0.0003 -d 0.01
 run 0 ./randtgba -e 10 -s 0 -n 500 -r -m -a 4 0.0003 -d 0.01
+run 0 ./randtgba -e 10 -s 0 -n 500 -r -m -a 4 0.0005 -D -d 0.01

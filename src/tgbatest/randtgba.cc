@@ -491,7 +491,7 @@ main(int argc, char** argv)
 			  if (opt_minim)
 			    {
 			      spot::tgba_run* minrun =
-				spot::minimize_run(a, run);
+				spot::minimize_run(res->automaton(), run);
 			      if (!spot::replay_tgba_run(s, res->automaton(),
 							 minrun))
 				{
