@@ -1,0 +1,45 @@
+#!/bin/sh
+
+. ./defs
+
+set -e
+
+cat > config <<EOF
+Algorithm
+{
+   Name = "Spot"
+   Path = "${LBTT_TRANSLATE} --spot ./spotlbtt"
+   Enabled = yes
+}
+
+GlobalOptions
+{
+   Rounds = 1
+   Interactive = Never
+#   Verbosity = 5
+}
+
+FormulaOptions
+{
+
+  AbbreviatedOperators = Yes
+  GenerateMode = Normal
+  OutputMode = Normal
+  PropositionPriority = 50
+
+  TruePriority = 1
+  FalsePriority = 1
+
+  AndPriority = 10
+  OrPriority = 10
+  
+  BeforePriority = 0
+  StrongReleasePriority = 0
+  WeakUntilPriority = 0
+
+  DefaultOperatorPriority = 5
+}
+EOF
+
+${LBTT}
+rm config

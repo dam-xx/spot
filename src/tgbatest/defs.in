@@ -26,6 +26,9 @@ test -z "$VERBOSE" && exec >/dev/null 2>&1
 echo "== Running test $0"
 
 DOT='@DOT@'
+top_builddir='@top_builddir@'
+LBTT="@LBTT@"
+LBTT_TRANSLATE="@LBTT_TRANSLATE@"
 
 # Turn on shell traces when VERBOSE=x.
 if test "x$VERBOSE" = xx; then

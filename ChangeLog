@@ -1,6 +1,20 @@
 2003-07-09  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
-	* src/tgba/succiterconcrete.cc (tgba_succ_iterator_concrete::next): 
+	* lbtt/: New directory.  Contains a patched version of lbtt 1.0.1.
+	* Makefile.am (MAYBE_LBTT): New variables.
+	(SUBDIRS): Add $(MAYBE_LBTT).
+	(EXTRA_DIST): Add m4/lbtt.m4.
+	* configure.ac: Call AX_CHECK_LBTT.
+	* m4/lbtt.m4: New file.
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Add spotlbtt.
+	(spotlbtt_SOURCES): New variables.
+	(TESTS): Add spotlbtt.test.
+	(CLEANFILE): Add config.
+	* src/tgbatest/defs.in (top_builddir, LBTT, LBTT_TRANSLATE): New
+	substitutions.
+	* src/tgbatest/spotlbtt.cc, src/tgbatest/spotlbtt.test: New files.
+
+	* src/tgba/succiterconcrete.cc (tgba_succ_iterator_concrete::next):
 	Fix computation of states sharing the same accepting set.
 
 	Make sure we only output one initial state in LBTT's output.

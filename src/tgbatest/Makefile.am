@@ -12,7 +12,8 @@ check_PROGRAMS = \
   bddprod \
   explprod \
   tripprod \
-  mixprod
+  mixprod \
+  spotlbtt
 
 # Keep this sorted alphabetically.
 bddprod_SOURCES  = ltlprod.cc
@@ -25,6 +26,7 @@ mixprod_SOURCES  = mixprod.cc
 readsave_SOURCES = readsave.cc
 tgbaread_SOURCES = tgbaread.cc
 tripprod_SOURCES = tripprod.cc
+spotlbtt_SOURCES = spotlbtt.cc
 
 # Keep this sorted by STRENGTH.  Test basic things first,
 # because such failures will be easier to diagnose and fix.
@@ -37,8 +39,9 @@ TESTS = \
   bddprod.test \
   explprod.test \
   tripprod.test \
-  mixprod.test
+  mixprod.test \
+  spotlbtt.test
 
 EXTRA_DIST = $(TESTS)
 
-CLEANFILES = input input1 input2 input3 stdout expected
+CLEANFILES = input input1 input2 input3 stdout expected config
