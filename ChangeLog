@@ -1,5 +1,8 @@
 2004-04-17  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* iface/gspn/ltlgspn.cc (main) [SSP]: Use the standard
+	counter-example computation for -e5 too.
+
 	* iface/gspn/ltlgspn.cc (main) [!SSP]: Do not accept -e3, -e4, or -e5.
 	(main) [SSP]: Use the standard counter-example computation
 	for -e and -e1.

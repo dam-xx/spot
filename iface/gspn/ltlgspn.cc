@@ -236,6 +236,7 @@ main(int argc, char **argv)
 		      {
 		      case Couvreur:
 		      case Couvreur2:
+		      case Couvreur5:
 			ce = new spot::counter_example(ecs);
 			break;
 		      default:
