@@ -1,7 +1,9 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
-# List directories in the order they must be built.
-SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse ltltest tgba tgbaalgos
+# List directories in the order they must be built.  
+# Keep tests at the end.
+SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse tgba tgbaalgos . \
+	  ltltest
 
 lib_LTLIBRARIES = libspot.la
 libspot_la_SOURCES =

@@ -1,5 +1,7 @@
 2003-06-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/Makefile.am (SUBDIRS): Build `ltltest' after `.'.
+
 	* src/ltlparse/ltlscan.ll: Use ltlyy as %prefix.
 	* src/ltlparse/parsedecl.hh (YY_DECL): Rename yylex to ltlyylex.
 	* src/ltlparse/ltlparse.yy: Define yylex as ltlyylex.
