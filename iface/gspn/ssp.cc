@@ -966,6 +966,8 @@ namespace spot
 	}
       if (i == h.end())
 	return 0;
+      if (i->first != s)
+	delete s;
       return &i->second;
     }
   };
