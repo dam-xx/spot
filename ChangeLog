@@ -1,8 +1,10 @@
 2003-07-25  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* iface/gspn/dcswave.test: Comment state space sizes.
+
 	* src/tgbaalgos/Makefile.am (tgbaalgos_HEADERS): Add reachiters.hh.
 	(libtgbaalgos_la_SOURCES): Add reachiters.cc.
-	* src/tgbaalgos/dotty.cc, src/tgbaalgos/save.cc: Rewrite using 
+	* src/tgbaalgos/dotty.cc, src/tgbaalgos/save.cc: Rewrite using
 	spot::tgba_reachable_iterator_breadth_first.
 	* src/tgbatest/explicit.test, src/tgbatest/tgbaread.test,
 	src/tgbatest/tripprod.test: Adjust expected output.
