@@ -98,6 +98,12 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
     grep -v 'for (;;)' $tmp | grep ';[^	 ")]' &&
       diag 'Must have space or newline after semicolon.'
 
+    grep '}.*}' $tmp &&
+      diag 'No two } on the same line.'
+
+    grep '{.*{' $tmp &&
+      diag 'No two { on the same line.'
+
     $fail && echo "$file" >>failures
   done
 done

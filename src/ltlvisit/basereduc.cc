@@ -80,25 +80,28 @@ namespace spot
 	    return;
 
 	  case unop::X:
-	    /* X(true) = true
-	       X(false) = false */
+	    // X(true) = true
+	    // X(false) = false
 	    if (node_type(result_) == (node_type_form_visitor::Const))
 	      return;
 
-	    /* XGF(f) = GF(f) */
+	    // XGF(f) = GF(f)
 	    if (is_GF(result_))
 	      return;
 
-	    /* X(f1 & GF(f2)) = X(f1) & GF(F2) */
-	    /* X(f1 | GF(f2)) = X(f1) | GF(F2) */
+	    // X(f1 & GF(f2)) = X(f1) & GF(F2)
+	    // X(f1 | GF(f2)) = X(f1) | GF(F2)
 	    mo = dynamic_cast<multop*>(result_);
 	    if (mo && mo->size() == 2)
 	      {
+		// FIXME: This is incomplete.  It should be done for
+		// multops of any size.
 		if (is_GF(mo->nth(0)))
 		  {
 		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::F,
-						  basic_reduce_form(mo->nth(1))));
+		    res->push_back
+		      (unop::instance(unop::F,
+				      basic_reduce_form(mo->nth(1))));
 		    res->push_back(basic_reduce_form(mo->nth(0)));
 		    result_ = multop::instance(mo->op(), res);
 		    destroy(mo);
@@ -107,8 +110,9 @@ namespace spot
 		if (is_GF(mo->nth(1)))
 		  {
 		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::F,
-						  basic_reduce_form(mo->nth(0))));
+		    res->push_back
+		      (unop::instance(unop::F,
+				      basic_reduce_form(mo->nth(0))));
 		    res->push_back(basic_reduce_form(mo->nth(1)));
 		    result_ = multop::instance(mo->op(), res);
 		    destroy(mo);
@@ -116,18 +120,17 @@ namespace spot
 		  }
 	      }
 
-
 	    result_ = unop::instance(unop::X, result_);
 	    return;
 
 	  case unop::F:
 
-	    /* F(true) = true
-	       F(false) = false */
+	    // F(true) = true
+	    // F(false) = false
 	    if (node_type(result_) == (node_type_form_visitor::Const))
 	      return;
 
-	    /* FX(a) = XF(a) */
+	    // FX(a) = XF(a)
 	    u = dynamic_cast<unop*>(result_);
 	    if (u && u->op() == unop::X)
 	      {
@@ -139,32 +142,34 @@ namespace spot
 	      return;
 	    }
 
-	    /* F(f1 & GF(f2)) = F(f1) & GF(F2) */
+	    // F(f1 & GF(f2)) = F(f1) & GF(F2)
 	    mo = dynamic_cast<multop*>(result_);
-	    if (mo && mo->op() == multop::And)
+	    if (mo && mo->op() == multop::And
+		// FIXME: This is incomplete.  It should be done for
+		// "And"s of any size.
+		&& mo->size() == 2)
 	      {
-		if (mo->size() == 2)
+		if (is_GF(mo->nth(0)))
 		  {
-		    if (is_GF(mo->nth(0)))
-		      {
-			multop::vec* res = new multop::vec;
-			res->push_back(unop::instance(unop::F,
-						      basic_reduce_form(mo->nth(1))));
-			res->push_back(basic_reduce_form(mo->nth(0)));
-			result_ = multop::instance(mo->op(), res);
-			destroy(mo);
-			return;
-		      }
-		    if (is_GF(mo->nth(1)))
-		      {
-			multop::vec* res = new multop::vec;
-			res->push_back(unop::instance(unop::F,
-						      basic_reduce_form(mo->nth(0))));
-			res->push_back(basic_reduce_form(mo->nth(1)));
-			result_ = multop::instance(mo->op(), res);
-			destroy(mo);
-			return;
-		      }
+		    multop::vec* res = new multop::vec;
+		    res->push_back
+		      (unop::instance(unop::F,
+				      basic_reduce_form(mo->nth(1))));
+		    res->push_back(basic_reduce_form(mo->nth(0)));
+		    result_ = multop::instance(mo->op(), res);
+		    destroy(mo);
+		    return;
+		  }
+		if (is_GF(mo->nth(1)))
+		  {
+		    multop::vec* res = new multop::vec;
+		    res->push_back
+		      (unop::instance(unop::F,
+				      basic_reduce_form(mo->nth(0))));
+		    res->push_back(basic_reduce_form(mo->nth(1)));
+		    result_ = multop::instance(mo->op(), res);
+		    destroy(mo);
+		    return;
 		  }
 	      }
 
@@ -174,12 +179,12 @@ namespace spot
 
 	  case unop::G:
 
-	    /* G(true) = true
-	       G(false) = false */
+	    // G(true) = true
+	    // G(false) = false
 	    if (node_type(result_) == (node_type_form_visitor::Const))
 	      return;
 
-	    /* G(a R b) = G(b) */
+	    // G(a R b) = G(b)
 	    bo = dynamic_cast<binop*>(result_);
 	    if (bo && bo->op() == binop::R)
 	      {
@@ -189,7 +194,7 @@ namespace spot
 		return;
 	      }
 
-	    /* GX(a) = XG(a) */
+	    // GX(a) = XG(a)
 	    u = dynamic_cast<unop*>(result_);
 	    if (u && u->op() == unop::X)
 	      {
@@ -201,35 +206,36 @@ namespace spot
 		return;
 	      }
 
-	    /* G(f1 | GF(f2)) = G(f1) | GF(F2) */
+	    // G(f1 | GF(f2)) = G(f1) | GF(F2)
 	    mo = dynamic_cast<multop*>(result_);
-	    if (mo && mo->op() == multop::Or)
+	    if (mo && mo->op() == multop::Or
+		// FIXME: This is incomplete.  It should be done for
+		// "Or"s of any size.
+		&& mo->size() == 2)
 	      {
-		if (mo->size() == 2)
+		if (is_GF(mo->nth(0)))
 		  {
-		    if (is_GF(mo->nth(0)))
-		      {
-			multop::vec* res = new multop::vec;
-			res->push_back(unop::instance(unop::F,
-						      basic_reduce_form(mo->nth(1))));
-			res->push_back(basic_reduce_form(mo->nth(0)));
-			result_ = multop::instance(mo->op(), res);
-			destroy(mo);
-			return;
-		      }
-		    if (is_GF(mo->nth(1)))
-		      {
-			multop::vec* res = new multop::vec;
-			res->push_back(unop::instance(unop::F,
-						      basic_reduce_form(mo->nth(0))));
-			res->push_back(basic_reduce_form(mo->nth(1)));
-			result_ = multop::instance(mo->op(), res);
-			destroy(mo);
-			return;
-		      }
+		    multop::vec* res = new multop::vec;
+		    res->push_back
+		      (unop::instance(unop::F,
+				      basic_reduce_form(mo->nth(1))));
+		    res->push_back(basic_reduce_form(mo->nth(0)));
+		    result_ = multop::instance(mo->op(), res);
+		    destroy(mo);
+		    return;
+		  }
+		if (is_GF(mo->nth(1)))
+		  {
+		    multop::vec* res = new multop::vec;
+		    res->push_back
+		      (unop::instance(unop::F,
+				      basic_reduce_form(mo->nth(0))));
+		    res->push_back(basic_reduce_form(mo->nth(1)));
+		    result_ = multop::instance(mo->op(), res);
+		    destroy(mo);
+		    return;
 		  }
 	      }
-
 
 	    result_ = unop::instance(unop::G, result_);
 	    return;
@@ -268,8 +274,8 @@ namespace spot
 	  case binop::U:
 	    f2 = basic_reduce_form(f2);
 
-	    /* a U false = false
-	       a U true = true */
+	    // a U false = false
+	    // a U true = true
 	    if (node_type(f2) == (node_type_form_visitor::Const))
 	      {
 		result_ = f2;
@@ -278,7 +284,7 @@ namespace spot
 
 	    f1 = basic_reduce_form(f1);
 
-	    /* X(a) U X(b) = X(a U b) */
+	    // X(a) U X(b) = X(a U b)
 	    fu1 = dynamic_cast<unop*>(f1);
 	    fu2 = dynamic_cast<unop*>(f2);
 	    if ((fu1 && fu2) &&
@@ -301,8 +307,8 @@ namespace spot
 	  case binop::R:
 	    f2 = basic_reduce_form(f2);
 
-	    /* a R false = false
-	       a R true = true */
+	    // a R false = false
+	    // a R true = true
 	    if (node_type(f2) == (node_type_form_visitor::Const))
 	      {
 		result_ = f2;
@@ -311,7 +317,7 @@ namespace spot
 
 	    f1 = basic_reduce_form(f1);
 
-	    /* X(a) R X(b) = X(a R b) */
+	    // X(a) R X(b) = X(a R b)
 	    fu1 = dynamic_cast<unop*>(f1);
 	    fu2 = dynamic_cast<unop*>(f2);
 	    if ((fu1 && fu2) &&
@@ -375,7 +381,7 @@ namespace spot
 
 		  case node_type_form_visitor::Unop:
 
-		    /* Xa & Xb = X(a & b)*/
+		    // Xa & Xb = X(a & b)
 		    uo = dynamic_cast<unop*>(*i);
 		    if (uo && uo->op() == unop::X)
 		      {
@@ -383,7 +389,7 @@ namespace spot
 			break;
 		      }
 
-		    /* FG(a) & FG(b) = FG(a & b)*/
+		    // FG(a) & FG(b) = FG(a & b)
 		    if (is_FG(*i))
 		      {
 			uo2 = dynamic_cast<unop*>(uo->child());
@@ -395,19 +401,18 @@ namespace spot
 
 		  case node_type_form_visitor::Binop:
 
-		    /* (a U b) & (c U b) = (a & c) U b */
+		    // (a U b) & (c U b) = (a & c) U b
 		    if (dynamic_cast<binop*>(*i)->op() == binop::U)
 		      {
 			ftmp = dynamic_cast<binop*>(*i)->second();
 			tmpUright = new multop::vec;
 			for (multop::vec::iterator j = i; j != res->end(); j++)
 			  {
-			    if (*j == NULL)
+			    if (!*j)
 			      continue;
-			    if ((node_type(*j) == node_type_form_visitor::Binop)
-				&&
-				(dynamic_cast<binop*>(*j)->op() == binop::U) &&
-				(ftmp == dynamic_cast<binop*>(*j)->second()))
+			    if (node_type(*j) == node_type_form_visitor::Binop
+				&& dynamic_cast<binop*>(*j)->op() == binop::U
+				&& ftmp == dynamic_cast<binop*>(*j)->second())
 			      {
 				bo = dynamic_cast<binop*>(*j);
 				tmpUright
@@ -415,7 +420,7 @@ namespace spot
 				if (j != i)
 				  {
 				    destroy(*j);
-				    *j = NULL;
+				    *j = 0;
 				  }
 			      }
 			  }
@@ -429,19 +434,18 @@ namespace spot
 			break;
 		      }
 
-		    /* (a R b) & (a R c) = a R (b & c) */
+		    // (a R b) & (a R c) = a R (b & c)
 		    if (dynamic_cast<binop*>(*i)->op() == binop::R)
 		      {
 			ftmp = dynamic_cast<binop*>(*i)->first();
 			tmpRright = new multop::vec;
 			for (multop::vec::iterator j = i; j != res->end(); j++)
 			  {
-			    if (*j == NULL)
+			    if (!*j)
 			      continue;
-			    if ((node_type(*j) == node_type_form_visitor::Binop)
-				&&
-				(dynamic_cast<binop*>(*j)->op() == binop::R) &&
-				(ftmp == dynamic_cast<binop*>(*j)->first()))
+			    if (node_type(*j) == node_type_form_visitor::Binop
+				&& dynamic_cast<binop*>(*j)->op() == binop::R
+				&& ftmp == dynamic_cast<binop*>(*j)->first())
 			      {
 				bo = dynamic_cast<binop*>(*j);
 				tmpRright
@@ -449,7 +453,7 @@ namespace spot
 				if (j != i)
 				  {
 				    destroy(*j);
-				    *j = NULL;
+				    *j = 0;
 				  }
 			      }
 			  }
@@ -479,14 +483,14 @@ namespace spot
 
 	    for (multop::vec::iterator i = res->begin(); i != res->end(); i++)
 	      {
-		if (*i == NULL)
+		if (!*i)
 		  continue;
 		switch (node_type(*i))
 		  {
 
 		  case node_type_form_visitor::Unop:
 
-		    /* Xa | Xb = X(a | b)*/
+		    // Xa | Xb = X(a | b)
 		    uo = dynamic_cast<unop*>(*i);
 		    if (uo && uo->op() == unop::X)
 		      {
@@ -494,7 +498,7 @@ namespace spot
 			break;
 		      }
 
-		    /* GF(a) | GF(b) = GF(a | b)*/
+		    // GF(a) | GF(b) = GF(a | b)
 		    if (is_GF(*i))
 		      {
 			uo2 = dynamic_cast<unop*>(uo->child());
@@ -506,19 +510,18 @@ namespace spot
 
 		  case node_type_form_visitor::Binop:
 
-		    /* (a U b) | (a U c) = a U (b | c) */
+		    // (a U b) | (a U c) = a U (b | c)
 		    if (dynamic_cast<binop*>(*i)->op() == binop::U)
 		      {
 			ftmp = dynamic_cast<binop*>(*i)->first();
 			tmpUright = new multop::vec;
 			for (multop::vec::iterator j = i; j != res->end(); j++)
 			  {
-			    if (*j == NULL)
+			    if (!*j)
 			      continue;
-			    if ((node_type(*j) == node_type_form_visitor::Binop)
-				&&
-				(dynamic_cast<binop*>(*j)->op() == binop::U) &&
-				(ftmp == dynamic_cast<binop*>(*j)->first()))
+			    if (node_type(*j) == node_type_form_visitor::Binop
+				&& dynamic_cast<binop*>(*j)->op() == binop::U
+				&& ftmp == dynamic_cast<binop*>(*j)->first())
 			      {
 				bo = dynamic_cast<binop*>(*j);
 				tmpUright
@@ -526,7 +529,7 @@ namespace spot
 				if (j != i)
 				  {
 				    destroy(*j);
-				    *j = NULL;
+				    *j = 0;
 				  }
 			      }
 			  }
@@ -538,19 +541,18 @@ namespace spot
 			break;
 		      }
 
-		    /* (a R b) | (c R b) = (a | c) R b */
+		    // (a R b) | (c R b) = (a | c) R b
 		    if (dynamic_cast<binop*>(*i)->op() == binop::R)
 		      {
 			ftmp = dynamic_cast<binop*>(*i)->second();
 			tmpRright = new multop::vec;
 			for (multop::vec::iterator j = i; j != res->end(); j++)
 			  {
-			    if (*j == NULL)
+			    if (!*j)
 			      continue;
-			    if ((node_type(*j) == node_type_form_visitor::Binop)
-				&&
-				(dynamic_cast<binop*>(*j)->op() == binop::R) &&
-				(ftmp == dynamic_cast<binop*>(*j)->second()))
+			    if (node_type(*j) == node_type_form_visitor::Binop
+				&& dynamic_cast<binop*>(*j)->op() == binop::R
+				&& ftmp == dynamic_cast<binop*>(*j)->second())
 			      {
 				bo = dynamic_cast<binop*>(*j);
 				tmpRright
@@ -558,7 +560,7 @@ namespace spot
 				if (j != i)
 				  {
 				    destroy(*j);
-				    *j = NULL;
+				    *j = 0;
 				  }
 			      }
 			  }

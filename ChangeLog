@@ -1,5 +1,9 @@
 2004-05-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/sanity/style.test: Catch {.*{ and }.*}.
+	* src/sanity/80columns.test: Untabify files.
+	* iface/gspn/ltlgspn.cc, src/ltlvisit/basereduc.cc: Fix long lines.
+
 	* src/ltlvisit/basereduc.cc, src/ltlvisit/reducform.cc,
 	src/ltlvisit/forminf.cc: Remove superfluous spot::ltl:: prefixes.
 

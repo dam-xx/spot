@@ -63,7 +63,8 @@ syntax(char* prog)
 #ifdef SSP
 	    << "  -e3 use semi-d. incl. Couvreur's emptiness-check"
 	    << std::endl
-	    << "  -e4 use semi-d. incl. Couvreur's emptiness-check's shy variant"
+	    << "  -e4 use semi-d. incl. Couvreur's emptiness-check's "
+	    << "shy variant"
 	    << std::endl
 	    << "  -e5 use d. incl. Couvreur's emptiness-check's shy variant"
 	    << std::endl
