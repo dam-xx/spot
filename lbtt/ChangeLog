@@ -1,5 +1,9 @@
 2004-03-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* configure.ac (YACC): Do not add `-d' here...
+	* src/Makefile.am (AM_YFLAGS): ... do it here.
+	(BUILT_SOURCES): New variable.
+
 	* doc/texinfo.tex: New upstream version.
 
 2004-02-11  Alexandre Duret-Lutz  <adl@src.lip6.fr>

@@ -1,3 +1,6 @@
+BUILT_SOURCES = Config-parse.h NeverClaim-parse.h
+AM_YFLAGS = -d
+
 bin_PROGRAMS = lbtt lbtt-translate
 lbtt_SOURCES = \
   BitArray.cc \
