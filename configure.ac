@@ -17,6 +17,8 @@ AC_CHECK_PROG([DOT], [dot], [dot])
 
 AC_CONFIG_FILES([
   Makefile
+  doc/Makefile
+  doc/Doxyfile
   src/Makefile
   src/ltlenv/Makefile
   src/ltlast/Makefile

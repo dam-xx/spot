@@ -1,5 +1,9 @@
 2003-04-18  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* configure.ac: Output doc/Doxyfile and doc/Makefile.
+	* doc/Makefile.am, doc/Doxyfile.in: New files.
+	* Makefile.am (SUBDIRS): Add doc.
+	
 	* src/ltlparse/ltlscan.ll: Recognize && and ||.
 	* src/ltltest/parse.test, src/ltltest/parseerr.test, 
 	src/ltltest/equals.test: Use these operators..
