@@ -1,5 +1,8 @@
 2004-06-23  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/ltlvisit/basicreduce.cc (basic_reduce_visitor::visit(binop*)):
+	Factorize.
+
 	* src/ltlvisit/basicreduce.hh: New file, extracted from ...
 	* src/ltlvisit/reducform.hh: ... here.
 	* src/ltlvisit/basereduc.cc: Rename as ...

@@ -232,56 +232,18 @@ namespace spot
 	switch (bo->op())
 	  {
 	  case binop::Xor:
-	    result_ = binop::instance(binop::Xor,
-				      basic_reduce(f1),
-				      basic_reduce(f2));
-	    return;
 	  case binop::Equiv:
-	    result_ = binop::instance(binop::Equiv,
-				      basic_reduce(f1),
-				      basic_reduce(f2));
-	    return;
 	  case binop::Implies:
-	    result_ = binop::instance(binop::Implies,
+	    result_ = binop::instance(bo->op(),
 				      basic_reduce(f1),
 				      basic_reduce(f2));
 	    return;
 	  case binop::U:
+	  case binop::R:
 	    f2 = basic_reduce(f2);
 
 	    // a U false = false
 	    // a U true = true
-	    if (dynamic_cast<constant*>(f2))
-	      {
-		result_ = f2;
-		return;
-	      }
-
-	    f1 = basic_reduce(f1);
-
-	    // X(a) U X(b) = X(a U b)
-	    fu1 = dynamic_cast<unop*>(f1);
-	    fu2 = dynamic_cast<unop*>(f2);
-	    if ((fu1 && fu2) &&
-		(fu1->op() == unop::X) &&
-		(fu2->op() == unop::X))
-	      {
-		formula* ftmp = binop::instance(binop::U,
-						basic_reduce(fu1->child()),
-						basic_reduce(fu2->child()));
-		result_ = unop::instance(unop::X, basic_reduce(ftmp));
-		destroy(f1);
-		destroy(f2);
-		destroy(ftmp);
-		return;
-	      }
-
-	    result_ = binop::instance(binop::U, f1, f2);
-	    return;
-
-	  case binop::R:
-	    f2 = basic_reduce(f2);
-
 	    // a R false = false
 	    // a R true = true
 	    if (dynamic_cast<constant*>(f2))
@@ -292,12 +254,13 @@ namespace spot
 
 	    f1 = basic_reduce(f1);
 
+	    // X(a) U X(b) = X(a U b)
 	    // X(a) R X(b) = X(a R b)
 	    fu1 = dynamic_cast<unop*>(f1);
 	    fu2 = dynamic_cast<unop*>(f2);
-	    if ((fu1 && fu2) &&
-		(fu1->op() == unop::X) &&
-		(fu2->op() == unop::X))
+	    if (fu1 && fu2
+		&& fu1->op() == unop::X
+		&& fu2->op() == unop::X)
 	      {
 		formula* ftmp = binop::instance(bo->op(),
 						basic_reduce(fu1->child()),
@@ -309,8 +272,7 @@ namespace spot
 		return;
 	    }
 
-	    result_ = binop::instance(bo->op(),
-				      f1, f2);
+	    result_ = binop::instance(bo->op(), f1, f2);
 	    return;
 	  }
 	/* Unreachable code.  */
