@@ -1,4 +1,5 @@
 #!@PYTHON@
+# -*- python -*-
 
 import sys
 import os
@@ -6,7 +7,7 @@ import cgi
 import cgitb; cgitb.enable()
 
 sys.path.insert(0, '@pythondir@')
-# Directory for temporary files (images and other auxiliary files). 
+# Directory for temporary files (images and other auxiliary files).
 imgdir = 'spotimg'
 
 # Cleanup stale files from our image directory.
@@ -51,6 +52,8 @@ formula = form.getfirst('formula', '')
 
 options = [
     ('show_parse',          'show traces during parsing',                  0),
+    ('show_formula_dot',    'print the formula as .dot',                   0),
+    ('show_formula_gif',    'draw the formula',                            0),
     ('show_automaton_dot',  'print Büchi automaton as .dot',               0),
     ('show_automaton_gif',  'draw Büchi automaton',                        1),
     ('show_degen_dot',      'print degeneralized Büchi automaton as .dot', 0),
@@ -111,6 +114,22 @@ if err:
     print '<p><b>Continuing anyway...</b></p>'
 
 print "<p>Formula is<code>", f, "</code></p>"
+
+if show_formula_dot:
+    print '<pre>'; sys.stdout.flush()
+    s = spot.ostringstream()
+    spot.dotty(s, f)
+    print cgi.escape(s.str())
+    del s
+    print '</pre>'; sys.stdout.flush()
+if show_formula_gif:
+    outfile = spot.ofstream(imgprefix + '-f.dot')
+    spot.dotty(outfile, f)
+    del outfile
+    os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-o',
+               imgprefix + '-f.gif', imgprefix + '-f.dot')
+    print '<img src="' + imgprefix + '-f.gif">'
+
 
 print '<H2>Automaton</H2>'
 

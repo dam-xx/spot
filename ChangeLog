@@ -1,5 +1,8 @@
 2003-08-06  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* wrap/python/cgi/ltl2tgba.in: Handle show_formula_dot and
+	show_formula_gif.
+
 	* src/ltlvisit/dotty.hh (dotty): Move the ostream argument first.
 	* src/ltlvisit/dump.hh (dump): Likewise.
 	* src/ltltest/equals.cc, src/ltltest/readltl.cc,
