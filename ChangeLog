@@ -1,5 +1,11 @@
 2004-09-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	Update to SWIG 1.3.22.
+	* wrap/python/libpy.c: Delete.
+	* wrap/python/swigpy.i: New file.
+	* wrap/python/Makefile.am (swigpy_wrap.c): Build this from swigpy.i
+	and use it instead of libpy.c.
+
 	* INSTALL, lbtt/INSTALL: New upstream version.
 
 2004-09-14  Thomas Martinez  <martinez@src.lip6.fr>

@@ -7,5 +7,5 @@ spot.py*
 buddy.py*
 *.lo
 *.loT
-*_wrap.cxx
+*_wrap.*
 *.pyc
