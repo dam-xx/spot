@@ -39,7 +39,7 @@ digraph G {
   0 [label="", style=invis, height=0]
   0 -> 1
   1 [label="s1"]
-  1 -> 2 [label="(a & !b)\n{Acc[d], Acc[c]}"]
+  1 -> 2 [label="a & !b\n{Acc[d], Acc[c]}"]
   2 [label="s2"]
   2 -> 3 [label="a\n{Acc[c]}"]
   3 [label="state 3"]

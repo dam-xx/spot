@@ -33,28 +33,28 @@ while read file; do
 
    sed 's,//.*,,' < $file > $tmp
 
-   grep ' if(' $tmp &&
+   grep '[	 ]if(' $tmp &&
      diag 'Missing space after "if"'
 
-   grep ' if (.*).*{' $tmp &&
+   grep '[	 ]if (.*).*{' $tmp &&
      diag 'Opening { should be on its own line.'
 
-   grep ' while(' $tmp &&
+   grep '[	 ]while(' $tmp &&
      diag 'Missing space after "while"'
 
-   grep ' while (.*).*{' $tmp &&
+   grep '[	 ]while (.*).*{' $tmp &&
      diag 'Opening { should be on its own line.'
 
-   grep ' for(' $tmp &&
+   grep '[	 ]for(' $tmp &&
      diag 'Missing space after "for"'
 
-   grep ' for (.*).*{' $tmp &&
+   grep '[	 ]for (.*).*{' $tmp &&
      diag 'Opening { should be on its own line.'
 
-   grep ' switch(' $tmp &&
-     diag 'Missing space after "for"'
+   grep '[	 ]switch(' $tmp &&
+     diag 'Missing space after "switch"'
 
-   grep ' switch (.*).*{' $tmp &&
+   grep '[	 ]switch (.*).*{' $tmp &&
      diag 'Opening { should be on its own line.'
 
    grep '( ' $tmp &&
@@ -69,10 +69,10 @@ while read file; do
    grep ',[(a-zA-Z+=_!]' $tmp &&
      diag 'Space after coma.'
 
-   grep '[^ \t\n]&&[^ \t\n]' $tmp &&
+   grep '[^	 ]&&[^	 ]' $tmp &&
      diag 'Space arround binary operators.'
 
-   grep '[^ \t\n]||[^ \t\n]' $tmp &&
+   grep '[^	 ]||[^	 ]' $tmp &&
      diag 'Space arround binary operators.'
 
    $fail && echo "$file" >>failures

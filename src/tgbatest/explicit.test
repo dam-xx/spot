@@ -38,7 +38,7 @@ digraph G {
   2 [label="state 1"]
   2 -> 3 [label="a\n{Acc[r]}"]
   3 [label="state 2"]
-  3 -> 1 [label="(b & c)\n"]
+  3 -> 1 [label="b & c\n"]
 }
 EOF
 

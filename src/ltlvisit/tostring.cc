@@ -35,7 +35,7 @@ namespace spot
     {
     public:
       to_string_visitor(std::ostream& os = std::cout)
-      : os_(os)
+	: os_(os), top_level_(true)
       {
       }
 
@@ -69,10 +69,14 @@ namespace spot
       void
       visit(const binop* bo)
       {
-	os_ << "(";
+	bool top_level = top_level_;
+	top_level_ = false;
+	if (!top_level)
+	  os_ << "(";
+
 	bo->first()->accept(*this);
 
-	switch(bo->op())
+	switch (bo->op())
 	  {
 	  case binop::Xor:
 	    os_ << " ^ ";
@@ -92,7 +96,8 @@ namespace spot
 	  }
 
 	bo->second()->accept(*this);
-	os_ << ")";
+	if (!top_level)
+	  os_ << ")";
       }
 
       void
@@ -101,7 +106,7 @@ namespace spot
 	// The parser treats F0, F1, G0, G1, X0, and X1 as atomic
 	// propositions.  So make sure we output F(0), G(1), etc.
 	bool need_parent = !!dynamic_cast<const constant*>(uo->child());
-	switch(uo->op())
+	switch (uo->op())
 	  {
 	  case unop::Not:
 	    os_ << "!";
@@ -118,6 +123,7 @@ namespace spot
 	    break;
 	  }
 
+	top_level_ = false;
 	if (need_parent)
 	  os_ << "(";
 	uo->child()->accept(*this);
@@ -128,7 +134,10 @@ namespace spot
       void
       visit(const multop* mo)
       {
-	os_ << "(";
+	bool top_level = top_level_;
+	top_level_ = false;
+	if (!top_level)
+	  os_ << "(";
 	unsigned max = mo->size();
 	mo->nth(0)->accept(*this);
 	const char* ch = " ";
@@ -147,10 +156,12 @@ namespace spot
 	    os_ << ch;
 	    mo->nth(n)->accept(*this);
 	  }
-	os_ << ")";
+	if (!top_level)
+	  os_ << ")";
       }
     protected:
       std::ostream& os_;
+      bool top_level_;
     };
 
     std::ostream&
@@ -185,9 +196,12 @@ namespace spot
       void
       visit(const binop* bo)
       {
-	os_ << "(";
+	bool top_level = top_level_;
+	top_level_ = false;
+	if (!top_level)
+	  os_ << "(";
 
-	switch(bo->op())
+	switch (bo->op())
 	  {
 	  case binop::Xor:
 	    os_ << "(!";
@@ -228,7 +242,8 @@ namespace spot
 	    break;
 	  }
 
-	os_ << ")";
+	if (!top_level)
+	  os_ << ")";
       }
 
       void
@@ -237,7 +252,7 @@ namespace spot
 	// The parser treats X0, and X1 as atomic propositions.	 So
 	// make sure we output X(0) and X(1).
 	bool need_parent = false;
-	switch(uo->op())
+	switch (uo->op())
 	  {
 	  case unop::Not:
 	    os_ << "!";
@@ -254,6 +269,7 @@ namespace spot
 	    break;
 	  }
 
+	top_level_ = false;
 	if (need_parent)
 	  os_ << "(";
 	uo->child()->accept(*this);
@@ -264,7 +280,10 @@ namespace spot
       void
       visit(const multop* mo)
       {
-	os_ << "(";
+	bool top_level = top_level_;
+	top_level_ = false;
+	if (!top_level)
+	  os_ << "(";
 	unsigned max = mo->size();
 	mo->nth(0)->accept(*this);
 	const char* ch = " ";
@@ -283,7 +302,8 @@ namespace spot
 	    os_ << ch;
 	    mo->nth(n)->accept(*this);
 	  }
-	os_ << ")";
+	if (!top_level)
+	  os_ << ")";
       }
     };
 

@@ -39,8 +39,8 @@ EOF
 
 cat >expected <<EOF
 acc = "p1" "p2" "p3";
-"s1 * s1", "s2 * s2", "(!a & b)",  "p1" "p2";
-"s1 * s1", "s3 * s3", "(a & !b)",  "p2" "p3";
+"s1 * s1", "s2 * s2", "!a & b",  "p1" "p2";
+"s1 * s1", "s3 * s3", "a & !b",  "p2" "p3";
 EOF
 
 run 0 ./explprod input1 input2 > stdout
@@ -48,7 +48,7 @@ run 0 ./explprod input1 input2 > stdout
 # Sort out some possible inversions in the output.
 # (The order is not guaranteed by SPOT.)
 perl -pe 's/("\w+") ("\w+")(?: ("\w+"))?/@{[sort $1, $2, $3]}/g;
-          s/\(!b & a\)/(a & !b)/g;s/\(b & !a\)/(!a & b)/g' \
+          s/!b & a/a & !b/g;s/b & !a/!a & b/g' \
   stdout > tmp_ && mv tmp_ stdout
 
 cat stdout

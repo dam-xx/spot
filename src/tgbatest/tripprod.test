@@ -49,12 +49,12 @@ EOF
 
 cat >expected <<EOF
 acc = "p1" "p2" "p3" "p4";
-"s1 * s1 * s1", "s3 * s2 * s2", "(a & b)",   "p1" "p2";
-"s1 * s1 * s1", "s2 * s2 * s2", "(a & b)",   "p1" "p2";
-"s1 * s1 * s1", "s3 * s2 * s3", "(a & b)",   "p1" "p2";
+"s1 * s1 * s1", "s3 * s2 * s2", "a & b",   "p1" "p2";
+"s1 * s1 * s1", "s2 * s2 * s2", "a & b",   "p1" "p2";
+"s1 * s1 * s1", "s3 * s2 * s3", "a & b",   "p1" "p2";
 "s1 * s1 * s1", "s2 * s2 * s3", "b",   "p1" "p2";
-"s2 * s2 * s2", "s3 * s1 * s3", "(a & c)",   "p3" "p4";
-"s2 * s2 * s3", "s3 * s1 * s2", "(a & c)",   "p3" "p4";
+"s2 * s2 * s2", "s3 * s1 * s3", "a & c",   "p3" "p4";
+"s2 * s2 * s3", "s3 * s1 * s2", "a & c",   "p3" "p4";
 EOF
 
 run 0 ./tripprod input1 input2 input3 > stdout
@@ -62,7 +62,7 @@ run 0 ./tripprod input1 input2 input3 > stdout
 # Sort out some possible inversions in the output.
 # (The order is not guaranteed by SPOT.)
 perl -pe 's/("\w+") ("\w+")(?: ("\w+"))?(?: ("\w+"))?/@{[sort $1,$2,$3,$4]}/g;
-          s/\(c & a\)/(a & c)/g;s/\(b & a\)/(a & b)/g' \
+          s/c & a/a & c/g;s/b & a/a & b/g' \
   stdout > tmp_ &&
   mv tmp_ stdout
 
