@@ -7,6 +7,7 @@
 #include "tgba/bddprint.hh"
 #include "tgba/tgbabddtranslatefactory.hh"
 #include "tgbaalgos/dotty.hh"
+#include "tgbaalgos/lbtt.hh"
 
 void
 syntax(char* prog)
@@ -19,10 +20,10 @@ syntax(char* prog)
 	    << "  -A   same as -a, but as a set" << std::endl
 	    << "  -d   turn on traces during parsing" << std::endl
 	    << "  -o   re-order BDD variables in the automata" << std::endl
-	    << std::endl
 	    << "  -r   display the relation BDD, not the reachability graph"
 	    << std::endl
 	    << "  -R   same as -r, but as a set" << std::endl
+	    << "  -t   display reachable states in LBTT's format" << std::endl
 	    << "  -v   display the BDD variables used by the automaton"
 	    << std::endl;
   exit(2);
@@ -68,6 +69,10 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-R"))
 	{
 	  output = 3;
+	}
+      else if (!strcmp(argv[formula_index], "-t"))
+	{
+	  output = 6;
 	}
       else if (!strcmp(argv[formula_index], "-v"))
 	{
@@ -117,6 +122,9 @@ main(int argc, char** argv)
 	  break;
 	case 5:
 	  a.get_dict().dump(std::cout);
+	  break;
+	case 6:
+	  spot::lbtt_reachable(std::cout, a);
 	  break;
 	default:
 	  assert(!"unknown output option");

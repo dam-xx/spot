@@ -73,7 +73,8 @@ namespace spot
 	else
 	  not_first = true;
 	if (varset[v] == 0)
-	  *where << "!";
+	  // The space is important for LBTT.
+	  *where << "! ";
 	print_handler(*where, v);
       }
   }

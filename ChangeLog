@@ -1,5 +1,12 @@
 2003-07-08  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgbatest/ltl2tgba.cc: Add option -t to output the LBTT automata.
+	* src/tgbaalgos/lbtt.cc, src/tgbaalgos/lbtt.hh: New files.
+	* src/tgbaalgos/Makefile.am (tgbaalgos_HEADERS): Add lbtt.hh.
+	(libtgbaalgos_la_SOURCES): Add lbtt.cc.
+	* src/tgba/bddprint.cc (print_sat_handler): Put a space after "!".
+	* src/tgbatest/readsave.test: Adjust spaces after "!".
+
 	* src/ltlvisit/dump.cc: Strip useless spot::ltl:: prefixes.
 
 2003-07-07  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
