@@ -20,7 +20,7 @@
 // 02111-1307, USA.
 
 #ifndef SPOT_LTLVISIT_APCOLLECT_HH
-# define SPOT_LTLVISIT_AP_COLLECT_HH
+# define SPOT_LTLVISIT_APCOLLECT_HH
 
 #include <set>
 #include "ltlvisit/postfix.hh"
