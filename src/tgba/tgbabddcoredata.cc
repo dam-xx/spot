@@ -7,7 +7,7 @@ namespace spot
       accepting_conditions(bddfalse),
       now_set(bddtrue),
       next_set(bddtrue),
-      negnow_set(bddtrue),
+      nownext_set(bddtrue),
       notnow_set(bddtrue),
       notnext_set(bddtrue),
       var_set(bddtrue),
@@ -25,7 +25,7 @@ namespace spot
       accepting_conditions(copy.accepting_conditions),
       now_set(copy.now_set),
       next_set(copy.next_set),
-      negnow_set(copy.negnow_set),
+      nownext_set(copy.nownext_set),
       notnow_set(copy.notnow_set),
       notnext_set(copy.notnext_set),
       var_set(copy.var_set),
@@ -46,7 +46,7 @@ namespace spot
 			   | right.accepting_conditions),
       now_set(left.now_set & right.now_set),
       next_set(left.next_set & right.next_set),
-      negnow_set(left.negnow_set & right.negnow_set),
+      nownext_set(left.nownext_set & right.nownext_set),
       notnow_set(left.notnow_set & right.notnow_set),
       notnext_set(left.notnext_set & right.notnext_set),
       var_set(left.var_set & right.var_set),
@@ -80,10 +80,10 @@ namespace spot
   {
     now_set &= now;
     next_set &= next;
-    negnow_set &= !now;
     notnext_set &= now;
     notnow_set &= next;
     bdd both = now & next;
+    nownext_set &= both;
     notvar_set &= both;
     notacc_set &= both;
     varandnext_set &= next;

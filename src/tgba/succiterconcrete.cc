@@ -111,7 +111,7 @@ namespace spot
 	      {
 		// AS is false when no transition from ST belongs to
 		// an accepting set.  Iterate over ST directly.
-		trans_set_ = bdd_exist(st, data_.now_set & data_.next_set);
+		trans_set_ = bdd_exist(st, data_.nownext_set);
 	      }
 	    else
 	      {
@@ -119,7 +119,7 @@ namespace spot
 		// only work over a set of transitions sharing the
 		// same accepting set.
 
-		as = bdd_exist(as, data_.now_set & data_.next_set);
+		as = bdd_exist(as, data_.nownext_set);
 		// as = (a | (!a)&b) & (Acc[a] | Acc[b]) + (!a & Acc[b])
 		bdd cube = bdd_satone(as);
 		// cube = (!ab & Acc[a])
@@ -137,7 +137,7 @@ namespace spot
 	// Pick and remove one satisfaction from trans_set_left_.
 	bdd cube = bdd_satone(trans_set_left_);
 	trans_set_left_ &= !cube;
-	// Let this cube grow as much as possible. 
+	// Let this cube grow as much as possible.
 	// (e.g., cube "(!a)&b" taken from "a | (!a)&b" can
 	// be simplified to "b").
 	cube = bdd_simplify(cube, cube | neg_trans_set_);

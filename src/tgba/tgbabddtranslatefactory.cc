@@ -16,7 +16,7 @@ namespace spot
     data_.accepting_conditions = bdd_replace(in.accepting_conditions, rewrite);
     data_.now_set = bdd_replace(in.now_set, rewrite);
     data_.next_set = bdd_replace(in.next_set, rewrite);
-    data_.negnow_set = bdd_replace(in.negnow_set, rewrite);
+    data_.nownext_set = bdd_replace(in.nownext_set, rewrite);
     data_.notnow_set = bdd_replace(in.notnow_set, rewrite);
     data_.notnext_set = bdd_replace(in.notnext_set, rewrite);
     data_.notvar_set = bdd_replace(in.notvar_set, rewrite);
