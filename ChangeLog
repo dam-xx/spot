@@ -1,3 +1,27 @@
+2003-05-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	Initial code for TGBA (Transition Generalized Büchi Automata).
+	Contains tgba_bdd, a BDD-encoded TGBA, and ltl_to_tgba,
+	a LTL-to-TGBA translator using Couvreur's algorithm.
+
+	* src/Makefile.am (SUBDIRS): Add tgba.
+	(libspot_la_LIBADD): Add tgba/libtgba.la.
+	* src/tgba/Makefile.am, src/tgba/bddfactory.cc,
+	src/tgba/bddfactory.hh, src/tgba/dictunion.cc,
+	src/tgba/dictunion.hh, src/tgba/ltl2tgba.cc, src/tgba/ltl2tgba.hh,
+	src/tgba/state.hh, src/tgba/statebdd.cc, src/tgba/statebdd.hh,
+	src/tgba/succiter.hh, src/tgba/succiterconcrete.cc,
+	src/tgba/succiterconcrete.hh, src/tgba/succlist.hh,
+	src/tgba/tgba.hh, src/tgba/tgbabddconcrete.cc,
+	src/tgba/tgbabddconcrete.hh, src/tgba/tgbabddconcretefactory.cc,
+	src/tgba/tgbabddconcretefactory.hh,
+	src/tgba/tgbabddconcreteproduct.cc,
+	src/tgba/tgbabddconcreteproduct.hh, src/tgba/tgbabddcoredata.cc,
+	src/tgba/tgbabddcoredata.hh, src/tgba/tgbabdddict.cc,
+	src/tgba/tgbabdddict.hh, src/tgba/tgbabddfactory.hh,
+	src/tgba/tgbabddtranslatefactory.cc,
+	src/tgba/tgbabddtranslatefactory.hh: New files.
+
 2003-05-23  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* m4/gccwarn.m4: Do not use -Winline, this is inappropriate

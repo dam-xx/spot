@@ -31,6 +31,7 @@ AC_CONFIG_FILES([
   src/ltltest/Makefile
   src/ltltest/defs
   src/ltlvisit/Makefile
+  src/tgba/Makefile
   src/misc/Makefile
   wrap/Makefile
 ])
