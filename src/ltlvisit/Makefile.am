@@ -9,6 +9,8 @@ libltlvisit_a_SOURCES = \
   dotty.hh \
   dump.cc \
   dump.hh \
+  tostring.cc \
+  tostring.hh \
   equals.cc \
   equals.hh \
   lunabbrev.hh \

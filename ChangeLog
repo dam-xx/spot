@@ -1,3 +1,10 @@
+2003-04-24  Rachid REBIHA  <rebiha@nyx>
+
+	* src/ltltest/tostring.test: New file.
+	* src/ltltest/tostring.cc: New files.
+	* src/ltlvisit/tostring.hh: From ast to string New files.
+	* src/ltlvisit/tostring.cc: From ast to string New files.
+
 2003-04-18  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
 	* src/ltlparse/Makefile.am (EXTRA_DIST): Distribute ltlparse.yy.

@@ -1,0 +1,28 @@
+#! /bin/sh
+
+# Check that spot::ltl::tostring is correct: after to parse we get the
+# string of the abstract syntax tree and xe parse it again to apply spot::ltl::tostring one more times.
+
+. ./defs || exit 1
+
+check()
+{
+  ./tostring "$1" || exit 1
+}
+
+check 'a'
+check '1'
+check '0'
+check 'a => b'
+check 'G a '
+check 'a U b'
+check 'a & b'
+check 'a & b & c'
+check 'b & a & b'
+check 'b & a & a'
+check 'a & b & (c |(f U g)| e)'
+check 'b & a & a & (c | e |(f U g)| e | c) & b'
+check 'a <=> b'
+check 'a & b & (c |(f U g)| e)'
+check 'b & a & a & (c | e |(g U g)| e | c) & b'
+:

@@ -43,3 +43,4 @@ namespace spot
     bool equals(const formula* f1, const formula* f2);
   }
 }
+
