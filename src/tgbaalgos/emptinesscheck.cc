@@ -202,10 +202,9 @@ namespace spot
 	    continue;
 	  }
 
-	// We know the state exist.  Since a state can have several
+	// We know the state exists.  Since a state can have several
 	// representations (i.e., objects), make sure we delete
-	// anything but the first one seen (the one used as key in
-	// H).
+	// anything but the first one seen (the one used as key in H).
 	if (dest != i->first)
 	  delete dest;
 
@@ -254,7 +253,7 @@ namespace spot
 	    return false;
 	  }
       }
-    // This automaton recognize no word.
+    // This automaton recognizes no word.
     return true;
   }
 
