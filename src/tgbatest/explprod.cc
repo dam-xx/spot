@@ -2,7 +2,7 @@
 #include <cassert>
 #include "tgba/ltl2tgba.hh"
 #include "tgba/tgbaexplicit.hh"
-#include "tgba/tgbabddprod.hh"
+#include "tgba/tgbaproduct.hh"
 #include "tgbaparse/public.hh"
 #include "tgbaalgos/save.hh"
 #include "ltlast/allnodes.hh"
@@ -33,7 +33,7 @@ main(int argc, char** argv)
     return 2;
   
   {
-    spot::tgba_bdd_product p(*a1, *a2);
+    spot::tgba_product p(*a1, *a2);
     spot::tgba_save_reachable(std::cout, p);
   }
 

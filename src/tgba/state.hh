@@ -26,7 +26,7 @@ namespace spot
     ///
     /// If this state uses any BDD variable.  This function
     /// should rewrite the variables according to \a rewrite.
-    /// This used by spot::tgbabddtranslateproxy.
+    /// This used by spot::tgba_translate_proxy.
     virtual void translate(bddPair* rewrite)
     {
       // This does nothing by default and is

@@ -1,46 +1,45 @@
-#include "tgbabddtranslateproxy.hh"
+#include "tgbatranslateproxy.hh"
 #include "bddprint.hh"
 #include <cassert>
 
 namespace spot
 {
 
-  // tgba_bdd_translate_proxy_succ_iterator
+  // tgba_translate_proxy_succ_iterator
   // --------------------------------------
 
-  tgba_bdd_translate_proxy_succ_iterator::
-  tgba_bdd_translate_proxy_succ_iterator(tgba_succ_iterator* it,
-					 bddPair* rewrite)
+  tgba_translate_proxy_succ_iterator::
+  tgba_translate_proxy_succ_iterator(tgba_succ_iterator* it,
+				     bddPair* rewrite)
     : iter_(it), rewrite_(rewrite)
   {
   }
 
-  tgba_bdd_translate_proxy_succ_iterator::
-  ~tgba_bdd_translate_proxy_succ_iterator()
+  tgba_translate_proxy_succ_iterator::~tgba_translate_proxy_succ_iterator()
   {
     delete iter_;
   }
 
   void
-  tgba_bdd_translate_proxy_succ_iterator::first()
+  tgba_translate_proxy_succ_iterator::first()
   {
     iter_->first();
   }
 
   void
-  tgba_bdd_translate_proxy_succ_iterator::next()
+  tgba_translate_proxy_succ_iterator::next()
   {
     iter_->next();
   }
 
   bool
-  tgba_bdd_translate_proxy_succ_iterator::done()
+  tgba_translate_proxy_succ_iterator::done()
   {
     return iter_->done();
   }
 
   state*
-  tgba_bdd_translate_proxy_succ_iterator::current_state()
+  tgba_translate_proxy_succ_iterator::current_state()
   {
     state* s = iter_->current_state();
     s->translate(rewrite_);
@@ -48,23 +47,23 @@ namespace spot
   }
 
   bdd
-  tgba_bdd_translate_proxy_succ_iterator::current_condition()
+  tgba_translate_proxy_succ_iterator::current_condition()
   {
     return bdd_replace(iter_->current_condition(), rewrite_);
   }
 
   bdd
-  tgba_bdd_translate_proxy_succ_iterator::current_promise()
+  tgba_translate_proxy_succ_iterator::current_promise()
   {
     return bdd_replace(iter_->current_promise(), rewrite_);
   }
 
 
-  // tgba_bdd_translate_proxy
+  // tgba_translate_proxy
   // ------------------------
 
-  tgba_bdd_translate_proxy::tgba_bdd_translate_proxy(const tgba& from,
-						     const tgba_bdd_dict& to)
+  tgba_translate_proxy::tgba_translate_proxy(const tgba& from,
+					     const tgba_bdd_dict& to)
     : from_(from), to_(to)
   {
     const tgba_bdd_dict& f = from.get_dict();
@@ -99,40 +98,40 @@ namespace spot
       }
   }
 
-  tgba_bdd_translate_proxy::~tgba_bdd_translate_proxy()
+  tgba_translate_proxy::~tgba_translate_proxy()
   {
     bdd_freepair(rewrite_from_);
     bdd_freepair(rewrite_to_);
   }
 
   state*
-  tgba_bdd_translate_proxy::get_init_state() const
+  tgba_translate_proxy::get_init_state() const
   {
     state* s = from_.get_init_state();
     s->translate(rewrite_to_);
     return s;
   }
 
-  tgba_bdd_translate_proxy_succ_iterator*
-  tgba_bdd_translate_proxy::succ_iter(const state* s) const
+  tgba_translate_proxy_succ_iterator*
+  tgba_translate_proxy::succ_iter(const state* s) const
   {
     state* s2 = s->clone();
     s2->translate(rewrite_from_);
-    tgba_bdd_translate_proxy_succ_iterator *res =
-      new tgba_bdd_translate_proxy_succ_iterator(from_.succ_iter(s2),
+    tgba_translate_proxy_succ_iterator *res =
+      new tgba_translate_proxy_succ_iterator(from_.succ_iter(s2),
 						 rewrite_to_);
     delete s2;
     return res;
   }
 
   const tgba_bdd_dict&
-  tgba_bdd_translate_proxy::get_dict() const
+  tgba_translate_proxy::get_dict() const
   {
     return to_;
   }
 
   std::string
-  tgba_bdd_translate_proxy::format_state(const state* s) const
+  tgba_translate_proxy::format_state(const state* s) const
   {
     state* s2 = s->clone();
     s2->translate(rewrite_from_);

@@ -4,7 +4,7 @@
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
 #include "tgba/ltl2tgba.hh"
-#include "tgba/tgbabddprod.hh"
+#include "tgba/tgbaproduct.hh"
 #include "tgba/tgbabddconcreteproduct.hh"
 #include "tgbaalgos/dotty.hh"
 
@@ -46,7 +46,7 @@ main(int argc, char** argv)
 #ifdef BDD_CONCRETE_PRODUCT
     spot::tgba_bdd_concrete p = spot::product(a1, a2);
 #else
-    spot::tgba_bdd_product p(a1, a2);
+    spot::tgba_product p(a1, a2);
 #endif
 
     spot::dotty_reachable(std::cout, p);

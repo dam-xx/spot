@@ -1,5 +1,5 @@
-#include "tgbabddprod.hh"
-#include "tgbabddtranslateproxy.hh"
+#include "tgbaproduct.hh"
+#include "tgbatranslateproxy.hh"
 #include "dictunion.hh"
 #include <cassert>
 
@@ -33,15 +33,15 @@ namespace spot
   }
 
   ////////////////////////////////////////////////////////////
-  // tgba_bdd_product_succ_iterator
+  // tgba_product_succ_iterator
 
-  tgba_bdd_product_succ_iterator::tgba_bdd_product_succ_iterator
+  tgba_product_succ_iterator::tgba_product_succ_iterator
   (tgba_succ_iterator* left, tgba_succ_iterator* right)
     : left_(left), right_(right)
   {
   }
 
-  tgba_bdd_product_succ_iterator::~tgba_bdd_product_succ_iterator()
+  tgba_product_succ_iterator::~tgba_product_succ_iterator()
   {
     delete left_;
     if (right_)
@@ -49,7 +49,7 @@ namespace spot
   }
 
   void
-  tgba_bdd_product_succ_iterator::step_()
+  tgba_product_succ_iterator::step_()
   {
     left_->next();
     if (left_->done())
@@ -60,7 +60,7 @@ namespace spot
   }
 
   void
-  tgba_bdd_product_succ_iterator::next_non_false_()
+  tgba_product_succ_iterator::next_non_false_()
   {
     while (!done())
       {
@@ -78,7 +78,7 @@ namespace spot
   }
 
   void
-  tgba_bdd_product_succ_iterator::first()
+  tgba_product_succ_iterator::first()
   {
     if (!right_)
       return;
@@ -98,41 +98,41 @@ namespace spot
   }
 
   void
-  tgba_bdd_product_succ_iterator::next()
+  tgba_product_succ_iterator::next()
   {
     step_();
     next_non_false_();
   }
 
   bool
-  tgba_bdd_product_succ_iterator::done()
+  tgba_product_succ_iterator::done()
   {
     return !right_ || right_->done();
   }
 
 
   state_bdd_product*
-  tgba_bdd_product_succ_iterator::current_state()
+  tgba_product_succ_iterator::current_state()
   {
     return new state_bdd_product(left_->current_state(),
 				 right_->current_state());
   }
 
   bdd
-  tgba_bdd_product_succ_iterator::current_condition()
+  tgba_product_succ_iterator::current_condition()
   {
     return current_cond_;
   }
 
-  bdd tgba_bdd_product_succ_iterator::current_promise()
+  bdd tgba_product_succ_iterator::current_promise()
   {
     return left_->current_promise() & right_->current_promise();
   }
 
   ////////////////////////////////////////////////////////////
-  // tgba_bdd_product
+  // tgba_product
 
-  tgba_bdd_product::tgba_bdd_product(const tgba& left, const tgba& right)
+  tgba_product::tgba_product(const tgba& left, const tgba& right)
     : dict_(tgba_bdd_dict_union(left.get_dict(), right.get_dict()))
   {
     // Translate the left automaton if needed.
@@ -143,7 +143,7 @@ namespace spot
       }
     else
       {
-	left_ = new tgba_bdd_translate_proxy(left, dict_);
+	left_ = new tgba_translate_proxy(left, dict_);
 	left_should_be_freed_ = true;
       }
 
@@ -155,12 +155,12 @@ namespace spot
       }
     else
       {
-	right_ = new tgba_bdd_translate_proxy(right, dict_);
+	right_ = new tgba_translate_proxy(right, dict_);
 	right_should_be_freed_ = true;
       }
   }
 
-  tgba_bdd_product::~tgba_bdd_product()
+  tgba_product::~tgba_product()
   {
     if (left_should_be_freed_)
       delete left_;
@@ -169,31 +169,31 @@ namespace spot
   }
 
   state*
-  tgba_bdd_product::get_init_state() const
+  tgba_product::get_init_state() const
   {
     return new state_bdd_product(left_->get_init_state(),
 				 right_->get_init_state());
   }
 
-  tgba_bdd_product_succ_iterator*
-  tgba_bdd_product::succ_iter(const state* state) const
+  tgba_product_succ_iterator*
+  tgba_product::succ_iter(const state* state) const
   {
     const state_bdd_product* s = dynamic_cast<const state_bdd_product*>(state);
     assert(s);
 
     tgba_succ_iterator* li = left_->succ_iter(s->left());
     tgba_succ_iterator* ri = right_->succ_iter(s->right());
-    return new tgba_bdd_product_succ_iterator(li, ri);
+    return new tgba_product_succ_iterator(li, ri);
   }
 
   const tgba_bdd_dict&
-  tgba_bdd_product::get_dict() const
+  tgba_product::get_dict() const
   {
     return dict_;
   }
 
   std::string
-  tgba_bdd_product::format_state(const state* state) const
+  tgba_product::format_state(const state* state) const
   {
     const state_bdd_product* s = dynamic_cast<const state_bdd_product*>(state);
     assert(s);

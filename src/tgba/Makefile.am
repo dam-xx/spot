@@ -30,11 +30,11 @@ libtgba_la_SOURCES = \
   tgbabdddict.cc \
   tgbabdddict.hh \
   tgbabddfactory.hh \
-  tgbabddprod.cc \
-  tgbabddprod.hh \
   tgbabddtranslatefactory.cc \
   tgbabddtranslatefactory.hh \
-  tgbabddtranslateproxy.cc \
-  tgbabddtranslateproxy.hh \
   tgbaexplicit.cc \
-  tgbaexplicit.hh
+  tgbaexplicit.hh \
+  tgbaproduct.cc \
+  tgbaproduct.hh \
+  tgbatranslateproxy.cc \
+  tgbatranslateproxy.hh

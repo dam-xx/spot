@@ -1,5 +1,5 @@
-#ifndef SPOT_TGBA_TGBABDDPROD_HH
-# define SPOT_TGBA_TGBABDDPROD_HH
+#ifndef SPOT_TGBA_TGBAPRODUCT_HH
+# define SPOT_TGBA_TGBAPRODUCT_HH
 
 #include "tgba.hh"
 #include "statebdd.hh"
@@ -7,7 +7,7 @@
 namespace spot
 {
 
-  /// \brief A state for spot::tgba_bdd_product.
+  /// \brief A state for spot::tgba_product.
   ///
   /// This state is in fact a pair of state: the state from the left
   /// automaton and that of the right.
@@ -50,13 +50,13 @@ namespace spot
 
 
   /// \brief Iterate over the successors of a product computed on the fly.
-  class tgba_bdd_product_succ_iterator: public tgba_succ_iterator
+  class tgba_product_succ_iterator: public tgba_succ_iterator
   {
   public:
-    tgba_bdd_product_succ_iterator(tgba_succ_iterator* left,
-				   tgba_succ_iterator* right);
+    tgba_product_succ_iterator(tgba_succ_iterator* left,
+			       tgba_succ_iterator* right);
 
-    virtual ~tgba_bdd_product_succ_iterator();
+    virtual ~tgba_product_succ_iterator();
 
     // iteration
     void first();
@@ -82,20 +82,20 @@ namespace spot
   };
 
   /// \brief A lazy product.  (States are computed on the fly.)
-  class tgba_bdd_product : public tgba
+  class tgba_product : public tgba
   {
   public:
     /// \brief Constructor.
     /// \param left The left automata in the product.
     /// \param right The right automata in the product.
     /// Do not be fooled by these arguments: a product \emph is commutative.
-    tgba_bdd_product(const tgba& left, const tgba& right);
+    tgba_product(const tgba& left, const tgba& right);
 
-    virtual ~tgba_bdd_product();
+    virtual ~tgba_product();
 
     virtual state* get_init_state() const;
 
-    virtual tgba_bdd_product_succ_iterator*
+    virtual tgba_product_succ_iterator*
     succ_iter(const state* state) const;
 
     virtual const tgba_bdd_dict& get_dict() const;
@@ -112,4 +112,4 @@ namespace spot
 
 }
 
-#endif // SPOT_TGBA_TGBABDDPROD_HH
+#endif // SPOT_TGBA_TGBAPRODUCT_HH

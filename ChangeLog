@@ -1,7 +1,21 @@
 2003-06-16  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/tgbabddprod.cc, src/tgba/tgbabddprod.hh: Rename as ...
+	* src/tgba/tgbaproduct.cc, src/tgba/tgbaproduct.hh: ... these.
+	(tgba_bdd_product, tgba_bdd_product_succ_iterator): Rename as ...
+	(tgba_product, tgba_product_succ_iterator): ... these, and adjust
+	all uses.
+	* src/tgba/tgbabddtranslateproxy.cc,
+	src/tgba/tgbabddtranslateproxy.hh: Rename as ...
+	* src/tgba/tgbatranslateproxy.cc,
+	src/tgba/tgbatranslateproxy.hh: ... these.
+	(tgba_bdd_translate_proxy, tgba_bdd_translate_proxy_succ_iterator):
+	Rename as ...
+	(tgba_translate_proxy, tgba_translate_proxy_succ_iterator): ... these,
+	and adjust all uses.
+
 	Make sure we can multiply two tgba_explicit.
-	
+
 	* tgba/state.hh (state::translate, state::clone, state::as_bdd):
 	New virtual methods.
 	* tgba/stataebdd.cc (state::translate, state::clone): New methods.
