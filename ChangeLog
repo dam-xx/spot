@@ -1,3 +1,14 @@
+2003-07-28  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/tgbatba.hh, src/tgba/tgbatba.cc
+	(tgba_tba_proxy::state_is_accepting): New method.
+	* src/tgbaalgos/magic.hh, src/tgbaalgos/magic.cc: New files.
+	* src/tgbaalgos/Makefile.am (libtgbaalgos_la_SOURCES,
+	tgbaalgos_HEADERS): Add them.
+	* src/tgbatest/ltlmagic.cc, src/tgbatest/ltlmagic.test: New files.
+	* src/tgbatest/Makefile.am (TESTS, ltlmagic_SOURCES,
+	check_PROGRAMS): Add them.
+
 2003-07-25  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/tgba.hh (tgba::~tgba): Make it public.

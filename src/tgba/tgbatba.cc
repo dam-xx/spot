@@ -27,7 +27,7 @@ namespace spot
     {
     }
 
-    virtual 
+    virtual
     ~state_tba_proxy()
     {
       delete s_;
@@ -45,7 +45,7 @@ namespace spot
       return acc_;
     }
 
-    virtual int 
+    virtual int
     compare(const state* other) const
     {
       const state_tba_proxy* o = dynamic_cast<const state_tba_proxy*>(other);
@@ -55,8 +55,8 @@ namespace spot
 	return res;
       return acc_.id() - o->accepting_cond().id();
     }
-    
-    virtual 
+
+    virtual
     state_tba_proxy* clone() const
     {
       return new state_tba_proxy(*this);
@@ -75,7 +75,7 @@ namespace spot
     tgba_tba_proxy_succ_iterator(tgba_succ_iterator* it,
 				 bdd acc, bdd next_acc,
 				 bdd the_accepting_cond)
-      : it_(it), acc_(acc), next_acc_(next_acc), 
+      : it_(it), acc_(acc), next_acc_(next_acc),
 	the_accepting_cond_(the_accepting_cond)
     {
     }
@@ -87,19 +87,19 @@ namespace spot
 
     // iteration
 
-    void 
+    void
     first()
     {
       it_->first();
     }
 
-    void 
+    void
     next()
     {
       it_->next();
     }
 
-    bool 
+    bool
     done() const
     {
       return it_->done();
@@ -107,14 +107,14 @@ namespace spot
 
     // inspection
 
-    state_tba_proxy* 
+    state_tba_proxy*
     current_state() const
     {
       state* s = it_->current_state();
       bdd acc;
       // Transition in the ACC_ accepting set should be directed
       // to the NEXT_ACC_ accepting set.
-      if (acc_ == bddtrue 
+      if (acc_ == bddtrue
 	  || (acc_ & it_->current_accepting_conditions()) == acc_)
 	acc = next_acc_;
       else
@@ -122,13 +122,13 @@ namespace spot
       return new state_tba_proxy(s, acc);
     }
 
-    bdd 
+    bdd
     current_condition() const
     {
       return it_->current_condition();
     }
 
-    bdd 
+    bdd
     current_accepting_conditions() const
     {
       return the_accepting_cond_;
@@ -176,7 +176,7 @@ namespace spot
     get_dict()->unregister_all_my_variables(this);
   }
 
-  state* 
+  state*
   tgba_tba_proxy::get_init_state() const
   {
     cycle_map::const_iterator i = acc_cycle_.find(bddtrue);
@@ -189,62 +189,71 @@ namespace spot
 			    const state* global_state,
 			    const tgba* global_automaton) const
   {
-    const state_tba_proxy* s = 
+    const state_tba_proxy* s =
       dynamic_cast<const state_tba_proxy*>(local_state);
     assert(s);
 
-    tgba_succ_iterator* it = a_->succ_iter(s->real_state(), 
+    tgba_succ_iterator* it = a_->succ_iter(s->real_state(),
 					   global_state, global_automaton);
     bdd acc = s->accepting_cond();
     cycle_map::const_iterator i = acc_cycle_.find(acc);
     assert(i != acc_cycle_.end());
-    return 
+    return
       new tgba_tba_proxy_succ_iterator(it, acc, i->second,
-				       (acc == bddtrue) 
+				       (acc == bddtrue)
 				       ? the_accepting_cond_ : bddfalse);
   }
-  
-  bdd_dict* 
+
+  bdd_dict*
   tgba_tba_proxy::get_dict() const
   {
     return a_->get_dict();
   }
-  
-  std::string 
+
+  std::string
   tgba_tba_proxy::format_state(const state* state) const
   {
-    const state_tba_proxy* s = 
+    const state_tba_proxy* s =
       dynamic_cast<const state_tba_proxy*>(state);
     assert(s);
-    return a_->format_state(s->real_state()) + "(" 
+    return a_->format_state(s->real_state()) + "("
       + bdd_format_set(get_dict(), s->accepting_cond()) + ")";
   }
-  
-  bdd 
+
+  bdd
   tgba_tba_proxy::all_accepting_conditions() const
   {
     return the_accepting_cond_;
   }
-  
-  bdd 
+
+  bdd
   tgba_tba_proxy::neg_accepting_conditions() const
   {
     return !the_accepting_cond_;
   }
-  
-  bdd 
+
+  bool
+  tgba_tba_proxy::state_is_accepting(const state* state) const
+  {
+    const state_tba_proxy* s =
+      dynamic_cast<const state_tba_proxy*>(state);
+    assert(s);
+    return bddtrue == s->accepting_cond();
+  }
+
+  bdd
   tgba_tba_proxy::compute_support_conditions(const state* state) const
   {
-    const state_tba_proxy* s = 
+    const state_tba_proxy* s =
       dynamic_cast<const state_tba_proxy*>(state);
     assert(s);
     return a_->support_conditions(s->real_state());
   }
-  
-  bdd 
+
+  bdd
   tgba_tba_proxy::compute_support_variables(const state* state) const
   {
-    const state_tba_proxy* s = 
+    const state_tba_proxy* s =
       dynamic_cast<const state_tba_proxy*>(state);
     assert(s);
     return a_->support_variables(s->real_state());

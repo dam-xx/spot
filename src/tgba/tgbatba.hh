@@ -44,6 +44,8 @@ namespace spot
     virtual bdd all_accepting_conditions() const;
     virtual bdd neg_accepting_conditions() const;
 
+    bool state_is_accepting(const state* state) const;
+
   protected:
     virtual bdd compute_support_conditions(const state* state) const;
     virtual bdd compute_support_variables(const state* state) const;

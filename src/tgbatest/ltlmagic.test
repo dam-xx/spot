@@ -1,0 +1,15 @@
+#!/bin/sh
+
+. ./defs
+
+set -e
+
+./ltlmagic a
+./ltlmagic 0 || test $? = 1
+./ltlmagic 'a & !a' || test $? = 1
+./ltlmagic 'a U b'
+./ltlmagic '!(a U b)'
+./ltlmagic '!(a U b) & !(!a R !b)' || test $? = 1
+# Expect four satisfactions
+test `./ltlmagic -a 'FFx <=> Fx' | grep Prefix: | wc -l` = 4
+./ltlmagic '!(FFx <=> Fx)'  || test $? = 1

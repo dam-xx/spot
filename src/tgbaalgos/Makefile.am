@@ -8,6 +8,7 @@ tgbaalgos_HEADERS = \
   dotty.hh \
   lbtt.hh \
   ltl2tgba.hh \
+  magic.hh \
   save.hh
 
 noinst_LTLIBRARIES = libtgbaalgos.la
@@ -16,4 +17,5 @@ libtgbaalgos_la_SOURCES = \
   dotty.cc \
   lbtt.cc \
   ltl2tgba.cc \
+  magic.cc \
   save.cc
