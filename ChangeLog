@@ -1,5 +1,25 @@
 2004-10-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	Preliminary support for Event-based GBA.
+	* src/evtgba/Makefile.am, src/evtgba/evtgba.cc,
+	src/evtgba/evtgba.hh, src/evtgba/evtgbaiter.hh,
+	src/evtgba/explicit.cc, src/evtgba/explicit.hh,
+	src/evtgba/product.cc, src/evtgba/product.hh,
+	src/evtgba/symbol.cc, src/evtgba/symbol.hh,
+	src/evtgbaalgos/Makefile.am, src/evtgbaalgos/dotty.cc,
+	src/evtgbaalgos/dotty.hh, src/evtgbaalgos/reachiter.cc,
+	src/evtgbaalgos/reachiter.hh, src/evtgbaalgos/save.cc,
+	src/evtgbaalgos/save.hh, src/evtgbaparse/Makefile.am,
+	src/evtgbaparse/evtgbaparse.yy, src/evtgbaparse/evtgbascan.ll,
+	src/evtgbaparse/fmterror.cc, src/evtgbaparse/parsedecl.hh,
+	src/evtgbaparse/public.hh, src/evtgbatest/Makefile.am,
+	src/evtgbatest/defs.in, src/evtgbatest/explicit.cc,
+	src/evtgbatest/explicit.test, src/evtgbatest/product.cc,
+	src/evtgbatest/product.test, src/evtgbatest/readsave.cc,
+	src/evtgbatest/readsave.test: New files.
+	* configure.ac: Create the Makefiles in these new subdirectories.
+	* src/Makefile.am: Recurse them.
+
 	* src/misc/bareword.hh, src/misc/bareword.cc (quote_unless_bare_word):
 	New function.
 

@@ -1,0 +1,10 @@
+.deps
+Makefile
+Makefile.in
+defs
+explicit
+.libs
+readsave
+product
+*.ps
+*.dot

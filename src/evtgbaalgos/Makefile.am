@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -19,30 +19,18 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-AUTOMAKE_OPTIONS = subdir-objects
+AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
+AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-# List directories in the order they must be built.
-# Keep tests at the end.
-SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse \
-          tgba tgbaalgos tgbaparse \
-	  evtgba evtgbaalgos evtgbaparse . \
-	  ltltest tgbatest evtgbatest sanity
+evtgbaalgosdir = $(pkgincludedir)/evtgbaalgos
 
-lib_LTLIBRARIES = libspot.la
-libspot_la_SOURCES =
-libspot_la_LDFLAGS = $(BUDDY_LDFLAGS) -no-undefined
-libspot_la_LIBADD =  \
-  misc/libmisc.la \
-  ltlenv/libltlenv.la \
-  ltlparse/libltlparse.la \
-  ltlvisit/libltlvisit.la \
-  ltlast/libltlast.la \
-  tgba/libtgba.la \
-  tgbaalgos/libtgbaalgos.la \
-  tgbaparse/libtgbaparse.la \
-  evtgba/libevtgba.la \
-  evtgbaalgos/libevtgbaalgos.la \
-  evtgbaparse/libevtgbaparse.la
+evtgbaalgos_HEADERS = \
+  dotty.hh \
+  reachiter.hh \
+  save.hh
 
-# Dummy C++ source to cause C++ linking.
-nodist_EXTRA_libspot_la_SOURCES = _.cc
+noinst_LTLIBRARIES = libevtgbaalgos.la
+libevtgbaalgos_la_SOURCES = \
+  dotty.cc \
+  reachiter.cc \
+  save.cc

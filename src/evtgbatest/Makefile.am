@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -19,30 +19,27 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-AUTOMAKE_OPTIONS = subdir-objects
+AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
+AM_CXXFLAGS = $(WARNING_CXXFLAGS)
+LDADD = ../libspot.la
 
-# List directories in the order they must be built.
-# Keep tests at the end.
-SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse \
-          tgba tgbaalgos tgbaparse \
-	  evtgba evtgbaalgos evtgbaparse . \
-	  ltltest tgbatest evtgbatest sanity
+check_SCRIPTS = defs
+# Keep this sorted alphabetically.
+check_PROGRAMS = \
+  explicit \
+  product \
+  readsave
 
-lib_LTLIBRARIES = libspot.la
-libspot_la_SOURCES =
-libspot_la_LDFLAGS = $(BUDDY_LDFLAGS) -no-undefined
-libspot_la_LIBADD =  \
-  misc/libmisc.la \
-  ltlenv/libltlenv.la \
-  ltlparse/libltlparse.la \
-  ltlvisit/libltlvisit.la \
-  ltlast/libltlast.la \
-  tgba/libtgba.la \
-  tgbaalgos/libtgbaalgos.la \
-  tgbaparse/libtgbaparse.la \
-  evtgba/libevtgba.la \
-  evtgbaalgos/libevtgbaalgos.la \
-  evtgbaparse/libevtgbaparse.la
+# Keep this sorted alphabetically.
+explicit_SOURCES = explicit.cc
+product_SOURCES = product.cc
+readsave_SOURCES = readsave.cc
 
-# Dummy C++ source to cause C++ linking.
-nodist_EXTRA_libspot_la_SOURCES = _.cc
+# Keep this sorted by STRENGTH.  Test basic things first,
+# because such failures will be easier to diagnose and fix.
+TESTS = \
+  explicit.test \
+  readsave.test \
+  product.test
+
+EXTRA_DIST = $(TESTS)
