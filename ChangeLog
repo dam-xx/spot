@@ -1,3 +1,12 @@
+2003-11-26  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgba/bddprint.cc (print_accset_handler, bdd_print_accset): New
+	functions.
+	* src/tgba/bddprint.cc (bdd_print_accset): Declare it.
+	* src/tgbaalgos/dotty.cc (dotty_bfs::process_link): Use it.
+	* src/tgbatest/tgbaread.test, src/tgbatest/explicit.test: Adjust
+	expected output.
+
 2003-11-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaparse/tgbaparse.yy: Remove a random character.

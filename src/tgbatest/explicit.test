@@ -32,11 +32,11 @@ digraph G {
   0 [label="", style=invis, height=0]
   0 -> 1
   1 [label="state 0"]
-  1 -> 2 [label="1\n<Acc[p]:0, Acc[q]:1, Acc[r]:0><Acc[p]:1, Acc[q]:0, Acc[r]:0>"]
+  1 -> 2 [label="1\n{Acc[q], Acc[p]}"]
   2 [label="state 1"]
-  2 -> 3 [label="a\n<Acc[p]:0, Acc[q]:0, Acc[r]:1>"]
+  2 -> 3 [label="a\n{Acc[r]}"]
   3 [label="state 2"]
-  3 -> 1 [label="(b & c)\nF"]
+  3 -> 1 [label="(b & c)\n"]
 }
 EOF
 

@@ -117,15 +117,11 @@ namespace spot
   print_acc_handler(char* varset, int size)
   {
     for (int v = 0; v < size; ++v)
-      {
-	if (varset[v] < 0)
-	  continue;
-	if (varset[v] > 0)
-	  {
-	    *where << " ";
-	    print_handler(*where, v);
-	  }
-      }
+      if (varset[v] > 0)
+	{
+	  *where << " ";
+	  print_handler(*where, v);
+	}
   }
 
   std::ostream&
@@ -135,6 +131,32 @@ namespace spot
     where = &os;
     want_acc = false;
     bdd_allsat(b, print_acc_handler);
+    return os;
+  }
+
+  static bool first_done = false;
+  static void
+  print_accset_handler(char* varset, int size)
+  {
+    for (int v = 0; v < size; ++v)
+      if (varset[v] > 0)
+	{
+	  *where << (first_done ? ", " : "{");
+	  print_handler(*where, v);
+	  first_done = true;
+	}
+  }
+
+  std::ostream&
+  bdd_print_accset(std::ostream& os, const bdd_dict* d, bdd b)
+  {
+    dict = d;
+    where = &os;
+    want_acc = true;
+    first_done = false;
+    bdd_allsat(b, print_accset_handler);
+    if (first_done)
+      *where << "}";
     return os;
   }
 

@@ -57,6 +57,16 @@ namespace spot
   std::ostream& bdd_print_acc(std::ostream& os,
 			      const bdd_dict* dict, bdd b);
 
+  /// \brief Print a BDD as a set of accepting conditions.
+  ///
+  /// This is used when saving a TGBA.
+  /// \param os The output stream.
+  /// \param dict The dictionary to use, to lookup variables.
+  /// \param b The BDD to print.
+  /// \return The BDD formated as a string.
+  std::ostream& bdd_print_accset(std::ostream& os,
+				 const bdd_dict* dict, bdd b);
+
   /// \brief Print a BDD as a set.
   /// \param os The output stream.
   /// \param dict The dictionary to use, to lookup variables.
