@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I$(srcdir)/..
+AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
 LDADD = ../libspot.la
 
 check_SCRIPTS = defs
