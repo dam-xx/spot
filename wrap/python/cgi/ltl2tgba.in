@@ -59,15 +59,31 @@ def escaped_print_set(dict, what):
 def print_stats(automaton):
     stats = spot.stats_reachable(automaton)
     print "<p>", stats.states,
-    if stats.states == 1:
+    if stats.states <= 1:
         print " state,",
     else:
         print " states,",
     print stats.transitions,
-    if stats.transitions == 1:
-        print " transition",
+    if stats.transitions <= 1:
+        print " transition,",
     else:
-        print " transitions",
+        print " transitions,",
+    # compute the number of acceptance conditions
+    acc = all = automaton.all_acceptance_conditions()
+    count = 0
+    while all != buddy.bddfalse:
+        all -= buddy.bdd_satone(all)
+        count += 1
+    if count > 0:
+        print count,
+        if count <= 1:
+            print "acceptance condition:",
+        else:
+            print "acceptance conditions:",
+            sys.stdout.flush()
+        spot.bdd_print_accset(spot.get_cout(), automaton.get_dict(), acc)
+    else:
+        print "no acceptance condition (all cycles are accepting)"
     print "</p>"
     sys.stdout.flush()
 
@@ -96,6 +112,7 @@ os.close(sys.stderr.fileno())
 os.dup2(sys.stdout.fileno(), sys.stderr.fileno())
 
 import spot
+import buddy
 
 print "<TITLE>LTL-to-Büchi test</TITLE>"
 print "<H1>Input</H1>"

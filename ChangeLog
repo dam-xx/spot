@@ -1,5 +1,8 @@
 2004-02-02  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* wrap/python/cgi/ltl2tgba.in (print_stats): Compute and display
+	the number of acceptance conditions.
+
 	* wrap/python/tests/bddnqueen.py, wrap/python/tests/interdep.py,
 	wrap/python/tests/ltl2tgba.py, wrap/python/tests/ltlparse.py,
 	wrap/python/tests/ltlsimple.py: Specify coding system to
