@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -65,6 +65,7 @@ namespace spot
 
   /// \brief Format diagnostics produced by spot::tgba_parse.
   /// \param os Where diagnostics should be output.
+  /// \param filename The filename that should appear in the diagnostics.
   /// \param error_list The error list filled by spot::ltl::parse while
   ///        parsing \a ltl_string.
   /// \return \c true iff any diagnostic was output.

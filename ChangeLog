@@ -1,5 +1,10 @@
 2005-01-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* doc/Doxyfile.in: Update for Doxygen 1.4.0, set
+	DOT_MULTI_TARGETS, and disable GROUP_GRAPH (it causes segfault).
+	* src/tgbaparse/public.hh (format_tgba_parse_errors): Complete
+	Doxygen comment.
+
 	* src/tgbaalgos/emptiness_stats.hh (ars_statistics): New class.
 	* src/tgbaalgos/ndfs_result.hh (ndfs_result): Inherit from
 	ars_statistics.
