@@ -73,7 +73,7 @@ namespace spot
 	    fact_.add_relation(bdd_apply(now, x | next, bddop_biimp));
 	    /*
 	      `x | next', doesn't actually encode the fact that x
-	      should be fulfilled at eventually.  We ensure
+	      should be fulfilled eventually.  We ensure
 	      this by creating a new generalized Büchi accepting set,
 	      Acc[x], and leave any transition going to NEXT without
 	      checking X out of this set.  Such accepting conditions
