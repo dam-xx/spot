@@ -27,25 +27,25 @@ set -e
 expect_ce()
 {
   ./ltl2tgba -X -e "$1"
-  ./ltl2tgba -X -ecouvreur99_shy "$1"
-  ./ltl2tgba -X -emagic_search "$1"
-  ./ltl2tgba -X -ebsh_magic_search "$1"
-  ./ltl2tgba -X -ese05_search "$1"
-  ./ltl2tgba -X -ebsh_se05_search "$1"
-  ./ltl2tgba -X -etau03_search "$1"
-  ./ltl2tgba -X -etau03_opt_search "$1"
+  ./ltl2tgba -X -eCou99_shy "$1"
+  ./ltl2tgba -X -eCVWY90 "$1"
+  ./ltl2tgba -X -eCVWY90_bsh "$1"
+  ./ltl2tgba -X -eSE05 "$1"
+  ./ltl2tgba -X -eSE05_bsh "$1"
+  ./ltl2tgba -X -eTau03 "$1"
+  ./ltl2tgba -X -eTau03_opt "$1"
 }
 
 expect_no()
 {
   ./ltl2tgba -X -E "$1"
-  ./ltl2tgba -X -Ecouvreur99_shy "$1"
-  ./ltl2tgba -X -Emagic_search "$1"
-  ./ltl2tgba -X -Ebsh_magic_search "$1"
-  ./ltl2tgba -X -Ese05_search "$1"
-  ./ltl2tgba -X -Ebsh_se05_search "$1"
-  ./ltl2tgba -X -Etau03_search "$1"
-  ./ltl2tgba -X -Etau03_opt_search "$1"
+  ./ltl2tgba -X -ECou99_shy "$1"
+  ./ltl2tgba -X -ECVWY90 "$1"
+  ./ltl2tgba -X -ECVWY90_bsh "$1"
+  ./ltl2tgba -X -ESE05 "$1"
+  ./ltl2tgba -X -ESE05_bsh "$1"
+  ./ltl2tgba -X -ETau03 "$1"
+  ./ltl2tgba -X -ETau03_opt "$1"
 }
 
 dir=$srcdir/tba_samples_from_spin

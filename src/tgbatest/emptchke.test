@@ -29,9 +29,9 @@ expect_ce()
 {
   run 0 ./ltl2tgba -e -X "$1"
   run 0 ./ltl2tgba -e -D -X "$1"
-  run 0 ./ltl2tgba -ecouvreur99_shy -X "$1"
-  run 0 ./ltl2tgba -ecouvreur99_shy -D -X "$1"
-  run 0 ./ltl2tgba -emagic_search -X "$1"
+  run 0 ./ltl2tgba -eCou99_shy -X "$1"
+  run 0 ./ltl2tgba -eCou99_shy -D -X "$1"
+  run 0 ./ltl2tgba -eCVWY90 -X "$1"
 }
 
 cat >input <<'EOF'

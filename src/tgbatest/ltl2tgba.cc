@@ -133,24 +133,24 @@ syntax(char* prog)
 	    << "(implies -f)" << std::endl
 	    << std::endl
 	    << "Where ALGO should be one of:" << std::endl
-	    << "  couvreur99 (the default)" << std::endl
-	    << "  couvreur99_shy-" << std::endl
-	    << "  couvreur99_shy" << std::endl
-	    << "  magic_search" << std::endl
-	    << "  magic_search_repeated" << std::endl
-	    << "  bsh_magic_search[(heap size in Mo - 10Mo by default)]"
+	    << "  Cou99 (the default)" << std::endl
+	    << "  Cou99_shy-" << std::endl
+	    << "  Cou99_shy" << std::endl
+	    << "  CVWY90" << std::endl
+	    << "  CVWY90_repeated" << std::endl
+	    << "  CVWY90_bsh[(heap size in Mo - 10Mo by default)]"
             << std::endl
-	    << "  bsh_magic_search_repeated[(heap size in MB - 10MB"
+	    << "  CVWY90_bsh_repeated[(heap size in MB - 10MB"
             << " by default)]" << std::endl
-	    << "  gv04" << std::endl
-	    << "  se05_search" << std::endl
-	    << "  se05_search_repeated" << std::endl
-	    << "  bsh_se05_search[(heap size in MB - 10MB by default)]"
+	    << "  GV04" << std::endl
+	    << "  SE05" << std::endl
+	    << "  SE05_repeated" << std::endl
+	    << "  SE05_bsh[(heap size in MB - 10MB by default)]"
             << std::endl
-	    << "  bsh_se05_search_repeated[(heap size in MB - 10MB"
+	    << "  SE05_bsh_repeated[(heap size in MB - 10MB"
             << " by default)]" << std::endl
-	    << "  tau03_search" << std::endl
-	    << "  tau03_opt_search" << std::endl;
+	    << "  Tau03" << std::endl
+	    << "  Tau03_opt" << std::endl;
   exit(2);
 }
 
@@ -241,7 +241,7 @@ main(int argc, char** argv)
               echeck_algo = argv[formula_index] + 2;
             }
           else
-            echeck_algo = "couvreur99";
+            echeck_algo = "Cou99";
           expect_counter_example = true;
           output = -1;
         }
@@ -255,7 +255,7 @@ main(int argc, char** argv)
               echeck_algo = argv[formula_index] + 2;
             }
           else
-            echeck_algo = "couvreur99";
+            echeck_algo = "Cou99";
           expect_counter_example = false;
           output = -1;
         }
@@ -412,77 +412,77 @@ main(int argc, char** argv)
 
   if (echeck_algo != "")
     {
-      if (echeck_algo == "couvreur99")
+      if (echeck_algo == "Cou99")
 	{
 	  echeck = Couvreur;
 	}
-      else if (echeck_algo == "couvreur99_shy")
+      else if (echeck_algo == "Cou99_shy")
 	{
 	  echeck = Couvreur2;
 	  couv_group = true;
 	}
-      else if (echeck_algo == "couvreur99_shy-")
+      else if (echeck_algo == "Cou99_shy-")
 	{
 	  echeck = Couvreur2;
 	  couv_group = false;
 	}
-      else if (echeck_algo == "magic_search")
+      else if (echeck_algo == "CVWY90")
 	{
 	  echeck = MagicSearch;
 	  degeneralize_maybe = true;
 	}
-      else if (echeck_algo == "magic_search_repeated")
+      else if (echeck_algo == "CVWY90_repeated")
 	{
 	  echeck = MagicSearch;
 	  degeneralize_maybe = true;
 	  search_many = true;
 	}
-      else if (echeck_algo == "bsh_magic_search")
+      else if (echeck_algo == "CVWY90_bsh")
 	{
 	  echeck = MagicSearch;
 	  degeneralize_maybe = true;
           bit_state_hashing = true;
 	}
-      else if (echeck_algo == "bsh_magic_search_repeated")
+      else if (echeck_algo == "CVWY90_bsh_repeated")
 	{
 	  echeck = MagicSearch;
 	  degeneralize_maybe = true;
           bit_state_hashing = true;
 	  search_many = true;
 	}
-      else if (echeck_algo == "se05_search")
+      else if (echeck_algo == "SE05")
 	{
 	  echeck = Se05Search;
 	  degeneralize_maybe = true;
 	}
-      else if (echeck_algo == "se05_search_repeated")
+      else if (echeck_algo == "SE05_repeated")
 	{
 	  echeck = Se05Search;
 	  degeneralize_maybe = true;
 	  search_many = true;
 	}
-      else if (echeck_algo == "bsh_se05_search")
+      else if (echeck_algo == "SE05_bsh")
 	{
 	  echeck = Se05Search;
 	  degeneralize_maybe = true;
           bit_state_hashing = true;
 	}
-      else if (echeck_algo == "bsh_se05_search_repeated")
+      else if (echeck_algo == "SE05_bsh_repeated")
 	{
 	  echeck = Se05Search;
 	  degeneralize_maybe = true;
           bit_state_hashing = true;
 	  search_many = true;
 	}
-      else if (echeck_algo == "tau03_search")
+      else if (echeck_algo == "Tau03")
 	{
 	  echeck = Tau03Search;
 	}
-      else if (echeck_algo == "tau03_opt_search")
+      else if (echeck_algo == "Tau03_opt")
 	{
 	  echeck = Tau03OptSearch;
 	}
-      else if (echeck_algo == "gv04")
+      else if (echeck_algo == "GV04")
 	{
 	  echeck = Gv04;
 	  degeneralize_maybe = true;
@@ -753,7 +753,7 @@ main(int argc, char** argv)
           if (a->number_of_acceptance_conditions() == 0)
             {
               if (!paper_opt)
-                std::cout << "To apply tau03_search, the automaton must have at"
+                std::cout << "To apply Tau03, the automaton must have at"
                           << " least one accepting condition. Try with another"
                           << " algorithm." << std::endl;
               else

@@ -103,16 +103,16 @@ struct ec_algo
 
 ec_algo ec_algos[] =
   {
-    { "couvreur99",            couvreur99_cons,                 0, -1U, true },
-    { "couvreur99_shy-",       couvreur99_shy_minus_cons,       0, -1U, true },
-    { "couvreur99_shy",        couvreur99_shy_cons,             0, -1U, true },
-    { "explicit_magic_search", spot::explicit_magic_search,     0,   1, true },
-    { "bsh_magic_search",      bsh_ms_cons,                     0,   1, false },
-    { "explicit_se05",         spot::explicit_se05_search,      0,   1, true },
-    { "bsh_se05",              bsh_se05_cons,                   0,   1, false },
-    { "explicit_gv04",         spot::explicit_gv04_check,       0,   1, true },
-    { "explicit_tau03",        spot::explicit_tau03_search,     1, -1U, true },
-    { "explicit_tau03_opt",    spot::explicit_tau03_opt_search, 0, -1U, true },
+    { "Cou99",      couvreur99_cons,                 0, -1U, true },
+    { "Cou99_shy-", couvreur99_shy_minus_cons,       0, -1U, true },
+    { "Cou99_shy",  couvreur99_shy_cons,             0, -1U, true },
+    { "CVWY90",     spot::explicit_magic_search,     0,   1, true },
+    { "CVWY90_bsh", bsh_ms_cons,                     0,   1, false },
+    { "GV04",       spot::explicit_gv04_check,       0,   1, true },
+    { "SE05",       spot::explicit_se05_search,      0,   1, true },
+    { "SE05_bsh",   bsh_se05_cons,                   0,   1, false },
+    { "Tau03",      spot::explicit_tau03_search,     1, -1U, true },
+    { "Tau03_opt",  spot::explicit_tau03_opt_search, 0, -1U, true },
   };
 
 spot::emptiness_check*

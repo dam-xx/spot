@@ -1,3 +1,10 @@
+2005-01-28  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/tgbatest/dfs.test, src/tgbatest/emptchk.test,
+	src/tgbatest/emptchke.test, src/tgbatest/ltl2tgba.cc,
+	src/tgbatest/randtgba.cc, src/tgbatest/tba_samples_from_spin.test:
+	Adjust names of emptiness check algorithms.
+
 2005-01-27  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/gtec/gtec.cc: Adjust statistics count to match

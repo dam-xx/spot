@@ -77,8 +77,8 @@ s9, s8,,;
 s9, s9,,;
 EOF
 
-run 0 ./ltl2tgba -emagic_search -X blue_counter
-run 0 ./ltl2tgba -ese05_search -X blue_counter
+run 0 ./ltl2tgba -eSE05 -X blue_counter
+run 0 ./ltl2tgba -eTau03_opt -X blue_counter
 
 # s1->s2->s3->(large composant from s4 to s9)
 # ^       ||
@@ -129,8 +129,8 @@ s9, s8,,;
 s9, s9,,;
 EOF
 
-run 0 ./ltl2tgba -emagic_search -X blue_last
-run 0 ./ltl2tgba -ese05_search -X blue_last
+run 0 ./ltl2tgba -eSE05 -X blue_last
+run 0 ./ltl2tgba -eTau03_opt -X blue_last
 
 #  _______
 # |       |
@@ -185,7 +185,7 @@ s9, s8,,;
 s9, s9,,;
 EOF
 
-run 0 ./ltl2tgba -emagic_search -X red
-run 0 ./ltl2tgba -ese05_search -X red
+run 0 ./ltl2tgba -eSE05 -X red
+run 0 ./ltl2tgba -eTau03_opt -X red
 
 rm -f red blue_counter blue_last
