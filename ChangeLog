@@ -1,5 +1,8 @@
 2003-07-31  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/misc/const_sel.hh: Delete.
+	* src/misc/Makefile.am (misc_HEADERS): Remove const_sel.hh.
+
 	* src/tgbaalgos/magic.cc, src/tgbaalgos/reachiter.cc: Include cassert.
 	* iface/Makefile.am (SUBDIRS): Recurse in gspn only if condition
 	WITH_GSPN.
