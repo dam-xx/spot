@@ -1,5 +1,5 @@
 /*========================================================================
-	       Copyright (C) 1996-2003 by Jorn Lind-Nielsen
+	       Copyright (C) 1996-2004 by Jorn Lind-Nielsen
 			    All rights reserved
 
     Permission is hereby granted, without written agreement and without
@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddop.c,v 1.8 2003/08/06 14:14:16 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddop.c,v 1.9 2004/01/07 16:05:21 adl Exp $
   FILE:  bddop.c
   DESCR: BDD operators
   AUTH:  Jorn Lind
@@ -2042,6 +2042,8 @@ BDD bdd_support(BDD r)
       /* On-demand allocation of support set */
    if (supportSize < bddvarnum)
    {
+     if (supportSet)
+       free(supportSet);
      if ((supportSet=(int*)malloc(bddvarnum*sizeof(int))) == NULL)
      {
        bdd_error(BDD_MEMORY);

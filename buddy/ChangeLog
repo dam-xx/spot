@@ -1,3 +1,9 @@
+2004-01-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/bddop.c (bdd_support): Free supportSet if it needs to be
+	reallocated.  This fixes a memory leak reported by
+	Souheib.Baarir@lip6.fr.
+
 2003-11-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* examples/Makefile.def (AM_CPPFLAGS): Add -I$(srcdir).
