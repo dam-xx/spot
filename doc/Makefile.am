@@ -18,7 +18,7 @@ spot.html: $(srcdir)/stamp
 spot.latex: $(srcdir)/stamp
 
 $(srcdir)/spotref.pdf: $(srcdir)/stamp
-	cd spot.latex \
+	cd $(srcdir)/spot.latex \
 	  && texi2dvi --pdf refman.tex \
 	  && cd .. && mv -f spot.latex/refman.pdf $@
 
