@@ -79,10 +79,14 @@ namespace spot
       void
       output_acc_set(const symbol_set& ss) const
       {
+	// Store all formated acceptance condition in a set to sort
+	// them in the output.
+	typedef std::set<std::string> acc_set;
+	acc_set acc;
 	for (symbol_set::const_iterator i = ss.begin(); i != ss.end(); ++i)
-	  os_ << " "
-	      << quote_unless_bare_word(automata_
-					->format_acceptance_condition(*i));
+	  acc.insert(automata_->format_acceptance_condition(*i));
+	for (acc_set::const_iterator i = acc.begin(); i != acc.end(); ++i)
+	  os_ << " " << quote_unless_bare_word(*i);
       }
 
     };

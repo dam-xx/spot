@@ -43,16 +43,10 @@ s2, "state 3", "\"he\\llo\"", c;
 "state 3", s1, e4,;
 EOF
 
-# Sort out some possible inversions in the output.
-# (The order is not guaranteed by SPOT.)
-sed 's/d c/c d/g' stdout > tmp_ && mv tmp_ stdout
-
 diff stdout expected
 
 mv stdout input
 run 0 ./readsave input > stdout
-
-sed 's/d c/c d/g' stdout > tmp_ && mv tmp_ stdout
 
 diff input stdout
 

@@ -1,5 +1,9 @@
 2004-11-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/evtgbaalgos/save.cc (save_bfs::output_acc_set): Sort
+	acceptance conditions in the output.
+	* src/evtgbatest/readsave.test, src/evtgbatest/product.test: Adjust.
+
 	* src/tgbaalgos/rundotdec.cc (tgba_run_dotty_decorator::link_decl):
 	Typo.
 

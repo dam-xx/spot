@@ -49,10 +49,8 @@ EOF
 
 run 0 ./product input1 input2 input3 >stdout
 
-perl -pi -e 's/Acc2 Acc1/Acc1 Acc2/g;' stdout
-
 cat >expected <<\EOF
-acc = Acc3 Acc1 Acc2;
+acc = Acc1 Acc2 Acc3;
 init = "<s1, t1, u1>" "<s1, t1, u2>";
 "<s1, t1, u1>", "<s2, t2, u1>", a,;
 "<s1, t1, u2>", "<s2, t2, u2>", a,;
