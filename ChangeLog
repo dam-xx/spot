@@ -19,7 +19,7 @@
 
 2003-05-15  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
-	Implements spot::ltl::destroy() and exercise it.
+	Implement spot::ltl::destroy() and exercise it.
 
 	* src/ltlast/atomic_prop.hh: Declare instance_count().
 	* src/ltlast/binop.hh, src/ltlast/unop.hh, src/ltlast/multop.hh:
