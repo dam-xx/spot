@@ -1,3 +1,8 @@
+2004-06-16  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/tgbatest/reductgba.cc, src/tgbatest/reductgba.test: Test for
+	reduction of tgba.
+
 2004-06-15  Thomas Martinez  <martinez@src.lip6.fr>
 
 	* src/tgbatest/ltl2tgba.cc: Add some option for the reduction of
