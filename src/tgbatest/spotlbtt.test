@@ -12,6 +12,13 @@ Algorithm
    Enabled = yes
 }
 
+Algorithm
+{
+   Name = "Spot TBA"
+   Path = "${LBTT_TRANSLATE} --spot ./tbalbtt"
+   Enabled = yes
+}
+
 GlobalOptions
 {
    Rounds = 100

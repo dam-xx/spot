@@ -13,6 +13,7 @@ check_PROGRAMS = \
   mixprod \
   readsave \
   spotlbtt \
+  tbalbtt \
   tgbaread \
   tripprod
 
@@ -26,6 +27,8 @@ ltlmagic_SOURCES = ltlmagic.cc
 ltlprod_SOURCES  = ltlprod.cc
 mixprod_SOURCES  = mixprod.cc
 readsave_SOURCES = readsave.cc
+tbalbtt_SOURCES  = spotlbtt.cc
+tbalbtt_CXXFLAGS = -DTBA
 tgbaread_SOURCES = tgbaread.cc
 tripprod_SOURCES = tripprod.cc
 spotlbtt_SOURCES = spotlbtt.cc

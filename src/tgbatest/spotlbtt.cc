@@ -7,7 +7,7 @@
 #include "ltlparse/public.hh"
 #include "tgbaalgos/ltl2tgba.hh"
 #include "tgbaalgos/lbtt.hh"
-
+#include "tgba/tgbatba.hh"
 
 void
 syntax(char* prog)
@@ -48,10 +48,17 @@ main(int argc, char** argv)
 
   if (f)
     {
-      spot::tgba_bdd_concrete* a = spot::ltl_to_tgba(f, dict);
+      spot::tgba* a;
+      spot::tgba* c = a = spot::ltl_to_tgba(f, dict);
       spot::ltl::destroy(f);
+#ifdef TBA
+      spot::tgba* d = a = new spot::tgba_tba_proxy(a);
+#endif
       spot::lbtt_reachable(std::cout, a);
-      delete a;
+#ifdef TBA
+      delete d;
+#endif
+      delete c;
     }
   else
     {
