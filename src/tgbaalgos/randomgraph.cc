@@ -91,7 +91,7 @@ namespace spot
       {
 	ltl::formula* f = env->require(acc(i));
 	int v = dict->register_acceptance_variable(f, res);
-	ltl::destroy(f);
+	res->declare_acceptance_condition(f);
 	allneg &= bdd_nithvar(v);
 	bdd b = bdd_ithvar(v);
 	accs.push_back(b);
