@@ -93,8 +93,8 @@ namespace spot
     std::stack<bdd> arc_accepting;
     std::stack<connected_component> root_component;
     seen seen_state_num;
-    state_sequence seq_counter;
-    cycle_path periode;
+    state_sequence suffix;
+    cycle_path period;
   private:
     std::stack<pair_state_iter> todo;
     std::vector<state_sequence> vec_sequence;
@@ -102,10 +102,9 @@ namespace spot
 
     /// Called by counter_example to find a path which traverses all
     /// accepting conditions in the accepted SCC.
-    void
-    accepting_path (const spot::tgba* aut_counter,
-		    const connected_component& comp_path,
-		    const spot::state* start_path, bdd to_accept);
+    void accepting_path (const spot::tgba* aut_counter,
+			 const connected_component& comp_path,
+			 const spot::state* start_path, bdd to_accept);
 
     /// Complete a cycle that caraterise the period of the counter
     /// example.  Append a sequence to the path given by accepting_path.

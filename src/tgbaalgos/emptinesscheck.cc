@@ -196,8 +196,8 @@ namespace spot
     os << "Prefix:" << std::endl;
     os << "======================" << std::endl;
     const bdd_dict* d = aut->get_dict();
-    for (state_sequence::const_iterator i_se = seq_counter.begin();
-	 i_se != seq_counter.end(); i_se++)
+    for (state_sequence::const_iterator i_se = suffix.begin();
+	 i_se != suffix.end(); i_se++)
       {
 	if (restrict)
 	  {
@@ -212,8 +212,8 @@ namespace spot
     os << "======================" << std::endl;
     os << "Cycle:" <<std::endl;
     os << "======================" << std::endl;
-    for (cycle_path::const_iterator it = periode.begin();
-	 it != periode.end(); it++)
+    for (cycle_path::const_iterator it = period.begin();
+	 it != period.end(); it++)
       {
 	if (restrict)
 	  {
@@ -231,7 +231,7 @@ namespace spot
     return os;
   }
 
-  /// \brief Build a possible prefixe and period for a counter example.
+  /// \brief Build a possible prefix and period for a counter example.
   void
   emptiness_check::counter_example(const spot::tgba* aut_counter)
   {
@@ -240,135 +240,140 @@ namespace spot
                      spot::state_ptr_less_than> path_state;
     path_state path_map;
 
-    if (!root_component.empty()){
-      int comp_size = root_component.size();
-      typedef std::vector<connected_component> vec_compo;
-      vec_compo vec_component;
-      vec_component.resize(comp_size);
-      vec_sequence.resize(comp_size);
-      state_sequence seq;
-      state_sequence tmp_lst;
-      state_sequence best_lst;
-      bdd tmp_acc = bddfalse;
-      std::stack<pair_state_iter> todo_accept;
+    if (!root_component.empty())
+      {
+	int comp_size = root_component.size();
+	typedef std::vector<connected_component> vec_compo;
+	vec_compo vec_component;
+	vec_component.resize(comp_size);
+	vec_sequence.resize(comp_size);
+	state_sequence seq;
+	state_sequence tmp_lst;
+	state_sequence best_lst;
+	bdd tmp_acc = bddfalse;
+	std::stack<pair_state_iter> todo_accept;
 
-      for (int j = comp_size -1; j >= 0; j--)
-	{
-	  vec_component[j] = root_component.top();
-	  root_component.pop();
-	}
+	for (int j = comp_size -1; j >= 0; j--)
+	  {
+	    vec_component[j] = root_component.top();
+	    root_component.pop();
+	  }
 
-      int q_index;
-      int tmp_int = 0;
-      // Fill the SCC in the stack root_component.
-      for (seen::iterator iter_map = seen_state_num.begin();
-	   iter_map != seen_state_num.end(); iter_map++)
-	{
-	  q_index = (*iter_map).second;
-	  tmp_int = 0;
-	  if (q_index > 0)
-	    {
-	      while ((tmp_int < comp_size)
-		     && (vec_component[tmp_int].index <= q_index))
-		tmp_int = tmp_int+1;
-	      if (tmp_int < comp_size)
-		vec_component[tmp_int-1].state_set.insert((*iter_map).first);
-	      else
-		vec_component[comp_size-1].state_set.insert((*iter_map).first);
-	    }
-	}
+	int q_index;
+	int tmp_int = 0;
+	// Fill the SCC in the stack root_component.
+	for (seen::iterator iter_map = seen_state_num.begin();
+	     iter_map != seen_state_num.end(); iter_map++)
+	  {
+	    q_index = (*iter_map).second;
+	    tmp_int = 0;
+	    if (q_index > 0)
+	      {
+		while ((tmp_int < comp_size)
+		       && (vec_component[tmp_int].index <= q_index))
+		  tmp_int = tmp_int+1;
+		if (tmp_int < comp_size)
+		  vec_component[tmp_int-1].state_set.insert((*iter_map).first);
+		else
+		  vec_component[comp_size-1].state_set
+		    .insert((*iter_map).first);
+	      }
+	  }
 
-      state* start_state = aut_counter->get_init_state();
-      if (comp_size != 1)
-	{
-	  tgba_succ_iterator* i = aut_counter->succ_iter(start_state);
-	  todo_trace.push_back(pair_state_iter(start_state, i));
+	state* start_state = aut_counter->get_init_state();
+	if (comp_size != 1)
+	  {
+	    tgba_succ_iterator* i = aut_counter->succ_iter(start_state);
+	    todo_trace.push_back(pair_state_iter(start_state, i));
 
-	  for (int k = 0; k < comp_size-1; k++)
-	    {
-	      // We build a path trought all SCC in the stack : a
-	      // possible prefixe for a counter example.
-	      while (!todo_trace.empty())
-		{
-		  pair_state_iter started_from = todo_trace.front();
-		  todo_trace.pop_front();
-		  started_from.second->first();
+	    for (int k = 0; k < comp_size-1; k++)
+	      {
+		// We build a path trought all SCC in the stack: a
+		// possible prefix for a counter example.
+		while (!todo_trace.empty())
+		  {
+		    pair_state_iter started_from = todo_trace.front();
+		    todo_trace.pop_front();
+		    started_from.second->first();
 
-		  for (started_from.second->first();
-		       !started_from.second->done();
-		       started_from.second->next())
-		    {
-		      const state* curr_state =
-			started_from.second->current_state();
-		      connected_component::set_of_state::iterator iter_set =
-			vec_component[k+1].state_set.find(curr_state);
-		      if (iter_set != vec_component[k+1].state_set.end())
-			{
-			  const state* curr_father = started_from.first;
-			  seq.push_front(*iter_set);
-			  seq.push_front(curr_father);
-			  seen::iterator i_2 =
-			    seen_state_num.find(curr_father);
-			  assert(i_2 != seen_state_num.end());
-			  while ((vec_component[k].index
-				  < seen_state_num[curr_father])
-				 && (seen_state_num[curr_father] != 1))
-			    {
-			      seq.push_front(path_map[curr_father]);
-			      curr_father = path_map[curr_father];
-			      seen::iterator i_3 =
-				seen_state_num.find(curr_father);
-			      assert(i_3 != seen_state_num.end());
-			    }
-			  vec_sequence[k] = seq;
-			  seq.clear();
-			  todo_trace.clear();
-			  break;
-			}
-		      else
-			{
-			  connected_component::set_of_state::iterator i_s =
-			    vec_component[k].state_set.find(curr_state);
-			  if (i_s != vec_component[k].state_set.end())
-			    {
-			      path_state::iterator i_path =
-				path_map.find(curr_state);
-			      seen::iterator i_seen =
-				seen_state_num.find(curr_state);
+		    for (started_from.second->first();
+			 !started_from.second->done();
+			 started_from.second->next())
+		      {
+			const state* curr_state =
+			  started_from.second->current_state();
+			connected_component::set_of_state::iterator iter_set =
+			  vec_component[k+1].state_set.find(curr_state);
+			if (iter_set != vec_component[k+1].state_set.end())
+			  {
+			    const state* curr_father = started_from.first;
+			    seq.push_front(*iter_set);
+			    seq.push_front(curr_father);
+			    seen::iterator i_2 =
+			      seen_state_num.find(curr_father);
+			    assert(i_2 != seen_state_num.end());
+			    while ((vec_component[k].index
+				    < seen_state_num[curr_father])
+				   && (seen_state_num[curr_father] != 1))
+			      {
+				seq.push_front(path_map[curr_father]);
+				curr_father = path_map[curr_father];
+				seen::iterator i_3 =
+				  seen_state_num.find(curr_father);
+				assert(i_3 != seen_state_num.end());
+			      }
+			    vec_sequence[k] = seq;
+			    seq.clear();
+			    todo_trace.clear();
+			    break;
+			  }
+			else
+			  {
+			    connected_component::set_of_state::iterator i_s =
+			      vec_component[k].state_set.find(curr_state);
+			    if (i_s != vec_component[k].state_set.end())
+			      {
+				path_state::iterator i_path =
+				  path_map.find(curr_state);
+				seen::iterator i_seen =
+				  seen_state_num.find(curr_state);
 
-			      if (i_seen != seen_state_num.end()
-				  && seen_state_num[curr_state] > 0
-				  && i_path == path_map.end())
-				{
-				  todo_trace.
-				    push_back(pair_state_iter(curr_state,
-							      aut_counter->succ_iter(curr_state)));
-				  path_map[curr_state] = started_from.first;
-				}
-			    }
-			}
-		    }
-		}
-	      todo_trace.
-		push_back(pair_state_iter(vec_sequence[k].back(),
-					  aut_counter->succ_iter(vec_sequence[k].back())));
-	    }
-	}
-      else
-	{
-	  seq_counter.push_front(start_state);
-	}
-      for (int n_ = 0; n_ < comp_size-1; n_++)
-	{
-	  for (state_sequence::iterator it = vec_sequence[n_].begin();
-	       it != vec_sequence[n_].end(); it++)
-	    {
-	      seq_counter.push_back(*it);
-	    }
-	}
-      seq_counter.unique();
-      emptiness_check::accepting_path(aut_counter, vec_component[comp_size-1], seq_counter.back(),vec_component[comp_size-1].condition);
-    }
+				if (i_seen != seen_state_num.end()
+				    && seen_state_num[curr_state] > 0
+				    && i_path == path_map.end())
+				  {
+				    todo_trace.
+				      push_back(pair_state_iter(curr_state,
+								aut_counter->succ_iter(curr_state)));
+				    path_map[curr_state] = started_from.first;
+				  }
+			      }
+			  }
+		      }
+		  }
+		todo_trace.
+		  push_back(pair_state_iter(vec_sequence[k].back(),
+					    aut_counter->succ_iter(vec_sequence[k].back())));
+	      }
+	  }
+	else
+	  {
+	    suffix.push_front(start_state);
+	  }
+	for (int n_ = 0; n_ < comp_size-1; n_++)
+	  {
+	    for (state_sequence::iterator it = vec_sequence[n_].begin();
+		 it != vec_sequence[n_].end(); it++)
+	      {
+		suffix.push_back(*it);
+	      }
+	  }
+	suffix.unique();
+	emptiness_check::accepting_path(aut_counter,
+					vec_component[comp_size-1],
+					suffix.back(),
+					vec_component[comp_size-1].condition);
+      }
     else
       {
 	std::cout << "EMPTY LANGUAGE NO COUNTER EXEMPLE" << std::endl;
@@ -414,7 +419,7 @@ namespace spot
 						 complete_map[curr_father].second));
 			    curr_father = complete_map[curr_father].first;
 			  }
-			emptiness_check::periode.splice(periode.end(),
+			emptiness_check::period.splice(period.end(),
 							tmp_comp);
 			todo_complete.clear();
 			break;
@@ -533,22 +538,22 @@ namespace spot
       }
     for (cycle_path::iterator it = best_lst.begin();
 	 it != best_lst.end(); it++)
-      emptiness_check::periode.push_back(*it);
+      emptiness_check::period.push_back(*it);
 
     if (best_acc != to_accept)
       {
 	bdd rec_to_acc = to_accept - best_acc;
 	emptiness_check::accepting_path(aut_counter, comp_path,
-					periode.back().first, rec_to_acc);
+					period.back().first, rec_to_acc);
       }
     else
       {
-	if (!periode.empty())
+	if (!period.empty())
 	  {
 	    /// The path contains all accepting conditions. Then we
 	    ///complete the cycle in this SCC by calling complete_cycle.
-	    complete_cycle(aut_counter, comp_path, periode.back().first,
-			   seq_counter.back());
+	    complete_cycle(aut_counter, comp_path, period.back().first,
+			   suffix.back());
 	  }
       }
   }

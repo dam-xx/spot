@@ -1,5 +1,9 @@
 2003-10-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.hh, src/tgbaalgos/emptinesscheck.cc
+	(emptiness_check::seq_counter, emptiness_check::periode): Rename as ...
+	(emptiness_check::prefix, emptiness_check::period): ... these.
+
 	* src/tgbaalgos/emptinesscheck.cc
 	(emptiness_check::tgba_emptiness_check,
 	emptiness_check::accepting_path): Simplify BDD operations.
