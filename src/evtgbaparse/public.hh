@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -32,7 +32,7 @@
 namespace spot
 {
   /// \brief A parse diagnostic with its location.
-  typedef std::pair<yy::Location, std::string> evtgba_parse_error;
+  typedef std::pair<yy::location, std::string> evtgba_parse_error;
   /// \brief A list of parser diagnostics, as filled by parse.
   typedef std::list<evtgba_parse_error> evtgba_parse_error_list;
 
@@ -56,10 +56,12 @@ namespace spot
 
   /// \brief Format diagnostics produced by spot::evtgba_parse.
   /// \param os Where diagnostics should be output.
+  /// \param filename The filename that should appear in the diagnostics.
   /// \param error_list The error list filled by spot::ltl::parse while
   ///        parsing \a ltl_string.
   /// \return \c true iff any diagnostic was output.
   bool format_evtgba_parse_errors(std::ostream& os,
+				  const std::string& filename,
 				  evtgba_parse_error_list& error_list);
 }
 

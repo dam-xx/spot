@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -67,7 +67,9 @@ main(int argc, char** argv)
       spot::evtgba_explicit* a = spot::evtgba_parse(argv[filename_index],
 						    pel, debug);
 
-      exit_code = spot::format_evtgba_parse_errors(std::cerr, pel);
+      exit_code = spot::format_evtgba_parse_errors(std::cerr,
+						   argv[filename_index],
+						   pel);
 
       if (a)
 	{

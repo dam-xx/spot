@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -38,7 +38,7 @@ namespace spot
     /// @{
 
     /// \brief A parse diagnostic with its location.
-    typedef std::pair<yy::Location, std::string> parse_error;
+    typedef std::pair<yy::location, std::string> parse_error;
     /// \brief A list of parser diagnostics, as filled by parse.
     typedef std::list<parse_error> parse_error_list;
 

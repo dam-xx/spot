@@ -36,7 +36,7 @@ namespace spot
   /// @{
 
   /// \brief A parse diagnostic with its location.
-  typedef std::pair<yy::Location, std::string> tgba_parse_error;
+  typedef std::pair<yy::location, std::string> tgba_parse_error;
   /// \brief A list of parser diagnostics, as filled by parse.
   typedef std::list<tgba_parse_error> tgba_parse_error_list;
 

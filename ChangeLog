@@ -1,5 +1,14 @@
 2005-02-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/evtgbaparse/evtgbaparse.yy, src/evtgbaparse/evtgbascan.ll,
+	src/evtgbaparse/fmterror.cc, src/evtgbaparse/parsedecl.hh,
+	src/evtgbaparse/public.hh, src/evtgbatest/product.cc,
+	src/evtgbatest/readsave.cc, src/ltlparse/fmterror.cc,
+	src/ltlparse/ltlparse.yy, src/ltlparse/parsedecl.hh,
+	src/ltlparse/public.hh, src/tgbaparse/parsedecl.hh,
+	src/tgbaparse/public.hh, src/tgbaparse/tgbaparse.yy: Update
+	to Bison 2.0.
+
 	* bench/emptchk/pml2tgba.pl (usage): Correct description.  From Denis.
 
 	* bench/emptchk/README: Timing info from Denis.

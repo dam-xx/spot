@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -26,14 +26,16 @@ namespace spot
 {
   bool
   format_evtgba_parse_errors(std::ostream& os,
+			     const std::string& filename,
 			     evtgba_parse_error_list& error_list)
   {
     bool printed = false;
     spot::evtgba_parse_error_list::iterator it;
     for (it = error_list.begin(); it != error_list.end(); ++it)
       {
-	if (it->first.begin.filename != "")
-	  os << it->first << ": ";
+	if (filename != "-")
+	  os << filename << ":";
+	os << it->first << ": ";
 	os << it->second << std::endl;
 	printed = true;
       }

@@ -1,4 +1,4 @@
-/* Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -54,6 +54,12 @@
 %type <symset> acc_list
 %token ACC_DEF
 %token INIT_DEF
+
+%destructor { delete $$; } STRING UNTERMINATED_STRING IDENT
+                           strident string acc_list
+
+%printer { debug_stream() << *$$; } STRING UNTERMINATED_STRING IDENT
+                                    strident string
 
 %%
 evtgba: lines
@@ -114,14 +120,7 @@ init_decl:
 %%
 
 void
-yy::Parser::print_()
-{
-  if (looka_ == STRING || looka_ == IDENT)
-    YYCDEBUG << " '" << *value.str << "'";
-}
-
-void
-yy::Parser::error_()
+yy::parser::error(const location_type& location, const std::string& message)
 {
   error_list.push_back(spot::evtgba_parse_error(location, message));
 }
@@ -136,12 +135,13 @@ namespace spot
     if (evtgbayyopen(name))
       {
 	error_list.push_back
-	  (evtgba_parse_error(yy::Location(),
+	  (evtgba_parse_error(yy::location(),
 			      std::string("Cannot open file ") + name));
 	return 0;
       }
     evtgba_explicit* result = new evtgba_explicit();
-    evtgbayy::Parser parser(debug, yy::Location(), error_list, result);
+    evtgbayy::parser parser(error_list, result);
+    parser.set_debug_level(debug);
     parser.parse();
     evtgbayyclose();
     return result;

@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -27,7 +27,7 @@
 #include "location.hh"
 
 # define YY_DECL \
-  int evtgbayylex (yystype *yylval, yy::Location *yylloc)
+  int evtgbayylex (yystype *yylval, yy::location *yylloc)
 YY_DECL;
 
 namespace spot

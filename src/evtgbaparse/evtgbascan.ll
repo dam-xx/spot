@@ -1,4 +1,4 @@
-/* Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -31,15 +31,7 @@
 #define YY_USER_ACTION \
   yylloc->columns(yyleng);
 
-#define YY_USER_INIT                            \
-  do {                                          \
-    yylloc->begin.filename = current_file;      \
-    yylloc->end.filename = current_file;        \
-  } while (0)
-
 #define YY_NEVER_INTERACTIVE 1
-
-static std::string current_file;
 
 %}
 
@@ -99,12 +91,10 @@ namespace spot
     if (name == "-")
       {
         yyin = stdin;
-        current_file = "standard input";
       }
     else
       {
         yyin = fopen (name.c_str (), "r");
-        current_file = name;
         if (!yyin)
 	  return 1;
       }

@@ -1,4 +1,4 @@
-/* Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -80,6 +80,9 @@ typedef std::map<std::string, bdd> formula_cache;
   delete $$;
   } acc_list
 
+%printer { debug_stream() << *$$; } STRING UNTERMINATED_STRING IDENT
+                                    strident string condition
+
 %%
 tgba: acceptance_decl lines
       | acceptance_decl
@@ -110,7 +113,7 @@ line: strident ',' strident ',' condition ',' acc_list ';'
 		      i != pel.end(); ++i)
 		   {
 		     // Adjust the diagnostic to the current position.
-		     Location here = @1;
+		     location here = @1;
 		     here.begin.line += i->first.begin.line;
 		     here.begin.column += i->first.begin.column;
 		     here.end.line =
@@ -201,14 +204,7 @@ acc_decl:
 %%
 
 void
-yy::Parser::print_()
-{
-  if (looka_ == STRING || looka_ == IDENT)
-    YYCDEBUG << " '" << *value.str << "'";
-}
-
-void
-yy::Parser::error_()
+yy::parser::error(const location_type& location, const std::string& message)
 {
   error_list.push_back(spot::tgba_parse_error(location, message));
 }
@@ -225,14 +221,14 @@ namespace spot
     if (tgbayyopen(name))
       {
 	error_list.push_back
-	  (tgba_parse_error(yy::Location(),
+	  (tgba_parse_error(yy::location(),
 			    std::string("Cannot open file ") + name));
 	return 0;
       }
     formula_cache fcache;
     tgba_explicit* result = new tgba_explicit(dict);
-    tgbayy::Parser parser(debug, yy::Location(), error_list,
-			  env, result, fcache);
+    tgbayy::parser parser(error_list, env, result, fcache);
+    parser.set_debug_level(debug);
     parser.parse();
     tgbayyclose();
     return result;

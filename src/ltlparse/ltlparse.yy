@@ -1,4 +1,4 @@
-/* Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -110,6 +110,8 @@ using namespace spot::ltl;
    References to ATOMIC_PROP are silently ignored.  */
 %destructor { delete $$; } "atomic proposition"
 %destructor { spot::ltl::destroy($$); } result subformula
+
+%printer { debug_stream() << *$$; } "atomic proposition"
 
 %%
 result:       subformula END_OF_INPUT
@@ -260,14 +262,7 @@ subformula: ATOMIC_PROP
 %%
 
 void
-yy::Parser::print_()
-{
-  if (looka_ == ATOMIC_PROP)
-    YYCDEBUG << " '" << *value.str << "'";
-}
-
-void
-yy::Parser::error_()
+yy::parser::error(const location_type& location, const std::string& message)
 {
   error_list.push_back(parse_error(location, message));
 }
@@ -284,7 +279,8 @@ namespace spot
     {
       formula* result = 0;
       flex_set_buffer(ltl_string.c_str());
-      yy::Parser parser(debug, yy::Location(), error_list, env, result);
+      yy::parser parser(error_list, env, result);
+      parser.set_debug_level(debug);
       parser.parse();
       return result;
     }

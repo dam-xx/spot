@@ -13,7 +13,7 @@ generally if you plan to regenerate some of the generated files.
   GNU Automake >= 1.9
   GNU Libtool >= 1.4
   GNU Flex (the version probably doesn't matter much, we used 2.5.31)
-  The CVS version of GNU Bison (called 1.875c at the time of writing)
+  GNU Bison >= 2.0
   SWIG >= 1.3.23
   Doxygen >= 1.4.0
 
