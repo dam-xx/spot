@@ -219,7 +219,7 @@ namespace spot
       + bdd_format_set(get_dict(), s->accepting_cond()) + ")";
   }
 
-  state* 
+  state*
   tgba_tba_proxy::project_state(const state* s, const tgba* t) const
   {
     const state_tba_proxy* s2 = dynamic_cast<const state_tba_proxy*>(s);

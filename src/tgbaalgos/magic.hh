@@ -50,7 +50,7 @@ namespace spot
     ///
     /// Restrict printed states to \a the state space of restrict if
     /// supplied.
-    std::ostream& print_result(std::ostream& os, 
+    std::ostream& print_result(std::ostream& os,
 			       const tgba* restrict = 0) const;
 
   private:

@@ -1,5 +1,13 @@
 2003-07-30  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* iface/gspn/Makefile.am (TESTS): Add dcswaveltl.test.
+	(ltlgspn_rg_LDADD, ltlgspn_srg_LDADD, ltlgspn_rg_SOURCES)
+	(ltlgspn_srg_SOURCES): New variables.
+	(check_PROGRAMS): Add ltlgspn-rg and ltlgspn-srg.
+
+	* iface/gspn/Makefile.am (gspn_HEADERS, gspndir): Install
+	gspn.hh.
+
 	* src/tgba/tgba.hh, src/tgba/tgba.cc
 	(tgba::project_state): New method.
 	* src/tgba/tgbaproduct.hh, src/tgba/tgbaproduct.cc

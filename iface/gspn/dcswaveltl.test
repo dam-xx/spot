@@ -1,0 +1,9 @@
+#! /bin/sh
+
+. ./defs || exit 1
+
+set -e
+
+cp -R $srcdir/examples/DCSwave .
+
+../ltlgspn-srg DCSwave/DCSWave '!G(ATTiIDLj => F(!SCj U SCi))' ATTiIDLj SCi SCj > output
