@@ -1,3 +1,8 @@
+2004-12-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* doc/Doxyfile.in (EXCLUDE_SYMLINKS): Set to YES, since we have no
+	legitimate symlink in our source tree.  Requested by Akim Demaille.
+
 2004-12-20  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/ndfs_result.hh: Rewrite the computation of accepting
