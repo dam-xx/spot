@@ -69,15 +69,17 @@ prop_list:
        {
 	 $$ = new std::list<pair>;
        }
-       | prop_list IDENT
+       | prop_list strident
        {
-	 $1->push_back(pair(false, parse_environment.require(*$2)));
+	 if (*$2 != "")
+	   $1->push_back(pair(false, parse_environment.require(*$2)));
 	 delete $2;
 	 $$ = $1;
        }
-       | prop_list '!' IDENT
+       | prop_list '!' strident
        {
-	 $1->push_back(pair(true, parse_environment.require(*$3)));
+	 if (*$3 != "")
+	   $1->push_back(pair(true, parse_environment.require(*$3)));
 	 delete $3;
 	 $$ = $1;
        }

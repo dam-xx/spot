@@ -25,10 +25,15 @@ namespace spot
 	if (isi != dict->prom_formula_map.end())
 	  {
 	    if (want_prom)
-	      o << "Prom[";
-	    to_string(isi->second, o);
-	    if (want_prom)
-	      o << "]";
+	      {
+		o << "Prom[";
+		to_string(isi->second, o) << "]";
+	      }
+	    else
+	      {
+		o << "\"";
+		to_string(isi->second, o) << "\"";
+	      }
 	  }
 	else
 	  {

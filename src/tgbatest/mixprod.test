@@ -1,0 +1,24 @@
+#!/bin/sh
+
+. ./defs
+
+set -e
+
+# We don't check the output, but just running this might be enough to
+# trigger assertions or I/O errors.
+
+cat >input1 <<EOF
+s1, s3, a,;
+s1, s2, b, p1;
+s2, s1, !a,;
+s2, s3, c,;
+EOF
+
+./mixprod 'F(a U b) & Xa' input1 >stdout
+cat stdout
+
+# Make sure we can read the produced output
+
+./mixprod 'G!a' stdout
+
+rm input1 stdout

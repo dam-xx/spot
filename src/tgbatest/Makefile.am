@@ -11,18 +11,23 @@ check_PROGRAMS = \
   ltlprod \
   bddprod \
   explprod \
-  tripprod
+  tripprod \
+  mixprod
 
+# Keep this sorted alphabetically.
 bddprod_SOURCES  = ltlprod.cc
 bddprod_CXXFLAGS = -DBDD_CONCRETE_PRODUCT
 explicit_SOURCES = explicit.cc
 explprod_SOURCES = explprod.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
 ltlprod_SOURCES  = ltlprod.cc
+mixprod_SOURCES  = mixprod.cc
 readsave_SOURCES = readsave.cc
 tgbaread_SOURCES = tgbaread.cc
 tripprod_SOURCES = tripprod.cc
 
+# Keep this sorted by STRENGTH.  Test basic things first,
+# because such failures will be easier to diagnose and fix.
 TESTS = \
   explicit.test \
   tgbaread.test \
@@ -31,7 +36,8 @@ TESTS = \
   ltlprod.test \
   bddprod.test \
   explprod.test \
-  tripprod.test
+  tripprod.test \
+  mixprod.test
 
 EXTRA_DIST = $(TESTS)
 

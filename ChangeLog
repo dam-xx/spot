@@ -1,3 +1,14 @@
+2003-06-18  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/bddprint.cc (print_handler): Quote promises
+	when !want_prom.
+	* src/tgbaparse/tgbaparse.yy (prop_list): Accept strings or
+	identifiers.  Discard empty strings.
+	* src/tgbatest/mixprod.cc, src/tgbatest/mixprod.test: New file.
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Add mixprod.
+	(mixprod_SOURCES): New variable.
+	(TESTS): Add mixprod.test.
+
 2003-06-17  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/tgbaproduct.cc (state_bdd_product::state_bdd_product):
