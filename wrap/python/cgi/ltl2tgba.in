@@ -89,14 +89,6 @@ filled = form.has_key('formula')
 uid = os.environ['UNIQUE_ID'];
 imgprefix = imgdir + '/' + uid
 
-def escaped_print_dot(dict, what):
-    print '<pre>'; sys.stdout.flush()
-    s = spot.ostringstream()
-    spot.bdd_print_dot(s, dict, what)
-    print cgi.escape(s.str())
-    del s
-    print '</pre>'; sys.stdout.flush()
-
 def escaped_print_set(dict, what):
     print '<pre>'; sys.stdout.flush()
     s = spot.ostringstream()
@@ -135,21 +127,35 @@ def print_stats(automaton):
         print "no acceptance condition (all cycles are accepting)"
     print "</p>"
     sys.stdout.flush()
+    # Decide whether we will render the automaton or not.
+    # (A webserver is not a calcul center...)
+    if stats.states > 64:
+        return "Automaton has too much states"
+    if float(stats.transitions)/stats.states > 10:
+        return "Automaton has too much transitions per states"
+    return False
 
 def render_dot(basename):
     os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tpng', '-Gsize=14,14', '-o',
-               basename + '.png', basename + '.dot')
+               basename + '.png', basename + '.txt')
     reset_alarm()
-    print '<img src="' + basename + '.png">'
+    b = cgi.escape(basename)
+    print '<img src="' + b + '.png"><br>(<a href="' + b + '.txt">dot source</a>)'
+    sys.stdout.flush()
 
-def render_automaton(basename, automata):
-    outfile = spot.ofstream(basename + '.dot')
+def render_automaton(basename, automata, dont_run_dot):
+    outfile = spot.ofstream(basename + '.txt')
     spot.dotty_reachable(outfile, automata)
     del outfile
-    render_dot(basename)
+    if dont_run_dot:
+        print ('<p>' + dont_run_dot + ''' to be rendered on-line.  However
+you may download the <a href="''' + cgi.escape(basename)
+               + '.txt">source in dot format</a> en render it yourself.')
+    else:
+        render_dot(basename)
 
 def render_bdd(basename, dictionary, bdd):
-    outfile = spot.ofstream(basename + '.dot')
+    outfile = spot.ofstream(basename + '.txt')
     spot.bdd_print_dot(outfile, dictionary, bdd)
     del outfile
     render_dot(basename)
@@ -166,24 +172,17 @@ options = [
     ('opt_symb_merge',
      'merge states with same symbolic successor representation (FM only)', 1),
     ('show_parse',          'show traces during parsing',                  0),
-    ('show_formula_dot',    'print the formula as .dot',                   0),
-    ('show_formula_gif',    'draw the formula',                            0),
-    ('show_automaton_dot',  'print Büchi automaton as .dot',               0),
-    ('show_automaton_gif',  'draw Büchi automaton',                        1),
-    ('show_degen_dot',      'print degeneralized Büchi automaton as .dot', 0),
-    ('show_degen_gif',      'draw degeneralized Büchi automaton',          0),
+    ('show_formula_png',    'draw the formula',                            0),
+    ('show_automaton_png',  'draw Büchi automaton',                        1),
+    ('show_degen_png',      'draw degeneralized Büchi automaton',          0),
     ('show_dictionnay',     'print BDD dictionary',                        0),
-    ('show_relation_dot',
-     'print the transition relation as .dot (LaCIM only)',                 0),
     ('show_relation_set',
      'print the transition relation as a BDD set (LaCIM only)',            0),
-    ('show_relation_gif',
+    ('show_relation_png',
      'draw the transition relation (LaCIM only)',                          0),
-    ('show_acceptance_dot',
-     'print the acceptance relation as .dot (LaCIM only)'  ,               0),
     ('show_acceptance_set',
      'print the acceptance relation as a BDD set (LaCIM only)',            0),
-    ('show_acceptance_gif',
+    ('show_acceptance_png',
      'draw the acceptance relation (LaCIM only)',                          0),
     ('show_lbtt',           'convert automaton for LBTT',                  0),
     ]
@@ -321,15 +320,8 @@ if err:
 
 print "<p>Formula is<code>", f, "</code></p>"
 
-if show_formula_dot:
-    print '<pre>'; sys.stdout.flush()
-    s = spot.ostringstream()
-    spot.dotty(s, f)
-    print cgi.escape(s.str())
-    del s
-    print '</pre>'; sys.stdout.flush()
-if show_formula_gif:
-    outfile = spot.ofstream(imgprefix + '-f.dot')
+if show_formula_png:
+    outfile = spot.ofstream(imgprefix + '-f.txt')
     spot.dotty(outfile, f)
     del outfile
     render_dot(imgprefix + '-f')
@@ -358,32 +350,16 @@ elif trans_fm:
 print 'done.</p>'
 sys.stdout.flush()
 
-print_stats(automaton)
+dont_run_dot = print_stats(automaton)
 
-if show_automaton_dot:
-    print '<pre>'; sys.stdout.flush()
-    s = spot.ostringstream()
-    spot.dotty_reachable(s, automaton)
-    print cgi.escape(s.str())
-    del s
-    print '</pre>'; sys.stdout.flush()
+if show_automaton_png:
+    render_automaton(imgprefix + '-a', automaton, dont_run_dot)
 
-if show_automaton_gif:
-    render_automaton(imgprefix + '-a', automaton)
-
-if show_degen_dot or show_degen_gif:
+if show_degen_png:
     print '<H3>Degeneralized automaton</H3>'
     degen = spot.tgba_tba_proxy(automaton)
-    print_stats(degen)
-    if show_degen_dot:
-	print '<pre>'; sys.stdout.flush()
-	s = spot.ostringstream()
-	spot.dotty_reachable(s, degen)
-	print cgi.escape(s.str())
-	del s
-	print '</pre>'; sys.stdout.flush()
-    if show_degen_gif:
-        render_automaton(imgprefix + '-d', degen)
+    dont_run_dot = print_stats(degen)
+    render_automaton(imgprefix + '-d', degen, dont_run_dot)
 else:
     degen = 0
 
@@ -395,28 +371,22 @@ if show_dictionnay:
     print '</pre>'
 
 if (type(automaton) == spot.tgba_bdd_concretePtr
-    and (show_relation_dot or show_relation_set or show_relation_gif)):
+    and (show_relation_set or show_relation_png)):
     print '<H3>Transition relation</H3>'
-    if show_relation_dot:
-	escaped_print_dot(automaton.get_dict(),
-			  automaton.get_core_data().relation)
     if show_relation_set:
 	escaped_print_set(automaton.get_dict(),
 			  automaton.get_core_data().relation)
-    if show_relation_gif:
+    if show_relation_png:
         render_bdd(imgprefix + '-b', automaton.get_dict(),
                    automaton.get_core_data().relation)
 
 if (type(automaton) == spot.tgba_bdd_concretePtr
-    and (show_acceptance_dot or show_acceptance_set or show_acceptance_gif)):
+    and (show_acceptance_set or show_acceptance_png)):
     print '<H3>Acceptance relation</H3>'
-    if show_acceptance_dot:
-	escaped_print_dot(automaton.get_dict(),
-			  automaton.get_core_data().acceptance_conditions)
     if show_acceptance_set:
 	escaped_print_set(automaton.get_dict(),
 			  automaton.get_core_data().acceptance_conditions)
-    if show_acceptance_gif:
+    if show_acceptance_png:
         render_bdd(imgprefix + '-c', automaton.get_dict(),
                    automaton.get_core_data().acceptance_conditions)
 
