@@ -1,5 +1,7 @@
 2004-02-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/lbtt.hh: Typos.
+
 	* src/tgbatest/spotlbtt.test: Typo.
 
 	* wrap/python/spot.i (unblock_signal): New function.

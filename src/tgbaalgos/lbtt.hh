@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -33,13 +33,13 @@ namespace spot
   /// labeled by propositional formulae, and generalized
   /// Büchi acceptance conditions on \b states.  This
   /// is unlike our spot::tgba automata which put
-  /// both generalized acceptance conditions and propositional
+  /// both generalized acceptance conditions (and propositional
   /// formulae) on \b transitions.
   ///
   /// This algorithm will therefore produce an automata where
   /// acceptance conditions have been moved from each transition to
-  /// previous state.  In the worst case, doing so will multiply the
-  /// number of states and transitions of the automata by
+  /// the previous state.  In the worst case, doing so will multiply
+  /// the number of states and transitions of the automata by
   /// <code>2^|Acc|</code>.  where <code>|Acc|</code> is the number of
   /// acceptance conditions used by the automata.  (It can be a bit
   /// more because LBTT allows only for one initial state:
