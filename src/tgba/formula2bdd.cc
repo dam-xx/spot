@@ -19,6 +19,7 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+#include <cassert>
 #include "formula2bdd.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlast/visitor.hh"

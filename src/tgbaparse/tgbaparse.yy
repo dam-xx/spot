@@ -106,7 +106,7 @@ cond_list:
        {
 	 $$ = new std::list<pair>;
        }
-       | cond_list string§
+       | cond_list string
        {
 	 if (*$2 != "")
 	   {

@@ -1,3 +1,8 @@
+2003-11-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaparse/tgbaparse.yy: Remove a random character.
+	* src/tgba/formula2bdd.cc: Include cassert.
+
 2003-11-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	Explicit automata can now have arbitrary logic formula on their
