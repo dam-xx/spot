@@ -1,11 +1,21 @@
 2004-04-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.hh
+	(explicit_connected_component_factory,
+	connected_component_hash_set_factory): New classes.
+	(counter_example::counter_example): Take an
+	explicit_connected_component_factory factory argument.
+	* src/tgbaalgos/emptinesscheck.cc: Adjust.
+
 	* src/tgbaalgos/emptinesscheck.hh (explicit_connected_component):
 	New class.
 	(counter_example::connected_component_set): Rename as ...
 	(connected_component_hash_set): ... this, and inherit from
 	explicit_connected_component.
 	(counter_example::accepting_path, counter_example::complete_cycle):
+	Take an explicit_connected_component argument instead of a
+	connected_component_set.
+	* src/tgbaalgos/emptinesscheck.cc: Adjust.
 
 	* src/tgbaalgos/emptinesscheck.hh
 	(counter_example::connected_component_set::has_state): Return

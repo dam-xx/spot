@@ -513,7 +513,29 @@ namespace spot
 
   //////////////////////////////////////////////////////////////////////
 
-  counter_example::counter_example(const emptiness_check_status* ecs)
+  connected_component_hash_set_factory::connected_component_hash_set_factory()
+    : explicit_connected_component_factory()
+  {
+  }
+
+  connected_component_hash_set*
+  connected_component_hash_set_factory::build() const
+  {
+    return new connected_component_hash_set();
+  }
+
+  const connected_component_hash_set_factory*
+  connected_component_hash_set_factory::instance()
+  {
+    static connected_component_hash_set_factory f;
+    return &f;
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  counter_example::counter_example(const emptiness_check_status* ecs,
+				   const explicit_connected_component_factory*
+				   eccf)
     : ecs_(ecs)
   {
     assert(!ecs_->root.empty());
@@ -526,7 +548,7 @@ namespace spot
       new (explicit_connected_component*)[comp_size];
     for (int j = comp_size - 1; 0 <= j; --j)
       {
-	scc[j] = new connected_component_hash_set();
+	scc[j] = eccf->build();
 	scc[j]->index = root.top().index;
 	scc[j]->condition = root.top().condition;
 	root.pop();

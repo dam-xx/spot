@@ -157,7 +157,7 @@ namespace spot
   class explicit_connected_component: public scc_stack::connected_component
   {
   public:
-    virtual ~explicit_connected_component() {};
+    virtual ~explicit_connected_component() {}
     /// \brief Check if the SCC contains states \a s.
     ///
     /// Return the representative of \a s in the SCC, and delete \a
@@ -172,7 +172,7 @@ namespace spot
   class connected_component_hash_set: public explicit_connected_component
   {
   public:
-    virtual ~connected_component_hash_set() {};
+    virtual ~connected_component_hash_set() {}
     virtual const state* has_state(const state* s) const;
     virtual void insert(const state* s);
   protected:
@@ -181,10 +181,32 @@ namespace spot
     set_type states;
   };
 
+  class explicit_connected_component_factory
+  {
+  public:
+    virtual ~explicit_connected_component_factory() {}
+    virtual explicit_connected_component* build() const = 0;
+  };
+
+  class connected_component_hash_set_factory :
+    public explicit_connected_component_factory
+  {
+  public:
+    virtual connected_component_hash_set* build() const;
+
+    static const connected_component_hash_set_factory* instance();
+
+  protected:
+    virtual ~connected_component_hash_set_factory() {}
+    connected_component_hash_set_factory();
+  };
+
   class counter_example
   {
   public:
-    counter_example(const emptiness_check_status* ecs);
+    counter_example(const emptiness_check_status* ecs,
+		    const explicit_connected_component_factory*
+		    eccf = connected_component_hash_set_factory::instance());
 
     typedef std::pair<const state*, bdd> state_proposition;
     typedef std::list<const state*> state_sequence;
