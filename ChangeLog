@@ -1,3 +1,8 @@
+2004-05-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltltest/reduc.test: Use ./defs and clean result.data.
+	* src/ltltest/Makefile.am (CLEANFILES): Clean result.data.
+
 2004-05-13  Thomas Martinez  <martinez@src.lip6.fr>
 
 	* src/ltlvisit/Makefile.am: Copyright 2004.

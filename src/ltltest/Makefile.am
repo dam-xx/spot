@@ -72,4 +72,4 @@ TESTS = \
   inf.test \
   reduc.test
 
-CLEANFILES = stdout expect parse.dot
+CLEANFILES = stdout expect parse.dot result.data
