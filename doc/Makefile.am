@@ -17,4 +17,4 @@ $(srcdir)/stamp: $(srcdir)/Doxyfile.in $(top_srcdir)/configure.ac
 spot.html: $(srcdir)/stamp
 spot.latex: $(srcdir)/stamp
 
-EXTRA_DIST = $(srcdir)/stamp spot.html
+EXTRA_DIST = $(srcdir)/stamp spot.html mainpage.dox

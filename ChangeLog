@@ -1,5 +1,9 @@
 2003-06-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* doc/mainpage.dox: New file.
+	* doc/Makefile.am (EXTRA_DIST): Add mainpage.dox.
+	* doc/Doxyfile.in (INPUT): Add @srcdir@/mainpage.dox
+
 	* src/tgba/succiter.hh: Adjust comments about promises to
 	refer to accepting conditions.
 	* src/tgba/tgbabddconcretefactory.hh: Likewise.
