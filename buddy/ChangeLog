@@ -1,3 +1,8 @@
+2004-07-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* examples/bddcalc/parser.yxx (actionSeq, varlist): Rewrite as
+	left-recursive rules.
+
 2004-06-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	Merge BuDDy 2.3.
