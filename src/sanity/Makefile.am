@@ -41,3 +41,4 @@ installcheck-local:
 
 
 CLEANFILES = failures incltest.*
+EXTRA_DIST = includes.test

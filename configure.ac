@@ -19,8 +19,8 @@
 # Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-AC_PREREQ([2.57])
-AC_INIT([spot], [0.0s])
+AC_PREREQ([2.59])
+AC_INIT([spot], [0.0t])
 AC_CONFIG_AUX_DIR([tools])
 AM_INIT_AUTOMAKE([gnits nostdinc 1.8])
 

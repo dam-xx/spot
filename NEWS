@@ -1,4 +1,14 @@
-New in spot 0.0s:
+New in spot 0.0t (2004-04-23):
+
+  * `emptiness_check':
+      - fix two bugs in the computation of the counter example,
+      - revamp the interface for better customization.
+  * `never_claim_reachable': new function.
+  * Introduce annonymous BDD variables in `bdd_dict', and start
+    to use it in `ltl_to_tgba_fm'.
+  * Offer never claim in the CGI script.
+  * Rename EESRG as SSP, and offer specialized variants of the
+    emptiness_check.
 
 New in spot 0.0r (2004-03-08):
 

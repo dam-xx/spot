@@ -1,5 +1,9 @@
 2004-04-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* configure.ac, NEWS: Bump version to 0.0t.
+	* HACKING: Update tools requirements.
+	* src/sanity/Makefile.am (EXTRA_DIST): Distribute includes.test.
+
 	* src/sanity/Makefile.am, src/sanity/includes.test: New files.
 	* src/Makefile.am (SUBDIRS): Add sanity.
 	* configure.ac: Output src/sanity/Makefile.in.
@@ -11,7 +15,7 @@
 
 2004-04-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
-	* src/tgbatest/explicit.test: Reorder bdd variable in output.
+	* src/tgbatest/explicit.test: Reorder bdd variables in output.
 	Report from Denis Poitrenaud.
 
 	* wrap/python/cgi/ltl2tgba.in: Print degeneralized statistics
