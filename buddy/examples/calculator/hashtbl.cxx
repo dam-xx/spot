@@ -1,5 +1,5 @@
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/examples/calculator/Attic/hashtbl.cxx,v 1.1 2003/05/05 10:57:55 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/examples/calculator/Attic/hashtbl.cxx,v 1.1.1.1 2003/05/05 10:57:55 aduret Exp $
   FILE:  hashtbl.cc
   DESCR: Compiler hash table
   AUTH:  Jorn Lind

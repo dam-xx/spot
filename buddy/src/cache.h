@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/cache.h,v 1.1 2003/05/05 10:57:56 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/cache.h,v 1.1.1.1 2003/05/05 10:57:56 aduret Exp $
   FILE:  cache.h
   DESCR: Cache class for caching apply/exist etc. results
   AUTH:  Jorn Lind

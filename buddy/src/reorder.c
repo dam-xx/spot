@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/reorder.c,v 1.1 2003/05/05 10:57:57 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/reorder.c,v 1.1.1.1 2003/05/05 10:57:57 aduret Exp $
   FILE:  reorder.c
   DESCR: BDD reordering functions
   AUTH:  Jorn Lind

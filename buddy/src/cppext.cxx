@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/cppext.cxx,v 1.1 2003/05/05 10:57:56 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/cppext.cxx,v 1.1.1.1 2003/05/05 10:57:56 aduret Exp $
   FILE:  cppext.cxx
   DESCR: C++ extension of BDD package
   AUTH:  Jorn Lind
