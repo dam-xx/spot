@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -61,7 +61,8 @@ namespace spot
   ///              (it exists a predecessor p of s in st_blue and s != t and
   ///              the arc between p and s is accepting)) then
   ///       report cycle;
-  ///     else if the edge (s,t) is accepting then
+  ///     end if;
+  ///     if the edge (s,t) is accepting then
   ///       call dfs_red(t);
   ///     end if;
   ///   end for;
