@@ -100,11 +100,11 @@ namespace spot
 	      AtomicProp index;
 	      int err = prop_index(i->first.c_str(), &index);
 	      if (err)
-		throw gspn_exeption("prop_index()", err);
+		throw gspn_exeption("prop_index(" + i->first + ")", err);
 	      AtomicPropKind kind;
 	      err = prop_kind(index, &kind);
 	      if (err)
-		throw gspn_exeption("prop_kind()", err);
+		throw gspn_exeption("prop_kind(" + i->first + ")", err);
 
 	      prop_dict[index] = ab_pair(kind, bdd_ithvar(var));
 	    }

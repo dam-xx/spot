@@ -1,5 +1,9 @@
 2003-11-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/gspn.cc
+	(tgba_gspn_eesrg_private_::tgba_gspn_eesrg_private_): Show prop_index()
+	and prop_kind() arguments on error.
+
 	* iface/gspn/eesrg.cc
 	(tgba_gspn_eesrg_private_::tgba_gspn_eesrg_private_): Show prop_index()
 	argument on error.
