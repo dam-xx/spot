@@ -2,18 +2,18 @@ SUBDIRS = tests
 
 AM_CPPFLAGS = -I$(PYTHONINC) -I$(top_srcdir)/src
 
-python_PYTHON = spot.py
+python_PYTHON = $(srcdir)/spot.py
 pyexec_LTLIBRARIES = _spot.la
 
-_spot_la_SOURCES = spot_wrap.cxx
+_spot_la_SOURCES = $(srcdir)/spot_wrap.cxx
 _spot_la_LDFLAGS = -avoid-version -module
 _spot_la_LIBADD = $(top_builddir)/src/libspot.la
 
 EXTRA_DIST = ltihooks.py spot.i
-spot_wrap.cxx: $(srcdir)/spot.i
+$(srcdir)/spot_wrap.cxx: $(srcdir)/spot.i
 	swig -c++ -python -I$(top_srcdir)/src $(srcdir)/spot.i
 
-spot.py: $(srcdir)/spot.i
+$(srcdir)/spot.py: $(srcdir)/spot.i
 	$(MAKE) $(AM_MAKEFLAGS) spot_wrap.cxx
 
-MAINTAINERCLEANFILES = spot_wrap.cxx spot.py
+MAINTAINERCLEANFILES = $(srcdir)/spot_wrap.cxx $(srcdir)/spot.py

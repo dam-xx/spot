@@ -1,5 +1,10 @@
 2003-08-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* wrap/python/Makefile.am (python_PYTHON, _spot_la_SOURCES):
+	Explicitely refer to spot_wrap.cxx and spot.py as
+	$(srcdir)/spot_wrap.cxx and $(srcdir)/spot.py.
+	(spot_wrap.cxx, spot.py):
+
 	* wrap/python/Makefile.am (spot_wrap.cxx, spot.py): Lookup
 	spot.i in $(srcdir).
 
