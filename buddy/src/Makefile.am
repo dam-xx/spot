@@ -1,3 +1,6 @@
+# For 
+AM_CPPFLAGS = -I$(top_builddir) 
+
 include_HEADERS = bdd.h fdd.h bvec.h
 
 lib_LTLIBRARIES = libbdd.la

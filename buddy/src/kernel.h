@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.h,v 1.2 2003/05/05 13:45:07 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.h,v 1.3 2003/05/05 14:07:28 aduret Exp $
   FILE:  kernel.h
   DESCR: Kernel specific definitions for BDD package
   AUTH:  Jorn Lind
@@ -43,6 +43,9 @@
 #include <limits.h>
 #include <setjmp.h>
 #include "bdd.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 /*=== SANITY CHECKS ====================================================*/
 

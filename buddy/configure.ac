@@ -14,6 +14,8 @@ AC_PROG_LIBTOOL
 
 buddy_DEBUG_FLAGS
 
+AC_CONFIG_HEADERS([config.h])
+
 AC_CONFIG_FILES([
   Makefile
   src/Makefile

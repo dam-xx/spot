@@ -1,5 +1,9 @@
 2003-05-05  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* configure.ac: Output config.h.
+	* src/kernel.h: Include it.
+	* src/Makefile.am (AM_CPPFLAGS): New variable.
+
 	* configure.ac, Makefile.am, src/Makefile.am, doc/Makefile.am,
 	examples/Makefile.am, examples/Makefile.def, 
 	examples/adder/Makefile.am, examples/calculator/Makefile.am,
