@@ -66,6 +66,8 @@ namespace spot
     /// with different conditions, leading to the same state.
     virtual state* current_state() = 0;
     /// \brief Get the condition on the transition leading to this successor.
+    ///
+    /// This is a boolean function of atomic propositions.
     virtual bdd current_condition() = 0;
     /// \brief Get the accepting conditions on the transition leading
     /// to this successor.
