@@ -24,19 +24,19 @@ namespace spot
       void
       visit(const atomic_prop* ap)
       {
-	draw_node_(ap, ap->name());
+	draw_node_(ap, ap->name(), true);
       }
 
       void
       visit(const constant* c)
       {
-	draw_node_(c, c->val_name());
+	draw_node_(c, c->val_name(), true);
       }
 
       void
       visit(const binop* bo)
       {
-	if (draw_node_(bo, bo->op_name(), true))
+	if (draw_node_(bo, bo->op_name()))
 	  {
 	    dotty_visitor v(*this);
 	    bo->first()->accept(v);
@@ -47,14 +47,14 @@ namespace spot
       void
       visit(const unop* uo)
       {
-	if (draw_node_(uo, uo->op_name(), true))
+	if (draw_node_(uo, uo->op_name()))
 	  uo->child()->accept(*this);
       }
 
       void
       visit(const multop* mo)
       {
-	if (!draw_node_(mo, mo->op_name(), true))
+	if (!draw_node_(mo, mo->op_name()))
 	  return;
 	unsigned max = mo->size();
 	for (unsigned n = 0; n < max; ++n)
@@ -94,7 +94,7 @@ namespace spot
 	os_ << "  " << node
 	    << " [label=\"" << str << "\"";
 	if (rec)
-	  os_ << ", shabe=box";
+	  os_ << ", shape=box";
 	os_ << "];" << std::endl;
 	return true;
       }

@@ -1,5 +1,9 @@
 2003-08-06  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/ltlvisit/dotty.cc (draw_node_): s/shabe/shape/.
+	(visit): Draw rectangular node for atomic propositions and
+	constant.  This is an attempt to mimic BuDDy's output.
+
 	* wrap/python/cgi/ltl2tgba.in: Handle show_formula_dot and
 	show_formula_gif.
 
