@@ -1,5 +1,9 @@
 2005-01-11  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
+	* src/ltltest/randltl.cc: Typo.
+
+2005-01-11  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
 	* src/tgbaparse/tgbaparse.yy: Accept automaton without state.
 
 	* src/ltltest/randltl.cc: Typo.
