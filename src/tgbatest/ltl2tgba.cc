@@ -14,6 +14,7 @@ syntax(char* prog)
   std::cerr << "Usage: "<< prog << " [-d][-o][-r] formula" << std::endl
 	    << std::endl
 	    << "  -a   display the accepting_conditions BDD, not the reachability graph"
+	    << std::endl
 	    << "  -A   same as -a, but as a set" << std::endl
 	    << "  -d   turn on traces during parsing" << std::endl
 	    << "  -o   re-order BDD variables in the automata" << std::endl

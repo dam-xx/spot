@@ -1,5 +1,7 @@
 2003-06-24  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgbatest/ltl2tgba.cc (syntax): Fix usage message.
+
 	* src/tgbatest/tripprod.test, src/tgbatest/explprod.test: Sort
 	accepting conditions.
 
