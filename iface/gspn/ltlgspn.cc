@@ -114,7 +114,7 @@ main(int argc, char **argv)
 	syntax(argv[0]);
 
 
-      while (argc >= formula_index + 3)
+      while (argc >= formula_index + MIN_ARG)
 	{
 	  env.declare(argv[argc - 1]);
 	  --argc;
