@@ -1,5 +1,9 @@
 2004-02-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Fix example
+	in comment.  Skip false transitions, and do not compute
+	sub-formulae reachable only via false transitions.
+
 	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Revert
 	yesterday's change.  This optimization is NOT covered by exprop.
 	In fact it could be generalized.

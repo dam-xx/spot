@@ -450,7 +450,7 @@ namespace spot
     std::set<const formula*> formulae_to_translate;
     // Map a representation of successors to a canonical formula.
     // We do this because many formulae (such as `aR(bRc)' and
-    // `aR(bRc).aR(bRc)') are equivalent, and are trivially identified
+    // `aR(bRc).(bRc)') are equivalent, and are trivially identified
     // by looking at the set of successors.
     typedef std::map<bdd, const formula*, bdd_less_than> succ_to_formula;
     succ_to_formula canonical_succ;
@@ -566,7 +566,7 @@ namespace spot
 	      }
 	  }
 
-	// Check for an arc going to True.  Register it first, that
+	// Check for an arc going to 1 (True).  Register it first, that
 	// way it will be explored before the other during the model
 	// checking.
 	dest_map::const_iterator i = dests.find(constant::true_instance());
@@ -575,20 +575,21 @@ namespace spot
 	// when exprop is used, but it fact it is complementary.
 	//
 	// Consider
-	//   r(p U q) = p + q.a(p).r(X(p U g))
+	//   f = r(X(1) R p) = p.(1 + r(X(1) R p))
 	// with exprop the two outgoing arcs would be
-        //         p               q {Acc[p]}
-	//   pUg ----> T       pUg ----------> pUg
+        //         p                  p
+	//     f ----> 1       f ----------> 1
 	//
 	// where in fact we could output
-        //         p               q*!p {Acc[p]}
-	//   pUg ----> T       pUg -------------> pUg
+        //         p
+	//     f ----> 1
 	//
-	// because there is no point in looping on pUg if we can go to T.
+	// because there is no point in looping on f if we can go to 1.
 	bdd cond_for_true = bddfalse;
 	if (i != dests.end())
 	  {
-	    // Transitions going to True are not expected to make any promises.
+	    // Transitions going to 1 (true) are not expected to make
+	    // any promises.
 	    assert(i->second.size() == 1);
 	    prom_map::const_iterator j = i->second.find(bddtrue);
 	    assert(j != i->second.end());
@@ -598,11 +599,14 @@ namespace spot
 	      a->create_transition(now, constant::true_instance()->val_name());
 	    a->add_condition(t, d.bdd_to_formula(cond_for_true));
 	  }
-
 	// Register other transitions.
 	for (i = dests.begin(); i != dests.end(); ++i)
 	  {
 	    const formula* dest = i->first;
+	    // The cond_for_true optimization can cause some
+	    // transitions to be removed.  So we have to remember
+	    // whether a formula is actually reachable.
+	    bool reachable = false;
 
 	    if (dest != constant::true_instance())
 	      {
@@ -610,14 +614,23 @@ namespace spot
 		for (prom_map::const_iterator j = i->second.begin();
 		     j != i->second.end(); ++j)
 		  {
+		    bdd cond = j->second - cond_for_true;
+		    if (cond == bddfalse) // Skip false transitions.
+		      continue;
 		    tgba_explicit::transition* t =
 		      a->create_transition(now, next);
-		    a->add_condition(t, d.bdd_to_formula(j->second
-							 - cond_for_true));
+		    a->add_condition(t, d.bdd_to_formula(cond));
 		    d.conj_bdd_to_acc(a, j->first, t);
+		    reachable = true;
 		  }
 	      }
-	    if (formulae_seen.find(dest) == formulae_seen.end())
+	    else
+	      {
+		// "1" is reachable.
+		reachable = true;
+	      }
+	    if (reachable
+		&& formulae_seen.find(dest) == formulae_seen.end())
 	      {
 		formulae_seen.insert(dest);
 		formulae_to_translate.insert(dest);
