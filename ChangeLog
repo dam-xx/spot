@@ -1,5 +1,7 @@
 2004-01-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* configure.ac, NEWS: Bump version to 0.0o.
+
 	* configure.ac: Bump version to 0.0n.
 	* NEWS: Update.
 
