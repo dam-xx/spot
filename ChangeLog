@@ -1,3 +1,8 @@
+2004-11-29  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/tgbaalgos/tau03opt.cc: Add a first version of the computation of
+	accepting runs
+
 2004-11-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/minimizerun.cc, src/tgbaalgos/minimizerun.hh
