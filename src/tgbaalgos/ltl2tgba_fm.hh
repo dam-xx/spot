@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -46,8 +46,13 @@ namespace spot
   ///   month	  = {September},
   ///   isbn      = {3-540-66587-0}
   /// }
+  ///
+  /// If \a exprop is set, the algorithm will consider all properties
+  /// combinations possible on each state, in an attempt to reduce
+  /// the non-determinism.
   /// \endverbatim
-  tgba_explicit* ltl_to_tgba_fm(const ltl::formula* f, bdd_dict* dict);
+  tgba_explicit* ltl_to_tgba_fm(const ltl::formula* f, bdd_dict* dict,
+				bool exprop = false);
 }
 
 #endif // SPOT_TGBA_LTL2TGBA_HH

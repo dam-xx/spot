@@ -188,6 +188,7 @@ options = [
 default_translator = 'trans_fm';
 translators = [
     ('trans_fm',        'Convreur/FM'),
+    ('trans_fm_exprop', 'Convreur/FM - exploded properties'),
     ('trans_lacim',     'Convreur/LaCIM'),
     ]
 
@@ -342,6 +343,8 @@ if trans_lacim:
     automaton = spot.ltl_to_tgba_lacim(f, dict)
 elif trans_fm:
     automaton = spot.ltl_to_tgba_fm(f, dict)
+elif trans_fm_exprop:
+    automaton = spot.ltl_to_tgba_fm(f, dict, True)
 
 print 'done.</p>'
 sys.stdout.flush()

@@ -1,3 +1,14 @@
+2004-02-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Take an exprop
+	argument.  Consider all possible combinations of propositions when
+	generating arcs.  Suggested by Jean-Michel Couvreur.
+	* src/tgbaalgos/ltl2tgba_fm.hh (ltl_to_tgba_fm): Adjust.
+	* src/tgbatest/ltl2tgba.cc: Honor -fx.
+	* src/tgbatest/spotlbtt.test: Exercise -fx.
+	* wrap/python/cgi/ltl2tgba.in: Support Couvreur/FM with exploded
+	properties.
+
 2004-02-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlparse/ltlparse.yy: Typo.

@@ -61,6 +61,8 @@ syntax(char* prog)
 	    << "counter-example " << std::endl
             << "  -f   use Couvreur's FM algorithm for translation"
 	    << std::endl
+            << "  -fx   use Couvreur's FM algorithm, with exploded properties"
+	    << std::endl
             << "  -F   read the formula from the file" << std::endl
 	    << "  -m   magic-search (implies -D), expect a counter-example"
 	    << std::endl
@@ -93,6 +95,7 @@ main(int argc, char** argv)
   bool debug_opt = false;
   bool degeneralize_opt = false;
   bool fm_opt = false;
+  bool fm_exprop_opt = false;
   bool file_opt = false;
   int output = 0;
   int formula_index = 0;
@@ -152,6 +155,11 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-f"))
 	{
 	  fm_opt = true;
+	}
+      else if (!strcmp(argv[formula_index], "-fx"))
+	{
+	  fm_opt = true;
+	  fm_exprop_opt = true;
 	}
       else if (!strcmp(argv[formula_index], "-F"))
 	{
@@ -265,7 +273,7 @@ main(int argc, char** argv)
       else
 	{
 	  if (fm_opt)
-	    to_free = a = spot::ltl_to_tgba_fm(f, dict);
+	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 	  spot::ltl::destroy(f);

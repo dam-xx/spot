@@ -438,7 +438,7 @@ namespace spot
   }
 
   tgba_explicit*
-  ltl_to_tgba_fm(const formula* f, bdd_dict* dict)
+  ltl_to_tgba_fm(const formula* f, bdd_dict* dict, bool exprop)
   {
     // Normalize the formula.  We want all the negations on
     // the atomic propositions.  We also suppress logic
@@ -506,54 +506,64 @@ namespace spot
 	// to handle this, we take the conditions of any transition
 	// going to true (it's `g' here), and remove it from the other
 	// transitions.
-	// It might be interesting to look at ways to generalize this.
-	// (Replace `g' by an arbitrary boolean function when thinking
-	// about it).
+	//
+	// In `exprop' mode, considering all possible combinations of
+	// outgoing propositions generalizes the above trick.
 
 	typedef std::map<bdd, bdd, bdd_less_than> prom_map;
 	typedef Sgi::hash_map<const formula*, prom_map, ptr_hash<formula> >
 	  dest_map;
 	dest_map dests;
 	// Compute all outgoing arcs.
-	minato_isop isop(res);
-	bdd cube;
-	while ((cube = isop.next()) != bddfalse)
+	bdd all_props = bddtrue;
+	bdd var_set = bdd_existcomp(bdd_support(res), d.var_set);
+	while (all_props != bddfalse)
 	  {
-	    const formula* dest =
-	      d.conj_bdd_to_formula(bdd_existcomp(cube, d.next_set));
-
-	    // If we already know a state with the same successors,
-	    // use it in lieu of the current one.  (See the comments
-	    // for canonical_succ.)  We need to do this only for new
-	    // destinations.
-	    if (formulae_seen.find(dest) == formulae_seen.end())
+	    bdd one_prop_set =
+	      exprop ? bdd_satoneset(all_props, var_set, bddtrue) : bddtrue;
+	    all_props -= one_prop_set;
+	    minato_isop isop(res & one_prop_set);
+	    bdd cube;
+	    while ((cube = isop.next()) != bddfalse)
 	      {
-		dest->accept(v);
-		bdd succbdd = v.result();
-		succ_to_formula::iterator cs = canonical_succ.find(succbdd);
-		if (cs != canonical_succ.end())
+		const formula* dest =
+		  d.conj_bdd_to_formula(bdd_existcomp(cube, d.next_set));
+
+		// If we already know a state with the same successors,
+		// use it in lieu of the current one.  (See the comments
+		// for canonical_succ.)  We need to do this only for new
+		// destinations.
+		if (formulae_seen.find(dest) == formulae_seen.end())
 		  {
-		    destroy(dest);
-		    dest = clone(cs->second);
+		    dest->accept(v);
+		    bdd succbdd = v.result();
+		    succ_to_formula::iterator cs =
+		      canonical_succ.find(succbdd);
+		    if (cs != canonical_succ.end())
+		      {
+			destroy(dest);
+			dest = clone(cs->second);
+		      }
+		    else
+		      {
+			canonical_succ[succbdd] = dest;
+		      }
+		  }
+
+		bdd promises = bdd_existcomp(cube, d.a_set);
+		bdd conds =
+		  exprop ? one_prop_set : bdd_existcomp(cube, var_set);
+
+		dest_map::iterator i = dests.find(dest);
+		if (i == dests.end())
+		  {
+		    dests[dest][promises] = conds;
 		  }
 		else
 		  {
-		    canonical_succ[succbdd] = dest;
+		    i->second[promises] |= conds;
+		    destroy(dest);
 		  }
-	      }
-
-	    bdd promises = bdd_existcomp(cube, d.a_set);
-	    bdd conds = bdd_existcomp(cube, d.var_set);
-
-	    dest_map::iterator i = dests.find(dest);
-	    if (i == dests.end())
-	      {
-		dests[dest][promises] = conds;
-	      }
-	    else
-	      {
-		i->second[promises] |= conds;
-		destroy(dest);
 	      }
 	  }
 
@@ -561,6 +571,9 @@ namespace spot
 	// way it will be explored before the other during the model
 	// checking.
 	dest_map::const_iterator i = dests.find(constant::true_instance());
+	// conditions of the True arc, so when can remove them from
+	// all other arcs.  This is not needed when exprop is used,
+	// but it does not hurt.
 	bdd cond_for_true = bddfalse;
 	if (i != dests.end())
 	  {
