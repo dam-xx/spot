@@ -52,6 +52,10 @@ namespace spot
     /// \brief Conctructor.
     /// \arg input The BDD function to translate in ISOP.
     minato_isop(bdd input);
+    /// \brief Conctructor.
+    /// \arg input The BDD function to translate in ISOP.
+    /// \arg vars  The set of BDD variables to factorize in \a input.
+    minato_isop(bdd input, bdd vars);
     /// \brief Compute the next sum term of the ISOP form.
     /// Return \c bddfalse when all terms have been output.
     bdd next();
@@ -70,16 +74,19 @@ namespace spot
       // we had to split it in four step (each step is separated
       // from the other by a call to ISOP in the original algorithm).
       enum { FirstStep, SecondStep, ThirdStep, FourthStep } step;
+      // The list of variable to factorize.  This is an addition to
+      // the original algorithm.
+      bdd vars;
       bdd v1;
       bdd f0_min, f0_max;
       bdd f1_min, f1_max;
       bdd g0, g1;
-      local_vars(bdd f_min, bdd f_max)
-	: f_min(f_min), f_max(f_max), step(FirstStep) {}
+      local_vars(bdd f_min, bdd f_max, bdd vars)
+	: f_min(f_min), f_max(f_max), step(FirstStep), vars(vars) {}
     };
-    std::stack<local_vars> todo;
-    std::stack<bdd> cube;
-    bdd ret;
+    std::stack<local_vars> todo_;
+    std::stack<bdd> cube_;
+    bdd ret_;
   };
 }
 

@@ -1,5 +1,12 @@
 2003-11-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/misc/minato.hh (minato_isop(bdd,bdd)): New constructor variant.
+	(minato_isop::local_vars::vars): New attribute.
+	(minato_isop::local_vars::local_vars): Add the vars arguments.
+	(minato_isop::todo, minato_isop::cube, minato_isop::ret): Rename as ...
+	(minato_isop::todo_, minato_isop::cube_, minato_isop::ret_): ... these.
+	* src/misc/minato.cc: Adjust to factorize only variables in vars.
+
 	* m4/devel.m4: Fix quoting and simplify default setting of
 	enable_devel.
 

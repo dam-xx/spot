@@ -27,54 +27,79 @@ namespace spot
 {
 
   minato_isop::minato_isop(bdd input)
-    : ret(bddfalse)
+    : ret_(bddfalse)
+
   {
-    todo.push(local_vars(input, input));
-    cube.push(bddtrue);
+    todo_.push(local_vars(input, input, bdd_support(input)));
+    cube_.push(bddtrue);
+  }
+
+  minato_isop::minato_isop(bdd input, bdd vars)
+    : ret_(bddfalse)
+  {
+    todo_.push(local_vars(input, input, vars));
+    cube_.push(bddtrue);
   }
 
   bdd
   minato_isop::next()
   {
-    while (todo.size())
+    while (todo_.size())
       {
-	local_vars& l = todo.top();
+	local_vars& l = todo_.top();
 	switch (l.step)
 	  {
 	  case local_vars::FirstStep:
-	    if (l.f_min == bddfalse)
-	      {
-		ret = bddfalse;
-		todo.pop();
-		continue;
-	      }
-	    if (l.f_max == bddtrue)
-	      {
-		ret = bddtrue;
-		todo.pop();
-		return cube.top();
-	      }
-	    l.step = local_vars::SecondStep;
-
+	  next_var:
 	    {
-	      // Pick the topmost variable.
+	      if (l.f_min == bddfalse)
+		{
+		  ret_ = bddfalse;
+		  todo_.pop();
+		  continue;
+		}
+	      if (l.vars == bddtrue || l.f_max == bddtrue)
+		{
+		  ret_ = l.f_max;
+		  todo_.pop();
+		  return cube_.top() & ret_;
+		}
+	      assert(l.vars != bddfalse);
+
+	      // Pick the first variable in VARS that is used by F_MIN
+	      // or F_MAX.  We know that VARS, F_MIN or F_MAX are not
+	      // constants (bddtrue or bddfalse) because one of the
+	      // two above `if' would have matched; so it's ok to call
+	      // bdd_var().
+	      int v = bdd_var(l.vars);
+	      l.vars = bdd_high(l.vars);
 	      int v_min = bdd_var(l.f_min);
 	      int v_max = bdd_var(l.f_max);
-	      int v = std::min(v_min, v_max);
+	      if (v < v_min && v < v_max)
+		// Do not use a while() for this goto, because we want
+		// `continue' to be relative to the outermost while().
+		goto next_var;
 
-	      // The following two `if's do
-	      //   v0 = bdd_nithvar(v);
-	      //   v1 = bdd_ithvar(v);
+	      l.step = local_vars::SecondStep;
+
+	      bdd v0 = bdd_nithvar(v);
+	      l.v1 = bdd_ithvar(v);
+
+	      // All the following should be equivalent to
 	      //   f0_min = bdd_restrict(f_min, v0);
 	      //   f0_max = bdd_restrict(f_max, v0);
 	      //   f1_min = bdd_restrict(f_min, v1);
 	      //   f1_max = bdd_restrict(f_max, v1);
-	      // but since we now the v is the topmost variable,
-	      // its more efficient to use bdd_low and bdd_high.
+	      // but we try to avoid bdd_restrict when possible.
 	      if (v == v_min)
 		{
 		  l.f0_min = bdd_low(l.f_min);
 		  l.f1_min = bdd_high(l.f_min);
+		}
+	      else if (v_min < v)
+		{
+		  l.f0_min = bdd_restrict(l.f_min, v0);
+		  l.f1_min = bdd_restrict(l.f_min, l.v1);
 		}
 	      else
 		{
@@ -85,41 +110,45 @@ namespace spot
 		  l.f0_max = bdd_low(l.f_max);
 		  l.f1_max = bdd_high(l.f_max);
 		}
+	      else if (v_max < v)
+		{
+		  l.f0_max = bdd_restrict(l.f_max, v0);
+		  l.f1_max = bdd_restrict(l.f_max, l.v1);
+		}
 	      else
 		{
 		  l.f1_max = l.f0_max = l.f_max;
 		}
 
-	      l.v1 = bdd_ithvar(v);
-	      cube.push(cube.top() & bdd_nithvar(v));
-	      todo.push(local_vars(l.f0_min - l.f1_max, l.f0_max));
+	      cube_.push(cube_.top() & v0);
+	      todo_.push(local_vars(l.f0_min - l.f1_max, l.f0_max, l.vars));
 	    }
 	    continue;
 
 	  case local_vars::SecondStep:
 	    l.step = local_vars::ThirdStep;
-	    l.g0 = ret;
-	    cube.pop();
-	    cube.push(cube.top() & l.v1);
-	    todo.push(local_vars(l.f1_min - l.f0_max, l.f1_max));
+	    l.g0 = ret_;
+	    cube_.pop();
+	    cube_.push(cube_.top() & l.v1);
+	    todo_.push(local_vars(l.f1_min - l.f0_max, l.f1_max, l.vars));
 	    continue;
 
 	  case local_vars::ThirdStep:
 	    l.step = local_vars::FourthStep;
-	    l.g1 = ret;
-	    cube.pop();
+	    l.g1 = ret_;
+	    cube_.pop();
 	    {
 	      bdd f0s_min = l.f0_min - l.g0;
 	      bdd f1s_min = l.f1_min - l.g1;
 	      bdd fs_max = l.f0_max & l.f1_max;
 	      bdd fs_min = fs_max & (f0s_min | f1s_min);
-	      todo.push(local_vars(fs_min, fs_max));
+	      todo_.push(local_vars(fs_min, fs_max, l.vars));
 	    }
 	    continue;
 
 	  case local_vars::FourthStep:
-	    ret |= (l.g0 - l.v1) | (l.g1 & l.v1);
-	    todo.pop();
+	    ret_ |= (l.g0 - l.v1) | (l.g1 & l.v1);
+	    todo_.pop();
 	    continue;
 	  }
 	// Unreachable code.
