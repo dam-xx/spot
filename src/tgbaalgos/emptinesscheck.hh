@@ -5,7 +5,6 @@
 #include "misc/hash.hh"
 #include <stack>
 #include <list>
-#include <set>
 #include <utility>
 #include <iostream>
 
@@ -23,12 +22,15 @@ namespace spot
     /// The bdd condition is the union of all accepting condition of
     /// transitions which connect the states of the connected component.
     bdd condition;
-    typedef std::set<const spot::state*,
-                     spot::state_ptr_less_than> set_of_state;
 
+    typedef Sgi::hash_set<const state*,
+			  state_ptr_hash, state_ptr_equal> set_type;
     /// for the counter example we need to know all the states of the
     /// component
-    set_of_state state_set;
+    set_type state_set;
+
+    /// Check if the SCC contains states \a s.
+    bool has_state(const state* s) const;
   };
 
   /// \brief Check whether the language of an automate is empty.
@@ -54,7 +56,7 @@ namespace spot
   class emptiness_check
   {
     typedef std::list<const state*> state_sequence;
-    typedef std::pair<const spot::state*, bdd> state_proposition;
+    typedef std::pair<const state*, bdd> state_proposition;
     typedef std::list<state_proposition> cycle_path;
   public:
     emptiness_check(const tgba* a);

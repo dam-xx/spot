@@ -16,6 +16,12 @@ namespace spot
     condition = bddfalse;
   }
 
+  bool
+  connected_component::has_state(const state* s) const
+  {
+    return state_set.find(s) != state_set.end();
+  }
+
 
   emptiness_check::emptiness_check(const tgba* a)
     : aut_(a)
@@ -62,7 +68,7 @@ namespace spot
     arc_accepting.push(bddfalse);
     tgba_succ_iterator* iter_ = aut_->succ_iter(init);
     iter_->first();
-    todo.push(pair_state_iter(init, iter_ ));
+    todo.push(pair_state_iter(init, iter_));
     while (!todo.empty())
       {
 	pair_state_iter step = todo.top();
@@ -105,7 +111,7 @@ namespace spot
 		arc_accepting.push(current_accepting);
 		tgba_succ_iterator* iter2 = aut_->succ_iter(current_state);
 		iter2->first();
-		todo.push(pair_state_iter(current_state, iter2 ));
+		todo.push(pair_state_iter(current_state, iter2));
 	      }
 	    else if (h[current_state] != -1)
 	      {
@@ -254,12 +260,10 @@ namespace spot
 		  {
 		    const state* curr_state =
 		      started_from.second->current_state();
-		    connected_component::set_of_state::iterator iter_set =
-		      vec_component[k+1].state_set.find(curr_state);
-		    if (iter_set != vec_component[k+1].state_set.end())
+		    if (vec_component[k+1].has_state(curr_state))
 		      {
 			const state* curr_father = started_from.first;
-			seq.push_front(*iter_set);
+			seq.push_front(curr_state);
 			seq.push_front(curr_father);
 			hash_type::iterator i_2 = h.find(curr_father);
 			assert(i_2 != h.end());
@@ -278,9 +282,7 @@ namespace spot
 		      }
 		    else
 		      {
-			connected_component::set_of_state::iterator i_s =
-			  vec_component[k].state_set.find(curr_state);
-			if (i_s != vec_component[k].state_set.end())
+			if (vec_component[k].has_state(curr_state))
 			  {
 			    path_state::iterator i_path =
 			      path_map.find(curr_state);
@@ -339,9 +341,7 @@ namespace spot
 	    for (iter_s->first(); !iter_s->done(); iter_s->next())
 	      {
 		const state* curr_state = (started_.second)->current_state();
-		connected_component::set_of_state::iterator i_set =
-		  comp_path.state_set.find(curr_state);
-		if (i_set != comp_path.state_set.end())
+		if (comp_path.has_state(curr_state))
 		  {
 		    if (curr_state->compare(to_state) == 0)
 		      {
@@ -402,9 +402,7 @@ namespace spot
 	else
 	  {
 	    state* curr_state = iter_->current_state();
-	    connected_component::set_of_state::iterator it_set =
-	      comp_path.state_set.find(curr_state);
-	    if (it_set != comp_path.state_set.end())
+	    if (comp_path.has_state(curr_state))
 	      {
 		hash_type::iterator i = seen_priority.find(curr_state);
 		if (i == seen_priority.end())

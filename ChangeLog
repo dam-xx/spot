@@ -1,5 +1,14 @@
 2003-10-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.hh (connected_component::set_of_state):
+	Rename as ...
+	(connected_component::set_type): ... this, and define as a hash_set.
+	(connected_component::has_state): New method.
+	* src/tgbaalgos/emptinesscheck.cc (connected_component::has_state):
+	New method.
+	(emptiness_check::counter_example, emptiness_check::complete_cycle,
+	emptiness_check::accepting_path): Simplify using has_state().
+
 	* src/tgbaalgos/emptinesscheck.hh (emptiness_check::seen_state_num):
 	Rename as ...
 	(emptiness_check::h): ... this, and define as a hash_map.
