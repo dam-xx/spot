@@ -201,7 +201,7 @@ namespace spot
       assert(successors_);
       // GSPN is expected to return a looping "dead" transition where
       // there is no successor.
-      assert(size_> 0);
+      assert(size_ > 0);
     }
 
     virtual

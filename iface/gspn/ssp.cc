@@ -40,7 +40,7 @@ namespace spot
       assert(new_size);
       bdd* tmp = new bdd[new_size];
 
-      for(int i = 0; i < size; i++)
+      for (int i = 0; i < size; i++)
 	tmp[i] = t[i];
 
       delete[] t;
@@ -195,7 +195,7 @@ namespace spot
     ~tgba_succ_iterator_gspn_ssp()
     {
 
-      for(size_t i = 0; i < size_states_; i++)
+      for (size_t i = 0; i < size_states_; i++)
       	delete state_array_[i];
 
       delete[] bdd_array_;
@@ -216,8 +216,8 @@ namespace spot
     virtual void
     first()
     {
-      if(!successors_)
-	return    ;
+      if (!successors_)
+	return;
       current_succ_=0;
     }
 
@@ -385,10 +385,10 @@ namespace spot
             state_array = (state**) realloc(state_array,
 					    (size_states + 1) * sizeof(state*));
 	    state_array[size_states] = i->current_state();
-	    props_[nb_arc_props].arc->curr_state  = size_states ;
+	    props_[nb_arc_props].arc->curr_state  = size_states;
             size_states++;
 
-	    while (all_conds_ != bddfalse )
+	    while (all_conds_ != bddfalse)
 	      {
 		cond = bdd_satone(all_conds_);
 		cond = bdd_simplify(cond, cond | outside_);
@@ -444,16 +444,16 @@ namespace spot
 
      for (j = 0; j < nb_arc_props; j++)
        {
-	 for (conj = 0 ; conj < props_[j].nb_conj ; conj++)
+	 for (conj = 0; conj < props_[j].nb_conj; conj++)
 	   free(props_[j].prop[conj]);
 	 free(props_[j].prop);
        }
 
      delete i;
      return new tgba_succ_iterator_gspn_ssp(succ_tgba_, size_tgba_,
-					      bdd_array, state_array,
-					      size_states, props_,
-					      nb_arc_props);
+					    bdd_array, state_array,
+					    size_states, props_,
+					    nb_arc_props);
   }
 
   bdd
@@ -672,7 +672,7 @@ namespace spot
 
 	      if (old_state->left()
 		  && new_state->left()
-		  && spot_inclusion(new_state->left(),old_state->left()))
+		  && spot_inclusion(new_state->left(), old_state->left()))
 		break;
 	    }
 	}
@@ -715,7 +715,7 @@ namespace spot
 
 	      if (old_state->left()
 		  && new_state->left()
-		  && spot_inclusion(new_state->left(),old_state->left()))
+		  && spot_inclusion(new_state->left(), old_state->left()))
 		break;
 	    }
 	}

@@ -1,5 +1,8 @@
 2004-05-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/sanity/style.test: Check the iface/ tree too.
+	* iface/gspn/gspn.cc, iface/gspn/ssp.cc: Fix style.
+
 	* src/sanity/80columns.test: Check the iface/ tree too.
 	* iface/gspn/dcswaveltl.test, iface/gspn/dcswavefm.test,
 	iface/gspn/dcswaveeltl.test, iface/gspn/udcsltl.test,
