@@ -1,6 +1,6 @@
 #!@PYTHON@
 # -*- python -*-
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -55,6 +55,21 @@ def escaped_print_set(dict, what):
     print cgi.escape(s.str())
     del s
     print '</pre>'; sys.stdout.flush()
+
+def print_stats(automaton):
+    stats = spot.stats_reachable(automaton)
+    print "<p>", stats.states,
+    if stats.states == 1:
+        print " state,",
+    else:
+        print " states,",
+    print stats.transitions,
+    if stats.transitions == 1:
+        print " transition",
+    else:
+        print " transitions",
+    print "</p>"
+    sys.stdout.flush()
 
 
 print "Content-Type: text/html"
@@ -188,6 +203,8 @@ elif trans_fm:
 print 'done.</p>'
 sys.stdout.flush()
 
+print_stats(automaton)
+
 if show_automaton_dot:
     print '<pre>'; sys.stdout.flush()
     s = spot.ostringstream()
@@ -210,6 +227,7 @@ if show_automaton_gif:
 if show_degen_dot or show_degen_gif:
     print '<H3>Degeneralized automaton</H3>'
     degen = spot.tgba_tba_proxy(automaton)
+    print_stats(degen)
     if show_degen_dot:
 	print '<pre>'; sys.stdout.flush()
 	s = spot.ostringstream()
