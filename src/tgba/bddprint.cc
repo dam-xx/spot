@@ -5,7 +5,10 @@
 namespace spot
 {
   /// Global dictionary used by print_handler() to lookup variables.
-  const tgba_bdd_dict* dict;
+  static const tgba_bdd_dict* dict;
+  
+  /// Global flag to enable Prom[x] output (instead of `x').
+  static bool want_prom;
 
   /// Stream handler used by Buddy to display BDD variables.
   static void
@@ -20,7 +23,11 @@ namespace spot
 	isi = dict->prom_formula_map.find(var);
 	if (isi != dict->prom_formula_map.end())
 	  {
-	    o << "Prom["; to_string(isi->second, o) << "]";
+	    if (want_prom)
+	      o << "Prom["; 
+	    to_string(isi->second, o);
+	    if (want_prom)
+	      o << "]";
 	  }
 	else
 	  {
@@ -46,10 +53,49 @@ namespace spot
   }
 
 
+  static std::ostream* where;
+  static void
+  print_sat_handler(char* varset, int size)
+  {
+    bool not_first = false;
+    for (int v = 0; v < size; ++v)
+      {
+	if (varset[v] < 0)
+	  continue;
+	if (not_first)
+	  *where << " ";
+	else
+	  not_first = true;
+	if (varset[v] == 0)
+	  *where << "!";
+	print_handler(*where, v);
+      }
+  }
+
+  std::ostream&
+  bdd_print_sat(std::ostream& os, const tgba_bdd_dict& d, bdd b)
+  {
+    dict = &d;
+    where = &os;
+    want_prom = false;
+    assert (bdd_satone(b) == b);
+    bdd_allsat (b, print_sat_handler);
+    return os;
+  }
+
+  std::string
+  bdd_format_sat(const tgba_bdd_dict& d, bdd b)
+  {
+    std::ostringstream os;
+    bdd_print_sat(os, d, b);
+    return os.str();
+  }
+
   std::ostream&
   bdd_print_set(std::ostream& os, const tgba_bdd_dict& d, bdd b)
   {
     dict = &d;
+    want_prom = true;
     bdd_strm_hook(print_handler);
     os << bddset << b;
     bdd_strm_hook(0);
@@ -68,6 +114,7 @@ namespace spot
   bdd_print_dot(std::ostream& os, const tgba_bdd_dict& d, bdd b)
   {
     dict = &d;
+    want_prom = true;
     bdd_strm_hook(print_handler);
     os << bdddot << b;
     bdd_strm_hook(0);
@@ -78,6 +125,7 @@ namespace spot
   bdd_print_table(std::ostream& os, const tgba_bdd_dict& d, bdd b)
   {
     dict = &d;
+    want_prom = true;
     bdd_strm_hook(print_handler);
     os << bddtable << b;
     bdd_strm_hook(0);

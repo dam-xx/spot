@@ -1,5 +1,19 @@
 2003-06-05  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/bddprint.cc (dict): Make this variable static.
+	(want_prom): New global static variable.
+	(print_handle): Honor want_prom.
+	(print_sat_handler, bdd_print_sat, bdd_format_sat): New functions.
+	(bdd_print_set, bdd_print_dot, bdd_print_table): Set want_prom.
+	* src/tgba/bddprint.hh (bdd_print_sat, bdd_format_sat): New functions.
+	* src/tgbaalgos/save.cc, src/tgbaalgos/save.hh,
+	src/tgbatest/readsave.cc, src/tgbatest/readsave.test: New files.
+	* src/tgbaalgos/Makefile.am (libtgbaalgos_la_SOURCES): Add
+	save.cc and save.hh.
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Add readsave.
+	(readsave_SOURCES): New variable.
+	(TESTS): Add readsave.test.
+
 	* configure.ac: Output src/tgbaparse/Makefile.
 	* src/Makefile.am (SUBDIRS): Add tgbaparse.
 	(libspot_la_LDADD): Add tgbaparse/libtgbaparse.la.
