@@ -1,0 +1,10 @@
+#! /bin/sh
+
+. ./defs || exit 1
+
+set -e
+
+cp -R $srcdir/examples/DCSwave .
+
+# ../dottygspn-rg DCSwave/DCSWave ATTiIDLj SCi SCj >output
+../dottygspn-srg DCSwave/DCSWave ATTiIDLj SCi SCj >output

@@ -22,4 +22,15 @@ EXTRA_DIST = \
   examples/DCSwave/DCSWave.tobs \
   examples/simple/simple.def \
   examples/simple/simple.net \
-  examples/simple/simple.tobs
+  examples/simple/simple.tobs \
+  $(TESTS)
+
+TESTS = \
+  simple.test \
+  dcswave.test
+
+# Each test case depends on defs.
+check_SCRIPTS = defs
+
+distclean-local:
+	-rm -rf testSubDir

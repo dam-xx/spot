@@ -1,3 +1,13 @@
+2003-07-24  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* configure.ac: Output iface/gspn/defs.
+	* iface/gspn/Makefile.am (EXTRA_DIST): Add $(TESTS).
+	(TESTS, check_SCRIPTS, distclean-local): New.
+	* iface/gspn/dcswave.test, iface/gspn/simple.test, 
+	iface/gspn/defs.in: New files.
+	* iface/gspn/dottygspn.cc (main): Take the list of properties
+	of interest in argument.
+
 2003-07-23  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* iface/gspn/examples/DCSwave/DCSWave.def,
@@ -5,7 +15,7 @@
 	iface/gspn/examples/DCSwave/DCSWave.tobs,
 	iface/gspn/examples/simple/simple.def,
 	iface/gspn/examples/simple/simple.net,
-	iface/gspn/examples/simple/simple.tobs: New files, from 
+	iface/gspn/examples/simple/simple.tobs: New files, from
 	Yann Thierry-Mieg.
 	* iface/gspn/Makefile.am (EXTRA_DIST): New variables.
 

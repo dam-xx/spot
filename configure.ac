@@ -28,6 +28,7 @@ AC_CONFIG_FILES([
   doc/Doxyfile
   iface/Makefile
   iface/gspn/Makefile
+  iface/gspn/defs
   src/Makefile
   src/ltlenv/Makefile
   src/ltlast/Makefile
