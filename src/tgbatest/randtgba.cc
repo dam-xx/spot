@@ -133,6 +133,7 @@ syntax(char* prog)
 	    << "Options:" << std::endl
 	    << "  -0      suppress default output, just generate the graph"
 	    << " in memory" << std::endl
+	    << "  -1    produce minimal output dedicated to the paper"
 	    << "  -a N F  number of acceptance conditions and probability that"
 	    << " one is true" << std::endl
 	    << "            [0 0.0]" << std::endl
@@ -492,70 +493,95 @@ print_ar_stats(ar_stats_type& ar_stats)
 }
 
 void
-print_ratio_stats(const std::string& s, const ratio_stat_type& ratio_stats)
+print_ratio_stats(const std::string& s, const ratio_stat_type& ratio_stats,
+                  bool opt_paper = false)
 {
-      std::cout << std::endl;
       std::ios::fmtflags old = std::cout.flags();
-      std::cout << std::right << std::fixed << std::setprecision(1);
-
-      std::cout << "Ratios in case of non-emptiness (" << s << ")"
-                << std::endl;
-      std::cout << "<for all algorithms, the reference size is the one of"
-                << " the generalized automaton>" << std::endl;
-      std::cout << std::setw(22) << ""
-		<< " |       % states        |    % transitions      |"
-		<< std::endl << std::setw(22) << "algorithm"
-		<< " |   min   < mean  < max |   min   < mean  < max |   n"
-		<< std::endl
-		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl;
-      for (ratio_stat_type::const_iterator i = ratio_stats.begin();
-	   i != ratio_stats.end(); ++i)
-	std::cout << std::setw(22) << i->first << " |"
-		  << std::setw(6) << i->second.min_ratio_states * 100.
-		  << " "
-		  << std::setw(8)
-		  << (static_cast<float>(i->second.tot_ratio_states) /
-                                                            i->second.n) * 100.
-		  << " "
-		  << std::setw(6) << i->second.max_ratio_states * 100.
-		  << " |"
-		  << std::setw(6) << i->second.min_ratio_transitions * 100.
-		  << " "
-		  << std::setw(8)
-		  << (static_cast<float>(i->second.tot_ratio_transitions) /
-                                                            i->second.n) * 100.
-		  << " "
-		  << std::setw(6) << i->second.max_ratio_transitions * 100.
-		  << " |"
-		  << std::setw(4) << i->second.n
-		  << std::endl;
-      std::cout << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl
-		<< std::setw(22) << ""
-		<< " |   % maximal depth     |"
-		<< std::endl
-                << std::setw(22) << "algorithm"
-		<< " |   min   < mean  < max |   n"
-		<< std::endl
-		<< std::setw(53) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl;
-      for (ratio_stat_type::const_iterator i = ratio_stats.begin();
-	   i != ratio_stats.end(); ++i)
-	std::cout << std::setw(22) << i->first << " |"
-		  << std::setw(6)
-		  << i->second.min_ratio_depth * 100.
-		  << " "
-		  << std::setw(8)
-		  << (static_cast<float>(i->second.tot_ratio_depth) /
-                                                          i->second.n) * 100.
-		  << " "
-		  << std::setw(6)
-		  << i->second.max_ratio_depth * 100.
-		  << " |"
-		  << std::setw(4) << i->second.n
-		  << std::endl;
-
+      if (opt_paper)
+        {
+          std::cout << "ratios (" << s << ")" << std::endl;
+          std::cout << std::right << std::fixed << std::setprecision(1);
+          for (ratio_stat_type::const_iterator i = ratio_stats.begin();
+              i != ratio_stats.end(); ++i)
+            {
+              std::cout << std::setw(22) << i->first << " "
+                        << std::setw(8)
+                        << (static_cast<float>(i->second.tot_ratio_states) /
+                                                             i->second.n) * 100.
+                        << " "
+                        << std::setw(8)
+                        << (static_cast<float>(i->second.tot_ratio_transitions) /
+                                                             i->second.n) * 100.
+                        << " "
+                        << std::setw(8)
+                        << (static_cast<float>(i->second.tot_ratio_depth) /
+                                                             i->second.n) * 100.
+                        << std::setw(4) << i->second.n
+                        << std::endl;
+            }
+        }
+      else
+        {
+          std::cout << std::endl;
+          std::cout << std::right << std::fixed << std::setprecision(1);
+          std::cout << "Ratios in case of non-emptiness (" << s << ")"
+                    << std::endl;
+          std::cout << "<for all algorithms, the reference size is the one of"
+                    << " the generalized automaton>" << std::endl;
+          std::cout << std::setw(22) << ""
+                    << " |       % states        |    % transitions      |"
+                    << std::endl << std::setw(22) << "algorithm"
+                    << " |   min   < mean  < max |   min   < mean  < max |   n"
+                    << std::endl
+                    << std::setw(79) << std::setfill('-') << ""
+                    << std::setfill(' ') << std::endl;
+          for (ratio_stat_type::const_iterator i = ratio_stats.begin();
+              i != ratio_stats.end(); ++i)
+            std::cout << std::setw(22) << i->first << " |"
+                      << std::setw(6) << i->second.min_ratio_states * 100.
+                      << " "
+                      << std::setw(8)
+                      << (static_cast<float>(i->second.tot_ratio_states) /
+                                                             i->second.n) * 100.
+                      << " "
+                      << std::setw(6) << i->second.max_ratio_states * 100.
+                      << " |"
+                      << std::setw(6) << i->second.min_ratio_transitions * 100.
+                      << " "
+                      << std::setw(8)
+                      << (static_cast<float>(i->second.tot_ratio_transitions) /
+                                                             i->second.n) * 100.
+                      << " "
+                      << std::setw(6) << i->second.max_ratio_transitions * 100.
+                      << " |"
+                      << std::setw(4) << i->second.n
+                      << std::endl;
+          std::cout << std::setw(79) << std::setfill('-') << ""
+                    << std::setfill(' ') << std::endl
+                    << std::setw(22) << ""
+                    << " |   % maximal depth     |"
+                    << std::endl
+                    << std::setw(22) << "algorithm"
+                    << " |   min   < mean  < max |   n"
+                    << std::endl
+                    << std::setw(53) << std::setfill('-') << ""
+                    << std::setfill(' ') << std::endl;
+          for (ratio_stat_type::const_iterator i = ratio_stats.begin();
+              i != ratio_stats.end(); ++i)
+            std::cout << std::setw(22) << i->first << " |"
+                      << std::setw(6)
+                      << i->second.min_ratio_depth * 100.
+                      << " "
+                      << std::setw(8)
+                      << (static_cast<float>(i->second.tot_ratio_depth) /
+                                                             i->second.n) * 100.
+                      << " "
+                      << std::setw(6)
+                      << i->second.max_ratio_depth * 100.
+                      << " |"
+                      << std::setw(4) << i->second.n
+                      << std::endl;
+        }
       std::cout << std::setiosflags(old);
 }
 
@@ -614,6 +640,7 @@ generate_formula(const spot::ltl::random_ltl& rl, int opt_f, int opt_s,
 int
 main(int argc, char** argv)
 {
+  bool opt_paper = false;
   bool opt_dp = false;
   int opt_f = 15;
   int opt_F = 0;
@@ -662,6 +689,10 @@ main(int argc, char** argv)
       if (!strcmp(argv[argn], "-0"))
 	{
 	  opt_0 = true;
+	}
+      else if (!strcmp(argv[argn], "-1"))
+	{
+	  opt_paper = true;
 	}
       else if (!strcmp(argv[argn], "-a"))
 	{
@@ -889,7 +920,8 @@ main(int argc, char** argv)
         {
           if (opt_ec)
             {
-              std::cout << "seed: " << opt_ec_seed << std::endl;
+              if (!opt_paper)
+                std::cout << "seed: " << opt_ec_seed << std::endl;
               spot::srand(opt_ec_seed);
             }
 
@@ -932,8 +964,11 @@ main(int argc, char** argv)
                     continue;
                   ++n_ec;
                   std::string algo = ec_algos[i].name;
-                  std::cout.width(32);
-                  std::cout << algo << ": ";
+                  if (!opt_paper)
+                    {
+                      std::cout.width(32);
+                      std::cout << algo << ": ";
+                    }
                   tm_ec.start(algo);
                   for (int count = opt_R;;)
                     {
@@ -960,7 +995,8 @@ main(int argc, char** argv)
                     }
                   if (res)
                     {
-                      std::cout << "acc. run";
+                      if (!opt_paper)
+                        std::cout << "acc. run";
                       ++n_non_empty;
                       const spot::acss_statistics* acss =
                         dynamic_cast<const spot::acss_statistics*>(res);
@@ -991,7 +1027,8 @@ main(int argc, char** argv)
                           if (!run)
                             {
                               tm_ar.cancel(algo);
-                              std::cout << " exists, not computed";
+                              if (!opt_paper)
+                                std::cout << " exists, not computed";
                             }
                           else
                             {
@@ -1000,17 +1037,19 @@ main(int argc, char** argv)
                               if (!spot::replay_tgba_run(s, res->automaton(),
                                                         run))
                                 {
-                                  std::cout << ", but could not replay it "
-                                            << "(ERROR!)";
+                                  if (!opt_paper)
+                                    std::cout << ", but could not replay it "
+                                              << "(ERROR!)";
                                   failed_seeds.insert(opt_ec_seed);
                                 }
                               else
                                 {
-                                  std::cout << ", computed";
+                                  if (!opt_paper)
+                                    std::cout << ", computed";
                                   if (opt_z)
                                     ar_stats[algo].count(run);
                                 }
-                              if (opt_z)
+                              if (opt_z && !opt_paper)
                                 std::cout << " [" << run->prefix.size()
                                           << "+" << run->cycle.size()
                                           << "]";
@@ -1022,8 +1061,9 @@ main(int argc, char** argv)
                                   if (!spot::replay_tgba_run(s,
                                                     res->automaton(), redrun))
                                     {
-                                      std::cout << ", but could not replay "
-                                                << "its minimization (ERROR!)";
+                                      if (!opt_paper)
+                                        std::cout << ", but could not replay "
+                                                 << "its minimization (ERROR!)";
                                       failed_seeds.insert(opt_ec_seed);
                                     }
                                   else
@@ -1032,7 +1072,7 @@ main(int argc, char** argv)
                                       if (opt_z)
                                         mar_stats[algo].count(redrun);
                                     }
-                                  if (opt_z)
+                                  if (opt_z && !opt_paper)
                                     {
                                       std::cout << " [" << redrun->prefix.size()
                                                 << "+" << redrun->cycle.size()
@@ -1043,25 +1083,28 @@ main(int argc, char** argv)
                               delete run;
                             }
                         }
-                      std::cout << std::endl;
+                      if (!opt_paper)
+                        std::cout << std::endl;
                       delete res;
                     }
                   else
                     {
                       if (ec_algos[i].safe)
                         {
-                          std::cout << "empty language" << std::endl;
+                          if (!opt_paper)
+                            std::cout << "empty language" << std::endl;
                           ++n_empty;
                         }
                       else
                         {
-                          std::cout << "maybe empty language" << std::endl;
+                          if (!opt_paper)
+                            std::cout << "maybe empty language" << std::endl;
                           ++n_maybe_empty;
                         }
 
                     }
 
-                  if (opt_Z)
+                  if (opt_Z && !opt_paper)
                     ec->print_stats(std::cout);
                   delete ec;
                 }
@@ -1100,7 +1143,7 @@ main(int argc, char** argv)
     }
   while (opt_F || opt_i);
 
-  if (!ec_stats.empty())
+  if (!opt_paper && !ec_stats.empty())
     {
       std::cout << std::endl;
       std::ios::fmtflags old = std::cout.flags();
@@ -1163,20 +1206,19 @@ main(int argc, char** argv)
 
   if (!glob_ratio_stats.empty())
     {
-      print_ratio_stats("all tests", glob_ratio_stats);
+      print_ratio_stats("all tests", glob_ratio_stats, opt_paper);
       if (ratio_stats.size() > 1)
         for (ratio_stats_type::const_iterator i = ratio_stats.begin();
             i != ratio_stats.end(); ++i)
           {
             std::ostringstream s;
             s << "tests with " << i->first << " acceptance conditions";
-            print_ratio_stats(s.str(), i->second);
+            print_ratio_stats(s.str(), i->second, opt_paper);
           }
 
     }
 
-
-  if (!acss_stats.empty())
+  if (!opt_paper && !acss_stats.empty())
     {
       std::cout << std::endl;
       std::ios::fmtflags old = std::cout.flags();
@@ -1207,7 +1249,8 @@ main(int argc, char** argv)
 		  << std::endl;
       std::cout << std::setiosflags(old);
     }
-  if (!ars_stats.empty())
+
+  if (!opt_paper && !ars_stats.empty())
     {
       std::cout << std::endl;
       std::ios::fmtflags old = std::cout.flags();
@@ -1239,20 +1282,20 @@ main(int argc, char** argv)
       std::cout << std::setiosflags(old);
     }
 
-  if (!ar_stats.empty())
+  if (!opt_paper && !ar_stats.empty())
     {
       std::cout << std::endl
 		<< "Statistics about accepting runs:" << std::endl;
       print_ar_stats(ar_stats);
     }
-  if (!mar_stats.empty())
+  if (!opt_paper && !mar_stats.empty())
     {
       std::cout << std::endl
 		<< "Statistics about reduced accepting runs:" << std::endl;
       print_ar_stats(mar_stats);
     }
 
-  if (opt_z)
+  if (!opt_paper && opt_z)
     {
       if (!tm_ec.empty())
 	{

@@ -20,6 +20,7 @@
 // 02111-1307, USA.
 
 #include <iostream>
+#include <iomanip>
 #include <cassert>
 #include <fstream>
 #include <string>
@@ -52,6 +53,9 @@
 #include "tgbaalgos/replayrun.hh"
 #include "tgbaalgos/rundotdec.hh"
 
+#include "tgbaalgos/stats.hh"
+#include "tgbaalgos/emptiness_stats.hh"
+
 void
 syntax(char* prog)
 {
@@ -60,6 +64,8 @@ syntax(char* prog)
             << "       "<< prog << " -X [OPTIONS...] file" << std::endl
 	    << std::endl
 	    << "Options:" << std::endl
+	    << "  -0    produce minimal output dedicated to the paper"
+	    << std::endl
 	    << "  -a    display the acceptance_conditions BDD, not the "
 	    << "reachability graph"
 	    << std::endl
@@ -154,6 +160,7 @@ main(int argc, char** argv)
   int exit_code = 0;
 
   bool debug_opt = false;
+  bool paper_opt = false;
   enum { NoDegen, DegenTBA, DegenSBA } degeneralize_opt = NoDegen;
   bool degeneralize_maybe = false;
   bool fm_opt = false;
@@ -186,6 +193,7 @@ main(int argc, char** argv)
   spot::ltl::atomic_prop_set* unobservables = 0;
   spot::tgba_explicit* system = 0;
   spot::tgba* product = 0;
+  spot::tgba* product_to_free = 0;
   spot::bdd_dict* dict = new spot::bdd_dict();
 
   for (;;)
@@ -195,7 +203,11 @@ main(int argc, char** argv)
 
       ++formula_index;
 
-      if (!strcmp(argv[formula_index], "-a"))
+      if (!strcmp(argv[formula_index], "-0"))
+	{
+	  paper_opt = true;
+	}
+      else if (!strcmp(argv[formula_index], "-a"))
 	{
 	  output = 2;
 	}
@@ -641,8 +653,22 @@ main(int argc, char** argv)
 	  break;
 	}
 
+      spot::tgba* product_degeneralized = 0;
+
       if (system)
-	a = product = new spot::tgba_product(system, a);
+        {
+          a = product = product_to_free = new spot::tgba_product(system, a);
+          if (degeneralize_maybe
+              && degeneralize_opt == NoDegen
+              && product->number_of_acceptance_conditions() > 1)
+            degeneralize_opt = DegenTBA;
+          if (degeneralize_opt == DegenTBA)
+            a = product = product_degeneralized =
+                                            new spot::tgba_tba_proxy(product);
+          else if (degeneralize_opt == DegenSBA)
+            a = product = product_degeneralized =
+                                            new spot::tgba_sba_proxy(product);
+        }
 
       switch (output)
 	{
@@ -726,9 +752,12 @@ main(int argc, char** argv)
 	case Tau03Search:
           if (a->number_of_acceptance_conditions() == 0)
             {
-              std::cout << "To apply tau03_search, the automaton must have at "
-                        << "least one accepting condition. Try with another "
-                        << "algorithm." << std::endl;
+              if (!paper_opt)
+                std::cout << "To apply tau03_search, the automaton must have at"
+                          << " least one accepting condition. Try with another"
+                          << " algorithm." << std::endl;
+              else
+                std::cout << std::endl;
             }
           else
             {
@@ -748,63 +777,100 @@ main(int argc, char** argv)
 	  do
 	    {
 	      spot::emptiness_check_result* res = ec->check();
-	      if (!graph_run_opt && !graph_run_tgba_opt)
-		ec->print_stats(std::cout);
-	      if (expect_counter_example != !!res &&
-                      (!bit_state_hashing || !expect_counter_example))
-		exit_code = 1;
-
-	      if (!res)
-		{
-                  std::cout << "no accepting run found";
-                  if (bit_state_hashing && expect_counter_example)
-                    {
-                      std::cout << " even if expected" << std::endl;
-                      std::cout << "this is maybe due to the use of the bit "
-                                << "state hashing technic" << std::endl;
-                      std::cout << "you can try to increase the heap size "
-                                << "or use an explicit storage" << std::endl;
-                    }
+              if (paper_opt)
+                {
+                  std::ios::fmtflags old = std::cout.flags();
+                  std::cout << std::left << std::setw(20)
+                            << echeck_algo << ", ";
+                  spot::tgba_statistics a_size =
+                                        spot::stats_reachable(ec->automaton());
+                  std::cout << std::right << std::setw(10)
+                            << a_size.states << ", "
+                            << std::right << std::setw(10)
+                            << a_size.transitions << ", ";
+                  std::cout <<
+                            ec->automaton()->number_of_acceptance_conditions()
+                            << ", ";
+                  const spot::ec_statistics* ecs =
+                        dynamic_cast<const spot::ec_statistics*>(ec);
+                  if (ecs)
+                    std::cout << std::right << std::setw(10)
+                              << ecs->states() << ", "
+                              << std::right << std::setw(10)
+                              << ecs->transitions() << ", "
+                              << std::right << std::setw(10)
+                              << ecs->max_depth();
+                  else
+                    std::cout << "no stats,, ";
+                  if (res)
+                    std::cout << ", accepting run found";
+                  else
+                    std::cout << ", no accepting run found";
                   std::cout << std::endl;
-                  break;
-		}
-	      else
-		{
+                  std::cout << std::setiosflags(old);
+                }
+              else
+                {
+                  if (!graph_run_opt && !graph_run_tgba_opt)
+                    ec->print_stats(std::cout);
+                  if (expect_counter_example != !!res &&
+                          (!bit_state_hashing || !expect_counter_example))
+                    exit_code = 1;
 
-		  spot::tgba_run* run = res->accepting_run();
-		  if (!run)
-		    {
-		      std::cout << "an accepting run exists" << std::endl;
-		    }
-		  else
-		    {
-		      if (opt_reduce)
-			{
-			  spot::tgba_run* redrun =
-			    spot::reduce_run(res->automaton(), run);
-			  delete run;
-			  run = redrun;
-			}
-		      if (graph_run_opt)
-			{
-			  spot::tgba_run_dotty_decorator deco(run);
-			  spot::dotty_reachable(std::cout, a, &deco);
-			}
-		      else if (graph_run_tgba_opt)
-			{
-			  spot::tgba* ar = spot::tgba_run_to_tgba(a, run);
-			  spot::dotty_reachable(std::cout, ar);
-			  delete ar;
-			}
-		      else
-			{
-			  spot::print_tgba_run(std::cout, a, run);
-			  if (!spot::replay_tgba_run(std::cout, a, run, true))
-			    exit_code = 1;
-			}
-		      delete run;
-		    }
-		}
+                  if (!res)
+                    {
+                      std::cout << "no accepting run found";
+                      if (bit_state_hashing && expect_counter_example)
+                        {
+                          std::cout << " even if expected" << std::endl;
+                          std::cout << "this is maybe due to the use of the bit"
+                                    << " state hashing technic" << std::endl;
+                          std::cout << "you can try to increase the heap size "
+                                    << "or use an explicit storage"
+                                    << std::endl;
+                        }
+                      std::cout << std::endl;
+                      break;
+                    }
+                  else
+                    {
+
+                      spot::tgba_run* run = res->accepting_run();
+                      if (!run)
+                        {
+                          std::cout << "an accepting run exists" << std::endl;
+                        }
+                      else
+                        {
+                          if (opt_reduce)
+                            {
+                              spot::tgba_run* redrun =
+                                spot::reduce_run(res->automaton(), run);
+                              delete run;
+                              run = redrun;
+                            }
+                          if (graph_run_opt)
+                            {
+                              spot::tgba_run_dotty_decorator deco(run);
+                              spot::dotty_reachable(std::cout, a, &deco);
+                            }
+                          else if (graph_run_tgba_opt)
+                            {
+                              spot::tgba* ar = spot::tgba_run_to_tgba(a, run);
+                              spot::dotty_reachable(std::cout, ar);
+                              delete ar;
+                            }
+                          else
+                            {
+                              spot::print_tgba_run(std::cout, a, run);
+                              if (!spot::replay_tgba_run(std::cout, a, run,
+                                                                        true))
+                                exit_code = 1;
+                            }
+                          delete run;
+                        }
+                    }
+                }
 	      delete res;
 	    }
 	  while (search_many);
@@ -813,7 +879,8 @@ main(int argc, char** argv)
 
       if (f)
         spot::ltl::destroy(f);
-      delete product;
+      delete product_degeneralized;
+      delete product_to_free;
       delete system;
       delete expl;
       delete degeneralized;
