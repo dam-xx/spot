@@ -1,5 +1,8 @@
 2004-05-26  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlvisit/reducform.cc (reduce_form_visitor::visit(constant)):
+	Simplify.
+
 	* src/ltlvisit/basereduc.cc, src/ltlvisit/reducform.cc: Use
 	dynamic_cast instead of node_type_form_visitor, this is usually
 	smaller.

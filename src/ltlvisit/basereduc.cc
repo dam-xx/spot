@@ -53,15 +53,7 @@ namespace spot
       void
       visit(constant* c)
       {
-	switch (c->val())
-	  {
-	  case constant::True:
-	    result_ = constant::true_instance();
-	    return;
-	  case constant::False:
-	    result_ = constant::false_instance();
-	    return;
-	  }
+	result_ = c;
       }
 
       void
