@@ -1,3 +1,23 @@
+2004-01-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	After this changes, degeneralized automata are 40% smaller
+	in LBTT's statistics.
+
+	* src/tgba/tgbatba.cc (state_tba_proxy): Store an iterator,
+	pointing somewhere into the acceptance conditions list, instead of
+	an acceptance condition.
+	(state_tba_proxy::acceptance_iterator): New method.
+	(tgba_tba_proxy_succ_iterator): Adjust to use iterators too.
+	(tgba_tba_proxy_succ_iterator::current_state): If the current
+	transition is in several consecutive acceptance steps after the
+	expected one, advance many steps at once.
+	(tgba_tba_proxy::tgba_tba_proxy): Build the acceptance cycle
+	as a list, not a map.
+	(tgba_tba_proxy::get_init_state, tgba_tba_proxy::succ_iter):
+	Adjust.
+	* src/tgba/tgbatba.hh (tgba_tba_proxy::acc_cycle_): Declare as
+	a list, not a map.
+
 2004-01-26  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/magic.cc (magic_search::~magic_search): Release

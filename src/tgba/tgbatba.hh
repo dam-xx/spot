@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -22,7 +22,7 @@
 #ifndef SPOT_TGBA_TGBATBA_HH
 # define SPOT_TGBA_TGBATBA_HH
 
-#include <map>
+#include <list>
 #include "tgba.hh"
 #include "misc/bddlt.hh"
 
@@ -70,14 +70,14 @@ namespace spot
 
     bool state_is_accepting(const state* state) const;
 
+    typedef std::list<bdd> cycle_list;
   protected:
     virtual bdd compute_support_conditions(const state* state) const;
     virtual bdd compute_support_variables(const state* state) const;
 
   private:
     const tgba* a_;
-    typedef std::map<bdd, bdd, bdd_less_than> cycle_map;
-    cycle_map acc_cycle_;
+    cycle_list acc_cycle_;
     bdd the_acceptance_cond_;
     // Disallow copy.
     tgba_tba_proxy(const tgba_tba_proxy&);

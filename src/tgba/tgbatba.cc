@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -30,12 +30,13 @@ namespace spot
   /// \brief A state for spot::tgba_tba_proxy.
   ///
   /// This state is in fact a pair of state: the state from the tgba
-  /// automaton, and the "counter" (we use the acceptance set
-  /// BDD variable instead of an integer counter).
+  /// automaton, and a state of the "counter" (we use a pointer
+  /// to the position in the cycle_acc_ list).
   class state_tba_proxy : public state
   {
+    typedef tgba_tba_proxy::cycle_list::const_iterator iterator;
   public:
-    state_tba_proxy(state* s, bdd acc)
+    state_tba_proxy(state* s, iterator acc)
       :	s_(s), acc_(acc)
     {
     }
@@ -44,7 +45,7 @@ namespace spot
     state_tba_proxy(const state_tba_proxy& o)
       : state(),
 	s_(o.real_state()->clone()),
-	acc_(o.acceptance_cond())
+	acc_(o.acceptance_iterator())
     {
     }
 
@@ -63,6 +64,12 @@ namespace spot
     bdd
     acceptance_cond() const
     {
+      return *acc_;
+    }
+
+    iterator
+    acceptance_iterator() const
+    {
       return acc_;
     }
 
@@ -74,15 +81,15 @@ namespace spot
       int res = s_->compare(o->real_state());
       if (res != 0)
 	return res;
-      return acc_.id() - o->acceptance_cond().id();
+      return acc_->id() - o->acceptance_cond().id();
     }
 
     virtual size_t
     hash() const
     {
-      // We expect to have many more state than acceptance conditions.
+      // We expect to have many more states than acceptance conditions.
       // Hence we keep only 8 bits for acceptance conditions.
-      return (s_->hash() << 8) + (acc_.id() & 0xFF);
+      return (s_->hash() << 8) + (acc_->id() & 0xFF);
     }
 
     virtual
@@ -93,18 +100,20 @@ namespace spot
 
   private:
     state* s_;
-    bdd acc_;
+    iterator acc_;
   };
 
 
   /// \brief Iterate over the successors of tgba_tba_proxy computed on the fly.
   class tgba_tba_proxy_succ_iterator: public tgba_succ_iterator
   {
+    typedef tgba_tba_proxy::cycle_list list;
+    typedef tgba_tba_proxy::cycle_list::const_iterator iterator;
   public:
     tgba_tba_proxy_succ_iterator(tgba_succ_iterator* it,
-				 bdd acc, bdd next_acc,
+				 iterator expected, iterator end,
 				 bdd the_acceptance_cond)
-      : it_(it), acc_(acc), next_acc_(next_acc),
+      : it_(it), expected_(expected), end_(end),
 	the_acceptance_cond_(the_acceptance_cond)
     {
     }
@@ -140,16 +149,27 @@ namespace spot
     state_tba_proxy*
     current_state() const
     {
-      state* s = it_->current_state();
-      bdd acc;
-      // Transition in the ACC_ acceptance set should be directed
-      // to the NEXT_ACC_ acceptance set.
-      if (acc_ == bddtrue
-	  || (acc_ & it_->current_acceptance_conditions()) == acc_)
-	acc = next_acc_;
-      else
-	acc = acc_;
-      return new state_tba_proxy(s, acc);
+      // A transition in the *EXPECTED acceptance set should be directed
+      // to the next acceptance set.  If the current transition is also
+      // in the next acceptance set, then go the one after, etc.
+      //
+      // Jérôme Leroux's PhD thesis has a nice explanation of how it
+      // works, chapter 6.
+      //  @PhDThesis{	  leroux.03.phd,
+      //    author = {J{\'e}r{\^o}me Leroux},
+      //    title  = {Algorithmique de la v{\'e}rification des syst{\`e}mes
+      //              {\`a} compteurs. Approximation et acc{\'e}l{\'e}ration.
+      //              Impl{\'e}mentation de l'outil {\sc Fast}},
+      //    school = {{\'E}cole Normale Sup{\'e}rieure de Cachan},
+      //    year   = {2003},
+      //    month  = {December}
+      //  }
+      //
+      iterator next = expected_;
+      bdd acc = it_->current_acceptance_conditions();
+      while ((acc & *next) == *next && next != end_)
+	++next;
+      return new state_tba_proxy(it_->current_state(), next);
     }
 
     bdd
@@ -166,9 +186,9 @@ namespace spot
 
   protected:
     tgba_succ_iterator* it_;
-    bdd acc_;
-    bdd next_acc_;
-    bdd the_acceptance_cond_;
+    const iterator expected_;
+    const iterator end_;
+    const bdd the_acceptance_cond_;
   };
 
 
@@ -185,20 +205,14 @@ namespace spot
 
     // Now build the "cycle" of acceptance conditions.
 
-    bdd last = bdd_satone(all);
-    all -= last;
-
-    acc_cycle_[bddtrue] = last;
+    acc_cycle_.push_front(bddtrue);
 
     while (all != bddfalse)
       {
 	bdd next = bdd_satone(all);
 	all -= next;
-	acc_cycle_[last] = next;
-	last = next;
+	acc_cycle_.push_front(next);
       }
-
-    acc_cycle_[last] = bddtrue;
   }
 
   tgba_tba_proxy::~tgba_tba_proxy()
@@ -209,9 +223,7 @@ namespace spot
   state*
   tgba_tba_proxy::get_init_state() const
   {
-    cycle_map::const_iterator i = acc_cycle_.find(bddtrue);
-    assert(i != acc_cycle_.end());
-    return new state_tba_proxy(a_->get_init_state(), i->second);
+    return new state_tba_proxy(a_->get_init_state(), acc_cycle_.begin());
   }
 
   tgba_succ_iterator*
@@ -225,13 +237,14 @@ namespace spot
 
     tgba_succ_iterator* it = a_->succ_iter(s->real_state(),
 					   global_state, global_automaton);
-    bdd acc = s->acceptance_cond();
-    cycle_map::const_iterator i = acc_cycle_.find(acc);
-    assert(i != acc_cycle_.end());
-    return
-      new tgba_tba_proxy_succ_iterator(it, acc, i->second,
-				       (acc == bddtrue)
-				       ? the_acceptance_cond_ : bddfalse);
+
+    cycle_list::const_iterator j = s->acceptance_iterator();
+    cycle_list::const_iterator i = j++;
+    if (j == acc_cycle_.end())
+      return new tgba_tba_proxy_succ_iterator(it, acc_cycle_.begin(),
+					      acc_cycle_.end(),
+					      the_acceptance_cond_);
+    return new tgba_tba_proxy_succ_iterator(it, i, acc_cycle_.end(), bddfalse);
   }
 
   bdd_dict*
