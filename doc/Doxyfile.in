@@ -58,13 +58,16 @@ WARN_LOGFILE           =
 # configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = @top_srcdir@/src
-FILE_PATTERNS          = *.cc \
-                         *.hh \
+FILE_PATTERNS          = *.hh \
                          *.hxx
 RECURSIVE              = YES
 EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
-EXCLUDE_PATTERNS       = *test/*
+EXCLUDE_PATTERNS       = */tgbaparse/location.hh \
+		         */tgbaparse/stack.hh \
+			 */tgbaparse/position.hh \
+		         */*parse/*parse*.hh \
+			 *test/*
 EXAMPLE_PATH           =
 EXAMPLE_PATTERNS       =
 EXAMPLE_RECURSIVE      = NO

@@ -1,11 +1,20 @@
 DOXYGEN = doxygen
 
-.PHONY: doc html
+.PHONY: doc spot
 
-doc: spot
+all-local: stamp
 
-spot: Doxyfile
-	$(DOXYGEN)
+doc:
+	rm stamp
+	$(AMKE) stamp
 
-clean-local:
+stamp: Doxyfile.in ../configure.ac
+	$(MAKE) Doxyfile
 	rm -rf spot.html spot.latex
+	$(DOXYGEN)
+	: > $@
+
+spot.html: stamp
+spot.latex: stamp
+
+EXTRA_DIST = stamp spot.html

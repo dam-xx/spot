@@ -1,9 +1,15 @@
 2003-06-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* doc/Makefile.am: Rewrite to run Doxygen whenever Doxyfile.in
+	or configure.ac changes.  Distribute the html doc.
+	* doc/Doxyfile.in (EXCLUDE_PATTERNS): Complete with
+	useless Bison classes.
+	(FILE_PATTERNS): Remove *.cc files.
+
 	Distribute BuDDy.  Compile and link with the included version if
-	explicitely requested (--with-included-buddy) or if there is
-	now stuitable version already installed.
-	
+	explicitely requested (--with-included-buddy) or if there is now
+	stuitable version already installed.
+
 	* buddy/: New directory.  Contains a patched version of BuDDy 2.2.
 	* m4/buddy.m4: Make sure the installed BuDDy supports bdd_mergepairs.
 	Honor --with-included-buddy and --without-included-buddy.  Define
@@ -14,7 +20,7 @@
 	* src/Makefile.am (libspot_LDFLAGS): New variable.
 	* src/tgba/Makefile.am (AM_CPPFLAGS): Add $(BUDDY_CPPFLAGS).
 	* src/tgbaalgos/Makefile.am (AM_CPPFLAGS): Likewise.
-	* src/tgbatest/Makefile.am (AM_CPPFLAGS): Likewise.	
+	* src/tgbatest/Makefile.am (AM_CPPFLAGS): Likewise.
 
 2003-06-25  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
