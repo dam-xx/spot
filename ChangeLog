@@ -1,3 +1,7 @@
+2004-10-12  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* wrap/python/tests/run.in: Typo.  From Akim Demaille.
+
 2004-10-11  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac: Empty CFLAGS and CXXFLAGS.
