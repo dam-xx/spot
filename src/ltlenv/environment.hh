@@ -35,6 +35,11 @@ namespace spot
       /// Get the name of the environment.
       virtual const std::string& name() = 0;
 
+      virtual
+      ~environment()
+      {
+      };
+
       // FIXME: More functions will be needed later, but
       // it's enough for now.
     };

@@ -86,8 +86,8 @@ namespace spot
 
       multop(type op, vec* v);
       static multop* instance(type op, vec* v);
-      static vec* multop::add(type op, vec* v, formula* f);
-      static void multop::add_sorted(vec* v, formula* f);
+      static vec* add(type op, vec* v, formula* f);
+      static void add_sorted(vec* v, formula* f);
 
       virtual ~multop();
 

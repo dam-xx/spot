@@ -17,6 +17,7 @@ namespace spot
     class default_environment : public environment
     {
     public:
+      virtual ~default_environment();
       virtual formula* require(const std::string& prop_str);
       virtual const std::string& name();
 

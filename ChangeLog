@@ -1,3 +1,15 @@
+2003-06-28  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	Fix errors reported by ICC.
+
+	* src/tgba/state.hh (state_ptr_less_than::operator()): Make it const.
+	* src/tgba/tgbaproduct.cc: Include string.hh.
+	* src/ltlast/multop.hh (multop::add, multop::add_sorted): Do
+	not use qualified names in declarations.
+	* m4/gccwarn.m4 (CF_GXX_WARNINGS): Fix GXX test.
+	* src/ltlenv/defaultenv.hh, src/ltlenv/defaultenv.cc,
+	src/ltlenv/environment.hh: Add virtual destructors.
+
 2003-06-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* Makefile.am (EXTRA_DIST): Add HACKING.

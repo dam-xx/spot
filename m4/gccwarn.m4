@@ -14,7 +14,7 @@ dnl A few other options have been left out because they are annoying in C++.
 
 
 AC_DEFUN([CF_GXX_WARNINGS],
-[if test -n "$GXX"; then
+[if test "x$GXX" = xyes; then
   AC_CACHE_CHECK([for g++ warning options], ac_cv_prog_gxx_warn_flags,
   [
   cat > conftest.$ac_ext <<EOF

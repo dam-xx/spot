@@ -1,6 +1,7 @@
 #include "tgbaproduct.hh"
 #include "tgbatranslateproxy.hh"
 #include "dictunion.hh"
+#include <string>
 #include <cassert>
 
 namespace spot

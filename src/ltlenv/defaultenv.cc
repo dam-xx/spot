@@ -6,6 +6,10 @@ namespace spot
   namespace ltl
   {
 
+    default_environment::~default_environment()
+    {
+    }
+
     formula*
     default_environment::require(const std::string& s)
     {

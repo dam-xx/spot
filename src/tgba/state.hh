@@ -63,7 +63,7 @@ namespace spot
   struct state_ptr_less_than
   {
     bool
-    operator()(const state* left, const state *right)
+    operator()(const state* left, const state *right) const
     {
       return left->compare(right) < 0;
     }
