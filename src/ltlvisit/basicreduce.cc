@@ -19,13 +19,13 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include "reducform.hh"
+#include "basicreduce.hh"
+#include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
 #include <cassert>
 
-#include "ltlvisit/clone.hh"
-#include "ltlvisit/destroy.hh"
-#include "ltlvisit/dump.hh"
+#include "clone.hh"
+#include "destroy.hh"
 
 namespace spot
 {

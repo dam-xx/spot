@@ -1,5 +1,13 @@
 2004-06-23  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/ltlvisit/basicreduce.hh: New file, extracted from ...
+	* src/ltlvisit/reducform.hh: ... here.
+	* src/ltlvisit/basereduc.cc: Rename as ...
+	* src/ltlvisit/basicreduce.cc: ... this, to match the function name.
+	* src/ltlvisit/Makefile.am (ltlvisit_HEADERS, libltlvisit_la_SOURCES):
+	Adjust filenames.
+	* src/ltlvisit/reducform.cc: Adjust includes.
+
 	* src/ltlvisit/lunabbrev.hh: Revert superfluous change from
 	2004-05-10.
 

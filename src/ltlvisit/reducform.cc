@@ -20,6 +20,7 @@
 // 02111-1307, USA.
 
 #include "reducform.hh"
+#include "basicreduce.hh"
 #include "syntimpl.hh"
 #include "ltlast/allnodes.hh"
 #include <cassert>

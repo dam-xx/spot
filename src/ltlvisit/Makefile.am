@@ -25,6 +25,7 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 ltlvisitdir = $(pkgincludedir)/ltlvisit
 
 ltlvisit_HEADERS = \
+  basicreduce.hh \
   clone.hh \
   destroy.hh \
   dotty.hh \
@@ -40,7 +41,7 @@ ltlvisit_HEADERS = \
 
 noinst_LTLIBRARIES = libltlvisit.la
 libltlvisit_la_SOURCES = \
-  basereduc.cc \
+  basicreduce.cc \
   clone.cc \
   destroy.cc \
   dotty.cc \

@@ -53,13 +53,8 @@ namespace spot
     /// \return the reduced formula
     formula* reduce(const formula* f, int opt = Reduce_All);
 
-    /// Basic rewritings.
-    formula* basic_reduce(const formula* f);
-
     /// \brief Check whether a formula is eventual.
     ///
-    /// FIXME: Describe what eventual formulae are.  Cite paper.
-
     /// This comes from
     /// \verbatim
     /// @InProceedings{	  etessami.00.concur,
@@ -72,21 +67,16 @@ namespace spot
     /// editor  	= {C. Palamidessi},
     /// volume  	= {1877},
     /// series  	= {Lecture Notes in Computer Science},
-    ///  publisher	= {Springer-Verlag}
+    /// publisher	= {Springer-Verlag}
     /// }
     /// \endverbatim
-
+    /// FIXME: Describe what eventual formulae are.
     bool is_eventual(const formula* f);
 
     /// \brief Check whether a formula is universal.
     ///
     /// FIXME: Describe what universal formulae are.  Cite paper.
     bool is_universal(const formula* f);
-
-    /// Whether a formula starts with GF.
-    bool is_GF(const formula* f);
-    /// Whether a formula starts with FG.
-    bool is_FG(const formula* f);
   }
 }
 
