@@ -45,4 +45,4 @@ installcheck-local:
 
 
 CLEANFILES = failures incltest.*
-EXTRA_DIST = includes.test
+EXTRA_DIST = includes.test 80columns.test style.test

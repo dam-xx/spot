@@ -1,7 +1,10 @@
 2004-05-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/sanity/Makefile.am (EXTRA_DIST): Distribute 80columns.test
+	and style.test.
+
 	* src/ltltest/Makefile.am (EXTRA_DIST): Distribute formulae.txt.
-	* src/ltltest/formulae.txt: New files (2200 LTL formulea generated
+	* src/ltltest/formulae.txt: New file (2200 LTL formulea generated
 	by Wring).
 	* src/ltltest/formules.ltl: Delete.
 	* src/reduc.test: Read formulae.txt.
