@@ -1,5 +1,7 @@
 2005-01-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/ltl2tgba.cc: Typo.
+
 	* src/tgbatest/randtgba.cc: Add option -P.
 
 2005-01-10  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
