@@ -1,5 +1,8 @@
 2004-10-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/misc/modgray.hh (loopless_modular_mixed_radix_gray_code::done,
+	loopless_modular_mixed_radix_gray_code::last): Declare as const.
+
 	* src/misc/bareword.hh, src/misc/bareword.cc: New files.
 	* src/misc/Makefile.am (libmisc_la_SOURCES, misc_HEADERS): Add them.
 

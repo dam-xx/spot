@@ -110,14 +110,14 @@ namespace spot
     /// At this point it is still OK to call next(), and then done() will
     /// become true.
     bool
-    last()
+    last() const
     {
       return f_[0] == n_;
     }
 
     /// Whether all tuple have been explored.
     bool
-    done()
+    done() const
     {
       return done_;
     }
