@@ -68,7 +68,7 @@ main(int argc, char** argv)
     {
     case 0:
       std::cout << "Test f1 < f2" << std::endl;
-      if (spot::ltl::inf_form(f1, f2))
+      if (spot::ltl::syntactic_implication(f1, f2))
 	{
 	  std::cout << f1s << " < " << f2s << std::endl;
 	  exit_return = 1;
@@ -77,7 +77,7 @@ main(int argc, char** argv)
 
     case 1:
       std::cout << "Test !f1 < f2" << std::endl;
-      if (spot::ltl::infneg_form(f1, f2, 0))
+      if (spot::ltl::syntactic_implication_neg(f1, f2, false))
 	{
 	  std::cout << "!(" << f1s << ") < " << f2s << std::endl;
 	  exit_return = 1;
@@ -86,7 +86,7 @@ main(int argc, char** argv)
 
     case 2:
       std::cout << "Test f1 < !f2" << std::endl;
-      if (spot::ltl::infneg_form(f1, f2, 1))
+      if (spot::ltl::syntactic_implication_neg(f1, f2, true))
 	{
 	  std::cout << f1s << " < !(" << f2s << ")" << std::endl;
 	  exit_return = 1;
@@ -96,8 +96,8 @@ main(int argc, char** argv)
       break;
     }
 
-  spot::ltl::dump(std::cout, f1); std::cout << std::endl;
-  spot::ltl::dump(std::cout, f2); std::cout << std::endl;
+  spot::ltl::dump(std::cout, f1) << std::endl;
+  spot::ltl::dump(std::cout, f2) << std::endl;
 
   spot::ltl::destroy(f1);
   spot::ltl::destroy(f2);

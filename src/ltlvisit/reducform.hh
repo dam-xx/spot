@@ -53,16 +53,18 @@ namespace spot
     /// \return the reduced formula
     formula* reduce(const formula* f, int opt = Reduce_All);
 
-    /// Implement basic rewriting.
-    formula* basic_reduce_form(const formula* f);
+    /// Basic rewritings.
+    formula* basic_reduce(const formula* f);
 
-    /// Detect easy case of implies.
-    /// True if f1 < f2, false otherwise.
-    bool inf_form(const formula* f1, const formula* f2);
-    /// Detect easy case of implies.
-    /// If n = 0, true if !f1 < f2, false otherwise.
-    /// If n = 1, true if f1 < !f2, false otherwise.
-    bool infneg_form(const formula* f1, const formula* f2, int n);
+    /// \brief Syntactic implication.
+    bool syntactic_implication(const formula* f1, const formula* f2);
+
+    /// \brief Syntactic implication.
+    ///
+    /// If right==false, true if !f1 < f2, false otherwise.
+    /// If right==true, true if f1 < !f2, false otherwise.
+    bool syntactic_implication_neg(const formula* f1, const formula* f2,
+				   bool right);
 
     /// \brief Check whether a formula is eventual.
     ///

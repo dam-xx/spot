@@ -32,16 +32,16 @@ namespace spot
   namespace ltl
   {
 
-    class reduce_form_visitor : public visitor
+    class reduce_visitor : public visitor
     {
     public:
 
-      reduce_form_visitor(int opt)
+      reduce_visitor(int opt)
 	: opt_(opt)
       {
       }
 
-      virtual ~reduce_form_visitor()
+      virtual ~reduce_visitor()
       {
       }
 
@@ -116,10 +116,11 @@ namespace spot
 
 	if (opt_ & Reduce_Syntactic_Implications)
 	  {
-	    bool inf = inf_form(f1, f2);
-	    bool infinv = inf_form(f2, f1);
-	    bool infnegleft = infneg_form(f2, f1, 0);
-	    bool infnegright = infneg_form(f2, f1, 1);
+	    // FIXME: These should be done only when needed.
+	    bool inf = syntactic_implication(f1, f2);
+	    bool infinv = syntactic_implication(f2, f1);
+	    bool infnegleft = syntactic_implication_neg(f2, f1, false);
+	    bool infnegright = syntactic_implication_neg(f2, f1, true);
 
 	    switch (bo->op())
 	      {
@@ -146,7 +147,8 @@ namespace spot
 		/* a < b => a U (b U c) = (b U c) */
 		{
 		  binop* bo = dynamic_cast<binop*>(f2);
-		  if (bo && bo->op() == binop::U && inf_form(f1, bo->first()))
+		  if (bo && bo->op() == binop::U
+		      && syntactic_implication(f1, bo->first()))
 		    {
 		      result_ = f2;
 		      destroy(f1);
@@ -173,7 +175,8 @@ namespace spot
 		/* b < a => a R (b R c) = b R c */
 		{
 		  binop* bo = dynamic_cast<binop*>(f2);
-		  if (bo && bo->op() == binop::R && inf_form(bo->first(), f1))
+		  if (bo && bo->op() == binop::R
+		      && syntactic_implication(bo->first(), f1))
 		    {
 		      result_ = f2;
 		      destroy(f1);
@@ -215,7 +218,7 @@ namespace spot
 		  {
 		    f2 = *index;
 		    /* a < b => a + b = b */
-		    if (inf_form(f1, f2)) // f1 < f2
+		    if (syntactic_implication(f1, f2)) // f1 < f2
 		      {
 			f1 = f2;
 			destroy(*indextmp);
@@ -223,7 +226,7 @@ namespace spot
 			indextmp = index;
 			index--;
 		      }
-		    else if (inf_form(f2, f1)) // f2 < f1
+		    else if (syntactic_implication(f2, f1)) // f2 < f1
 		      {
 			destroy(*index);
 			res->erase(index);
@@ -243,13 +246,13 @@ namespace spot
 		  {
 		    f2 = *index;
 		    /* a < b => a & b = a */
-		    if (inf_form(f1, f2)) // f1 < f2
+		    if (syntactic_implication(f1, f2)) // f1 < f2
 		      {
 			destroy(*index);
 			res->erase(index);
 			index--;
 		      }
-		    else if (inf_form(f2, f1)) // f2 < f1
+		    else if (syntactic_implication(f2, f1)) // f2 < f1
 		      {
 			f1 = f2;
 			destroy(*indextmp);
@@ -266,8 +269,8 @@ namespace spot
 	    for (index = res->begin(); index != res->end(); index++)
 	      for (indextmp = res->begin(); indextmp != res->end(); indextmp++)
 		if (index != indextmp
-		    && infneg_form(*index,*indextmp,
-				   (mo->op() == multop::Or) ? 0 : 1))
+		    && syntactic_implication_neg(*index, *indextmp,
+						 mo->op() != multop::Or))
 		  {
 		    for (multop::vec::iterator j = res->begin();
 			 j != res->end(); j++)
@@ -310,27 +313,27 @@ namespace spot
 
       if (opt & Reduce_Basics)
 	{
-	  f1 = basic_reduce_form(f2);
+	  f1 = basic_reduce(f2);
 	  destroy(f2);
 	  f2 = f1;
 	}
       if (opt & (Reduce_Syntactic_Implications
 		 | Reduce_Eventuality_And_Universality))
 	{
-	  reduce_form_visitor v(opt);
+	  reduce_visitor v(opt);
 	  f2->accept(v);
 	  f1 = v.result();
 	  destroy(f2);
 	  f2 = f1;
 
-	  // Run basic_reduce_form again.
+	  // Run basic_reduce again.
 	  //
 	  // Consider `F b & g'   were g is an eventual formula rewritten
-	  // as `g = F c'  Then basic_reduce_form with rewrite it
+	  // as `g = F c'  Then basic_reduce with rewrite it
 	  // as F(b & c).
 	  if (opt & Reduce_Basics)
 	    {
-	      f1 = basic_reduce_form(f2);
+	      f1 = basic_reduce(f2);
 	      destroy(f2);
 	      f2 = f1;
 	    }

@@ -32,43 +32,17 @@ namespace spot
   namespace ltl
   {
 
-    bool
-    is_GF(const formula* f)
-    {
-      const unop* op = dynamic_cast<const unop*>(f);
-      if (op && op->op() == unop::G)
-	{
-	  const unop* opchild = dynamic_cast<const unop*>(op->child());
-	  if (opchild && opchild->op() == unop::F)
-	    return true;
-	}
-      return false;
-    }
-
-    bool
-    is_FG(const formula* f)
-    {
-      const unop* op = dynamic_cast<const unop*>(f);
-      if (op && op->op() == unop::F)
-	{
-	  const unop* opchild = dynamic_cast<const unop*>(op->child());
-	  if (opchild && opchild->op() == unop::G)
-	    return true;
-	}
-      return false;
-    }
-
-    class form_eventual_universal_visitor : public const_visitor
+    class eventual_universal_visitor : public const_visitor
     {
     public:
 
-      form_eventual_universal_visitor()
+      eventual_universal_visitor()
 	: eventual(false), universal(false)
       {
       }
 
       virtual
-      ~form_eventual_universal_visitor()
+      ~eventual_universal_visitor()
       {
       }
 
@@ -163,7 +137,7 @@ namespace spot
       bool
       recurse_ev(const formula* f)
       {
-	form_eventual_universal_visitor v;
+	eventual_universal_visitor v;
 	const_cast<formula*>(f)->accept(v);
 	return v.is_eventual();
       }
@@ -171,7 +145,7 @@ namespace spot
       bool
       recurse_un(const formula* f)
       {
-	form_eventual_universal_visitor v;
+	eventual_universal_visitor v;
 	const_cast<formula*>(f)->accept(v);
 	return v.is_universal();
       }
@@ -182,33 +156,36 @@ namespace spot
     };
 
 
-    bool is_eventual(const formula* f)
+    bool
+    is_eventual(const formula* f)
     {
-      form_eventual_universal_visitor v;
+      eventual_universal_visitor v;
       const_cast<formula*>(f)->accept(v);
       return v.is_eventual();
     }
 
-    bool is_universal(const formula* f)
+    bool
+    is_universal(const formula* f)
     {
-      form_eventual_universal_visitor v;
+      eventual_universal_visitor v;
       const_cast<formula*>(f)->accept(v);
       return v.is_universal();
     }
 
     /////////////////////////////////////////////////////////////////////////
 
-    class inf_form_right_recurse_visitor : public const_visitor
+
+    class inf_right_recurse_visitor : public const_visitor
     {
     public:
 
-      inf_form_right_recurse_visitor(const formula *f)
+      inf_right_recurse_visitor(const formula *f)
 	: result_(false), f(f)
       {
       }
 
       virtual
-      ~inf_form_right_recurse_visitor()
+      ~inf_right_recurse_visitor()
       {
       }
 
@@ -254,17 +231,17 @@ namespace spot
 	    {
 	      const unop* op = dynamic_cast<const unop*>(f);
 	      if (op && op->op() == unop::X)
-		result_ = inf_form(op->child(), f1);
+		result_ = syntactic_implication(op->child(), f1);
 	    }
 	    return;
 	  case unop::F:
 	    /* F(a) = true U a */
-	    result_ = inf_form(f, f1);
+	    result_ = syntactic_implication(f, f1);
 	    return;
 	  case unop::G:
 	    /* G(a) = false R a */
 	    tmp = constant::false_instance();
-	    if (inf_form(f, tmp))
+	    if (syntactic_implication(f, tmp))
 	      result_ = true;
 	    destroy(tmp);
 	    return;
@@ -285,11 +262,12 @@ namespace spot
 	  case binop::Implies:
 	    return;
 	  case binop::U:
-	    if (inf_form(f, f2))
+	    if (syntactic_implication(f, f2))
 	      result_ = true;
 	    return;
 	  case binop::R:
-	    if (inf_form(f, f1) && inf_form(f, f2))
+	    if (syntactic_implication(f, f1)
+		&& syntactic_implication(f, f2))
 	      result_ = true;
 	    return;
 	  }
@@ -306,13 +284,13 @@ namespace spot
 	  {
 	  case multop::And:
 	    for (unsigned i = 0; i < mos; ++i)
-	      if (!inf_form(f, mo->nth(i)))
+	      if (!syntactic_implication(f, mo->nth(i)))
 		return;
 	    result_ = true;
 	    break;
 	  case multop::Or:
 	    for (unsigned i = 0; i < mos && !result_; ++i)
-	      if (inf_form(f, mo->nth(i)))
+	      if (syntactic_implication(f, mo->nth(i)))
 		result_ = true;
 	    break;
 	  }
@@ -323,7 +301,7 @@ namespace spot
       {
 	if (f1 == f2)
 	  return true;
-	inf_form_right_recurse_visitor v(f2);
+	inf_right_recurse_visitor v(f2);
 	const_cast<formula*>(f1)->accept(v);
 	return v.result();
       }
@@ -335,17 +313,17 @@ namespace spot
 
     /////////////////////////////////////////////////////////////////////////
 
-    class inf_form_left_recurse_visitor : public const_visitor
+    class inf_left_recurse_visitor : public const_visitor
     {
     public:
 
-      inf_form_left_recurse_visitor(const formula *f)
+      inf_left_recurse_visitor(const formula *f)
 	: result_(false), f(f)
       {
       }
 
       virtual
-      ~inf_form_left_recurse_visitor()
+      ~inf_left_recurse_visitor()
       {
       }
 
@@ -355,8 +333,8 @@ namespace spot
 	const binop* fb = dynamic_cast<const binop*>(f);
 	const binop* f2b = dynamic_cast<const binop*>(f2);
 	if (fb && f2b && fb->op() == f2b->op()
-	    && inf_form(f2b->first(), fb->first())
-	    && inf_form(f2b->second(), fb->second()))
+	    && syntactic_implication(f2b->first(), fb->first())
+	    && syntactic_implication(f2b->second(), fb->second()))
 	  return true;
 	return false;
       }
@@ -370,7 +348,7 @@ namespace spot
       void
       visit(const atomic_prop* ap)
       {
-	inf_form_right_recurse_visitor v(ap);
+	inf_right_recurse_visitor v(ap);
 	const_cast<formula*>(f)->accept(v);
 	result_ = v.result();
       }
@@ -378,7 +356,7 @@ namespace spot
       void
       visit(const constant* c)
       {
-	inf_form_right_recurse_visitor v(c);
+	inf_right_recurse_visitor v(c);
 	switch (c->val())
 	  {
 	  case constant::True:
@@ -397,7 +375,7 @@ namespace spot
       visit(const unop* uo)
       {
 	const formula* f1 = uo->child();
-	inf_form_right_recurse_visitor v(uo);
+	inf_right_recurse_visitor v(uo);
 	switch (uo->op())
 	  {
 	  case unop::Not:
@@ -408,7 +386,7 @@ namespace spot
 	    {
 	      const unop* op = dynamic_cast<const unop*>(f);
 	      if (op && op->op() == unop::X)
-		result_ = inf_form(f1, op->child());
+		result_ = syntactic_implication(f1, op->child());
 	    }
 	    return;
 	  case unop::F:
@@ -423,7 +401,7 @@ namespace spot
 		  destroy(tmp);
 		  return;
 		}
-	      if (inf_form(tmp, f))
+	      if (syntactic_implication(tmp, f))
 		result_ = true;
 	      destroy(tmp);
 	      return;
@@ -440,7 +418,7 @@ namespace spot
 		  destroy(tmp);
 		  return;
 		}
-	      if (inf_form(f1, f))
+	      if (syntactic_implication(f1, f))
 		result_ = true;
 	      destroy(tmp);
 	      return;
@@ -468,11 +446,12 @@ namespace spot
 	  case binop::Implies:
 	    return;
 	  case binop::U:
-	    if (inf_form(f1, f) && inf_form(f2, f))
+	    if (syntactic_implication(f1, f)
+		&& syntactic_implication(f2, f))
 	      result_ = true;
 	    return;
 	  case binop::R:
-	    if (inf_form(f2, f))
+	    if (syntactic_implication(f2, f))
 	      result_ = true;
 	    return;
 	  }
@@ -489,12 +468,12 @@ namespace spot
 	  {
 	  case multop::And:
 	    for (unsigned i = 0; (i < mos) && !result_; ++i)
-	      if (inf_form(mo->nth(i), f))
+	      if (syntactic_implication(mo->nth(i), f))
 		result_ = true;
 	    break;
 	  case multop::Or:
 	    for (unsigned i = 0; i < mos; ++i)
-	      if (!inf_form(mo->nth(i), f))
+	      if (!syntactic_implication(mo->nth(i), f))
 		return;
 	    result_ = true;
 	    break;
@@ -506,15 +485,15 @@ namespace spot
       const formula* f;
     };
 
+    // This is called by syntactic_implication() after the
+    // formulae have been normalized.
     bool
-    inf_form(const formula* f1, const formula* f2)
+    syntactic_implication(const formula* f1, const formula* f2)
     {
-      /* f1 and f2 are unabbreviated */
       if (f1 == f2)
 	return true;
-      inf_form_left_recurse_visitor v1(f2);
-      inf_form_right_recurse_visitor v2(f1);
-
+      inf_left_recurse_visitor v1(f2);
+      inf_right_recurse_visitor v2(f1);
 
       if (f2 == constant::true_instance()
 	  || f1 == constant::false_instance())
@@ -532,13 +511,13 @@ namespace spot
     }
 
     bool
-    infneg_form(const formula* f1, const formula* f2, int n)
+    syntactic_implication_neg(const formula* f1, const formula* f2, bool right)
     {
       const formula* ftmp1;
       const formula* ftmp2;
       const formula* ftmp3 = unop::instance(unop::Not,
-					    (!n) ? clone(f1) : clone(f2));
-      const formula* ftmp4 = negative_normal_form((!n) ? f2 : f1);
+					    right ? clone(f2) : clone(f1));
+      const formula* ftmp4 = negative_normal_form(right ? f1 : f2);
       const formula* ftmp5;
       const formula* ftmp6;
       bool result;
@@ -549,10 +528,10 @@ namespace spot
       ftmp5 = unabbreviate_logic(ftmp4);
       ftmp6 = negative_normal_form(ftmp5);
 
-      if (n == 0)
-	result = inf_form(ftmp1, ftmp6);
+      if (right)
+	result = syntactic_implication(ftmp6, ftmp1);
       else
-	result = inf_form(ftmp6, ftmp1);
+	result = syntactic_implication(ftmp1, ftmp6);
 
       destroy(ftmp1);
       destroy(ftmp2);

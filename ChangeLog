@@ -1,3 +1,20 @@
+2004-05-30  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/ltlvisit/forminf.cc (form_eventual_universal_visitor,
+	inf_form_right_recurse_visitor, inf_form_left_recurse_visitor): Rename
+	as ...
+	(eventual_universal_visitor, inf_right_recurse_visitor,
+	inf_left_recurse_visitor): ... these.
+	(is_GF, is_FG): Move ...
+	* src/ltlvisit/basereduc.cc (is_GF, is_FG): ... here, since they
+	are only used here.
+	(basic_reduce_form, basic_reduce_form_visitor): Rename as ...
+	(basic_reduce, basic_reduce_visitor): ... these.
+	* src/ltlvisit/reducform.cc (reduce_form_visitor): Rename as ...
+	(reduce_visitor): ... this.
+	* src/ltltest/inf.cc: Adjust calls.
+	* src/sanity/style.test: Improve missing-space after coma detection.
+
 2004-05-26  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlvisit/reducform.cc (reduce_form_visitor::visit(constant)):
