@@ -49,10 +49,16 @@ namespace spot
   ///
   /// If \a exprop is set, the algorithm will consider all properties
   /// combinations possible on each state, in an attempt to reduce
-  /// the non-determinism.
+  /// the non-determinism.  The automaton will have the same size as
+  /// without this option, but because the transition will be more
+  /// deterministic product automaton will be smaller (or, at worse, equal).
+  ///
+  /// If \a symb_merge is set to false, states with the same symbolic
+  /// representation (these are equivalent formulae) will not be
+  /// merged.
   /// \endverbatim
   tgba_explicit* ltl_to_tgba_fm(const ltl::formula* f, bdd_dict* dict,
-				bool exprop = false);
+				bool exprop = false, bool symb_merge = true);
 }
 
 #endif // SPOT_TGBA_LTL2TGBA_HH

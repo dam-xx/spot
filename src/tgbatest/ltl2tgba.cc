@@ -61,8 +61,6 @@ syntax(char* prog)
 	    << "counter-example " << std::endl
             << "  -f   use Couvreur's FM algorithm for translation"
 	    << std::endl
-            << "  -fx   use Couvreur's FM algorithm, with exploded properties"
-	    << std::endl
             << "  -F   read the formula from the file" << std::endl
 	    << "  -m   magic-search (implies -D), expect a counter-example"
 	    << std::endl
@@ -82,8 +80,12 @@ syntax(char* prog)
 	    << "acceptance conditions" << std::endl
 	    << "  -v   display the BDD variables used by the automaton"
 	    << std::endl
+            << "  -x   try to produce a more deterministic automata "
+	    << "(implies -f)" << std::endl
 	    << "  -X   do not compute an automaton, read it from a file"
-	    << std::endl;
+	    << std::endl
+	    << "  -y   do not merge states with same symbolic representation "
+	    << "(implies -f)" << std::endl;
   exit(2);
 }
 
@@ -96,6 +98,7 @@ main(int argc, char** argv)
   bool degeneralize_opt = false;
   bool fm_opt = false;
   bool fm_exprop_opt = false;
+  bool fm_symb_merge_opt = true;
   bool file_opt = false;
   int output = 0;
   int formula_index = 0;
@@ -156,11 +159,6 @@ main(int argc, char** argv)
 	{
 	  fm_opt = true;
 	}
-      else if (!strcmp(argv[formula_index], "-fx"))
-	{
-	  fm_opt = true;
-	  fm_exprop_opt = true;
-	}
       else if (!strcmp(argv[formula_index], "-F"))
 	{
 	  file_opt = true;
@@ -215,9 +213,19 @@ main(int argc, char** argv)
 	{
 	  output = 5;
 	}
+      else if (!strcmp(argv[formula_index], "-x"))
+	{
+	  fm_opt = true;
+	  fm_exprop_opt = true;
+	}
       else if (!strcmp(argv[formula_index], "-X"))
 	{
 	  from_file = true;
+	}
+      else if (!strcmp(argv[formula_index], "-y"))
+	{
+	  fm_opt = true;
+	  fm_symb_merge_opt = false;
 	}
       else
 	{
@@ -282,7 +290,8 @@ main(int argc, char** argv)
       else
 	{
 	  if (fm_opt)
-	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt);
+	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt,
+					       fm_symb_merge_opt);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 	  spot::ltl::destroy(f);

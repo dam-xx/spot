@@ -58,6 +58,13 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- FM), without symb_merge"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -y -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM), degeneralized"
    Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -t -D'"
    Enabled = yes
@@ -72,6 +79,13 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- FM), without symb_merge, fake"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -y -T'"
+   Enabled = no
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM), fake, LTL simplifications by ltl2ba"
    Path = "${LBTT_TRANSLATE} --spot '${srcdir}/ltl2baw.pl --spot=\"-f -T\" -F'"
    Enabled = no
@@ -80,28 +94,42 @@ Algorithm
 Algorithm
 {
    Name = "Spot (Couvreur -- FM exprop)"
-   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -fx -t'"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -x -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM exprop), without symb_merge"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -x -y -t'"
    Enabled = yes
 }
 
 Algorithm
 {
    Name = "Spot (Couvreur -- FM exprop), degeneralized"
-   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -fx -t -D'"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -x -t -D'"
    Enabled = yes
 }
 
 Algorithm
 {
    Name = "Spot (Couvreur -- FM exprop), fake"
-   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -fx -T'"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -x -T'"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM exprop), without symb_merge, fake"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -x -y -T'"
    Enabled = no
 }
 
 Algorithm
 {
    Name = "Spot (Couvreur -- FM exprop), fake, LTL simplifications by ltl2ba"
-   Path = "${LBTT_TRANSLATE} --spot '${srcdir}/ltl2baw.pl --spot=\"-fx -T\" -F'"
+   Path = "${LBTT_TRANSLATE} --spot '${srcdir}/ltl2baw.pl --spot=\"-f -x -T\" -F'"
    Enabled = no
 }
 

@@ -435,7 +435,8 @@ namespace spot
   }
 
   tgba_explicit*
-  ltl_to_tgba_fm(const formula* f, bdd_dict* dict, bool exprop)
+  ltl_to_tgba_fm(const formula* f, bdd_dict* dict,
+		 bool exprop, bool symb_merge)
   {
     // Normalize the formula.  We want all the negations on
     // the atomic propositions.  We also suppress logic
@@ -530,7 +531,8 @@ namespace spot
 		// use it in lieu of the current one.  (See the comments
 		// for canonical_succ.)  We need to do this only for new
 		// destinations.
-		if (formulae_seen.find(dest) == formulae_seen.end())
+		if (symb_merge
+		    && formulae_seen.find(dest) == formulae_seen.end())
 		  {
 		    dest->accept(v);
 		    bdd succbdd = v.result();

@@ -1,5 +1,13 @@
 2004-02-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba_fm.hh (ltl_to_tgba_fm): Add the
+	symb_merge argument.
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Likewise.
+	* src/tgbatest/ltl2tgba.cc (main): Rename -fx as -x, and add -y
+	to unset symb_merge.
+	* wrap/python/cgi/ltl2tgba.in: Remove the exprop version
+	of the FM translator, make exprop and symb_merge options.
+
 	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_trad_visitor::visit) <unop::G>:
 	suppress the GFy optimisation introduced on 2003-11-26, it is
 	generalized by the identification of states with same symbolic
