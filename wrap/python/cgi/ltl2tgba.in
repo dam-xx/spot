@@ -194,24 +194,23 @@ formula = form.getfirst('formula', '')
 color_fm = '#E0D8E0'
 color_lacim = "#F8D8E8"
 
-options = [(
-    'Common options', 0, '', [
+options_common = [
     ('show_formula_png',    'draw the formula',                            0),
     ('show_automaton_png',  'draw Büchi automaton',                        1),
     ('show_degen_png',      'draw degeneralized Büchi automaton',          0),
     ('show_never_claim',    'output Spin never claim',                     0),
     ('show_lbtt',           'convert automaton for LBTT',                  0),
-    ]), (
-    'Debugging options', 0, '', [
+    ]
+options_debug = [
     ('show_parse',          'show traces during parsing',                  0),
     ('show_dictionnay',     'print BDD dictionary',                        0),
-    ]), (
-    'Couvreur/FM options', 1, color_fm, [
+    ]
+options_trans_fm = [
     ('opt_exprop',          'optimize determinism',                        1),
     ('opt_symb_merge',
      'merge states with same symbolic successor representation',           1),
-    ]), (
-    'Couvreur/LaCIM options', 1, color_lacim, [
+    ]
+options_trans_lacim = [
     ('show_relation_set',
      'print the transition relation as a BDD set',                         0),
     ('show_relation_png',
@@ -220,7 +219,7 @@ options = [(
      'print the acceptance relation as a BDD set',                         0),
     ('show_acceptance_png',
      'draw the acceptance relation',                                       0),
-    ])]
+    ]
 
 default_translator = 'trans_fm';
 translators = [
@@ -300,23 +299,14 @@ an indentifier: <code>aUb</code> is an atomic proposition, unlike
 
 column = [[], []]
 
-column[0].append("<TH>Algorithm</TH>")
-trans = form.getfirst("trans", default_translator)
-for opt, desc, color in translators:
-    if trans == opt:
-	str = "checked"
-    else:
-	str = ""
-    globals()[opt] = str
-    s = '<TD bgcolor=%s><INPUT type="radio" name="trans" value="%s" %s>%s</TD>'
-    column[0].append(s % (color, opt, str, desc))
-
-print """</TD></TR></TABLE><TABLE>"""
-
-for opt_group, opt_column, opt_color, opt_list in options:
+def add_options(opt_group, opt_column, opt_color, opt_list):
     if opt_color:
         opt_color = ' bgcolor="%s"' % opt_color
-    column[opt_column].append(("<TH%s>" % opt_color) + opt_group + "</TH>")
+    if opt_group:
+        column[opt_column].append(("<TH%s>" % opt_color) + opt_group + "</TH>")
+        prefix = ''
+    else:
+        prefix = '&nbsp;&nbsp;&nbsp;&nbsp;'
     for opt, desc, arg, in opt_list:
         if formula:
             val = int(form.getfirst(opt, 0))
@@ -327,8 +317,26 @@ for opt_group, opt_column, opt_color, opt_list in options:
         else:
             str = ""
         globals()[opt] = val
-        s = '<TD%s><INPUT type="checkbox" name="%s" value="1"%s>%s</TD>'
-        column[opt_column].append(s % (opt_color, opt, str, desc))
+        s = '<TD%s>%s<INPUT type="checkbox" name="%s" value="1"%s>%s</TD>'
+        column[opt_column].append((s % (opt_color, prefix, opt, str, desc)))
+
+
+column[0].append("<TH>Algorithm</TH>")
+trans = form.getfirst("trans", default_translator)
+for opt, desc, color in translators:
+    if trans == opt:
+	str = "checked"
+    else:
+	str = ""
+    globals()[opt] = str
+    s = '<TD bgcolor=%s><INPUT type="radio" name="trans" value="%s" %s>%s</TD>'
+    column[0].append(s % (color, opt, str, desc))
+    add_options('', 0, color, globals()['options_' + opt])
+
+print """</TD></TR></TABLE><TABLE>"""
+
+add_options("Common Options", 1, '', options_common)
+add_options("Debugging Options", 1, '', options_debug)
 
 print '<TABLE>'
 width = range(len(column))
