@@ -8,3 +8,10 @@ chmod +w udcs
 # F(ReP1 => F(gsP1)) is false
 ../ltlgspn-srg udcs/udcs 'F(ReP1 => F(gsP1))' ReP1 gsP1 > output
 test $? = 1 || exit 1
+
+# !F(ReP1 => F(gsP1)) is true
+../ltlgspn-srg udcs/udcs '!F(ReP1 => F(gsP1))' ReP1 gsP1 > output || exit 1
+
+# !G(ReP1 => F(gsP1)) is false
+../ltlgspn-srg udcs/udcs '!G(ReP1 => F(gsP1))' ReP1 gsP1 > output
+test $? = 1 || exit 1

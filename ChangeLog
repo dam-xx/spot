@@ -1,5 +1,12 @@
 2003-10-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/udcsfm.test, iface/gspn/udcsefm.test: New files.
+	* iface/gspn/Makefile.am (TESTS) Add them.
+	(check_PROGRAMS): Add emgspn-srg.
+	(efmgspn_srg_SOURCES, efmgspn_srg_LDADD, efmgspn_srg_CPPFLAGS): New
+	variables.
+	* iface/gspn/udcsltl.test, iface/gspn/udcseltl.test: Complete.
+
 	* src/ltlparse/ltlscan.ll: Allow doubly quoted atomic propositions.
 
 2003-10-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
