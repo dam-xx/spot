@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/pairs.c,v 1.5 2003/05/20 10:42:19 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/pairs.c,v 1.6 2003/05/22 12:07:52 aduret Exp $
   FILE:  pairs.c
   DESCR: Pair management for BDD package.
   AUTH:  Jorn Lind
@@ -206,7 +206,7 @@ bddPair *bdd_copypair(bddPair *from)
    memcpy(p->result, from->result, bddvarnum * sizeof(*p->result));
 
    p->id = update_pairsid();
-   p->last = -1;
+   p->last = from->last;
 
    bdd_register_pair(p);
    return p;

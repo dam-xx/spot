@@ -1,6 +1,7 @@
 2003-05-20  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
-	* src/pairs.c (bdd_copypair): Use memcpy to copy from->result.
+	* src/pairs.c (bdd_copypair): Use memcpy to copy from->result,
+	and correctly copy p->last from from->last.
 
 	* src/pairs.c (bdd_setbddpair): Fix prototype in documentation.
 
