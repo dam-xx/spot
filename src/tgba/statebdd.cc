@@ -16,12 +16,6 @@ namespace spot
     return o->as_bdd().id() - state_.id();
   }
 
-  void
-  state_bdd::translate(bddPair* rewrite)
-  {
-    state_ = bdd_replace(state_, rewrite);
-  }
-
   /// Duplicate a state.
   state_bdd*
   state_bdd::clone() const

@@ -23,7 +23,6 @@ namespace spot
     }
 
     virtual int compare(const state* other) const;
-    virtual void translate(bddPair* rewrite);
     virtual state_bdd* clone() const;
 
   protected:

@@ -22,18 +22,6 @@ namespace spot
     /// \sa spot::state_ptr_less_than
     virtual int compare(const state* other) const = 0;
 
-    /// \brief Translate a state.
-    ///
-    /// If this state uses any BDD variable.  This function
-    /// should rewrite the variables according to \a rewrite.
-    /// This used by spot::tgba_translate_proxy.
-    virtual void translate(bddPair* rewrite)
-    {
-      // This does nothing by default and is
-      // overridden in spot::state_bdd.
-      (void) rewrite;
-    }
-
     /// Duplicate a state.
     virtual state* clone() const = 0;
 

@@ -1,3 +1,8 @@
+2003-08-14  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/state.hh, src/tgba/statebdd.hh, src/tgba/statebdd.cc:
+	Remove the translate() method.  Useless since 2003-07-14.
+
 2003-08-11  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* wrap/python/Makefile.am (SUBDIRS): Build `.' first.
