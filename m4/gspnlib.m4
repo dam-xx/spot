@@ -2,11 +2,11 @@ AC_DEFUN([AX_CHECK_GSPNLIB], [
   AC_ARG_WITH([gspn],
 	      [AC_HELP_STRING([--with-gpsn=/root/of/greatspn],
 			      [build interface with GreadSPN])])
-  if test x${with_gspn-no} != xno; then
+  if test "x${with_gspn-no}" != xno; then
     ax_tmp_LDFLAGS=$LDFLAGS
     ax_tmp_LIBS=$LIBS
     LIBGSPN_LDFLAGS=
-    if test x${with_gspn-yes} != xyes; then
+    if test "x${with_gspn-yes}" != xyes; then
        # Try to locate the headers and libraries.
        gspn_version_sh=$with_gspn/SOURCES/contrib/version.sh;
        AC_CHECK_FILE($gspn_version_sh,,
@@ -27,13 +27,16 @@ AC_DEFUN([AX_CHECK_GSPNLIB], [
      LIBGSPNSRG_LDFLAGS="$LIBGSPN_LDFLAGS -lgspnSRG -lm -lfl"
 
      LDFLAGS="$LDFLAGS $LIBGSPN_LDFLAGS"
-     AC_CHECK_LIB([gspnESRG], [initialize], [],
-	[AC_MSG_ERROR([Cannot find libgspnESRG.  Check --with-gspn's argument.])],        [-lm -lfl])
+     # Soheib Baarir is working on this library, and it is not part
+     # of the GreatSPN repository yet.  Use it only if it is here.
+     AC_CHECK_LIB([gspnESRG], [initialize], [have_eesrg=yes],
+	          [have_eesrg=no], [-lm -lfl])
      LIBGSPNESRG_LDFLAGS="$LIBGSPN_LDFLAGS -lgspnESRG -lm -lfl"
      LDFLAGS="$ax_tmp_LDFLAGS"
      LIBS="$ax_tmp_LIBS"
   fi
-  AM_CONDITIONAL([WITH_GSPN], [test x${with_gspn+set} = xset])
+  AM_CONDITIONAL([WITH_GSPN], [test "x${with_gspn-no}" != xno])
+  AM_CONDITIONAL([WITH_GSPN_EESRG], [test "x${have_eesrg-no}" != xno])
   AC_SUBST([LIBGSPN_CPPFLAGS])
   AC_SUBST([LIBGSPNRG_LDFLAGS])
   AC_SUBST([LIBGSPNSRG_LDFLAGS])

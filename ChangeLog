@@ -1,5 +1,13 @@
 2004-01-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* m4/gspnlib.m4 (AX_CHECK_GSPNLIB): Do not warn about a missing
+	library for eesrg.  Define the WITH_GSPN_EESRG conditional.
+	* iface/gspn/Makefile.am (gspn_HEADERS, check_PROGRAMS): Add the
+	eesrg items in condition WITH_GSPN_EESRG.
+	(libspotgspneesrg_la_LIBADD, libspotgspneesrg_la_CPPFLAGS)
+	(libspotgspneesrg_la_SOURCES): Define only in condition
+	WITH_GSPN_EESRG.
+
 	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::print_stats):
 	New function.
 	* src/tgbaalgos/emptinesscheck.hh (emptiness_check::print_stats):

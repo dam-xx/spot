@@ -1,4 +1,4 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -26,8 +26,7 @@ gspndir = $(pkgincludedir)/gspn
 
 gspn_HEADERS = \
   common.hh \
-  gspn.hh \
-  eesrg.hh
+  gspn.hh
 
 lib_LTLIBRARIES = libspotgspn.la libspotgspneesrg.la
 libspotgspn_la_LIBADD = $(top_builddir)/src/libspot.la
@@ -35,19 +34,25 @@ libspotgspn_la_SOURCES = \
   common.cc \
   gspn.cc
 
+check_PROGRAMS = \
+  dottygspn-rg \
+  dottygspn-srg \
+  ltlgspn-rg \
+  ltlgspn-srg
+
+if WITH_GSPN_EESRG
+gspn_HEADERS += eesrg.hh
+check_PROGRAMS += \
+  dottygspn-eesrg \
+  ltleesrg
+
 libspotgspneesrg_la_LIBADD = $(top_builddir)/src/libspot.la
 libspotgspneesrg_la_CPPFLAGS = -DESYMBOLIC $(AM_CPPFLAGS)
 libspotgspneesrg_la_SOURCES = \
   common.cc \
   eesrg.cc
+endif
 
-check_PROGRAMS = \
-  dottygspn-rg \
-  dottygspn-srg \
-  dottygspn-eesrg \
-  ltlgspn-rg \
-  ltlgspn-srg \
-  ltleesrg
 
 dottygspn_rg_SOURCES = dottygspn.cc
 dottygspn_rg_LDADD = libspotgspn.la $(LIBGSPNRG_LDFLAGS)
