@@ -1,5 +1,10 @@
 2003-06-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* doc/Makefile.am (doc): Typo.
+	* src/ltlvisit/tostring.hh (to_string): Add doxygen comments.
+	* src/ltlast/multop.hh (multop::paircmp): Add doxygen comments.
+	* src/ltlvisit/postfix.hh: Typo.
+
 	* src/ltlast/Makefile.am (ltlastdir, ltlast_HEADERS): New variables.
 	(libltlast_la_SOURCES): Move all headers to ltlast_HEADERS.
 	* src/ltlenv/Makefile.am (ltlenvdir, ltlenv_HEADERS): New variables.

@@ -42,4 +42,3 @@ libtgba_la_SOURCES = \
   tgbaexplicit.cc \
   tgbaproduct.cc \
   tgbatranslateproxy.cc
-

@@ -4,7 +4,7 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 tgbaparsedir = $(pkgincludedir)/tgbaparse
 
 tgbaparse_HEADERS = \
-  public.hh  
+  public.hh
 
 noinst_LTLIBRARIES = libtgbaparse.la
 

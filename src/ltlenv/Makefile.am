@@ -9,4 +9,4 @@ ltlenv_HEADERS = \
 
 noinst_LTLIBRARIES = libltlenv.la
 libltlenv_la_SOURCES = \
-  defaultenv.cc 
+  defaultenv.cc

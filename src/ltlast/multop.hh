@@ -70,6 +70,7 @@ namespace spot
 
 
       typedef std::pair<type, vec*> pair;
+      /// Comparison functor used internally by ltl::multop.
       struct paircmp
       {
 	bool

@@ -1,8 +1,8 @@
 AM_CPPFLAGS = -I$(srcdir)/..
 LDADD = ../ltlparse/libltlparse.la \
-        ../ltlvisit/libltlvisit.la \
+	../ltlvisit/libltlvisit.la \
 	../ltlenv/libltlenv.la \
-        ../ltlast/libltlast.la
+	../ltlast/libltlast.la
 
 check_SCRIPTS = defs
 # Keep this sorted alphabetically.

@@ -5,8 +5,8 @@ DOXYGEN = doxygen
 all-local: $(srcdir)/stamp
 
 doc:
-	rm $(srcdir)/stamp
-	$(AMKE) $(srcdir)/stamp
+	rm -f $(srcdir)/stamp
+	$(MAKE) $(srcdir)/stamp
 
 $(srcdir)/stamp: $(srcdir)/Doxyfile.in $(top_srcdir)/configure.ac
 	$(MAKE) Doxyfile

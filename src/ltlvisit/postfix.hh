@@ -8,7 +8,7 @@ namespace spot
 {
   namespace ltl
   {
-    /// \brief Apply a algorithm on each node of an AST,
+    /// \brief Apply an algorithm on each node of an AST,
     /// during a postfix traversal.
     ///
     /// Override one or more of the postifix_visitor::doit methods

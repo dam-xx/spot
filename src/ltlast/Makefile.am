@@ -24,4 +24,3 @@ libltlast_la_SOURCES = \
   multop.cc \
   refformula.cc \
   unop.cc
-

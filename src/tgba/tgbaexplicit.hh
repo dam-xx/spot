@@ -21,6 +21,8 @@ namespace spot
 
     struct transition;
     typedef std::list<transition*> state;
+
+    /// Explicit transitions (used by spot::tgba_explicit).
     struct transition
     {
       bdd condition;
@@ -65,6 +67,7 @@ namespace spot
   };
 
 
+  /// States used by spot::tgba_explicit.
   class state_explicit : public spot::state
   {
   public:
@@ -87,6 +90,7 @@ namespace spot
   };
 
 
+  /// Successor iterators used by spot::tgba_explicit.
   class tgba_explicit_succ_iterator : public tgba_succ_iterator
   {
   public:
