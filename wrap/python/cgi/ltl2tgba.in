@@ -329,12 +329,7 @@ if show_formula_gif:
     outfile = spot.ofstream(imgprefix + '-f.dot')
     spot.dotty(outfile, f)
     del outfile
-    os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
-               imgprefix + '-f.gif', imgprefix + '-f.dot')
-    os.spawnlp(os.P_WAIT, 'convert', 'convert',
-               imgprefix + '-f.gif', imgprefix + '-f.png')
-    print '<img src="' + imgprefix + '-f.png">'
-
+    render_dot(imgprefix + '-f')
 
 print '<H2>Automaton</H2>'
 

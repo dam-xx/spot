@@ -41,3 +41,5 @@ You have to install the script yourself if you want to test it.
    each time it runs.
 
 4) `dot', from the GraphViz package, should be in the PATH.
+
+5) Apache should have its unique_id module loaded.

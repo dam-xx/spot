@@ -1,4 +1,10 @@
-2004-02-08  Alexandre Duret-Lutz  <adl@gnu.org>
+2004-02-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* wrap/python/cgi/ltl2tgba.in: Use render_dot when
+	showing formula.
+	* wrap/python/cgi/README: Mention unique_id.
+
+2004-02-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	This should help getting accurate statistics (on both the
 	formula automaton and the synchronized product) from LBTT.
