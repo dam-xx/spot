@@ -25,11 +25,17 @@ AC_DEFUN([AX_CHECK_GSPNLIB], [
      AC_CHECK_LIB([gspnSRG], [initialize], [],
 	[AC_MSG_ERROR([Cannot find libgspnSRG.  Check --with-gspn's argument.])],        [-lm -lfl])
      LIBGSPNSRG_LDFLAGS="$LIBGSPN_LDFLAGS -lgspnSRG -lm -lfl"
+
+     LDFLAGS="$LDFLAGS $LIBGSPN_LDFLAGS"
+     AC_CHECK_LIB([gspnESRG], [initialize], [],
+	[AC_MSG_ERROR([Cannot find libgspnESRG.  Check --with-gspn's argument.])],        [-lm -lfl])
+     LIBGSPNESRG_LDFLAGS="$LIBGSPN_LDFLAGS -lgspnESRG -lm -lfl"
      LDFLAGS="$ax_tmp_LDFLAGS"
      LIBS="$ax_tmp_LIBS"
   fi
   AM_CONDITIONAL([WITH_GSPN], [test x${with_gspn+set} = xset])
   AC_SUBST([LIBGSPN_CPPFLAGS])
-  AC_SUBST([LIBGSPNRG_LDFLAGS])]
+  AC_SUBST([LIBGSPNRG_LDFLAGS])
   AC_SUBST([LIBGSPNSRG_LDFLAGS])
-)
+  AC_SUBST([LIBGSPNESRG_LDFLAGS])
+])

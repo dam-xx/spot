@@ -4,16 +4,25 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 gspndir = $(pkgincludedir)/gspn
 
 gspn_HEADERS = \
+  common.hh \
   gspn.hh
 
-lib_LTLIBRARIES = libspotgspn.la
+lib_LTLIBRARIES = libspotgspn.la libspotgspneesrg.la
 libspotgspn_la_LIBADD = $(top_builddir)/src/libspot.la
 libspotgspn_la_SOURCES = \
+  common.cc \
   gspn.cc
+
+libspotgspneesrg_la_LIBADD = $(top_builddir)/src/libspot.la
+libspotgspneesrg_la_CPPFLAGS = -DESYMBOLIC $(AM_CPPFLAGS)
+libspotgspneesrg_la_SOURCES = \
+  common.cc \
+  eesrg.cc
 
 check_PROGRAMS = \
   dottygspn-rg \
   dottygspn-srg \
+  dottygspn-eesrg \
   ltlgspn-rg \
   ltlgspn-srg
 
@@ -22,6 +31,9 @@ dottygspn_rg_LDADD = libspotgspn.la $(LIBGSPNRG_LDFLAGS)
 
 dottygspn_srg_SOURCES = dottygspn.cc
 dottygspn_srg_LDADD = libspotgspn.la $(LIBGSPNSRG_LDFLAGS)
+
+dottygspn_eesrg_SOURCES = dottyeesrg.cc
+dottygspn_eesrg_LDADD = libspotgspneesrg.la $(LIBGSPNESRG_LDFLAGS)
 
 ltlgspn_rg_SOURCES = ltlgspn.cc
 ltlgspn_rg_LDADD = libspotgspn.la $(LIBGSPNRG_LDFLAGS)

@@ -1,3 +1,19 @@
+2003-10-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* m4/gspnlib.m4: Define LIBGSPNESRG_LDFLAGS.
+	* iface/gspn/Makefile.am (gspn_HEADERS): Add common.hh.
+	(libspotgspn_la_SOURCES): Add common.cc.
+	(libspotgspneesrg_la_LIBADD, libspotgspneesrg_la_CPPFLAGS)
+	(libspotgspneesrg_la_SOURCES, ltlgspn_eesrg_SOURCES)
+	(dotty_eesrg_LDADD, dotty_eesrg_CPPFLAGS): New variables.
+	(lib_LTLIBRARIES): Add libspotgspneesrg.la.
+	(check_PROGRAMS): Add dottygspn-eesrg.
+	* iface/gspn/gspn.hh, iface/gspn/gspn.cc
+	(gspn_exeption, operator<<(gspn_exeption), gspn_environment): Move ...
+	* iface/gspn/common.hh, iface/gspn/common.cc: ... in these new files.
+	* iface/gspn/eesrg.hh, iface/gspn/eesrg.cc, iface/gspn/dottyeesrg.cc:
+	New files.
+
 2003-10-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::complete_cycle):
