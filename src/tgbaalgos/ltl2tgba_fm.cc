@@ -148,6 +148,9 @@ namespace spot
 	if (isi != dict->var_formula_map.end())
 	  return clone(isi->second);
 	assert(0);
+	// Never reached, but some GCC versions complain about
+	// a missing return otherwise.
+	return 0;
       }
 
       formula*

@@ -1,5 +1,8 @@
 2004-05-04  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba_fm.cc: Add a superfluous return to pacify
+	some GCC version.  Report from Denis Poitrenaud.
+
 	* wrap/python/cgi/ltl2tgba.in: Fix output HTML.
 
 2004-05-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
