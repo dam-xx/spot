@@ -99,6 +99,16 @@ namespace spot
     return change;
   }
 
+  bool
+  spoiler_node_delayed::compare(spoiler_node* n)
+  {
+    std::cout << "spoiler_node_delayed::compare" << std::endl;
+    return (this->spoiler_node::compare(n) &&
+	    (acceptance_condition_visited_ ==
+	     dynamic_cast<spoiler_node_delayed*>(n)->
+	     get_acceptance_condition_visited()));
+  }
+
   std::string
   spoiler_node_delayed::to_string(const tgba* a)
   {
@@ -128,13 +138,13 @@ namespace spot
   }
 
   bdd
-  spoiler_node_delayed::get_acceptance_condition_visited()
+  spoiler_node_delayed::get_acceptance_condition_visited() const
   {
     return acceptance_condition_visited_;
   }
 
   int
-  spoiler_node_delayed::get_progress_measure()
+  spoiler_node_delayed::get_progress_measure() const
   {
     if ((acceptance_condition_visited_ == bddfalse) &&
 	(progress_measure_ != (nb_spoiler_loose_ + 1)))
@@ -180,7 +190,8 @@ namespace spot
     sn_v::iterator i = lnode_succ->begin();
     if (i != lnode_succ->end())
       {
-	tmpmin = dynamic_cast<spoiler_node_delayed*>(*i)->get_progress_measure();
+	tmpmin =
+	  dynamic_cast<spoiler_node_delayed*>(*i)->get_progress_measure();
 	/*
 	  debug &= (dynamic_cast<spoiler_node_delayed*>(*i)
 	  ->get_acceptance_condition_visited()
@@ -550,6 +561,7 @@ namespace spot
     //bool exist_pred = false;
 
     sn_v::iterator i1;
+    int n = 0;
     for (i1 = spoiler_vertice_.begin(); i1 != spoiler_vertice_.end(); ++i1)
       {
 	/*
@@ -584,6 +596,7 @@ namespace spot
 	// We add a link between a spoiler and a (new) duplicator.
 	// The acc of the duplicator must contains the
 	// acceptance_condition_visited_ of the spoiler.
+	std::cout << "build_link : iter " << ++n << std::endl;
 	build_recurse_successor_spoiler(*i1);
 
       }
@@ -615,16 +628,21 @@ namespace spot
 	    if (s->compare(*i1) == 0)
 	      {
 		duplicator_node_delayed* dn
-		  = new duplicator_node_delayed(*i1,
+		  = add_duplicator_node_delayed(*i1,
 						sn->get_duplicator_node(),
 						si->current_condition(),
 						btmp,
 						nb_node_parity_game++);
-		duplicator_vertice_.push_back(dn);
 
 		// dn is already a successor of sn.
+		std::cout << "spoiler call add_succ" << std::endl;
 		if (!(sn->add_succ(dn)))
-		  continue;
+		  {
+		    std::cout << "dn is already a successor of sn."
+			      << std::endl;
+		    continue;
+		  }
+		std::cout << "dn is a new successor of sn." << std::endl;
 		(dn)->add_pred(sn);
 
 		/* TEST
@@ -662,6 +680,11 @@ namespace spot
 	    get_acceptance_condition_visited();
 	bdd btmp2 = btmp - si->current_acceptance_conditions();
 
+	/*
+	if (btmp2 == bddfalse)
+	  continue;
+	*/
+
 	s_v::iterator i1;
 	state* s;
 	for (i1 = tgba_state_.begin();
@@ -671,15 +694,20 @@ namespace spot
 	    if (s->compare(*i1) == 0)
 	      {
 		spoiler_node_delayed* sn_n
-		  = new spoiler_node_delayed(sn->get_spoiler_node(),
+		  = add_spoiler_node_delayed(sn->get_spoiler_node(),
 					     *i1,
 					     btmp2,
 					     nb_node_parity_game++);
-		spoiler_vertice_.push_back(sn_n);
 
-		// dn is already a successor of sn.
+		// sn_n is already a successor of dn.
+		std::cout << "duplicator call add_succ" << std::endl;
 		if (!(dn->add_succ(sn_n)))
-		  continue;
+		  {
+		    std::cout << "sn_n is already a successor of dn."
+			      << std::endl;
+		    continue;
+		  }
+		std::cout << "sn_n is a new successor of dn." << std::endl;
 		(sn_n)->add_pred(dn);
 
 		build_recurse_successor_spoiler(sn_n);
@@ -693,13 +721,67 @@ namespace spot
 
   }
 
-
-  void
-  parity_game_graph_delayed::add_dup_node(state*,
-					  state*,
-					  bdd,
-					  bdd)
+  duplicator_node_delayed*
+  parity_game_graph_delayed::add_duplicator_node_delayed(const spot::state* sn,
+							 const spot::state* dn,
+							 bdd acc,
+							 bdd label,
+							 int nb)
   {
+    bool exist = false;
+
+    duplicator_node_delayed* dn_n
+      = new duplicator_node_delayed(sn, dn, acc, label, nb);
+
+    for (Sgi::vector<duplicator_node*>::iterator i
+	       = duplicator_vertice_.begin();
+	     i != duplicator_vertice_.end(); ++i)
+      {
+	std::cout << "COMPARE" << std::endl;
+	if (dn_n->compare(*i))
+	  {
+	    exist = true;
+	    delete dn_n;
+	    dn_n = dynamic_cast<duplicator_node_delayed*>(*i);
+	    break;
+	  }
+      }
+
+    if (!exist)
+      duplicator_vertice_.push_back(dn_n);
+
+    return dn_n;
+  }
+
+  spoiler_node_delayed*
+  parity_game_graph_delayed::add_spoiler_node_delayed(const spot::state* sn,
+						      const spot::state* dn,
+						      bdd acc,
+						      int nb)
+  {
+    bool exist = false;
+
+    spoiler_node_delayed* sn_n
+      = new spoiler_node_delayed(sn, dn, acc, nb);
+
+    for (Sgi::vector<spoiler_node*>::iterator i
+	   = spoiler_vertice_.begin();
+	 i != spoiler_vertice_.end(); ++i)
+      {
+	std::cout << "COMPARE" << std::endl;
+	if (sn_n->compare(*i))
+	  {
+	    exist = true;
+	    delete sn_n;
+	    sn_n = dynamic_cast<spoiler_node_delayed*>(*i);
+	    break;
+	  }
+      }
+
+    if (!exist)
+      spoiler_vertice_.push_back(sn_n);
+
+    return sn_n;
   }
 
   void
@@ -707,6 +789,13 @@ namespace spot
   {
 
     bool change = true;
+
+    std::cout << "prune : nb spoiler : "
+	      << spoiler_vertice_.size()
+	      << std::endl
+	      << "prune : nb duplicator : "
+	      << duplicator_vertice_.size()
+	      << std::endl;
 
     while (change)
       {
@@ -718,6 +807,7 @@ namespace spot
 	  {
 	    if ((*i)->get_nb_succ() == 0)
 	      {
+		std::cout << "Remove duplicator" << std::endl;
 		(*i)->del_pred();
 		delete *i;
 		i = duplicator_vertice_.erase(i);
@@ -732,6 +822,7 @@ namespace spot
 	  {
 	    if ((*i)->get_nb_succ() == 0)
 	      {
+		std::cout << "Remove spoiler" << std::endl;
 		(*i)->del_pred();
 		delete *i;
 		i = spoiler_vertice_.erase(i);
@@ -742,6 +833,13 @@ namespace spot
 	  }
       }
     std::cout << "prune::change = false" << std::endl;
+
+    std::cout << "prune : nb spoiler : "
+	      << spoiler_vertice_.size()
+	      << std::endl
+	      << "prune : nb duplicator : "
+	      << duplicator_vertice_.size()
+	      << std::endl;
   }
 
   void
@@ -836,12 +934,15 @@ namespace spot
   {
     /// FIXME : this method is incorrect !!
     /// Don't use it !!
-    parity_game_graph_delayed* G = new parity_game_graph_delayed(f);
-    simulation_relation* rel = G->get_relation();
-    if (opt == 1)
+    /*
+      parity_game_graph_delayed* G = new parity_game_graph_delayed(f);
+      simulation_relation* rel = G->get_relation();
+      if (opt == 1)
       G->print(std::cout);
-    delete G;
-    return rel;
+      delete G;
+    */
+
+    return get_direct_relation_simulation(f, opt);
   }
 
 }

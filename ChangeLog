@@ -1,3 +1,12 @@
+2004-06-22  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/tgbatest/ltl2tgba.cc, src/tgbaalgos/reductgba_sim_del.cc,
+	src/tgbaalgos/reductgba_sim.hh, src/tgbaalgos/reductgba_sim.cc:
+	bug in delayed simulation.
+
+	* src/tgbatest/reduccmp.test, src/tgbatest/reductgba.test,
+	src/tgba/tgbareduc.cc: bug in scc reduction.
+
 2004-06-21  Thomas Martinez  <martinez@src.lip6.fr>
 
 	* src/tgbatest/reductgba.test, src/tgba/tgbareduc.cc:

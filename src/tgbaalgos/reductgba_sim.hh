@@ -144,6 +144,7 @@ namespace spot
     virtual bool set_win();
     virtual std::string to_string(const tgba* a);
     virtual std::string succ_to_string();
+    virtual bool compare(spoiler_node* n);
 
     const state* get_spoiler_node();
     const state* get_duplicator_node();
@@ -172,9 +173,13 @@ namespace spot
 
     virtual bool set_win();
     virtual std::string to_string(const tgba* a);
+    virtual bool compare(spoiler_node* n);
 
     bool match(bdd l, bdd a);
     bool implies(bdd l, bdd a);
+
+    bdd get_label() const;
+    bdd get_acc() const;
 
   protected:
     bdd label_;
@@ -213,11 +218,12 @@ namespace spot
 
     /// Return true if the progress_measure has changed.
     bool set_win();
-    bdd get_acceptance_condition_visited();
+    bdd get_acceptance_condition_visited() const;
+    virtual bool compare(spoiler_node* n);
 
     virtual std::string to_string(const tgba* a);
 
-    int get_progress_measure();
+    int get_progress_measure() const;
 
   protected:
     /// a Bdd for retain all the acceptance condition
@@ -291,13 +297,18 @@ namespace spot
     /// Compute sub_set_acc_cond_;
     void build_sub_set_acc_cond();
 
-    /// Add a duplicator node, and
-    /// all his successor (spoiler node) which
-    /// have a acceptance_condition_visited_ != bddfalse
-    void add_dup_node(state* ss,
-		      state* sd,
-		      bdd l,
-		      bdd a);
+    ///
+    duplicator_node_delayed* add_duplicator_node_delayed(const spot::state* sn,
+							 const spot::state* dn,
+							 bdd acc,
+							 bdd label,
+							 int nb);
+
+    ///
+    spoiler_node_delayed* add_spoiler_node_delayed(const spot::state* sn,
+						   const spot::state* dn,
+						   bdd acc,
+						   int nb);
 
     /// \brief Compute the couple as for direct simulation,
     virtual void build_couple();

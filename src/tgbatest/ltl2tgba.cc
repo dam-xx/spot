@@ -404,7 +404,7 @@ main(int argc, char** argv)
 	      if (reduc_aut & spot::Reduce_Dir_Sim)
 		rel = spot::get_direct_relation_simulation(a);
 	      else if (reduc_aut & spot::Reduce_Del_Sim)
-		rel = spot::get_delayed_relation_simulation(a, 1);
+		rel = spot::get_delayed_relation_simulation(a);
 	      else
 		assert(0);
 

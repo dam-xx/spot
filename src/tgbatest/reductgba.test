@@ -21,7 +21,7 @@
 # 02111-1307, USA.
 
 
-#. ./defs
+. ./defs
 
 set -e
 
@@ -34,22 +34,22 @@ check()
 # We don't check the output, but just running these might be enough to
 # trigger assertions.
 
-#check 0 'Fa & Xb & GFc & Gd'
-#check 0 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+check 0 'Fa & Xb & GFc & Gd'
+check 0 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
 
-#check 0 a
-#check 0 'a U b'
-#check 0 'a U Fb'
-#check 0 'X a'
-#check 0 'a & b & c'
-#check 0 'a | b | (c U (d & (g U (h ^ i))))'
-#check 0 'Xa & (b U !a) & (b U !a)'
-#check 0 'Fa & Xb & GFc & Gd'
-#check 0 'Fa & Xa & GFc & Gc'
-#check 0 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
-#check 0 'a R (b R c)'
-#check 0 '(a U b) U (c U d)'
-#check 0 '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
+check 0 a
+check 0 'a U b'
+check 0 'a U Fb'
+check 0 'X a'
+check 0 'a & b & c'
+check 0 'a | b | (c U (d & (g U (h ^ i))))'
+check 0 'Xa & (b U !a) & (b U !a)'
+check 0 'Fa & Xb & GFc & Gd'
+check 0 'Fa & Xa & GFc & Gc'
+check 0 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+check 0 'a R (b R c)'
+check 0 '(a U b) U (c U d)'
+check 0 '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
 
 # No reduction
 check 1 a
@@ -66,22 +66,22 @@ check 1 '(a U b) U (c U d)'
 check 1 '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
 
 #reduction
-#check 1 'a U Fb'
+check 1 'a U Fb'
 
-#check 3 a
-#check 3 'a U b'
-#check 3 'a U Fb'
+check 3 a
+check 3 'a U b'
+check 3 'a U Fb'
 
-#check 3 a
-#check 3 'a U b'
-#check 3 'a U Fb'
-#check 3 'X a'
-#check 3 'a & b & c'
-#check 3 'a | b | (c U (d & (g U (h ^ i))))'
-#check 3 'Xa & (b U !a) & (b U !a)'
-#check 3 'Fa & Xb & GFc & Gd'
-#check 3 'Fa & Xa & GFc & Gc'
-#check 3 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
-#check 3 'a R (b R c)'
-#check 3 '(a U b) U (c U d)'
-#check 3 '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
+check 3 a
+check 3 'a U b'
+check 3 'a U Fb'
+check 3 'X a'
+check 3 'a & b & c'
+check 3 'a | b | (c U (d & (g U (h ^ i))))'
+check 3 'Xa & (b U !a) & (b U !a)'
+check 3 'Fa & Xb & GFc & Gd'
+check 3 'Fa & Xa & GFc & Gc'
+check 3 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+check 3 'a R (b R c)'
+check 3 '(a U b) U (c U d)'
+check 3 '((Xp2)U(X(1)))*(p1 R(p2 R p0))'

@@ -35,7 +35,7 @@ namespace spot
     sc_ = new state_couple(d_node, s_node);
     lnode_succ = new sn_v;
     lnode_pred = new sn_v;
-    this->not_win = false;
+    not_win = false;
   }
 
   spoiler_node::~spoiler_node()
@@ -50,15 +50,27 @@ namespace spot
   bool
   spoiler_node::add_succ(spoiler_node* n)
   {
-    /*
-      bool exist = false;
-      for (sn_v::iterator i = lnode_succ->begin();
-      i != lnode_succ->end();)
+    //std::cout << "spoiler_node::add_succ" << std::endl;
+    bool exist = false;
+    for (sn_v::iterator i = lnode_succ->begin();
+	 i != lnode_succ->end(); ++i)
+      // Be careful, we have to compare two duplicator node
       if (*i == n)
-      exist = true;
-      if (exist)
+	exist = true;
+    if (exist)
+      return false;
+    // TO TEST FOR THE DIRECT SIMULATION //
+    /*
+    bool exist = false;
+    for (sn_v::iterator i = lnode_succ->begin();
+	 i != lnode_succ->end(); ++i)
+      // Be careful, we have to compare two duplicator node
+      if (dynamic_cast<duplicator_node*>(*i)->compare(n) == 0)
+	exist = true;
+    if (exist)
       return false;
     */
+    ///////////////
     lnode_succ->push_back(n);
     return true;
   }
@@ -81,15 +93,15 @@ namespace spot
   void
   spoiler_node::add_pred(spoiler_node* n)
   {
-    /*
-      bool exist = false;
-      for (sn_v::iterator i = lnode_pred->begin();
-      i != lnode_pred->end();)
-      if (*i == n)
-      exist = true;
-      if (!exist)
-    */
-    lnode_pred->push_back(n);
+    // TO TEST FOR THE DIRECT SIMULATION //
+    bool exist = false;
+    for (sn_v::iterator i = lnode_pred->begin();
+	 i != lnode_pred->end(); ++i)
+      if ((*i)->compare(n) == 0)
+	exist = true;
+    if (!exist)
+      ///////////////
+      lnode_pred->push_back(n);
   }
 
   void
@@ -137,6 +149,14 @@ namespace spot
 	os << num_ << " -> " << (*i)->num_ << std::endl;
       }
     return os.str();
+  }
+
+  bool
+  spoiler_node::compare(spoiler_node* n)
+  {
+    //std::cout << "spoiler_node::compare" << std::endl;
+    return (((sc_->first)->compare((n->get_pair())->first) == 0) &&
+	    ((sc_->second)->compare((n->get_pair())->second) == 0));
   }
 
   int
@@ -197,6 +217,7 @@ namespace spot
 	    not_win &= (*i)->not_win;
 	  }
       }
+
     return (change != not_win);
   }
 
@@ -212,11 +233,34 @@ namespace spot
        << ", "
        << a->format_state(sc_->second)
        << ", ";
+    bdd_print_acc(os, a->get_dict(), label_);
+    os << ", ";
     bdd_print_acc(os, a->get_dict(), acc_);
     os << ")\"]"
        << std::endl;
 
     return os.str();
+  }
+
+  bool
+  duplicator_node::compare(spoiler_node* n)
+  {
+    //std::cout << "duplicator_node::compare" << std::endl;
+    return (this->spoiler_node::compare(n) &&
+	    (label_ == dynamic_cast<duplicator_node*>(n)->get_label()) &&
+	    (acc_ == dynamic_cast<duplicator_node*>(n)->get_acc()));
+  }
+
+  bdd
+  duplicator_node::get_label() const
+  {
+    return label_;
+  }
+
+  bdd
+  duplicator_node::get_acc() const
+  {
+    return acc_;
   }
 
   bool
@@ -552,7 +596,7 @@ namespace spot
 	    // We remove the state in rel from seen
 	    // because the destructor of
 	    // tgba_reachable_iterator_breadth_first
-	    // delete all the state.
+	    // delete all instance of state.
 
 
    	    if ((j = seen.find(p->first)) != seen.end())

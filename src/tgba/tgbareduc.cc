@@ -121,7 +121,8 @@ namespace spot
   {
     if (!scc_computed_)
       this->compute_scc();
-    this->delete_scc();
+    // FIXME
+    // this->delete_scc();
   }
 
   std::string
@@ -334,7 +335,7 @@ namespace spot
       name_state_map_[tgba_explicit::format_state(s)];
 
     // for all successor q of s, we remove s of the predecessor of q.
-
+    // Note that the initial node can't be removed.
     for (state::iterator j = st->begin(); j != st->end(); ++j)
       this->remove_predecessor_state((*j)->dest, st);
 
@@ -591,6 +592,8 @@ namespace spot
 		state_scc_v_.erase(i);
 		break;
 	      }
+	    //else
+	    delete s;
 	    std::cout << "end is_terminal" << std::endl;
 	  }
       }
