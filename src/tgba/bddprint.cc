@@ -6,7 +6,7 @@
 namespace spot
 {
   /// Global dictionary used by print_handler() to lookup variables.
-  static const tgba_bdd_dict* dict;
+  static const bdd_dict* dict;
 
   /// Global flag to enable Acc[x] output (instead of `x').
   static bool want_acc;
@@ -15,7 +15,7 @@ namespace spot
   static void
   print_handler(std::ostream& o, int var)
   {
-    tgba_bdd_dict::vf_map::const_iterator isi =
+    bdd_dict::vf_map::const_iterator isi =
       dict->var_formula_map.find(var);
     if (isi != dict->var_formula_map.end())
       to_string(isi->second, o);
@@ -80,9 +80,9 @@ namespace spot
   }
 
   std::ostream&
-  bdd_print_sat(std::ostream& os, const tgba_bdd_dict& d, bdd b)
+  bdd_print_sat(std::ostream& os, const bdd_dict* d, bdd b)
   {
-    dict = &d;
+    dict = d;
     where = &os;
     want_acc = false;
     assert(bdd_satone(b) == b);
@@ -106,9 +106,9 @@ namespace spot
   }
 
   std::ostream&
-  bdd_print_acc(std::ostream& os, const tgba_bdd_dict& d, bdd b)
+  bdd_print_acc(std::ostream& os, const bdd_dict* d, bdd b)
   {
-    dict = &d;
+    dict = d;
     where = &os;
     want_acc = false;
     bdd_allsat(b, print_acc_handler);
@@ -116,7 +116,7 @@ namespace spot
   }
 
   std::string
-  bdd_format_sat(const tgba_bdd_dict& d, bdd b)
+  bdd_format_sat(const bdd_dict* d, bdd b)
   {
     std::ostringstream os;
     bdd_print_sat(os, d, b);
@@ -124,9 +124,9 @@ namespace spot
   }
 
   std::ostream&
-  bdd_print_set(std::ostream& os, const tgba_bdd_dict& d, bdd b)
+  bdd_print_set(std::ostream& os, const bdd_dict* d, bdd b)
   {
-    dict = &d;
+    dict = d;
     want_acc = true;
     bdd_strm_hook(print_handler);
     os << bddset << b;
@@ -135,7 +135,7 @@ namespace spot
   }
 
   std::string
-  bdd_format_set(const tgba_bdd_dict& d, bdd b)
+  bdd_format_set(const bdd_dict* d, bdd b)
   {
     std::ostringstream os;
     bdd_print_set(os, d, b);
@@ -143,9 +143,9 @@ namespace spot
   }
 
   std::ostream&
-  bdd_print_dot(std::ostream& os, const tgba_bdd_dict& d, bdd b)
+  bdd_print_dot(std::ostream& os, const bdd_dict* d, bdd b)
   {
-    dict = &d;
+    dict = d;
     want_acc = true;
     bdd_strm_hook(print_handler);
     os << bdddot << b;
@@ -154,9 +154,9 @@ namespace spot
   }
 
   std::ostream&
-  bdd_print_table(std::ostream& os, const tgba_bdd_dict& d, bdd b)
+  bdd_print_table(std::ostream& os, const bdd_dict* d, bdd b)
   {
-    dict = &d;
+    dict = d;
     want_acc = true;
     bdd_strm_hook(print_handler);
     os << bddtable << b;

@@ -1,7 +1,9 @@
 #include <iostream>
+#include <cassert>
 #include "tgbaparse/public.hh"
 #include "tgba/tgbaexplicit.hh"
 #include "tgbaalgos/dotty.hh"
+#include "ltlast/allnodes.hh"
 
 void
 syntax(char* prog)
@@ -29,10 +31,12 @@ main(int argc, char** argv)
       filename_index = 2;
     }
 
+  spot::bdd_dict* dict = new spot::bdd_dict();
+
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::tgba_parse_error_list pel;
   spot::tgba_explicit* a = spot::tgba_parse(argv[filename_index],
-					    pel, env, debug);
+					    pel, dict, env, debug);
 
   if (spot::format_tgba_parse_errors(std::cerr, pel))
     return 2;
@@ -46,5 +50,12 @@ main(int argc, char** argv)
     {
       return 1;
     }
+
+  delete dict;
+  assert(spot::ltl::atomic_prop::instance_count() == 0);
+  assert(spot::ltl::unop::instance_count() == 0);
+  assert(spot::ltl::binop::instance_count() == 0);
+  assert(spot::ltl::multop::instance_count() == 0);
+
   return 0;
 }

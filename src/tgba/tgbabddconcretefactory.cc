@@ -3,8 +3,8 @@
 #include "tgbabddconcretefactory.hh"
 namespace spot
 {
-  tgba_bdd_concrete_factory::tgba_bdd_concrete_factory()
-    : now_to_next_(bdd_newpair())
+  tgba_bdd_concrete_factory::tgba_bdd_concrete_factory(bdd_dict* dict)
+    : data_(dict)
   {
   }
 
@@ -13,50 +13,26 @@ namespace spot
     acc_map_::iterator ai;
     for (ai = acc_.begin(); ai != acc_.end(); ++ai)
       destroy(ai->first);
+    get_dict()->unregister_all_my_variables(this);
   }
 
   int
   tgba_bdd_concrete_factory::create_state(const ltl::formula* f)
   {
-    // Do not build a state that already exists.
-    tgba_bdd_dict::fv_map::iterator sii = dict_.now_map.find(f);
-    if (sii != dict_.now_map.end())
-      return sii->second;
-
-    f = clone(f);
-
-    int num = create_pair();
-    dict_.now_map[f] = num;
-    dict_.now_formula_map[num] = f;
-
-    // Record that num+1 should be renamed as num when
-    // the next state becomes current.
-    bdd_setpair(data_.next_to_now, num + 1, num);
-    bdd_setpair(now_to_next_, num, num + 1);
-
+    int num = get_dict()->register_state(f, this);
     // Keep track of all "Now" variables for easy
     // existential quantification.
-    data_.declare_now_next (ithvar(num), ithvar(num + 1));
+    data_.declare_now_next (bdd_ithvar(num), bdd_ithvar(num + 1));
     return num;
   }
 
   int
   tgba_bdd_concrete_factory::create_atomic_prop(const ltl::formula* f)
   {
-    // Do not build a variable that already exists.
-    tgba_bdd_dict::fv_map::iterator sii = dict_.var_map.find(f);
-    if (sii != dict_.var_map.end())
-      return sii->second;
-
-    f = clone(f);
-
-    int num = create_node();
-    dict_.var_map[f] = num;
-    dict_.var_formula_map[num] = f;
-
+    int num = get_dict()->register_proposition(f, this);
     // Keep track of all atomic proposition for easy
     // existential quantification.
-    data_.declare_atomic_prop(ithvar(num));
+    data_.declare_atomic_prop(bdd_ithvar(num));
     return num;
   }
 
@@ -86,18 +62,14 @@ namespace spot
     for (ai = acc_.begin(); ai != acc_.end(); ++ai)
       {
 	// Register a BDD variable for this accepting condition.
-	int a = create_node();
-	const ltl::formula* f = clone(ai->first); // The associated formula.
-	dict_.acc_map[f] = a;
-	dict_.acc_formula_map[a] = f;
-	bdd acc = ithvar(a);
+	int num = get_dict()->register_accepting_variable(ai->first, this);
 	// Keep track of all accepting conditions for easy
 	// existential quantification.
-	data_.declare_accepting_condition(acc);
+	data_.declare_accepting_condition(bdd_ithvar(num));
       }
     for (ai = acc_.begin(); ai != acc_.end(); ++ai)
       {
-	bdd acc = ithvar(dict_.acc_map[ai->first]);
+	bdd acc = bdd_ithvar(get_dict()->acc_map[ai->first]);
 
 	// Complete acc with all the other accepting conditions negated.
 	acc &= bdd_exist(data_.negacc_set, acc);
@@ -119,7 +91,7 @@ namespace spot
     // state: the combination exists but won't allow further exploration
     // because it fails the constraints.)
     data_.relation &= bdd_replace(bdd_exist(data_.relation, data_.notnow_set),
-				  now_to_next_);
+				  get_dict()->now_to_next);
   }
 
   const tgba_bdd_core_data&
@@ -128,10 +100,10 @@ namespace spot
     return data_;
   }
 
-  const tgba_bdd_dict&
+  bdd_dict*
   tgba_bdd_concrete_factory::get_dict() const
   {
-    return dict_;
+    return data_.dict;
   }
 
   void

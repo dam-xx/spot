@@ -64,7 +64,7 @@ namespace spot
   // Conjunctions are printed by bdd_format_sat, so we just have
   // to handle the other cases.
   static std::string
-  bdd_to_lbtt(bdd b, const tgba_bdd_dict& d)
+  bdd_to_lbtt(bdd b, const bdd_dict* d)
   {
     if (b == bddfalse)
       return "f";
@@ -178,7 +178,7 @@ namespace spot
   std::ostream&
   lbtt_reachable(std::ostream& os, const tgba& g)
   {
-    const tgba_bdd_dict& d = g.get_dict();
+    const bdd_dict* d = g.get_dict();
     std::ostringstream body;
 
     seen_map seen;

@@ -37,9 +37,10 @@ main(int argc, char** argv)
   if (spot::ltl::format_parse_errors(std::cerr, argv[2], pel2))
     return 2;
 
+  spot::bdd_dict* dict = new spot::bdd_dict();
   {
-    spot::tgba_bdd_concrete a1 = spot::ltl_to_tgba(f1);
-    spot::tgba_bdd_concrete a2 = spot::ltl_to_tgba(f2);
+    spot::tgba_bdd_concrete a1 = spot::ltl_to_tgba(f1, dict);
+    spot::tgba_bdd_concrete a2 = spot::ltl_to_tgba(f2, dict);
     spot::ltl::destroy(f1);
     spot::ltl::destroy(f2);
 
@@ -56,5 +57,6 @@ main(int argc, char** argv)
   assert(spot::ltl::unop::instance_count() == 0);
   assert(spot::ltl::binop::instance_count() == 0);
   assert(spot::ltl::multop::instance_count() == 0);
+  delete dict;
   return exit_code;
 }

@@ -43,7 +43,7 @@ namespace spot
 
     std::string format_state(const state* state) const;
 
-    const tgba_bdd_dict& get_dict() const;
+    bdd_dict* get_dict() const;
 
     /// \brief Get the core data associated to this automaton.
     ///
@@ -57,7 +57,6 @@ namespace spot
 
   protected:
     tgba_bdd_core_data data_;	///< Core data associated to the automaton.
-    tgba_bdd_dict dict_;	///< Dictionary used by the automaton.
     bdd init_;			///< Initial state.
   };
 }

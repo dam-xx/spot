@@ -2,7 +2,6 @@
 # define SPOT_TGBA_TGBABDDFACTORY_H
 
 #include "tgbabddcoredata.hh"
-#include "tgbabdddict.hh"
 
 namespace spot
 {
@@ -15,8 +14,6 @@ namespace spot
   public:
     /// Get the core data for the new automata.
     virtual const tgba_bdd_core_data& get_core_data() const = 0;
-    /// Get the dictionary for the new automata.
-    virtual const tgba_bdd_dict& get_dict() const = 0;
   };
 }
 

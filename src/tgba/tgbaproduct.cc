@@ -1,6 +1,4 @@
 #include "tgbaproduct.hh"
-#include "tgbatranslateproxy.hh"
-#include "dictunion.hh"
 #include <string>
 #include <cassert>
 
@@ -146,31 +144,9 @@ namespace spot
   // tgba_product
 
   tgba_product::tgba_product(const tgba& left, const tgba& right)
-    : dict_(tgba_bdd_dict_union(left.get_dict(), right.get_dict()))
+    : dict_(left.get_dict()), left_(&left), right_(&right)
   {
-    // Translate the left automaton if needed.
-    if (dict_.contains(left.get_dict()))
-      {
-	left_ = &left;
-	left_should_be_freed_ = false;
-      }
-    else
-      {
-	left_ = new tgba_translate_proxy(left, dict_);
-	left_should_be_freed_ = true;
-      }
-
-    // Translate the right automaton if needed.
-    if (dict_.contains(right.get_dict()))
-      {
-	right_ = &right;
-	right_should_be_freed_ = false;
-      }
-    else
-      {
-	right_ = new tgba_translate_proxy(right, dict_);
-	right_should_be_freed_ = true;
-      }
+    assert(dict_ == right.get_dict());
 
     all_accepting_conditions_ = ((left_->all_accepting_conditions()
 				  & right_->neg_accepting_conditions())
@@ -178,14 +154,13 @@ namespace spot
 				    & left_->neg_accepting_conditions()));
     neg_accepting_conditions_ = (left_->neg_accepting_conditions()
 				 & right_->neg_accepting_conditions());
+    dict_->register_all_variables_of(&left_, this);
+    dict_->register_all_variables_of(&right_, this);
   }
 
   tgba_product::~tgba_product()
   {
-    if (left_should_be_freed_)
-      delete left_;
-    if (right_should_be_freed_)
-      delete right_;
+    dict_->unregister_all_my_variables(this);
   }
 
   state*
@@ -208,7 +183,7 @@ namespace spot
 					  right_->neg_accepting_conditions());
   }
 
-  const tgba_bdd_dict&
+  bdd_dict*
   tgba_product::get_dict() const
   {
     return dict_;

@@ -5,18 +5,21 @@
 namespace spot
 {
   tgba_bdd_concrete::tgba_bdd_concrete(const tgba_bdd_factory& fact)
-    : data_(fact.get_core_data()), dict_(fact.get_dict())
+    : data_(fact.get_core_data())
   {
+    get_dict()->register_all_variables_of(&fact, this);
   }
 
   tgba_bdd_concrete::tgba_bdd_concrete(const tgba_bdd_factory& fact, bdd init)
-    : data_(fact.get_core_data()), dict_(fact.get_dict())
+    : data_(fact.get_core_data())
   {
+    get_dict()->register_all_variables_of(&fact, this);
     set_init_state(init);
   }
 
   tgba_bdd_concrete::~tgba_bdd_concrete()
   {
+    get_dict()->unregister_all_my_variables(this);
   }
 
   void
@@ -81,13 +84,13 @@ namespace spot
   {
     const state_bdd* s = dynamic_cast<const state_bdd*>(state);
     assert(s);
-    return bdd_format_set(dict_, s->as_bdd());
+    return bdd_format_set(get_dict(), s->as_bdd());
   }
 
-  const tgba_bdd_dict&
+  bdd_dict*
   tgba_bdd_concrete::get_dict() const
   {
-    return dict_;
+    return data_.dict;
   }
 
   bdd

@@ -1,4 +1,77 @@
-2003-07-13  Alexandre Duret-Lutz  <adl@gnu.org>
+2003-07-14  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	Before this change, all automata would construct their own
+	dictionaries (map of BDD variables to LTL formulae).  This was
+	cumbersome, because to multiply two automata we had to build a
+	common dictionary (the union of the two LTL formula spaces), and
+	install wrappers to translate each automaton's BDD answers into
+	the common dictionary.  This translation, that had to be repeated
+	when several products were nested, was time consuming and was a
+	hindrance for some optimizations.
+	In the new scheme, all automata involved in a product must
+	share the same dictionary.  An empty dictionary should be
+	constructed by the user and passed to the automaton' constructors
+	as necessary.
+	This huge change removes most code than it adds.
+
+	* src/Makefile.am (libspot_la_LIBADD): Add misc/libmisc.la.
+	* src/misc/bddalloc.hh, src/misc/bddalloc.cc: New files.  These
+	partly replace src/tgba/bddfactory.hh and src/tgba/bddfactory.cc.
+	* src/misc/Makefile.am: Adjust to build bddalloc.hh and bddalloc.cc.
+	* src/tgba/bddfactory.hh, src/tgba/bddfactory.cc,
+	src/tgba/dictunion.hh, src/tgba/dictunion.cc,
+	src/tgba/tgbabdddict.hh, src/tgba/tgbabdddict.cc,
+	src/tgba/tgbabddtranslatefactory.hh,
+	src/tgba/tgbabddtranslatefactory.cc,
+	src/tgba/tgbatranslateproxy.hh, src/tgba/tgbatranslateproxy.cc:
+	Delete.
+	* src/tgba/bdddict.hh, src/tgba/bdddict.cc: New files.  These
+	replaces tgbabdddict.hh and tgbabdddict.cc, and also part of
+	bddfactory.hh and bddfactory.cc.
+	* src/tgba/bddprint.cc, src/tgba/bddprint.hh: Adjust to
+	use bdd_dict* instead of tgba_bdd_dict&.
+	* src/tgba/succiterconcrete.cc (succ_iter_concrete::next()):
+	Get next_to_now from the dictionary.
+	* src/tgba/tgba.hh (tgba::get_dict): Return a bdd_dict*,
+	not a const tgba_bdd_dict*.
+	* src/tgba/tgbabddconcrete.cc, src/tgba/tgbabddconcrete.hh:
+	Adjust to use the new dictionary, stored in data_.
+	* src/tgba/tgbabddconcretefactory.cc,
+	src/tgba/tgbabddconcretefactory.hh: Likewise.  Plus
+	now_to_next_ is now also stored in the dictionary.
+	* src/tgba/tgbabddconcreteproduct.cc: Likewise.  Now
+	that both operand share the same product, there is not
+	point in using tgba_bdd_translate_factory.
+	* src/tgba/tgbabddcoredata.cc, src/tgba/tgbabddcoredata.hh:
+	Store a bdd_dict (taken as constructor argument).
+	(tgba_bdd_core_data::~tgba_bdd_core_data): Remove.
+	(tgba_bdd_core_data::translate): Remove.
+	(tgba_bdd_core_data::next_to_now): Remove (now in dict).
+	(tgba_bdd_core_data::dict): New pointer.
+	* src/tgba/tgbabddfactory.hh: (tgba_bdd_factory::get_dict): Remove.
+	* src/tgba/tgbaexplicit.cc, src/tgba/tgbaexplicit.hh:
+	Adjust to use the new dictionary.
+	* src/tgba/tgbaproduct.cc, src/tgba/tgbaproduct.hh: Likewise.  Do
+	not use tgba_bdd_dict_union and tgba_bdd_translate_proxy anymore.
+	* src/tgbaalgos/lbtt.cc, src/tgbaalgos/save.cc: Adjust to
+	use bdd_dict* instead of tgba_bdd_dict&.
+	* src/tgbaalgos/ltl2tgba.cc, src/tgbaalgos/ltl2tgba.cc: Likewise.
+	(ltl_to_tgba): Take a dict argument.
+	* src/tgbaparse/public.hh (tgba_parse): Take a dict argument.
+	* src/tgbaparse/tgbaparse.yy (tgba_parse): Take a dict argument.
+	* src/tgbatest/explicit.cc, src/tgbatest/explprod.cc,
+	src/tgbatest/ltlprod.cc, src/tgbatest/mixprod.cc,
+	src/tgbatest/readsave.cc, src/tgbatest/spotlbtt.cc,
+	src/tgbatest/tgbaread.cc, src/tgbatest/tripprod.cc: Instantiate
+	a dictionary, and pass it to the automata' constructors.
+	* src/tgbatest/ltl2tgba.cc: Likewise, and remove the -o (defrag)
+	option.
+	* iface/gspn/gspn.hh (tgba_gspn::tgba_gspn): Take a bdd_dict argument.
+	(tgba_gspn::get_dict): Adjust return type.
+	* iface/gspn/gspn.cc: Do not use bdd_factory, adjust to
+	use the new dictionary instead.
+
+2003-07-13  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* configure.ac: Bump version to 0.0e.
 

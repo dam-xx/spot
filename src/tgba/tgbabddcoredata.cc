@@ -1,8 +1,9 @@
+#include <cassert>
 #include "tgbabddcoredata.hh"
 
 namespace spot
 {
-  tgba_bdd_core_data::tgba_bdd_core_data()
+  tgba_bdd_core_data::tgba_bdd_core_data(bdd_dict* dict)
     : relation(bddtrue),
       accepting_conditions(bddfalse),
       all_accepting_conditions(bddfalse),
@@ -17,7 +18,7 @@ namespace spot
       acc_set(bddtrue),
       notacc_set(bddtrue),
       negacc_set(bddtrue),
-      next_to_now(bdd_newpair())
+      dict(dict)
   {
   }
 
@@ -36,7 +37,7 @@ namespace spot
       acc_set(copy.acc_set),
       notacc_set(copy.notacc_set),
       negacc_set(copy.negacc_set),
-      next_to_now(bdd_copypair(copy.next_to_now))
+      dict(copy.dict)
   {
   }
 
@@ -59,8 +60,9 @@ namespace spot
       acc_set(left.acc_set & right.acc_set),
       notacc_set(left.notacc_set & right.notacc_set),
       negacc_set(left.negacc_set & right.negacc_set),
-      next_to_now(bdd_mergepairs(left.next_to_now, right.next_to_now))
+      dict(left.dict)
   {
+    assert(dict == right.dict);
   }
 
   const tgba_bdd_core_data&
@@ -72,11 +74,6 @@ namespace spot
 	new (this) tgba_bdd_core_data(copy);
       }
     return *this;
-  }
-
-  tgba_bdd_core_data::~tgba_bdd_core_data()
-  {
-    bdd_freepair(next_to_now);
   }
 
   void
@@ -111,24 +108,5 @@ namespace spot
     notvar_set &= acc;
     acc_set &= acc;
     negacc_set &= !acc;
-  }
-
-  void
-  tgba_bdd_core_data::translate(bddPair* rewrite)
-  {
-    relation = bdd_replace(relation, rewrite);
-    accepting_conditions = bdd_replace(accepting_conditions, rewrite);
-    all_accepting_conditions = bdd_replace(all_accepting_conditions, rewrite);
-    now_set = bdd_replace(now_set, rewrite);
-    next_set = bdd_replace(next_set, rewrite);
-    nownext_set = bdd_replace(nownext_set, rewrite);
-    notnow_set = bdd_replace(notnow_set, rewrite);
-    notnext_set = bdd_replace(notnext_set, rewrite);
-    notvar_set = bdd_replace(notvar_set, rewrite);
-    var_set = bdd_replace(var_set, rewrite);
-    varandnext_set = bdd_replace(varandnext_set, rewrite);
-    acc_set = bdd_replace(acc_set, rewrite);
-    notacc_set = bdd_replace(notacc_set, rewrite);
-    negacc_set = bdd_replace(negacc_set, rewrite);
   }
 }

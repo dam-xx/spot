@@ -140,7 +140,7 @@ namespace spot
 	// successor (a dead node) and we can skip it.  We need to
 	// compute current_state_ anyway, so this test costs us nothing.
 	assert(dest == bdd_exist(current_, data_.notnext_set));
-	current_state_ = bdd_replace(dest, data_.next_to_now);
+	current_state_ = bdd_replace(dest, data_.dict->next_to_now);
       }
     while ((current_state_ & data_.relation) == bddfalse);
   }

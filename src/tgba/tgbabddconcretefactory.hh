@@ -2,17 +2,16 @@
 # define SPOT_TGBA_TGBABDDCONCRETEFACTORY_HH
 
 #include "ltlast/formula.hh"
-#include "bddfactory.hh"
 #include "tgbabddfactory.hh"
 #include <map>
 
 namespace spot
 {
   /// Helper class to build a spot::tgba_bdd_concrete object.
-  class tgba_bdd_concrete_factory: public bdd_factory, public tgba_bdd_factory
+  class tgba_bdd_concrete_factory: public tgba_bdd_factory
   {
   public:
-    tgba_bdd_concrete_factory();
+    tgba_bdd_concrete_factory(bdd_dict* dict);
 
     virtual ~tgba_bdd_concrete_factory();
 
@@ -50,7 +49,7 @@ namespace spot
     void declare_accepting_condition(bdd b, const ltl::formula* a);
 
     const tgba_bdd_core_data& get_core_data() const;
-    const tgba_bdd_dict& get_dict() const;
+    bdd_dict* get_dict() const;
 
     /// Add a new constraint to the relation.
     void constrain_relation(bdd new_rel);
@@ -64,12 +63,9 @@ namespace spot
 
   private:
     tgba_bdd_core_data data_;	///< Core data for the new automata.
-    tgba_bdd_dict dict_;	///< Dictionary for the new automata.
 
     typedef std::map<const ltl::formula*, bdd> acc_map_;
     acc_map_ acc_;		///< BDD associated to each accepting condition
-    bddPair *now_to_next_;	///< \brief Rewriting pairs to transform
-				///  Now variables into Next variables.
   };
 
 }

@@ -103,7 +103,7 @@ namespace spot
     virtual tgba_product_succ_iterator*
     succ_iter(const state* state) const;
 
-    virtual const tgba_bdd_dict& get_dict() const;
+    virtual bdd_dict* get_dict() const;
 
     virtual std::string format_state(const state* state) const;
 
@@ -111,11 +111,9 @@ namespace spot
     virtual bdd neg_accepting_conditions() const;
 
   private:
+    bdd_dict* dict_;
     const tgba* left_;
-    bool left_should_be_freed_;
     const tgba* right_;
-    bool right_should_be_freed_;
-    tgba_bdd_dict dict_;
     bdd all_accepting_conditions_;
     bdd neg_accepting_conditions_;
   };

@@ -42,10 +42,10 @@ namespace spot
   std::ostream&
   tgba_save_reachable(std::ostream& os, const tgba& g)
   {
-    const tgba_bdd_dict& d = g.get_dict();
+    const bdd_dict* d = g.get_dict();
     os << "acc =";
-    for (tgba_bdd_dict::fv_map::const_iterator ai = d.acc_map.begin();
-	 ai != d.acc_map.end(); ++ai)
+    for (bdd_dict::fv_map::const_iterator ai = d->acc_map.begin();
+	 ai != d->acc_map.end(); ++ai)
       {
 	os << " \"";
 	ltl::to_string(ai->first, os) << "\"";

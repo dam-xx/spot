@@ -35,8 +35,10 @@ main(int argc, char** argv)
   if (! std::getline(fin, input, '\0'))
     {
       std::cerr << "Cannot read " << argv[1] << std::endl;
-      exit(2);      
+      exit(2);
     }
+
+  spot::bdd_dict* dict = new spot::bdd_dict();
 
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::parse_error_list pel;
@@ -46,7 +48,7 @@ main(int argc, char** argv)
 
   if (f)
     {
-      spot::tgba_bdd_concrete a = spot::ltl_to_tgba(f);
+      spot::tgba_bdd_concrete a = spot::ltl_to_tgba(f, dict);
       spot::ltl::destroy(f);
       spot::lbtt_reachable(std::cout, a);
     }
@@ -59,5 +61,6 @@ main(int argc, char** argv)
   assert(spot::ltl::unop::instance_count() == 0);
   assert(spot::ltl::binop::instance_count() == 0);
   assert(spot::ltl::multop::instance_count() == 0);
+  delete dict;
   return exit_code;
 }

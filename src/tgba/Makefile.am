@@ -4,9 +4,8 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 tgbadir = $(pkgincludedir)/tgba
 
 tgba_HEADERS = \
-  bddfactory.hh \
+  bdddict.hh \
   bddprint.hh \
-  dictunion.hh \
   public.hh \
   state.hh \
   statebdd.hh \
@@ -17,26 +16,19 @@ tgba_HEADERS = \
   tgbabddconcretefactory.hh \
   tgbabddconcreteproduct.hh \
   tgbabddcoredata.hh \
-  tgbabdddict.hh \
   tgbabddfactory.hh \
-  tgbabddtranslatefactory.hh \
   tgbaexplicit.hh \
-  tgbaproduct.hh \
-  tgbatranslateproxy.hh
+  tgbaproduct.hh
 
 noinst_LTLIBRARIES = libtgba.la
 libtgba_la_SOURCES = \
-  bddfactory.cc \
+  bdddict.cc \
   bddprint.cc \
-  dictunion.cc \
   statebdd.cc \
   succiterconcrete.cc \
   tgbabddconcrete.cc \
   tgbabddconcretefactory.cc \
   tgbabddconcreteproduct.cc \
   tgbabddcoredata.cc \
-  tgbabdddict.cc \
-  tgbabddtranslatefactory.cc \
   tgbaexplicit.cc \
-  tgbaproduct.cc \
-  tgbatranslateproxy.cc
+  tgbaproduct.cc

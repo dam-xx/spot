@@ -20,6 +20,7 @@ namespace spot
   /// \param filename The name of the file to parse.
   /// \param error_list A list that will be filled with
   ///        parse errors that occured during parsing.
+  /// \param dict The BDD dictionary where to use.
   /// \param env The environment into which parsing should take place.
   /// \param debug When true, causes the parser to trace its execution.
   /// \return A pointer to the tgba built from \a filename, or
@@ -33,6 +34,7 @@ namespace spot
   /// \warning This function is not reentrant.
   tgba_explicit* tgba_parse(const std::string& filename,
 			    tgba_parse_error_list& error_list,
+			    bdd_dict* dict,
 			    ltl::environment& env
 			    = ltl::default_environment::instance(),
 			    bool debug = false);

@@ -155,22 +155,23 @@ namespace spot
   tgba_explicit*
   tgba_parse(const std::string& name,
 	     tgba_parse_error_list& error_list,
+	     bdd_dict* dict,
 	     environment& env,
 	     bool debug)
   {
     if (tgbayyopen(name))
-	{
-	  error_list.push_back
-	    (tgba_parse_error(yy::Location(),
-			       std::string("Cannot open file ") + name));
-	  return 0;
-	}
-      tgba_explicit* result = new tgba_explicit;
-      tgbayy::Parser parser(debug, yy::Location(), error_list, env, result);
-      parser.parse();
-      tgbayyclose();
-      return result;
-    }
+      {
+	error_list.push_back
+	  (tgba_parse_error(yy::Location(),
+			    std::string("Cannot open file ") + name));
+	return 0;
+      }
+    tgba_explicit* result = new tgba_explicit(dict);
+    tgbayy::Parser parser(debug, yy::Location(), error_list, env, result);
+    parser.parse();
+    tgbayyclose();
+    return result;
+  }
 }
 
 // Local Variables:

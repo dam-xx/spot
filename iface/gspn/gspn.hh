@@ -2,7 +2,7 @@
 # define SPOT_IFACE_GSPN_HH
 
 // Try not to include gspnlib.h here, or it will polute the user's
-// namespace with internal C symbols. 
+// namespace with internal C symbols.
 
 # include <string>
 # include "tgba/tgba.hh"
@@ -20,7 +20,7 @@ namespace spot
       : err(err)
     {
     }
-    
+
     int
     get_err() const
     {
@@ -29,7 +29,7 @@ namespace spot
   private:
     int err;
   };
-     
+
 
   class gspn_environment : public ltl::environment
   {
@@ -42,11 +42,11 @@ namespace spot
     bool declare(const std::string& prop_str);
 
     virtual ltl::formula* require(const std::string& prop_str);
-    
+
     /// Get the name of the environment.
     virtual const std::string& name();
 
-    typedef std::map<const std::string, ltl::atomic_prop*> prop_map; 
+    typedef std::map<const std::string, ltl::atomic_prop*> prop_map;
 
     /// Get the map of atomic proposition known to this environment.
     const prop_map& get_prop_map() const;
@@ -62,20 +62,20 @@ namespace spot
   class tgba_gspn: public tgba
   {
   public:
-    tgba_gspn(const gspn_environment& env);
+    tgba_gspn(bdd_dict* dict, const gspn_environment& env);
     tgba_gspn(const tgba_gspn& other);
     tgba_gspn& operator=(const tgba_gspn& other);
     virtual ~tgba_gspn();
     virtual state* get_init_state() const;
     virtual tgba_succ_iterator* succ_iter(const state* state) const;
-    virtual const tgba_bdd_dict& get_dict() const;
+    virtual bdd_dict* get_dict() const;
     virtual std::string format_state(const state* state) const;
     virtual bdd all_accepting_conditions() const;
     virtual bdd neg_accepting_conditions() const;
   private:
     tgba_gspn_private_* data_;
   };
-  
+
 }
 
 #endif // SPOT_IFACE_GSPN_HH

@@ -4,7 +4,6 @@
 #include "gspnlib.h"
 #include "gspn.hh"
 #include "ltlvisit/destroy.hh"
-#include "tgba/bddfactory.hh"
 
 namespace spot
 {
@@ -12,52 +11,59 @@ namespace spot
   // tgba_gspn_private_
   //////////////////////////////////////////////////////////////////////
 
-  struct tgba_gspn_private_ : public bdd_factory
+  struct tgba_gspn_private_
   {
     int refs;			// reference count
 
-    tgba_bdd_dict dict;
+    bdd_dict* dict;
     typedef std::pair<AtomicPropKind, bdd> ab_pair;
     typedef std::map<AtomicProp, ab_pair> prop_map;
     prop_map prop_dict;
     AtomicProp *all_indexes;
     size_t index_count;
 
-    tgba_gspn_private_(const gspn_environment& env)
-      : refs(0)
+    tgba_gspn_private_(bdd_dict* dict, const gspn_environment& env)
+      : refs(0), dict(dict)
     {
       const gspn_environment::prop_map& p = env.get_prop_map();
 
-      for (gspn_environment::prop_map::const_iterator i = p.begin();
-	   i != p.end(); ++i)
+      try
 	{
-	  int var = create_node();
-	  i->second->ref();
-	  dict.var_map[i->second] = var;
-	  dict.var_formula_map[var] = i->second;
+	  for (gspn_environment::prop_map::const_iterator i = p.begin();
+	       i != p.end(); ++i)
+	    {
+	      int var = dict->register_proposition(i->second, this);
+	      AtomicProp index;
+	      int err = prop_index(i->first.c_str(), &index);
+	      if (err)
+		throw gspn_exeption(err);
+	      AtomicPropKind kind;
+	      err = prop_kind(index, &kind);
+	      if (err)
+		throw gspn_exeption(err);
 
-	  AtomicProp index;
-	  int err = prop_index(i->first.c_str(), &index);
-	  if (err)
-	    throw gspn_exeption(err);
-	  AtomicPropKind kind;
-	  err = prop_kind(index, &kind);
-	  if (err)
-	    throw gspn_exeption(err);
+	      prop_dict[index] = ab_pair(kind, bdd_ithvar(var));
+	    }
 
-	  prop_dict[index] = ab_pair(kind, ithvar(var));
+	  index_count = prop_dict.size();
+	  all_indexes = new AtomicProp[index_count];
+
+	  unsigned idx = 0;
+	  for (prop_map::const_iterator i = prop_dict.begin();
+	       i != prop_dict.end(); ++i)
+	    all_indexes[idx++] = i->first;
 	}
-      // If an exception occurs during the loop, dict will
-      // be cleaned and that will dereferenciate the formula
-      // it contains.  No need to handle anything explicitely.
+      catch (...)
+	{
+	  // If an exception occurs during the loop, we need to clean
+	  // all BDD variables which have been registered so far.
+	  dict->unregister_all_my_variables(this);
+	}
+    }
 
-      index_count = prop_dict.size();
-      all_indexes = new AtomicProp[index_count];
-
-      unsigned idx = 0;
-      for (prop_map::const_iterator i = prop_dict.begin();
-	   i != prop_dict.end(); ++i)
-	all_indexes[idx++] = i->first;
+    tgba_gspn_private_::~tgba_gspn_private_()
+    {
+      dict->unregister_all_my_variables(this);
     }
 
     bdd index_to_bdd(AtomicProp index) const
@@ -239,9 +245,9 @@ namespace spot
   //////////////////////////////////////////////////////////////////////
 
 
-  tgba_gspn::tgba_gspn(const gspn_environment& env)
+  tgba_gspn::tgba_gspn(bdd_dict* dict, const gspn_environment& env)
   {
-    data_ = new tgba_gspn_private_(env);
+    data_ = new tgba_gspn_private_(dict, env);
   }
 
   tgba_gspn::tgba_gspn(const tgba_gspn& other)
@@ -299,7 +305,7 @@ namespace spot
     return new tgba_succ_iterator_gspn(state_conds, s->get_state(), data_);
   }
 
-  const tgba_bdd_dict&
+  bdd_dict*
   tgba_gspn::get_dict() const
   {
     return data_->dict;

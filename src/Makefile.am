@@ -9,6 +9,7 @@ lib_LTLIBRARIES = libspot.la
 libspot_la_SOURCES =
 libspot_la_LDFLAGS = $(BUDDY_LDFLAGS)
 libspot_la_LIBADD =  \
+  misc/libmisc.la \
   ltlenv/libltlenv.la \
   ltlparse/libltlparse.la \
   ltlvisit/libltlvisit.la \

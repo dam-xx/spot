@@ -22,13 +22,15 @@ main(int argc, char** argv)
   if (argc != 3)
     syntax(argv[0]);
 
+  spot::bdd_dict* dict = new spot::bdd_dict();
+
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::tgba_parse_error_list pel1;
-  spot::tgba_explicit* a1 = spot::tgba_parse(argv[1], pel1, env);
+  spot::tgba_explicit* a1 = spot::tgba_parse(argv[1], pel1, dict, env);
   if (spot::format_tgba_parse_errors(std::cerr, pel1))
     return 2;
   spot::tgba_parse_error_list pel2;
-  spot::tgba_explicit* a2 = spot::tgba_parse(argv[2], pel2, env);
+  spot::tgba_explicit* a2 = spot::tgba_parse(argv[2], pel2, dict, env);
   if (spot::format_tgba_parse_errors(std::cerr, pel2))
     return 2;
 
@@ -44,5 +46,6 @@ main(int argc, char** argv)
   delete a1;
   delete a2;
   assert(spot::ltl::atomic_prop::instance_count() == 0);
+  delete dict;
   return exit_code;
 }

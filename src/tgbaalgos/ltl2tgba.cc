@@ -38,7 +38,7 @@ namespace spot
     void
     visit(const atomic_prop* node)
     {
-      res_ = fact_.ithvar(fact_.create_atomic_prop(node));
+      res_ = bdd_ithvar(fact_.create_atomic_prop(node));
     }
 
     void
@@ -70,8 +70,8 @@ namespace spot
 		   now <=> x | next
 	    */
 	    int v = fact_.create_state(node);
-	    bdd now = fact_.ithvar(v);
-	    bdd next = fact_.ithvar(v + 1);
+	    bdd now = bdd_ithvar(v);
+	    bdd next = bdd_ithvar(v + 1);
 	    bdd x = recurse(node->child());
 	    fact_.constrain_relation(bdd_apply(now, x | next, bddop_biimp));
 	    /*
@@ -101,8 +101,8 @@ namespace spot
 	      }
 	    // Gx  <=>  x && XGx
 	    int v = fact_.create_state(node);
-	    bdd now = fact_.ithvar(v);
-	    bdd next = fact_.ithvar(v + 1);
+	    bdd now = bdd_ithvar(v);
+	    bdd next = bdd_ithvar(v + 1);
 	    fact_.constrain_relation(bdd_apply(now, child & next,
 					       bddop_biimp));
 	    res_ = now;
@@ -116,8 +116,8 @@ namespace spot
 	case unop::X:
 	  {
 	    int v = fact_.create_state(node->child());
-	    bdd now = fact_.ithvar(v);
-	    bdd next = fact_.ithvar(v + 1);
+	    bdd now = bdd_ithvar(v);
+	    bdd next = bdd_ithvar(v + 1);
 	    fact_.constrain_relation(bdd_apply(now, recurse(node->child()),
 					       bddop_biimp));
 	    res_ = next;
@@ -153,8 +153,8 @@ namespace spot
 		   now <=> f2 | (f1 & next)
 	    */
 	    int v = fact_.create_state(node);
-	    bdd now = fact_.ithvar(v);
-	    bdd next = fact_.ithvar(v + 1);
+	    bdd now = bdd_ithvar(v);
+	    bdd next = bdd_ithvar(v + 1);
 	    fact_.constrain_relation(bdd_apply(now, f2 | (f1 & next),
 					       bddop_biimp));
 	    /*
@@ -175,8 +175,8 @@ namespace spot
 		   now <=> f2 & (f1 | next)
 	    */
 	    int v = fact_.create_state(node);
-	    bdd now = fact_.ithvar(v);
-	    bdd next = fact_.ithvar(v + 1);
+	    bdd now = bdd_ithvar(v);
+	    bdd next = bdd_ithvar(v + 1);
 	    fact_.constrain_relation(bdd_apply(now, f2 & (f1 | next),
 					       bddop_biimp));
 	    res_ = now;
@@ -231,18 +231,18 @@ namespace spot
   };
 
   tgba_bdd_concrete
-  ltl_to_tgba(const ltl::formula* f)
+  ltl_to_tgba(const ltl::formula* f, bdd_dict* dict)
   {
-    // Normalize the formula.  We want all the negation on
-    // the atomic proposition.  We also suppress logic
-    // abbreviation such as <=>, =>, or XOR, since they
+    // Normalize the formula.  We want all the negations on
+    // the atomic propositions.  We also suppress logic
+    // abbreviations such as <=>, =>, or XOR, since they
     // would involve negations at the BDD level.
     const ltl::formula* f1 = ltl::unabbreviate_logic(f);
     const ltl::formula* f2 = ltl::negative_normal_form(f1);
     ltl::destroy(f1);
 
     // Traverse the formula and draft the automaton in a factory.
-    tgba_bdd_concrete_factory fact;
+    tgba_bdd_concrete_factory fact(dict);
     ltl_trad_visitor v(fact, true);
     f2->accept(v);
     ltl::destroy(f2);

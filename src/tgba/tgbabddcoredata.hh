@@ -2,6 +2,7 @@
 # define SPOT_TGBA_TGBABDDCOREDATA_HH
 
 #include <bdd.h>
+#include "bdddict.hh"
 
 namespace spot
 {
@@ -92,13 +93,13 @@ namespace spot
     /// conditions.
     bdd negacc_set;
 
-    /// Record pairings between Next and Now variables.
-    bddPair* next_to_now;
+    /// The dictionary used by the automata.
+    bdd_dict* dict;
 
     /// \brief Default constructor.
     ///
     /// Initially all variable set are empty and the \c relation is true.
-    tgba_bdd_core_data();
+    tgba_bdd_core_data(bdd_dict* dict);
 
     /// Copy constructor.
     tgba_bdd_core_data(const tgba_bdd_core_data& copy);
@@ -111,8 +112,6 @@ namespace spot
 
     const tgba_bdd_core_data& operator= (const tgba_bdd_core_data& copy);
 
-    ~tgba_bdd_core_data();
-
     /// \brief Update the variable sets to take a new pair of variables into
     /// account.
     void declare_now_next(bdd now, bdd next);
@@ -122,12 +121,6 @@ namespace spot
     /// \brief Update the variable sets to take a new accepting condition
     /// into account.
     void declare_accepting_condition(bdd prom);
-
-    /// \brief Translate BDD variables.
-    ///
-    /// Rewrite the variables according to \a rewrite.
-    /// This used by spot::tgba_bdd_translate_factory.
-    void translate(bddPair* rewrite);
   };
 }
 

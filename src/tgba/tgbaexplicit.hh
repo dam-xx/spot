@@ -5,7 +5,6 @@
 #include <map>
 #include "tgba.hh"
 #include "ltlast/formula.hh"
-#include "bddfactory.hh"
 
 namespace spot
 {
@@ -14,10 +13,12 @@ namespace spot
   class tgba_explicit_succ_iterator;
 
   /// Explicit representation of a spot::tgba.
-  class tgba_explicit : public tgba, public bdd_factory
+  class tgba_explicit: public tgba
   {
   public:
-    tgba_explicit();
+    tgba_explicit(bdd_dict* dict);
+    tgba_explicit(const tgba_explicit& other);
+    tgba_explicit& tgba_explicit::operator=(const tgba_explicit& other);
 
     struct transition;
     typedef std::list<transition*> state;
@@ -44,7 +45,7 @@ namespace spot
     virtual spot::state* get_init_state() const;
     virtual tgba_succ_iterator*
     succ_iter(const spot::state* state) const;
-    virtual const tgba_bdd_dict& get_dict() const;
+    virtual bdd_dict* get_dict() const;
     virtual std::string format_state(const spot::state* state) const;
 
     virtual bdd all_accepting_conditions() const;
@@ -59,7 +60,7 @@ namespace spot
     typedef std::map<const tgba_explicit::state*, std::string> sn_map;
     ns_map name_state_map_;
     sn_map state_name_map_;
-    tgba_bdd_dict dict_;
+    bdd_dict* dict_;
     tgba_explicit::state* init_;
     mutable bdd all_accepting_conditions_;
     bdd neg_accepting_conditions_;
