@@ -1,3 +1,27 @@
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// département Systèmes Répartis Coopératifs (SRC), Université Pierre
+// et Marie Curie.
+//
+// This file is part of Spot, a model checking library.
+//
+// Spot is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// Spot is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+// or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+// License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Spot; see the file COPYING.  If not, write to the Free
+// Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+// 02111-1307, USA.
+
+// This is derived from Buddy's headers, distributed with the
+// following license:
+
 /*========================================================================
 	       Copyright (C) 1996-2003 by Jorn Lind-Nielsen
 			    All rights reserved
@@ -27,8 +51,6 @@
     MODIFICATIONS.
 ========================================================================*/
 
-/* Derived from Buddy's header by Alexandre.Duret-Lutz@lip6.fr */
-
 
 %module buddy
 
@@ -40,6 +62,54 @@
 #include "fdd.h"
 #include "bvec.h"
 %}
+
+%typemap(in) (int* input_buf, int input_buf_size) {
+  if (!PySequence_Check($input))
+    {
+      PyErr_SetString(PyExc_ValueError, "Expected a sequence");
+      return 0;
+    }
+  $2 = PySequence_Length($input);
+  $1 = (int*) malloc($2 * sizeof(int));
+  for (int i = 0; i < $2; ++i)
+    {
+      PyObject* o = PySequence_GetItem($input, i);
+      if (PyInt_Check(o))
+        {
+          $1[i] = PyInt_AsLong(o);
+	}
+      else
+        {
+          PyErr_SetString(PyExc_ValueError,
+                          "Sequence elements must be integers");
+          return 0;
+        }
+    }
+}
+%typemap(freearg) (int* input_buf, int input_buf_size) {
+  if ($1)
+    free($1);
+}
+
+
+%inline {
+  struct const_int_ptr
+  {
+    const_int_ptr(const int* ptr)
+      : ptr(ptr)
+    {
+    }
+    const int* ptr;
+  };
+}
+
+%extend const_int_ptr {
+  int
+  __getitem__(int i)
+  {
+    return self->ptr[i];
+  }
+}
 
 struct bdd
 {
@@ -173,13 +243,13 @@ extern const bdd bddtrue;
 
 /************************************************************************/
 
-int  fdd_extdomain(int*, int);
+int  fdd_extdomain(int* input_buf, int input_buf_size);
 int  fdd_overlapdomain(int, int);
 void fdd_clearall(void);
 int  fdd_domainnum(void);
 int  fdd_domainsize(int);
 int  fdd_varnum(int);
-int* fdd_vars(int);
+const_int_ptr fdd_vars(int);
 bdd  fdd_ithvar(int, int);
 int  fdd_scanvar(bdd, int);
 int* fdd_scanallvar(bdd);
