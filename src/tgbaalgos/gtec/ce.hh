@@ -27,6 +27,7 @@
 
 namespace spot
 {
+  /// Compute a counter example from a spot::emptiness_check_status
   class counter_example
   {
   public:
@@ -42,6 +43,7 @@ namespace spot
 
     /// \brief Display the example computed by counter_example().
     ///
+    /// \param os the output stream
     /// \param restrict optional automaton to project the example on.
     std::ostream& print_result(std::ostream& os,
 			       const tgba* restrict = 0) const;

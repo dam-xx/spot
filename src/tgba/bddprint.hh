@@ -70,7 +70,6 @@ namespace spot
   /// \brief Format a BDD as a set of acceptance conditions.
   ///
   /// This is used when saving a TGBA.
-  /// \param os The output stream.
   /// \param dict The dictionary to use, to lookup variables.
   /// \param b The BDD to print.
   /// \return The BDD formated as a string.

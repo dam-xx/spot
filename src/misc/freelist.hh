@@ -65,7 +65,7 @@ namespace spot
     /// requested by the user.
     virtual int extend(int n) = 0;
 
-    /// Such pairs describe \c second free integer starting at \first.
+    /// Such pairs describe \c second free integer starting at \c first.
     typedef std::pair<int, int> pos_lenght_pair;
     typedef std::list<pos_lenght_pair> free_list_type;
     free_list_type fl; ///< Tracks unused BDD variables.

@@ -1,5 +1,8 @@
 2004-04-21  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/tgbaalgos/gtec/ce.hh, src/misc/freelist.hh,
+	src/tgba/bddprint.hh: Fix Doxygen comments.
+
 	* src/tgbaalgos/neverclaim.hh (never_claim_reachable): Document
 	arguments.
 	* src/tgbaalgos/neverclaim.cc (never_claim_bfs::state_is_accepting):
