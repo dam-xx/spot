@@ -125,20 +125,25 @@ namespace spot
         return os;
       }
 
+      virtual bool safe() const
+      {
+	return heap::Safe;
+      }
+
       const heap& get_heap() const
-        {
-          return h;
-        }
+      {
+	return h;
+      }
 
       const stack_type& get_st_blue() const
-        {
-          return st_blue;
-        }
+      {
+	return st_blue;
+      }
 
       const stack_type& get_st_red() const
-        {
-          return st_red;
-        }
+      {
+	return st_red;
+      }
     private:
 
       void push(stack_type& st, const state* s,
@@ -421,6 +426,8 @@ namespace spot
     class explicit_magic_search_heap
     {
     public:
+      enum { Safe = 1 };
+
       class color_ref
       {
       public:
@@ -505,6 +512,8 @@ namespace spot
     class bsh_magic_search_heap
     {
     public:
+      enum { Safe = 0 };
+
       class color_ref
       {
       public:

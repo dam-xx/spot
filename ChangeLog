@@ -1,5 +1,11 @@
 2005-02-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptiness.hh,
+	src/tgbaalgos/emptiness.cc (emptiness_check::safe): New method.
+	* src/tgbaalgos/magic.cc, src/tgbaalgos/magic.hh,
+	src/tgbaalgos/se05.hh, src/tgbaalgos/se05.cc: Implement it.
+	* src/tgbatest/randtgba.cc: Simplify.
+
 	* src/tgbaalgos/magic.hh, src/tgbaalgos/magic.cc,
 	src/tgbaalgos/se05.hh, src/tgbaalgos/se05.cc: Provide wrapper
 	functions that read the hash-map size from a "bsh" option.

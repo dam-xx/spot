@@ -75,37 +75,36 @@ struct ec_algo
   spot::emptiness_check* (*construct)(const spot::tgba*, spot::option_map o);
   unsigned int min_acc;
   unsigned int max_acc;
-  bool safe;
 };
 
 ec_algo ec_algos[] =
   {
     { "Cou99",          "!poprem",
-                        couvreur99_cons,                     0, -1U, true },
+                        couvreur99_cons,                     0, -1U },
     { "Cou99_shy-",     "!poprem shy !group",
-                        couvreur99_cons,                     0, -1U, true },
+                        couvreur99_cons,                     0, -1U },
     { "Cou99_shy",      "!poprem shy group",
-                        couvreur99_cons,                     0, -1U, true },
+                        couvreur99_cons,                     0, -1U },
     { "Cou99_rem",      "poprem",
-                        couvreur99_cons,                     0, -1U, true },
+                        couvreur99_cons,                     0, -1U },
     { "Cou99_rem_shy-", "poprem shy !group",
-                        couvreur99_cons,                     0, -1U, true },
+                        couvreur99_cons,                     0, -1U },
     { "Cou99_rem_shy",  "poprem shy group",
-                        couvreur99_cons,                     0, -1U, true },
+                        couvreur99_cons,                     0, -1U },
     { "CVWY90",         0,
-                        spot::magic_search,                  0,   1, true },
+                        spot::magic_search,                  0,   1 },
     { "CVWY90_bsh",     "bsh=4K",
-                        spot::magic_search,                  0,   1, false },
+                        spot::magic_search,                  0,   1 },
     { "GV04",           0,
-                        spot::explicit_gv04_check,           0,   1, true },
+                        spot::explicit_gv04_check,           0,   1 },
     { "SE05",           0,
-                        spot::se05,                          0,   1, true },
+                        spot::se05,                          0,   1 },
     { "SE05_bsh",       "bsh=4K",
-                        spot::se05,                          0,   1, false },
+                        spot::se05,                          0,   1 },
     { "Tau03",          0,
-                        spot::explicit_tau03_search,         1, -1U, true },
+                        spot::explicit_tau03_search,         1, -1U },
     { "Tau03_opt",      0,
-                        spot::explicit_tau03_opt_search,     0, -1U, true },
+                        spot::explicit_tau03_opt_search,     0, -1U },
   };
 
 spot::option_map options;
@@ -1038,7 +1037,7 @@ main(int argc, char** argv)
 		    }
 		  else
 		    {
-		      if (ec_algos[i].safe)
+		      if (ec->safe())
 			{
 			  if (!opt_paper)
 			    std::cout << "empty language" << std::endl;

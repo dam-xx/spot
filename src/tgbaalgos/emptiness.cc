@@ -51,9 +51,10 @@ namespace spot
       }
   }
 
-  std::ostream& print_tgba_run(std::ostream& os,
-			       const tgba* a,
-			       const tgba_run* run)
+  std::ostream&
+  print_tgba_run(std::ostream& os,
+		 const tgba* a,
+		 const tgba_run* run)
   {
     bdd_dict* d = a->get_dict();
     os << "Prefix:" << std::endl;
@@ -105,6 +106,21 @@ namespace spot
     return dynamic_cast<const unsigned_statistics*>(this);
   }
 
+  const char*
+  emptiness_check_result::parse_options(char* options)
+  {
+    option_map old(o_);
+    const char* s = o_.parse_options(options);
+    options_updated(old);
+    return s;
+  }
+
+  void
+  emptiness_check_result::options_updated(const option_map&)
+  {
+  }
+
+
   emptiness_check::~emptiness_check()
   {
   }
@@ -113,6 +129,26 @@ namespace spot
   emptiness_check::statistics() const
   {
     return dynamic_cast<const unsigned_statistics*>(this);
+  }
+
+  const char*
+  emptiness_check::parse_options(char* options)
+  {
+    option_map old(o_);
+    const char* s = o_.parse_options(options);
+    options_updated(old);
+    return s;
+  }
+
+  void
+  emptiness_check::options_updated(const option_map&)
+  {
+  }
+
+  bool
+  emptiness_check::safe() const
+  {
+    return true;
   }
 
   std::ostream&
@@ -131,7 +167,8 @@ namespace spot
     }
   }
 
-  tgba* tgba_run_to_tgba(const tgba* a, const tgba_run* run)
+  tgba*
+  tgba_run_to_tgba(const tgba* a, const tgba_run* run)
   {
     tgba_explicit* res = new tgba_explicit(a->get_dict());
     res->copy_acceptance_conditions_of(a);

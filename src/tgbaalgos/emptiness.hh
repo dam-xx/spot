@@ -114,29 +114,18 @@ namespace spot
       return o_;
     }
 
-    /// Modify the options parametrizing how the accepting run is computed.
-    const char*
-    parse_options(char* options)
-    {
-      option_map old(o_);
-      const char* s = o_.parse_options(options);
-      options_updated(old);
-      return s;
-    }
+    /// Modify the algorithm options.
+    const char* parse_options(char* options);
 
     /// Return statistics, if available.
     virtual const unsigned_statistics* statistics() const;
 
   protected:
-    /// React when options are modified.
-    virtual void
-    options_updated(const option_map& old)
-    {
-      (void)old;
-    }
+    /// Notify option updates.
+    virtual void options_updated(const option_map& old);
 
     const tgba* a_;		///< The automaton.
-    option_map o_;		///< The options
+    option_map o_;		///< The options.
   };
 
   /// Common interface to emptiness check algorithms.
@@ -163,19 +152,15 @@ namespace spot
       return o_;
     }
 
-    /// Modify the options parametrizing how the accepting run is realized.
-    const char*
-    parse_options(char* options)
-    {
-      option_map old(o_);
-      const char* s = o_.parse_options(options);
-      options_updated(old);
-      return s;
-    }
+    /// Modify the algorithm options.
+    const char* parse_options(char* options);
+
+    /// Return false iff accepting_run() can return 0 for non-empty automata.
+    virtual bool safe() const;
 
     /// \brief Check whether the automaton contain an accepting run.
     ///
-    /// Return 0 if the automaton accept no run.  Return an instance
+    /// Return 0 if the automaton accepts no run.  Return an instance
     /// of emptiness_check_result otherwise.  This instance might
     /// allow to obtain one sample acceptance run.  The result has to
     /// be destroyed before the emptiness_check instance that
@@ -183,6 +168,10 @@ namespace spot
     ///
     /// Some emptiness_check algorithms may allow check() to be called
     /// several time, but generally you should not assume that.
+    ///
+    /// Some emptiness_check algorithms, especially those using bit state
+    /// hashing may return 0 even if the automaton is not empty.
+    /// \see safe()
     virtual emptiness_check_result* check() = 0;
 
     /// Return statistics, if available.
@@ -191,11 +180,8 @@ namespace spot
     /// Print statistics, if any.
     virtual std::ostream& print_stats(std::ostream& os) const;
 
-    /// React when options are modified.
-    virtual void options_updated(const option_map& old)
-    {
-      (void)old;
-    }
+    /// Notify option updates.
+    virtual void options_updated(const option_map& old);
 
   protected:
     const tgba* a_;		///< The automaton.

@@ -125,24 +125,29 @@ namespace spot
         return os;
       }
 
+      virtual bool safe() const
+      {
+	return heap::Safe;
+      }
+
       const heap& get_heap() const
-        {
-          return h;
-        }
+      {
+	return h;
+      }
 
       const stack_type& get_st_blue() const
-        {
-          return st_blue;
-        }
+      {
+	return st_blue;
+      }
 
       const stack_type& get_st_red() const
-        {
-          return st_red;
-        }
+      {
+	return st_red;
+      }
     private:
 
       void push(stack_type& st, const state* s,
-                        const bdd& label, const bdd& acc)
+		const bdd& label, const bdd& acc)
       {
         inc_depth();
         tgba_succ_iterator* i = a_->succ_iter(s);
@@ -436,6 +441,8 @@ namespace spot
       typedef Sgi::hash_map<const state*, color,
                 state_ptr_hash, state_ptr_equal> hash_type;
     public:
+      enum { Safe = 1 };
+
       class color_ref
       {
       public:
@@ -568,6 +575,8 @@ namespace spot
       typedef Sgi::hash_set<const state*,
                 state_ptr_hash, state_ptr_equal> hcyan_type;
     public:
+      enum { Safe = 0 };
+
       class color_ref
       {
       public:
