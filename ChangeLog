@@ -1,5 +1,7 @@
 2004-11-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/randtgba.cc: Add option -D.
+
 	* src/tgbaalgos/emptiness.hh (emptiness_check, emptiness_check_result):
 	Add the TGBA considered as a protected attribute, and provide an
 	automaton() accessor.

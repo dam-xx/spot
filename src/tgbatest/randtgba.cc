@@ -32,6 +32,7 @@
 #include "ltlast/atomic_prop.hh"
 #include "tgbaalgos/dotty.hh"
 #include "misc/random.hh"
+#include "tgba/tgbatba.hh"
 
 #include "tgbaalgos/emptiness.hh"
 #include "tgbaalgos/emptiness_stats.hh"
@@ -53,6 +54,9 @@ syntax(char* prog)
 	    << " one is true" << std::endl
 	    << "            [0 0.0]" << std::endl
 	    << "  -d F    density of the graph [0.2]" << std::endl
+	    << "  -D      degeneralize TGBA for emptiness-check algorithms that"
+	    << " would" << std::endl
+	    << "            otherwise be skipped (implies -e)" << std::endl
 	    << "  -e N    compare result of all "
 	    << "emptiness checks on N randomly generated graphs" << std::endl
 	    << "  -g      output in dot format" << std::endl
@@ -203,7 +207,7 @@ main(int argc, char** argv)
   int opt_ec = 0;
   int opt_ec_seed = 0;
   bool opt_replay = false;
-
+  bool opt_degen = false;
   int argn = 0;
 
   int exit_code = 0;
@@ -234,6 +238,12 @@ main(int argc, char** argv)
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
 	  opt_d = to_float(argv[++argn]);
+	}
+      else if (!strcmp(argv[argn], "-D"))
+	{
+	  opt_degen = true;
+	  if (!opt_ec)
+	    opt_ec = 1;
 	}
       else if (!strcmp(argv[argn], "-e"))
 	{
@@ -309,6 +319,10 @@ main(int argc, char** argv)
 	}
       else
 	{
+	  spot::tgba* degen = 0;
+	  if (opt_degen && opt_n_acc != 1)
+	    degen = new spot::tgba_tba_proxy(a);
+
 	  std::vector<spot::emptiness_check*> ec_obj;
 	  std::vector<std::string> ec_name;
 	  std::vector<bool> ec_safe;
@@ -321,32 +335,36 @@ main(int argc, char** argv)
 	  ec_name.push_back("couvreur99_shy");
 	  ec_safe.push_back(true);
 
-	  if (opt_n_acc <= 1)
+	  if (opt_n_acc <= 1 || opt_degen)
 	    {
-	      ec_obj.push_back(spot::explicit_magic_search(a));
+	      spot::tgba* d = opt_n_acc > 1 ? degen : a;
+
+	      ec_obj.push_back(spot::explicit_magic_search(d));
 	      ec_name.push_back("explicit_magic_search");
 	      ec_safe.push_back(true);
 
-	      ec_obj.push_back(spot::bit_state_hashing_magic_search(a, 4096));
+	      ec_obj.push_back(spot::bit_state_hashing_magic_search(d, 4096));
 	      ec_name.push_back("bit_state_hashing_magic_search");
 	      ec_safe.push_back(false);
 
-	      ec_obj.push_back(spot::explicit_se05_search(a));
+	      ec_obj.push_back(spot::explicit_se05_search(d));
 	      ec_name.push_back("explicit_se05");
 	      ec_safe.push_back(true);
 
-	      ec_obj.push_back(spot::bit_state_hashing_se05_search(a, 4096));
+	      ec_obj.push_back(spot::bit_state_hashing_se05_search(d, 4096));
 	      ec_name.push_back("bit_state_hashing_se05_search");
 	      ec_safe.push_back(false);
 
-	      ec_obj.push_back(spot::explicit_gv04_check(a));
+	      ec_obj.push_back(spot::explicit_gv04_check(d));
 	      ec_name.push_back("explicit_gv04");
 	      ec_safe.push_back(true);
 	    }
 
-	  if (opt_n_acc >= 1)
+	  if (opt_n_acc >= 1 || opt_degen)
 	    {
-              ec_obj.push_back(spot::explicit_tau03_search(a));
+	      spot::tgba* d = opt_n_acc == 0 ? degen : a;
+
+              ec_obj.push_back(spot::explicit_tau03_search(d));
               ec_name.push_back("explicit_tau03_search");
               ec_safe.push_back(true);
             }
@@ -380,7 +398,7 @@ main(int argc, char** argv)
 		      if (run)
 			{
 			  std::ostringstream s;
-			  if (!spot::replay_tgba_run(s, a, run))
+			  if (!spot::replay_tgba_run(s, res->automaton(), run))
 			    {
 			      std::cout << ", but could not replay it (ERROR!)";
 			      failed_seeds.insert(opt_ec_seed);
@@ -433,6 +451,8 @@ main(int argc, char** argv)
 	      std::cout << "ERROR: not all algorithms agree" << std::endl;
 	      failed_seeds.insert(opt_ec_seed);
 	    }
+
+	  delete degen;
 	}
 
       delete a;
