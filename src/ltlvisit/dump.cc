@@ -3,7 +3,7 @@
 #include "ltlast/allnodes.hh"
 
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
@@ -15,13 +15,13 @@ namespace spot
 	: os_(os)
       {
       }
-      
-      virtual 
+
+      virtual
       ~dump_visitor()
       {
       }
 
-      void 
+      void
       visit(const spot::ltl::atomic_prop* ap)
       {
 	os_ << "AP(" << ap->name() << ")";
@@ -31,8 +31,8 @@ namespace spot
       visit(const spot::ltl::constant* c)
       {
 	os_ << "constant(" << c->val_name() << ")";
-      }      
-      
+      }
+
       void
       visit(const spot::ltl::binop* bo)
       {
@@ -42,7 +42,7 @@ namespace spot
 	bo->second()->accept(*this);
 	os_ << ")";
       }
-      
+
       void
       visit(const spot::ltl::unop* uo)
       {
@@ -50,7 +50,7 @@ namespace spot
 	uo->child()->accept(*this);
 	os_ << ")";
       }
-      
+
       void
       visit(const spot::ltl::multop* mo)
       {
@@ -68,11 +68,11 @@ namespace spot
       std::ostream& os_;
     };
 
-    void 
-    dump(const formula& f, std::ostream& os)
+    void
+    dump(const formula* f, std::ostream& os)
     {
       dump_visitor v(os);
-      f.accept(v);
+      f->accept(v);
     }
 
   }

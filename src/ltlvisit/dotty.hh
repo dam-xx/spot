@@ -4,7 +4,7 @@
 #include <ltlast/formula.hh>
 #include <iostream>
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
@@ -14,7 +14,7 @@ namespace spot
     ///
     /// \c dot is part of the GraphViz package
     /// http://www.research.att.com/sw/tools/graphviz/
-    void dotty(const formula& f, std::ostream& os);
+    void dotty(const formula* f, std::ostream& os);
   }
 }
 

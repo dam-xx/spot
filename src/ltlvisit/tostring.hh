@@ -4,12 +4,12 @@
 #include <ltlast/formula.hh>
 #include <iostream>
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
-    void to_string(const formula& f, std::ostream& os);
-    std::string to_string(const formula& f);
+    void to_string(const formula* f, std::ostream& os);
+    std::string to_string(const formula* f);
   }
 }
 

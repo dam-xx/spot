@@ -26,7 +26,7 @@ main(int argc, char **argv)
   // The string generated from an abstract tree should be parsable
   // again.
 
-  std::string f1s = spot::ltl::to_string(*f1);
+  std::string f1s = spot::ltl::to_string(f1);
   std::cout << f1s << std::endl;
 
   spot::ltl::formula* f2 = spot::ltl::parse(f1s, p1);
@@ -41,7 +41,7 @@ main(int argc, char **argv)
 
   // It should also map to the same string.
 
-  std::string f2s = spot::ltl::to_string(*f2);
+  std::string f2s = spot::ltl::to_string(f2);
   std::cout << f2s << std::endl;
 
   if (f2s != f1s)

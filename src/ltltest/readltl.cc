@@ -43,9 +43,9 @@ main(int argc, char** argv)
   if (f)
     {
 #ifdef DOTTY
-      spot::ltl::dotty(*f, std::cout);
+      spot::ltl::dotty(f, std::cout);
 #else
-      spot::ltl::dump(*f, std::cout);
+      spot::ltl::dump(f, std::cout);
       std::cout << std::endl;
 #endif
       spot::ltl::destroy(f);

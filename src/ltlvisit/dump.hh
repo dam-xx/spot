@@ -4,7 +4,7 @@
 #include "ltlast/formula.hh"
 #include <iostream>
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
@@ -13,7 +13,7 @@ namespace spot
     /// \param os The stream where it should be output.
     ///
     /// This is useful to display a formula when debugging.
-    void dump(const formula& f, std::ostream& os);
+    void dump(const formula* f, std::ostream& os);
   }
 }
 

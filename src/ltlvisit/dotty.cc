@@ -3,7 +3,7 @@
 #include "ltlast/allnodes.hh"
 
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
@@ -16,12 +16,12 @@ namespace spot
       {
       }
 
-      virtual 
+      virtual
       ~dotty_visitor()
       {
       }
 
-      void 
+      void
       visit(const spot::ltl::atomic_prop* ap)
       {
 	draw_node_(ap->name());
@@ -32,20 +32,20 @@ namespace spot
       {
 	draw_node_(c->val_name());
       }
-      
+
       void
       visit(const spot::ltl::binop* bo)
       {
 	draw_rec_node_(bo->op_name());
 	std::string label = label_;
-	
+
 	label_ += "l";
 	draw_link_(label, label_);
 	bo->first()->accept(*this);
 	label_ = draw_link_(label, label + "r");
 	bo->second()->accept(*this);
       }
-      
+
       void
       visit(const spot::ltl::unop* uo)
       {
@@ -53,7 +53,7 @@ namespace spot
 	label_ = draw_link_(label_, label_ + "c");
 	uo->child()->accept(*this);
       }
-      
+
       void
       visit(const spot::ltl::multop* mo)
       {
@@ -79,10 +79,10 @@ namespace spot
 	return out;
       }
 
-      void 
+      void
       draw_rec_node_(const char* str) const
       {
-	os_ << "  " << label_ << " [label=\"" << str << "\", shabe=box];" 
+	os_ << "  " << label_ << " [label=\"" << str << "\", shabe=box];"
 	    << std::endl;
       }
 
@@ -91,15 +91,15 @@ namespace spot
       {
 	os_ << "  " << label_ << " [label=\"" << str << "\"];" << std::endl;
       }
-      
+
     };
 
-    void 
-    dotty(const formula& f, std::ostream& os)
+    void
+    dotty(const formula* f, std::ostream& os)
     {
       dotty_visitor v(os);
       os << "digraph G {" << std::endl;
-      f.accept(v);
+      f->accept(v);
       os << "}" << std::endl;
     }
 

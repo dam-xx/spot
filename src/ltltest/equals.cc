@@ -38,26 +38,23 @@ main(int argc, char** argv)
 #endif
 #ifdef LUNABBREV
   tmp = f1;
-  std::cout << spot::ltl::atomic_prop::instance_count() << std::endl;
   f1 = spot::ltl::unabbreviate_logic(f1);
-  std::cout << spot::ltl::atomic_prop::instance_count() << std::endl;
   spot::ltl::destroy(tmp);
-  std::cout << spot::ltl::atomic_prop::instance_count() << std::endl;
-  spot::ltl::dump(*f1, std::cout);
+  spot::ltl::dump(f1, std::cout);
   std::cout << std::endl;
 #endif
 #ifdef TUNABBREV
   tmp = f1;
   f1 = spot::ltl::unabbreviate_ltl(f1);
   spot::ltl::destroy(tmp);
-  spot::ltl::dump(*f1, std::cout);
+  spot::ltl::dump(f1, std::cout);
   std::cout << std::endl;
 #endif
 #ifdef NENOFORM
   tmp = f1;
   f1 = spot::ltl::negative_normal_form(f1);
   spot::ltl::destroy(tmp);
-  spot::ltl::dump(*f1, std::cout);
+  spot::ltl::dump(f1, std::cout);
   std::cout << std::endl;
 #endif
 

@@ -5,7 +5,7 @@
 #include "ltlast/allnodes.hh"
 
 
-namespace spot 
+namespace spot
 {
   namespace ltl
   {
@@ -17,13 +17,13 @@ namespace spot
 	: os_(os)
       {
       }
-      
-      virtual 
+
+      virtual
       ~to_string_visitor()
       {
       }
-      
-      void 
+
+      void
       visit(const atomic_prop* ap)
       {
 	os_ << ap->name();
@@ -33,14 +33,14 @@ namespace spot
       visit(const constant* c)
       {
 	os_ << c->val_name();
-      }      
-      
+      }
+
       void
       visit(const binop* bo)
       {
 	os_ << "(";
 	bo->first()->accept(*this);
-	
+
 	switch(bo->op())
 	  {
 	  case binop::Xor:
@@ -59,14 +59,14 @@ namespace spot
 	    os_ << " R ";
 	    break;
 	  }
-	
+
 	bo->second()->accept(*this);
 	os_ << ")";
       }
-      
+
       void
       visit(const unop* uo)
-      {   
+      {
 	switch(uo->op())
 	  {
 	  case unop::Not:
@@ -82,10 +82,10 @@ namespace spot
 	    os_ << "G";
 	    break;
 	  }
-        
+
 	uo->child()->accept(*this);
       }
-      
+
       void
       visit(const multop* mo)
       {
@@ -97,12 +97,12 @@ namespace spot
 	  {
 	  case multop::Or:
 	    ch = " | ";
-	    break; 
+	    break;
 	  case multop::And:
 	    ch = " & ";
 	    break;
 	  }
-	
+
 	for (unsigned n = 1; n < max; ++n)
 	  {
 	    os_ << ch;
@@ -113,16 +113,16 @@ namespace spot
     private:
       std::ostream& os_;
     };
-    
-    void 
-    to_string(const formula& f, std::ostream& os)
+
+    void
+    to_string(const formula* f, std::ostream& os)
     {
       to_string_visitor v(os);
-      f.accept(v);
+      f->accept(v);
     }
 
-    std::string 
-    to_string(const formula& f)
+    std::string
+    to_string(const formula* f)
     {
       std::ostringstream os;
       to_string(f, os);
