@@ -1,3 +1,9 @@
+2003-11-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::complete_cycle):
+	Check whether the state is in the current SCC before passing it
+	to h_filt().
+
 2003-11-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/eesrg.cc (tgba_succ_iterator_gspn_eesrg::first_): New

@@ -425,11 +425,15 @@ namespace spot
 	todo.pop_front();
 	for (i->first(); !i->done(); i->next())
 	  {
-	    const state* dest = h_filt(i->current_state());
+	    const state* dest = i->current_state();
 
 	    // Do not escape this SCC.
 	    if (!scc.has_state(dest))
-	      continue;
+	      {
+		delete dest;
+		continue;
+	      }
+	    dest = h_filt(dest);
 
 	    bdd cond = i->current_condition();
 
