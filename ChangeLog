@@ -1,3 +1,8 @@
+2005-01-10  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/tgbaalgos/tau03.cc: Typo.
+	* src/tgbatest/ltl2tgba.cc: Add option -b.
+
 2005-01-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/ndfs_result.hxx (ndfs_result, acss_interface):

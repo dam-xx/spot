@@ -32,6 +32,7 @@
 #include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"
 #include "tgba/bddprint.hh"
+#include "tgbaalgos/save.hh"
 #include "tgbaalgos/dotty.hh"
 #include "tgbaalgos/lbtt.hh"
 #include "tgba/tgbatba.hh"
@@ -63,6 +64,8 @@ syntax(char* prog)
 	    << "reachability graph"
 	    << std::endl
 	    << "  -A    same as -a, but as a set" << std::endl
+	    << "  -b    display the automaton in the format of spot"
+            << std::endl
 	    << "  -d    turn on traces during parsing" << std::endl
 	    << "  -D    degeneralize the automaton as a TBA" << std::endl
 	    << "  -DS   degeneralize the automaton as an SBA" << std::endl
@@ -196,9 +199,13 @@ main(int argc, char** argv)
 	{
 	  output = 2;
 	}
-      else if (!strcmp(argv[formula_index], "-A"))
+      else if (!strcmp(argv[formula_index], "-b"))
 	{
-	  output = 4;
+	  output = 7;
+	}
+      else if (!strcmp(argv[formula_index], "-v"))
+	{
+	  output = 5;
 	}
       else if (!strcmp(argv[formula_index], "-d"))
 	{
@@ -673,6 +680,9 @@ main(int argc, char** argv)
 	case 6:
 	  spot::lbtt_reachable(std::cout, a);
 	  break;
+	case 7:
+	  spot::tgba_save_reachable(std::cout, a);
+	  break;
 	case 8:
 	  {
 	    assert(degeneralize_opt == DegenSBA);
@@ -717,7 +727,7 @@ main(int argc, char** argv)
           if (a->number_of_acceptance_conditions() == 0)
             {
               std::cout << "To apply tau03_search, the automaton must have at "
-                        << "least on accepting condition. Try with another "
+                        << "least one accepting condition. Try with another "
                         << "algorithm." << std::endl;
             }
           else

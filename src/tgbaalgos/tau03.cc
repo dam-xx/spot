@@ -193,9 +193,9 @@ namespace spot
                   {
                    inc_transitions();
                    const state *s_prime = i->current_state();
-                    trace << "DFS_BLUE rescanning the arc from "
-                          << a_->format_state(f.s) << "  to "
-                          << a_->format_state(s_prime) << std::endl;
+                   trace << "DFS_BLUE rescanning the arc from "
+                         << a_->format_state(f.s) << "  to "
+                         << a_->format_state(s_prime) << std::endl;
                     bdd label = i->current_condition();
                     bdd acc = i->current_acceptance_conditions();
                     typename heap::color_ref c_prime = h.get_color_ref(s_prime);
