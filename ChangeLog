@@ -1,5 +1,17 @@
 2004-07-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	lbtt 1.1.0 supports TGBAs, use that and remove old workarounds.
+	* src/tgbaalgos/lbtt.cc (state_acc_pair, state_acc_pair_equal,
+	state_acc_pair_hash, acp_seen_map, todo_set, seen_map, fill_todo
+	lbtt_reachable): Remove.
+	(nonacceptant_lbtt_bfs): Rename as ...
+	(lbtt_bfs): ... this, and adjust to output acceptance conditions
+	on transitions.
+	(nonacceptant_lbtt_reachable): Rename as ...
+	(lbtt_reachable): ... this.
+	* src/tgbaalgos/lbtt.hh (nonacceptant_lbtt_reachable): Delete.
+	* src/tgbatest/ltl2tgba.cc: Suppress option "-T".
+
 	Patch from Heikki Tauriainen <heikki.tauriainen@hut.fi>.
 	* src/tgbaalgos/gtec/ce.cc (counter_example::counter_example): Do
 	not parenthesize the type after the new operator (g++ 3.4 complains).

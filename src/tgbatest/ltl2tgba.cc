@@ -91,22 +91,20 @@ syntax(char* prog)
 	    << "  -R1  use direct simulation to reduce the automata "
 	    << "(use -L for more reduction)"
 	    << std::endl
-	    << "  -R2  use delayed simulation to reduce the automata, incorrect"
+	    << "  -R2  use delayed simulation to reduce the automata "
 	    << "(use -L for more reduction)"
 	    << std::endl
 	    << "  -R3  use SCC to reduce the automata"
 	    << std::endl
-	    << "  -Rd  to display simulation relation"
+	    << "  -Rd  display the simulation relation"
 	    << std::endl
-	    << "  -RD  to display parity game (dot format)"
+	    << "  -RD  display the parity game (dot format)"
 	    << std::endl
 	    << "  -s   convert to explicit automata, and number states "
 	    << "in DFS order" << std::endl
 	    << "  -S   convert to explicit automata, and number states "
 	    << "in BFS order" << std::endl
 	    << "  -t   display reachable states in LBTT's format" << std::endl
-	    << "  -T   display reachable states in LBTT's format w/o "
-	    << "acceptance conditions" << std::endl
 	    << "  -v   display the BDD variables used by the automaton"
 	    << std::endl
             << "  -x   try to produce a more deterministic automata "
@@ -296,10 +294,6 @@ main(int argc, char** argv)
 	{
 	  output = 6;
 	}
-      else if (!strcmp(argv[formula_index], "-T"))
-	{
-	  output = 7;
-	}
       else if (!strcmp(argv[formula_index], "-v"))
 	{
 	  output = 5;
@@ -487,9 +481,6 @@ main(int argc, char** argv)
 	  break;
 	case 6:
 	  spot::lbtt_reachable(std::cout, a);
-	  break;
-	case 7:
-	  spot::nonacceptant_lbtt_reachable(std::cout, a);
 	  break;
 	case 8:
 	  spot::never_claim_reachable(std::cout, degeneralized, f);

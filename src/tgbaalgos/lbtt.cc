@@ -20,15 +20,10 @@
 // 02111-1307, USA.
 
 #include "lbtt.hh"
-#include "misc/hash.hh"
 #include <map>
-#include <set>
 #include <string>
 #include <sstream>
 #include <functional>
-#include "save.hh"
-#include "tgba/bddprint.hh"
-#include "ltlvisit/tostring.hh"
 #include "tgba/bddprint.hh"
 #include "reachiter.hh"
 #include "misc/bddlt.hh"
@@ -105,186 +100,15 @@ namespace spot
 
   }
 
-  // Each state in the produced automata corresponds to
-  // a (state, acceptance set) pair for the source automata.
-
-  typedef std::pair<state*, bdd> state_acc_pair;
-
-  struct state_acc_pair_equal :
-    public std::binary_function<const state_acc_pair&,
-                                const state_acc_pair&, bool>
-  {
-    bool
-    operator()(const state_acc_pair& left, const state_acc_pair& right) const
-    {
-      if (left.first->compare(right.first))
-	return false;
-      return left.second.id() == right.second.id();
-    }
-  };
-
-  struct state_acc_pair_hash :
-    public std::unary_function<const state_acc_pair&, size_t>
-  {
-    bool
-    operator()(const state_acc_pair& that) const
-    {
-      // We assume there will be far more states than acceptance conditions.
-      // Hence we keep only 8 bits for the latter.
-      return (that.first->hash() << 8) + (that.second.id() & 0xFF);
-    }
-  };
-
-  // Each state of the produced automata is numbered.  Map of state seen.
-  typedef Sgi::hash_map<state_acc_pair, unsigned, state_acc_pair_hash,
-			state_acc_pair_equal> acp_seen_map;
-
-  // Set of states yet to produce.
-  typedef Sgi::hash_set<state_acc_pair, state_acc_pair_hash,
-			state_acc_pair_equal> todo_set;
-
-  // Each *source* state corresponds to several states in the produced
-  // automata.  A minmax_pair specifies the range of such associated states.
-  typedef std::pair<unsigned, unsigned> minmax_pair;
-  typedef Sgi::hash_map<state*, minmax_pair,
-			state_ptr_hash, state_ptr_equal> seen_map;
-
-  // Take a STATE from the source automaton, and fill TODO with
-  // the list of associated states to output.  Return the correponding
-  // range in MMP.  Update SEEN, ACP_SEEN, and STATE_NUMBER.
-  //
-  // INIT must be set to true when registering the initial state.
-  // This allows us to create an additional state if required.  (LBTT
-  // supports only one initial state, so whenever the initial state
-  // of the source automaton has to be split, we need to create
-  // a supplementary state, to act as initial state for LBTT.)
-  void
-  fill_todo(todo_set& todo, seen_map& seen, acp_seen_map& acp_seen,
-	    state* state, const tgba* g,
-	    minmax_pair& mmp, unsigned& state_number,
-	    bool init)
-  {
-    typedef std::set<bdd, bdd_less_than> bdd_set;
-
-    seen_map::iterator i = seen.find(state);
-    if (i != seen.end())
-      {
-	mmp = i->second;
-	delete state;
-	return;
-      }
-
-    // Browse the successors of STATE to gather acceptance
-    // conditions of outgoing transitions.
-    bdd_set acc_seen;
-    tgba_succ_iterator* si = g->succ_iter(state);
-    for (si->first(); !si->done(); si->next())
-      {
-	acc_seen.insert(si->current_acceptance_conditions());
-      }
-
-    // Order the creation of the supplementary initial state if needed.
-    // Use bddtrue as acceptance condition because it cannot conflict
-    // with other (state, acceptance cond) pairs in the maps.
-    if (init && acc_seen.size() > 1)
-      {
-	state_acc_pair p(state, bddtrue);
-	todo.insert(p);
-	acp_seen[p] = state_number++;
-      }
-
-    // Order the creation of normal states.
-    mmp.first = state_number;
-    for (bdd_set::iterator i = acc_seen.begin(); i != acc_seen.end(); ++i)
-      {
-	state_acc_pair p(state, *i);
-	todo.insert(p);
-	acp_seen[p] = state_number++;
-      }
-    mmp.second = state_number;
-    seen[state] = mmp;
-  }
-
-  std::ostream&
-  lbtt_reachable(std::ostream& os, const tgba* g)
-  {
-    const bdd_dict* d = g->get_dict();
-    std::ostringstream body;
-
-    seen_map seen;
-    acp_seen_map acp_seen;
-    todo_set todo;
-    unsigned state_number = 0;
-
-    minmax_pair mmp;
-
-    fill_todo(todo, seen, acp_seen,
-	      g->get_init_state(), g, mmp, state_number, true);
-    acceptance_cond_splitter acs(g->all_acceptance_conditions());
-
-    while (!todo.empty())
-      {
-	state_acc_pair sap = *todo.begin();
-	todo.erase(todo.begin());
-	unsigned number = acp_seen[sap];
-
-	// number == 0 is the initial state.  bddtrue as an acceptance
-	// conditions indicates a "fake" initial state introduced
-	// because the original initial state was split into many
-	// states (with different acceptance conditions).
-	// As this "fake" state has no input transitions, there is
-	// no point in computing any acceptance conditions.
-	body << number << (number ? " 0 " : " 1 ");
-	if (sap.second != bddtrue)
-	  acs.split(body, sap.second);
-	body << "-1" << std::endl;
-
-	tgba_succ_iterator* si = g->succ_iter(sap.first);
-	for (si->first(); !si->done(); si->next())
-	  {
-	    // We have put the acceptance conditions on the state,
-	    // so draw only outgoing transition with these acceptance
-	    // conditions.
-
-	    if (sap.second != bddtrue
-		&& si->current_acceptance_conditions() != sap.second)
-	      continue;
-
-	    minmax_pair destrange;
-	    fill_todo(todo, seen, acp_seen,
-		      si->current_state(), g, destrange, state_number, false);
-
-	    // Link to all instances of the successor.
-	    std::string s = bdd_to_lbtt(si->current_condition(), d);
-	    for (unsigned i = destrange.first; i < destrange.second; ++i)
-	      {
-		body << i << " " << s << std::endl;
-	      }
-	  }
-	body << "-1" << std::endl;
-	delete si;
-      }
-
-    os << state_number << " " << acs.count() << std::endl;
-    os << body.str();
-    // Finally delete all states used as keys in m.
-    seen_map::const_iterator s = seen.begin();
-    while (s != seen.end())
-      {
-	// Advance the iterator before deleting the "key" pointer.
-	const state* ptr = s->first;
-	++s;
-	delete ptr;
-      }
-    return os;
-  }
-
-
-  class nonacceptant_lbtt_bfs : public tgba_reachable_iterator_breadth_first
+  class lbtt_bfs : public tgba_reachable_iterator_breadth_first
   {
   public:
-    nonacceptant_lbtt_bfs(const tgba* a, std::ostream& os)
-      : tgba_reachable_iterator_breadth_first(a), os_(os), acc_count_(0)
+    lbtt_bfs(const tgba* a, std::ostream& os)
+      : tgba_reachable_iterator_breadth_first(a),
+	os_(os),
+	acc_count_(0),
+	acs_(a->all_acceptance_conditions())
+
     {
       // Count the number of acceptance_conditions.
       bdd all = a->all_acceptance_conditions();
@@ -301,24 +125,24 @@ namespace spot
     {
       --n;
       if (n == 0)
-	body_ << "0 1 -1" << std::endl;
+	body_ << "0 1" << std::endl;
       else
-	body_ << "-1" << std::endl << n << " 0 -1" << std::endl;
+	body_ << "-1" << std::endl << n << " 0" << std::endl;
     }
 
     void
     process_link(int, int out, const tgba_succ_iterator* si)
     {
-      --out;
-      std::string s =
-	bdd_to_lbtt(si->current_condition(), automata_->get_dict());
-      body_ << out << " " << s << std::endl;
+      body_ << out - 1 << " ";
+      acs_.split(body_, si->current_acceptance_conditions());
+      body_ << "-1 " << bdd_to_lbtt(si->current_condition(),
+				    automata_->get_dict()) << std::endl;
     }
 
     void
     end()
     {
-      os_ << seen.size() << " " << acc_count_ << std::endl
+      os_ << seen.size() << " " << acc_count_ << "t" << std::endl
 	  << body_.str() << "-1" << std::endl;
     }
 
@@ -326,13 +150,14 @@ namespace spot
     std::ostream& os_;
     std::ostringstream body_;
     unsigned acc_count_;
+    acceptance_cond_splitter acs_;
   };
 
 
   std::ostream&
-  nonacceptant_lbtt_reachable(std::ostream& os, const tgba* g)
+  lbtt_reachable(std::ostream& os, const tgba* g)
   {
-    nonacceptant_lbtt_bfs b(g, os);
+    lbtt_bfs b(g, os);
     b.run();
     return os;
   }
