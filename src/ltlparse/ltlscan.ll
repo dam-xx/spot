@@ -34,29 +34,30 @@ flex_set_buffer(const char *buf)
   yylloc->step ();
 %}
 
-"("		return PAR_OPEN;
-")"		return PAR_CLOSE;
+"("			return PAR_OPEN;
+")"			return PAR_CLOSE;
 
-"!"		return OP_NOT;
-"|"|"+"		return OP_OR;
-"&"|"."|"*"	return OP_AND;
-"^"		return OP_XOR;
-"=>"|"->"	return OP_IMPLIES;
-"<=>"|"<->"	return OP_EQUIV;
+"!"			return OP_NOT;
+  /* & and | come from Spin.  && and || from LTL2BA.  */
+"||"|"|"|"+"		return OP_OR;
+"&&"|"&"|"."|"*"	return OP_AND;
+"^"			return OP_XOR;
+"=>"|"->"		return OP_IMPLIES;
+"<=>"|"<->"		return OP_EQUIV;
 
   /* <>, [], and () are used in Spin.  */
-"F"|"<>"	return OP_F;
-"G"|"[]"	return OP_G;
-"U"		return OP_U;
-"R"|"V"		return OP_R;
-"X"|"()"	return OP_X;
+"F"|"<>"		return OP_F;
+"G"|"[]"		return OP_G;
+"U"			return OP_U;
+"R"|"V"			return OP_R;
+"X"|"()"		return OP_X;
 
-"1"|"true"	return CONST_TRUE;
-"0"|"false"	return CONST_FALSE;
+"1"|"true"		return CONST_TRUE;
+"0"|"false"		return CONST_FALSE;
 
-[ \t\n]+	yylloc->step (); /* discard whitespace */
+[ \t\n]+		/* discard whitespace */ yylloc->step (); 
 
-  /* An Atomic propisition cannot start with the letter
+  /* An Atomic proposition cannot start with the letter
      used by a unary operator (F,G,X), unless this
      letter is followed by a digit in which case we assume
      it's an ATOMIC_PROP (even though F0 could be seen as Ffalse).  */

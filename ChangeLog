@@ -1,3 +1,9 @@
+2003-04-18  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
+
+	* src/ltlparse/ltlscan.ll: Recognize && and ||.
+	* src/ltltest/parse.test, src/ltltest/parseerr.test, 
+	src/ltltest/equals.test: Use these operators..
+
 2003-04-17  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
 	* src/ltltest/readltl.cc, src/ltltest/equals.cc: Cosmetics.
