@@ -47,6 +47,9 @@ namespace spot
 
     /// Output statistics about this object.
     void print_stats(std::ostream& os) const;
+
+    /// Return the number of states visited by the search
+    int states() const;
   };
 
 }

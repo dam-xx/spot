@@ -31,6 +31,7 @@ tgbaalgos_HEADERS = \
   dottydec.hh \
   dupexp.hh \
   emptiness.hh \
+  emptiness_stats.hh \
   lbtt.hh \
   ltl2tgba_fm.hh \
   ltl2tgba_lacim.hh \
@@ -47,7 +48,8 @@ tgbaalgos_HEADERS = \
   stats.hh \
   tau03.hh \
   tau03opt.hh \
-  reductgba_sim.hh
+  reductgba_sim.hh \
+  weight.hh
 
 noinst_LTLIBRARIES = libtgbaalgos.la
 libtgbaalgos_la_SOURCES = \
@@ -72,6 +74,7 @@ libtgbaalgos_la_SOURCES = \
   tau03.cc \
   tau03opt.cc \
   reductgba_sim.cc \
-  reductgba_sim_del.cc
+  reductgba_sim_del.cc \
+  weight.cc
 
 libtgbaalgos_la_LIBADD = gtec/libgtec.la

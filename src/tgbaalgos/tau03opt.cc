@@ -19,10 +19,23 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-/// FIXME: Add
-/// - the optimisation based on weights (a weight by accepting conditions),
-/// - the computation of a counter example if detected.
-/// - a bit-state hashing version.
+/// FIXME:
+///
+/// * Add the computation of a counter example if detected.
+///
+/// * Add some heuristics on the order of visit of the successors in the blue
+///   dfs:
+///   - favorize the arcs conducting to the blue stack (the states of color
+///     cyan)
+///   - in this category, favorize the arcs labelled
+///   - for the remaining ones, favorize the arcs labelled by the greatest
+///     number of new acceptance conditions (notice that this number may evolve
+///     after the visit of previous successors).
+///
+/// * Add a bit-state hashing version.
+///
+/// * Is it possible to reduce the tgba on-the-fly during the product: only the
+///   acceptance conditions are pertinent...
 
 //#define TRACE
 
@@ -36,7 +49,9 @@
 #include "misc/hash.hh"
 #include "tgba/tgba.hh"
 #include "emptiness.hh"
+#include "emptiness_stats.hh"
 #include "tau03opt.hh"
+#include "weight.hh"
 
 namespace spot
 {
@@ -47,14 +62,17 @@ namespace spot
     /// \brief Emptiness checker on spot::tgba automata having at most one
     /// accepting condition (i.e. a TBA).
     template <typename heap>
-    class tau03_opt_search : public emptiness_check
+    class tau03_opt_search : public emptiness_check, public ec_statistics
     {
     public:
       /// \brief Initialize the search algorithm on the automaton \a a
       tau03_opt_search(const tgba *a, size_t size)
-        : h(size), a(a), all_acc(a->all_acceptance_conditions())
+        : ec_statistics(),
+          current_weight(a->neg_acceptance_conditions()),
+          h(size),
+          a(a),
+          all_acc(a->all_acceptance_conditions())
       {
-        assert(a->number_of_acceptance_conditions() > 0);
       }
 
       virtual ~tau03_opt_search()
@@ -80,17 +98,12 @@ namespace spot
       /// accepting path.
       virtual emptiness_check_result* check()
       {
-        if (!st_red.empty())
-          {
-            assert(!st_blue.empty());
+        if (!st_blue.empty())
             return 0;
-          }
-        assert(st_blue.empty());
-        nbn = nbt = 0;
-        sts = mdp = 0;
+        assert(st_red.empty());
         const state* s0 = a->get_init_state();
-        ++nbn;
-        h.add_new_state(s0, CYAN);
+        inc_states();
+        h.add_new_state(s0, CYAN, current_weight);
         push(st_blue, s0, bddfalse, bddfalse);
         if (dfs_blue())
           return new emptiness_check_result;
@@ -99,17 +112,13 @@ namespace spot
 
       virtual std::ostream& print_stats(std::ostream &os) const
       {
-        os << nbn << " distinct nodes visited" << std::endl;
-        os << nbt << " transitions explored" << std::endl;
-        os << mdp << " nodes for the maximal stack depth" << std::endl;
+        os << states() << " distinct nodes visited" << std::endl;
+        os << transitions() << " transitions explored" << std::endl;
+        os << max_depth() << " nodes for the maximal stack depth" << std::endl;
         return os;
       }
 
     private:
-      /// \brief counters for statistics (number of distinct nodes, of
-      /// transitions and maximal stacks size.
-      int nbn, nbt, mdp, sts;
-
       struct stack_item
       {
         stack_item(const state* n, tgba_succ_iterator* i, bdd l, bdd a)
@@ -131,13 +140,21 @@ namespace spot
       void push(stack_type& st, const state* s,
                         const bdd& label, const bdd& acc)
       {
-        ++sts;
-        if (sts>mdp)
-          mdp = sts;
+        inc_depth();
         tgba_succ_iterator* i = a->succ_iter(s);
         i->first();
         st.push_front(stack_item(s, i, label, acc));
       }
+
+      void pop(stack_type& st)
+      {
+        dec_depth();
+        delete st.front().it;
+        st.pop_front();
+      }
+
+      /// \brief weight of the state on top of the blue stack.
+      weight current_weight;
 
       /// \brief Stack of the blue dfs.
       stack_type st_blue;
@@ -160,30 +177,31 @@ namespace spot
         while (!st_blue.empty())
           {
             stack_item& f = st_blue.front();
-#ifdef TRACE
+#           ifdef TRACE
             std::cout << "DFS_BLUE treats: "
                       << a->format_state(f.s) << std::endl;
-#endif
+#           endif
             if (!f.it->done())
               {
-                ++nbt;
                 const state *s_prime = f.it->current_state();
-                bdd label = f.it->current_condition();
-                bdd acc = f.it->current_acceptance_conditions();
-#ifdef TRACE
+#               ifdef TRACE
                 std::cout << "  Visit the successor: "
                           << a->format_state(s_prime) << std::endl;
-#endif
+#               endif
+                bdd label = f.it->current_condition();
+                bdd acc = f.it->current_acceptance_conditions();
+                // Go down the edge (f.s, <label, acc>, s_prime)
                 f.it->next();
+                inc_transitions();
                 typename heap::color_ref c_prime = h.get_color_ref(s_prime);
                 if (c_prime.is_white())
-                // Go down the edge (f.s, <label, acc>, s_prime)
                   {
-                    ++nbn;
-#ifdef TRACE
+#                   ifdef TRACE
                     std::cout << "  It is white, go down" << std::endl;
-#endif
-                    h.add_new_state(s_prime, CYAN);
+#                   endif
+                    current_weight += acc;
+                    inc_states();
+                    h.add_new_state(s_prime, CYAN, current_weight);
                     push(st_blue, s_prime, label, acc);
                   }
                 else
@@ -191,23 +209,47 @@ namespace spot
                     typename heap::color_ref c = h.get_color_ref(f.s);
                     assert(!c.is_white());
                     if (c_prime.get_color() == CYAN &&
-                      (c.get_acc() | acc | c_prime.get_acc()) == all_acc)
+                      ((current_weight - c_prime.get_weight()) |
+                          c.get_acc() | acc | c_prime.get_acc()) == all_acc)
                       {
-#ifdef TRACE
-                          std::cout << "  It is cyan and acceptance condition "
-                                    << "is reached, report cycle" << std::endl;
-#endif
+#                       ifdef TRACE
+                        std::cout << "  It is cyan and acceptance condition "
+                                  << "is reached, report cycle" << std::endl;
+#                       endif
                         c_prime.cumulate_acc(c.get_acc() | acc);
                         push(st_red, s_prime, label, acc);
                         return true;
                       }
-                    else // Backtrack the edge (f.s, <label, acc>, s_prime)
+                    else
                       {
-#ifdef TRACE
-                          std::cout << "  It is cyan or blue, pop it"
-                                    << std::endl;
-#endif
-                          h.pop_notify(s_prime);
+#                       ifdef TRACE
+                        std::cout << "  It is cyan or blue and";
+#                       endif
+                        bdd acu = acc | c.get_acc();
+                        if ((c_prime.get_acc() & acu) != acu)
+                          {
+#                           ifdef TRACE
+                            bdd_print_acc(std::cout, a->get_dict(), acu);
+                            std::cout << "  is not included in ";
+                            bdd_print_acc(std::cout, a->get_dict(),
+                                                          c_prime.get_acc());
+                            std::cout << ", start a red dfs propagating: ";
+                            bdd_print_acc(std::cout, a->get_dict(), acu);
+                            std::cout << std::endl;
+#                           endif
+                            c_prime.cumulate_acc(acu);
+                            push(st_red, s_prime, label, acc);
+                            if (dfs_red(acu))
+                              return true;
+                          }
+                        else
+                          {
+#                           ifdef TRACE
+                            std::cout << " no propagation is needed, pop it."
+                                      << std::endl;
+#                           endif
+                            h.pop_notify(s_prime);
+                          }
                       }
                   }
               }
@@ -215,58 +257,52 @@ namespace spot
             // Backtrack the edge
             //        (predecessor of f.s in st_blue, <f.label, f.acc>, f.s)
               {
-#ifdef TRACE
+#               ifdef TRACE
                 std::cout << "  All the successors have been visited"
-                          << ", rescan this successors"
                           << std::endl;
-#endif
-                typename heap::color_ref c = h.get_color_ref(f.s);
-                assert(!c.is_white());
-                tgba_succ_iterator* i = a->succ_iter(f.s);
-                for (i->first(); !i->done(); i->next())
+#               endif
+                stack_item f_dest(f);
+                pop(st_blue);
+                current_weight -= f_dest.acc;
+                typename heap::color_ref c_prime = h.get_color_ref(f_dest.s);
+                assert(!c_prime.is_white());
+                c_prime.set_color(BLUE);
+                if (!st_blue.empty())
                   {
-                    ++nbt;
-                    const state *s_prime = i->current_state();
-                    bdd label = i->current_condition();
-                    bdd acc = i->current_acceptance_conditions();
-                    typename heap::color_ref c_prime = h.get_color_ref(s_prime);
-                    assert(!c_prime.is_white());
-                    bdd acu = acc | c.get_acc();
-#ifdef TRACE
-                    std::cout << "DFS_BLUE rescanning the arc from "
-                              << a->format_state(f.s) << "  to "
-                              << a->format_state(s_prime) << std::endl;
-#endif
+                    typename heap::color_ref c =
+                                          h.get_color_ref(st_blue.front().s);
+                    assert(!c.is_white());
+                    bdd acu = f_dest.acc | c.get_acc();
                     if ((c_prime.get_acc() & acu) != acu)
                       {
-#ifdef TRACE
-                        std::cout << "  ";
-                        bdd_print_acc(std::cout, a->get_dict(), acu);
-                        std::cout << "  is not included in ";
-                        bdd_print_acc(std::cout, a->get_dict(),
-                                                        c_prime.get_acc());
+#                       ifdef TRACE
+                        std::cout << "  The arc from "
+                                  << a->format_state(st_blue.front().s)
+                                  << " to the current state implies to "
+                                  << " start a red dfs propagating ";
+                                  bdd_print_acc(std::cout, a->get_dict(), acu);
                         std::cout << std::endl;
-                        std::cout << "  Start a red dfs from "
-                                  << a->format_state(s_prime)
-                                  << "  propagating: ";
-                        bdd_print_acc(std::cout, a->get_dict(), acu);
-                        std::cout << std::endl;
-#endif
+#                       endif
                         c_prime.cumulate_acc(acu);
-                        push(st_red, s_prime, label, acc);
+                        push(st_red, f_dest.s, f_dest.label, f_dest.acc);
                         if (dfs_red(acu))
-                          {
-                            delete i;
                             return true;
-                          }
-                     }
+                      }
+                    else
+                      {
+#                       ifdef TRACE
+                        std::cout << "  Pop it" << std::endl;
+#                       endif
+                        h.pop_notify(f_dest.s);
+                      }
                   }
-                delete i;
-                c.set_color(BLUE);
-                delete f.it;
-                --sts;
-                h.pop_notify(f.s);
-                st_blue.pop_front();
+                else
+                  {
+#                   ifdef TRACE
+                    std::cout << "  Pop it" << std::endl;
+#                   endif
+                    h.pop_notify(f_dest.s);
+                  }
               }
           }
         return false;
@@ -279,72 +315,69 @@ namespace spot
         while (!st_red.empty())
           {
             stack_item& f = st_red.front();
-#ifdef TRACE
+#           ifdef TRACE
             std::cout << "DFS_RED treats: "
                       << a->format_state(f.s) << std::endl;
-#endif
-            if (!f.it->done()) // Go down
+#           endif
+            if (!f.it->done())
               {
-                ++nbt;
                 const state *s_prime = f.it->current_state();
-                bdd label = f.it->current_condition();
-                bdd acc = f.it->current_acceptance_conditions();
-#ifdef TRACE
+#               ifdef TRACE
                 std::cout << "  Visit the successor: "
                           << a->format_state(s_prime) << std::endl;
-#endif
+#               endif
+                bdd label = f.it->current_condition();
+                bdd acc = f.it->current_acceptance_conditions();
+                // Go down the edge (f.s, <label, acc>, s_prime)
                 f.it->next();
+                inc_transitions();
                 typename heap::color_ref c_prime = h.get_color_ref(s_prime);
-                if (!c_prime.is_white())
+                if (c_prime.is_white())
                   {
-                    if (c_prime.get_color() == CYAN &&
-                        (c_prime.get_acc() | acu) == all_acc)
-                      {
-#ifdef TRACE
-                        std::cout << "  It is cyan and acceptance condition "
-                                  << "is reached, report cycle" << std::endl;
-#endif
-                        c_prime.cumulate_acc(acu);
-                        push(st_red, s_prime, label, acc);
-                        return true;
-                      }
-                    else if ((c_prime.get_acc() & acu) != acu)
-                      {
-#ifdef TRACE
-                        std::cout << "  It is cyan or blue and propagation "
-                                  << "is needed, go down"
-                                  << std::endl;
-#endif
-                        c_prime.cumulate_acc(acu);
-                        push(st_red, s_prime, label, acc);
-                      }
-                    else
-                      {
-#ifdef TRACE
-                        std::cout << "  It is cyan or blue and no propagation "
-                                  << "is needed , pop it" << std::endl;
-#endif
-                        h.pop_notify(s_prime);
-                      }
+#                   ifdef TRACE
+                    std::cout << "  It is white, pop it" << std::endl;
+#                   endif
+                    delete s_prime;
+                  }
+                 else if (c_prime.get_color() == CYAN &&
+                     ((current_weight - c_prime.get_weight()) |
+                                c_prime.get_acc() | acu) == all_acc)
+                  {
+#                   ifdef TRACE
+                    std::cout << "  It is cyan and acceptance condition "
+                              << "is reached, report cycle" << std::endl;
+#                   endif
+                    c_prime.cumulate_acc(acu);
+                    push(st_red, s_prime, label, acc);
+                    return true;
+                  }
+                else if ((c_prime.get_acc() & acu) != acu)
+                  {
+#                   ifdef TRACE
+                    std::cout << "  It is cyan or blue and propagation "
+                              << "is needed, go down"
+                              << std::endl;
+#                   endif
+                    c_prime.cumulate_acc(acu);
+                    push(st_red, s_prime, label, acc);
                   }
                 else
                   {
-#ifdef TRACE
-                    std::cout << "  It is white, pop it" << std::endl;
-#endif
-                    delete s_prime;
+#                   ifdef TRACE
+                    std::cout << "  It is cyan or blue and no propagation "
+                              << "is needed , pop it" << std::endl;
+#                   endif
+                    h.pop_notify(s_prime);
                   }
               }
             else // Backtrack
               {
-#ifdef TRACE
-                std::cout << "  All the successors have been visited"
-                          << ", pop it" << std::endl;
-#endif
-                --sts;
+#               ifdef TRACE
+                std::cout << "  All the successors have been visited, pop it"
+                          << std::endl;
+#               endif
                 h.pop_notify(f.s);
-                delete f.it;
-                st_red.pop_front();
+                pop(st_red);
               }
           }
         return false;
@@ -354,21 +387,52 @@ namespace spot
 
     class explicit_tau03_opt_search_heap
     {
+      typedef Sgi::hash_map<const state*, std::pair<weight, bdd>,
+                state_ptr_hash, state_ptr_equal> hcyan_type;
+      typedef Sgi::hash_map<const state*, std::pair<color, bdd>,
+                state_ptr_hash, state_ptr_equal> hash_type;
     public:
       class color_ref
       {
       public:
-        color_ref(color* c, bdd* a) :p(c), acc(a)
+        color_ref(hash_type* h, hcyan_type* hc, const state* s,
+            const weight* w, bdd* a)
+          : is_cyan(true), w(w), ph(h), phc(hc), ps(s), acc(a)
+          {
+          }
+        color_ref(color* c, bdd* a)
+          : is_cyan(false), pc(c), acc(a)
           {
           }
         color get_color() const
           {
-            return *p;
+            if (is_cyan)
+              return CYAN;
+            return *pc;
+          }
+        const weight& get_weight() const
+          {
+            assert(is_cyan);
+            return *w;
           }
         void set_color(color c)
           {
             assert(!is_white());
-            *p = c;
+            if (is_cyan)
+              {
+                assert(c != CYAN);
+                std::pair<hash_type::iterator, bool> p;
+                p = ph->insert(std::make_pair(ps, std::make_pair(c, *acc)));
+                assert(p.second);
+                acc = &(p.first->second.second);
+                int i = phc->erase(ps);
+                assert(i==1);
+                (void)i;
+              }
+            else
+              {
+                *pc=c;
+              }
           }
         const bdd& get_acc() const
           {
@@ -382,11 +446,17 @@ namespace spot
           }
         bool is_white() const
           {
-            return p == 0;
+            return !is_cyan && pc == 0;
           }
       private:
-        color *p;
-        bdd* acc;
+        bool is_cyan;
+        const weight* w; // point to the weight of a state in hcyan
+        hash_type* ph; //point to the main hash table
+        hcyan_type* phc; // point to the hash table hcyan
+        const state* ps; // point to the state in hcyan
+        color *pc; // point to the color of a state stored in main hash table
+        bdd* acc; // point to the acc set of a state stored in main hash table
+                  // or hcyan
       };
 
       explicit_tau03_opt_search_heap(size_t)
@@ -395,10 +465,16 @@ namespace spot
 
       ~explicit_tau03_opt_search_heap()
         {
+          hcyan_type::const_iterator sc = hc.begin();
+          while (sc != hc.end())
+            {
+              const state* ptr = sc->first;
+              ++sc;
+              delete ptr;
+            }
           hash_type::const_iterator s = h.begin();
           while (s != h.end())
             {
-              // Advance the iterator before deleting the "key" pointer.
               const state* ptr = s->first;
               ++s;
               delete ptr;
@@ -407,21 +483,43 @@ namespace spot
 
       color_ref get_color_ref(const state*& s)
         {
-          hash_type::iterator it = h.find(s);
-          if (it==h.end())
-            return color_ref(0, 0);
-          if (s!=it->first)
+          hcyan_type::iterator ic = hc.find(s);
+          if (ic==hc.end())
+            {
+              hash_type::iterator it = h.find(s);
+              if (it==h.end())
+                // white state
+                return color_ref(0, 0);
+              if (s!=it->first)
+                {
+                  delete s;
+                  s = it->first;
+                }
+              // blue or red state
+              return color_ref(&(it->second.first), &(it->second.second));
+            }
+          if (s!=ic->first)
             {
               delete s;
-              s = it->first;
+              s = ic->first;
             }
-          return color_ref(&(it->second.first), &(it->second.second));
+          // cyan state
+          return color_ref(&h, &hc, ic->first,
+                              &(ic->second.first), &(ic->second.second));
         }
 
       void add_new_state(const state* s, color c)
         {
-          assert(h.find(s)==h.end());
+          assert(hc.find(s)==hc.end() && h.find(s)==h.end());
+          assert(c != CYAN);
           h.insert(std::make_pair(s, std::make_pair(c, bddfalse)));
+        }
+
+      void add_new_state(const state* s, color c, const weight& w)
+        {
+          assert(hc.find(s)==hc.end() && h.find(s)==h.end());
+          assert(c == CYAN);
+          hc.insert(std::make_pair(s, std::make_pair(w, bddfalse)));
         }
 
       void pop_notify(const state*)
@@ -430,9 +528,10 @@ namespace spot
 
     private:
 
-      typedef Sgi::hash_map<const state*, std::pair<color, bdd>,
-                state_ptr_hash, state_ptr_equal> hash_type;
+      // associate to each blue and red state its color and its acceptance set
       hash_type h;
+      // associate to each cyan state its weight and its acceptance set
+      hcyan_type hc;
     };
 
   } // anonymous

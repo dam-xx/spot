@@ -34,6 +34,7 @@
 #include "misc/random.hh"
 
 #include "tgbaalgos/emptiness.hh"
+#include "tgbaalgos/emptiness_stats.hh"
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/se05.hh"
@@ -98,6 +99,51 @@ to_float(const char* s)
   return res;
 }
 
+struct ec_stat
+{
+  int min_states;
+  int max_states;
+  int tot_states;
+  int min_transitions;
+  int max_transitions;
+  int tot_transitions;
+  int min_max_depth;
+  int max_max_depth;
+  int tot_max_depth;
+  int n;
+
+  ec_stat()
+    : n(0)
+  {
+  }
+
+  void
+  count(const spot::ec_statistics* ec)
+  {
+    int s = ec->states();
+    int t = ec->transitions();
+    int m = ec->max_depth();
+    if (n++)
+      {
+	min_states = std::min(min_states, s);
+	max_states = std::max(max_states, s);
+	tot_states += s;
+	min_transitions = std::min(min_transitions, t);
+	max_transitions = std::max(max_transitions, t);
+	tot_transitions += t;
+	min_max_depth = std::min(min_max_depth, m);
+	max_max_depth = std::max(max_max_depth, m);
+	tot_max_depth += m;
+      }
+    else
+      {
+	min_states = max_states = tot_states = s;
+	min_transitions = max_transitions = tot_transitions = t;
+	min_max_depth = max_max_depth = tot_max_depth = m;
+      }
+  }
+};
+
 struct ce_stat
 {
   int min_prefix;
@@ -161,8 +207,11 @@ main(int argc, char** argv)
 
   int exit_code = 0;
 
-  typedef std::map<std::string, ce_stat> stats_type;
-  stats_type stats;
+  typedef std::map<std::string, ec_stat> ec_stats_type;
+  ec_stats_type ec_stats;
+
+  typedef std::map<std::string, ce_stat> ce_stats_type;
+  ce_stats_type ce_stats;
 
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* ap = new spot::ltl::atomic_prop_set;
@@ -271,17 +320,6 @@ main(int argc, char** argv)
 	  ec_name.push_back("couvreur99_shy");
 	  ec_safe.push_back(true);
 
-	  if (opt_n_acc >= 1)
-	    {
-              ec_obj.push_back(spot::explicit_tau03_search(a));
-              ec_name.push_back("explicit_tau03_search");
-              ec_safe.push_back(true);
-
-              ec_obj.push_back(spot::explicit_tau03_opt_search(a));
-              ec_name.push_back("explicit_tau03_opt_search");
-              ec_safe.push_back(true);
-            }
-
 	  if (opt_n_acc <= 1)
 	    {
 	      ec_obj.push_back(spot::explicit_magic_search(a));
@@ -301,6 +339,17 @@ main(int argc, char** argv)
 	      ec_safe.push_back(false);
 	    }
 
+	  if (opt_n_acc >= 1)
+	    {
+              ec_obj.push_back(spot::explicit_tau03_search(a));
+              ec_name.push_back("explicit_tau03_search");
+              ec_safe.push_back(true);
+            }
+
+          ec_obj.push_back(spot::explicit_tau03_opt_search(a));
+          ec_name.push_back("explicit_tau03_opt_search");
+          ec_safe.push_back(true);
+
 	  int n_ec = ec_obj.size();
 	  int n_empty = 0;
 	  int n_non_empty = 0;
@@ -312,6 +361,10 @@ main(int argc, char** argv)
 	      std::cout.width(32);
 	      std::cout << algo << ": ";
 	      spot::emptiness_check_result* res = ec_obj[i]->check();
+	      const spot::ec_statistics* ecs =
+                       dynamic_cast<const spot::ec_statistics*>(ec_obj[i]);
+              if (opt_z && ecs)
+		ec_stats[algo].count(ecs);
 	      if (res)
 		{
 		  std::cout << "accepting run exists";
@@ -331,7 +384,7 @@ main(int argc, char** argv)
 			    {
 			      std::cout << ", computed OK";
 			      if (opt_z)
-				stats[algo].count(run);
+				ce_stats[algo].count(run);
 			    }
 			  if (opt_z)
 			    std::cout << " [" << run->prefix.size()
@@ -387,7 +440,61 @@ main(int argc, char** argv)
     }
   while (opt_ec);
 
-  if (!stats.empty())
+  if (!ec_stats.empty())
+    {
+      std::cout << "Statistics about emptiness checkers:" << std::endl;
+      std::cout << std::setw(32) << ""
+		<< " |       states      |    transitions    |"
+		<< std::endl << std::setw(32) << "algorithm"
+		<< " |  min < mean < max |  min < mean < max |   n "
+		<< std::endl
+		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl << std::setprecision(3);
+      for (ec_stats_type::const_iterator i = ec_stats.begin();
+                                                i != ec_stats.end(); ++i)
+	std::cout << std::setw(32) << i->first << " |"
+		  << std::setw(5) << i->second.min_states
+		  << " "
+		  << std::setw(6)
+		  << static_cast<float>(i->second.tot_states) / i->second.n
+		  << " "
+		  << std::setw(5) << i->second.max_states
+		  << " |"
+		  << std::setw(5) << i->second.min_transitions
+		  << " "
+		  << std::setw(6)
+		  << static_cast<float>(i->second.tot_transitions) / i->second.n
+		  << " "
+		  << std::setw(5) << i->second.max_transitions
+		  << " |"
+		  << std::setw(5) << i->second.n
+		  << std::endl;
+      std::cout << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl
+		<< std::setw(32) << ""
+		<< " |   maximal depth   |"
+		<< std::endl << std::setw(32) << "algorithm"
+		<< " |  min < mean < max |   n "
+		<< std::endl
+		<< std::setw(59) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl;
+      for (ec_stats_type::const_iterator i = ec_stats.begin();
+                                                i != ec_stats.end(); ++i)
+	std::cout << std::setw(32) << i->first << " |"
+		  << std::setw(5)
+		  << i->second.min_max_depth
+		  << " "
+		  << std::setw(6)
+		  << static_cast<float>(i->second.tot_max_depth) / i->second.n
+		  << " "
+		  << std::setw(5)
+		  << i->second.max_max_depth
+		  << " |"
+		  << std::setw(5) << i->second.n
+		  << std::endl;
+    }
+
+  if (!ce_stats.empty())
     {
       std::cout << "Statistics about counter-examples:" << std::endl;
       std::cout << std::setw(32) << ""
@@ -397,7 +504,8 @@ main(int argc, char** argv)
 		<< std::endl
 		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
 		<< std::endl << std::setprecision(3);
-      for (stats_type::const_iterator i = stats.begin(); i != stats.end(); ++i)
+      for (ce_stats_type::const_iterator i = ce_stats.begin();
+                                                i != ce_stats.end(); ++i)
 	std::cout << std::setw(32) << i->first << " |"
 		  << std::setw(5) << i->second.min_prefix
 		  << " "
@@ -424,7 +532,8 @@ main(int argc, char** argv)
 		<< std::endl
 		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
 		<< std::endl;
-      for (stats_type::const_iterator i = stats.begin(); i != stats.end(); ++i)
+      for (ce_stats_type::const_iterator i = ce_stats.begin();
+                                                i != ce_stats.end(); ++i)
 	std::cout << std::setw(32) << i->first << " |"
 		  << std::setw(5)
 		  << i->second.min_run

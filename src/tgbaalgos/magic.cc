@@ -19,11 +19,18 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+//#define TRACE
+
+#ifdef TRACE
+#include <iostream>
+#endif
+
 #include <cassert>
 #include <list>
 #include "misc/hash.hh"
 #include "tgba/tgba.hh"
 #include "emptiness.hh"
+#include "emptiness_stats.hh"
 #include "magic.hh"
 
 namespace spot
@@ -35,7 +42,7 @@ namespace spot
     /// \brief Emptiness checker on spot::tgba automata having at most one
     /// accepting condition (i.e. a TBA).
     template <typename heap>
-    class magic_search : public emptiness_check
+    class magic_search : public emptiness_check, public ec_statistics
     {
     public:
       /// \brief Initialize the Magic Search algorithm on the automaton \a a
@@ -43,7 +50,10 @@ namespace spot
       /// \pre The automaton \a a must have at most one accepting
       /// condition (i.e. it is a TBA).
       magic_search(const tgba *a, size_t size)
-        : h(size), a(a), all_cond(a->all_acceptance_conditions())
+        : ec_statistics(),
+          h(size),
+          a(a),
+          all_cond(a->all_acceptance_conditions())
       {
         assert(a->number_of_acceptance_conditions() <= 1);
       }
@@ -75,13 +85,11 @@ namespace spot
       /// visits only a finite set of accepting paths.
       virtual emptiness_check_result* check()
       {
-        nbn = nbt = 0;
-        sts = mdp = st_blue.size() + st_red.size();
         if (st_red.empty())
           {
             assert(st_blue.empty());
             const state* s0 = a->get_init_state();
-            ++nbn;
+            inc_states();
             h.add_new_state(s0, BLUE);
             push(st_blue, s0, bddfalse, bddfalse);
             if (dfs_blue())
@@ -90,8 +98,7 @@ namespace spot
         else
           {
             h.pop_notify(st_red.front().s);
-            delete st_red.front().it;
-            st_red.pop_front();
+            pop(st_red);
             if (!st_red.empty() && dfs_red())
               return new result(*this);
             else
@@ -103,9 +110,9 @@ namespace spot
 
       virtual std::ostream& print_stats(std::ostream &os) const
       {
-        os << nbn << " distinct nodes visited" << std::endl;
-        os << nbt << " transitions explored" << std::endl;
-        os << mdp << " nodes for the maximal stack depth" << std::endl;
+        os << states() << " distinct nodes visited" << std::endl;
+        os << transitions() << " transitions explored" << std::endl;
+        os << max_depth() << " nodes for the maximal stack depth" << std::endl;
         if (!st_red.empty())
           {
             assert(!st_blue.empty());
@@ -116,9 +123,6 @@ namespace spot
       }
 
     private:
-      /// \brief counters for statistics (number of distinct nodes, of
-      /// transitions and maximal stacks size.
-      int nbn, nbt, mdp, sts;
 
       struct stack_item
       {
@@ -141,12 +145,17 @@ namespace spot
       void push(stack_type& st, const state* s,
                         const bdd& label, const bdd& acc)
       {
-        ++sts;
-        if (sts>mdp)
-          mdp = sts;
+        inc_depth();
         tgba_succ_iterator* i = a->succ_iter(s);
         i->first();
         st.push_front(stack_item(s, i, label, acc));
+      }
+
+      void pop(stack_type& st)
+      {
+        dec_depth();
+        delete st.front().it;
+        st.pop_front();
       }
 
       /// \brief Stack of the blue dfs.
@@ -173,64 +182,98 @@ namespace spot
         while (!st_blue.empty())
           {
             stack_item& f = st_blue.front();
+#           ifdef TRACE
+            std::cout << "DFS_BLUE treats: "
+                      << a->format_state(f.s) << std::endl;
+#           endif
             if (!f.it->done())
               {
-                ++nbt;
                 const state *s_prime = f.it->current_state();
+#               ifdef TRACE
+                std::cout << "  Visit the successor: "
+                          << a->format_state(s_prime) << std::endl;
+#               endif
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
+                // Go down the edge (f.s, <label, acc>, s_prime)
                 f.it->next();
+                inc_transitions();
                 typename heap::color_ref c = h.get_color_ref(s_prime);
                 if (c.is_white())
-                // Go down the edge (f.s, <label, acc>, s_prime)
                   {
-                    ++nbn;
+#                   ifdef TRACE
+                    std::cout << "  It is white, go down" << std::endl;
+#                   endif
+                    inc_states();
                     h.add_new_state(s_prime, BLUE);
                     push(st_blue, s_prime, label, acc);
                   }
-                else // Backtrack the edge (f.s, <label, acc>, s_prime)
+                else
                   {
-                    if (c.get() != RED && acc == all_cond)
-                    // the test 'c.get() != RED' is added to limit
-                    // the number of runs reported by successive
-                    // calls to the check method. Without this
-                    // functionnality, the test can be ommited.
+                    if (acc == all_cond && c.get_color() != RED)
                       {
+                        // the test 'c.get_color() != RED' is added to limit
+                        // the number of runs reported by successive
+                        // calls to the check method. Without this
+                        // functionnality, the test can be ommited.
+#                       ifdef TRACE
+                        std::cout << "  It is blue and the arc is "
+                                  << "accepting, start a red dfs" << std::endl;
+#                       endif
                         target = f.s;
-                        c.set(RED);
+                        c.set_color(RED);
                         push(st_red, s_prime, label, acc);
                         if (dfs_red())
                           return true;
                       }
                     else
-                      h.pop_notify(s_prime);
+                      {
+#                       ifdef TRACE
+                        std::cout << "  It is blue or red, pop it" << std::endl;
+#                       endif
+                        h.pop_notify(s_prime);
+                      }
                   }
               }
             else
             // Backtrack the edge
             //        (predecessor of f.s in st_blue, <f.label, f.acc>, f.s)
               {
-                --sts;
+#               ifdef TRACE
+                std::cout << "  All the successors have been visited"
+                          << std::endl;
+#               endif
                 stack_item f_dest(f);
-                delete f.it;
-                st_blue.pop_front();
+                pop(st_blue);
                 typename heap::color_ref c = h.get_color_ref(f_dest.s);
                 assert(!c.is_white());
-                if (c.get() != RED && f_dest.acc == all_cond
-                                    && !st_blue.empty())
-                // the test 'c.get() != RED' is added to limit
-                // the number of runs reported by successive
-                // calls to the check method. Without this
-                // functionnality, the test can be ommited.
+                if (!st_blue.empty() &&
+                           f_dest.acc == all_cond && c.get_color() != RED)
                   {
+                    // the test 'c.get_color() != RED' is added to limit
+                    // the number of runs reported by successive
+                    // calls to the check method. Without this
+                    // functionnality, the test can be ommited.
+#                   ifdef TRACE
+                    std::cout << "  It is blue and the arc from "
+                              << a->format_state(st_blue.front().s)
+                              << " to it is accepting, start a red dfs"
+                              << std::endl;
+#                   endif
                     target = st_blue.front().s;
-                    c.set(RED);
+                    c.set_color(RED);
                     push(st_red, f_dest.s, f_dest.label, f_dest.acc);
                     if (dfs_red())
                       return true;
                   }
                 else
-                  h.pop_notify(f_dest.s);
+                  {
+#                   ifdef TRACE
+                    std::cout << "  Pop it"
+                              << std::endl;
+#                   endif
+                    h.pop_notify(f_dest.s);
+                  }
               }
           }
         return false;
@@ -245,40 +288,63 @@ namespace spot
         while (!st_red.empty())
           {
             stack_item& f = st_red.front();
-            if (!f.it->done()) // Go down
+#           ifdef TRACE
+            std::cout << "DFS_RED treats: "
+                      << a->format_state(f.s) << std::endl;
+#           endif
+            if (!f.it->done())
               {
-                ++nbt;
                 const state *s_prime = f.it->current_state();
+#               ifdef TRACE
+                std::cout << "  Visit the successor: "
+                          << a->format_state(s_prime) << std::endl;
+#               endif
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
+                // Go down the edge (f.s, <label, acc>, s_prime)
                 f.it->next();
+                inc_transitions();
                 typename heap::color_ref c = h.get_color_ref(s_prime);
                 if (c.is_white())
-                // Go down the edge (f.s, <label, acc>, s_prime)
                   {
-                    ++nbn;
-                    h.add_new_state(s_prime, RED);
-                    push(st_red, s_prime, label, acc);
+                    // If the red dfs find a white here, it must have crossed
+                    // the blue stack and the target must be reached soon.
+                    // Notice that this property holds only for explicit search.
+                    // Collisions in bit-state hashing search can also lead
+                    // to the visit of white state. Anyway, it is not necessary
+                    // to visit white states either if a cycle can be missed
+                    // with bit-state hashing search.
+#                   ifdef TRACE
+                    std::cout << "  It is white, pop it" << std::endl;
+#                   endif
+                    delete s_prime;
                   }
-                else // Go down the edge (f.s, <label, acc>, s_prime)
+                else if (c.get_color() == BLUE)
                   {
-                    if (c.get() != RED)
-                      {
-                        c.set(RED);
-                        push(st_red, s_prime, label, acc);
-                        if (target->compare(s_prime) == 0)
-                          return true;
-                      }
-                    else
-                      h.pop_notify(s_prime);
+#                   ifdef TRACE
+                    std::cout << "  It is blue, go down" << std::endl;
+#                   endif
+                    c.set_color(RED);
+                    push(st_red, s_prime, label, acc);
+                    if (target->compare(s_prime) == 0)
+                      return true;
+                  }
+                else
+                  {
+#                   ifdef TRACE
+                    std::cout << "  It is red, pop it" << std::endl;
+#                   endif
+                    h.pop_notify(s_prime);
                   }
               }
             else // Backtrack
               {
-                --sts;
+#               ifdef TRACE
+                std::cout << "  All the successors have been visited, pop it"
+                          << std::endl;
+#               endif
                 h.pop_notify(f.s);
-                delete f.it;
-                st_red.pop_front();
+                pop(st_red);
               }
           }
         return false;
@@ -343,11 +409,11 @@ namespace spot
         color_ref(color* c) :p(c)
           {
           }
-        color get() const
+        color get_color() const
           {
             return *p;
           }
-        void set(color c)
+        void set_color(color c)
           {
             assert(!is_white());
             *p=c;
@@ -415,17 +481,17 @@ namespace spot
         color_ref(unsigned char *b, unsigned char o): base(b), offset(o*2)
           {
           }
-        color get() const
+        color get_color() const
           {
             return color(((*base) >> offset) & 3U);
           }
-        void set(color c)
+        void set_color(color c)
           {
             *base =  (*base & ~(3U << offset)) | (c << offset);
           }
         bool is_white() const
           {
-            return get()==WHITE;
+            return get_color()==WHITE;
           }
       private:
         unsigned char *base;
@@ -454,7 +520,7 @@ namespace spot
         {
           color_ref cr(get_color_ref(s));
           assert(cr.is_white());
-          cr.set(c);
+          cr.set_color(c);
         }
 
       void pop_notify(const state* s)

@@ -677,16 +677,7 @@ main(int argc, char** argv)
             }
 
 	case Tau03OptSearch:
-          if (a->number_of_acceptance_conditions() == 0)
-            {
-              std::cout << "To apply tau03_opt_search, the automaton must "
-                        << "have at least on accepting condition. "
-                        << "Try with another algorithm." << std::endl;
-            }
-          else
-            {
-              ec = spot::explicit_tau03_opt_search(a);
-            }
+          ec = spot::explicit_tau03_opt_search(a);
 	  break;
 	}
 

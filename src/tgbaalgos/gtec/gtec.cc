@@ -221,6 +221,7 @@ namespace spot
 		delete todo.top().second;
 		todo.pop();
 	      }
+            set_states(ecs_->states());
 	    return new couvreur99_check_result(ecs_);
 	  }
       }
@@ -344,6 +345,7 @@ namespace spot
 			  }
 			todo.pop();
 		      }
+                    set_states(ecs_->states());
 		    return new couvreur99_check_result(ecs_);
 		  }
 	      }

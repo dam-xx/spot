@@ -45,4 +45,10 @@ namespace spot
        << " strongly connected components in search stack"
        << std::endl;
   }
+
+  int
+  couvreur99_check_status::states() const
+  {
+    return h->size();
+  }
 }

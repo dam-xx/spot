@@ -49,6 +49,7 @@ expect_ce()
   run 0 ./ltl2tgba -ese05_search -f "$1"
   run 0 ./ltl2tgba -ebsh_se05_search "$1"
   run 0 ./ltl2tgba -ebsh_se05_search -f "$1"
+  run 0 ./ltl2tgba -etau03_opt_search -f "$1"
   # Expect multiple accepting runs
   test `./ltl2tgba -emagic_search_repeated "$1" | grep Prefix: | wc -l` -ge $2
   test `./ltl2tgba -ese05_search_repeated "$1" | grep Prefix: | wc -l` -ge $2
@@ -72,6 +73,7 @@ expect_no()
   run 0 ./ltl2tgba -Ese05_search -f "$1"
   run 0 ./ltl2tgba -Ebsh_se05_search "$1"
   run 0 ./ltl2tgba -Ebsh_se05_search -f "$1"
+  run 0 ./ltl2tgba -Etau03_opt_search -f "$1"
   test `./ltl2tgba -emagic_search_repeated "!($1)" |
         grep Prefix: | wc -l` -ge $2
   test `./ltl2tgba -ese05_search_repeated "!($1)" |

@@ -24,6 +24,7 @@
 
 #include "status.hh"
 #include "tgbaalgos/emptiness.hh"
+#include "tgbaalgos/emptiness_stats.hh"
 
 namespace spot
 {
@@ -71,7 +72,7 @@ namespace spot
   /// tgba_succ_iterators: it must compute all successors of a state
   /// at once in order to decide which to explore first, and must keep
   /// a list of all unexplored successors in its DFS stack.
-  class couvreur99_check: public emptiness_check
+  class couvreur99_check: public emptiness_check, public ec_statistics
   {
   public:
     couvreur99_check(const tgba* a,

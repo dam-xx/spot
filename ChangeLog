@@ -1,3 +1,18 @@
+2004-11-22  Poitrenaud Denis  <denis@src.lip6.fr>
+
+	* src/tgbaalgos/emptiness_stats.hh, src/tgbaalgos/weight.cc,
+	src/tgbaalgos/weight.hh: New files.
+	* src/tgbaalgos/Makefile.am: Add them.
+	* src/tgbaalgos/magic.cc, src/tgbaalgos/se05.cc,
+	src/tgbaalgos/tau03.cc, src/tgbaalgos/tau03opt.cc,
+	src/tgbaalgos/gtec/gtec.cc, src/tgbaalgos/gtec/status.cc,
+	src/tgbaalgos/gtec/status.hh, : Add emptiness check statistics
+	capability.
+	* src/tgbatest/randtgba.cc: Print these statistics.
+	* src/tgbatest/ltl2tgba.cc: tau03opt search can deal without acceptance
+	condition.
+	* src/tgbatest/emptchk.test: Test tau03opt search.
+
 2004-11-19  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/magic.hh, src/tgbaalgos/magic.cc,
