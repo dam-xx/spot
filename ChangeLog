@@ -1,5 +1,14 @@
 2004-12-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/gtec/gtec.hh, src/tgbaalgos/gtec/gtec.cc
+	(couvreur99_check_shy::couvreur99_check_shy): Add the group option,
+	and redefine todo as a list so it can be iterated over.
+	* src/tgbatest/ltl2tgba.cc, src/tgbatest/randtgba.cc: Introduce
+	couvreur99_shy- (for group=false) in addition to couvreur99_shy
+	(for group=true).
+	* iface/gspn/ssp.cc (couvreur99_check_ssp_shy_semi,
+	couvreur99_check_ssp_shy): Use group=true;
+
 	* src/tgbaalgos/randomgraph.cc (random_graph): Do not use the
 	pointer of the state created as keys in sets; otherwise the graph
 	created depends on the memory layout.

@@ -108,11 +108,17 @@ namespace spot
   /// \brief A version of spot::couvreur99_check that tries to visit
   /// known states first.
   ///
+  /// If \a group is true (the default), the successors of all the
+  /// states that belong to the same SCC will be considered when
+  /// choosing a successor.  Otherwise, only the successor of the
+  /// topmost state on the DFS stack are considered.
+  ///
   /// See the documentation for spot::couvreur99_check
   class couvreur99_check_shy : public couvreur99_check
   {
   public:
     couvreur99_check_shy(const tgba* a,
+			 bool group = true,
 			 const numbered_state_heap_factory* nshf
 			 = numbered_state_heap_hash_map_factory::instance());
     virtual ~couvreur99_check_shy();
@@ -140,7 +146,12 @@ namespace spot
     //   (ACCEPTANCE_CONDITIONS, STATE) pairs.
     typedef std::list<successor> succ_queue;
     typedef std::pair<const state*, succ_queue> pair_state_successors;
-    std::stack<pair_state_successors> todo;
+    typedef std::list<pair_state_successors> todo_list;
+    todo_list todo;
+
+    // Whether successors should be grouped for states in the same
+    // SCC.
+    bool group_;
 
     /// \brief find the SCC number of a unprocessed state.
     ///

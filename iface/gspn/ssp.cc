@@ -900,6 +900,7 @@ namespace spot
   public:
     couvreur99_check_shy_ssp(const tgba* a)
       : couvreur99_check_shy(a,
+			     true,
 			     numbered_state_heap_ssp_factory_semi::instance())
     {
     }
@@ -944,7 +945,7 @@ namespace spot
 			{
 			  State* succ_tgba_ = 0;
 			  size_t size_tgba_ = 0;
-			  succ_queue& queue = todo.top().second;
+			  succ_queue& queue = todo.back().second;
 
 			  Diff_succ(old_state->left(), new_state->left(),
 				    &succ_tgba_, &size_tgba_);
@@ -991,7 +992,8 @@ namespace spot
     return
       new couvreur99_check_shy
       (ssp_automata,
-	 numbered_state_heap_ssp_factory_semi::instance());
+       true,
+       numbered_state_heap_ssp_factory_semi::instance());
   }
 
   couvreur99_check*

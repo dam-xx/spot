@@ -122,6 +122,7 @@ syntax(char* prog)
 	    << std::endl
 	    << "Where ALGO should be one of:" << std::endl
 	    << "  couvreur99 (the default)" << std::endl
+	    << "  couvreur99_shy-" << std::endl
 	    << "  couvreur99_shy" << std::endl
 	    << "  magic_search" << std::endl
 	    << "  magic_search_repeated" << std::endl
@@ -159,6 +160,7 @@ main(int argc, char** argv)
   enum { None, Couvreur, Couvreur2, MagicSearch, Se05Search,
 	 Tau03Search, Tau03OptSearch, Gv04 } echeck = None;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
+  bool couv_group = true;
   bool search_many = false;
   bool bit_state_hashing = false;
   int heap_size = 10*1024*1024;
@@ -381,6 +383,12 @@ main(int argc, char** argv)
       else if (echeck_algo == "couvreur99_shy")
 	{
 	  echeck = Couvreur2;
+	  couv_group = true;
+	}
+      else if (echeck_algo == "couvreur99_shy-")
+	{
+	  echeck = Couvreur2;
+	  couv_group = false;
 	}
       else if (echeck_algo == "magic_search")
 	{
@@ -670,7 +678,7 @@ main(int argc, char** argv)
 	  break;
 
 	case Couvreur2:
-	  ec = new spot::couvreur99_check_shy(a);
+	  ec = new spot::couvreur99_check_shy(a, couv_group);
 	  break;
 
         case MagicSearch:

@@ -256,14 +256,15 @@ namespace spot
   //////////////////////////////////////////////////////////////////////
 
   couvreur99_check_shy::couvreur99_check_shy(const tgba* a,
+					     bool group,
 					     const numbered_state_heap_factory*
 					     nshf)
-    : couvreur99_check(a, nshf), num(1)
+    : couvreur99_check(a, nshf), num(1), group_(group)
   {
     // Setup depth-first search from the initial state.
-    todo.push(pair_state_successors(0, succ_queue()));
+    todo.push_back(pair_state_successors(0, succ_queue()));
     inc_depth();
-    todo.top().second.push_front(successor(bddtrue,
+    todo.back().second.push_front(successor(bddtrue,
 					   ecs_->aut->get_init_state()));
   }
 
@@ -279,7 +280,7 @@ namespace spot
 	assert(ecs_->root.size() == arc.size());
 
 	// Get the successors of the current state.
-	succ_queue& queue = todo.top().second;
+	succ_queue& queue = todo.back().second;
 
 	// First, we process all successors that we have already seen.
 	// This is an idea from Soheib Baarir.  It helps to merge SCCs
@@ -342,7 +343,7 @@ namespace spot
 		    // unless they are used as keys in H.
 		    while (!todo.empty())
 		      {
-			succ_queue& queue = todo.top().second;
+			succ_queue& queue = todo.back().second;
 			for (succ_queue::iterator q = queue.begin();
 			     q != queue.end(); ++q)
 			  {
@@ -354,7 +355,7 @@ namespace spot
 			    if (spi.first == 0)
 			      delete q->s;
 			  }
-			todo.pop();
+			todo.pop_back();
 			dec_depth();
 		      }
                     set_states(ecs_->states());
@@ -367,13 +368,33 @@ namespace spot
 	    queue.erase(old);
 	  }
 
+	// Group the pending successors of formed SCC of requested.
+	if (group_ && todo.back().first != 0)
+	  {
+	    int top_index = *ecs_->h->index(todo.back().first).second;
+	    if (ecs_->root.top().index < top_index)
+	      {
+		do
+		  {
+		    todo_list::reverse_iterator prev = todo.rbegin();
+		    todo_list::reverse_iterator last = prev++;
+		    prev->second.splice(prev->second.end(), last->second);
+		    todo.pop_back();
+		    dec_depth();
+		    top_index = *ecs_->h->index(todo.back().first).second;
+		  }
+		while (ecs_->root.top().index < top_index);
+		continue;
+	      }
+	  }
+
 	// If there is no more successor, backtrack.
 	if (queue.empty())
 	  {
 	    // We have explored all successors of state CURR.
-	    const state* curr = todo.top().first;
+	    const state* curr = todo.back().first;
 	    // Backtrack TODO.
-	    todo.pop();
+	    todo.pop_back();
 	    dec_depth();
 	    if (todo.empty())
 	      {
@@ -408,9 +429,9 @@ namespace spot
 	ecs_->h->insert(succ.s, ++num);
 	ecs_->root.push(num);
 	arc.push(succ.acc);
-	todo.push(pair_state_successors(succ.s, succ_queue()));
+	todo.push_back(pair_state_successors(succ.s, succ_queue()));
 	inc_depth();
-	succ_queue& new_queue = todo.top().second;
+	succ_queue& new_queue = todo.back().second;
 	tgba_succ_iterator* iter = ecs_->aut->succ_iter(succ.s);
 	for (iter->first(); !iter->done(); iter->next(), inc_transitions())
 	  new_queue.push_back(successor(iter->current_acceptance_conditions(),

@@ -60,6 +60,12 @@ couvreur99_shy_cons(const spot::tgba* a)
 }
 
 spot::emptiness_check*
+couvreur99_shy_minus_cons(const spot::tgba* a)
+{
+  return new spot::couvreur99_check_shy(a, false);
+}
+
+spot::emptiness_check*
 bsh_ms_cons(const spot::tgba* a)
 {
   return spot::bit_state_hashing_magic_search(a, 4096);
@@ -82,6 +88,7 @@ struct ec_algo
 ec_algo ec_algos[] =
   {
     { "couvreur99",            couvreur99_cons,                 0, -1U, true },
+    { "couvreur99_shy-",       couvreur99_shy_minus_cons,       0, -1U, true },
     { "couvreur99_shy",        couvreur99_shy_cons,             0, -1U, true },
     { "explicit_magic_search", spot::explicit_magic_search,     0,   1, true },
     { "bit_state_hashing_magic_search",
