@@ -37,6 +37,7 @@
 #include "emptiness.hh"
 #include "emptiness_stats.hh"
 #include "bfssteps.hh"
+#include "misc/hash.hh"
 
 /// FIXME:
 /// * Add the necessary calls to pop_notify.

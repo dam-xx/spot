@@ -1,3 +1,7 @@
+2004-12-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ndfs_result.hh: Include misc/hash.hh.
+
 2004-12-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/reducerun.cc (reduce_run): Do not call erase() after
