@@ -1,4 +1,4 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -37,7 +37,7 @@ _spot_la_LDFLAGS = -avoid-version -module
 _spot_la_LIBADD = $(top_builddir)/src/libspot.la libspotswigpy.la
 
 $(srcdir)/spot_wrap.cxx: $(srcdir)/spot.i
-	swig -c -c++ -python -I$(srcdir) -I$(top_srcdir)/src $(srcdir)/spot.i
+	swig -noruntime -c++ -python -I$(srcdir) -I$(top_srcdir)/src $(srcdir)/spot.i
 
 $(srcdir)/spot.py: $(srcdir)/spot.i
 	$(MAKE) $(AM_MAKEFLAGS) spot_wrap.cxx
@@ -46,7 +46,7 @@ _buddy_la_SOURCES = $(srcdir)/buddy_wrap.cxx
 _buddy_la_LDFLAGS = -avoid-version -module $(BUDDY_LDFLAGS) libspotswigpy.la
 
 $(srcdir)/buddy_wrap.cxx: $(srcdir)/buddy.i
-	swig -c -c++ -python $(BUDDY_CPPFLAGS) $(srcdir)/buddy.i
+	swig -noruntime -c++ -python $(BUDDY_CPPFLAGS) $(srcdir)/buddy.i
 
 $(srcdir)/buddy.py: $(srcdir)/buddy.i
 	$(MAKE) $(AM_MAKEFLAGS) buddy_wrap.cxx
