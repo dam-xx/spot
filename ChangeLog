@@ -1,5 +1,10 @@
 2004-11-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check::check,
+	couvreur99_check_shy::check): Compute more statistics for
+	randtgba.
+	(couvreur99_check::print_stats): Print these here too.
+
 	* src/sanity/style.test: Allow "'" after ",".
 
 	* src/tgbaalgos/gv04.cc, src/tgbaalgos/gv04.hh: New files, partly

@@ -63,6 +63,8 @@ namespace spot
 	// Remove each destination of this iterator.
 	for (i->first(); !i->done(); i->next())
 	  {
+	    inc_transitions();
+
 	    state* s = i->current_state();
 	    numbered_state_heap::state_index_p spi = ecs_->h->index(s);
 
@@ -116,6 +118,7 @@ namespace spot
       tgba_succ_iterator* iter = ecs_->aut->succ_iter(init);
       iter->first();
       todo.push(pair_state_iter(init, iter));
+      inc_depth();
     }
 
     while (!todo.empty())
@@ -133,6 +136,7 @@ namespace spot
 
 	    // Backtrack TODO.
 	    todo.pop();
+	    dec_depth();
 
 	    // When backtracking the root of an SCC, we must also
 	    // remove that SCC from the ARC/ROOT stacks.  We must
@@ -153,9 +157,10 @@ namespace spot
 	    continue;
 	  }
 
-	// We have a successor to look at.  Fetch the values
-	// (destination state, acceptance conditions of the arc)
-	// we are interested in...
+	// We have a successor to look at.
+	inc_transitions();
+	// Fetch the values (destination state, acceptance conditions
+	// of the arc) we are interested in...
 	const state* dest = succ->current_state();
 	bdd acc = succ->current_acceptance_conditions();
 	// ... and point the iterator to the next successor, for
@@ -175,6 +180,7 @@ namespace spot
 	    tgba_succ_iterator* iter = ecs_->aut->succ_iter(dest);
 	    iter->first();
 	    todo.push(pair_state_iter(dest, iter));
+	    inc_depth();
 	    continue;
 	  }
 
@@ -220,12 +226,14 @@ namespace spot
 	      {
 		delete todo.top().second;
 		todo.pop();
+		dec_depth();
 	      }
             set_states(ecs_->states());
 	    return new couvreur99_check_result(ecs_);
 	  }
       }
     // This automaton recognizes no word.
+    set_states(ecs_->states());
     return 0;
   }
 
@@ -239,6 +247,8 @@ namespace spot
   couvreur99_check::print_stats(std::ostream& os) const
   {
     ecs_->print_stats(os);
+    os << transitions() << " transitions explored" << std::endl;
+    os << max_depth() << " items max in DFS search stack" << std::endl;
     return os;
   }
 
@@ -251,6 +261,7 @@ namespace spot
   {
     // Setup depth-first search from the initial state.
     todo.push(pair_state_successors(0, succ_queue()));
+    inc_depth();
     todo.top().second.push_front(successor(bddtrue,
 					   ecs_->aut->get_init_state()));
   }
@@ -262,7 +273,6 @@ namespace spot
   emptiness_check_result*
   couvreur99_check_shy::check()
   {
-
     for (;;)
       {
 	assert(ecs_->root.size() == arc.size());
@@ -344,6 +354,7 @@ namespace spot
 			      delete q->s;
 			  }
 			todo.pop();
+			dec_depth();
 		      }
                     set_states(ecs_->states());
 		    return new couvreur99_check_result(ecs_);
@@ -362,9 +373,13 @@ namespace spot
 	    const state* curr = todo.top().first;
 	    // Backtrack TODO.
 	    todo.pop();
+	    dec_depth();
 	    if (todo.empty())
-	      // This automaton recognizes no word.
-	      return 0;
+	      {
+		// This automaton recognizes no word.
+		set_states(ecs_->states());
+		return 0;
+	      }
 
 	    // When backtracking the root of an SCC, we must also
 	    // remove that SCC from the ARC/ROOT stacks.  We must
@@ -393,9 +408,10 @@ namespace spot
 	ecs_->root.push(num);
 	arc.push(succ.acc);
 	todo.push(pair_state_successors(succ.s, succ_queue()));
+	inc_depth();
 	succ_queue& new_queue = todo.top().second;
 	tgba_succ_iterator* iter = ecs_->aut->succ_iter(succ.s);
-	for (iter->first(); !iter->done(); iter->next())
+	for (iter->first(); !iter->done(); iter->next(), inc_transitions())
 	  new_queue.push_back(successor(iter->current_acceptance_conditions(),
 					iter->current_state()));
 	delete iter;
