@@ -8,16 +8,31 @@ namespace spot
   namespace ltl
   {    
     multop::multop(type op, formulae* first, formulae* second)
-      : op_(op), children_(2)
+      : op_(op)
     {
-      children_[0] = first;
-      children_[1] = second;
+      children_.reserve(2);
+      add(first);
+      add(second);
     }
     
     void
     multop::add(formulae* f)
     {
-      children_.push_back(f);
+      // If the formulae we add is itself a multop for the same operator,
+      // merge its children with ours.
+      multop* p = dynamic_cast<multop*>(f);
+      if (p && p->op() == op())
+	{
+	  unsigned ps = p->size();
+	  for (unsigned i = 0; i < ps; ++i)
+	    children_.push_back(p->nth(i));
+	  // that sub-formulae is now useless 
+	  delete f;
+	}
+      else
+	{
+	  children_.push_back(f);
+	}
     }
 
     multop::~multop()

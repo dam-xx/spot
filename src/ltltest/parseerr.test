@@ -39,6 +39,9 @@ check 'a U b V c R' ''
 # leading and trailing garbage are skipped
 check '/2/3/4/5 a + b /6/7/8/' 'multop(Or, AP(a), AP(b))'
 check 'a U b c' 'binop(U, AP(a), AP(b))'
+# (check multop merging while we are at it)
+check 'a & b & c & d e' 'multop(And, AP(a), AP(b), AP(c), AP(d))'
+check 'a & (b | c) & d should work' 'multop(And, AP(a), multop(Or, AP(b), AP(c)), AP(d))'
 
 # Recovery inside parentheses
 check 'a U (b c) U e R (f g <=> h)' \

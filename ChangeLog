@@ -1,3 +1,10 @@
+2003-04-16  Alexandre DURET-LUTZ  <aduret@circe.lip6.fr>
+
+	* src/ltlast/multop.cc (multop::multop): Use multop::add.
+	(multop::add): If the formulae we add is itself a multop for the 
+	same operator, merge its children with ours.
+	* src/ltltest/parseerr.test: Add two tests for multop merging.
+
 2003-04-15  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
 	* src/ltlast/formulae.hh (formulae::equals): Remove.
