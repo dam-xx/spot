@@ -14,13 +14,15 @@ Algorithm
 
 GlobalOptions
 {
-   Rounds = 1
+   Rounds = 100
    Interactive = Never
 #   Verbosity = 5
 }
 
 FormulaOptions
 {
+  Size = 1...13
+  Propositions = 6
 
   AbbreviatedOperators = Yes
   GenerateMode = Normal
@@ -32,7 +34,7 @@ FormulaOptions
 
   AndPriority = 10
   OrPriority = 10
-  
+
   BeforePriority = 0
   StrongReleasePriority = 0
   WeakUntilPriority = 0

@@ -1,5 +1,7 @@
 2003-07-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgbatest/spotlbtt.test: Make 100 rounds.
+
 	* src/tgba/succiterconcrete.cc (tgba_succ_iterator_concrete::next):
 	Fix so that !p.!Acc[g].Acc[f] + p.!Acc[g].Acc[f] + p.Acc[g].!Acc[f]
 	is factored as !p.!Acc[g].Acc[f] + p.(!Acc[g].Acc[f] + Acc[g].!Acc[f]),
