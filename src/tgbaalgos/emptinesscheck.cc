@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -423,7 +423,10 @@ namespace spot
 				  const state* from,
 				  const state* to)
   {
-    if (from == to)
+    // If by change or period already ends on the state we have
+    // to reach back, we are done.
+    if (from == to
+	&& ! period.empty())
       return;
 
     // Records backlinks to parent state during the BFS.
