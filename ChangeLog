@@ -1,5 +1,15 @@
 2003-07-31  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* configure.ac: Output wrap/python/tests/Makefile
+	and wrap/python/tests/run.
+	* wrap/python/Makefile.am (SUBDIRS): New variable.
+	* wrap/python/spot.i: Include all formulae headers from ltlast/,
+	as well as ltlvisit/destroy.hh.
+	(spot::ltl::formula::__cmp__, spot::ltl::formula::__str__): New
+	functions.
+	* wrap/python/tests/Makefile.am, wrap/python/tests/ltlsimple.py,
+	wrap/python/tests/run.in: New files.
+
 	* wrap/python/ltihooks.py: New file.
 	* wrap/python/Makefile.am (EXTRA_DIST): Add ltihooks.py.
 

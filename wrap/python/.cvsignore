@@ -7,3 +7,4 @@ spot.py*
 *.lo
 *.loT
 spot_wrap.cxx
+*.pyc

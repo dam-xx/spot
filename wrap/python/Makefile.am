@@ -1,3 +1,4 @@
+SUBDIRS = tests
 
 AM_CPPFLAGS = -I$(PYTHONINC) -I$(top_srcdir)/src
 
