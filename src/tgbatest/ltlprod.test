@@ -1,0 +1,17 @@
+#!/bin/sh
+
+. ./defs
+
+set -e
+
+# We don't check the output, but just running these might be enough to
+# trigger assertions.
+
+./ltlprod a b
+./ltlprod a a
+./ltlprod 'a U b' 'X f'
+./ltlprod 'X a' 'X a'
+./ltlprod 'X a' 'a U b'
+./ltlprod 'a & b & c' 'b & d & c'
+./ltlprod 'a | b | (c U (d & (g U (h ^ i))))' 'h ^ i'
+./ltlprod 'Xa & (b U !a) & (b U !a)' '(b U !a) & f'

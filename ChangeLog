@@ -1,5 +1,12 @@
 2003-06-06  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/dictunion.cc (tgba_bdd_dict_union): Clone formulae
+	while building new dictionary.
+	* src/tgbatest/ltlprod.test, src/tgbatest/ltlprod.cc: New files.
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Add ltlprod.
+	(ltlprod_SOURCES): New variable.
+	(TESTS): Add ltlprod.test.
+
 	* src/ltlvisit/clone.cc (clone): New const version.
 	* src/ltlvisit/clone.hh (clone): Likewise.
 	* src/ltlvisit/destroy.cc (destroy): New const version.
