@@ -1,5 +1,11 @@
 2004-04-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* tgbaalgos/emptinesscheck.hh (numbered_state_heap_const_iterator,
+	numbered_state_heap, numbered_state_heap_hash_map): New classes.
+	* tgbaalgos/emptinesscheck.cc
+	(numbered_state_heap_hash_map_const_iterator): New class.
+	(numbered_state_heap_hash_map): Implement it.
+
 	* src/tgbaalgos/emptinesscheck.hh
 	(explicit_connected_component_factory,
 	connected_component_hash_set_factory): New classes.

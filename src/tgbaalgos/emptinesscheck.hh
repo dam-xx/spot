@@ -57,24 +57,77 @@ namespace spot
     stack_type s;
   };
 
+  class numbered_state_heap_const_iterator
+  {
+  public:
+    virtual ~numbered_state_heap_const_iterator() {}
+
+    virtual void first() = 0;
+    virtual void next() = 0;
+    virtual bool done() const = 0;
+
+    virtual const state* get_state() const = 0;
+    virtual int get_index() const = 0;
+  };
+
+  class numbered_state_heap
+  {
+  public:
+    virtual ~numbered_state_heap() {}
+    //@{
+    /// \brief Is state in the heap?
+    ///
+    /// Returns 0 if \a s is not in the heap. or a pointer to
+    /// its number if it is.
+    virtual const int* find(const state* s) const = 0;
+    virtual int* find(const state* s) = 0;
+    //@}
+
+    virtual void insert(const state* s, int index) = 0;
+    virtual int size() const = 0;
+
+    virtual numbered_state_heap_const_iterator* iterator() const = 0;
+
+    /// \brief Return a state which is equal to \a s, but is in \c h,
+    /// and free \a s if it is different.
+    ///
+    /// Doing so simplify memory management, because we don't have to
+    /// track which state need to be kept or deallocated: all key in
+    /// \c h should last for the whole life of the emptiness_check.
+    virtual const state* filter(const state* s) const = 0;
+  };
+
+  class numbered_state_heap_hash_map : public numbered_state_heap
+  {
+  public:
+    virtual ~numbered_state_heap_hash_map();
+
+    virtual const int* find(const state* s) const;
+    virtual int* find(const state* s);
+    virtual void insert(const state* s, int index);
+    virtual int size() const;
+
+    virtual numbered_state_heap_const_iterator* iterator() const;
+
+    virtual const state* filter(const state* s) const;
+
+  protected:
+    typedef Sgi::hash_map<const state*, int,
+			  state_ptr_hash, state_ptr_equal> hash_type;
+    hash_type h;		///< Map of visited states.
+
+    friend class numbered_state_heap_hash_map_const_iterator;
+  };
+
   class emptiness_check_status
   {
   public:
     emptiness_check_status(const tgba* aut);
     ~emptiness_check_status();
 
-    /// \brief Return a state which is equal to \a s, but is in \c h,
-    /// and free \a s if it is different.  Doing so simplify memory
-    /// management, because we don't have to track which state need
-    /// to be kept or deallocated: all key in \c h should last for
-    /// the whole life of the emptiness_check.
-    const state* h_filt(const state* s) const;
-
     const tgba* aut;
     scc_stack root;
-    typedef Sgi::hash_map<const state*, int,
-			  state_ptr_hash, state_ptr_equal> hash_type;
-    hash_type h;		///< Map of visited states.
+    numbered_state_heap_hash_map h; ///< Map of visited states.
 
     /// Output statistics about this object.
     void print_stats(std::ostream& os) const;
@@ -162,7 +215,7 @@ namespace spot
     ///
     /// Return the representative of \a s in the SCC, and delete \a
     /// s if it is different (acting like
-    /// emptiness_check_status::h_filt), or 0 otherwise.
+    /// numbered_state_heap::filter), or 0 otherwise.
     virtual const state* has_state(const state* s) const = 0;
 
     /// Insert a new state in the SCC.

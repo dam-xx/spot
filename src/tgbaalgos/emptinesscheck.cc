@@ -75,6 +75,71 @@ namespace spot
 
   emptiness_check_status::~emptiness_check_status()
   {
+  }
+
+  void
+  emptiness_check_status::print_stats(std::ostream& os) const
+  {
+    os << h.size() << " unique states visited" << std::endl;
+    os << root.size()
+       << " strongly connected components in search stack"
+       << std::endl;
+  }
+
+
+  //////////////////////////////////////////////////////////////////////
+
+  class numbered_state_heap_hash_map_const_iterator :
+    public numbered_state_heap_const_iterator
+  {
+  public:
+    numbered_state_heap_hash_map_const_iterator
+      (const numbered_state_heap_hash_map::hash_type& h)
+	: numbered_state_heap_const_iterator(), h(h)
+    {
+    }
+
+    ~numbered_state_heap_hash_map_const_iterator()
+    {
+    }
+
+    virtual void
+    first()
+    {
+      i = h.begin();
+    }
+
+    virtual void
+    next()
+    {
+      ++i;
+    }
+
+    virtual bool
+    done() const
+    {
+      return i == h.end();
+    }
+
+    virtual const state*
+    get_state() const
+    {
+      return i->first;
+    }
+
+    virtual int
+    get_index() const
+    {
+      return i->second;
+    }
+
+  private:
+    numbered_state_heap_hash_map::hash_type::const_iterator i;
+    const numbered_state_heap_hash_map::hash_type& h;
+  };
+
+  numbered_state_heap_hash_map::~numbered_state_heap_hash_map()
+  {
     // Free keys in H.
     hash_type::iterator i = h.begin();
     while (i != h.end())
@@ -86,8 +151,44 @@ namespace spot
       }
   }
 
+  const int*
+  numbered_state_heap_hash_map::find(const state* s) const
+  {
+    hash_type::const_iterator i = h.find(s);
+    if (i == h.end())
+      return 0;
+    return &i->second;
+  }
+
+  int*
+  numbered_state_heap_hash_map::find(const state* s)
+  {
+    hash_type::iterator i = h.find(s);
+    if (i == h.end())
+      return 0;
+    return &i->second;
+  }
+
+  void
+  numbered_state_heap_hash_map::insert(const state* s, int index)
+  {
+    h[s] = index;
+  }
+
+  int
+  numbered_state_heap_hash_map::size() const
+  {
+    return h.size();
+  }
+
+  numbered_state_heap_const_iterator*
+  numbered_state_heap_hash_map::iterator() const
+  {
+    return new numbered_state_heap_hash_map_const_iterator(h);
+  }
+
   const state*
-  emptiness_check_status::h_filt(const state* s) const
+  numbered_state_heap_hash_map::filter(const state* s) const
   {
     hash_type::const_iterator i = h.find(s);
     assert(i != h.end());
@@ -96,14 +197,6 @@ namespace spot
     return i->first;
   }
 
-  void
-  emptiness_check_status::print_stats(std::ostream& os) const
-  {
-    os << h.size() << " unique states visited" << std::endl;
-    os << root.size()
-       << " strongly connected components in search stack"
-       << std::endl;
-  }
 
 
   //////////////////////////////////////////////////////////////////////
@@ -133,9 +226,10 @@ namespace spot
     // (FROM should be in H, otherwise it means all reachable
     // states from FROM have already been removed and there is no
     // point in calling remove_component.)
-    emptiness_check_status::hash_type::iterator hi = ecs_->h.find(from);
-    assert(hi->second != -1);
-    hi->second = -1;
+    int* hi = ecs_->h.find(from);
+    assert(hi);
+    assert(*hi != -1);
+    *hi = -1;
     tgba_succ_iterator* i = ecs_->aut->succ_iter(from);
 
     for (;;)
@@ -144,12 +238,12 @@ namespace spot
 	for (i->first(); !i->done(); i->next())
 	  {
 	    state* s = i->current_state();
-	    emptiness_check_status::hash_type::iterator hi = ecs_->h.find(s);
-	    assert(hi != ecs_->h.end());
+	    int *hi = ecs_->h.find(s);
+	    assert(hi);
 
-	    if (hi->second != -1)
+	    if (*hi != -1)
 	      {
-		hi->second = -1;
+		*hi = -1;
 		to_remove.push(ecs_->aut->succ_iter(s));
 	      }
 	    delete s;
@@ -184,7 +278,7 @@ namespace spot
     // Setup depth-first search from the initial state.
     {
       state* init = ecs_->aut->get_init_state();
-      ecs_->h[init] = 1;
+      ecs_->h.insert(init, 1);
       ecs_->root.push(1);
       arc.push(bddfalse);
       tgba_succ_iterator* iter = ecs_->aut->succ_iter(init);
@@ -211,10 +305,10 @@ namespace spot
 	    // When backtracking the root of an SCC, we must also
 	    // remove that SCC from the ARC/ROOT stacks.  We must
 	    // discard from H all reachable states from this SCC.
-	    emptiness_check_status::hash_type::iterator i = ecs_->h.find(curr);
-	    assert(i != ecs_->h.end());
+	    int* i = ecs_->h.find(curr);
+	    assert(i);
 	    assert(!ecs_->root.empty());
-	    if (ecs_->root.top().index == i->second)
+	    if (ecs_->root.top().index == *i)
 	      {
 		assert(!arc.empty());
 		arc.pop();
@@ -238,12 +332,12 @@ namespace spot
 	// We do not need SUCC from now on.
 
 	// Are we going to a new state?
-	emptiness_check_status::hash_type::iterator i = ecs_->h.find(dest);
-	if (i == ecs_->h.end())
+	int* i = ecs_->h.find(dest);
+	if (!i)
 	  {
 	    // Yes.  Number it, stack it, and register its successors
 	    // for later processing.
-	    ecs_->h[dest] = ++num;
+	    ecs_->h.insert(dest, ++num);
 	    ecs_->root.push(num);
 	    arc.push(acc);
 	    tgba_succ_iterator* iter = ecs_->aut->succ_iter(dest);
@@ -255,11 +349,10 @@ namespace spot
 	// We know the state exists.  Since a state can have several
 	// representations (i.e., objects), make sure we delete
 	// anything but the first one seen (the one used as key in H).
-	if (dest != i->first)
-	  delete dest;
+	(void) ecs_->h.filter(dest);
 
 	// If we have reached a dead component, ignore it.
-	if (i->second == -1)
+	if (*i == -1)
 	  continue;
 
 	// Now this is the most interesting case.  We have reached a
@@ -273,7 +366,7 @@ namespace spot
 	// ROOT is ascending: we just have to merge all SCCs from the
 	// top of ROOT that have an index greater to the one of
 	// the SCC of S2 (called the "threshold").
-	int threshold = i->second;
+	int threshold = *i;
 	while (threshold < ecs_->root.top().index)
 	  {
 	    assert(!ecs_->root.empty());
@@ -366,8 +459,8 @@ namespace spot
 	succ_queue::iterator q = queue.begin();
 	while (q != queue.end())
 	  {
-	    emptiness_check_status::hash_type::iterator i = ecs_->h.find(q->s);
-	    if (i == ecs_->h.end())
+	    int* i = ecs_->h.find(q->s);
+	    if (!i)
 	      {
 		// Skip unknown states.
 		++q;
@@ -375,7 +468,7 @@ namespace spot
 	      }
 
 	    // Skip states from dead SCCs.
-	    if (i->second != -1)
+	    if (*i != -1)
 	      {
 		// Now this is the most interesting case.  We have
 		// reached a state S1 which is already part of a
@@ -391,7 +484,7 @@ namespace spot
 		// merge all SCCs from the top of ROOT that have
 		// an index greater to the one of the SCC of S2
 		// (called the "threshold").
-		int threshold = i->second;
+		int threshold = *i;
 		bdd acc = q->acc;
 		while (threshold < ecs_->root.top().index)
 		  {
@@ -422,9 +515,13 @@ namespace spot
 			for (succ_queue::iterator q = queue.begin();
 			     q != queue.end(); ++q)
 			  {
-			    emptiness_check_status::hash_type::iterator i = ecs_->h.find(q->s);
-			    if (i == ecs_->h.end() || i->first != q->s)
+			    int* i = ecs_->h.find(q->s);
+			    if (!i)
 			      delete q->s;
+			    else
+			      // Delete the state if it is a clone
+			      // of a state in the heap.
+			      (void) ecs_->h.filter(q->s);
 			  }
 			todo.pop();
 		      }
@@ -434,8 +531,7 @@ namespace spot
 	    // We know the state exists.  Since a state can have several
 	    // representations (i.e., objects), make sure we delete
 	    // anything but the first one seen (the one used as key in H).
-	    if (q->s != i->first)
-	      delete q->s;
+	    (void) ecs_->h.filter(q->s);
 	    // Remove that state from the queue, so we do not
 	    // recurse into it.
 	    succ_queue::iterator old = q++;
@@ -456,10 +552,10 @@ namespace spot
 	    // When backtracking the root of an SCC, we must also
 	    // remove that SCC from the ARC/ROOT stacks.  We must
 	    // discard from H all reachable states from this SCC.
-	    emptiness_check_status::hash_type::iterator i = ecs_->h.find(curr);
-	    assert(i != ecs_->h.end());
+	    int* i = ecs_->h.find(curr);
+	    assert(i);
 	    assert(!ecs_->root.empty());
-	    if (ecs_->root.top().index == i->second)
+	    if (ecs_->root.top().index == *i)
 	      {
 		assert(!arc.empty());
 		arc.pop();
@@ -476,7 +572,7 @@ namespace spot
 	// stacks.
 	successor succ = queue.front();
 	queue.pop_front();
-	ecs_->h[succ.s] = ++num;
+	ecs_->h.insert(succ.s, ++num);
 	ecs_->root.push(num);
 	arc.push(succ.acc);
 	todo.push(pair_state_successors(succ.s, succ_queue()));
@@ -556,10 +652,10 @@ namespace spot
     assert(root.empty());
 
     // Build the set of states for all SCCs.
-    for (emptiness_check_status::hash_type::const_iterator i = ecs_->h.begin();
-	 i != ecs_->h.end(); ++i)
+    numbered_state_heap_const_iterator* i = ecs_->h.iterator();
+    for (i->first(); !i->done(); i->next())
       {
-	int index = i->second;
+	int index = i->get_index();
 	// Skip states from dead SCCs.
 	if (index < 0)
 	  continue;
@@ -570,10 +666,11 @@ namespace spot
 	for (j = 1; j < comp_size; ++j)
 	  if (index < scc[j]->index)
 	    break;
-	scc[j - 1]->insert(i->first);
+	scc[j - 1]->insert(i->get_state());
       }
+    delete i;
 
-    suffix.push_front(ecs_->h_filt(ecs_->aut->get_init_state()));
+    suffix.push_front(ecs_->h.filter(ecs_->aut->get_init_state()));
 
     // We build a path trough each SCC in the stack.  For the
     // first SCC, the starting state is the initial state of the
