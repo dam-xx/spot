@@ -42,17 +42,11 @@ namespace spot
     }
 
     formula*
-    unabbreviate_ltl(formula* f)
-    {
-      unabbreviate_ltl_visitor v;
-      f->accept(v);
-      return v.result();
-    }
-
-    const formula*
     unabbreviate_ltl(const formula* f)
     {
-      return unabbreviate_ltl(const_cast<formula*>(f));
+      unabbreviate_ltl_visitor v;
+      const_cast<formula*>(f)->accept(v);
+      return v.result();
     }
 
   }

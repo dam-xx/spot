@@ -168,17 +168,12 @@ namespace spot
     };
 
     formula*
-    negative_normal_form(formula* f, bool negated)
+    negative_normal_form(const formula* f, bool negated)
     {
       negative_normal_form_visitor v(negated);
-      f->accept(v);
+      const_cast<formula*>(f)->accept(v);
       return v.result();
     }
 
-    const formula*
-    negative_normal_form(const formula* f)
-    {
-      return negative_normal_form(const_cast<formula*>(f));
-    }
   }
 }

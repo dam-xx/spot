@@ -66,17 +66,11 @@ namespace spot
     }
 
     formula*
-    unabbreviate_logic(formula* f)
-    {
-      unabbreviate_logic_visitor v;
-      f->accept(v);
-      return v.result();
-    }
-
-    const formula*
     unabbreviate_logic(const formula* f)
     {
-      return unabbreviate_logic(const_cast<formula*>(f));
+      unabbreviate_logic_visitor v;
+      const_cast<formula*>(f)->accept(v);
+      return v.result();
     }
   }
 }

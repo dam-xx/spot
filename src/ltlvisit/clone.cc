@@ -63,17 +63,11 @@ namespace spot
     }
 
     formula*
-    clone(formula* f)
-    {
-      clone_visitor v;
-      f->accept(v);
-      return v.result();
-    }
-
-    formula*
     clone(const formula* f)
     {
-      return clone(const_cast<formula*>(f));
+      clone_visitor v;
+      const_cast<formula*>(f)->accept(v);
+      return v.result();
     }
   }
 }

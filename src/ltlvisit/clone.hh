@@ -35,8 +35,6 @@ namespace spot
     };
 
     /// \brief Clone a formula.
-    formula* clone(formula* f);
-    /// \brief Clone a formula.
     formula* clone(const formula* f);
   }
 }

@@ -1,7 +1,21 @@
 2003-08-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/ltlvisit/lunabbrev.cc, src/ltlvisit/lunabbrev.hh: Merge the
+	two unabbreviate_logic definitions (const and non-const) into a
+	function that takes a const formula* and return a non-const
+	formula*.  Since formula* is convertible to const formula*, and
+	the const version of the function just called the non-onst one, it
+	makes no sense to keep both.  Also, it confused Swig.
+	* src/ltlvisit/nenoform.cc, src/ltlvisit/nenoform.hh: Likewise
+	for negative_normal_form.
+	* src/ltlvisit/tunabbrev.cc, src/ltlvisit/tunabbrev.hh: Likewise
+	for unabbreviate_ltl.
+	* src/ltlvisit/clone.cc, src/ltlvisit/clone.hh: Likewise for clone.
+	* src/ltlvisit/destroy.cc, src/ltlvisit/destroy.hh: Likewise
+	for destroy.
+
 	* configure.ac: Bump version to 0.0g.
-	
+
 	* configure.ac, NEWS: Bump version to 0.0f.
 
 	* iface/gspn/simple.test, iface/gspn/dcswave.test,

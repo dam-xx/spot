@@ -16,16 +16,10 @@ namespace spot
     };
 
     void
-    destroy(formula* f)
-    {
-      destroy_visitor v;
-      f->accept(v);
-    }
-
-    void
     destroy(const formula* f)
     {
-      destroy(const_cast<formula*>(f));
+      destroy_visitor v;
+      const_cast<formula*>(f)->accept(v);
     }
   }
 }
