@@ -75,12 +75,15 @@ main(int argc, char **argv)
 	  {
 	    ec.counter_example();
 	    ec.print_result(std::cout, &a);
-	    exit(1);
 	  }
 	else
 	  {
 	    std::cout << "empty" << std::endl;
 	  }
+	std::cout << std::endl;
+	ec.print_stats(std::cout);
+	if (!res)
+	  exit(1);
       }
 
       delete prod;

@@ -633,4 +633,17 @@ namespace spot
     // forming a cycle.
     complete_cycle(scc, start, suffix.back());
   }
+
+
+  void
+  emptiness_check::print_stats(std::ostream& os) const
+  {
+    os << h.size() << " unique states visited" << std::endl;
+    os << suffix.size() << " states in suffix" << std::endl;
+    os << period.size() << " states in period" << std::endl;
+    os << root.size()
+       << " strongly connected components in search stack"
+       << std::endl;
+  }
+
 }

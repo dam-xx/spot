@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -68,8 +68,14 @@ namespace spot
     /// Compute a counter example if tgba_emptiness_check() returned false.
     void counter_example();
 
+    /// \brief Display the example computed by counter_example().
+    ///
+    /// \param restrict optional automaton to project the example on.
     std::ostream& print_result(std::ostream& os,
 			       const tgba* restrict = 0) const;
+
+    /// Output statistics about this object.
+    void print_stats(std::ostream& os) const;
 
   private:
 

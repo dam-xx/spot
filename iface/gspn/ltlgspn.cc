@@ -146,12 +146,15 @@ main(int argc, char **argv)
 		  {
 		    std::cout << "non empty" << std::endl;
 		  }
-		exit(1);
 	      }
 	    else
 	      {
 		std::cout << "empty" << std::endl;
 	      }
+	    std::cout << std::endl;
+	    ec.print_stats(std::cout);
+	    if (!res)
+	      exit(1);
 	  }
 	  break;
 	case Magic:
