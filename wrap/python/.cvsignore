@@ -4,7 +4,8 @@ Makefile
 Makefile.in
 *.la
 spot.py*
+buddy.py*
 *.lo
 *.loT
-spot_wrap.cxx
+*_wrap.cxx
 *.pyc

@@ -5,4 +5,5 @@ TESTS_ENVIRONMENT = ./run
 check_SCRIPTS = run
 
 TESTS = \
-  ltlsimple.py
+  ltlsimple.py \
+  bddnqueen.py

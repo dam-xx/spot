@@ -1,5 +1,14 @@
 2003-08-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* wrap/python/buddy.i: New file.
+	* wrap/python/Makefile.am (EXTRA_DIST): Add it.
+	(python_PYTHON, MAINTAINERCLEANFILES): Add buddy.py.
+	(pyexec_LTLIBRARIES): Add _buddy.la.
+	(_buddy_la_SOURCES, _buddy_la_LDFLAGS, $(srcdir)/buddy_wrap.cxx) 
+	($(srcdir)/buddy.py): New.
+	* wrap/python/tests/bddnqueen.py: New file.
+	* wrap/python/tests/Makefile.am (TESTS): Add it.
+
 	* src/ltlvisit/lunabbrev.cc, src/ltlvisit/lunabbrev.hh: Merge the
 	two unabbreviate_logic definitions (const and non-const) into a
 	function that takes a const formula* and return a non-const
