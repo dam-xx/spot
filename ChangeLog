@@ -1,3 +1,11 @@
+2004-05-17  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/ltlvisit/basereduc.cc (spot): 80 columns.
+	* src/ltlvisit/reducform.cc (spot), src/ltltest/inf.cc,
+	src/ltltest/reduc.cc (main), src/ltlvisit/reducform.hh,
+	src/tgbatest/ltl2tgba.cc (main): More option.
+	* src/ltltest/inf.test: More test.
+
 2004-05-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* wrap/python/buddy.i: Define typemap for input_buf and use it

@@ -91,13 +91,13 @@ namespace spot
 
 	  case unop::F:
 	    /* If f is class of eventuality then F(f)=f.  */
-	    if (!is_eventual(result_) || (o == Inf))
+	    if (!is_eventual(result_) || o == Inf || o == InfBase)
 	      result_ = unop::instance(unop::F, result_);
 	    return;
 
 	  case unop::G:
 	    /* If f is class of universality then G(f)=f.  */
-	    if (!is_universal(result_) || (o == Inf))
+	    if (!is_universal(result_) || o == Inf || o == InfBase)
 	      result_ = unop::instance(unop::G, result_);
 	    return;
 	  }
@@ -112,7 +112,7 @@ namespace spot
 
 	/* If b is of class eventuality then a U b = b.
 	   If b is of class universality then a R b = b. */
-	if ((o != Inf)
+	if ((o != Inf) && (o != InfBase)
 	    && ((is_eventual(f2) && ((bo->op()) == binop::U))
 		|| (is_universal(f2) && ((bo->op()) == binop::R))))
 	  {
@@ -122,7 +122,7 @@ namespace spot
 	/* case of implies */
 	formula* f1 = recurse(bo->first());
 
-	if (o != EventualUniversal)
+	if (o != EventualUniversal && o != EventualUniversalBase)
 	  {
 	    bool inf = inf_form(f1, f2);
 	    bool infinv = inf_form(f2, f1);
@@ -206,7 +206,7 @@ namespace spot
 	for (unsigned i = 0; i < mos; ++i)
 	  res->push_back(recurse(mo->nth(i)));
 
-	if (o != EventualUniversal)
+	if (o != EventualUniversal && o != EventualUniversalBase)
 	  {
 	    switch (mo->op())
 	      {
@@ -312,7 +312,8 @@ namespace spot
       spot::ltl::formula* ftmp2 = NULL;
       reduce_form_visitor v(o);
 
-      if (o == BRI)
+      if (o == BRI || o == InfBase ||
+	  o == EventualUniversalBase)
 	{
 	  ftmp1 = spot::ltl::basic_reduce_form(f);
 	  const_cast<formula*>(ftmp1)->accept(v);
@@ -350,11 +351,20 @@ namespace spot
 	case Inf:
 	  ftmp3 = spot::ltl::reduce_form(ftmp2, o);
 	  break;
+	case InfBase:
+	  ftmp3 = spot::ltl::reduce_form(ftmp2, o);
+	  break;
 	case EventualUniversal:
 	  ftmp3 = spot::ltl::reduce_form(ftmp2, o);
 	  break;
+	case EventualUniversalBase:
+	  ftmp3 = spot::ltl::reduce_form(ftmp2, o);
+	  break;
+	case InfEventualUniversal:
+	  ftmp3 = spot::ltl::reduce_form(ftmp2, o);
+	  break;
 	case BRI:
-	  ftmp3 = spot::ltl::reduce_form(ftmp2);
+	  ftmp3 = spot::ltl::reduce_form(ftmp2, o);
 	  break;
 	default:
 	  assert(0);

@@ -42,7 +42,13 @@ namespace spot
     /// EventualUniversal for spot::ltl::reduce_eventuality_universality_form,
     /// BRI for spot::ltl::reduce_form.
 
-    enum option {Base, Inf, EventualUniversal, BRI};
+    enum option {Base,
+		 Inf,
+		 InfBase,
+		 EventualUniversal,
+		 EventualUniversalBase,
+		 InfEventualUniversal,
+		 BRI};
     formula* reduce(const formula* f, option o = BRI);
 
     /// Implement basic rewriting.

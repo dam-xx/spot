@@ -70,6 +70,9 @@ namespace spot
       {
 	formula* f = uo->child();
 	result_ = basic_reduce_form(f);
+	multop* mo = NULL;
+	unop* u = NULL;
+	binop* bo = NULL;
 	switch (uo->op())
 	  {
 	  case unop::Not:
@@ -87,30 +90,31 @@ namespace spot
 
 	    /* X(f1 & GF(f2)) = X(f1) & GF(F2) */
 	    /* X(f1 | GF(f2)) = X(f1) | GF(F2) */
-	    if (node_type(result_) == (node_type_form_visitor::Multop)) {
-	      if (dynamic_cast<multop*>(result_)->size() == 2) {
-		if (is_GF(dynamic_cast<multop*>(result_)->nth(0))) {
-		  //|| is_FG(dynamic_cast<multop*>(result_)->nth(0))) {
+	    mo = dynamic_cast<multop*>(result_);
+	    if (mo && mo->size() == 2)
+	      {
+		if (is_GF(mo->nth(0)))
+		  {
 		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::F, basic_reduce_form(dynamic_cast<multop*>(result_)->nth(1))));
-		    res->push_back(basic_reduce_form(dynamic_cast<multop*>(result_)->nth(0)));
-		    f = result_;
-		    result_ = multop::instance(dynamic_cast<multop*>(result_)->op(), res);
-		    spot::ltl::destroy(f);
+		    res->push_back(unop::instance(unop::F,
+						  basic_reduce_form(mo->nth(1))));
+		    res->push_back(basic_reduce_form(mo->nth(0)));
+		    result_ = multop::instance(mo->op(), res);
+		    spot::ltl::destroy(mo);
 		    return;
 		  }
-		if (is_GF(dynamic_cast<multop*>(result_)->nth(1))) {
-		  //|| is_FG(dynamic_cast<multop*>(result_)->nth(1))) {
+		if (is_GF(mo->nth(1)))
+		  {
 		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::F, basic_reduce_form(dynamic_cast<multop*>(result_)->nth(0))));
-		    res->push_back(basic_reduce_form(dynamic_cast<multop*>(result_)->nth(1)));
-		    f = result_;
-		    result_ = multop::instance(dynamic_cast<multop*>(result_)->op(), res);
-		    spot::ltl::destroy(f);
+		    res->push_back(unop::instance(unop::F,
+						  basic_reduce_form(mo->nth(0))));
+		    res->push_back(basic_reduce_form(mo->nth(1)));
+		    result_ = multop::instance(mo->op(), res);
+		    spot::ltl::destroy(mo);
 		    return;
 		  }
-		}
-	    }
+	      }
+
 
 	    result_ = unop::instance(unop::X, result_);
 	    return;
@@ -123,41 +127,46 @@ namespace spot
 	      return;
 
 	    /* FX(a) = XF(a) */
-	    if (node_type(result_) == (node_type_form_visitor::Unop))
-	      if (dynamic_cast<unop*>(result_)->op() == unop::X){
-		f = result_;
-		result_ = unop::instance(unop::X,
-					 unop::instance(unop::F,
-							basic_reduce_form(dynamic_cast<unop*>(result_)->child()) ));
-		spot::ltl::destroy(f);
-		return;
-	      }
+	    u = dynamic_cast<unop*>(result_);
+	    if (u && u->op() == unop::X)
+	      {
+		result_ =
+		  unop::instance(unop::X,
+				 unop::instance(unop::F,
+						basic_reduce_form(u->child())));
+		spot::ltl::destroy(u);
+	      return;
+	    }
 
 	    /* F(f1 & GF(f2)) = F(f1) & GF(F2) */
-	    if (node_type(result_) == (node_type_form_visitor::Multop)) {
-	      if (dynamic_cast<multop*>(result_)->op() == multop::And) {
-		if (dynamic_cast<multop*>(result_)->size() == 2) {
-		  if (is_GF(dynamic_cast<multop*>(result_)->nth(0))) {
-		    //|| is_FG(dynamic_cast<multop*>(result_)->nth(0))) {
-		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::F, basic_reduce_form(dynamic_cast<multop*>(result_)->nth(1))));
-		    res->push_back(basic_reduce_form(dynamic_cast<multop*>(result_)->nth(0)));
-		    spot::ltl::destroy(result_);
-		    result_ = multop::instance(multop::And, res);
-		    return;
+	    mo = dynamic_cast<multop*>(result_);
+	    if (mo && mo->op() == multop::And)
+	      {
+		if (mo->size() == 2)
+		  {
+		    if (is_GF(mo->nth(0)))
+		      {
+			multop::vec* res = new multop::vec;
+			res->push_back(unop::instance(unop::F,
+						      basic_reduce_form(mo->nth(1))));
+			res->push_back(basic_reduce_form(mo->nth(0)));
+			result_ = multop::instance(mo->op(), res);
+			spot::ltl::destroy(mo);
+			return;
+		      }
+		    if (is_GF(mo->nth(1)))
+		      {
+			multop::vec* res = new multop::vec;
+			res->push_back(unop::instance(unop::F,
+						      basic_reduce_form(mo->nth(0))));
+			res->push_back(basic_reduce_form(mo->nth(1)));
+			result_ = multop::instance(mo->op(), res);
+			spot::ltl::destroy(mo);
+			return;
+		      }
 		  }
-		  if (is_GF(dynamic_cast<multop*>(result_)->nth(1))) {
-		    //|| is_FG(dynamic_cast<multop*>(result_)->nth(1))) {
-		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::F, basic_reduce_form(dynamic_cast<multop*>(result_)->nth(0))));
-		    res->push_back(basic_reduce_form(dynamic_cast<multop*>(result_)->nth(1)));
-		    spot::ltl::destroy(result_);
-		    result_ = multop::instance(multop::And, res);
-		    return;
-		  }
-		}
 	      }
-	    }
+
 
 	    result_ = unop::instance(unop::F, result_);
 	    return;
@@ -170,50 +179,56 @@ namespace spot
 	      return;
 
 	    /* G(a R b) = G(b) */
-	    if (node_type(result_) == node_type_form_visitor::Binop)
-	      if (dynamic_cast<binop*>(result_)->op() == binop::R){
-		f = result_;
-		result_ = unop::instance(unop::G, basic_reduce_form(dynamic_cast<binop*>(result_)->second()));
-		spot::ltl::destroy(f);
+	    bo = dynamic_cast<binop*>(result_);
+	    if (bo && bo->op() == binop::R)
+	      {
+		result_ = unop::instance(unop::G,
+					 basic_reduce_form(bo->second()));
+		spot::ltl::destroy(bo);
 		return;
 	      }
 
 	    /* GX(a) = XG(a) */
-	    if (node_type(result_) == (node_type_form_visitor::Unop))
-	      if ( dynamic_cast<unop*>(result_)->op() == unop::X ){
-		f = result_;
-		result_ = unop::instance(unop::X,
-					 unop::instance(unop::G,
-							basic_reduce_form(dynamic_cast<unop*>(result_)->child())));
-		spot::ltl::destroy(f);
+	    u = dynamic_cast<unop*>(result_);
+	    if (u && u->op() == unop::X)
+	      {
+		result_ =
+		  unop::instance(unop::X,
+				 unop::instance(unop::G,
+						basic_reduce_form(u->child())));
+		spot::ltl::destroy(u);
 		return;
 	      }
 
 	    /* G(f1 | GF(f2)) = G(f1) | GF(F2) */
-	    if (node_type(result_) == (node_type_form_visitor::Multop)) {
-	      if (dynamic_cast<multop*>(f)->op() == multop::Or) {
-		if (dynamic_cast<multop*>(result_)->size() == 2) {
-		  if (is_GF(dynamic_cast<multop*>(result_)->nth(0))) {
-		    //|| is_FG(dynamic_cast<multop*>(result_)->nth(0))) {
-		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::G, basic_reduce_form(dynamic_cast<multop*>(result_)->nth(1))));
-		    res->push_back(basic_reduce_form(dynamic_cast<multop*>(result_)->nth(0)));
-		    spot::ltl::destroy(result_);
-		    result_ = multop::instance(multop::Or, res);
-		    return;
+	    mo = dynamic_cast<multop*>(result_);
+	    if (mo && mo->op() == multop::Or)
+	      {
+		if (mo->size() == 2)
+		  {
+		    if (is_GF(mo->nth(0)))
+		      {
+			multop::vec* res = new multop::vec;
+			res->push_back(unop::instance(unop::F,
+						      basic_reduce_form(mo->nth(1))));
+			res->push_back(basic_reduce_form(mo->nth(0)));
+			result_ = multop::instance(mo->op(), res);
+			spot::ltl::destroy(mo);
+			return;
+		      }
+		    if (is_GF(mo->nth(1)))
+		      {
+			multop::vec* res = new multop::vec;
+			res->push_back(unop::instance(unop::F,
+						      basic_reduce_form(mo->nth(0))));
+			res->push_back(basic_reduce_form(mo->nth(1)));
+			result_ = multop::instance(mo->op(), res);
+			spot::ltl::destroy(mo);
+			return;
+		      }
 		  }
-		  if (is_GF(dynamic_cast<multop*>(result_)->nth(1))) {
-		    //|| is_FG(dynamic_cast<multop*>(result_)->nth(1))) {
-		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::G, basic_reduce_form(dynamic_cast<multop*>(result_)->nth(0))));
-		    res->push_back(basic_reduce_form(dynamic_cast<multop*>(result_)->nth(1)));
-		    spot::ltl::destroy(result_);
-		    result_ = multop::instance(multop::Or, res);
-		    return;
-		  }
-		}
 	      }
-	    }
+
 
 	    result_ = unop::instance(unop::G, result_);
 	    return;
@@ -230,6 +245,8 @@ namespace spot
 	formula* ftmp = NULL;
 	node_type_form_visitor v1;
 	node_type_form_visitor v2;
+	unop* fu1 = NULL;
+	unop* fu2 = NULL;
 	switch (bo->op())
 	  {
 	  case binop::Xor:
@@ -252,28 +269,31 @@ namespace spot
 
 	    /* a U false = false
 	       a U true = true */
-	    if (node_type(f2) == (node_type_form_visitor::Const)) {
-	      result_ = f2;
-	      return;
-	    }
+	    if (node_type(f2) == (node_type_form_visitor::Const))
+	      {
+		result_ = f2;
+		return;
+	      }
 
 	    f1 = basic_reduce_form(f1);
 
 	    /* X(a) U X(b) = X(a U b) */
-	    if ( node_type(f1) == (node_type_form_visitor::Unop)
-		 && node_type(f2) == (node_type_form_visitor::Unop)) {
-	      if ((dynamic_cast<unop*>(f1)->op() == unop::X)
-		  && (dynamic_cast<unop*>(f2)->op() == unop::X)) {
+	    fu1 = dynamic_cast<unop*>(f1);
+	    fu2 = dynamic_cast<unop*>(f2);
+	    if ((fu1 && fu2) &&
+		(fu1->op() == unop::X) &&
+		(fu2->op() == unop::X))
+	      {
 		ftmp = binop::instance(binop::U,
-				       basic_reduce_form(dynamic_cast<unop*>(f1)->child()),
-				       basic_reduce_form(dynamic_cast<unop*>(f2)->child()));
+				       basic_reduce_form(fu1->child()),
+				       basic_reduce_form(fu2->child()));
 		result_ = unop::instance(unop::X, basic_reduce_form(ftmp));
 		spot::ltl::destroy(f1);
 		spot::ltl::destroy(f2);
 		spot::ltl::destroy(ftmp);
 		return;
 	      }
-	    }
+
 	    result_ = binop::instance(binop::U, f1, f2);
 	    return;
 
@@ -282,28 +302,31 @@ namespace spot
 
 	    /* a R false = false
 	       a R true = true */
-	    if (node_type(f2) == (node_type_form_visitor::Const)) {
-	      result_ = f2;
-	      return;
-	    }
+	    if (node_type(f2) == (node_type_form_visitor::Const))
+	      {
+		result_ = f2;
+		return;
+	      }
 
 	    f1 = basic_reduce_form(f1);
 
 	    /* X(a) R X(b) = X(a R b) */
-	    if (node_type(f1) == (node_type_form_visitor::Unop)
-		&& node_type(f2) == (node_type_form_visitor::Unop)) {
-	      if ((dynamic_cast<unop*>(f1)->op() == unop::X)
-		  && (dynamic_cast<unop*>(f2)->op() == unop::X)) {
+	    fu1 = dynamic_cast<unop*>(f1);
+	    fu2 = dynamic_cast<unop*>(f2);
+	    if ((fu1 && fu2) &&
+		(fu1->op() == unop::X) &&
+		(fu2->op() == unop::X))
+	      {
 		ftmp = binop::instance(bo->op(),
-				       basic_reduce_form(dynamic_cast<unop*>(f1)->child()),
-				       basic_reduce_form(dynamic_cast<unop*>(f2)->child()));
+				       basic_reduce_form(fu1->child()),
+				       basic_reduce_form(fu2->child()));
 		result_ = unop::instance(unop::X, basic_reduce_form(ftmp));
 		spot::ltl::destroy(f1);
 		spot::ltl::destroy(f2);
 		spot::ltl::destroy(ftmp);
 		return;
-	      }
 	    }
+
 	    result_ = binop::instance(bo->op(),
 				      f1, f2);
 	    return;
@@ -330,6 +353,9 @@ namespace spot
 
 	multop::vec* tmpOther = new multop::vec;
 
+	unop* uo = NULL;
+	unop* uo2 = NULL;
+	binop* bo = NULL;
 	formula* ftmp = NULL;
 
 	for (unsigned i = 0; i < mos; ++i)
@@ -340,96 +366,107 @@ namespace spot
 	  {
 	  case multop::And:
 
-	    for (multop::vec::iterator i = res->begin(); i != res->end(); i++) {
-	      if (*i == NULL) continue;
-	      switch (node_type(*i)) {
+	    for (multop::vec::iterator i = res->begin(); i != res->end(); i++)
+	      {
+		if (*i == NULL)
+		  continue;
+		switch (node_type(*i))
+		  {
 
-	      case node_type_form_visitor::Unop:
+		  case node_type_form_visitor::Unop:
 
-		/* Xa & Xb = X(a & b)*/
-		if (dynamic_cast<unop*>(*i)->op() == unop::X) {
-		  tmpX->push_back(spot::ltl::basic_reduce_form(dynamic_cast<unop*>(*i)->child()));
-		  break;
-		}
+		    /* Xa & Xb = X(a & b)*/
+		    uo = dynamic_cast<unop*>(*i);
+		    if (uo && uo->op() == unop::X)
+		      {
+			tmpX->push_back(basic_reduce_form(uo->child()));
+			break;
+		      }
 
-		/* FG(a) & FG(b) = FG(a & b)*/
-		if (is_FG(*i)) {
-		  tmpFG->push_back(spot::ltl::basic_reduce_form(dynamic_cast<unop*>(dynamic_cast<unop*>(*i)->child())->child()));
-		  break;
-		}
-		tmpOther->push_back(spot::ltl::basic_reduce_form(*i));
-		break;
-		/* A GERER !!!!!!!!!!!!!!!!!!!!!!!
-		   case node_type_form_visitor::Const:
-		   tmpX->push_back( spot::ltl::clone((*i)) );
-		   break;
-		*/
+		    /* FG(a) & FG(b) = FG(a & b)*/
+		    if (is_FG(*i))
+		      {
+			uo2 = dynamic_cast<unop*>(uo->child());
+			tmpFG->push_back(basic_reduce_form(uo2->child()));
+			break;
+		      }
+		    tmpOther->push_back(basic_reduce_form(*i));
+		    break;
 
-	      case node_type_form_visitor::Binop:
+		  case node_type_form_visitor::Binop:
 
-		/* (a U b) & (c U b) = (a & c) U b */
-		if (dynamic_cast<binop*>(*i)->op() == binop::U) {
-		  ftmp = dynamic_cast<binop*>(*i)->second();
-		  tmpUright = new multop::vec;
-		  for (multop::vec::iterator j = i; j != res->end(); j++)
-		    {
-		      if (*j == NULL) continue;
-		      if (node_type(*j) == node_type_form_visitor::Binop)
-			{
-			  if (dynamic_cast<binop*>(*j)->op() == binop::U)
-			    {
-			      if (ftmp == dynamic_cast<binop*>(*j)->second())
-				{
-				  tmpUright->push_back(spot::ltl::basic_reduce_form(dynamic_cast<binop*>(*j)->first() ));
-				  if (j != i) {
+		    /* (a U b) & (c U b) = (a & c) U b */
+		    if (dynamic_cast<binop*>(*i)->op() == binop::U)
+		      {
+			ftmp = dynamic_cast<binop*>(*i)->second();
+			tmpUright = new multop::vec;
+			for (multop::vec::iterator j = i; j != res->end(); j++)
+			  {
+			    if (*j == NULL) continue;
+			    if ((node_type(*j) == node_type_form_visitor::Binop)
+				&&
+				(dynamic_cast<binop*>(*j)->op() == binop::U) &&
+				(ftmp == dynamic_cast<binop*>(*j)->second()))
+			      {
+				bo = dynamic_cast<binop*>(*j);
+				tmpUright
+				  ->push_back(basic_reduce_form(bo->first()));
+				if (j != i)
+				  {
+				    destroy(*j);
+				    *j = NULL;
+				  }
+			      }
+			  }
+			tmpU
+			  ->push_back(binop::instance(binop::U,
+						      multop::
+						      instance(multop::
+							       And,
+							       tmpUright),
+						      basic_reduce_form(ftmp)));
+			break;
+		      }
+
+		    /* (a R b) & (a R c) = a R (b & c) */
+		    if (dynamic_cast<binop*>(*i)->op() == binop::R)
+		      {
+			ftmp = dynamic_cast<binop*>(*i)->first();
+			tmpRright = new multop::vec;
+			for (multop::vec::iterator j = i; j != res->end(); j++)
+			  {
+			    if (*j == NULL) continue;
+			    if ((node_type(*j) == node_type_form_visitor::Binop)
+				&&
+				(dynamic_cast<binop*>(*j)->op() == binop::R) &&
+				(ftmp == dynamic_cast<binop*>(*j)->first()))
+			      {
+				bo = dynamic_cast<binop*>(*j);
+				tmpRright
+				  ->push_back(basic_reduce_form(bo->second()));
+				if (j != i)
+				  {
 				    spot::ltl::destroy(*j);
 				    *j = NULL;
 				  }
-				}
-			    }
-			}
-		    }
-		  tmpU->push_back(binop::instance(binop::U,
-						  multop::instance(multop::And,tmpUright),
-						  basic_reduce_form(ftmp)));
-		  break;
-		}
-
-		/* (a R b) & (a R c) = a R (b & c) */
-		if (dynamic_cast<binop*>(*i)->op() == binop::R) {
-		  ftmp = dynamic_cast<binop*>(*i)->first();
-		  tmpRright = new multop::vec;
-		  for (multop::vec::iterator j = i; j != res->end(); j++)
-		    {
-		      if (*j == NULL) continue;
-		      if (node_type(*j) == node_type_form_visitor::Binop)
-			{
-			  if (dynamic_cast<binop*>(*j)->op() == binop::R)
-			    {
-			      if (ftmp == dynamic_cast<binop*>(*j)->first())
-				{
-				  tmpRright->push_back(spot::ltl::basic_reduce_form(dynamic_cast<binop*>(*j)->second() ));
-				  if (j != i) {
-				    spot::ltl::destroy(*j);
-				    *j = NULL;
-				  }
-				}
-			    }
-			}
-		    }
-		  tmpR->push_back(binop::instance(binop::R,
-						  basic_reduce_form(ftmp),
-						  multop::instance(multop::And,tmpRright)));
-		  break;
-		}
-		tmpOther->push_back(spot::ltl::basic_reduce_form(*i));
-		break;
-	      default:
-		tmpOther->push_back(spot::ltl::basic_reduce_form(*i));
-		break;
+			      }
+			  }
+			tmpR
+			  ->push_back(binop::instance(binop::R,
+						      basic_reduce_form(ftmp),
+						      multop::
+						      instance(multop::And,
+							       tmpRright)));
+			break;
+		      }
+		    tmpOther->push_back(basic_reduce_form(*i));
+		    break;
+		  default:
+		    tmpOther->push_back(basic_reduce_form(*i));
+		    break;
+		  }
+		spot::ltl::destroy(*i);
 	      }
-	      spot::ltl::destroy(*i);
-	    }
 
 	    delete(tmpGF);
 	    tmpGF = NULL;
@@ -438,91 +475,104 @@ namespace spot
 
 	  case multop::Or:
 
-	    for (multop::vec::iterator i = res->begin(); i != res->end(); i++) {
-	      if (*i == NULL) continue;
-	      switch (node_type(*i)) {
+	    for (multop::vec::iterator i = res->begin(); i != res->end(); i++)
+	      {
+		if (*i == NULL) continue;
+		switch (node_type(*i))
+		  {
 
-	      case node_type_form_visitor::Unop:
+		  case node_type_form_visitor::Unop:
 
-		/* Xa | Xb = X(a | b)*/
-		if (dynamic_cast<unop*>(*i)->op() == unop::X) {
-		  tmpX->push_back(spot::ltl::basic_reduce_form(dynamic_cast<unop*>(*i)->child()));
-		  break;
-		}
+		    /* Xa | Xb = X(a | b)*/
+		    uo = dynamic_cast<unop*>(*i);
+		    if (uo && uo->op() == unop::X)
+		      {
+			tmpX->push_back(basic_reduce_form(uo->child()));
+			break;
+		      }
 
-		/* GF(a) | GF(b) = GF(a | b)*/
-		if (is_GF(*i)) {
-		  tmpGF->push_back(spot::ltl::basic_reduce_form(dynamic_cast<unop*>(dynamic_cast<unop*>(*i)->child())->child()));
-		  break;
-		}
-		tmpOther->push_back(spot::ltl::basic_reduce_form(*i));
-		break;
+		    /* GF(a) | GF(b) = GF(a | b)*/
+		    if (is_GF(*i))
+		      {
+			uo2 = dynamic_cast<unop*>(uo->child());
+			tmpGF->push_back(basic_reduce_form(uo2->child()));
+			break;
+		      }
+		    tmpOther->push_back(basic_reduce_form(*i));
+		    break;
 
-	      case node_type_form_visitor::Binop:
+		  case node_type_form_visitor::Binop:
 
-		/* (a U b) | (a U c) = a U (b | c) */
-		if (dynamic_cast<binop*>(*i)->op() == binop::U) {
-		  ftmp = dynamic_cast<binop*>(*i)->first();
-		  tmpUright = new multop::vec;
-		  for (multop::vec::iterator j = i; j != res->end(); j++)
-		    {
-		      if (*j == NULL) continue;
-		      if (node_type(*j) == node_type_form_visitor::Binop)
-			{
-			  if (dynamic_cast<binop*>(*j)->op() == binop::U)
-			    {
-			      if (ftmp == dynamic_cast<binop*>(*j)->first())
-				{
-				  tmpUright->push_back(spot::ltl::basic_reduce_form(dynamic_cast<binop*>(*j)->second()));
-				  if (j != i) {
-				    spot::ltl::destroy(*j);
+		    /* (a U b) | (a U c) = a U (b | c) */
+		    if (dynamic_cast<binop*>(*i)->op() == binop::U)
+		      {
+			ftmp = dynamic_cast<binop*>(*i)->first();
+			tmpUright = new multop::vec;
+			for (multop::vec::iterator j = i; j != res->end(); j++)
+			  {
+			    if (*j == NULL) continue;
+			    if ((node_type(*j) == node_type_form_visitor::Binop)
+				&&
+				(dynamic_cast<binop*>(*j)->op() == binop::U) &&
+				(ftmp == dynamic_cast<binop*>(*j)->first()))
+			      {
+				bo = dynamic_cast<binop*>(*j);
+				tmpUright
+				  ->push_back(basic_reduce_form(bo->second()));
+				if (j != i)
+				  {
+				    destroy(*j);
 				    *j = NULL;
 				  }
-				}
-			    }
-			}
-		    }
-		  tmpU->push_back(binop::instance(binop::U,
-						  basic_reduce_form(ftmp),
-						  multop::instance(multop::Or,tmpUright)));
-		  break;
-		}
+			      }
+			  }
+			tmpU->push_back(binop::instance(binop::U,
+							basic_reduce_form(ftmp),
+							multop::
+							instance(multop::Or,
+								 tmpUright)));
+			break;
+		      }
 
-		/* (a R b) | (c R b) = (a | c) R b */
-		if (dynamic_cast<binop*>(*i)->op() == binop::R) {
-		  ftmp = dynamic_cast<binop*>(*i)->second();
-		  tmpRright = new multop::vec;
-		  for (multop::vec::iterator j = i; j != res->end(); j++)
-		    {
-		      if (*j == NULL) continue;
-		      if (node_type(*j) == node_type_form_visitor::Binop)
-			{
-			  if (dynamic_cast<binop*>(*j)->op() == binop::R)
-			    {
-			      if (ftmp == dynamic_cast<binop*>(*j)->second())
-				{
-				  tmpRright->push_back(spot::ltl::basic_reduce_form(dynamic_cast<binop*>(*j)->first()));
-				  if (j != i) {
-				    spot::ltl::destroy(*j);
+		    /* (a R b) | (c R b) = (a | c) R b */
+		    if (dynamic_cast<binop*>(*i)->op() == binop::R)
+		      {
+			ftmp = dynamic_cast<binop*>(*i)->second();
+			tmpRright = new multop::vec;
+			for (multop::vec::iterator j = i; j != res->end(); j++)
+			  {
+			    if (*j == NULL) continue;
+			    if ((node_type(*j) == node_type_form_visitor::Binop)
+				&&
+				(dynamic_cast<binop*>(*j)->op() == binop::R) &&
+				(ftmp == dynamic_cast<binop*>(*j)->second()))
+			      {
+				bo = dynamic_cast<binop*>(*j);
+				tmpRright
+				  ->push_back(basic_reduce_form(bo->first()));
+				if (j != i)
+				  {
+				    destroy(*j);
 				    *j = NULL;
 				  }
-				}
-			    }
-			}
-		    }
-		  tmpR->push_back(binop::instance(binop::R,
-						  multop::instance(multop::Or,tmpRright),
-						  basic_reduce_form(ftmp)));
-		  break;
-		}
-		tmpOther->push_back(spot::ltl::basic_reduce_form(*i));
-		break;
-	      default:
-		tmpOther->push_back(spot::ltl::basic_reduce_form(*i));
-		break;
+			      }
+			  }
+			tmpR
+			  ->push_back(binop::instance(binop::R,
+						      multop::
+						      instance(multop::Or,
+							       tmpRright),
+						      basic_reduce_form(ftmp)));
+			break;
+		      }
+		    tmpOther->push_back(basic_reduce_form(*i));
+		    break;
+		  default:
+		    tmpOther->push_back(basic_reduce_form(*i));
+		    break;
+		  }
+		spot::ltl::destroy(*i);
 	      }
-	      spot::ltl::destroy(*i);
-	    }
 
 	    delete(tmpFG);
 	    tmpFG = NULL;
@@ -535,27 +585,37 @@ namespace spot
 	delete(res);
 
 	if (tmpX->size())
-	  tmpOther->push_back(unop::instance(unop::X,multop::instance(mo->op(),tmpX)));
+	  tmpOther->push_back(unop::instance(unop::X,
+					     multop::instance(mo->op(),
+							      tmpX)));
 	else delete(tmpX);
 
 	if (tmpU->size())
-	  tmpOther->push_back(multop::instance(mo->op(),tmpU));
+	  tmpOther->push_back(multop::instance(mo->op(), tmpU));
 	else delete(tmpU);
 
 	if (tmpR->size())
-	  tmpOther->push_back(multop::instance(mo->op(),tmpR));
+	  tmpOther->push_back(multop::instance(mo->op(), tmpR));
 	else delete(tmpR);
 
-	if (tmpGF != NULL)
-	  if (tmpGF->size())
-	    tmpOther->push_back(unop::instance(unop::G,
-					       unop::instance(unop::F,
-							      multop::instance(mo->op(),tmpGF))));
-	if (tmpFG != NULL)
-	  if (tmpFG->size())
-	    tmpOther->push_back(unop::instance(unop::F,
-					       unop::instance(unop::G,
-							      multop::instance(mo->op(),tmpFG))));
+	if ((tmpGF != NULL) &&
+	    (tmpGF->size()))
+	  {
+	    ftmp = unop::instance(unop::G,
+				  unop::instance(unop::F,
+						 multop::instance(mo->op(),
+								  tmpGF)));
+	    tmpOther->push_back(ftmp);
+	  }
+	if ((tmpFG != NULL) &&
+	    (tmpFG->size()))
+	  {
+	    ftmp = unop::instance(unop::F,
+				  unop::instance(unop::G,
+						 multop::instance(mo->op(),
+								  tmpFG)));
+	    tmpOther->push_back(ftmp);
+	  }
 
 	result_ = multop::instance(op, tmpOther);
 

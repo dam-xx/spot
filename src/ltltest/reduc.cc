@@ -59,6 +59,15 @@ main(int argc, char** argv)
     case 3:
       o = spot::ltl::BRI;
       break;
+    case 4:
+      o = spot::ltl::InfBase;
+      break;
+    case 5:
+      o = spot::ltl::EventualUniversalBase;
+      break;
+    case 6:
+      o = spot::ltl::InfEventualUniversal;
+      break;
     default:
       return 2;
   }

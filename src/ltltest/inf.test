@@ -26,67 +26,67 @@
 . ./defs || exit 1
 
 #
-run 1 ./inf 'Xa' 'X(b U a)'
-run 1 ./inf 'XXa' 'XX(b U a)'
+run 1 ./inf 0 'Xa' 'X(b U a)'
+run 1 ./inf 0 'XXa' 'XX(b U a)'
 
-run 1 ./inf '(e R f)' '(g U f)'
-run 1 ./inf '( X(a + b))' '( X((a + b)+(c)+(d)))'
-run 1 ./inf '( X(a + b)) U (e R f)' '( X((a + b)+(c)+(d))) U (g U f)'
+run 1 ./inf 0 '(e R f)' '(g U f)'
+run 1 ./inf 0 '( X(a + b))' '( X((a + b)+(c)+(d)))'
+run 1 ./inf 0 '( X(a + b)) U (e R f)' '( X((a + b)+(c)+(d))) U (g U f)'
 
-run 0 ./inf 'Xa' 'XX(b U a)'
-run 0 ./inf 'XXa' 'X(b U a)'
+run 0 ./inf 0 'Xa' 'XX(b U a)'
+run 0 ./inf 0 'XXa' 'X(b U a)'
 
-run 0 ./inf '( X(a + b))' '( X(X(a + b)+(c)+(d)))'
-run 0 ./inf '( X(a + b)) U (e R f)' '( X(X(a + b)+(c)+(d))) U (g U f)'
+run 0 ./inf 0 '( X(a + b))' '( X(X(a + b)+(c)+(d)))'
+run 0 ./inf 0 '( X(a + b)) U (e R f)' '( X(X(a + b)+(c)+(d))) U (g U f)'
 
-run 0 ./inf 'a' 'b'
-run 0 ./inf 'a' 'b + c'
-run 0 ./inf 'a + b' 'a'
-run 0 ./inf 'a' 'a * c'
-run 0 ./inf 'a * b' 'c'
-run 0 ./inf 'a' 'a U b'
-run 0 ./inf 'a' 'a R b'
-run 0 ./inf 'a R b' 'a'
+run 0 ./inf 0 'a' 'b'
+run 0 ./inf 0 'a' 'b + c'
+run 0 ./inf 0 'a + b' 'a'
+run 0 ./inf 0 'a' 'a * c'
+run 0 ./inf 0 'a * b' 'c'
+run 0 ./inf 0 'a' 'a U b'
+run 0 ./inf 0 'a' 'a R b'
+run 0 ./inf 0 'a R b' 'a'
 
-run 1 ./inf '1' '1'
-run 1 ./inf '0' '0'
+run 1 ./inf 0 '1' '1'
+run 1 ./inf 0 '0' '0'
 
-run 1 ./inf 'a' '1'
-run 1 ./inf 'a' 'a'
+run 1 ./inf 0 'a' '1'
+run 1 ./inf 0 'a' 'a'
 
-run 1 ./inf 'a' 'a * 1'
+run 1 ./inf 0 'a' 'a * 1'
 
-run 1 ./inf 'a * b' 'b'
-run 1 ./inf 'a * b' 'a'
+run 1 ./inf 0 'a * b' 'b'
+run 1 ./inf 0 'a * b' 'a'
 
-run 1 ./inf 'a' 'a + b'
-run 1 ./inf 'b' 'a + b'
+run 1 ./inf 0 'a' 'a + b'
+run 1 ./inf 0 'b' 'a + b'
 
-run 1 ./inf 'a + b' '1'
+run 1 ./inf 0 'a + b' '1'
 
-run 1 ./inf 'a' 'b U a'
-run 1 ./inf 'a' 'b U 1'
-run 1 ./inf 'a U b' '1'
+run 1 ./inf 0 'a' 'b U a'
+run 1 ./inf 0 'a' 'b U 1'
+run 1 ./inf 0 'a U b' '1'
 
-run 1 ./inf 'a' '1 R a'
-run 1 ./inf 'a' 'a R 1'
-run 1 ./inf 'a R b' 'b'
-run 1 ./inf 'a R b' '1'
+run 1 ./inf 0 'a' '1 R a'
+run 1 ./inf 0 'a' 'a R 1'
+run 1 ./inf 0 'a R b' 'b'
+run 1 ./inf 0 'a R b' '1'
 
-run 1 ./inf 'Xa' 'X(b U a)'
-run 1 ./inf 'X(a R b)' 'Xb'
+run 1 ./inf 0 'Xa' 'X(b U a)'
+run 1 ./inf 0 'X(a R b)' 'Xb'
 
-run 1 ./inf 'a U b' '1 U b'
-run 1 ./inf 'a R b' '1 R b'
+run 1 ./inf 0 'a U b' '1 U b'
+run 1 ./inf 0 'a R b' '1 R b'
 
-run 1 ./inf 'b * (a U b)' 'a U b'
-run 1 ./inf 'a U b' 'c + (a U b)'
+run 1 ./inf 0 'b * (a U b)' 'a U b'
+run 1 ./inf 0 'a U b' 'c + (a U b)'
 
 exit 0
 #
 
-#run 1 ./inf '(a U b) U ((a U b) U (a U b))' 'a U b'
-#run 1 ./inf '(a U b) && (a U b)' 'a U b'
+#run 1 ./inf 0 '(a U b) U ((a U b) U (a U b))' 'a U b'
+#run 1 ./inf 0 '(a U b) && (a U b)' 'a U b'
 
 'X1' '1'
 'a U 0' '0'

@@ -352,12 +352,19 @@ main(int argc, char** argv)
 	  else if (reduc_r1 | reduc_r2 | reduc_r3)
 	    {
 	      spot::ltl::option o = spot::ltl::BRI;
-	      if (reduc_r1)
+	      if (reduc_r1 & !reduc_r2 & !reduc_r3)
 		o = spot::ltl::Base;
-	      if (reduc_r2)
+	      if (!reduc_r1 & reduc_r2 & !reduc_r3)
 		o = spot::ltl::EventualUniversal;
-	      if (reduc_r3)
+	      if (reduc_r1 & reduc_r2 & !reduc_r3)
+		o = spot::ltl::EventualUniversalBase;
+	      if (!reduc_r1 & !reduc_r2 & reduc_r3)
 		o = spot::ltl::Inf;
+	      if (reduc_r1 & !reduc_r2 & reduc_r3)
+		o = spot::ltl::InfBase;
+	      if (!reduc_r1 & reduc_r2 & reduc_r3)
+		o = spot::ltl::InfEventualUniversal;
+
 	      f = spot::ltl::reduce(f, o);
 	    }
 

@@ -41,21 +41,22 @@ syntax(char* prog)
 int
 main(int argc, char** argv)
 {
-  if (argc < 3)
+  if (argc < 4)
     syntax(argv[0]);
 
+  int opt = atoi(argv[1]);
 
   spot::ltl::parse_error_list p1;
-  spot::ltl::formula* f1 = spot::ltl::parse(argv[1], p1);
+  spot::ltl::formula* f1 = spot::ltl::parse(argv[2], p1);
   spot::ltl::formula* f2 = NULL;
 
-  if (spot::ltl::format_parse_errors(std::cerr, argv[1], p1))
+  if (spot::ltl::format_parse_errors(std::cerr, argv[2], p1))
     return 2;
 
   spot::ltl::parse_error_list p2;
-  f2 = spot::ltl::parse(argv[2], p2);
+  f2 = spot::ltl::parse(argv[3], p2);
 
-  if (spot::ltl::format_parse_errors(std::cerr, argv[2], p2))
+  if (spot::ltl::format_parse_errors(std::cerr, argv[3], p2))
     return 2;
 
   std::string f1s = spot::ltl::to_string(f1);
@@ -63,28 +64,36 @@ main(int argc, char** argv)
 
   int exit_return = 0;
 
-  std::cout << "Test f1 < f2" << std::endl;
-  if (spot::ltl::inf_form(f1, f2))
+  switch (opt)
     {
-      std::cout << f1s << " < " << f2s << std::endl;
-      exit_return = 1;
-    }
+    case 0:
+      std::cout << "Test f1 < f2" << std::endl;
+      if (spot::ltl::inf_form(f1, f2))
+	{
+	  std::cout << f1s << " < " << f2s << std::endl;
+	  exit_return = 1;
+	}
+      break;
 
-  /*
-  std::cout << "Test !f1 < f2" << std::endl;
-  if (spot::ltl::infneg_form(f1, f2, 0))
-    {
-      std::cout << "!(" << f1s << ") < " << f2s << std::endl;
-      exit_return = 2;
-    }
+    case 1:
+      std::cout << "Test !f1 < f2" << std::endl;
+      if (spot::ltl::infneg_form(f1, f2, 0))
+	{
+	  std::cout << "!(" << f1s << ") < " << f2s << std::endl;
+	  exit_return = 1;
+	}
+      break;
 
-  std::cout << "Test f1 < !f2" << std::endl;
-  if (spot::ltl::infneg_form(f1, f2, 1))
-    {
-      std::cout << f1s << " < !(" << f2s << ")" << std::endl;
-      exit_return = 3;
+    case 2:
+      std::cout << "Test f1 < !f2" << std::endl;
+      if (spot::ltl::infneg_form(f1, f2, 1))
+	{
+	  std::cout << f1s << " < !(" << f2s << ")" << std::endl;
+	  exit_return = 1;
+	}
+      break;
+    default: break;
     }
-  */
 
   spot::ltl::dump(std::cout, f1); std::cout << std::endl;
   spot::ltl::dump(std::cout, f2); std::cout << std::endl;
