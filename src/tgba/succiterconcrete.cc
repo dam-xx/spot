@@ -100,10 +100,21 @@ namespace spot
 	    bdd prop = bdd_exist(cube, data_.acc_set);
 	    // prop = (!a)&b
 	    current_acc_ = bdd_forall(bdd_restrict(as, prop), data_.var_set);
-	    // acc = (Acc[a] | Acc[b])
-	    bdd all = as & current_acc_;
+	    // current_acc_ = (Acc[a] | Acc[b])
+	    assert(current_acc_ != bddfalse);
+	    // Find other transitions included in each of these
+	    // accepting sets.
+	    bdd all = bddtrue;
+	    bdd acc = current_acc_;
+	    do
+	      {
+		bdd one_acc = bdd_satone(acc);
+		acc &= !one_acc;
+		all &= bdd_relprod(as, one_acc, data_.acc_set);
+	      }
+	    while (acc != bddfalse);
 	    // all = (a | (!a)&b) & (Acc[a] | Acc[b])
-	    current_ = bdd_exist(all, data_.acc_set) & dest;
+	    current_ = all & dest;
 	    // current_ = (a | (!a)&b) & (Next...)
 	  }
 	else
