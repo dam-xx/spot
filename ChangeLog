@@ -1,5 +1,7 @@
 2004-05-10  Thomas MARTINEZ  <martinez@abacus.lip6.fr>
 
+	* src/tgbatest/ltl2tgba.cc (main): Add a option for reduce the formula.
+
 	* src/ltltest/formules.ltl: A pattern of 2000 formulas.
 	* src/ltltest/inf.test: Test some case of implies.
 	* src/ltltest/inf.cc: Test some case of implies.
