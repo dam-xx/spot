@@ -1,5 +1,7 @@
 2004-01-26  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/explpro2.test: Fix reordering regex.
+
 	* src/tgbatest/defs.in (run): Use libtool --mode=execute.
 
 2004-01-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
