@@ -1,3 +1,19 @@
+2003-07-16  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* m4/gspnlib.m4: New file.
+	* configure.ac: Call AX_CHECK_GSPNLIB.
+	* Makefile.am (EXTRA_DIST): Add m4/gspnlib.m4.
+	* iface/gspn/Makefile.am (AM_CPPFLAGS): Add $(LIBGSPN_CPPFLAGS).
+	(libspotgspn_la_LIBADD, check_PROGRAMS, dottygspn_SOURCES,
+	dottygspn_LDADD): New variables.
+	* iface/gspn/gspn.hh (gspn_interface): New class.
+	(gspn_exeption): Take a string argument and adjust all callers.
+	(operator<<): Define for gspn_exeption.
+	* iface/gspn/gspn.cc (gspn_interface::gspn_interface,
+	gspn_interface::~gspn_interface): New.
+	* iface/gspn/gspnlib.h: Delete, it belongs to GSPN.
+	* iface/gspn/dottygspn.cc: New file.
+
 2003-07-15  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* m4/lbtt.m4 (AX_CHECK_LBTT): Set LBTT and LBTT_TRANSLATE

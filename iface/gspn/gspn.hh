@@ -4,6 +4,7 @@
 // Try not to include gspnlib.h here, or it will polute the user's
 // namespace with internal C symbols.
 
+# include <iostream>
 # include <string>
 # include "tgba/tgba.hh"
 # include "ltlast/atomic_prop.hh"
@@ -12,24 +13,46 @@
 namespace spot
 {
 
+  class gspn_interface
+  {
+  public:
+    gspn_interface(int argc, char **argv);
+    ~gspn_interface();
+    tgba* get_automata();
+  };
+
+
   /// An exeption used to forward GSPN errors.
   class gspn_exeption
   {
   public:
-    gspn_exeption(int err)
-      : err(err)
+    gspn_exeption(const std::string& where, int err)
+      : err_(err), where_(where)
     {
     }
 
     int
     get_err() const
     {
-      return err;
+      return err_;
     }
+
+    std::string
+    get_where() const
+    {
+      return where_;
+    }
+
   private:
-    int err;
+    int err_;
+    std::string where_;
   };
 
+  std::ostream& operator<<(std::ostream& os, const gspn_exeption& e)
+  {
+    os << e.get_where() << " exited with " << e.get_err();
+    return os;
+  }
 
   class gspn_environment : public ltl::environment
   {

@@ -8,6 +8,21 @@
 namespace spot
 {
 
+  gspn_interface::gspn_interface(int argc, char **argv)
+  {
+    int res = initialize(argc, argv);
+    if (res)
+      throw gspn_exeption("initialize()", res);
+  }
+
+  gspn_interface::~gspn_interface()
+  {
+    int res = finalize();
+    if (res)
+      throw gspn_exeption("finalize()", res);
+  }
+
+
   // tgba_gspn_private_
   //////////////////////////////////////////////////////////////////////
 
@@ -36,11 +51,11 @@ namespace spot
 	      AtomicProp index;
 	      int err = prop_index(i->first.c_str(), &index);
 	      if (err)
-		throw gspn_exeption(err);
+		throw gspn_exeption("prop_index()", err);
 	      AtomicPropKind kind;
 	      err = prop_kind(index, &kind);
 	      if (err)
-		throw gspn_exeption(err);
+		throw gspn_exeption("prop_kind()", err);
 
 	      prop_dict[index] = ab_pair(kind, bdd_ithvar(var));
 	    }
@@ -97,7 +112,8 @@ namespace spot
     {
       const state_gspn* o = dynamic_cast<const state_gspn*>(other);
       assert(o);
-      return o->get_state() - get_state();
+      return reinterpret_cast<char*>(o->get_state())
+	- reinterpret_cast<char*>(get_state());
     }
 
     virtual state_gspn* clone() const
@@ -130,11 +146,9 @@ namespace spot
 	current_(0),
 	data_(data)
     {
-      AtomicProp want[] = { EVENT_TRUE };
-      int res = succ(state, want, sizeof(want) / sizeof(*want),
-		     &successors_, &size_);
+      int res = succ(state, &successors_, &size_);
       if (res)
-	throw res;
+	throw gspn_exeption("succ()", res);
       assert(successors_);
       // GSPN is expected to return a looping "dead" transition where
       // there is no successor,
@@ -188,7 +202,7 @@ namespace spot
   private:
     bdd state_conds_;		/// All conditions known on STATE.
     EventPropSucc* successors_; /// array of successors
-    size_t size_;    		/// size of successors_
+    size_t size_;		/// size of successors_
     size_t current_;		/// current position in successors_
     tgba_gspn_private_* data_;
   }; // tgba_succ_iterator_gspn
@@ -278,7 +292,7 @@ namespace spot
     State s;
     int err = initial_state(&s);
     if (err)
-      throw gspn_exeption(err);
+      throw gspn_exeption("initial_state()", err);
     return new state_gspn(s);
   }
 
@@ -293,7 +307,7 @@ namespace spot
     int res = satisfy(s->get_state(),
 		      data_->all_indexes, &cube, data_->index_count);
     if (res)
-      throw res;
+      throw gspn_exeption("satisfy()", res);
     assert(cube);
     bdd state_conds = bddtrue;
     for (size_t i = 0; i < data_->index_count; ++i)
