@@ -34,7 +34,8 @@ namespace spot
     public acss_statistics
   {
   public:
-    couvreur99_check_result(const couvreur99_check_status* ecs);
+    couvreur99_check_result(const couvreur99_check_status* ecs,
+			    option_map o = option_map());
 
     virtual tgba_run* accepting_run();
 

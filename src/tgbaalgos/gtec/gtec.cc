@@ -30,10 +30,11 @@ namespace spot
   }
 
   couvreur99_check::couvreur99_check(const tgba* a,
-				     bool poprem,
+				     option_map o,
 				     const numbered_state_heap_factory* nshf)
-    : emptiness_check(a), poprem_(poprem)
+    : emptiness_check(a, o)
   {
+    poprem_ = o.get("poprem", 1);
     ecs_ = new couvreur99_check_status(a, nshf);
   }
 
@@ -262,7 +263,7 @@ namespace spot
 	    // cycle.
 	    ecs_->cycle_seed = spi.first;
             set_states(ecs_->states());
-	    return new couvreur99_check_result(ecs_);
+	    return new couvreur99_check_result(ecs_, options());
 	  }
       }
     // This automaton recognizes no word.
@@ -288,12 +289,13 @@ namespace spot
   //////////////////////////////////////////////////////////////////////
 
   couvreur99_check_shy::couvreur99_check_shy(const tgba* a,
-					     bool poprem,
-					     bool group,
+					     option_map o,
 					     const numbered_state_heap_factory*
 					     nshf)
-    : couvreur99_check(a, poprem, nshf), num(1), group_(group)
+    : couvreur99_check(a, o, nshf), num(1)
   {
+    group_ = o.get("group", 1);
+
     // Setup depth-first search from the initial state.
     todo.push_back(todo_item(0, 0));
     todo.back().q.push_front(successor(bddtrue, ecs_->aut->get_init_state()));
@@ -409,7 +411,7 @@ namespace spot
 		// We have found an accepting SCC.  Clean up TODO.
 		clear_todo();
 		set_states(ecs_->states());
-		return new couvreur99_check_result(ecs_);
+		return new couvreur99_check_result(ecs_, options());
 	      }
 
 	    continue;
@@ -491,7 +493,7 @@ namespace spot
 		clear_todo();
 		set_states(ecs_->states());
 		delete iter;
-		return new couvreur99_check_result(ecs_);
+		return new couvreur99_check_result(ecs_, options());
 	      }
 	    // Group the pending successors of formed SCC if requested.
 	    if (group_)
@@ -560,7 +562,7 @@ namespace spot
 		    // We have found an accepting SCC.  Clean up TODO.
 		    clear_todo();
 		    set_states(ecs_->states());
-		    return new couvreur99_check_result(ecs_);
+		    return new couvreur99_check_result(ecs_, options());
 		  }
 	      }
 	  }
@@ -571,6 +573,16 @@ namespace spot
   couvreur99_check_shy::find_state(const state* s)
   {
     return ecs_->h->find(s).second;
+  }
+
+  emptiness_check*
+  couvreur99(const tgba* a,
+	     option_map o,
+	     const numbered_state_heap_factory* nshf)
+  {
+    if (o.get("shy"))
+      return new couvreur99_check_shy(a, o, nshf);
+    return  new couvreur99_check(a, o, nshf);
   }
 
 }

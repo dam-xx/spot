@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -21,6 +21,8 @@
 
 #ifndef SPOT_TGBAALGOS_GV04_HH
 # define SPOT_TGBAALGOS_GV04_HH
+
+#include "misc/optionmap.hh"
 
 namespace spot
 {
@@ -51,7 +53,8 @@ namespace spot
   ///   isbn    = {3-540-21299-X}
   /// }
   /// \endverbatim
-  emptiness_check* explicit_gv04_check(const tgba* a);
+  emptiness_check* explicit_gv04_check(const tgba* a,
+				       option_map o = option_map());
 }
 
 #endif // SPOT_TGBAALGOS_GV04_HH

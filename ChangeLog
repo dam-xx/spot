@@ -1,3 +1,19 @@
+2005-02-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/misc/optionmap.cc, src/misc/optionmap.hh (option_map::get,
+	option_map::set): Handle default values.
+	(anonymous::to_int): Do not print anything.
+	* src/tgbaalgos/gv04.cc, src/tgbaalgos/gv04.hh,
+	src/tgbaalgos/tau03.cc, src/tgbaalgos/tau03.hh,
+	src/tgbaalgos/tau03opt.cc, src/tgbaalgos/tau03opt.hh,
+	src/tgbaalgos/ce.cc, src/tgbaalgos/ce.hh: Take an option_map in
+	the constructor.
+	* src/tgbaalgos/gtec.cc, src/tgbaalgos/gtec.hh: Likewise.  Handle
+	the "poprem", "group", and "shy" options via the option_map.
+	Supply a couvreur99() wrapper to the shy/non-shy variant.
+	* src/tgbatest/ltl2tgba.cc, src/tgbatest/randtgba.cc,
+	iface/gspn/ssp.cc: Adjust.
+
 2005-02-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/randtgba.cc: Factorize more code using the

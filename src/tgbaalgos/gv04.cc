@@ -69,8 +69,8 @@ namespace spot
       int dftop;		// Top of DFS stack.
       bool violation;		// Whether an accepting run was found.
 
-      gv04(const tgba *a)
-	: emptiness_check(a), accepting(a->all_acceptance_conditions())
+      gv04(const tgba *a, option_map o)
+	: emptiness_check(a, o), accepting(a->all_acceptance_conditions())
       {
 	assert(a->number_of_acceptance_conditions() <= 1);
       }
@@ -243,7 +243,8 @@ namespace spot
 	gv04& data;
 
 	result(gv04& data)
-	  : emptiness_check_result(data.automaton()), data(data)
+	  : emptiness_check_result(data.automaton(), data.options()),
+	    data(data)
 	{
 	}
 
@@ -405,8 +406,8 @@ namespace spot
   } // anonymous
 
   emptiness_check*
-  explicit_gv04_check(const tgba* a)
+  explicit_gv04_check(const tgba* a, option_map o)
   {
-    return new gv04(a);
+    return new gv04(a, o);
   }
 }

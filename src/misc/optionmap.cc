@@ -19,7 +19,6 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include <cassert>
 #include <cstring>
 #include <iostream>
 #include "optionmap.hh"
@@ -34,44 +33,43 @@ namespace spot
       char* endptr;
       int res = strtol(s, &endptr, 10);
       if (*endptr)
-        {
-          std::cerr << "Failed to parse `" << s << "' as an integer."
-                    << std::endl;
-          return false;
-        }
+	return false;
       i = res;
       return true;
     }
   };
 
-  const char* option_map::parse_options(char* options)
+  const char*
+  option_map::parse_options(char* options)
   {
-      char* opt = strtok(options, ", \t;");
-      while (opt)
-        {
-          char* equal;
-          if ((equal = strchr(opt, '=')) != 0)
-            {
-              *equal = 0;
-              int val;
-              if (!to_int(equal+1, val))
-                return opt;
-              options_[opt] = val;
-            }
-          else
-            // default value if declared
-            options_[opt] = 1;
-          opt = strtok(0, ", \t;");
-        }
-      return 0;
+    char* opt = strtok(options, ", \t;");
+    while (opt)
+      {
+	char* equal = strchr(opt, '=');
+	if (equal)
+	  {
+	    *equal = 0;
+	    int val;
+	    if (!to_int(equal + 1, val))
+	      return opt;
+	    options_[opt] = val;
+	  }
+	else
+	  {
+	    options_[opt] = 1;
+	  }
+	opt = strtok(0, ", \t;");
+      }
+    return 0;
   }
 
-  int option_map::get(const char* option) const
+  int
+  option_map::get(const char* option, int def) const
   {
     std::map<std::string, int>::const_iterator it = options_.find(option);
     if (it == options_.end())
       // default value if not declared
-      return 0;
+      return def;
     else
       return it->second;
   }
@@ -81,22 +79,25 @@ namespace spot
     return get(option);
   }
 
-  int option_map::set(const char* option, int val)
+  int
+  option_map::set(const char* option, int val, int def)
   {
-    int old = get(option);
+    int old = get(option, def);
     options_[option] = val;
     return old;
   }
 
-  int& option_map::operator[](const char* option)
+  int&
+  option_map::operator[](const char* option)
   {
     return options_[option];
   }
 
-  std::ostream& operator<<(std::ostream& os, const option_map& m)
+  std::ostream&
+  operator<<(std::ostream& os, const option_map& m)
   {
     for (std::map<std::string, int>::const_iterator it = m.options_.begin();
-        it != m.options_.end(); ++it)
+	 it != m.options_.end(); ++it)
       os << "\"" << it->first << "\" = " << it->second << std::endl;
     return os;
   }

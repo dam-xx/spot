@@ -131,7 +131,7 @@ namespace spot
   /// \sa spot::explicit_se05_search
   ///
   emptiness_check* bit_state_hashing_se05_search(const tgba *a, size_t size,
-                                                  option_map o = option_map());
+						 option_map o = option_map());
 
   /// @}
 }

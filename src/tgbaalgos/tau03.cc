@@ -53,8 +53,8 @@ namespace spot
     {
     public:
       /// \brief Initialize the search algorithm on the automaton \a a
-      tau03_search(const tgba *a, size_t size)
-        : emptiness_check(a),
+      tau03_search(const tgba *a, size_t size, option_map o)
+        : emptiness_check(a, o),
           h(size),
           all_cond(a->all_acceptance_conditions())
       {
@@ -375,9 +375,9 @@ namespace spot
 
   } // anonymous
 
-  emptiness_check* explicit_tau03_search(const tgba *a)
+  emptiness_check* explicit_tau03_search(const tgba *a, option_map o)
   {
-    return new tau03_search<explicit_tau03_search_heap>(a, 0);
+    return new tau03_search<explicit_tau03_search_heap>(a, 0, o);
   }
 
 }

@@ -77,8 +77,8 @@ namespace spot
   }
 
   couvreur99_check_result::couvreur99_check_result
-  (const couvreur99_check_status* ecs)
-    : emptiness_check_result(ecs->aut), ecs_(ecs)
+  (const couvreur99_check_status* ecs, option_map o)
+    : emptiness_check_result(ecs->aut, o), ecs_(ecs)
   {
   }
 

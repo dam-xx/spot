@@ -62,72 +62,41 @@
 #include "tgbaalgos/tau03opt.hh"
 #include "tgbaalgos/replayrun.hh"
 
-spot::option_map options;
-
 spot::emptiness_check*
-couvreur99_cons(const spot::tgba* a)
+couvreur99_cons(const spot::tgba* a, spot::option_map o)
 {
-  return new spot::couvreur99_check(a, false);
+  return spot::couvreur99(a, o);
 }
 
 spot::emptiness_check*
-couvreur99_shy_cons(const spot::tgba* a)
+ms_cons(const spot::tgba* a, spot::option_map o)
 {
-  return new spot::couvreur99_check_shy(a, false);
+  return spot::explicit_magic_search(a, o);
 }
 
 spot::emptiness_check*
-couvreur99_shy_minus_cons(const spot::tgba* a)
+se05_cons(const spot::tgba* a, spot::option_map o)
 {
-  return new spot::couvreur99_check_shy(a, false, false);
+  return spot::explicit_se05_search(a, o);
 }
 
 spot::emptiness_check*
-couvreur99_rem_cons(const spot::tgba* a)
+bsh_ms_cons(const spot::tgba* a, spot::option_map o)
 {
-  return new spot::couvreur99_check(a, true);
+  return spot::bit_state_hashing_magic_search(a, 4096, o);
 }
 
 spot::emptiness_check*
-couvreur99_rem_shy_cons(const spot::tgba* a)
+bsh_se05_cons(const spot::tgba* a, spot::option_map o)
 {
-  return new spot::couvreur99_check_shy(a, true);
-}
-
-spot::emptiness_check*
-couvreur99_rem_shy_minus_cons(const spot::tgba* a)
-{
-  return new spot::couvreur99_check_shy(a, true, false);
-}
-
-spot::emptiness_check*
-ms_cons(const spot::tgba* a)
-{
-  return spot::explicit_magic_search(a, options);
-}
-
-spot::emptiness_check*
-se05_cons(const spot::tgba* a)
-{
-  return spot::explicit_se05_search(a, options);
-}
-
-spot::emptiness_check*
-bsh_ms_cons(const spot::tgba* a)
-{
-  return spot::bit_state_hashing_magic_search(a, 4096, options);
-}
-
-spot::emptiness_check*
-bsh_se05_cons(const spot::tgba* a)
-{
-  return spot::bit_state_hashing_se05_search(a, 4096, options);
+  return spot::bit_state_hashing_se05_search(a, 4096, o);
 }
 
 struct ec_algo
 {
   const char* name;
-  spot::emptiness_check* (*construct)(const spot::tgba*);
+  const char* options;
+  spot::emptiness_check* (*construct)(const spot::tgba*, spot::option_map o);
   unsigned int min_acc;
   unsigned int max_acc;
   bool safe;
@@ -135,29 +104,53 @@ struct ec_algo
 
 ec_algo ec_algos[] =
   {
-    { "Cou99",          couvreur99_cons,                     0, -1U, true },
-    { "Cou99_shy-",     couvreur99_shy_minus_cons,           0, -1U, true },
-    { "Cou99_shy",      couvreur99_shy_cons,                 0, -1U, true },
-    { "Cou99_rem",      couvreur99_rem_cons,                 0, -1U, true },
-    { "Cou99_rem_shy-", couvreur99_rem_shy_minus_cons,       0, -1U, true },
-    { "Cou99_rem_shy",  couvreur99_rem_shy_cons,             0, -1U, true },
-    { "CVWY90",         ms_cons,                             0,   1, true },
-    { "CVWY90_bsh",     bsh_ms_cons,                         0,   1, false },
-    { "GV04",           spot::explicit_gv04_check,           0,   1, true },
-    { "SE05",           se05_cons,                           0,   1, true },
-    { "SE05_bsh",       bsh_se05_cons,                       0,   1, false },
-    { "Tau03",          spot::explicit_tau03_search,         1, -1U, true },
-    { "Tau03_opt",      spot::explicit_tau03_opt_search,     0, -1U, true },
+    { "Cou99",          "poprem=0",
+                        couvreur99_cons,                     0, -1U, true },
+    { "Cou99_shy-",     "poprem=0,shy=1,group=0",
+                        couvreur99_cons,                     0, -1U, true },
+    { "Cou99_shy",      "poprem=0,shy=1,group=1",
+                        couvreur99_cons,                     0, -1U, true },
+    { "Cou99_rem",      "poprem=1",
+                        couvreur99_cons,                     0, -1U, true },
+    { "Cou99_rem_shy-", "poprem=1,shy=1,group=0",
+                        couvreur99_cons,                     0, -1U, true },
+    { "Cou99_rem_shy",  "poprem=1,shy=1,group=1",
+                        couvreur99_cons,                     0, -1U, true },
+    { "CVWY90",         0,
+                        ms_cons,                             0,   1, true },
+    { "CVWY90_bsh",     0,
+                        bsh_ms_cons,                         0,   1, false },
+    { "GV04",           0,
+                        spot::explicit_gv04_check,           0,   1, true },
+    { "SE05",           0,
+                        se05_cons,                           0,   1, true },
+    { "SE05_bsh",       0,
+                        bsh_se05_cons,                       0,   1, false },
+    { "Tau03",          0,
+                        spot::explicit_tau03_search,         1, -1U, true },
+    { "Tau03_opt",      0,
+                        spot::explicit_tau03_opt_search,     0, -1U, true },
   };
+
+spot::option_map options;
 
 spot::emptiness_check*
 cons_emptiness_check(int num, const spot::tgba* a,
 		     const spot::tgba* degen, unsigned int n_acc)
 {
+  spot::option_map o = options;
+  if (ec_algos[num].options)
+    {
+      char* x = strdup(ec_algos[num].options);
+      const char* err = o.parse_options(x);
+      assert(!err);
+      (void)err;
+      free(x);
+    }
   if (n_acc < ec_algos[num].min_acc || n_acc > ec_algos[num].max_acc)
     a = degen;
   if (a)
-    return ec_algos[num].construct(a);
+    return ec_algos[num].construct(a, o);
   return 0;
 }
 

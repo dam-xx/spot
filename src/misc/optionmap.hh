@@ -46,19 +46,22 @@ namespace spot
 
     /// \brief Get the value of \a option.
     ///
-    /// \return The value associated to \a option if it exists, 0 otherwise.
-    int get(const char* option) const;
+    /// \return The value associated to \a option if it exists,
+    /// \a def otherwise.
+    /// \see operator[]()
+    int get(const char* option, int def = 0) const;
 
     /// \brief Get the value of \a option.
     ///
     /// \return The value associated to \a option if it exists, 0 otherwise.
+    /// \see get()
     int operator[](const char* option) const;
 
     /// \brief Set the value of \a option to \a val.
     ///
-    /// \return The current value associated to \a option if declared,
-    /// 0 otherwise.
-    int set(const char* option, int val);
+    /// \return The previous value associated to \a option if declared,
+    /// or \a def otherwise.
+    int set(const char* option, int val, int def = 0);
 
     /// \brief Get a reference to the current value of \a option.
     int& operator[](const char* option);

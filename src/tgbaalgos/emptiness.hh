@@ -129,7 +129,8 @@ namespace spot
 
   protected:
     /// React when options are modified.
-    virtual void options_updated(const option_map& old)
+    virtual void
+    options_updated(const option_map& old)
     {
       (void)old;
     }

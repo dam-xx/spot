@@ -744,6 +744,10 @@ main(int argc, char** argv)
 	  assert(!"unknown output option");
 	}
 
+      spot::option_map o;
+      o.set("poprem", poprem);
+      o.set("group", couv_group);
+
       spot::emptiness_check* ec = 0;
       switch (echeck)
 	{
@@ -751,11 +755,11 @@ main(int argc, char** argv)
 	  break;
 
 	case Couvreur:
-	  ec = new spot::couvreur99_check(a, poprem);
+	  ec = new spot::couvreur99_check(a, o);
 	  break;
 
 	case Couvreur2:
-	  ec = new spot::couvreur99_check_shy(a, poprem, couv_group);
+	  ec = new spot::couvreur99_check_shy(a, o);
 	  break;
 
         case MagicSearch:

@@ -113,19 +113,43 @@ namespace spot
   /// at once in order to decide which to explore first, and must keep
   /// a list of all unexplored successors in its DFS stack.
   ///
-  /// The \c poprem parameter specifies how the algorithm should
-  /// handle the destruction of non-accepting maximal strongly
-  /// connected components.  If \c poprem is true, the algorithm will
-  /// keep a list of all states of a SCC that are fully processed and
-  /// should be removed once the MSCC is popped.  If \c poprem is
-  /// false, the MSCC will be traversed again (i.e. generating the
-  /// successors of the root recursively) for deletion.  This is
-  /// a choice between memory and speed.
+  /// The couvreur99() function is a wrapper around these two flavors
+  /// of the algorithm.  \a options is an option map that specifies
+  /// which algorithms should be used, and how.
+  ///
+  /// The following options are available.
+  /// \li \c "shy" : if non zero, then spot::couvreur99_check_shy is used,
+  ///                otherwise (and by default) spot::couvreur99_check is used.
+  ///
+  /// \li \c "poprem" : specifies how the algorithm should handle the
+  /// destruction of non-accepting maximal strongly connected
+  /// components.  If \c poprem is non null, the algorithm will keep a
+  /// list of all states of a SCC that are fully processed and should
+  /// be removed once the MSCC is popped.  If \c poprem is null (the
+  /// default), the MSCC will be traversed again (i.e. generating the
+  /// successors of the root recursively) for deletion.  This is a
+  /// choice between memory and speed.
+  ///
+  /// \li \c "group" : this options is used only by spot::couvreur99_check_shy.
+  /// If non null (the default), the successors of all the
+  /// states that belong to the same SCC will be considered when
+  /// choosing a successor.  Otherwise, only the successor of the
+  /// topmost state on the DFS stack are considered.
+  emptiness_check*
+  couvreur99(const tgba* a,
+	     option_map options = option_map(),
+	     const numbered_state_heap_factory* nshf
+	     = numbered_state_heap_hash_map_factory::instance());
+
+
+  /// \brief An implementation of the Couvreur99 emptiness-check algorithm.
+  ///
+  /// See the documentation for spot::couvreur99.
   class couvreur99_check: public emptiness_check, public ec_statistics
   {
   public:
     couvreur99_check(const tgba* a,
-		     bool poprem = true,
+		     option_map o = option_map(),
 		     const numbered_state_heap_factory* nshf
 		     = numbered_state_heap_hash_map_factory::instance());
     virtual ~couvreur99_check();
@@ -161,18 +185,12 @@ namespace spot
   /// \brief A version of spot::couvreur99_check that tries to visit
   /// known states first.
   ///
-  /// If \a group is true (the default), the successors of all the
-  /// states that belong to the same SCC will be considered when
-  /// choosing a successor.  Otherwise, only the successor of the
-  /// topmost state on the DFS stack are considered.
-  ///
-  /// See the documentation for spot::couvreur99_check
+  /// See the documentation for spot::couvreur99.
   class couvreur99_check_shy : public couvreur99_check
   {
   public:
     couvreur99_check_shy(const tgba* a,
-			 bool poprem = true,
-			 bool group = true,
+			 option_map o = option_map(),
 			 const numbered_state_heap_factory* nshf
 			 = numbered_state_heap_hash_map_factory::instance());
     virtual ~couvreur99_check_shy();
@@ -230,6 +248,7 @@ namespace spot
     /// overriding this method is the way to go.
     virtual int* find_state(const state* s);
   };
+
 
   /// @}
 }

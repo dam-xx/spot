@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -913,9 +913,9 @@ namespace spot
   public:
     couvreur99_check_shy_ssp(const tgba* a)
       : couvreur99_check_shy(a,
-			     true,
+			     option_map(),
 			     numbered_state_heap_ssp_factory_semi::instance())
-    {
+     {
     }
 
   protected:
@@ -995,6 +995,7 @@ namespace spot
     assert(dynamic_cast<const tgba_gspn_ssp*>(ssp_automata));
     return
       new couvreur99_check(ssp_automata,
+			   option_map(),
 			   numbered_state_heap_ssp_factory_semi::instance());
   }
 
@@ -1005,7 +1006,7 @@ namespace spot
     return
       new couvreur99_check_shy
       (ssp_automata,
-       true,
+       option_map(),
        numbered_state_heap_ssp_factory_semi::instance());
   }
 
