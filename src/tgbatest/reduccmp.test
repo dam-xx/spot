@@ -43,6 +43,8 @@ digraph G {
 }
 EOF
 
+rm input stdout expected
+
 # FIXME
 exit 0
 
@@ -50,5 +52,3 @@ exit 0
 # (The order is not guaranteed by SPOT.)
 sed 's/!b & a/a \& !b/g' stdout > tmp_ && mv tmp_ stdout
 diff stdout expected
-
-#rm input stdout expected

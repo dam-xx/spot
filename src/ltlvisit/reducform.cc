@@ -202,7 +202,7 @@ namespace spot
 	if (opt_ & Reduce_Syntactic_Implications)
 	  {
 
-	    bool removed = true;;
+	    bool removed = true;
 	    multop::vec::iterator f1;
 	    multop::vec::iterator f2;
 
@@ -229,7 +229,7 @@ namespace spot
 		      }
 		    else if ((syntactic_implication(*f2, *f1) && // f2 < f1
 			      (mo->op() == multop::Or)) ||
-			     ((syntactic_implication(*f1,* f2)) && // f1 < f2
+			     ((syntactic_implication(*f1, *f2)) && // f1 < f2
 			      (mo->op() == multop::And)))
 		      {
 			// We keep f1

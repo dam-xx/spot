@@ -1,3 +1,10 @@
+2004-06-22  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/ltlvisit/reducform.cc, src/tgba/tgbareduc.cc,
+	src/tgbaalgos/reductgba_sim.cc, src/tgbaalgos/reductgba_sim.hh
+	src/tgbaalgos/reductgba_sim_del.cc, src/tgbatest/reduccmp.test,
+	src/tgbatest/reductgba.cc: 80 columns and style.
+
 2004-06-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/sanity/style.test: Typo.

@@ -63,7 +63,7 @@ namespace spot
   /// Compute a delayed simulation relation on state of tgba \a f.
   /// FIXME : this method is incorrect !!
   /// Don't use it !!
-  simulation_relation*  get_delayed_relation_simulation(const tgba* a,
+  simulation_relation* get_delayed_relation_simulation(const tgba* a,
 						      int opt = -1);
 
   /// To free a simulation relation.

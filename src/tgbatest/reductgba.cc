@@ -85,9 +85,9 @@ main(int argc, char** argv)
   }
 
   int exit_code = 0;
-  spot::simulation_relation* rel = NULL;
-  spot::tgba* automata = NULL;
-  spot::tgba_reduc* automatareduc = NULL;
+  spot::simulation_relation* rel = 0;
+  spot::tgba* automata = 0;
+  spot::tgba_reduc* automatareduc = 0;
 
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::bdd_dict* dict = new spot::bdd_dict();
@@ -121,7 +121,7 @@ main(int argc, char** argv)
       automatareduc->quotient_state(rel);
     }
 
-  if (rel != NULL)
+  if (rel != 0)
     {
       automatareduc->display_rel_sim(rel, std::cout);
       spot::free_relation_simulation(rel);
@@ -133,17 +133,17 @@ main(int argc, char** argv)
       //automatareduc->display_scc(std::cout);
     }
 
-  if (automatareduc != NULL)
+  if (automatareduc != 0)
     {
       spot::dotty_reachable(std::cout, automatareduc);
     }
 
-  if (automata != NULL)
+  if (automata != 0)
     delete automata;
-  if (automatareduc != NULL)
+  if (automatareduc != 0)
     delete automatareduc;
 #ifndef REDUCCMP
-  if (f != NULL)
+  if (f != 0)
     spot::ltl::destroy(f);
 #endif
 
@@ -152,7 +152,7 @@ main(int argc, char** argv)
   assert(spot::ltl::binop::instance_count() == 0);
   assert(spot::ltl::multop::instance_count() == 0);
 
-  if (dict != NULL)
+  if (dict != 0)
     delete dict;
 
   return exit_code;

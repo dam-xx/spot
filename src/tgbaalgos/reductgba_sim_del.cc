@@ -331,12 +331,12 @@ namespace spot
     nb_spoiler = 0;
     nb_duplicator = 0;
 
-    tgba_succ_iterator* si = NULL;
+    tgba_succ_iterator* si = 0;
     typedef Sgi::pair<bdd, bdd> couple_bdd;
-    couple_bdd *p = NULL;
-    Sgi::vector<couple_bdd*>* trans = NULL;
+    couple_bdd *p = 0;
+    Sgi::vector<couple_bdd*>* trans = 0;
     bool exist = false;
-    spot::state* s = NULL;
+    spot::state* s = 0;
 
     s_v::iterator i;
     for (i = tgba_state_.begin(); i != tgba_state_.end(); ++i)
@@ -448,7 +448,7 @@ namespace spot
     //std::cout << "build link" << std::endl;
     int nb_ds = 0;
     int nb_sd = 0;
-    spot::state* s = NULL;
+    spot::state* s = 0;
 
     // for each couple of (spoiler, duplicator)
     sn_v::iterator i;
@@ -557,7 +557,7 @@ namespace spot
     // We create when it's possible a duplicator node
     // and recursively his successor.
 
-    //spot::state* s1 = NULL;
+    //spot::state* s1 = 0;
     //bool exist_pred = false;
 
     sn_v::iterator i1;
@@ -574,7 +574,7 @@ namespace spot
 	  {
 	    tgba_succ_iterator* si;
 	    s_v::iterator i2;
-	    spot::state* s2 = NULL;
+	    spot::state* s2 = 0;
 	    for (i2 = tgba_state_.begin();
 		 i2 != tgba_state_.end(); ++i2)
 	      {
@@ -634,22 +634,16 @@ namespace spot
 						btmp,
 						nb_node_parity_game++);
 
-		// dn is already a successor of sn.
 		std::cout << "spoiler call add_succ" << std::endl;
 		if (!(sn->add_succ(dn)))
 		  {
+		    // dn is already a successor of sn.
 		    std::cout << "dn is already a successor of sn."
 			      << std::endl;
 		    continue;
 		  }
 		std::cout << "dn is a new successor of sn." << std::endl;
 		(dn)->add_pred(sn);
-
-		/* TEST
-		   bdd btmp2 =
-		   dynamic_cast<spoiler_node_delayed*>(sn)->
-		   get_acceptance_condition_visited();
-		*/
 
 		build_recurse_successor_duplicator(dn, sn);
 	      }
@@ -664,7 +658,7 @@ namespace spot
   void
   parity_game_graph_delayed::
   build_recurse_successor_duplicator(duplicator_node* dn,
-				     spoiler_node* sn)
+				     spoiler_node*)
   {
     std::cout << "build_recurse_successor_duplicator" << std::endl;
 
@@ -675,9 +669,13 @@ namespace spot
       {
 	std::cout << "transition " << i++ << std::endl;
 
+	/*
 	bdd btmp =
 	  dynamic_cast<spoiler_node_delayed*>(sn)->
 	    get_acceptance_condition_visited();
+	*/
+
+	bdd btmp = dn->get_acc();
 	bdd btmp2 = btmp - si->current_acceptance_conditions();
 
 	/*
@@ -694,7 +692,7 @@ namespace spot
 	    if (s->compare(*i1) == 0)
 	      {
 		spoiler_node_delayed* sn_n
-		  = add_spoiler_node_delayed(sn->get_spoiler_node(),
+		  = add_spoiler_node_delayed(dn->get_spoiler_node(),
 					     *i1,
 					     btmp2,
 					     nb_node_parity_game++);
@@ -737,7 +735,7 @@ namespace spot
 	       = duplicator_vertice_.begin();
 	     i != duplicator_vertice_.end(); ++i)
       {
-	std::cout << "COMPARE" << std::endl;
+	//std::cout << "COMPARE" << std::endl;
 	if (dn_n->compare(*i))
 	  {
 	    exist = true;
@@ -768,7 +766,7 @@ namespace spot
 	   = spoiler_vertice_.begin();
 	 i != spoiler_vertice_.end(); ++i)
       {
-	std::cout << "COMPARE" << std::endl;
+	//std::cout << "COMPARE" << std::endl;
 	if (sn_n->compare(*i))
 	  {
 	    exist = true;
@@ -873,7 +871,7 @@ namespace spot
   parity_game_graph_delayed::get_relation()
   {
     simulation_relation* rel = new simulation_relation();
-    state_couple* p = NULL;
+    state_couple* p = 0;
     seen_map::iterator j;
 
     for (Sgi::vector<spoiler_node*>::iterator i
@@ -922,7 +920,7 @@ namespace spot
     this->build_link();
     std::cout << "prune" << std::endl;
     this->prune();
-    std::cout << "lift" << std::endl;
+    std::cout << "lift : " << nb_spoiler_loose_ << std::endl;
     this->lift();
     std::cout << "END" << std::endl;
     //this->print(std::cout);
@@ -934,15 +932,18 @@ namespace spot
   {
     /// FIXME : this method is incorrect !!
     /// Don't use it !!
-    /*
-      parity_game_graph_delayed* G = new parity_game_graph_delayed(f);
-      simulation_relation* rel = G->get_relation();
-      if (opt == 1)
+    parity_game_graph_delayed* G = new parity_game_graph_delayed(f);
+    simulation_relation* rel = G->get_relation();
+    if ((opt == 1) || (opt == -1))
       G->print(std::cout);
-      delete G;
+    delete G;
+
+    return rel;
+
+    /*
+      return get_direct_relation_simulation(f, opt);
     */
 
-    return get_direct_relation_simulation(f, opt);
   }
 
 }

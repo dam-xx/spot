@@ -40,7 +40,7 @@ namespace spot
     run();
     all_acceptance_conditions_ = a->all_acceptance_conditions();
     all_acceptance_conditions_computed_ = true;
-    seen_ = NULL;
+    seen_ = 0;
     scc_computed_ = false;
   }
 
@@ -355,7 +355,7 @@ namespace spot
 	    if ((*j)->dest == st)
 	      {
 		// Remove the transition
-		delete(*j);
+		delete *j;
 		j = (*p)->erase(j);
 		++j;
 	      }
@@ -623,10 +623,10 @@ namespace spot
       {
 	acc_ = bddfalse;
 	b = true;
-	assert(seen_ == NULL);
+	assert(seen_ == 0);
 	seen_ = new seen_map();
 	i = si_.find(s);
-	assert(i->first != NULL);
+	assert(i->first != 0);
 	n = i->second;
       }
     ///////////////////////////////
@@ -685,8 +685,8 @@ namespace spot
 	seen_->clear();
 	std::cout << "delete seen_" << std::endl;
 	delete seen_;
-	std::cout << "seen_ = NULL" << std::endl;
-	seen_ = NULL;
+	std::cout << "seen_ = 0" << std::endl;
+	seen_ = 0;
 	std::cout << "acc_ == this->all_acceptance_conditions()" << std::endl;
 	if (acc_ == this->all_acceptance_conditions())
 	  ret = false;
@@ -724,8 +724,8 @@ namespace spot
   {
     if (n == -1)
       {
-	assert(seen_ == NULL);
-	seen_ = new seen_map();;
+	assert(seen_ == 0);
+	seen_ = new seen_map();
       }
 
     seen_map::const_iterator sm = seen_->find(s);
@@ -744,7 +744,7 @@ namespace spot
     if (n == -1)
       {
 	delete seen_;
-	seen_ = NULL;
+	seen_ = 0;
       }
   }
 
@@ -764,10 +764,10 @@ namespace spot
       {
 	acc_ == bddfalse;
 	b = true;
-	assert(seen_ == NULL);
+	assert(seen_ == 0);
 	seen_ = new seen_map();
 	i = si_.find(s);
-	assert(i->first != NULL);
+	assert(i->first != 0);
 	n = i->second;
       }
 
@@ -796,7 +796,7 @@ namespace spot
     if (b)
       {
 	delete seen_;
-	seen_ = NULL;
+	seen_ = 0;
 	if (acc_ == this->all_acceptance_conditions())
 	  ret = false;
       }

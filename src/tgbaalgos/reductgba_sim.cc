@@ -54,23 +54,11 @@ namespace spot
     bool exist = false;
     for (sn_v::iterator i = lnode_succ->begin();
 	 i != lnode_succ->end(); ++i)
-      // Be careful, we have to compare two duplicator node
-      if (*i == n)
+      if ((*i)->compare(n) == true)
 	exist = true;
     if (exist)
       return false;
-    // TO TEST FOR THE DIRECT SIMULATION //
-    /*
-    bool exist = false;
-    for (sn_v::iterator i = lnode_succ->begin();
-	 i != lnode_succ->end(); ++i)
-      // Be careful, we have to compare two duplicator node
-      if (dynamic_cast<duplicator_node*>(*i)->compare(n) == 0)
-	exist = true;
-    if (exist)
-      return false;
-    */
-    ///////////////
+
     lnode_succ->push_back(n);
     return true;
   }
@@ -93,14 +81,12 @@ namespace spot
   void
   spoiler_node::add_pred(spoiler_node* n)
   {
-    // TO TEST FOR THE DIRECT SIMULATION //
     bool exist = false;
     for (sn_v::iterator i = lnode_pred->begin();
 	 i != lnode_pred->end(); ++i)
       if ((*i)->compare(n) == 0)
 	exist = true;
     if (!exist)
-      ///////////////
       lnode_pred->push_back(n);
   }
 
@@ -121,7 +107,7 @@ namespace spot
       {
 	not_win |= (*i)->not_win;
       }
-    return (change != not_win);
+    return change != not_win;
   }
 
   std::string
@@ -218,7 +204,7 @@ namespace spot
 	  }
       }
 
-    return (change != not_win);
+    return change != not_win;
   }
 
   std::string
@@ -407,12 +393,12 @@ namespace spot
   void
   parity_game_graph_direct::build_couple()
   {
-    tgba_succ_iterator* si = NULL;
+    tgba_succ_iterator* si = 0;
     typedef Sgi::pair<bdd, bdd> couple_bdd;
-    couple_bdd *p = NULL;
-    Sgi::vector<couple_bdd*>* trans = NULL;
+    couple_bdd *p = 0;
+    Sgi::vector<couple_bdd*>* trans = 0;
     bool exist = false;
-    spot::state* s = NULL;
+    spot::state* s = 0;
 
     for (Sgi::vector<const state*>::iterator i = tgba_state_.begin();
 	 i != tgba_state_.end(); ++i)
@@ -469,11 +455,13 @@ namespace spot
 			     s != tgba_state_.end(); ++s)
 			  {
 			    duplicator_node* n2
-			      = new duplicator_node(*i,
-						    *s,
-						    si->current_condition(),
-						    si->current_acceptance_conditions(),
-						    nb_node_parity_game++);
+			      = new
+			      duplicator_node(*i,
+					      *s,
+					      si->current_condition(),
+					      si
+					      ->current_acceptance_conditions(),
+					      nb_node_parity_game++);
 			    duplicator_vertice_.push_back(n2);
 			  }
 		      }
@@ -498,7 +486,7 @@ namespace spot
   {
     int nb_ds = 0;
     int nb_sd = 0;
-    spot::state* s = NULL;
+    spot::state* s = 0;
 
     // for each couple of (spoiler, duplicator)
     for (Sgi::vector<spoiler_node*>::iterator i
@@ -509,7 +497,8 @@ namespace spot
 	     j != duplicator_vertice_.end(); ++j)
 	  {
 	    // We add a link between a duplicator and a spoiler.
-	    if ((*j)->get_spoiler_node()->compare((*i)->get_spoiler_node()) == 0)
+	    if ((*j)->get_spoiler_node()
+		->compare((*i)->get_spoiler_node()) == 0)
 	      {
 		tgba_succ_iterator* si
 		  = automata_->succ_iter((*j)->get_duplicator_node());
@@ -529,7 +518,8 @@ namespace spot
 	      }
 
 	    // We add a link between a spoiler and a duplicator.
-	    if ((*j)->get_duplicator_node()->compare((*i)->get_duplicator_node()) == 0)
+	    if ((*j)->get_duplicator_node()
+		->compare((*i)->get_duplicator_node()) == 0)
 	      {
 		tgba_succ_iterator* si
 		  = automata_->succ_iter((*i)->get_spoiler_node());
@@ -579,7 +569,7 @@ namespace spot
   parity_game_graph_direct::get_relation()
   {
     simulation_relation* rel = new simulation_relation();
-    state_couple* p = NULL;
+    state_couple* p = 0;
     seen_map::iterator j;
 
     for (Sgi::vector<spoiler_node*>::iterator i
@@ -638,7 +628,7 @@ namespace spot
   void
   free_relation_simulation(simulation_relation* rel)
   {
-    if (rel == NULL)
+    if (rel == 0)
       return;
 
     Sgi::hash_map<const spot::state*, int,
@@ -658,13 +648,13 @@ namespace spot
 	delete *i;
       }
     delete rel;
-    rel = NULL;
+    rel = 0;
 
     for (j = seen.begin(); j != seen.end();)
       {
 	const state* ptr = j->first;
 	++j;
-	delete(ptr);
+	delete ptr;
       }
   }
 
