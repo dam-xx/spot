@@ -80,7 +80,7 @@ namespace spot
 	    root_component.pop();
 	    hash_type::iterator i_0 = h.find(step.first);
 	    assert(i_0 != h.end());
-	    if (comp_tmp.index == h[step.first])
+	    if (comp_tmp.index == i_0->second)
 	      {
 		// The current node is a root of a Strong Connected Component.
 		emptiness_check::remove_component(step.first);
@@ -113,14 +113,14 @@ namespace spot
 		iter2->first();
 		todo.push(pair_state_iter(current_state, iter2));
 	      }
-	    else if (h[current_state] != -1)
+	    else if (i->second != -1)
 	      {
 		// A node with order != -1 (a seen node not removed).
 		assert(!root_component.empty());
 		connected_component comp = root_component.top();
 		root_component.pop();
 		bdd new_condition = current_accepting;
-		int current_index = h[current_state];
+		int current_index = i->second;
 		while (comp.index > current_index)
 		  {
 		    // root_component and arc_accepting are popped
@@ -267,13 +267,12 @@ namespace spot
 			seq.push_front(curr_father);
 			hash_type::iterator i_2 = h.find(curr_father);
 			assert(i_2 != h.end());
-			while ((vec_component[k].index < h[curr_father])
-			       && (h[curr_father] != 1))
+			while (vec_component[k].index < i_2->second)
 			  {
+			    assert(i_2->second != 1);
 			    seq.push_front(path_map[curr_father]);
 			    curr_father = path_map[curr_father];
-			    hash_type::iterator i_3 = h.find(curr_father);
-			    assert(i_3 != h.end());
+			    assert(h.find(curr_father) != h.end());
 			  }
 			vec_sequence[k] = seq;
 			seq.clear();
@@ -289,7 +288,7 @@ namespace spot
 			    hash_type::iterator i_seen = h.find(curr_state);
 
 			    if (i_seen != h.end()
-				&& h[curr_state] > 0
+				&& i_seen->second > 0
 				&& i_path == path_map.end())
 			      {
 				todo_trace.
