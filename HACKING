@@ -136,6 +136,26 @@ Formating
 
   * If a line takes more than 80 columns, split it or rethink it.
 
+  * Labels or case statements are left-indented by two spaces,
+    without space before the `:'.
+  
+    if (something)
+      {
+      top:
+        bar = foo();
+        switch (something_else)
+	  {
+	  case first_case:
+	    f();
+	    break;
+	  case second_case:
+	    g();
+	    break;
+	  default:
+	    goto top;
+	  }
+      }
+
 Naming
 ======
 
