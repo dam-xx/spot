@@ -6,7 +6,7 @@
 
 namespace spot
 {
-  
+
   /// A spot::tgba_bdd_factory than renumber BDD variables.
   class tgba_bdd_translate_factory: public tgba_bdd_factory
   {

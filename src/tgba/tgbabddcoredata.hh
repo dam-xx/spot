@@ -27,7 +27,7 @@ namespace spot
     /// \brief The (positive) conjunction of all variables which are
     /// not Now variables.
     bdd notnow_set;
-    /// \brief The (positive) conjunction of all variables which are 
+    /// \brief The (positive) conjunction of all variables which are
     /// not atomic propositions.
     bdd notvar_set;
     /// The (positive) conjunction of all variables which are not promises.

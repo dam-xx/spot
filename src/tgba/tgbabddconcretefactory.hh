@@ -28,7 +28,7 @@ namespace spot
     /// \param f The formula to create an aotmic proposition for.
     /// \return The variable number for this state.
     ///
-    /// The atomic proposition is not created if it already exists.  
+    /// The atomic proposition is not created if it already exists.
     /// Instead its existing variable number is returned.  Variable numbers
     /// can be turned into BDD using ithvar().
     int create_atomic_prop(const ltl::formula* f);
