@@ -1,3 +1,11 @@
+2003-12-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgba/tgbaexplicit.cc, src/tgba/tgbaexplicit.hh
+	(tgba_explicit::merge_transitions): New method.
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Factorize all
+	variables (not just Next and A) when computing prime implicants,
+	and then call merge_transitions().
+
 2003-12-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac: Bump version to 0.0m.

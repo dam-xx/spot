@@ -469,7 +469,32 @@ namespace spot
 
 	std::string now = to_string(f);
 
-	minato_isop isop(res, d.next_set & d.a_set);
+	// We used to factor only Next and A variables while computing
+	// prime implicants, with
+	//    minato_isop isop(res, d.next_set & d.a_set);
+	// in order to obtain transitions with formulae of atomic
+	// proposition directly, but unfortunately this led to strange
+	// factorizations.  For instance f U g was translated as
+	//     r(f U g) = g + a(g).r(X(f U g)).(f + g)
+	// instead of just
+	//     r(f U g) = g + a(g).r(X(f U g)).f
+	// Of course both formulae are logically equivalent, but the
+	// latter is "more deterministic" than the former, so it should
+	// be preferred.
+	//
+	// Therefore we now factor all variables.  This may lead to more
+	// transitions than necessary (e.g.,  r(f + g) = f + g  will be
+	// coded as two transitions), but we later call merge_transitions()
+	// to gather transitions with same source/destination and acceptance
+	// conditions.
+	//
+	// Note that this is still not optimal.  For instance it would
+	// be better to encode `f U g' as
+	//     r(f U g) = g + a(g).r(X(f U g)).f.!g
+	// because that leads to a deterministic automaton.  However it
+	// is not clear how to formalize this generally (replace `g'
+	// by an arbitrary boolean function when thinking about it).
+	minato_isop isop(res);
 	bdd cube;
 	while ((cube = isop.next()) != bddfalse)
 	  {
@@ -501,6 +526,8 @@ namespace spot
 	 i != formulae_seen.end(); ++i)
       destroy(*i);
 
+    // Merge transitions if we can.
+    a->merge_transitions();
     // Turn all promises into real acceptance conditions.
     a->complement_all_acceptance_conditions();
     return a;

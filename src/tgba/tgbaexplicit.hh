@@ -64,6 +64,7 @@ namespace spot
     /// This assumes that all acceptance conditions in \a f are known from dict.
     void add_acceptance_conditions(transition* t, bdd f);
     void complement_all_acceptance_conditions();
+    void merge_transitions();
 
     // tgba interface
     virtual ~tgba_explicit();

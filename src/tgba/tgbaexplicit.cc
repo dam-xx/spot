@@ -220,6 +220,37 @@ namespace spot
       }
   }
 
+  void
+  tgba_explicit::merge_transitions()
+  {
+    ns_map::iterator i;
+    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+      {
+	state::iterator t1;
+	for (t1 = i->second->begin(); t1 != i->second->end(); ++t1)
+	  {
+	    bdd acc = (*t1)->acceptance_conditions;
+	    state* dest = (*t1)->dest;
+
+	    // Find another transition with the same destination and
+	    // acceptance conditions.
+	    state::iterator t2 = t1;
+	    ++t2;
+	    while (t2 != i->second->end())
+	      {
+		state::iterator t2copy = t2++;
+		if ((*t2copy)->acceptance_conditions == acc
+		    && (*t2copy)->dest == dest)
+		  {
+		    (*t1)->condition |= (*t2copy)->condition;
+		    delete *t2copy;
+		    i->second->erase(t2copy);
+		  }
+	      }
+	  }
+      }
+  }
+
   bool
   tgba_explicit::has_acceptance_condition(const ltl::formula* f) const
   {
