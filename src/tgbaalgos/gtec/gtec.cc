@@ -465,7 +465,7 @@ namespace spot
 		      }
 		    prev->q.splice(prev->q.end(), last->q);
 		    todo.pop_back();
-		    dec_depth();
+		    // dec_depth();
 		  }
 		new_queue = &todo.back().q;
 	      }
