@@ -20,8 +20,7 @@
 // 02111-1307, USA.
 
 #include "length.hh"
-#include "ltlast/allnodes.hh"
-#include "ltlast/visitor.hh"
+#include "ltlvisit/postfix.hh"
 
 namespace spot
 {
@@ -29,17 +28,11 @@ namespace spot
   {
     namespace
     {
-      class length_visitor: public const_visitor
+      class length_visitor: public postfix_visitor
       {
       public:
-
 	length_visitor()
-	{
-	  result_ = 0;
-	}
-
-	virtual
-	~length_visitor()
+	  : result_(0)
 	{
 	}
 
@@ -49,37 +42,10 @@ namespace spot
 	  return result_;
 	}
 
-	void
-	visit(const atomic_prop*)
+	virtual void
+	doit_default(formula*)
 	{
-	  result_ = 1;
-	}
-
-	void
-	visit(const constant*)
-	{
-	  result_ = 1;
-	}
-
-	void
-	visit(const unop* uo)
-	{
-	  result_ = 1 + length(uo->child());
-	}
-
-	void
-	visit(const binop* bo)
-	{
-	  result_ = 1 + length(bo->first()) + length(bo->second());
-	}
-
-	void
-	visit(const multop* mo)
-	{
-	  unsigned mos = mo->size();
 	  ++result_;
-	  for (unsigned i = 0; i < mos; ++i)
-	    result_ += length(mo->nth(i));
 	}
 
       protected:
