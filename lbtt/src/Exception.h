@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -74,7 +74,7 @@ public:
   virtual ~UserBreakException() throw();            /* Destructor. */
 
   UserBreakException&                               /* Assignment operator. */
-    operator=(const UserBreakException& e);
+    operator=(const UserBreakException& e);     
 
   /* `what' inherited from class Exception */
 
@@ -289,13 +289,13 @@ public:
   Exceptional_istream                               /* Constructor. */
     (istream *istr,
      ios::iostate mask = ios::goodbit);
-
+  
   /* default copy constructor */
-
+  
   ~Exceptional_istream();                           /* Destructor. */
 
   /* default assignment operator */
-
+  
   template<class T>                                 /* Operator for reading */
   Exceptional_istream &operator>>(T &t);            /* from the stream.     */
 
@@ -337,9 +337,9 @@ public:
   Exceptional_ostream                               /* Constructor. */
     (ostream* ostr,
      ios::iostate mask = ios::goodbit);
-
+  
   /* default copy constructor */
-
+  
   ~Exceptional_ostream();                           /* Destructor. */
 
   /* default assignment operator */
@@ -353,7 +353,7 @@ public:
 						     * aware output stream into
 						     * a regular output stream.
 						     */
-
+  
 private:
   ostream* stream;                                  /* A pointer to the
 						     * `regular' output stream
@@ -482,7 +482,7 @@ inline UserBreakException& UserBreakException::operator=
   (const UserBreakException& e)
 /* ----------------------------------------------------------------------------
  *
- * Descrption:   Assignment operator for class UserBreakException. Assigns the
+ * Descrption:   Assignment operator for class UserBreakException. Assigns the 
  *               value of another UserBreakException to `this' one.
  *
  * Argument:     e  --  A reference to a constant UserBreakException.
@@ -808,7 +808,7 @@ inline FileWriteException::FileWriteException() :
 inline FileWriteException::FileWriteException
   (const string& filename, const string& details) :
   IOException("error writing to " + filename
-	      + string(details.empty() ? "" : " " + details))
+              + string(details.empty() ? "" : " " + details))
 /* ----------------------------------------------------------------------------
  *
  * Description:   Constructor for class FileWriteException. This constructor
@@ -954,7 +954,7 @@ inline Exceptional_istream::Exceptional_istream
  *
  * Arguments:     istr  --  A pointer to an object of type istream.
  *                mask  --  A bit mask determining when the Exceptional_istream
- *                          should throw exceptions. The most useful constants
+ *                          should throw exceptions. The most useful constants 
  *                          for the bit mask are
  *                            ios::badbit   Throw an exception if the input
  *                                          stream (after performing an input
@@ -1060,7 +1060,7 @@ inline Exceptional_ostream::Exceptional_ostream
  *
  * Arguments:     ostr  --  A pointer to an object of type ostream.
  *                mask  --  A bit mask determining when the Exceptional_ostream
- *                          should throw exceptions. The most useful constants
+ *                          should throw exceptions. The most useful constants 
  *                          for the bit mask are
  *                            ios::badbit   Throw an exception if the output
  *                                          stream (after performing an output

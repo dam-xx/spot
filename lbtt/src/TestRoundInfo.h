@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include "ObstackAlloc.h"
+#include "LbttAlloc.h"
 #include "Exception.h"
 #include "LtlFormula.h"
 #include "ProductAutomaton.h"

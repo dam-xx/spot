@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -20,16 +20,12 @@
 #ifndef TESTOPERATIONS_H
 #define TESTOPERATIONS_H
 
-#ifdef __GNUC__
-#pragma interface
-#endif /* __GNUC__ */
-
 #include <config.h>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
-#include "ObstackAlloc.h"
+#include "LbttAlloc.h"
 #include "Configuration.h"
 #include "Exception.h"
 #include "StateSpace.h"

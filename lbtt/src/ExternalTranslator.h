@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -20,10 +20,6 @@
 #ifndef EXTERNALTRANSLATOR_H
 #define EXTERNALTRANSLATOR_H
 
-#ifdef __GNUC__
-#pragma interface
-#endif /* __GNUC__ */
-
 #include <config.h>
 #include <deque>
 #include <stack>
@@ -33,7 +29,7 @@
 #else
 #include <strstream>
 #endif /* HAVE_SSTREAM */
-#include "ObstackAlloc.h"
+#include "LbttAlloc.h"
 #include "Exception.h"
 #include "LtlFormula.h"
 #include "translate.h"
@@ -210,8 +206,8 @@ private:
 						     */
 
   stack<TempFileObject*,                            /* Stack for storing */
-	deque<TempFileObject*,                      /* temporary file    */
-	      ALLOC(TempFileObject*) > >            /* information.      */
+        deque<TempFileObject*,                      /* temporary file    */
+              ALLOC(TempFileObject*) > >            /* information.      */
     temporary_file_objects;
 
   friend class KecWrapper;                          /* Friend declarations. */

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -16,10 +16,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
-#ifdef __GNUC__
-#pragma implementation
-#endif /* __GNUC__ */
 
 #include <config.h>
 #include <cstdio>
@@ -97,7 +93,7 @@ const struct Configuration::IntegerRange Configuration::STATESPACE_SIZE_RANGE
 const struct Configuration::IntegerRange
   Configuration::STATESPACE_MAX_SIZE_RANGE
     = {1, LONG_MAX, "minimum state space size exceeds the maximum state space "
-		    "size"};
+	            "size"};
 
 
 
@@ -312,7 +308,7 @@ void Configuration::read(int argc, char* argv[])
 	{
 	  long int interval_length
 	    = parseCommandLineInteger
-		(command_line_options[option_index].name, optarg);
+	        (command_line_options[option_index].name, optarg);
 	  checkIntegerRange(interval_length, GENERATION_RANGE, false);
 
 	  if (opttype == OPT_FORMULACHANGEINTERVAL)
@@ -426,14 +422,14 @@ void Configuration::read(int argc, char* argv[])
 	{
 	  long int number_of_rounds
 	    = parseCommandLineInteger
-		(command_line_options[option_index].name, optarg);
+	        (command_line_options[option_index].name, optarg);
 	  checkIntegerRange(number_of_rounds, ROUND_COUNT_RANGE, false);
 	  global_options.number_of_rounds = number_of_rounds;
 	  locked_options.insert(make_pair(CFG_GLOBALOPTIONS, CFG_ROUNDS));
 	}
 
 	break;
-
+	  
       case OPT_SHOWCONFIG :
 	print_config = true;
 	break;
@@ -446,7 +442,7 @@ void Configuration::read(int argc, char* argv[])
 	{
 	  long int rounds_to_skip
 	    = parseCommandLineInteger
-		(command_line_options[option_index].name, optarg);
+	        (command_line_options[option_index].name, optarg);
 	  checkIntegerRange(rounds_to_skip, ROUND_COUNT_RANGE, false);
 	  global_options.init_skip = rounds_to_skip;
 	}
@@ -465,7 +461,7 @@ void Configuration::read(int argc, char* argv[])
 	{
 	  long int verbosity
 	    = parseCommandLineInteger
-		(command_line_options[option_index].name, optarg);
+	        (command_line_options[option_index].name, optarg);
 	  checkIntegerRange(verbosity, VERBOSITY_RANGE, false);
 	  global_options.verbosity = verbosity;
 	  locked_options.insert(make_pair(CFG_GLOBALOPTIONS, CFG_VERBOSITY));
@@ -475,17 +471,17 @@ void Configuration::read(int argc, char* argv[])
 
       case OPT_VERSION :
 	cout << "lbtt " PACKAGE_VERSION "\n"
-		"lbtt is free software; you may change and "
-		"redistribute it under the terms of\n"
-		"the GNU General Public License. lbtt comes with "
-		"NO WARRANTY. See the file\n"
-		"COPYING for details.\n";
+	        "lbtt is free software; you may change and "
+                "redistribute it under the terms of\n"
+                "the GNU General Public License. lbtt comes with "
+                "NO WARRANTY. See the file\n"
+	        "COPYING for details.\n";
 	exit(0);
 	break;
 
       case OPT_ABBREVIATEDOPERATORS :
       case OPT_NOABBREVIATEDOPERATORS :
-	formula_options.allow_abbreviated_operators
+        formula_options.allow_abbreviated_operators
 	  = (opttype == OPT_ABBREVIATEDOPERATORS);
 	locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
 					CFG_ABBREVIATEDOPERATORS));
@@ -512,7 +508,7 @@ void Configuration::read(int argc, char* argv[])
 	{
 	  long int priority
 	    = parseCommandLineInteger
-		(command_line_options[option_index].name, optarg);
+	        (command_line_options[option_index].name, optarg);
 
 	  checkIntegerRange(priority, PRIORITY_RANGE, false);
 
@@ -546,7 +542,7 @@ void Configuration::read(int argc, char* argv[])
 
 	    case OPT_FALSEPRIORITY :
 	      symbol = ::Ltl::LTL_FALSE;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
+              locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
 					      CFG_FALSEPRIORITY));
 	      break;
 
@@ -594,7 +590,7 @@ void Configuration::read(int argc, char* argv[])
 
 	    case OPT_RELEASEPRIORITY :
 	      symbol = ::Ltl::LTL_V;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
+	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS, 
 					      CFG_RELEASEPRIORITY));
 	      break;
 
@@ -658,13 +654,13 @@ void Configuration::read(int argc, char* argv[])
 
 	locked_options.insert(make_pair(CFG_FORMULAOPTIONS, CFG_OUTPUTMODE));
 	break;
-
+	
       case OPT_FORMULAPROPOSITIONS :
       case OPT_STATESPACEPROPOSITIONS :
 	{
 	  long int num_propositions
 	    = parseCommandLineInteger
-		(command_line_options[option_index].name, optarg);
+	        (command_line_options[option_index].name, optarg);
 
 	  checkIntegerRange(num_propositions, PROPOSITION_COUNT_RANGE, false);
 
@@ -710,7 +706,7 @@ void Configuration::read(int argc, char* argv[])
 	  {
 	    long int size
 	      = parseCommandLineInteger
-		  (command_line_options[option_index].name, value);
+	          (command_line_options[option_index].name, value);
 
 	    checkIntegerRange(size, min_size_range, false);
 
@@ -797,7 +793,7 @@ void Configuration::read(int argc, char* argv[])
 	locked_options.insert(make_pair(CFG_STATESPACEOPTIONS,
 					CFG_GENERATEMODE));
 	break;
-
+	
       case OPT_RANDOMCONNECTEDGRAPH :
 	global_options.statespace_generation_mode = RANDOMCONNECTEDGRAPH;
 	locked_options.insert(make_pair(CFG_STATESPACEOPTIONS,
@@ -840,15 +836,15 @@ void Configuration::read(int argc, char* argv[])
     if (error)
       throw ConfigurationException
 	("", string("unrecognized argument (`") + optarg
-	     + "') for option `--"
-	     + command_line_options[option_index].name + "'");
+             + "') for option `--"
+             + command_line_options[option_index].name + "'");
   }
   while (opttype != -1);
 
   if (optind != argc)
     throw ConfigurationException
       ("", string("unrecognized command line option `")
-	   + argv[optind] + "'");
+           + argv[optind] + "'");
 
   /*
    *  Read the configuration file.
@@ -857,8 +853,8 @@ void Configuration::read(int argc, char* argv[])
   FILE* configuration_file = fopen(global_options.cfg_filename.c_str(), "r");
   if (configuration_file == NULL)
     throw ConfigurationException
-	    ("", "error opening configuration file `"
-		 + global_options.cfg_filename + "'");
+            ("", "error opening configuration file `"
+	         + global_options.cfg_filename + "'");
 
   try
   {
@@ -903,7 +899,7 @@ void Configuration::read(int argc, char* argv[])
     }
 
     for (set<unsigned long int, less<unsigned long int>,
-	     ALLOC(unsigned long int) >::const_iterator
+             ALLOC(unsigned long int) >::const_iterator
 	   id = algorithm_id_set.begin();
 	 id != algorithm_id_set.end();
 	 ++id)
@@ -933,8 +929,8 @@ void Configuration::read(int argc, char* argv[])
 
   if (global_options.number_of_rounds <= global_options.init_skip)
     throw ConfigurationException
-	    ("", "the argument for `--skip' must be less than the total "
-		 "number of test rounds");
+            ("", "the argument for `--skip' must be less than the total "
+	         "number of test rounds");
 
   /*
    *  Check that there is at least one algorithm available for use.
@@ -942,7 +938,7 @@ void Configuration::read(int argc, char* argv[])
 
   if (algorithms.empty())
     throw ConfigurationException
-	    ("", "no implementations defined in the configuration file");
+            ("", "no implementations defined in the configuration file");
 
   /*
    *  The case where the number of available variables for propositional
@@ -962,7 +958,7 @@ void Configuration::read(int argc, char* argv[])
       && formula_options.symbol_priority[::Ltl::LTL_TRUE] == 0
       && formula_options.symbol_priority[::Ltl::LTL_FALSE] == 0)
     throw ConfigurationException("", "at least one atomic symbol must have "
-				     "nonzero priority");
+                                     "nonzero priority");
 
   /*
    *  If the operators ->, <->, xor, <>, [], W and M are disallowed, set their
@@ -997,15 +993,15 @@ void Configuration::read(int argc, char* argv[])
       it->second = formula_options.default_operator_priority;
 
     if (it->second > 0 && !unary_operator_allowed)
-      unary_operator_allowed =
-	(it->first == ::Ltl::LTL_NEGATION || it->first == ::Ltl::LTL_NEXT
+      unary_operator_allowed = 
+	(it->first == ::Ltl::LTL_NEGATION || it->first == ::Ltl::LTL_NEXT 
 	 || it->first == ::Ltl::LTL_FINALLY
-	 || it->first == ::Ltl::LTL_GLOBALLY);
+         || it->first == ::Ltl::LTL_GLOBALLY);
   }
 
   if (!unary_operator_allowed)
     throw ConfigurationException("", "at least one unary operator must have "
-				     "a nonzero priority");
+                                     "a nonzero priority");
 
   /*
    *  Initialize the random formula generator with priorities for the LTL
@@ -1024,49 +1020,49 @@ void Configuration::read(int argc, char* argv[])
     {
       switch (it->first)
       {
-	case ::Ltl::LTL_ATOM :
-	case ::Ltl::LTL_TRUE :
-	case ::Ltl::LTL_FALSE :
-	  formula_options.formula_generator.useSymbol(it->first, it->second);
-	  break;
+        case ::Ltl::LTL_ATOM :
+        case ::Ltl::LTL_TRUE :
+        case ::Ltl::LTL_FALSE :
+          formula_options.formula_generator.useSymbol(it->first, it->second);
+          break;
 
-	case ::Ltl::LTL_NEGATION :
-	  formula_options.formula_generator.useShortOperator
+        case ::Ltl::LTL_NEGATION :
+          formula_options.formula_generator.useShortOperator
 	    (it->first, it->second);
 	  total_short_unary_priority += it->second;
-	  if (formula_options.generate_mode != NNF)
+          if (formula_options.generate_mode != NNF)
 	  {
-	    formula_options.formula_generator.useLongOperator
+            formula_options.formula_generator.useLongOperator
 	      (it->first, it->second);
 	    total_long_unary_priority += it->second;
 	  }
-	  break;
+          break;
 
-	case ::Ltl::LTL_NEXT :
-	case ::Ltl::LTL_FINALLY :
-	case ::Ltl::LTL_GLOBALLY :
-	  formula_options.formula_generator.useShortOperator
+        case ::Ltl::LTL_NEXT :
+        case ::Ltl::LTL_FINALLY :
+        case ::Ltl::LTL_GLOBALLY :
+          formula_options.formula_generator.useShortOperator
 	    (it->first, it->second);
 	  total_short_unary_priority += it->second;
-	  formula_options.formula_generator.useLongOperator
+          formula_options.formula_generator.useLongOperator
 	    (it->first, it->second);
 	  total_long_unary_priority += it->second;
-	  break;
+          break;
 
-	case ::Ltl::LTL_CONJUNCTION :
-	case ::Ltl::LTL_DISJUNCTION :
-	case ::Ltl::LTL_IMPLICATION :
-	case ::Ltl::LTL_EQUIVALENCE :
-	case ::Ltl::LTL_XOR :
-	case ::Ltl::LTL_UNTIL :
-	case ::Ltl::LTL_V :
-	case ::Ltl::LTL_WEAK_UNTIL :
-	case ::Ltl::LTL_STRONG_RELEASE :
-	case ::Ltl::LTL_BEFORE :
-	  formula_options.formula_generator.useLongOperator
+        case ::Ltl::LTL_CONJUNCTION :
+        case ::Ltl::LTL_DISJUNCTION :
+        case ::Ltl::LTL_IMPLICATION :
+        case ::Ltl::LTL_EQUIVALENCE :
+        case ::Ltl::LTL_XOR :
+        case ::Ltl::LTL_UNTIL :
+        case ::Ltl::LTL_V :
+        case ::Ltl::LTL_WEAK_UNTIL :
+        case ::Ltl::LTL_STRONG_RELEASE :
+        case ::Ltl::LTL_BEFORE :
+          formula_options.formula_generator.useLongOperator
 	    (it->first, it->second);
 	  total_binary_priority += it->second;
-	  break;
+          break;
       }
     }
   }
@@ -1091,9 +1087,9 @@ void Configuration::read(int argc, char* argv[])
 	   ++op)
       {
 	if (op->second > 0)
-	{
+        {
 	  switch (op->first)
-	  {
+          {
 	    case ::Ltl::LTL_ATOM :
 	    case ::Ltl::LTL_TRUE :
 	    case ::Ltl::LTL_FALSE :
@@ -1106,18 +1102,18 @@ void Configuration::read(int argc, char* argv[])
 		       = formula_options.formula_generator.size;
 		     s <= formula_options.formula_generator.max_size;
 		     s++)
-		{
+	        {
 		  if (k >= s)
 		    continue;
 		  probability += operatorProbability
-				   (op->first, k, s,
+		                   (op->first, k, s,
 				    total_short_unary_priority,
 				    total_long_unary_priority,
 				    total_binary_priority,
 				    result_cache);
 		}
 		probability /= static_cast<double>
-				 (formula_options.formula_generator.max_size
+                                 (formula_options.formula_generator.max_size
 				  - formula_options.formula_generator.size
 				  + 1);
 
@@ -1158,18 +1154,18 @@ void Configuration::print(ostream& stream, int indent) const
   Exceptional_ostream estream(&stream, ios::badbit | ios::failbit);
 
   estream << string(indent, ' ') + "Program configuration:\n"
-	     + string(indent, ' ') + string(22, '-') + "\n\n"
-	     + string(indent + 2, ' ')
-	     + toString(global_options.number_of_rounds)
-	     + " test round"
-	     + (global_options.number_of_rounds > 1 ? "s" : "");
+             + string(indent, ' ') + string(22, '-') + "\n\n"
+             + string(indent + 2, ' ')
+             + toString(global_options.number_of_rounds)
+             + " test round"
+             + (global_options.number_of_rounds > 1 ? "s" : "");
 
   if (global_options.init_skip > 0)
     estream << " (of which the first "
-	       + (global_options.init_skip > 1
+               + (global_options.init_skip > 1
 		  ? toString(global_options.init_skip) + " rounds "
 		  : string(""))
-	       + "will be skipped)";
+               + "will be skipped)";
 
   estream << ".\n" + string(indent + 2, ' ');
 
@@ -1181,20 +1177,20 @@ void Configuration::print(ostream& stream, int indent) const
     estream << "Running in batch mode.\n";
 
   estream << string(indent + 2, ' ')
-	     + "Using "
-	     + (global_options.product_mode == GLOBAL
+             + "Using "
+             + (global_options.product_mode == GLOBAL
 		? "global" : "local")
-	     + " model checking for tests.\n";
+             + " model checking for tests.\n";
 
   if (!global_options.transcript_filename.empty())
     estream << string(indent + 2, ' ') + "Writing error log to `"
-	       + global_options.transcript_filename + "'.\n";
+               + global_options.transcript_filename + "'.\n";
 
   estream << '\n' + string(indent + 2, ' ') + "Implementations:\n";
 
   vector<AlgorithmInformation, ALLOC(AlgorithmInformation) >::size_type
     algorithm_number = 0;
-
+  
   for (vector<AlgorithmInformation, ALLOC(AlgorithmInformation) >
 	 ::const_iterator a = algorithms.begin();
        a != algorithms.end();
@@ -1218,19 +1214,19 @@ void Configuration::print(ostream& stream, int indent) const
     estream << "Enabled tests:\n";
     if (global_options.do_comp_test)
       estream << string(indent + 4, ' ') +
-		 "Model checking result cross-comparison test\n";
+                 "Model checking result cross-comparison test\n";
     if (global_options.do_cons_test)
       estream << string(indent + 4, ' ') +
-		 "Model checking result consistency check\n";
+	         "Model checking result consistency check\n";
     if (global_options.do_intr_test)
       estream << string(indent + 4, ' ') +
-		 "Büchi automata intersection emptiness check\n";
+	         "Büchi automata intersection emptiness check\n";
   }
   else
     estream << "All automata correctness tests disabled.\n";
 
   estream << '\n' + string(indent + 2, ' ') + "Random state spaces:\n"
-	     + string(indent + 4, ' ');
+             + string(indent + 4, ' ');
 
   switch (global_options.statespace_generation_mode)
   {
@@ -1257,15 +1253,15 @@ void Configuration::print(ostream& stream, int indent) const
     estream << "..." + toString(statespace_generator.max_size);
 
   estream << string(" state")
-	     + (statespace_generator.max_size == 1 ? "" : "s") + ", "
-	     + toString(statespace_generator.atoms_per_state)
-	     + " atomic proposition"
-	     + (statespace_generator.atoms_per_state == 1 ? "" : "s")
-	     + ")\n" + string(indent + 4, ' ');
+             + (statespace_generator.max_size == 1 ? "" : "s") + ", "
+             + toString(statespace_generator.atoms_per_state)
+             + " atomic proposition"
+             + (statespace_generator.atoms_per_state == 1 ? "" : "s")
+             + ")\n" + string(indent + 4, ' ');
 
   if (global_options.statespace_change_interval == 0
       || global_options.statespace_change_interval
-	   >= global_options.number_of_rounds)
+           >= global_options.number_of_rounds)
     estream << "Using a fixed state space.\n" + string(indent + 4, ' ');
   else
   {
@@ -1297,16 +1293,16 @@ void Configuration::print(ostream& stream, int indent) const
   if (global_options.statespace_generation_mode != ENUMERATEDPATH)
   {
     estream << "Random seed: "
-	       + toString(global_options.statespace_random_seed)
-	       + '\n' + string(indent + 4, ' ');
+               + toString(global_options.statespace_random_seed)
+               + '\n' + string(indent + 4, ' ');
 
     if (global_options.statespace_generation_mode & GRAPH)
       estream << "Random edge probability: "
-		 + toString(statespace_generator.edge_probability)
-		 + '\n' + string(indent + 4, ' ');
+	         + toString(statespace_generator.edge_probability)
+                 + '\n' + string(indent + 4, ' ');
 
     estream << "Propositional truth probability: "
-	       + toString(statespace_generator.truth_probability)
+               + toString(statespace_generator.truth_probability)
 	       + "\n";
   }
 
@@ -1315,32 +1311,32 @@ void Configuration::print(ostream& stream, int indent) const
   if (global_options.formula_input_filename.empty())
   {
     estream << "Random LTL formulas:\n" + string(indent + 4, ' ')
-	       + toString(formula_options.formula_generator.size);
+               + toString(formula_options.formula_generator.size);
 
     if (formula_options.formula_generator.max_size
-	  != formula_options.formula_generator.size)
+          != formula_options.formula_generator.size)
       estream << "..."
-		 + toString(formula_options.formula_generator.max_size);
+                 + toString(formula_options.formula_generator.max_size);
 
     estream << string(" parse tree node")
-	       + (formula_options.formula_generator.max_size == 1 ? "" : "s")
-	       + ", "
+               + (formula_options.formula_generator.max_size == 1 ? "" : "s")
+               + ", "
 	       + toString(formula_options.formula_generator.
 			    number_of_available_variables)
 	       + " atomic proposition"
-	       + (formula_options.formula_generator.
+               + (formula_options.formula_generator.
 		    number_of_available_variables == 1 ? "" : "s");
   }
   else
     estream << "Reading LTL formulas from `"
-	       + global_options.formula_input_filename
-	       + "'.";
+               + global_options.formula_input_filename
+               + "'.";
 
   estream << '\n' + string(indent + 4, ' ');
 
   if (global_options.formula_change_interval == 0
       || global_options.formula_change_interval
-	   >= global_options.number_of_rounds)
+           >= global_options.number_of_rounds)
     estream << "Using a fixed LTL formula.";
   else
   {
@@ -1357,7 +1353,7 @@ void Configuration::print(ostream& stream, int indent) const
 	  || global_options.formula_change_interval % 100 >= 20)
       {
 	switch (global_options.formula_change_interval % 10)
-	{
+        {
 	  case 1 : estream << "st"; break;
 	  case 2 : estream << "nd"; break;
 	  case 3 : estream << "rd"; break;
@@ -1378,18 +1374,18 @@ void Configuration::print(ostream& stream, int indent) const
   if (global_options.formula_input_filename.empty()
       && formula_options.generate_mode == NNF)
     estream << string(indent + 4, ' ')
-	       + "Formulas will be generated into negation normal form.\n";
+               + "Formulas will be generated into negation normal form.\n";
   else if (formula_options.output_mode == NNF)
     estream << string(indent + 4, ' ')
-	       + "Formulas will be converted into negation normal form.\n";
+               + "Formulas will be converted into negation normal form.\n";
 
   if (global_options.formula_input_filename.empty())
   {
     estream << string(indent + 4, ' ') + "Random seed: "
-	       + toString(global_options.formula_random_seed)
-	       + '\n' + string(indent + 4, ' ')
-	       + "Atomic symbols in use (priority):\n"
-	       + string(indent + 6, ' ');
+               + toString(global_options.formula_random_seed)
+               + '\n' + string(indent + 4, ' ')
+               + "Atomic symbols in use (priority):\n"
+               + string(indent + 6, ' ');
 
     bool first_printed = false;
 
@@ -1410,13 +1406,13 @@ void Configuration::print(ostream& stream, int indent) const
 
       switch (op->first)
       {
-	case ::Ltl::LTL_ATOM :
+        case ::Ltl::LTL_ATOM :
 	  estream << "propositions";
 	  break;
-	case ::Ltl::LTL_TRUE : case ::Ltl::LTL_FALSE :
+        case ::Ltl::LTL_TRUE : case ::Ltl::LTL_FALSE :
 	  estream << ::Ltl::infixSymbol(op->first);
 	  break;
-	default :
+        default :
 	  break;
       }
 
@@ -1425,7 +1421,7 @@ void Configuration::print(ostream& stream, int indent) const
 
     estream << '\n'
 	    << string(indent + 4, ' ')
-	       + "Operators used for random LTL formula generation:";
+               + "Operators used for random LTL formula generation:";
 
     string operator_name_string;
     string operator_priority_string;
@@ -1452,7 +1448,7 @@ void Configuration::print(ostream& stream, int indent) const
 	{
 	  operator_name_string = string(11, ' ') + operator_name_string;
 	  operator_priority_string = string(11, ' ')
-				     + operator_priority_string;
+	                             + operator_priority_string;
 	  operator_distribution_string
 	    = string(indent + 6, ' ') + "occurrences/formula  ";
 	}
@@ -1478,7 +1474,7 @@ void Configuration::print(ostream& stream, int indent) const
 	    == max_operators_per_line - 1)
       {
 	estream << '\n' + operator_name_string + '\n'
-		   + operator_priority_string + '\n';
+	           + operator_priority_string + '\n';
 
 	if (!formula_options.symbol_distribution.empty())
 	  estream << operator_distribution_string + '\n';
@@ -1498,7 +1494,7 @@ void Configuration::print(ostream& stream, int indent) const
     if (number_of_operators_printed % max_operators_per_line != 0)
     {
       estream << '\n' + operator_name_string + '\n' + operator_priority_string
-		 + '\n';
+                 + '\n';
 
       if (!formula_options.symbol_distribution.empty())
 	estream << operator_distribution_string + '\n';
@@ -1512,7 +1508,7 @@ void Configuration::print(ostream& stream, int indent) const
 /* ========================================================================= */
 string Configuration::algorithmString
   (vector<Configuration::AlgorithmInformation,
-	  ALLOC(Configuration::AlgorithmInformation) >::size_type
+          ALLOC(Configuration::AlgorithmInformation) >::size_type
      algorithm_id) const
 /* ----------------------------------------------------------------------------
  *
@@ -1528,7 +1524,7 @@ string Configuration::algorithmString
   using namespace ::StringUtil;
 
   return toString(algorithm_id) + ": `" + *(algorithms[algorithm_id].name)
-	 + '\'';
+         + '\'';
 }
 
 /* ========================================================================= */
@@ -1544,184 +1540,184 @@ void Configuration::showCommandLineHelp(const char* program_name)
  * ------------------------------------------------------------------------- */
 {
   cout << string("Usage: ") + program_name
-	  + " [OPTION]...\n\nGeneral options:\n"
-	    "  --[no]comparisontest        Enable or disable the model "
-					   "checking result\n"
-	    "                              cross-comparison test\n"
-	    "  --configfile=FILE           Read configuration from FILE\n"
-	    "  --[no]consistencytest       Enable or disable the model "
-					   "checking result\n"
-	    "                              consistency test\n"
-	    "  --disable=IMPLEMENTATION-ID[,IMPLEMENTATION-ID...]\n"
-	    "                              Exclude implementation(s) from "
-					   "tests\n"
-	    "  --enable=IMPLEMENTATION-ID[,IMPLEMENTATION-ID,...]\n"
-	    "                              Include implementation(s) into "
-					   "tests\n"
-	    "  --formulafile=FILE          Read LTL formulas from FILE\n"
-	    "  --globalmodelcheck          Use global model checking in "
-					   "tests\n"
-	    "                              (equivalent to "
-					   "`--modelcheck=global')\n"
-	    "  -h, --help                  Show this help and exit\n"
-	    "  --interactive=MODE          Set the interactivity mode "
-					   "(`always', `onerror', \n"
-	    "                              `never')\n"
-	    "  --[no]intersectiontest      Enable or disable the Büchi "
-					   "automata\n"
-	    "                              intersection emptiness test\n"
-	    "  --localmodelcheck           Use local model checking in tests"
-					   "\n"
-	    "                              (equivalent to "
-					   "`--modelcheck=local')\n"
-	    "  --logfile=FILE              Write error log to FILE\n"
-	    "  --modelcheck=MODE           Set model checking mode "
-					   "(`global' or `local')\n"
-	    "  --nopause                   Do not pause between test rounds "
-					   "(equivalent to\n"
-	    "                              `--interactive=never')\n"
-	    "  --pause                     Pause unconditionally after every "
-					   "test round\n"
-	    "                              (equivalent to "
-					   "`--interactive=always')\n"
-	    "  --pauseonerror              Pause between test rounds only in "
-					   "case of an\n"
-	    "                              error (equivalent to "
-					   "`--interactive=onerror')\n"
-	    "  --profile                   Disable all automata correctness "
-					   "tests\n"
-	    "  --quiet, --silent           Run all tests silently without "
-					   "interruption\n"
-	    "  --rounds=NUMBER-OF-ROUNDS   Set number of test rounds (1-)\n"
-	    "  --showconfig                Display current configuration and "
-					   "exit\n"
-	    "  --showoperatordistribution  Display probability distribution "
-					   "for LTL formula\n"
-	    "                              operators\n"
-	    "  --skip=NUMBER-OF-ROUNDS     Set number of test rounds to skip "
-					   "before\n"
-	    "                              starting tests\n"
-	    "  --verbosity=INTEGER         Set the verbosity of output (0-5)\n"
-	    "  --version                   Display program version and exit"
-					   "\n\n"
-	    "LTL formula generation options:\n"
-	    "  --[no]abbreviatedoperators  Allow or disallow operators ->, "
-					   "<->, xor, <>,\n"
-	    "                              [], u, w in the generated "
-					   "formulas\n"
-	    "  --andpriority=INTEGER       Set priority for the /\\ operator\n"
-	    "  --beforepriority=INTEGER    Set priority for the Before "
-					   "operator\n"
-	    "  --defaultoperatorpriority=INTEGER\n"
-	    "                              Set default priority for operators"
-					   "\n"
-	    "  --equivalencepriority=INTEGER\n"
-	    "                              Set priority for the <-> operator\n"
-	    "  --falsepriority=INTEGER     Set priority for the constant "
-					   "`false'\n"
-	    "  --finallypriority=INTEGER   Set priority for the <> operator\n"
-	    "  --formulachangeinterval=NUMBER-OF-ROUNDS\n"
-	    "                              Set formula generation interval in "
-					   "test rounds\n"
-	    "                              (0-)\n"
-	    "  --formulageneratemode=MODE  Set formula generation mode "
-					   "(`normal', `nnf')\n"
-	    "  --formulaoutputmode=MODE    Set formula output mode (`normal', "
-					   "`nnf')\n"
-	    "  --formulapropositions=NUMBER-OF-PROPOSITIONS\n"
-	    "                              Set maximum number of atomic "
-					   "propositions in\n"
-	    "                              generated formulas (0-)\n"
-	    "  --formularandomseed=INTEGER Set random seed for the formula "
-					   "generation\n"
-	    "                              algorithm\n"
-	    "  --formulasize=SIZE,\n"
-	    "  --formulasize=MIN-SIZE...MAX-SIZE\n"
-	    "                              Set size of random LTL formulas "
-					   "(1-)\n"
-	    "  --[no]generatennf           Force or prevent generating LTL "
-					   "formulas in\n"
-	    "                              negation normal form\n"
-	    "  --globallypriority=INTEGER  Set priority for the [] operator\n"
-	    "  --implicationpriority=INTEGER\n"
-	    "                              Set priority for the -> operator\n"
-	    "  --nextpriority=INTEGER      Set priority for the Next operator"
-					   "\n"
-	    "  --notpriority=INTEGER       Set priority for the negation "
-					   "operator\n"
-	    "  --orpriority=INTEGER        Set priority for the \\/ operator\n"
-	    "  --[no]outputnnf             Enable or disable formula "
-					   "translation to\n"
-	    "                              negation normal form before "
-					   "invoking the\n"
-	    "                              translators\n"
-	    "  --propositionpriority=INTEGER\n"
-	    "                              Set priority for atomic "
-					   "propositions\n"
-	    "  --releasepriority=INTEGER   Set priority for the (Weak) Release"
-					   " operator\n"
-	    "  --strongreleasepriority=INTEGER\n"
-	    "                              Set priority for the Strong "
-					   "Release operator\n"
-	    "  --truepriority=INTEGER      Set priority for the constant "
-					   "`true'\n"
-	    "  --untilpriority=INTEGER     Set priority for the (Strong) Until"
-					   " operator\n"
-	    "  --weakuntilpriority=INTEGER\n"
-	    "                              Set priority for the Weak Until "
-					   "operator\n"
-	    "  --xorpriority=INTEGER       Set priority for the xor "
-					   "operator\n\n"
-	    "State space generation options:\n"
-	    "  --edgeprobability=PROBABILITY\n"
-	    "                              Set random edge probability for "
-					   "state spaces\n"
-	    "                              (0.0--1.0)\n"
-	    "  --enumeratedpath            Enumerate all paths of a given "
-					   "size and a given\n"
-	    "                              number of propositions per state "
-					   "(equivalent to\n"
-	    "                              `--statespacegeneratemode="
-					   "enumeratedpath')\n"
-	    "  --randomconnectedgraph      Generate connected graphs as state "
-					   "spaces\n"
-	    "                              (equivalent to\n"
-	    "                              `--statespacegeneratemode="
-					   "randomconnectedgraph')\n"
-	    "  --randomgraph               Generate random graphs as state "
-					   "spaces\n"
-	    "                              (equivalent to\n"
-	    "                              `--statespacegeneratemode="
-					   "randomgraph')\n"
-	    "  --randompath                Generate random paths as state "
-					   "spaces\n"
-	    "                              (equivalent to\n"
-	    "                              `--statespacegeneratemode="
-					   "randompath')\n"
-	    "  --statespacechangeinterval=NUMBER-OF-ROUNDS\n"
-	    "                              Set state space generation "
-					   "interval in test\n"
-	    "                              rounds (0-)\n"
-	    "  --statespacegeneratemode=MODE\n"
-	    "                              Set state space generation mode\n"
-	    "                              (`randomconnectedgraph', "
-					   "`randomgraph',\n"
-	    "                              `randompath', `enumeratedpath')\n"
-	    "  --statespacepropositions=NUMBER-OF-PROPOSITIONS\n"
-	    "                              Set number of propositions per "
-					   "state (0-)\n"
-	    "  --statespacerandomseed=INTEGER\n"
-	    "                              Set random seed for the state "
-					   "space generation\n"
-	    "                              algorithm\n"
-	    "  --statespacesize=SIZE,\n"
-	    "  --statespacesize=MIN-SIZE...MAX-SIZE\n"
-	    "                              Set size of generated state spaces "
-					   "(1-)\n"
-	    "  --truthprobability=PROBABILITY\n"
-	    "                              Set truth probability of "
-					   "propositions (0.0--1.0)\n\n"
-	    "Report bugs to <heikki.tauriainen@hut.fi>.\n";
+          + " [OPTION]...\n\nGeneral options:\n"
+            "  --[no]comparisontest        Enable or disable the model "
+                                           "checking result\n"
+            "                              cross-comparison test\n"
+            "  --configfile=FILE           Read configuration from FILE\n"
+            "  --[no]consistencytest       Enable or disable the model "
+                                           "checking result\n"
+            "                              consistency test\n"
+            "  --disable=IMPLEMENTATION-ID[,IMPLEMENTATION-ID...]\n"
+            "                              Exclude implementation(s) from "
+                                           "tests\n"
+            "  --enable=IMPLEMENTATION-ID[,IMPLEMENTATION-ID,...]\n"
+            "                              Include implementation(s) into "
+                                           "tests\n"
+            "  --formulafile=FILE          Read LTL formulas from FILE\n"
+            "  --globalmodelcheck          Use global model checking in "
+                                           "tests\n"
+            "                              (equivalent to "
+                                           "`--modelcheck=global')\n"
+            "  -h, --help                  Show this help and exit\n"
+            "  --interactive=MODE          Set the interactivity mode "
+                                           "(`always', `onerror', \n"
+            "                              `never')\n"
+            "  --[no]intersectiontest      Enable or disable the Büchi "
+                                           "automata\n"
+            "                              intersection emptiness test\n"
+            "  --localmodelcheck           Use local model checking in tests"
+                                           "\n"
+            "                              (equivalent to "
+                                           "`--modelcheck=local')\n"
+            "  --logfile=FILE              Write error log to FILE\n"
+            "  --modelcheck=MODE           Set model checking mode "
+                                           "(`global' or `local')\n"
+            "  --nopause                   Do not pause between test rounds "
+                                           "(equivalent to\n"
+            "                              `--interactive=never')\n"
+            "  --pause                     Pause unconditionally after every "
+                                           "test round\n"
+            "                              (equivalent to "
+                                           "`--interactive=always')\n"
+            "  --pauseonerror              Pause between test rounds only in "
+                                           "case of an\n"
+            "                              error (equivalent to "
+                                           "`--interactive=onerror')\n"
+            "  --profile                   Disable all automata correctness "
+                                           "tests\n"
+            "  --quiet, --silent           Run all tests silently without "
+                                           "interruption\n"
+            "  --rounds=NUMBER-OF-ROUNDS   Set number of test rounds (1-)\n"
+            "  --showconfig                Display current configuration and "
+                                           "exit\n"
+            "  --showoperatordistribution  Display probability distribution "
+                                           "for LTL formula\n"
+            "                              operators\n"
+            "  --skip=NUMBER-OF-ROUNDS     Set number of test rounds to skip "
+                                           "before\n"
+            "                              starting tests\n"
+            "  --verbosity=INTEGER         Set the verbosity of output (0-5)\n"
+            "  --version                   Display program version and exit"
+                                           "\n\n"
+            "LTL formula generation options:\n"
+            "  --[no]abbreviatedoperators  Allow or disallow operators ->, "
+                                           "<->, xor, <>,\n"
+            "                              [], u, w in the generated "
+                                           "formulas\n"
+            "  --andpriority=INTEGER       Set priority for the /\\ operator\n"
+            "  --beforepriority=INTEGER    Set priority for the Before "
+                                           "operator\n"
+            "  --defaultoperatorpriority=INTEGER\n"
+            "                              Set default priority for operators"
+                                           "\n"
+            "  --equivalencepriority=INTEGER\n"
+            "                              Set priority for the <-> operator\n"
+            "  --falsepriority=INTEGER     Set priority for the constant "
+                                           "`false'\n"
+            "  --finallypriority=INTEGER   Set priority for the <> operator\n"
+            "  --formulachangeinterval=NUMBER-OF-ROUNDS\n"
+            "                              Set formula generation interval in "
+                                           "test rounds\n"
+            "                              (0-)\n"
+            "  --formulageneratemode=MODE  Set formula generation mode "
+                                           "(`normal', `nnf')\n"
+            "  --formulaoutputmode=MODE    Set formula output mode (`normal', "
+                                           "`nnf')\n"
+            "  --formulapropositions=NUMBER-OF-PROPOSITIONS\n"
+            "                              Set maximum number of atomic "
+                                           "propositions in\n"
+            "                              generated formulas (0-)\n"
+            "  --formularandomseed=INTEGER Set random seed for the formula "
+                                           "generation\n"
+            "                              algorithm\n"
+            "  --formulasize=SIZE,\n"
+            "  --formulasize=MIN-SIZE...MAX-SIZE\n"
+            "                              Set size of random LTL formulas "
+                                           "(1-)\n"
+            "  --[no]generatennf           Force or prevent generating LTL "
+                                           "formulas in\n"
+            "                              negation normal form\n"
+            "  --globallypriority=INTEGER  Set priority for the [] operator\n"
+            "  --implicationpriority=INTEGER\n"
+            "                              Set priority for the -> operator\n"
+            "  --nextpriority=INTEGER      Set priority for the Next operator"
+                                           "\n"
+            "  --notpriority=INTEGER       Set priority for the negation "
+                                           "operator\n"
+            "  --orpriority=INTEGER        Set priority for the \\/ operator\n"
+            "  --[no]outputnnf             Enable or disable formula "
+                                           "translation to\n"
+            "                              negation normal form before "
+                                           "invoking the\n"
+            "                              translators\n"
+            "  --propositionpriority=INTEGER\n"
+            "                              Set priority for atomic "
+                                           "propositions\n"
+            "  --releasepriority=INTEGER   Set priority for the (Weak) Release"
+                                           " operator\n"
+            "  --strongreleasepriority=INTEGER\n"
+            "                              Set priority for the Strong "
+                                           "Release operator\n"
+            "  --truepriority=INTEGER      Set priority for the constant "
+                                           "`true'\n"
+            "  --untilpriority=INTEGER     Set priority for the (Strong) Until"
+                                           " operator\n"
+            "  --weakuntilpriority=INTEGER\n"
+            "                              Set priority for the Weak Until "
+                                           "operator\n"
+            "  --xorpriority=INTEGER       Set priority for the xor "
+                                           "operator\n\n"
+            "State space generation options:\n"
+            "  --edgeprobability=PROBABILITY\n"
+            "                              Set random edge probability for "
+                                           "state spaces\n"
+            "                              (0.0--1.0)\n"
+            "  --enumeratedpath            Enumerate all paths of a given "
+                                           "size and a given\n"
+            "                              number of propositions per state "
+                                           "(equivalent to\n"
+            "                              `--statespacegeneratemode="
+                                           "enumeratedpath')\n"
+            "  --randomconnectedgraph      Generate connected graphs as state "
+                                           "spaces\n"
+            "                              (equivalent to\n"
+            "                              `--statespacegeneratemode="
+                                           "randomconnectedgraph')\n"
+            "  --randomgraph               Generate random graphs as state "
+                                           "spaces\n"
+            "                              (equivalent to\n"
+            "                              `--statespacegeneratemode="
+                                           "randomgraph')\n"
+            "  --randompath                Generate random paths as state "
+                                           "spaces\n"
+            "                              (equivalent to\n"
+            "                              `--statespacegeneratemode="
+                                           "randompath')\n"
+            "  --statespacechangeinterval=NUMBER-OF-ROUNDS\n"
+            "                              Set state space generation "
+                                           "interval in test\n"
+            "                              rounds (0-)\n"
+            "  --statespacegeneratemode=MODE\n"
+            "                              Set state space generation mode\n"
+            "                              (`randomconnectedgraph', "
+                                           "`randomgraph',\n"
+            "                              `randompath', `enumeratedpath')\n"
+            "  --statespacepropositions=NUMBER-OF-PROPOSITIONS\n"
+            "                              Set number of propositions per "
+                                           "state (0-)\n"
+            "  --statespacerandomseed=INTEGER\n"
+            "                              Set random seed for the state "
+                                           "space generation\n"
+            "                              algorithm\n"
+            "  --statespacesize=SIZE,\n"
+            "  --statespacesize=MIN-SIZE...MAX-SIZE\n"
+            "                              Set size of generated state spaces "
+                                           "(1-)\n"
+            "  --truthprobability=PROBABILITY\n"
+            "                              Set truth probability of "
+                                           "propositions (0.0--1.0)\n\n"
+            "Report bugs to <heikki.tauriainen@hut.fi>.\n";
 }
 
 /* ========================================================================= */
@@ -1809,12 +1805,12 @@ long int Configuration::parseCommandLineInteger
 
   if (*endptr != '\0' || value.empty())
     throw ConfigurationException
-	    ("", "the argument for `--" + option + "' must be a nonnegative "
-		 "integer");
+            ("", "the argument for `--" + option + "' must be a nonnegative "
+	         "integer");
 
   if (val == LONG_MIN || val == LONG_MAX)
     throw ConfigurationException
-	    ("", "the argument for `--" + option + "' is out of range");
+            ("", "the argument for `--" + option + "' is out of range");
 
   return val;
 }
@@ -1899,7 +1895,7 @@ double Configuration::operatorProbability
   {
     if (arity == 1 && total_short_unary_priority > 0)
       result = static_cast<double>(priority)
-		 / static_cast<double>(total_short_unary_priority);
+	         / static_cast<double>(total_short_unary_priority);
     else
       result = 0.0;
   }
@@ -1931,7 +1927,7 @@ double Configuration::operatorProbability
 				      total_long_unary_priority,
 				      total_binary_priority,
 				      result_cache)
-		    * operatorProbability(op, k - i, n - m - 1,
+	            * operatorProbability(op, k - i, n - m - 1,
 					  total_short_unary_priority,
 					  total_long_unary_priority,
 					  total_binary_priority,
@@ -1946,7 +1942,7 @@ double Configuration::operatorProbability
 
       if (op != ::Ltl::LTL_NEGATION || formula_options.generate_mode != NNF)
 	result += static_cast<double>(priority)
-		    * operatorProbability(op, k - 1, n - 1,
+	            * operatorProbability(op, k - 1, n - 1,
 					  total_short_unary_priority,
 					  total_long_unary_priority,
 					  total_binary_priority,
@@ -1965,7 +1961,7 @@ double Configuration::operatorProbability
 				   total_long_unary_priority,
 				   total_binary_priority,
 				   result_cache)
-		 * operatorProbability(op, k - 1 - i, n - m - 1,
+	         * operatorProbability(op, k - 1 - i, n - m - 1,
 				       total_short_unary_priority,
 				       total_long_unary_priority,
 				       total_binary_priority,
@@ -1976,7 +1972,7 @@ double Configuration::operatorProbability
     }
 
     result += static_cast<double>(p1)
-		* operatorProbability(op, k, n - 1,
+                * operatorProbability(op, k, n - 1,
 				      total_short_unary_priority,
 				      total_long_unary_priority,
 				      total_binary_priority,

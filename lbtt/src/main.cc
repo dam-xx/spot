@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif  /* HAVE_READLINE */
-#include "ObstackAlloc.h"
+#include "LbttAlloc.h"
 #include "Configuration.h"
 #include "DispUtil.h"
 #include "Exception.h"

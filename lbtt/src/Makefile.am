@@ -16,10 +16,10 @@ lbtt_SOURCES = \
   FormulaRandomizer.cc \
   FormulaRandomizer.h \
   FormulaWriter.h \
+  LbttAlloc.h \
   LtlFormula.cc \
   LtlFormula.h \
   main.cc \
-  ObstackAlloc.h \
   PathEvaluator.cc \
   PathEvaluator.h \
   PathIterator.cc \

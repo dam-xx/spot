@@ -10,23 +10,6 @@
 
 	* src/TestOperations.cc: Include sys/wait.h.
 
-	* src/Alloc.h: Rename as ...
-	* src/ObstackAlloc.h: ... this.  The problem is that alloc.h is a
-	system header in g++ < 3.0, and Darwin has a case-insensitive
-	filesystem.  System headers that include alloc.h pick the local
-	Alloc.h version.
-	* BuchiAutomaton.h, Configuration.h, DispUtil.cc,
-	ExternalTranslator.h, FormulaRandomizer.h, Graph.h.in,
-	LtlFormula.h, Makefile.am, NeverClaimAutomaton.h, PathEvaluator.h,
-	ProductAutomaton.h, SccIterator.h, SharedTestData.h,
-	StatDisplay.h, StateSpace.h, StateSpaceRandomizer.cc,
-	StringUtil.h, TestOperations.h, TestRoundInfo.h, TestStatistics.h,
-	UserCommandReader.h, UserCommands.h, main.cc: Adjust includes.
-
-2003-12-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
-
-	* doc/texinfo.tex: New upstream version.
-
 2003-07-29  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/TestOperations.cc (generateBuchiAutomaton): Forward SIGINT
@@ -34,11 +17,6 @@
 	* src/ExternalTranslator.cc (ExternalTranslator::translate): Likewise.
 	* src/main.cc (main): Do not intercept SIGINT in
 	non-interactive runs.
-
-2003-07-13  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
-
-	* doc/lbtt.texi: Never use @-commands in @node names, recent Texinfo
-	versions are stricter on this.
 
 2003-07-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
@@ -59,13 +37,74 @@
 	* src/Makefile.am (lbtt_translate_SOURCES): Add SpotWrapper.cc
 	and SpotWrapper.h.
 	* src/translate.cc (main): Add the --spot option, and build
-	a SpotWrapper of required.
+	a SpotWrapper if required.
+
+2004-02-13  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* src/BitArray.{h,cc}, src/BuchiAutomaton.{h,cc},
+	src/Configuration.{h,cc}, src/DispUtil.{h,cc},
+	src/ExternalTranslator.{h,cc}, src/FormulaRandomizer.{h,cc},
+	src/LtlFormula.{h,cc}, src/NeverClaimAutomaton.{h,cc},
+	src/PathEvaluator.{h,cc}, src/PathIterator.{h,cc},
+	src/ProductAutomaton.{h,cc}, src/SpinWrapper.{h,cc},
+	src/StatDisplay.{h,cc}, src/StateSpace.{h,cc},
+	src/StateSpaceRandomizer.{h,cc}, src/StringUtil.{h,cc},
+	src/TestOperations.{h,cc}, src/TestStatistics.{h,cc},
+	src/translate.{h,cc}, src/UserCommandReader.{h,cc},
+	src/UserCommands.{h,cc}: Remove all #pragmas.
+
+2004-02-12  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* doc/texinfo.tex: New upstream version.
+
+	* doc/lbtt.texi: Update edition to 1.0.2.
+	Remove node names with commands to fix dvi file generation.
+	Move the node about the lbtt-translate utility to correct menu.
+	Reformat the automata file format section to avoid overfull lines
+	in dvi generation.
+	Fix description of the Algorithm block used with lbtt-translate.
+
+	* doc/testprocedure.txt, doc/intersectioncheck.txt: Add initial
+	newlines.
+
+2004-02-11  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* src/UserCommandReader.cc [HAVE_ISATTY]: Include the unistd.h
+	header.
+	(executeUserCommands) Stop waiting for new commands if an EOF is
+	detected. [HAVE_ISATTY]: If standard input is not connected to a
+	terminal, echo the input line.
+
+2004-02-10  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* configure.ac:	Remove duplicate checks for headers.
+	(GLIBC_OBSTACK_WORKAROUND): New config.h macro for checking for a
+	version of the obstack.h header that requires a workaround to be
+	compiled with g++.
+	Add check for the `isatty' library function.
+	Include the stdio.h header when testing for readline libraries.
+
+	* src/Alloc.h: Rename to LbttAlloc.h to avoid a name conflict with
+	system header files on Darwin.
+	[GLIBC_OBSTACK_WORKAROUND] (__INT_TO_PTR): Redefine macro to
+	work around a C++ bug in the obstack.h header file in glibc 2.3.2.
+	Thanks to Alexandre Duret-Lutz for the original patch.
+
+	* src/BuchiAutomaton.h, src/Configuration.h, src/DispUtil.cc,
+	src/ExternalTranslator.h, src/FormulaRandomizer.h, src/Graph.h.in,
+	src/LtlFormula.h, src/main.cc, src/Makefile.am,
+	src/NeverClaimAutomaton.h, src/PathEvaluator.h,
+	src/ProductAutomaton.h, src/SccIterator.h, src/SharedTestData.h,
+	src/StatDisplay.h, src/StateSpace.h, src/StateSpaceRandomizer.cc,
+	src/StringUtil.h, src/TestOperations.h, src/TestRoundInfo.h,
+	src/TestStatistics.h, src/UserCommandReader.h,
+	src/UserCommands.h: Adjust includes.
+
+	* Update copyright information in source files.
 
 2003-07-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/Config-parse.yy: Remove stray `,' in %token arguments.
-	* src/Alloc.h (__INT_TO_PTR): Redefine to work around glibc 2.3.
-	* doc/texinfo.tex: New upstream version.
 
 2003-07-18  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
