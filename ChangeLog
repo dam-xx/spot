@@ -1,7 +1,7 @@
 2003-07-09  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/succiterconcrete.cc (tgba_succ_iterator_concrete::next): 
-	Fix computation of states sharing the same accepting state.
+	Fix computation of states sharing the same accepting set.
 
 	Make sure we only output one initial state in LBTT's output.
 	* src/tgbaalgos/lbtt.cc (fill_todo): Add the 'first' argument
