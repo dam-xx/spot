@@ -27,7 +27,7 @@ FORMULAE=$srcdir/models/eeaean.ltl
 
 opts='-f -x -m'
 
-for model in eeaean1.tgba eeaean2.tgba
+for model in eeaean1.tgba eeaean2.tgba eeaean1R.tgba eeaean2R.tgba
 do
   echo "+++++++++++++++++++++"
   echo "  $model"

@@ -1,7 +1,7 @@
 This directory contains the input files and scripts used to produce
 the measures in our paper "On-the-fly Emptiness Checks for Generalized
 Büchi Automata" (J.-M. Couvreur, A. Duret-Lutz, D. Poitrenaud),
-submitted to CAV'05.
+submitted to Spin'05.
 
 ==========
  CONTENTS
@@ -114,7 +114,7 @@ This directory contains:
 
 * pml2tgba.pl
 
-    A Perl script to translate Promela models into TGBA readble by Spot.
+    A Perl script to translate Promela models into TGBA readable by Spot.
     This requires a working spin in PATH.
 
 * ltl-random.sh
@@ -131,7 +131,7 @@ This directory contains:
 
     Check the two configurations of the client/server example against
     the formula in models/clserv.ltl, without and with fairness
-    assumptions, using all the algorithms of the file `algorihms'.
+    assumptions, using all the algorithms of the file `algorithms'.
     You should have run `make' before attempting to run this script,
     so the state space are available.
 
@@ -139,7 +139,7 @@ This directory contains:
 
     Check models/eeaean1.pml and models/eeaean2.pml against each
     formulae in models/eeaean.ltl, using all the algorithms of the
-    file `algorihms'.  You should have run `make' before attempting to
+    file `algorithms'.  You should have run `make' before attempting to
     run this script, so the state space are available.
 
 * algorithms
@@ -150,7 +150,7 @@ This directory contains:
  USAGE
 =======
 
-  0. Install SPIN (spinroot.com), and make sure the `spin' binary is in
+  0. Install Spin (spinroot.com), and make sure the `spin' binary is in
      your path.
 
   1. If that is not done already, configure and compile all the Spot
@@ -159,12 +159,22 @@ This directory contains:
   2. Run `make' in this directory.  This will call pml2tgba.pl to
      generate the TGBA input for the two pml-*.sh tests.
 
+     Promela inputs are translated in 4 different graphs.
+     For instance eeaean1.pml is translated as
+       - eeaean1.tgba        full translation
+       - eeaean1fair.tgba    full translation with weak fairness
+       - eeaean1R.tgba       reduced translation
+       - eeaean1Rfair.tgba   reduced translation with weak fairness
+     The "reduced" translation uses Spin's partial order reductions.
+
+     (The "R"educed variants are not shown in the paper.)
+
   3. Run the tests you are interested in
 
-     - ltl-random.sh
-     - ltl-human.sh
-     - pml-clserv.sh
-     - pml-eeaean.sh
+      - ltl-random.sh
+      - ltl-human.sh
+      - pml-clserv.sh
+      - pml-eeaean.sh
 
      Beware that the two ltl-*.sh tests are very long (each of them
      run 13 emptiness-check algorithms against 18000 product-spaces!).
@@ -221,11 +231,11 @@ This directory contains:
       expressed as a % of the number of transition of the product space
   (C) mean of the maximal stack size
       expressed as a % of the number of state of the product space
-  (D) number of non-empy automata used for these statistics
+  (D) number of non-empty automata used for these statistics
   (E) mean number of states in the search space for accepting runs
       expressed as a % of the number of state of the product space
   (F) mean number of states visited (possibly several times) while
-      computing the acceptin run
+      computing the accepting run
       expressed as a % of the number of state of the product space
 
 
@@ -242,7 +252,7 @@ This directory contains:
   (K) Number of distinct states visited by the emptiness-check algorithm.
   (L) Number of transitions visited by the emptiness-check algorithm.
   (M) Maximal size of the stack.
-  (N) Whehter an accepting run was found.
+  (N) Whether an accepting run was found.
 
 
 =================

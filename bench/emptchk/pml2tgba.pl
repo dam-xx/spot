@@ -36,6 +36,7 @@
 #     (we want to use the LTL->TGBA translation of Spot, not that of Spin)
 #   - output the state space in Spot's format
 #   - optionally output weak fairness constraints
+#   - allow partial order or not
 
 use strict;
 
@@ -47,7 +48,10 @@ sub usage()
   print <<EOF;
 Usage: pml2tgba.pl [-w] promela-model properties...
 Extract the state-space of the promela-model, observing properties.
-If -w is given, output acceptance conditions to ensure weak fairness.
+
+Options:
+  -w    output acceptance conditions to ensure weak fairness
+  -r    let Spin reduce the state-space using partial order
 EOF
   exit 1;
 }
@@ -88,9 +92,21 @@ sub create_2n_automaton (@)
 usage unless @ARGV;
 
 my $weak = 0;
-if ($ARGV[0] eq '-w')
+my $reduce = ' -DNOREDUCE';
+while (1)
 {
-  $weak = 1;
+  if ($ARGV[0] eq '-w')
+    {
+      $weak = 1;
+    }
+  elsif ($ARGV[0] eq '-r')
+    {
+      $reduce = '';
+    }
+  else
+    {
+      last;
+    }
   shift;
 }
 
@@ -106,7 +122,7 @@ close NEVER;
 
 system "spin -a -N never.$$ \"$model\"";
 unlink "never.$$";
-system "gcc -DCHECK -DNOREDUCE -O -o pan pan.c 2>/dev/null";
+system "gcc -DCHECK$reduce -O -o pan pan.c 2>/dev/null";
 
 # Match Büchi states to propositions
 my $buechitrans = 'BUG';

@@ -42,36 +42,68 @@ dist_noinst_DATA = \
 
 nodist_noinst_DATA = \
   models/cl3serv1.tgba \
+  models/cl3serv1R.tgba \
   models/cl3serv1fair.tgba \
+  models/cl3serv1Rfair.tgba \
   models/cl3serv3.tgba \
+  models/cl3serv3R.tgba \
   models/cl3serv3fair.tgba \
+  models/cl3serv3Rfair.tgba \
   models/eeaean1.tgba \
-  models/eeaean2.tgba
+  models/eeaean1R.tgba \
+  models/eeaean2.tgba \
+  models/eeaean2R.tgba
 
 models/cl3serv1.tgba: $(srcdir)/models/cl3serv1.pml
 	$(mkdir_p) models
 	$(PML2TGBA) $(srcdir)/models/cl3serv1.pml w1 s1 >$@
 
+models/cl3serv1R.tgba: $(srcdir)/models/cl3serv1.pml
+	$(mkdir_p) models
+	$(PML2TGBA) -r $(srcdir)/models/cl3serv1.pml w1 s1 >$@
+
 models/cl3serv1fair.tgba: $(srcdir)/models/cl3serv1.pml
 	$(mkdir_p) models
 	$(PML2TGBA) -w $(srcdir)/models/cl3serv1.pml w1 s1 >$@
+
+models/cl3serv1Rfair.tgba: $(srcdir)/models/cl3serv1.pml
+	$(mkdir_p) models
+	$(PML2TGBA) -w -r $(srcdir)/models/cl3serv1.pml w1 s1 >$@
 
 models/cl3serv3.tgba: $(srcdir)/models/cl3serv3.pml
 	$(mkdir_p) models
 	$(PML2TGBA) $(srcdir)/models/cl3serv3.pml w1 s1 >$@
 
+models/cl3serv3R.tgba: $(srcdir)/models/cl3serv3.pml
+	$(mkdir_p) models
+	$(PML2TGBA) -r $(srcdir)/models/cl3serv3.pml w1 s1 >$@
+
 models/cl3serv3fair.tgba: $(srcdir)/models/cl3serv3.pml
 	$(mkdir_p) models
 	$(PML2TGBA) -w $(srcdir)/models/cl3serv3.pml w1 s1 >$@
+
+models/cl3serv3Rfair.tgba: $(srcdir)/models/cl3serv3.pml
+	$(mkdir_p) models
+	$(PML2TGBA) -w -r $(srcdir)/models/cl3serv3.pml w1 s1 >$@
 
 models/eeaean1.tgba: $(srcdir)/models/eeaean1.pml
 	$(mkdir_p) models
 	$(PML2TGBA) $(srcdir)/models/eeaean1.pml \
           noLeader zeroLeads oneLeads twoLeads threeLeads >$@
 
+models/eeaean1R.tgba: $(srcdir)/models/eeaean1.pml
+	$(mkdir_p) models
+	$(PML2TGBA) -r $(srcdir)/models/eeaean1.pml \
+          noLeader zeroLeads oneLeads twoLeads threeLeads >$@
+
 models/eeaean2.tgba: $(srcdir)/models/eeaean2.pml
 	$(mkdir_p) models
 	$(PML2TGBA) $(srcdir)/models/eeaean2.pml \
+          noLeader zeroLeads oneLeads twoLeads threeLeads >$@
+
+models/eeaean2R.tgba: $(srcdir)/models/eeaean2.pml
+	$(mkdir_p) models
+	$(PML2TGBA) -r $(srcdir)/models/eeaean2.pml \
           noLeader zeroLeads oneLeads twoLeads threeLeads >$@
 
 CLEANFILES = $(nodist_noinst_DATA)

@@ -27,7 +27,9 @@ FORMULAE=$srcdir/models/clserv.ltl
 
 opts='-f -x -m'
 
-for model in cl3serv1.tgba cl3serv1fair.tgba cl3serv3.tgba cl3serv3fair.tgba
+for model in \
+  cl3serv1.tgba  cl3serv1fair.tgba  cl3serv3.tgba  cl3serv3fair.tgba \
+  cl3serv1R.tgba cl3serv1Rfair.tgba cl3serv3R.tgba cl3serv3Rfair.tgba
 do
   echo "+++++++++++++++++++++"
   echo "  $model"

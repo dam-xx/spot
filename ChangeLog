@@ -1,3 +1,11 @@
+2005-04-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* bench/emptchk/Makefile.am: Create reduced versions of the graphs.
+	* bench/emptchk/pml2tgba.pl: Add option -r.
+	* bench/emptchk/pml-clserv.sh, bench/emptchk/pml-eeaean.sh:
+	Also run on reduced graphs (this is fast).
+	* bench/emptchk/README: Adjust.
+
 2005-02-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlvisit/length.cc (length_visitor): Rewrite using
