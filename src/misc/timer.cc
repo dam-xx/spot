@@ -22,6 +22,7 @@
 #include "timer.hh"
 #include <iostream>
 #include <iomanip>
+#include <cassert>
 
 namespace spot
 {
