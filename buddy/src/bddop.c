@@ -1,5 +1,5 @@
 /*========================================================================
-	       Copyright (C) 1996-2002 by Jorn Lind-Nielsen
+	       Copyright (C) 1996-2003 by Jorn Lind-Nielsen
 			    All rights reserved
 
     Permission is hereby granted, without written agreement and without
@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddop.c,v 1.7 2003/07/17 14:09:04 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddop.c,v 1.8 2003/08/06 14:14:16 aduret Exp $
   FILE:  bddop.c
   DESCR: BDD operators
   AUTH:  Jorn Lind
@@ -1601,7 +1601,7 @@ NAME    {* bdd\_existcomp *}
 SECTION {* operator *}
 SHORT   {* existential quantification of other variables *}
 PROTO   {* BDD bdd_existcomp(BDD r, BDD var) *}
-DESCR   {* Removes all occurences in {\tt r} of variables not in the set
+DESCR   {* Removes all occurences in {\tt r} of variables {\bf not} in the set
 	   {\tt var} by existential quantification. *}
 ALSO    {* bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_forallcomp, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
 RETURN  {* The quantified BDD. *}
@@ -1632,7 +1632,7 @@ NAME    {* bdd\_forallcomp *}
 SECTION {* operator *}
 SHORT   {* universal quantification of other variables *}
 PROTO   {* BDD bdd_forallcomp(BDD r, BDD var) *}
-DESCR   {* Removes all occurences in {\tt r} of variables in the set
+DESCR   {* Removes all occurences in {\tt r} of variables {\bf not} in the set
 	   {\tt var} by universal quantification. *}
 ALSO    {* bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
 RETURN  {* The quantified BDD. *}
@@ -1666,11 +1666,8 @@ NAME    {* bdd\_uniquecomp *}
 SECTION {* operator *}
 SHORT   {* unique quantification of other variables *}
 PROTO   {* BDD bdd_uniquecomp(BDD r, BDD var) *}
-DESCR   {* Removes all occurences in {\tt r} of variables now in the set
-	   {\tt var} by unique quantification. This type of quantification
-	   uses a XOR operator instead of an OR operator as in the
-	   existential quantification, and an AND operator as in the
-	   universal quantification. *}
+DESCR   {* Removes all occurences in {\tt r} of variables now {\bf not} in
+           the set {\tt var} by unique quantification.  *}
 ALSO    {* bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_forallcomp, bdd\_uniquecomp, bdd\_makeset *}
 RETURN  {* The quantified BDD. *}
 */
@@ -1797,12 +1794,12 @@ BDD bdd_appex(BDD l, BDD r, int opr, BDD var)
 /*
 NAME    {* bdd\_appexcomp *}
 SECTION {* operator *}
-SHORT   {* apply operation and (complemented) existential quantification *}
+SHORT   {* apply operation and existential (complemented) quantification *}
 PROTO   {* BDD bdd_appexcomp(BDD left, BDD right, int opr, BDD var) *}
 DESCR   {* Applies the binary operator {\tt opr} to the arguments
 	   {\tt left} and {\tt right} and then performs an existential
-	   quantification of the variables which are not in the variable set
-	   {\tt var}. This is done in a bottom up manner such that both the
+	   quantification of the variables which are {\bf not} in the variable
+	   set {\tt var}. This is done in a bottom up manner such that both the
 	   apply and quantification is done on the lower nodes before
 	   stepping up to the higher nodes. This makes the {\tt bdd\_appexcomp}
 	   function much more efficient than an apply operation followed
@@ -1841,12 +1838,12 @@ BDD bdd_appall(BDD l, BDD r, int opr, BDD var)
 /*
 NAME    {* bdd\_appallcomp *}
 SECTION {* operator *}
-SHORT   {* apply operation and (complemented) universal quantification *}
+SHORT   {* apply operation and universal (complemented) quantification *}
 PROTO   {* BDD bdd_appall(BDD left, BDD right, int opr, BDD var) *}
 DESCR   {* Applies the binary operator {\tt opr} to the arguments
 	   {\tt left} and {\tt right} and then performs an universal
-	   quantification of the variables which are not in the variable set
-	   {\tt var}. This is done in a bottom up manner such that both the
+	   quantification of the variables which are {\bf not} in the variable
+	   set {\tt var}. This is done in a bottom up manner such that both the
 	   apply and quantification is done on the lower nodes before
 	   stepping up to the higher nodes. This makes the
 	   {\tt bdd\_appallcomp} function much more efficient than an
@@ -1889,8 +1886,8 @@ SHORT   {* apply operation and unique (complemented) quantification *}
 PROTO   {* BDD bdd_appunicomp(BDD left, BDD right, int opr, BDD var) *}
 DESCR   {* Applies the binary operator {\tt opr} to the arguments
 	   {\tt left} and {\tt right} and then performs a unique
-	   quantification of the variables which are not in the variable set
-	   {\tt var}. This is done in a bottom up manner such that both the
+	   quantification of the variables which are {\bf not} in the variable
+	   set {\tt var}. This is done in a bottom up manner such that both the
 	   apply and quantification is done on the lower nodes before
 	   stepping up to the higher nodes. This makes the
 	   {\tt bdd\_appunicomp} function much more efficient than an
