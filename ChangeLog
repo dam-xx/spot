@@ -1,5 +1,7 @@
 2003-06-05  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/ltlparse/ltlparse.yy: Typo in comment.
+
 	* configure.ac: Output src/tgbatest/Makefile and src/tgbatest/defs.
 	* src/Makefile.am (SUBDIRS): Add tgbatest.
 	* src/tgba/tgbaexplicit.hh, src/tgba/tgbaexplicit.cc: New file.

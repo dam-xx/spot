@@ -19,7 +19,7 @@
 }
 
 %{
-/* Spotparse.hh and parsedecl.hh include each other recursively.
+/* ltlparse.hh and parsedecl.hh include each other recursively.
    We mut ensure that YYSTYPE is declared (by the above %union)
    before parsedecl.hh uses it. */
 #include "parsedecl.hh"
