@@ -50,7 +50,6 @@ namespace spot
   bool
   spoiler_node::add_succ(spoiler_node* n)
   {
-    //std::cout << "spoiler_node::add_succ" << std::endl;
     bool exist = false;
     for (sn_v::iterator i = lnode_succ->begin();
 	 i != lnode_succ->end(); ++i)
@@ -84,15 +83,6 @@ namespace spot
   spoiler_node::add_pred(spoiler_node* n)
   {
     lnode_pred->push_back(n);
-    /*
-      bool exist = false;
-      for (sn_v::iterator i = lnode_pred->begin();
-      i != lnode_pred->end(); ++i)
-      if ((*i)->compare(n) == 0)
-      exist = true;
-      if (!exist)
-      lnode_pred->push_back(n);
-    */
   }
 
   void
@@ -120,25 +110,10 @@ namespace spot
     return change != not_win;
   }
 
-  /*
-  bool
-  spoiler_node::set_win()
-  {
-    bool change = not_win;
-    for (Sgi::vector<spoiler_node*>::iterator i = lnode_succ->begin();
-	 i != lnode_succ->end(); ++i)
-      {
-	not_win |= (*i)->not_win;
-      }
-    return change != not_win;
-  }
-  */
-
   std::string
   spoiler_node::to_string(const tgba* a)
   {
     std::ostringstream os;
-    // print the node.
     os << num_
        << " [shape=box, label=\"("
        << a->format_state(sc_->first)
@@ -164,7 +139,6 @@ namespace spot
   bool
   spoiler_node::compare(spoiler_node* n)
   {
-    //std::cout << "spoiler_node::compare" << std::endl;
     return (((sc_->first)->compare((n->get_pair())->first) == 0) &&
 	    ((sc_->second)->compare((n->get_pair())->second) == 0));
   }
@@ -235,34 +209,10 @@ namespace spot
     return change != not_win;
   }
 
-  /*
-  bool
-  duplicator_node::set_win()
-  {
-    bool change = not_win;
-
-    if (!this->get_nb_succ())
-      not_win = true;
-    else
-      {
-	not_win = true;
-	for (Sgi::vector<spoiler_node*>::iterator i = lnode_succ->begin();
-	     i != lnode_succ->end(); ++i)
-	  {
-	    not_win &= (*i)->not_win;
-	  }
-      }
-
-    return change != not_win;
-  }
-  */
-
   std::string
   duplicator_node::to_string(const tgba* a)
   {
     std::ostringstream os;
-
-    // print the node.
     os << num_
        << " [shape=box, label=\"("
        << a->format_state(sc_->first)
@@ -274,14 +224,12 @@ namespace spot
     bdd_print_acc(os, a->get_dict(), acc_);
     os << ")\"]"
        << std::endl;
-
     return os.str();
   }
 
   bool
   duplicator_node::compare(spoiler_node* n)
   {
-    //std::cout << "duplicator_node::compare" << std::endl;
     return (this->spoiler_node::compare(n) &&
 	    (label_ == dynamic_cast<duplicator_node*>(n)->get_label()) &&
 	    (acc_ == dynamic_cast<duplicator_node*>(n)->get_acc()));
@@ -591,216 +539,6 @@ namespace spot
       }
   }
 
-  /*
-  void
-  parity_game_graph_direct::build_couple()
-  {
-    // We build only some "basic" spoiler node.
-    sn_v tab_temp;
-    s_v::iterator i1;
-    for (i1 = tgba_state_.begin(); i1 != tgba_state_.end(); ++i1)
-      {
-
-	// spoiler node are all state couple (i,j)
-	s_v::iterator i2;
-	for (i2 = tgba_state_.begin();
-	     i2 != tgba_state_.end(); ++i2)
-	  {
-	    //std::cout << "add spoiler node" << std::endl;
-	    spoiler_node_delayed* n1
-	      = new spoiler_node_delayed(*i1, *i2,
-					 bddfalse,
-					 nb_node_parity_game++);
-	    spoiler_vertice_.push_back(n1);
-	    tab_temp.push_back(n1);
-	  }
-      }
-
-    sn_v::iterator j;
-    std::ostringstream os;
-    for (j = tab_temp.begin(); j != tab_temp.end(); ++j)
-      build_recurse_successor_spoiler(*j, os);
-
-  }
-
-  void
-  parity_game_graph_direct::
-  build_recurse_successor_spoiler(spoiler_node* sn,
-				  std::ostringstream& os)
-  {
-    //std::cout << os.str() << "build_recurse_successor_spoiler : begin"
-    //<< std::endl;
-
-    tgba_succ_iterator* si = automata_->succ_iter(sn->get_spoiler_node());
-
-    for (si->first(); !si->done(); si->next())
-      {
-
-	bdd btmp = si->current_acceptance_conditions();
-
-	s_v::iterator i1;
-	state* s;
-	for (i1 = tgba_state_.begin();
-	     i1 != tgba_state_.end(); ++i1)
-	  {
-
-	    s  = si->current_state();
-	    if (s->compare(*i1) == 0)
-	      {
-		delete s;
-		duplicator_node* dn
-		  = add_duplicator_node(*i1,
-					sn->get_duplicator_node(),
-					si->current_condition(),
-					btmp,
-					nb_node_parity_game++);
-
-		if (!(sn->add_succ(dn)))
-		    continue;
-
-		std::ostringstream os2;
-		os2 << os.str() << " ";
-		build_recurse_successor_duplicator(dn, sn, os2);
-	      }
-	    else
-	      delete s;
-	  }
-      }
-
-    delete si;
-
-    //std::cout << os.str() << "build_recurse_successor_spoiler : end" <<
-    //std::endl;
-  }
-
-  void
-  parity_game_graph_direct::
-  build_recurse_successor_duplicator(duplicator_node* dn,
-				     spoiler_node* ,
-				     std::ostringstream& os)
-  {
-    //std::cout << "build_recurse_successor_duplicator : begin" << std::endl;
-
-    tgba_succ_iterator* si = automata_->succ_iter(dn->get_duplicator_node());
-
-    for (si->first(); !si->done(); si->next())
-      {
-
-	// if si->current_condition() doesn't implies sn->get_label()
-	// then duplicator can't play.
-	if ((!dn->get_label() | si->current_condition()) != bddtrue)
-	  continue;
-
-	bdd btmp = dn->get_acc() -
-	  (dn->get_acc() & si->current_acceptance_conditions());
-
-	s_v::iterator i1;
-	state* s;
-	for (i1 = tgba_state_.begin();
-	     i1 != tgba_state_.end(); ++i1)
-	  {
-	    s  = si->current_state();
-
-	    if (s->compare(*i1) == 0)
-	      {
-		delete s;
-		spoiler_node* sn_n
-		  = add_spoiler_node(dn->get_spoiler_node(),
-				     *i1,
-				     nb_node_parity_game++);
-
-		if (!(dn->add_succ(sn_n)))
-		  continue;
-
-		std::ostringstream os2;
-		os2 << os.str() << " ";
-		build_recurse_successor_spoiler(sn_n, os2);
-	      }
-	    else
-	      delete s;
-	  }
-      }
-
-    delete si;
-
-    //std::cout << os.str() << "build_recurse_successor_duplicator : end"
-    //<< std::endl;
-  }
-
-  duplicator_node*
-  parity_game_graph_direct::add_duplicator_node(const spot::state* sn,
-						const spot::state* dn,
-						bdd acc,
-						bdd label,
-						int nb)
-  {
-    bool exist = false;
-
-    duplicator_node* dn_n
-      = new duplicator_node(sn, dn, acc, label, nb);
-
-    for (Sgi::vector<duplicator_node*>::iterator i
-	       = duplicator_vertice_.begin();
-	     i != duplicator_vertice_.end(); ++i)
-      {
-	if (dn_n->compare(*i))
-	  {
-	    exist = true;
-	    delete dn_n;
-	    dn_n = *i;
-	    break;
-	  }
-      }
-
-    if (!exist)
-      duplicator_vertice_.push_back(dn_n);
-
-    return dn_n;
-  }
-
-  spoiler_node*
-  parity_game_graph_direct::add_spoiler_node(const spot::state* sn,
-					      const spot::state* dn,
-					      int nb)
-  {
-    bool exist = false;
-
-    spoiler_node* sn_n
-      = new spoiler_node(sn, dn, nb);
-
-    for (Sgi::vector<spoiler_node*>::iterator i
-	   = spoiler_vertice_.begin();
-	 i != spoiler_vertice_.end(); ++i)
-      {
-	if (sn_n->compare(*i))
-	  {
-	    exist = true;
-	    delete sn_n;
-	    sn_n = *i;
-	    break;
-	  }
-      }
-
-    if (!exist)
-	spoiler_vertice_.push_back(sn_n);
-
-    return sn_n;
-  }
-  */
-
-  /*
-  void
-  parity_game_graph_direct::lift()
-  {
-    for (Sgi::vector<spoiler_node*>::iterator i
-	   = spoiler_vertice_.begin();
-	 i != spoiler_vertice_.end(); ++i)
-      {
-	(*i)->set_win();
-      }
-  }
-  */
-
   void
   parity_game_graph_direct::lift()
   {
@@ -874,12 +612,14 @@ namespace spot
   ///////////////////////////////////////////////////////////////////////
 
   simulation_relation*
-  get_direct_relation_simulation(const tgba* f, int opt)
+  get_direct_relation_simulation(const tgba* f,
+				 std::ostream& os,
+				 int opt)
   {
     parity_game_graph_direct* G = new parity_game_graph_direct(f);
     simulation_relation* rel = G->get_relation();
     if (opt == 1)
-      G->print(std::cout);
+      G->print(os);
     delete G;
     return rel;
   }
@@ -931,7 +671,7 @@ namespace spot
     if (opt & Reduce_Dir_Sim)
       {
 	simulation_relation* rel
-	  = get_direct_relation_simulation(automatareduc);
+	  = get_direct_relation_simulation(automatareduc, std::cout);
 
 	automatareduc->display_rel_sim(rel, std::cout);
 	automatareduc->prune_automata(rel);
@@ -942,7 +682,7 @@ namespace spot
       if (opt & Reduce_Del_Sim)
 	{
 	  simulation_relation* rel
-	    = get_delayed_relation_simulation(automatareduc);
+	    = get_delayed_relation_simulation(automatareduc, std::cout);
 
 	  automatareduc->display_rel_sim(rel, std::cout);
 	  automatareduc->prune_automata(rel);
@@ -952,7 +692,6 @@ namespace spot
 
     if (opt & Reduce_Scc)
       {
-	automatareduc->compute_scc();
 	automatareduc->prune_scc();
       }
 

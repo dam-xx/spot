@@ -1,3 +1,12 @@
+2004-07-02  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/tgba/tgbareduc.cc, src/tgba/tgbareduc.hh,
+	src/tgbaalgos/reductgba_sim.cc,	src/tgbaalgos/reductgba_sim.hh,
+	src/tgbaalgos/reductgba_sim_del.cc: Remove some comments.
+
+	* src/tgbatest/ltl2tgba.cc, src/tgbatest/reductgba.cc: Adjust ...
+	* src/tgbatest/spotlbtt.test: More test (delayed simulation)
+
 2004-06-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac, NEWS: Bump version to 0.0w.

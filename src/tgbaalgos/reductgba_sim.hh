@@ -58,20 +58,18 @@ namespace spot
 
   /// \brief Compute a direct simulation relation on state of tgba \a f.
   simulation_relation* get_direct_relation_simulation(const tgba* a,
+						      std::ostream& os,
 						      int opt = -1);
 
   /// Compute a delayed simulation relation on state of tgba \a f.
-  /// FIXME : this method is incorrect !!
-  /// Don't use it !!
+  // FIXME: This method is correct but she build sometime (when there are more
+  // than one acceptance condition) only a part of the simulation relation.
   simulation_relation* get_delayed_relation_simulation(const tgba* a,
+						      std::ostream& os,
 						      int opt = -1);
 
   /// To free a simulation relation.
   void free_relation_simulation(simulation_relation* rel);
-
-  /// Test if the initial state of a2 fair simulate this of a1.
-  /// Not implemented.
-  bool is_include(const tgba* a1, const tgba* a2);
 
   ///////////////////////////////////////////////////////////////////////
   // simulation.
@@ -107,11 +105,6 @@ namespace spot
 
     /// \brief Compute each node of the graph.
     virtual void build_graph() = 0;
-
-    /// \brief Compute the link of the graph.
-    /// Successor of spoiler node (resp. duplicator node)
-    /// are duplicator node (resp. spoiler node).
-    //virtual void build_link() = 0;
 
     /// \brief Remove edge from spoiler to duplicator that make
     /// duplicator loose.
@@ -156,7 +149,6 @@ namespace spot
   protected:
     sn_v* lnode_succ;
     sn_v* lnode_pred;
-    //Sgi::vector<spoiler_node*>* lnode_succ;
     state_couple* sc_;
   };
 
@@ -200,23 +192,6 @@ namespace spot
     virtual void lift();
     void build_link();
 
-    /*
-      private:
-      void build_recurse_successor_spoiler(spoiler_node* sn,
-      std::ostringstream& os);
-      void build_recurse_successor_duplicator(duplicator_node* dn,
-      spoiler_node* sn,
-      std::ostringstream& os);
-      duplicator_node* add_duplicator_node(const spot::state* sn,
-      const spot::state* dn,
-      bdd acc,
-      bdd label,
-      int nb);
-      spoiler_node* add_spoiler_node(const spot::state* sn,
-      const spot::state* dn,
-      int nb);
-    */
-
   };
 
 
@@ -230,8 +205,7 @@ namespace spot
     spoiler_node_delayed(const state* d_node,
 			 const state* s_node,
 			 bdd a,
-			 int num,
-			 bool l2a = true);
+			 int num);
     ~spoiler_node_delayed();
 
     /// Return true if the progress_measure has changed.
@@ -242,16 +216,16 @@ namespace spot
     int get_progress_measure() const;
 
     bool get_lead_2_acc_all();
-    /*
-    void set_lead_2_acc_all();
-    */
+    bool set_lead_2_acc_all(bdd acc = bddfalse);
+
+    //
+    bool seen_;
   protected:
     /// a Bdd for retain all the acceptance condition
     /// that a node has visited.
     bdd acceptance_condition_visited_;
     int progress_measure_;
     bool lead_2_acc_all_;
-
   };
 
   /// Duplicator node of parity game graph for delayed simulation.
@@ -271,9 +245,12 @@ namespace spot
     bool implies_label(bdd l);
     bool implies_acc(bdd a);
     int get_progress_measure();
-    bool get_lead_2_acc_all();
-    void set_lead_2_acc_all();
 
+    bool get_lead_2_acc_all();
+    bool set_lead_2_acc_all(bdd acc = bddfalse);
+
+    //
+    bool seen_;
   protected:
     int progress_measure_;
     bool lead_2_acc_all_;
@@ -316,9 +293,6 @@ namespace spot
     /// Return the number of acceptance condition.
     int nb_set_acc_cond();
 
-    /// Compute sub_set_acc_cond_;
-    void build_sub_set_acc_cond();
-
     ///
     duplicator_node_delayed* add_duplicator_node_delayed(const spot::state* sn,
 							 const spot::state* dn,
@@ -332,21 +306,18 @@ namespace spot
 						   bdd acc,
 						   int nb);
 
-    /// \brief Compute the couple as for direct simulation,
-    virtual void build_graph();
-    //virtual void build_link();
-
     void build_recurse_successor_spoiler(spoiler_node* sn,
 					 std::ostringstream& os);
     void build_recurse_successor_duplicator(duplicator_node* dn,
 					    spoiler_node* sn,
 					    std::ostringstream& os);
 
+    /// \brief Compute the couple as for direct simulation,
+    virtual void build_graph();
+
     /// \brief The Jurdzinski's lifting algorithm.
     virtual void lift();
 
-    /// \brief Remove all node so as to there is no dead ends (terminal node).
-    //virtual void prune();
   };
 
 }

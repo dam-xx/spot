@@ -98,6 +98,8 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -Rd  to display simulation relation"
 	    << std::endl
+	    << "  -RD  to display parity game (dot format)"
+	    << std::endl
 	    << "  -s   convert to explicit automata, and number states "
 	    << "in DFS order" << std::endl
 	    << "  -S   convert to explicit automata, and number states "
@@ -138,6 +140,7 @@ main(int argc, char** argv)
   int redopt = spot::ltl::Reduce_None;
   bool display_reduce_form = false;
   bool display_rel_sim = false;
+  bool display_parity_game = false;
   bool post_branching = false;
   bool fair_loop_approx = false;
 
@@ -257,6 +260,30 @@ main(int argc, char** argv)
 	{
 	  output = 3;
 	}
+      else if (!strcmp(argv[formula_index], "-R1"))
+	{
+	  reduc_aut |= spot::Reduce_Dir_Sim;
+	}
+      else if (!strcmp(argv[formula_index], "-R2"))
+	{
+	  reduc_aut |= spot::Reduce_Del_Sim;
+	}
+      else if (!strcmp(argv[formula_index], "-R3"))
+	{
+	  reduc_aut |= spot::Reduce_Scc;
+	}
+      else if (!strcmp(argv[formula_index], "-rd"))
+	{
+	  display_reduce_form = true;
+	}
+      else if (!strcmp(argv[formula_index], "-Rd"))
+	{
+	  display_rel_sim = true;
+	}
+      else if (!strcmp(argv[formula_index], "-RD"))
+	{
+	  display_parity_game = true;
+	}
       else if (!strcmp(argv[formula_index], "-s"))
 	{
 	  dupexp = DFS;
@@ -290,26 +317,6 @@ main(int argc, char** argv)
 	{
 	  fm_opt = true;
 	  fm_symb_merge_opt = false;
-	}
-      else if (!strcmp(argv[formula_index], "-R1"))
-	{
-	  reduc_aut |= spot::Reduce_Dir_Sim;
-	}
-      else if (!strcmp(argv[formula_index], "-R2"))
-	{
-	  reduc_aut |= spot::Reduce_Del_Sim;
-	}
-      else if (!strcmp(argv[formula_index], "-R3"))
-	{
-	  reduc_aut |= spot::Reduce_Scc;
-	}
-      else if (!strcmp(argv[formula_index], "-rd"))
-	{
-	  display_reduce_form = true;
-	}
-      else if (!strcmp(argv[formula_index], "-Rd"))
-	{
-	  display_rel_sim = true;
 	}
       else
 	{
@@ -399,14 +406,22 @@ main(int argc, char** argv)
       if (reduc_aut != spot::Reduce_None)
 	{
 	  a = aut_red = new spot::tgba_reduc(a);
+
+	  if (reduc_aut & spot::Reduce_Scc)
+	    aut_red->prune_scc();
+
 	  if ((reduc_aut & spot::Reduce_Dir_Sim) ||
 	      (reduc_aut & spot::Reduce_Del_Sim))
 	    {
 	      spot::simulation_relation* rel;
 	      if (reduc_aut & spot::Reduce_Dir_Sim)
-		rel = spot::get_direct_relation_simulation(a);
+		rel = spot::get_direct_relation_simulation(a,
+							   std::cout,
+							   display_parity_game);
 	      else if (reduc_aut & spot::Reduce_Del_Sim)
-		rel = spot::get_delayed_relation_simulation(a);
+		rel = spot::get_delayed_relation_simulation(a,
+							    std::cout,
+							    display_parity_game);
 	      else
 		assert(0);
 
@@ -422,9 +437,6 @@ main(int argc, char** argv)
 
 	      spot::free_relation_simulation(rel);
 	    }
-
-	  if (reduc_aut & spot::Reduce_Scc)
-	    aut_red->prune_scc();
 	}
 
       spot::tgba_explicit* expl = 0;

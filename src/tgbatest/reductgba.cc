@@ -112,12 +112,12 @@ main(int argc, char** argv)
 
   if (o & spot::Reduce_Dir_Sim)
     {
-      rel = spot::get_direct_relation_simulation(automatareduc);
+      rel = spot::get_direct_relation_simulation(automatareduc, std::cout);
       automatareduc->prune_automata(rel);
     }
   else if (o & spot::Reduce_Del_Sim)
     {
-      rel = spot::get_delayed_relation_simulation(automatareduc);
+      rel = spot::get_delayed_relation_simulation(automatareduc, std::cout);
       automatareduc->quotient_state(rel);
     }
 

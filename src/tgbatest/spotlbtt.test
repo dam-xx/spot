@@ -100,6 +100,13 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- FM), post reduction with delayed simulation"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -R2 -F -f -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM), post reduction with scc"
    Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -R3 -F -f -t'"
    Enabled = yes

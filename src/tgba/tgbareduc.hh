@@ -64,11 +64,7 @@ namespace spot
     /// Add the SCC index to the display of the state \a state.
     virtual std::string format_state(const spot::state* state) const;
 
-    /// Obsolete.
-    int get_nb_state();
-    int get_nb_transition();
-
-    // Just for Debug !!
+    // For Debug
     void display_rel_sim(simulation_relation* rel, std::ostream& os);
     void display_scc(std::ostream& os);
 

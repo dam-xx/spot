@@ -122,7 +122,6 @@ namespace spot
     if (!scc_computed_)
       this->compute_scc();
     this->prune_acc();
-    // FIXME
     this->delete_scc();
   }
 
@@ -142,26 +141,6 @@ namespace spot
       }
     else
       return i->second;
-  }
-
-  int
-  tgba_reduc::get_nb_state()
-  {
-    return state_name_map_.size();
-  }
-
-  int
-  tgba_reduc::get_nb_transition()
-  {
-    int nb_transition = 0;
-    sn_map::iterator i;
-    for (i = state_name_map_.begin();
-	 i != state_name_map_.end(); ++i)
-      {
-	nb_transition += (i->first)->size();
-      }
-
-    return nb_transition;
   }
 
   ////////////////////////////////////////////
