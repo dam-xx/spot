@@ -7,7 +7,7 @@
 namespace spot
 {
 
-  /// \brief A state for spot::tgba_bdd_product.  
+  /// \brief A state for spot::tgba_bdd_product.
   ///
   /// This state is in fact a pair of state: the state from the left
   /// automaton and that of the right.
@@ -19,32 +19,33 @@ namespace spot
     /// \param right The state from the right automaton.
     /// These state are acquired by spot::state_bdd_product, and will
     /// be deleted on destruction.
-    state_bdd_product(state_bdd* left, state_bdd* right)
-      : state_bdd(left->as_bdd() & right->as_bdd()), 
-	left_(left), 
+    state_bdd_product(state* left, state* right)
+      : state_bdd(left->as_bdd() & right->as_bdd()),
+	left_(left),
 	right_(right)
     {
     }
-    
+
     virtual ~state_bdd_product();
 
-    state_bdd* 
+    state*
     left() const
     {
       return left_;
     }
 
-    state_bdd* 
+    state*
     right() const
     {
       return right_;
     }
 
     virtual int compare(const state* other) const;
+    virtual state_bdd_product* clone() const;
 
   private:
-    state_bdd* left_;		///< State from the left automaton.
-    state_bdd* right_;		///< State from the right automaton.
+    state* left_;		///< State from the left automaton.
+    state* right_;		///< State from the right automaton.
   };
 
 
@@ -52,16 +53,18 @@ namespace spot
   class tgba_bdd_product_succ_iterator: public tgba_succ_iterator
   {
   public:
-    tgba_bdd_product_succ_iterator(tgba_succ_iterator* left, 
+    tgba_bdd_product_succ_iterator(tgba_succ_iterator* left,
 				   tgba_succ_iterator* right);
-    
+
+    virtual ~tgba_bdd_product_succ_iterator();
+
     // iteration
     void first();
     void next();
     bool done();
 
     // inspection
-    state_bdd* current_state();
+    state_bdd_product* current_state();
     bdd current_condition();
     bdd current_promise();
 
@@ -77,7 +80,7 @@ namespace spot
     tgba_succ_iterator* right_;
     bdd current_cond_;
   };
-  
+
   /// \brief A lazy product.  (States are computed on the fly.)
   class tgba_bdd_product : public tgba
   {
@@ -87,12 +90,12 @@ namespace spot
     /// \param right The right automata in the product.
     /// Do not be fooled by these arguments: a product \emph is commutative.
     tgba_bdd_product(const tgba& left, const tgba& right);
-    
+
     virtual ~tgba_bdd_product();
-    
+
     virtual state* get_init_state() const;
 
-    virtual tgba_bdd_product_succ_iterator* 
+    virtual tgba_bdd_product_succ_iterator*
     succ_iter(const state* state) const;
 
     virtual const tgba_bdd_dict& get_dict() const;

@@ -6,10 +6,10 @@
 int
 main()
 {
-  spot::ltl::default_environment& e = 
+  spot::ltl::default_environment& e =
     spot::ltl::default_environment::instance();
   spot::tgba_explicit a;
-  
+
   typedef spot::tgba_explicit::transition trans;
 
   trans* t1 = a.create_transition("state 0", "state 1");

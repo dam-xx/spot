@@ -24,7 +24,7 @@ namespace spot
     node = m.size() + 1;
     m[st] = node;
 
-    os << "  " << node << " [label=\"" 
+    os << "  " << node << " [label=\""
        << g.format_state(st) << "\"]" << std::endl;
     return true;
   }

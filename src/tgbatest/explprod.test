@@ -1,0 +1,29 @@
+#!/bin/sh
+
+. ./defs
+
+set -e
+
+cat >input1 <<EOF
+s1, s3, a,;
+s1, s2, b, p1;
+s2, s1, !a,;
+s2, s3, c,;
+EOF
+
+cat >input2 <<EOF
+s1, s2, b, p2;
+s2, s1, a, p3;
+EOF
+
+cat >expected <<EOF
+"s1 * s1", "s3 * s2", a b, p2;
+"s1 * s1", "s2 * s2", b, p2 p1;
+"s2 * s2", "s3 * s1", c a, p3;
+EOF
+
+./explprod input1 input2 > stdout
+
+cat stdout
+diff stdout expected
+rm input1 input2 stdout expected

@@ -68,6 +68,8 @@ namespace spot
 
     virtual int compare(const spot::state* other) const;
 
+    virtual state_explicit* clone() const;
+
     virtual ~state_explicit()
     {
     }

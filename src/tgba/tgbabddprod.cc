@@ -26,6 +26,12 @@ namespace spot
     return right_->compare(o->right());
   }
 
+  state_bdd_product*
+  state_bdd_product::clone() const
+  {
+    return new state_bdd_product(*this);
+  }
+
   ////////////////////////////////////////////////////////////
   // tgba_bdd_product_succ_iterator
 
@@ -33,6 +39,13 @@ namespace spot
   (tgba_succ_iterator* left, tgba_succ_iterator* right)
     : left_(left), right_(right)
   {
+  }
+
+  tgba_bdd_product_succ_iterator::~tgba_bdd_product_succ_iterator()
+  {
+    delete left_;
+    if (right_)
+      delete right_;
   }
 
   void
@@ -67,8 +80,20 @@ namespace spot
   void
   tgba_bdd_product_succ_iterator::first()
   {
+    if (!right_)
+      return;
+
     left_->first();
     right_->first();
+    // If one of the two successor set is empty initially, we reset
+    // right_, so that done() can detect this situation easily.  (We
+    // choose to reset right_ because this variable is already used by
+    // done().)
+    if (left_->done() || right_->done())
+      {
+	delete right_;
+	right_ = 0;
+      }
     next_non_false_();
   }
 
@@ -82,18 +107,15 @@ namespace spot
   bool
   tgba_bdd_product_succ_iterator::done()
   {
-    return right_->done();
+    return !right_ || right_->done();
   }
 
 
-  state_bdd*
+  state_bdd_product*
   tgba_bdd_product_succ_iterator::current_state()
   {
-    state_bdd* ls = dynamic_cast<state_bdd*>(left_->current_state());
-    state_bdd* rs = dynamic_cast<state_bdd*>(right_->current_state());
-    assert(ls);
-    assert(rs);
-    return new state_bdd_product(ls, rs);
+    return new state_bdd_product(left_->current_state(),
+				 right_->current_state());
   }
 
   bdd
@@ -149,11 +171,8 @@ namespace spot
   state*
   tgba_bdd_product::get_init_state() const
   {
-    state_bdd* ls = dynamic_cast<state_bdd*>(left_->get_init_state());
-    state_bdd* rs = dynamic_cast<state_bdd*>(right_->get_init_state());
-    assert(ls);
-    assert(rs);
-    return new state_bdd_product(ls, rs);
+    return new state_bdd_product(left_->get_init_state(),
+				 right_->get_init_state());
   }
 
   tgba_bdd_product_succ_iterator*

@@ -1,3 +1,42 @@
+2003-06-16  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	Make sure we can multiply two tgba_explicit.
+	
+	* tgba/state.hh (state::translate, state::clone, state::as_bdd):
+	New virtual methods.
+	* tgba/stataebdd.cc (state::translate, state::clone): New methods.
+	* tgba/stataebdd.hh (state::translate, state::clone): New methods.
+	* tgba/tgbabddprod.cc (state_bdd_product::clone,
+	tgba_bdd_product_succ_iterator::~tgba_bdd_product_succ_iterator):
+	New methods.
+	(tgba_bdd_product_succ_iterator::first): Reset right_
+	if any of left_ or right_ is already done (i.e., is empty).
+	(tgba_bdd_product_succ_iterator::done): Return true
+	if right_ is NULL.
+	(tgba_bdd_product_succ_iterator::current_state,
+	tgba_bdd_product::get_init_state): Work	directory with `state's.
+	* tgba/tgbabddprod.hh (state_bdd_product::clone,
+	tgba_bdd_product_succ_iterator::~tgba_bdd_product_succ_iterator):
+	New methods.
+	* tgba/tgbabddtranslateproxy.cc
+	(tgba_bdd_translate_proxy_succ_iterator::
+	tgba_bdd_translate_proxy_succ_iterator): Work on any kind of iteraator.
+	(tgba_bdd_translate_proxy_succ_iterator::
+	~tgba_bdd_translate_proxy_succ_iterator): New method.
+	(tgba_bdd_translate_proxy_succ_iterator::current_state,
+	tgba_bdd_translate_proxy::get_init_state,
+	tgba_bdd_translate_proxy::succ_iter): Work on `state's and
+	`tgba_succ_iterator's directlry.
+	(tgba_bdd_translate_proxy::format_state): Delegate formating
+	to the proxied automata.
+	* tgba/tgbaexplicit.cc (state_explicit::clone): New method.
+	* src/tgba/tgbaexplicit.cc (tgba_explicit::get_condition,
+	tgba_explicit::get_promise): Call ltl::destroy on existing formulae.
+	* tgbatest/Makefile.am (check_PROGRAMS): Add explprod.
+	(explprod_SOURCES): New variable.
+	(TESTS): Add explprod.test.
+	(CLEANFILES): Add input1 and input2.
+
 2003-06-12  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/tgbabddconcrete.cc (set_init_state, succ_iter): Make

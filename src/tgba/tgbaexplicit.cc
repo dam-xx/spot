@@ -1,4 +1,5 @@
 #include "ltlast/atomic_prop.hh"
+#include "ltlvisit/destroy.hh"
 #include "tgbaexplicit.hh"
 #include <cassert>
 
@@ -14,37 +15,37 @@ namespace spot
   {
   }
 
-  void 
+  void
   tgba_explicit_succ_iterator::first()
   {
     i_ = s_->begin();
   }
 
-  void 
+  void
   tgba_explicit_succ_iterator::next()
   {
     ++i_;
   }
 
-  bool 
+  bool
   tgba_explicit_succ_iterator::done()
   {
     return i_ == s_->end();
   }
 
-  state_explicit* 
+  state_explicit*
   tgba_explicit_succ_iterator::current_state()
   {
     return new state_explicit((*i_)->dest);
   }
 
-  bdd 
+  bdd
   tgba_explicit_succ_iterator::current_condition()
   {
     return (*i_)->condition;
   }
 
-  bdd 
+  bdd
   tgba_explicit_succ_iterator::current_promise()
   {
     return (*i_)->promise;
@@ -54,7 +55,7 @@ namespace spot
   ////////////////////////////////////////
   // state_explicit
 
-  const tgba_explicit::state* 
+  const tgba_explicit::state*
   state_explicit::get_state() const
   {
     return state_;
@@ -66,6 +67,12 @@ namespace spot
     const state_explicit* o = dynamic_cast<const state_explicit*>(other);
     assert(o);
     return o->get_state() - get_state();
+  }
+
+  state_explicit*
+  state_explicit::clone() const
+  {
+    return new state_explicit(*this);
   }
 
   ////////////////////////////////////////
@@ -88,7 +95,7 @@ namespace spot
 	delete i->second;
       }
   }
-  
+
   tgba_explicit::state*
   tgba_explicit::add_state(const std::string& name)
   {
@@ -109,7 +116,7 @@ namespace spot
   }
 
   tgba_explicit::transition*
-  tgba_explicit::create_transition(const std::string& source, 
+  tgba_explicit::create_transition(const std::string& source,
 				   const std::string& dest)
   {
     tgba_explicit::state* s = add_state(source);
@@ -135,6 +142,7 @@ namespace spot
       }
     else
       {
+	ltl::destroy(f);
 	v = i->second;
       }
     return v;
@@ -162,6 +170,7 @@ namespace spot
       }
     else
       {
+	ltl::destroy(f);
 	v = i->second;
       }
     return v;
@@ -177,27 +186,27 @@ namespace spot
     t->promise &= ! ithvar(get_promise(f));
   }
 
-  state* 
+  state*
   tgba_explicit::get_init_state() const
   {
     return new state_explicit(init_);
   }
 
-  tgba_succ_iterator* 
+  tgba_succ_iterator*
   tgba_explicit::succ_iter(const spot::state* state) const
   {
     const state_explicit* s = dynamic_cast<const state_explicit*>(state);
     assert(s);
     return new tgba_explicit_succ_iterator(s->get_state());
   }
-    
-  const tgba_bdd_dict& 
+
+  const tgba_bdd_dict&
   tgba_explicit::get_dict() const
   {
     return dict_;
   }
 
-  std::string 
+  std::string
   tgba_explicit::format_state(const spot::state* s) const
   {
     const state_explicit* se = dynamic_cast<const state_explicit*>(s);

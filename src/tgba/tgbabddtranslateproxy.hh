@@ -2,7 +2,6 @@
 # define SPOT_TGBA_TGBABDDTRANSLATEPROXY_HH
 
 #include "tgba.hh"
-#include "succiterconcrete.hh"
 
 namespace spot
 {
@@ -11,8 +10,9 @@ namespace spot
   class tgba_bdd_translate_proxy_succ_iterator: public tgba_succ_iterator
   {
   public:
-    tgba_bdd_translate_proxy_succ_iterator
-    (tgba_succ_iterator_concrete* it, bddPair* rewrite);
+    tgba_bdd_translate_proxy_succ_iterator(tgba_succ_iterator* it,
+					   bddPair* rewrite);
+    virtual ~tgba_bdd_translate_proxy_succ_iterator();
 
     // iteration
     void first();
@@ -20,11 +20,11 @@ namespace spot
     bool done();
 
     // inspection
-    state_bdd* current_state();
+    state* current_state();
     bdd current_condition();
     bdd current_promise();
   protected:
-    tgba_succ_iterator_concrete* iter_;
+    tgba_succ_iterator* iter_;
     bddPair* rewrite_;
   };
 
@@ -42,7 +42,7 @@ namespace spot
 
     virtual ~tgba_bdd_translate_proxy();
 
-    virtual state_bdd* get_init_state() const;
+    virtual state* get_init_state() const;
 
     virtual tgba_bdd_translate_proxy_succ_iterator*
     succ_iter(const state* state) const;
