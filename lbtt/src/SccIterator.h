@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #include <set>
 #include <stack>
 #include <vector>
-#include "Alloc.h"
+#include "LbttAlloc.h"
 #include "Graph.h"
 
 using namespace std;

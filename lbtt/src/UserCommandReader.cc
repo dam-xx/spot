@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -16,10 +16,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
-#ifdef __GNUC__
-#pragma implementation
-#endif /* __GNUC__ */
 
 #include <config.h>
 #include <csignal>
@@ -49,6 +45,13 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif /* HAVE_READLINE */
+
+#ifdef HAVE_ISATTY
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif /* HAVE_UNISTD_H */
+#endif /* HAVE_ISATTY */
+
 
 
 /******************************************************************************
@@ -131,20 +134,41 @@ void executeUserCommands()
 	input_line = line;
       else
       {
-	round_info.cout << '\n';
-	round_info.cout.flush();
-      }
 #else
       round_info.cout << prompt;
       round_info.cout.flush();
       getline(cin, input_line, '\n');
       if (cin.eof())
       {
-	round_info.cout << '\n';
-	round_info.cout.flush();
 	cin.clear();
+#endif /* HAVE_READLINE */
+#ifdef HAVE_ISATTY
+	/*
+	 *  If standard input is not bound to a terminal, act on EOF as if the
+	 *  `continue' command had been issued. Otherwise act as if an empty
+	 *  line was given as input.
+	 */
+	if (!isatty(STDIN_FILENO))
+	  input_line = "continue";
+	else
+	{
+	  round_info.cout << '\n';
+	  round_info.cout.flush();
+	}
+#else
+	input_line = "continue";
+	round_info.cout << input_line << '\n';
+	round_info.cout.flush();
+#endif /* HAVE_ISATTY */
       }
-#endif  /* HAVE_READLINE */
+
+#ifdef HAVE_ISATTY
+      if (!isatty(STDIN_FILENO))
+      {
+	round_info.cout << input_line << '\n';
+	round_info.cout.flush();
+      }
+#endif /* HAVE_ISATTY */
 
       external_command = "";
       string::size_type pipe_pos = input_line.find_first_of('|');
@@ -166,8 +190,11 @@ void executeUserCommands()
       if (!input_tokens.empty())
       {
 #ifdef HAVE_READLINE
-	add_history(line);
-	free(line);
+	if (line != static_cast<char*>(0))   /* line may be 0 on EOF */
+	{
+	  add_history(line);
+	  free(line);
+	}
 #endif  /* HAVE_READLINE */
         round_info.cout << '\n';
 	round_info.cout.flush();

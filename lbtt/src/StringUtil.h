@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -20,10 +20,6 @@
 #ifndef STRINGUTIL_H
 #define STRINGUTIL_H
 
-#ifdef __GNUC__
-#pragma interface
-#endif /* __GNUC__ */
-
 #include <config.h>
 #include <set>
 #include <string>
@@ -33,7 +29,7 @@
 #include <strstream>
 #endif /* HAVE_SSTREAM */
 #include <vector>
-#include "Alloc.h"
+#include "LbttAlloc.h"
 #include "Exception.h"
 
 using namespace std;

@@ -1,8 +1,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.53])
-AC_INIT([lbtt], [1.0.2], [heikki.tauriainen@hut.fi])
-AC_REVISION([Revision: 1.2])
+AC_INIT([lbtt], [1.0.3], [heikki.tauriainen@hut.fi])
+AC_REVISION([Revision: 1.3])
 AC_CONFIG_SRCDIR([src/main.cc])
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER([config.h])
@@ -37,7 +37,7 @@ AC_ARG_WITH([readline],
 # Check for the availability of headers.
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS([fcntl.h obstack.h stdlib.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h])
 
 # Check for the availability of the GNU readline headers.
 
@@ -50,6 +50,22 @@ if test "${readline}" = yes; then
 fi
 
 AC_LANG([C++])
+
+# Check for the availability of the obstack.h header. GNU libc 2.3.2 includes a
+# version of this header that cannot be compiled using g++; enable a workaround
+# if necessary.
+
+AC_CHECK_HEADERS([obstack.h],
+                 [AC_MSG_CHECKING([whether obstack.h compilation workaround is needed])
+                  AC_TRY_COMPILE([#include <obstack.h>],
+                                 [#if __GLIBC__ == 2 && __GLIBC_MINOR__ == 3
+                                  obstack_alloc(0, 0);
+                                  #endif],
+                                 [AC_MSG_RESULT([no])],
+                                 [AC_MSG_RESULT([yes])
+                                  AC_DEFINE([GLIBC_OBSTACK_WORKAROUND],
+                                            [1],
+                                            [Define to 1 to enable an obstack.h C++ compilation workaround for GNU libc 2.3.])])])
 
 # Check for the availablility of the sstream or strstream header.
 
@@ -131,11 +147,11 @@ AC_C_INLINE
 # Checks for library functions.
 
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS([mkdir strchr strtod strtol strtoul getopt_long])
+AC_CHECK_FUNCS([mkdir strchr strtod strtol strtoul getopt_long isatty])
 if test x"${ac_cv_func_getopt_long}" = xno; then
   AC_LIBOBJ([getopt])
   AC_LIBOBJ([getopt1])
-  AC_CHECK_HEADERS([libintl.h string.h strings.h])
+  AC_CHECK_HEADERS([libintl.h])
   AC_CHECK_FUNCS([memset])
 fi
 
@@ -147,7 +163,8 @@ if test "${readline}" = yes; then
   for READLINELIBS in "-lreadline" "-lreadline -lcurses" "-lreadline -ltermcap" error; do
     if test "${READLINELIBS}" != error; then
       LIBS="${oldlibs} ${READLINELIBS}"
-      AC_TRY_LINK([#include <${rl_history_h}>
+      AC_TRY_LINK([#include <stdio.h>
+                   #include <${rl_history_h}>
                    #include <${rl_readline_h}>],
                   [using_history(); readline(""); add_history("");],
                   [break])

@@ -1,5 +1,5 @@
-lbtt NEWS -- history of user-visible changes.   18 Jul 2003
-Copyright (C) 2003 Heikki Tauriainen
+lbtt NEWS -- history of user-visible changes.   13 Feb 2004
+Copyright (C) 2004 Heikki Tauriainen
 
    Permission is granted to anyone to make or distribute verbatim copies
    of this document as received, in any medium, provided that the
@@ -11,6 +11,14 @@ Copyright (C) 2003 Heikki Tauriainen
    changed them.
 
 Please send bug reports to <heikki.tauriainen@hut.fi>.
+
+Version 1.0.3
+
+* This release fixes several compilation issues with GNU libc 2.3.2
+  and Darwin, and documentation generation in dvi format.  A problem
+  with reading user commands from a source that is not a terminal was
+  also fixed.  Many thanks to Alexandre Duret-Lutz for patches and
+  useful suggestions.
 
 Version 1.0.2
 

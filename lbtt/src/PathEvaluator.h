@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -20,13 +20,9 @@
 #ifndef PATHEVALUATOR_H
 #define PATHEVALUATOR_H
 
-#ifdef __GNUC__
-#pragma interface
-#endif /* __GNUC__ */
-
 #include <iostream>
 #include <map>
-#include "Alloc.h"
+#include "LbttAlloc.h"
 #include "BitArray.h"
 #include "Exception.h"
 #include "LtlFormula.h"

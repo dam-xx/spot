@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -368,7 +368,7 @@ static inline bool isLocked(int option)
 /* Punctuation symbols. */
 
 %token CFG_LBRACE CFG_RBRACE CFG_EQUALS
-%token CFG_BLOCK_ID, CFG_OPTION_ID
+%token CFG_BLOCK_ID CFG_OPTION_ID
 
 /* The `unknown' token. */
 

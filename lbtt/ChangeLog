@@ -1,3 +1,70 @@
+2004-02-13  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* src/BitArray.{h,cc}, src/BuchiAutomaton.{h,cc},
+	src/Configuration.{h,cc}, src/DispUtil.{h,cc},
+	src/ExternalTranslator.{h,cc}, src/FormulaRandomizer.{h,cc},
+	src/LtlFormula.{h,cc}, src/NeverClaimAutomaton.{h,cc},
+	src/PathEvaluator.{h,cc}, src/PathIterator.{h,cc},
+	src/ProductAutomaton.{h,cc}, src/SpinWrapper.{h,cc},
+	src/StatDisplay.{h,cc}, src/StateSpace.{h,cc},
+	src/StateSpaceRandomizer.{h,cc}, src/StringUtil.{h,cc},
+	src/TestOperations.{h,cc}, src/TestStatistics.{h,cc},
+	src/translate.{h,cc}, src/UserCommandReader.{h,cc},
+	src/UserCommands.{h,cc}: Remove all #pragmas.
+
+2004-02-12  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* doc/texinfo.tex: New upstream version.
+
+	* doc/lbtt.texi: Update edition to 1.0.2.
+	Remove node names with commands to fix dvi file generation.
+	Move the node about the lbtt-translate utility to correct menu.
+	Reformat the automata file format section to avoid overfull lines
+	in dvi generation.
+	Fix description of the Algorithm block used with lbtt-translate.
+	
+	* doc/testprocedure.txt, doc/intersectioncheck.txt: Add initial
+	newlines.
+
+2004-02-11  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* src/UserCommandReader.cc [HAVE_ISATTY]: Include the unistd.h
+	header.
+	(executeUserCommands) Stop waiting for new commands if an EOF is
+	detected. [HAVE_ISATTY]: If standard input is not connected to a
+	terminal, echo the input line.
+
+2004-02-10  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
+
+	* configure.ac:	Remove duplicate checks for headers.
+	(GLIBC_OBSTACK_WORKAROUND): New config.h macro for checking for a
+	version of the obstack.h header that requires a workaround to be
+	compiled with g++.
+	Add check for the `isatty' library function.
+	Include the stdio.h header when testing for readline libraries.
+
+	* src/Alloc.h: Rename to LbttAlloc.h to avoid a name conflict with
+	system header files on Darwin.
+	[GLIBC_OBSTACK_WORKAROUND] (__INT_TO_PTR): Redefine macro to
+	work around a C++ bug in the obstack.h header file in glibc 2.3.2.
+	Thanks to Alexandre Duret-Lutz for the original patch.
+
+	* src/BuchiAutomaton.h, src/Configuration.h, src/DispUtil.cc,
+	src/ExternalTranslator.h, src/FormulaRandomizer.h, src/Graph.h.in,
+	src/LtlFormula.h, src/main.cc, src/Makefile.am,
+	src/NeverClaimAutomaton.h, src/PathEvaluator.h,
+	src/ProductAutomaton.h, src/SccIterator.h, src/SharedTestData.h,
+	src/StatDisplay.h, src/StateSpace.h, src/StateSpaceRandomizer.cc,
+	src/StringUtil.h, src/TestOperations.h, src/TestRoundInfo.h,
+	src/TestStatistics.h, src/UserCommandReader.h,
+	src/UserCommands.h: Adjust includes.
+
+	* Update copyright information in source files.
+
+2003-07-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/Config-parse.yy: Remove stray `,' in %token arguments.
+
 2003-07-18  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* UserCommands.cc (printAutomatonAnalysisResults): Ensure that
@@ -7,7 +74,7 @@
 	state of the witness.
 
 	* Version 1.0.2 released.
-	
+
 2003-07-17  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* NeverClaimAutomaton.cc (ParseErrorException::ParseErrorException):
@@ -19,17 +86,17 @@
 	in previous releases.)
 
 2002-11-04  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
-	
+
 	* StatDisplay.cc (printCollectiveStats): If using more than five
 	formula operators (but the total number of operators is not
 	a multiple of 5), insert an empty line in the output before the
 	last row of the operator distribution table.
 
 2002-10-21  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
-	
+
 	* BitArray.cc (BitArray::find): Fix bug in testing whether
 	all accessed bytes were zero.
-	
+
 2002-10-01  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* Version 1.0.1 released.
@@ -38,21 +105,21 @@
 
 	* Alloc.h: Use preprocessor macro HAVE_SINGLE_CLIENT_ALLOC
 	instead of HAVE_SGI_STL in #ifdef conditionals.
-	
+
 	* BitArray.cc (BitArray::BitArray): Do not clear the allocated
 	array after initialization. All callers updated to reflect the
 	changed constructor semantics.
-	
+
 	* BitArray.cc (BitArray::bitwiseAnd, BitArray::bitwiseOr)
 	(BitArray::bitwiseXor): New functions.
 
 	* BitArray.cc (BitArray::equal, BitArray::subset)
 	(BitArray::count): Fix `&' operator precedence in comparisons.
-	
+
 	* BitArray.cc (BitArray::hammingDistance): Use the `bit_counts'
 	array to compute the result instead of scanning the array bit by
 	bit.
-	
+
 	* BitArray.cc: Documentation fixes.
 
 	* BitArray.h (BitArray::bitwiseAnd, BitArray::bitwiseOr)
@@ -76,7 +143,7 @@
 
 	* BuchiAutomaton.cc: Documentation fixes.
 
-	* BuchiAutomaton.h (BuchiAutomaton::regularize): Changed 
+	* BuchiAutomaton.h (BuchiAutomaton::regularize): Changed
 	semantics (see above).
 
 	* BuchiAutomaton.h
@@ -108,14 +175,14 @@
 	preprocessor macro SLIST_NAMESPACE.
 
 	* EdgeContainer.h: Remove uses of redundant preprocessor macros.
-	
+
 	* Graph.h: Renamed to Graph.h.in to implement the optional
 	inclusion of the slist header using an autoconf substitution
 	variable.
 
 	* Graph.h.in: Use HAVE_SLIST macro instead of HAVE_SGI_STL in
 	#ifdef conditionals.
-	
+
 	* Graph.h.in (Graph::Edge, Graph::Node): Make classes public (to
 	prevent warnings from Intel C++ Compiler).
 
@@ -172,7 +239,7 @@
 
 	* src/Makefile.am: Remove redundant references to @LEXLIB@ (the
 	sources are independent of any external lexer library).
-	
+
 	* NeverClaimAutomaton.cc (NeverClaimAutomaton::write): Add
 	detection for jumps to undefined never claim labels.
 
@@ -185,7 +252,7 @@
 	* ProductAutomaton.cc (ProductAutomaton::computeProduct):
 	Avoid creating a temporary Bitset object when checking the
 	enabledness of a product transition.
-	
+
 	* ProductAutomaton.cc (ProductAutomaton::findAcceptingExecution)
 	Use BitArrays instead of Bitsets.
 
@@ -211,12 +278,12 @@
 
 	* TestOperations.cc (performEmptinessCheck): Added a colon to
 	the end of the "Accepting cycles" message.
-	
+
 	* TestRoundInfo.h: Removed redundant inclusion of BitArray.h.
 
 	* translate.cc (main): Use autoconf-generated PACKAGE_VERSION
 	macro for displaying program version.
-	
+
 	* translate.cc (main): Fix bug in checking the number of
 	command line arguments.
 
@@ -227,7 +294,7 @@
 	against the internal model checking algorithm).
 
 	* version.h.in: Removed.
-	
+
 2001-11-12  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* Version 1.0.0 released.
