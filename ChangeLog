@@ -1,3 +1,10 @@
+2003-06-02  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/tgbabdddict.cc, src/tgba/tgbabdddict.hh: New files.
+	* src/tgba/Makefile.am (libtgba_la_SOURCES): Add them.
+	* src/tgba/tgbabdddict.cc (tgba_bdd_dict::contains): New function.
+	* src/tgba/tgbabdddict.hh (tgba_bdd_dict::contains): Likewise.
+
 2003-05-28  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/statebdd.hh (state_bdd::as_bdd): Add non-const variant.
@@ -85,7 +92,7 @@
 	not a bdd.
 	* src/tgba/tgbabddconcrete.cc: Likewise.
 
-	Initial code for TGBA (Transition Generalized Büchi Automata).
+	Initial code for TGBA (Transition Generalized BŽüchi Automata).
 	Contains tgba_bdd, a BDD-encoded TGBA, and ltl_to_tgba,
 	a LTL-to-TGBA translator using Couvreur's algorithm.
 
