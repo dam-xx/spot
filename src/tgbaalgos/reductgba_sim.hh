@@ -106,18 +106,18 @@ namespace spot
     void process_link(int in, int out, const tgba_succ_iterator* si);
 
     /// \brief Compute each node of the graph.
-    virtual void build_couple() = 0;
+    virtual void build_graph() = 0;
 
     /// \brief Compute the link of the graph.
     /// Successor of spoiler node (resp. duplicator node)
     /// are duplicator node (resp. spoiler node).
-    virtual void build_link() = 0;
+    //virtual void build_link() = 0;
 
     /// \brief Remove edge from spoiler to duplicator that make
     /// duplicator loose.
     /// Spoiler node whose still have some link, reveal
     /// a direct simulation relation.
-    virtual void prune() = 0;
+    virtual void lift() = 0;
   };
 
   ///////////////////////////////////////////////////////////////////////
@@ -196,10 +196,27 @@ namespace spot
     virtual simulation_relation* get_relation();
 
   protected:
+    virtual void build_graph();
+    virtual void lift();
+    void build_link();
 
-    virtual void build_couple();
-    virtual void build_link();
-    virtual void prune();
+    /*
+      private:
+      void build_recurse_successor_spoiler(spoiler_node* sn,
+      std::ostringstream& os);
+      void build_recurse_successor_duplicator(duplicator_node* dn,
+      spoiler_node* sn,
+      std::ostringstream& os);
+      duplicator_node* add_duplicator_node(const spot::state* sn,
+      const spot::state* dn,
+      bdd acc,
+      bdd label,
+      int nb);
+      spoiler_node* add_spoiler_node(const spot::state* sn,
+      const spot::state* dn,
+      int nb);
+    */
+
   };
 
 
@@ -213,23 +230,27 @@ namespace spot
     spoiler_node_delayed(const state* d_node,
 			 const state* s_node,
 			 bdd a,
-			 int num);
+			 int num,
+			 bool l2a = true);
     ~spoiler_node_delayed();
 
     /// Return true if the progress_measure has changed.
     bool set_win();
     bdd get_acceptance_condition_visited() const;
     virtual bool compare(spoiler_node* n);
-
     virtual std::string to_string(const tgba* a);
-
     int get_progress_measure() const;
 
+    bool get_lead_2_acc_all();
+    /*
+    void set_lead_2_acc_all();
+    */
   protected:
     /// a Bdd for retain all the acceptance condition
     /// that a node has visited.
     bdd acceptance_condition_visited_;
     int progress_measure_;
+    bool lead_2_acc_all_;
 
   };
 
@@ -247,14 +268,15 @@ namespace spot
     /// Return true if the progress_measure has changed.
     bool set_win();
     virtual std::string to_string(const tgba* a);
-
     bool implies_label(bdd l);
     bool implies_acc(bdd a);
-
     int get_progress_measure();
+    bool get_lead_2_acc_all();
+    void set_lead_2_acc_all();
 
   protected:
     int progress_measure_;
+    bool lead_2_acc_all_;
   };
 
   /// Parity game graph which compute the delayed simulation relation
@@ -311,17 +333,20 @@ namespace spot
 						   int nb);
 
     /// \brief Compute the couple as for direct simulation,
-    virtual void build_couple();
-    virtual void build_link();
-    void build_recurse_successor_spoiler(spoiler_node* sn);
+    virtual void build_graph();
+    //virtual void build_link();
+
+    void build_recurse_successor_spoiler(spoiler_node* sn,
+					 std::ostringstream& os);
     void build_recurse_successor_duplicator(duplicator_node* dn,
-					    spoiler_node* sn);
+					    spoiler_node* sn,
+					    std::ostringstream& os);
 
     /// \brief The Jurdzinski's lifting algorithm.
-    void lift();
+    virtual void lift();
 
     /// \brief Remove all node so as to there is no dead ends (terminal node).
-    virtual void prune();
+    //virtual void prune();
   };
 
 }

@@ -29,6 +29,7 @@
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/syntimpl.hh"
 #include "ltlast/allnodes.hh"
+#include "ltlvisit/nenoform.hh"
 
 void
 syntax(char* prog)
@@ -46,16 +47,19 @@ main(int argc, char** argv)
   int opt = atoi(argv[1]);
 
   spot::ltl::parse_error_list p1;
-  spot::ltl::formula* f1 = spot::ltl::parse(argv[2], p1);
+  spot::ltl::formula* ftmp1 = spot::ltl::parse(argv[2], p1);
 
   if (spot::ltl::format_parse_errors(std::cerr, argv[2], p1))
     return 2;
 
   spot::ltl::parse_error_list p2;
-  spot::ltl::formula* f2 = spot::ltl::parse(argv[3], p2);
+  spot::ltl::formula* ftmp2 = spot::ltl::parse(argv[3], p2);
 
   if (spot::ltl::format_parse_errors(std::cerr, argv[3], p2))
     return 2;
+
+  spot::ltl::formula* f1 = spot::ltl::negative_normal_form(ftmp1);
+  spot::ltl::formula* f2 = spot::ltl::negative_normal_form(ftmp2);
 
   std::string f1s = spot::ltl::to_string(f1);
   std::string f2s = spot::ltl::to_string(f2);
@@ -99,6 +103,8 @@ main(int argc, char** argv)
 
   spot::ltl::destroy(f1);
   spot::ltl::destroy(f2);
+  spot::ltl::destroy(ftmp1);
+  spot::ltl::destroy(ftmp2);
   assert(spot::ltl::atomic_prop::instance_count() == 0);
   assert(spot::ltl::unop::instance_count() == 0);
   assert(spot::ltl::binop::instance_count() == 0);

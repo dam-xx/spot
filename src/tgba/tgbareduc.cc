@@ -121,8 +121,9 @@ namespace spot
   {
     if (!scc_computed_)
       this->compute_scc();
+    this->prune_acc();
     // FIXME
-    // this->delete_scc();
+    this->delete_scc();
   }
 
   std::string
@@ -418,15 +419,33 @@ namespace spot
 	  }
       }
 
+    // FIXME
+    // Be careful, we have to stock on s2 the accepting condition on the arc
+    // leaving s1 (possible when the simulation is delayed). Since s2 simulate
+    // s1, s2 has some label whose implies these of s1, so we can put the
+    // accepting conditions on this arcs.
+    for (tgba_explicit::state::const_iterator j = s1->begin();
+	 j != s1->end(); ++j)
+      {
+	// FIXME
+	transition* t = new transition();
+	t->dest = (*j)->dest;
+	t->condition = (*j)->condition;
+	t->acceptance_conditions = (*j)->acceptance_conditions;
+	const_cast<tgba_explicit::state*>(s2)->push_back(t);
+      }
+
     // We remove all the predecessor of s1.
     (i->second)->clear();
 
     // then we can remove s1 safely, without change the language
     // of the automaton.
+    // useless because the state is not reachable.
     this->remove_state(sim1);
 
   }
 
+  /////////////////////////////////////////
   /////////////////////////////////////////
 
   // From gtec.cc
@@ -562,14 +581,145 @@ namespace spot
     scc_computed_ = true;
   }
 
+  ///////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////
+
+  void
+  tgba_reduc::prune_acc()
+  {
+    if (!scc_computed_)
+      this->compute_scc();
+
+    Sgi::hash_map<int, const spot::state*>::iterator i;
+    for (i = state_scc_v_.begin(); i != state_scc_v_.end(); ++i)
+      {
+	if (is_not_accepting(i->second))
+	    remove_acc(i->second);
+      }
+  }
+
+  void
+  tgba_reduc::remove_acc(const spot::state* s)
+  {
+    //std::cout << "remove_acc" << std::endl;
+
+    tgba_explicit::state* s1;
+    seen_map::iterator sm = si_.find(s);
+    sm = si_.find(s);
+    int n = sm->second;
+
+    for (sm == si_.begin(); sm != si_.end(); ++sm)
+      {
+
+	if (sm->second == n)
+	  {
+	    s1 = name_state_map_[tgba_explicit::format_state(s)];
+	    s1 = const_cast<tgba_explicit::state*>(s1);
+	    for (state::iterator i = s1->begin();
+		 i != s1->end(); ++i)
+	      (*i)->acceptance_conditions = bddfalse;
+	  }
+	else
+	  {
+	    // FIXME
+	    /*
+	      tgba_succ_iterator* si = this->succ_iter(sm->first);
+	      spot::state* s2 = si->current_state();
+	      seen_map::iterator sm2 = si_.find(s2);
+	      if (sm2->second == n)
+	      {
+	      s1 = name_state_map_[tgba_explicit::format_state(sm2->first)];
+	      for (state::iterator i = s1->begin();
+	      i != s1->end(); ++i)
+	      (*i)->acceptance_conditions = bddfalse;
+	      }
+	      delete s2;
+	      delete si;
+	    */
+	  }
+
+      }
+  }
+
+  bool
+  tgba_reduc::is_not_accepting(const spot::state* s,
+			       int n)
+  {
+    //std::cout << "is not accepting" << std::endl;
+    bool b = false;
+
+    // First call of is_terminal //
+    seen_map::const_iterator i;
+    if (n == -1)
+      {
+	acc_ = bddfalse;
+	b = true;
+	assert(seen_ == 0);
+	seen_ = new seen_map();
+	i = si_.find(s);
+	assert(i->first != 0);
+	n = i->second;
+      }
+    ///////////////////////////////
+
+    seen_map::const_iterator sm = seen_->find(s);
+    if (sm == seen_->end())
+      {
+	// this state is visited for the first time.
+	seen_->insert(std::pair<const spot::state*, int>(s, 1));
+	i = si_.find(s);
+	assert(i->first != 0);
+	if (n != i->second)
+	    return true;
+      }
+    else
+      // This state is already visited.
+      {
+	delete s;
+	s = 0;
+	return true;
+      }
+
+    spot::state* s2;
+    tgba_succ_iterator* j = this->succ_iter(s);
+    for (j->first(); !j->done(); j->next())
+      {
+	s2 = j->current_state();
+	i = si_.find(s2);
+	assert(i->first != 0);
+	if (n == i->second)
+	  {
+	    acc_ |= j->current_acceptance_conditions();
+	    this->is_not_accepting(s2, n);
+	  }
+      }
+    delete j;
+
+    // First call of is_terminal //
+    if (b)
+      {
+	for (seen_map::iterator i = seen_->begin();
+	     i != seen_->end(); ++i)
+	  {
+	    s2 = const_cast<spot::state*>(i->first);
+	    assert(s2 != 0);
+	    delete dynamic_cast<tgba_explicit*>(s2);
+	  }
+	seen_->clear();
+	delete seen_;
+	seen_ = 0;
+	return acc_ != this->all_acceptance_conditions();
+      }
+    ///////////////////////////////
+
+    return true;
+  }
+
   void
   tgba_reduc::delete_scc()
   {
-    std::cout << "delete_scc" << std::endl;
-
     bool change = true;
     Sgi::hash_map<int, const spot::state*>::iterator i;
-    //Sgi::hash_map<int, const spot::state*>::iterator itmp;
     spot::state* s;
 
     // we check if there is a terminal SCC we can be remove while
@@ -580,21 +730,16 @@ namespace spot
 	change = false;
 	for (i = state_scc_v_.begin(); i != state_scc_v_.end(); ++i)
 	  {
-	    std::cout << "delete_scc : ["
-		      << this->format_state(i->second)
-		      << "]"
-		      << "is_terminal ??" << std::endl;
 	    s = (i->second)->clone();
+
 	    if (is_terminal(s))
 	      {
 		change = true;
-		this->remove_scc(const_cast<spot::state*>(i->second));
+		remove_scc(const_cast<spot::state*>(i->second));
 		state_scc_v_.erase(i);
 		break;
 	      }
-	    //else
 	    delete s;
-	    std::cout << "end is_terminal" << std::endl;
 	  }
       }
   }
@@ -609,11 +754,6 @@ namespace spot
     // the acceptance condition.
     // So we can remove it safely without change the
     // automaton language.
-
-    std::cout << "is_terminal : ["
-	      << this->format_state(s)
-	      << "]"
-	      << std::endl;
 
     bool b = false;
 
@@ -631,25 +771,19 @@ namespace spot
       }
     ///////////////////////////////
 
-    std::cout << "seen_->find" << std::endl;
     seen_map::const_iterator sm = seen_->find(s);
-    std::cout << "seen_->end" << std::endl;
     if (sm == seen_->end())
       {
 	// this state is visited for the first time.
-	std::cout << "first time" << std::endl;
 	seen_->insert(std::pair<const spot::state*, int>(s, 1));
-	std::cout << "seen_->insert" << std::endl;
 	i = si_.find(s);
-	std::cout << "assert" << std::endl;
 	assert(i->first != 0);
 	if (n != i->second)
 	    return false;
       }
     else
-      // This state is already visited.
       {
-	std::cout << "second time" << std::endl;
+	// This state is already visited.
 	delete s;
 	s = 0;
 	return true;
@@ -658,10 +792,8 @@ namespace spot
     bool ret = true;
     spot::state* s2;
     tgba_succ_iterator* j = this->succ_iter(s);
-    int nb_succ = 0;
     for (j->first(); !j->done(); j->next())
       {
-	std::cout << "successor " << nb_succ++ << std::endl;
 	s2 = j->current_state();
 	acc_ |= j->current_acceptance_conditions();
 	ret &= this->is_terminal(s2, n);
@@ -673,24 +805,18 @@ namespace spot
     // First call of is_terminal //
     if (b)
       {
-	std::cout << "if b : begin" << std::endl;
 	for (seen_map::iterator i = seen_->begin();
 	     i != seen_->end(); ++i)
 	  {
-	    std::cout << "delete" << std::endl;
 	    s2 = const_cast<spot::state*>(i->first);
 	    assert(s2 != 0);
 	    delete dynamic_cast<tgba_explicit*>(s2);
 	  }
 	seen_->clear();
-	std::cout << "delete seen_" << std::endl;
 	delete seen_;
-	std::cout << "seen_ = 0" << std::endl;
 	seen_ = 0;
-	std::cout << "acc_ == this->all_acceptance_conditions()" << std::endl;
 	if (acc_ == this->all_acceptance_conditions())
 	  ret = false;
-	std::cout << "if b : end" << nb_succ << std::endl;
       }
     ///////////////////////////////
 
@@ -701,8 +827,6 @@ namespace spot
   tgba_reduc::remove_scc(spot::state* s)
   {
     // To remove a scc, we remove all his state.
-
-    std::cout << "remove_scc" << std::endl;
 
     seen_map::iterator sm = si_.find(s);
     sm = si_.find(s);

@@ -55,6 +55,9 @@ namespace spot
     /// Remove all state which not lead to an accepting cycle.
     void prune_scc();
 
+    /// Remove some useless accepting condition.
+    void prune_acc();
+
     /// Compute the maximal SCC of the automata.
     void compute_scc();
 
@@ -82,6 +85,7 @@ namespace spot
 			  ptr_hash<tgba_explicit::state> > sp_map;
     sp_map state_predecessor_map_;
 
+    // For reduction using scc.
     typedef Sgi::hash_map<const spot::state*, int,
 			  state_ptr_hash, state_ptr_equal> seen_map;
     seen_map si_;
@@ -147,14 +151,23 @@ namespace spot
     bool is_terminal(const spot::state* s,
 		     int n = -1);
 
-    /// For compute_scc.
-    void remove_component(const spot::state* from);
+    // Return false if the scc contains all the accepting condition.
+    bool is_not_accepting(const spot::state* s,
+			  int n = -1);
+
+    /// If a scc maximal do not contains all the accepting condition
+    /// we can remove all the accepting condition in this scc.
+    void remove_acc(const spot::state* s);
 
     /// Remove all the state which belong to the same scc that s.
     void remove_scc(spot::state* s);
 
     /// Same as remove_scc but more efficient.
     void remove_scc_depth_first(spot::state* s, int n = -1);
+
+    /// For compute_scc.
+    void remove_component(const spot::state* from);
+
   };
 }
 

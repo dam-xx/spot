@@ -54,12 +54,14 @@ namespace spot
     bool exist = false;
     for (sn_v::iterator i = lnode_succ->begin();
 	 i != lnode_succ->end(); ++i)
-      if ((*i)->compare(n) == true)
+      if ((*i == n) ||
+	  ((*i)->compare(n) == true))
 	exist = true;
     if (exist)
       return false;
 
     lnode_succ->push_back(n);
+    n->add_pred(this);
     return true;
   }
 
@@ -81,13 +83,16 @@ namespace spot
   void
   spoiler_node::add_pred(spoiler_node* n)
   {
-    bool exist = false;
-    for (sn_v::iterator i = lnode_pred->begin();
-	 i != lnode_pred->end(); ++i)
+    lnode_pred->push_back(n);
+    /*
+      bool exist = false;
+      for (sn_v::iterator i = lnode_pred->begin();
+      i != lnode_pred->end(); ++i)
       if ((*i)->compare(n) == 0)
-	exist = true;
-    if (!exist)
+      exist = true;
+      if (!exist)
       lnode_pred->push_back(n);
+    */
   }
 
   void
@@ -107,8 +112,27 @@ namespace spot
       {
 	not_win |= (*i)->not_win;
       }
+    if (change != not_win)
+      for (Sgi::vector<spoiler_node*>::iterator i = lnode_pred->begin();
+	   i != lnode_pred->end(); ++i)
+	(*i)->set_win();
+
     return change != not_win;
   }
+
+  /*
+  bool
+  spoiler_node::set_win()
+  {
+    bool change = not_win;
+    for (Sgi::vector<spoiler_node*>::iterator i = lnode_succ->begin();
+	 i != lnode_succ->end(); ++i)
+      {
+	not_win |= (*i)->not_win;
+      }
+    return change != not_win;
+  }
+  */
 
   std::string
   spoiler_node::to_string(const tgba* a)
@@ -203,9 +227,35 @@ namespace spot
 	    not_win &= (*i)->not_win;
 	  }
       }
+    if (change != not_win)
+      for (Sgi::vector<spoiler_node*>::iterator i = lnode_pred->begin();
+	   i != lnode_pred->end(); ++i)
+	(*i)->set_win();
 
     return change != not_win;
   }
+
+  /*
+  bool
+  duplicator_node::set_win()
+  {
+    bool change = not_win;
+
+    if (!this->get_nb_succ())
+      not_win = true;
+    else
+      {
+	not_win = true;
+	for (Sgi::vector<spoiler_node*>::iterator i = lnode_succ->begin();
+	     i != lnode_succ->end(); ++i)
+	  {
+	    not_win &= (*i)->not_win;
+	  }
+      }
+
+    return change != not_win;
+  }
+  */
 
   std::string
   duplicator_node::to_string(const tgba* a)
@@ -391,7 +441,7 @@ namespace spot
   // parity_game_graph_direct
 
   void
-  parity_game_graph_direct::build_couple()
+  parity_game_graph_direct::build_graph()
   {
     tgba_succ_iterator* si = 0;
     typedef Sgi::pair<bdd, bdd> couple_bdd;
@@ -541,8 +591,218 @@ namespace spot
       }
   }
 
+  /*
   void
-  parity_game_graph_direct::prune()
+  parity_game_graph_direct::build_couple()
+  {
+    // We build only some "basic" spoiler node.
+    sn_v tab_temp;
+    s_v::iterator i1;
+    for (i1 = tgba_state_.begin(); i1 != tgba_state_.end(); ++i1)
+      {
+
+	// spoiler node are all state couple (i,j)
+	s_v::iterator i2;
+	for (i2 = tgba_state_.begin();
+	     i2 != tgba_state_.end(); ++i2)
+	  {
+	    //std::cout << "add spoiler node" << std::endl;
+	    spoiler_node_delayed* n1
+	      = new spoiler_node_delayed(*i1, *i2,
+					 bddfalse,
+					 nb_node_parity_game++);
+	    spoiler_vertice_.push_back(n1);
+	    tab_temp.push_back(n1);
+	  }
+      }
+
+    sn_v::iterator j;
+    std::ostringstream os;
+    for (j = tab_temp.begin(); j != tab_temp.end(); ++j)
+      build_recurse_successor_spoiler(*j, os);
+
+  }
+
+  void
+  parity_game_graph_direct::
+  build_recurse_successor_spoiler(spoiler_node* sn,
+				  std::ostringstream& os)
+  {
+    //std::cout << os.str() << "build_recurse_successor_spoiler : begin"
+    //<< std::endl;
+
+    tgba_succ_iterator* si = automata_->succ_iter(sn->get_spoiler_node());
+
+    for (si->first(); !si->done(); si->next())
+      {
+
+	bdd btmp = si->current_acceptance_conditions();
+
+	s_v::iterator i1;
+	state* s;
+	for (i1 = tgba_state_.begin();
+	     i1 != tgba_state_.end(); ++i1)
+	  {
+
+	    s  = si->current_state();
+	    if (s->compare(*i1) == 0)
+	      {
+		delete s;
+		duplicator_node* dn
+		  = add_duplicator_node(*i1,
+					sn->get_duplicator_node(),
+					si->current_condition(),
+					btmp,
+					nb_node_parity_game++);
+
+		if (!(sn->add_succ(dn)))
+		    continue;
+
+		std::ostringstream os2;
+		os2 << os.str() << " ";
+		build_recurse_successor_duplicator(dn, sn, os2);
+	      }
+	    else
+	      delete s;
+	  }
+      }
+
+    delete si;
+
+    //std::cout << os.str() << "build_recurse_successor_spoiler : end" <<
+    //std::endl;
+  }
+
+  void
+  parity_game_graph_direct::
+  build_recurse_successor_duplicator(duplicator_node* dn,
+				     spoiler_node* ,
+				     std::ostringstream& os)
+  {
+    //std::cout << "build_recurse_successor_duplicator : begin" << std::endl;
+
+    tgba_succ_iterator* si = automata_->succ_iter(dn->get_duplicator_node());
+
+    for (si->first(); !si->done(); si->next())
+      {
+
+	// if si->current_condition() doesn't implies sn->get_label()
+	// then duplicator can't play.
+	if ((!dn->get_label() | si->current_condition()) != bddtrue)
+	  continue;
+
+	bdd btmp = dn->get_acc() -
+	  (dn->get_acc() & si->current_acceptance_conditions());
+
+	s_v::iterator i1;
+	state* s;
+	for (i1 = tgba_state_.begin();
+	     i1 != tgba_state_.end(); ++i1)
+	  {
+	    s  = si->current_state();
+
+	    if (s->compare(*i1) == 0)
+	      {
+		delete s;
+		spoiler_node* sn_n
+		  = add_spoiler_node(dn->get_spoiler_node(),
+				     *i1,
+				     nb_node_parity_game++);
+
+		if (!(dn->add_succ(sn_n)))
+		  continue;
+
+		std::ostringstream os2;
+		os2 << os.str() << " ";
+		build_recurse_successor_spoiler(sn_n, os2);
+	      }
+	    else
+	      delete s;
+	  }
+      }
+
+    delete si;
+
+    //std::cout << os.str() << "build_recurse_successor_duplicator : end"
+    //<< std::endl;
+  }
+
+  duplicator_node*
+  parity_game_graph_direct::add_duplicator_node(const spot::state* sn,
+						const spot::state* dn,
+						bdd acc,
+						bdd label,
+						int nb)
+  {
+    bool exist = false;
+
+    duplicator_node* dn_n
+      = new duplicator_node(sn, dn, acc, label, nb);
+
+    for (Sgi::vector<duplicator_node*>::iterator i
+	       = duplicator_vertice_.begin();
+	     i != duplicator_vertice_.end(); ++i)
+      {
+	if (dn_n->compare(*i))
+	  {
+	    exist = true;
+	    delete dn_n;
+	    dn_n = *i;
+	    break;
+	  }
+      }
+
+    if (!exist)
+      duplicator_vertice_.push_back(dn_n);
+
+    return dn_n;
+  }
+
+  spoiler_node*
+  parity_game_graph_direct::add_spoiler_node(const spot::state* sn,
+					      const spot::state* dn,
+					      int nb)
+  {
+    bool exist = false;
+
+    spoiler_node* sn_n
+      = new spoiler_node(sn, dn, nb);
+
+    for (Sgi::vector<spoiler_node*>::iterator i
+	   = spoiler_vertice_.begin();
+	 i != spoiler_vertice_.end(); ++i)
+      {
+	if (sn_n->compare(*i))
+	  {
+	    exist = true;
+	    delete sn_n;
+	    sn_n = *i;
+	    break;
+	  }
+      }
+
+    if (!exist)
+	spoiler_vertice_.push_back(sn_n);
+
+    return sn_n;
+  }
+  */
+
+  /*
+  void
+  parity_game_graph_direct::lift()
+  {
+    for (Sgi::vector<spoiler_node*>::iterator i
+	   = spoiler_vertice_.begin();
+	 i != spoiler_vertice_.end(); ++i)
+      {
+	(*i)->set_win();
+      }
+  }
+  */
+
+  void
+  parity_game_graph_direct::lift()
   {
     bool change = true;
 
@@ -562,7 +822,6 @@ namespace spot
 	    change |= (*i)->set_win();
 	  }
       }
-
   }
 
   simulation_relation*
@@ -607,9 +866,9 @@ namespace spot
   parity_game_graph_direct::parity_game_graph_direct(const tgba* a)
     : parity_game_graph(a)
   {
-    this->build_couple();
+    this->build_graph();
     this->build_link();
-    this->prune();
+    this->lift();
   }
 
   ///////////////////////////////////////////////////////////////////////

@@ -425,6 +425,11 @@ namespace spot
 			unop* uo2 = dynamic_cast<unop*>(uo->child());
 			tmpGF->push_back(clone(uo2->child()));
 		      }
+		    else if (is_FG(*i))
+		      {
+			// FG(a) | FG(b) = F(Ga | Gb)
+			tmpFG->push_back(clone(uo->child()));
+		      }
 		    else
 		      {
 			tmpOther->push_back(clone(*i));
@@ -501,8 +506,10 @@ namespace spot
 		destroy(*i);
 	      }
 
-	    delete tmpFG;
-	    tmpFG = 0;
+	    /*
+	      delete tmpFG;
+	      tmpFG = 0;
+	    */
 
 	    break;
 	  }
@@ -546,11 +553,17 @@ namespace spot
 
 	if (tmpFG && tmpFG->size())
 	  {
-	    formula* ftmp
-	      = unop::instance(unop::F,
-			       unop::instance(unop::G,
-					      multop::instance(mo->op(),
-							       tmpFG)));
+	    formula* ftmp = 0;
+	    if (mo->op() == multop::And)
+	      ftmp
+		= unop::instance(unop::F,
+				 unop::instance(unop::G,
+						multop::instance(mo->op(),
+								 tmpFG)));
+	    else
+	      ftmp
+		= unop::instance(unop::F,
+				 multop::instance(mo->op(), tmpFG));
 	    tmpOther->push_back(ftmp);
 	  }
 	else if (tmpFG && !tmpFG->size())

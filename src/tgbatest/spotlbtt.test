@@ -93,15 +93,22 @@ Algorithm
 
 Algorithm
 {
-   Name = "Spot (Couvreur -- FM), post reduction"
+   Name = "Spot (Couvreur -- FM), post reduction with direct simulation"
    Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -R1 -F -f -t'"
    Enabled = yes
 }
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- FM), post reduction with scc"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -R3 -F -f -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM), pre + post reduction"
-   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r4 -R1 -F -f -t'"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r4 -R1 -R3 -F -f -t'"
    Enabled = yes
 }
 

@@ -258,6 +258,8 @@ namespace spot
       {
 	const formula* f1 = bo->first();
 	const formula* f2 = bo->second();
+	const binop* fb = dynamic_cast<const binop*>(f);
+	const unop* fu = dynamic_cast<const unop*>(f);
 	switch (bo->op())
 	  {
 	  case binop::Xor:
@@ -269,6 +271,20 @@ namespace spot
 	      result_ = true;
 	    return;
 	  case binop::R:
+	    if (fb && fb->op() == binop::R)
+	      if (syntactic_implication(fb->first(), f1) &&
+		  syntactic_implication(fb->second(), f2))
+		{
+		  result_ = true;
+		  return;
+		}
+	    if (fu && fu->op() == unop::G)
+	      if (f1 == constant::false_instance() &&
+		  syntactic_implication(fu->child(), f2))
+		{
+		  result_ = true;
+		  return;
+		}
 	    if (syntactic_implication(f, f1)
 		&& syntactic_implication(f, f2))
 	      result_ = true;
@@ -411,7 +427,7 @@ namespace spot
 	    }
 	  case unop::G:
 	    {
-	      /* F(a) = false R a */
+	      /* G(a) = false R a */
 	      const formula* tmp = binop::instance(binop::R,
 						   constant::false_instance(),
 						   clone(f1));
@@ -421,7 +437,7 @@ namespace spot
 		  destroy(tmp);
 		  return;
 		}
-	      if (syntactic_implication(f1, f))
+	      if (syntactic_implication(tmp, f))
 		result_ = true;
 	      destroy(tmp);
 	      return;
@@ -442,6 +458,8 @@ namespace spot
 
 	const formula* f1 = bo->first();
 	const formula* f2 = bo->second();
+	const binop* fb = dynamic_cast<const binop*>(f);
+	const unop* fu = dynamic_cast<const unop*>(f);
 	switch (bo->op())
 	  {
 	  case binop::Xor:
@@ -449,11 +467,33 @@ namespace spot
 	  case binop::Implies:
 	    return;
 	  case binop::U:
+	    /* (a < c) && (c < d) => a U b < c U d */
+	    if (fb && fb->op() == binop::U)
+	      if (syntactic_implication(f1, fb->first()) &&
+		  syntactic_implication(f2, fb->second()))
+		{
+		  result_ = true;
+		  return;
+		}
+	    if (fu && fu->op() == unop::F)
+	      if (f1 == constant::true_instance() &&
+		  syntactic_implication(f2, fu->child()))
+		{
+		  result_ = true;
+		  return;
+		}
 	    if (syntactic_implication(f1, f)
 		&& syntactic_implication(f2, f))
 	      result_ = true;
 	    return;
 	  case binop::R:
+	    if (fu && fu->op() == unop::G)
+	      if (f1 == constant::false_instance() &&
+		  syntactic_implication(f2, fu->child()))
+		{
+		  result_ = true;
+		  return;
+		}
 	    if (syntactic_implication(f2, f))
 	      result_ = true;
 	    return;

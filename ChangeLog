@@ -1,3 +1,20 @@
+2004-06-28  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/tgbatest/reduccmp.test: Bug.
+
+	* src/tgbatest/reductgba.test: More Test.
+
+	* src/tgbatest/ltl2tgba.cc: Adjust ...
+	* src/tgbaalgos/reductgba_sim_del.cc, src/tgbaalgos/reductgba_sim.hh,
+	src/tgbaalgos/reductgba_sim.cc: try to optimize.
+
+	* src/tgba/tgbareduc.hh, src/tgba/tgbareduc.cc: Scc reduction
+	and we remove some acceptance condition in scc which are not accepting.
+	* src/ltlvisit/syntimpl.cc : Some case wasn't detect.
+	* src/ltlvisit/basicreduce.cc: Case FGa || FGb = F(Ga | Gb) added.
+	* src/ltltest/syntimpl.test: More Test.
+	* src/ltltest/syntimpl.cc: Put the formula in negative normal form.
+
 2004-06-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* buddy/: Merge buddy-2-3.

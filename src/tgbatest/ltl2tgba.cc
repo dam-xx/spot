@@ -89,10 +89,10 @@ syntax(char* prog)
 	    << "  -rd  display the reduce formula" << std::endl
 	    << "  -R   same as -r, but as a set" << std::endl
 	    << "  -R1  use direct simulation to reduce the automata "
-	    << "(implies -L)"
+	    << "(use -L for more reduction)"
 	    << std::endl
 	    << "  -R2  use delayed simulation to reduce the automata, incorrect"
-	    << "(implies -L)"
+	    << "(use -L for more reduction)"
 	    << std::endl
 	    << "  -R3  use SCC to reduce the automata"
 	    << std::endl
@@ -294,12 +294,10 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-R1"))
 	{
 	  reduc_aut |= spot::Reduce_Dir_Sim;
-	  fair_loop_approx = true;
 	}
       else if (!strcmp(argv[formula_index], "-R2"))
 	{
 	  reduc_aut |= spot::Reduce_Del_Sim;
-	  fair_loop_approx = true;
 	}
       else if (!strcmp(argv[formula_index], "-R3"))
 	{

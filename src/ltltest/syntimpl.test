@@ -26,6 +26,13 @@
 . ./defs || exit 1
 
 #
+#GFa && GFb && FG(!a && !b)
+run 1 ./syntimpl 0 'a' 'a | b'
+run 1 ./syntimpl 0 'F(a)' 'F(a | b)'
+run 1 ./syntimpl 0 'G(a)' 'G(a | b)'
+run 1 ./syntimpl 0 'GF(a)' 'GF(a | b)'
+run 1 ./syntimpl 0 'GF(a)' '!FG(!a && !b)'
+
 run 1 ./syntimpl 0 'Xa' 'X(b U a)'
 run 1 ./syntimpl 0 'XXa' 'XX(b U a)'
 
