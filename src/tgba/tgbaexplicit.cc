@@ -59,18 +59,21 @@ namespace spot
   state_explicit*
   tgba_explicit_succ_iterator::current_state() const
   {
+    assert(!done());
     return new state_explicit((*i_)->dest);
   }
 
   bdd
   tgba_explicit_succ_iterator::current_condition() const
   {
+    assert(!done());
     return (*i_)->condition;
   }
 
   bdd
   tgba_explicit_succ_iterator::current_acceptance_conditions() const
   {
+    assert(!done());
     return (*i_)->acceptance_conditions & all_acceptance_conditions_;
   }
 
