@@ -1,4 +1,9 @@
-2003-08-15  Alexandre Duret-Lutz  <adl@gnu.org>
+2003-08-18  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* wrap/python/tests/ltl2tgba.test: Run $srcdir/ltl2tgba.py, not
+	ltl2tgba.py.
+
+2003-08-15  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	This implements Couvreur's FM'99 ltl2tgba translation.
 	* src/tgba/bdddict.cc (bdd_dict::is_registered): Split as ...
