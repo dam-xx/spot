@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,21 +19,38 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_TGBAALGOS_DOTTY_HH
-# define SPOT_TGBAALGOS_DOTTY_HH
-
 #include "dottydec.hh"
-#include <iosfwd>
+#include "tgba/tgba.hh"
 
 namespace spot
 {
-  class tgba;
+  dotty_decorator::dotty_decorator()
+  {
+  }
 
-  /// \brief Print reachable states in dot format.
-  std::ostream&
-  dotty_reachable(std::ostream& os,
-		  const tgba* g,
-		  dotty_decorator* dd = dotty_decorator::instance());
+  dotty_decorator::~dotty_decorator()
+  {
+  }
+
+  std::string
+  dotty_decorator::state_decl(const tgba*, const state*, int,
+			      tgba_succ_iterator*, const std::string& label)
+  {
+    return "[label=\"" + label + "\"]";
+  }
+
+  std::string
+  dotty_decorator::link_decl(const tgba*, const state*, int, const state*, int,
+			     const tgba_succ_iterator*,
+			     const std::string& label)
+  {
+    return "[label=\"" + label + "\"]";
+  }
+
+  dotty_decorator*
+  dotty_decorator::instance()
+  {
+    static dotty_decorator d;
+    return &d;
+  }
 }
-
-#endif // SPOT_TGBAALGOS_DOTTY_HH

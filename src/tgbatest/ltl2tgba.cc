@@ -43,6 +43,7 @@
 #include "tgbaalgos/neverclaim.hh"
 #include "tgbaalgos/reductgba_sim.hh"
 #include "tgbaalgos/replayrun.hh"
+#include "tgbaalgos/rundotdec.hh"
 
 void
 syntax(char* prog)
@@ -65,6 +66,7 @@ syntax(char* prog)
             << "  -f    use Couvreur's FM algorithm for translation"
 	    << std::endl
             << "  -F    read the formula from the file" << std::endl
+	    << "  -g    graph the accepting run on the automaton (requires -e)"
             << "  -L    fair-loop approximation (implies -f)" << std::endl
 	    << "  -N    display the never clain for Spin "
 	    << "(implies -D)" << std::endl
@@ -147,6 +149,7 @@ main(int argc, char** argv)
   bool display_parity_game = false;
   bool post_branching = false;
   bool fair_loop_approx = false;
+  bool graph_run_opt = false;
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* unobservables = 0;
 
@@ -198,6 +201,10 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-F"))
 	{
 	  file_opt = true;
+	}
+      else if (!strcmp(argv[formula_index], "-g"))
+	{
+	  graph_run_opt = true;
 	}
       else if (!strcmp(argv[formula_index], "-L"))
 	{
@@ -345,6 +352,12 @@ main(int argc, char** argv)
 	  std::cerr << "unknown emptiness-check: " << echeck_algo << std::endl;
 	  syntax(argv[0]);
 	}
+    }
+
+  if (graph_run_opt && (echeck_algo == "" || !expect_counter_example))
+    {
+      std::cerr << argv[0] << ": error: -g requires -e." << std::endl;
+      exit(1);
     }
 
   std::string input;
@@ -561,7 +574,8 @@ main(int argc, char** argv)
 	  do
 	    {
 	      spot::emptiness_check_result* res = ec->check();
-	      ec->print_stats(std::cout);
+	      if (!graph_run_opt)
+		ec->print_stats(std::cout);
 	      if (expect_counter_example != !!res)
 		exit_code = 1;
 
@@ -580,9 +594,17 @@ main(int argc, char** argv)
 		    }
 		  else
 		    {
-		      spot::print_tgba_run(std::cout, ec_a, run);
-		      if (!spot::replay_tgba_run(std::cout, ec_a, run))
-			exit_code = 1;
+		      if (graph_run_opt)
+			{
+			  spot::tgba_run_dotty_decorator deco(run);
+			  spot::dotty_reachable(std::cout, ec_a, &deco);
+			}
+		      else
+			{
+			  spot::print_tgba_run(std::cout, ec_a, run);
+			  if (!spot::replay_tgba_run(std::cout, ec_a, run))
+			    exit_code = 1;
+			}
 		      delete run;
 		    }
 		}

@@ -33,8 +33,8 @@ namespace spot
     class dotty_bfs : public tgba_reachable_iterator_breadth_first
     {
     public:
-      dotty_bfs(const tgba* a, std::ostream& os)
-	: tgba_reachable_iterator_breadth_first(a), os_(os)
+      dotty_bfs(std::ostream& os, const tgba* a, dotty_decorator* dd)
+	: tgba_reachable_iterator_breadth_first(a), os_(os), dd_(dd)
       {
       }
 
@@ -53,34 +53,41 @@ namespace spot
       }
 
       void
-      process_state(const state* s, int n, tgba_succ_iterator*)
+      process_state(const state* s, int n, tgba_succ_iterator* si)
       {
-	os_ << "  " << n << " [label=\"";
-	escape_str(os_, automata_->format_state(s)) << "\"]" << std::endl;
+	os_ << "  " << n << " "
+	    << dd_->state_decl(automata_, s, n, si,
+			       escape_str(automata_->format_state(s)))
+	    << std::endl;
       }
 
       void
-      process_link(const state*, int in,
-		   const state*, int out, const tgba_succ_iterator* si)
+      process_link(const state* in_s, int in,
+		   const state* out_s, int out, const tgba_succ_iterator* si)
       {
-	os_ << "  " << in << " -> " << out << " [label=\"";
-	escape_str(os_, bdd_format_formula(automata_->get_dict(),
-					   si->current_condition())) << "\\n";
-	escape_str(os_,
-		   bdd_format_accset(automata_->get_dict(),
-				     si->current_acceptance_conditions()))
-	  << "\"]" << std::endl;
+	std::string label =
+	  bdd_format_formula(automata_->get_dict(),
+			     si->current_condition())
+	  + "\n"
+	  + bdd_format_accset(automata_->get_dict(),
+			      si->current_acceptance_conditions());
+
+	os_ << "  " << in << " -> " << out << " "
+	    << dd_->link_decl(automata_, in_s, in, out_s, out, si,
+			      escape_str(label))
+	    << std::endl;
       }
 
     private:
       std::ostream& os_;
+      dotty_decorator* dd_;
     };
   }
 
   std::ostream&
-  dotty_reachable(std::ostream& os, const tgba* g)
+  dotty_reachable(std::ostream& os, const tgba* g, dotty_decorator* dd)
   {
-    dotty_bfs d(g, os);
+    dotty_bfs d(os, g, dd);
     d.run();
     return os;
   }

@@ -25,18 +25,24 @@
 
 set -e
 
+expect_ce_do()
+{
+  run 0 ./ltl2tgba "$@"
+  run 0 ./ltl2tgba -g "$@"
+}
+
 expect_ce()
 {
-  run 0 ./ltl2tgba -e "$1"
-  run 0 ./ltl2tgba -e -D "$1"
-  run 0 ./ltl2tgba -e -f "$1"
-  run 0 ./ltl2tgba -e -f -D "$1"
-  run 0 ./ltl2tgba -ecouvreur99_shy "$1"
-  run 0 ./ltl2tgba -ecouvreur99_shy -D "$1"
-  run 0 ./ltl2tgba -ecouvreur99_shy -f "$1"
-  run 0 ./ltl2tgba -ecouvreur99_shy -f -D "$1"
-  run 0 ./ltl2tgba -emagic_search "$1"
-  run 0 ./ltl2tgba -emagic_search -f "$1"
+  expect_ce_do -e "$1"
+  expect_ce_do -e -D "$1"
+  expect_ce_do -e -f "$1"
+  expect_ce_do -e -f -D "$1"
+  expect_ce_do -ecouvreur99_shy "$1"
+  expect_ce_do -ecouvreur99_shy -D "$1"
+  expect_ce_do -ecouvreur99_shy -f "$1"
+  expect_ce_do -ecouvreur99_shy -f -D "$1"
+  expect_ce_do -emagic_search "$1"
+  expect_ce_do -emagic_search -f "$1"
 }
 
 expect_no()

@@ -28,6 +28,7 @@ tgbaalgosdir = $(pkgincludedir)/tgbaalgos
 
 tgbaalgos_HEADERS = \
   dotty.hh \
+  dottydec.hh \
   dupexp.hh \
   emptiness.hh \
   lbtt.hh \
@@ -39,6 +40,7 @@ tgbaalgos_HEADERS = \
   projrun.hh \
   reachiter.hh \
   replayrun.hh \
+  rundotdec.hh \
   save.hh \
   stats.hh \
   reductgba_sim.hh
@@ -46,6 +48,7 @@ tgbaalgos_HEADERS = \
 noinst_LTLIBRARIES = libtgbaalgos.la
 libtgbaalgos_la_SOURCES = \
   dotty.cc \
+  dottydec.cc \
   dupexp.cc \
   emptiness.cc \
   lbtt.cc \
@@ -57,6 +60,7 @@ libtgbaalgos_la_SOURCES = \
   projrun.cc \
   reachiter.cc \
   replayrun.cc \
+  rundotdec.cc \
   save.cc \
   stats.cc \
   reductgba_sim.cc \
