@@ -6,6 +6,9 @@
 %import "buddy.i"
 
 %{
+#include <iostream>
+#include <fstream>
+
 #include "ltlast/formula.hh"
 #include "ltlast/refformula.hh"
 #include "ltlast/atomic_prop.hh"
@@ -118,6 +121,17 @@ using namespace spot;
     return spot::ltl::to_string(self);
   }
 
+}
+
+%nodefault std::ostream;
+namespace std {
+  class ostream {};
+  class ofstream : public ostream
+  {
+  public:
+     ofstream(const char *fn);
+     ~ofstream();
+  };
 }
 
 %inline %{
