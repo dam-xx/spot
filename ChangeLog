@@ -1,5 +1,10 @@
 2004-12-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/misc/random.hh (nrand, bmrand, prand): New functions.
+	(barand): New class.
+	* src/misc/random.cc (nrand, bmrand, prand): New functions.
+	* wrap/python/spot.i: Process src/misc/random.hh.
+
 	* src/misc/timer.cc: Do not include cassert, then.
 
 2004-12-07  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>

@@ -36,6 +36,7 @@
 #include "misc/bddalloc.hh"
 #include "misc/minato.hh"
 #include "misc/modgray.hh"
+#include "misc/random.hh"
 
 #include "ltlast/formula.hh"
 #include "ltlast/refformula.hh"
@@ -95,6 +96,7 @@ using namespace spot;
 %include "misc/version.hh"
 %include "misc/bddalloc.hh"
 %include "misc/minato.hh"
+%include "misc/random.hh"
 
 %feature("director") spot::loopless_modular_mixed_radix_gray_code;
 %include "misc/modgray.hh"
