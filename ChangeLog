@@ -1,3 +1,13 @@
+2004-11-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+	    Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/tgbaalgos/minimizerun.hh, src/tgbaalgos/minimizerun.cc: New
+	files.
+	* src/tgbaalgos/Makefile.am (tgbaalgos_HEADERS,
+	libtgbaalgos_la_SOURCES): Add them/
+	* src/tgbatest/randtgba.cc, src/tgbatest/ltl2tgba.cc: Add option -m.
+	* src/tgbatest/emptchkr.test: Use -m.
+
 2004-11-25  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/magic.cc, src/tgbaalgos/magic.hh,

@@ -39,6 +39,7 @@
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/gv04.hh"
 #include "tgbaalgos/magic.hh"
+#include "tgbaalgos/minimizerun.hh"
 #include "tgbaalgos/se05.hh"
 #include "tgbaalgos/tau03.hh"
 #include "tgbaalgos/tau03opt.hh"
@@ -60,13 +61,15 @@ syntax(char* prog)
 	    << "  -e N    compare result of all "
 	    << "emptiness checks on N randomly generated graphs" << std::endl
 	    << "  -g      output in dot format" << std::endl
+	    << "  -m      try to minimize runs, in a second pass (implies -r)"
+	    << std::endl
 	    << "  -n N    number of nodes of the graph [20]" << std::endl
 	    << "  -r      compute and replay acceptance runs (implies -e)"
 	    << std::endl
 	    << "  -s N    seed for the random number generator" << std::endl
 	    << "  -t F    probability of the atomic propositions to be true"
 	    << " [0.5]" << std::endl
-	    << "  -z      display statistics about computed counter-examples"
+	    << "  -z      display statistics about computed accepting runs"
 	    << std::endl
 	    << "  -Z      like -z, but print extra statistics after the run"
 	    << " of each algorithm" << std::endl
@@ -149,7 +152,7 @@ struct ec_stat
   }
 };
 
-struct ce_stat
+struct ar_stat
 {
   int min_prefix;
   int max_prefix;
@@ -161,7 +164,7 @@ struct ce_stat
   int max_run;
   int n;
 
-  ce_stat()
+  ar_stat()
     : n(0)
   {
   }
@@ -191,6 +194,74 @@ struct ce_stat
   }
 };
 
+typedef std::map<std::string, ec_stat> ec_stats_type;
+ec_stats_type ec_stats;
+
+typedef std::map<std::string, ar_stat> ar_stats_type;
+ar_stats_type ar_stats;		// Statistics about accepting runs.
+ar_stats_type mar_stats;        // ... about minimized accepting runs.
+
+void
+print_ar_stats(ar_stats_type& ar_stats)
+{
+      std::cout << std::setw(32) << ""
+		<< " |       prefix      |       cycle       |"
+		<< std::endl << std::setw(32) << "algorithm"
+		<< " |  min < mean < max |  min < mean < max |   n "
+		<< std::endl
+		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl << std::setprecision(3);
+      for (ar_stats_type::const_iterator i = ar_stats.begin();
+	   i != ar_stats.end(); ++i)
+	std::cout << std::setw(32) << i->first << " |"
+		  << std::setw(5) << i->second.min_prefix
+		  << " "
+		  << std::setw(6)
+		  << static_cast<float>(i->second.tot_prefix) / i->second.n
+		  << " "
+		  << std::setw(5) << i->second.max_prefix
+		  << " |"
+		  << std::setw(5) << i->second.min_cycle
+		  << " "
+		  << std::setw(6)
+		  << static_cast<float>(i->second.tot_cycle) / i->second.n
+		  << " "
+		  << std::setw(5) << i->second.max_cycle
+		  << " |"
+		  << std::setw(5) << i->second.n
+		  << std::endl;
+      std::cout << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl
+		<< std::setw(32) << ""
+		<< " |        runs       |       total      |"
+		<< std::endl << std::setw(32) << "algorithm"
+		<< " |  min < mean < max | pre.  cyc.  runs |   n "
+		<< std::endl
+		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl;
+      for (ar_stats_type::const_iterator i = ar_stats.begin();
+	   i != ar_stats.end(); ++i)
+	std::cout << std::setw(32) << i->first << " |"
+		  << std::setw(5)
+		  << i->second.min_run
+		  << " "
+		  << std::setw(6)
+		  << static_cast<float>(i->second.tot_prefix
+					+ i->second.tot_cycle) / i->second.n
+		  << " "
+		  << std::setw(5)
+		  << i->second.max_run
+		  << " |"
+		  << std::setw(5) << i->second.tot_prefix
+		  << " "
+		  << std::setw(5) << i->second.tot_cycle
+		  << " "
+		  << std::setw(5) << i->second.tot_prefix + i->second.tot_cycle
+		  << " |"
+		  << std::setw(5) << i->second.n
+		  << std::endl;
+}
+
 int
 main(int argc, char** argv)
 {
@@ -206,17 +277,12 @@ main(int argc, char** argv)
   bool opt_dot = false;
   int opt_ec = 0;
   int opt_ec_seed = 0;
+  bool opt_minim = false;
   bool opt_replay = false;
   bool opt_degen = false;
   int argn = 0;
 
   int exit_code = 0;
-
-  typedef std::map<std::string, ec_stat> ec_stats_type;
-  ec_stats_type ec_stats;
-
-  typedef std::map<std::string, ce_stat> ce_stats_type;
-  ce_stats_type ce_stats;
 
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* ap = new spot::ltl::atomic_prop_set;
@@ -254,6 +320,13 @@ main(int argc, char** argv)
       else if (!strcmp(argv[argn], "-g"))
 	{
 	  opt_dot = true;
+	}
+      else if (!strcmp(argv[argn], "-m"))
+	{
+	  opt_minim = true;
+	  opt_replay = true;
+	  if (!opt_ec)
+	    opt_ec = 1;
 	}
       else if (!strcmp(argv[argn], "-n"))
 	{
@@ -340,11 +413,11 @@ main(int argc, char** argv)
 	      spot::tgba* d = opt_n_acc > 1 ? degen : a;
 
 	      ec_obj.push_back(spot::explicit_magic_search(d));
-	      ec_name.push_back("explicit_magic");
+	      ec_name.push_back("explicit_magic_search");
 	      ec_safe.push_back(true);
 
 	      ec_obj.push_back(spot::bit_state_hashing_magic_search(d, 4096));
-	      ec_name.push_back("bit_state_hashing_magic");
+	      ec_name.push_back("bit_state_hashing_magic_search");
 	      ec_safe.push_back(false);
 
 	      ec_obj.push_back(spot::explicit_se05_search(d));
@@ -390,7 +463,7 @@ main(int argc, char** argv)
 		ec_stats[algo].count(ecs);
 	      if (res)
 		{
-		  std::cout << "accepting run exists";
+		  std::cout << "acc. run";
 		  ++n_non_empty;
 		  if (opt_replay)
 		    {
@@ -405,19 +478,45 @@ main(int argc, char** argv)
 			    }
 			  else
 			    {
-			      std::cout << ", computed OK";
+			      std::cout << ", computed";
 			      if (opt_z)
-				ce_stats[algo].count(run);
+				ar_stats[algo].count(run);
 			    }
 			  if (opt_z)
 			    std::cout << " [" << run->prefix.size()
-				      << " + " << run->cycle.size()
+				      << "+" << run->cycle.size()
 				      << "]";
+
+			  if (opt_minim)
+			    {
+			      spot::tgba_run* minrun =
+				spot::minimize_run(a, run);
+			      if (!spot::replay_tgba_run(s, res->automaton(),
+							 minrun))
+				{
+				  std::cout << ", but could not replay "
+					    << "its minimization (ERROR!)";
+				  failed_seeds.insert(opt_ec_seed);
+				}
+			      else
+				{
+				  std::cout << ", minimized";
+				  if (opt_z)
+				    mar_stats[algo].count(minrun);
+				}
+			      if (opt_z)
+				{
+				  std::cout << " [" << minrun->prefix.size()
+					    << "+" << minrun->cycle.size()
+					    << "]";
+				}
+			      delete minrun;
+			    }
 			  delete run;
 			}
 		      else
 			{
-			  std::cout << ", not computed";
+			  std::cout << " exists, not computed";
 			}
 		    }
 		  std::cout << std::endl;
@@ -519,66 +618,17 @@ main(int argc, char** argv)
 		  << std::endl;
     }
 
-  if (!ce_stats.empty())
+  if (!ar_stats.empty())
     {
-      std::cout << "Statistics about counter-examples:" << std::endl;
-      std::cout << std::setw(32) << ""
-		<< " |       prefix      |       cycle       |"
-		<< std::endl << std::setw(32) << "algorithm"
-		<< " |  min < mean < max |  min < mean < max |   n "
-		<< std::endl
-		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl << std::setprecision(3);
-      for (ce_stats_type::const_iterator i = ce_stats.begin();
-                                                i != ce_stats.end(); ++i)
-	std::cout << std::setw(32) << i->first << " |"
-		  << std::setw(5) << i->second.min_prefix
-		  << " "
-		  << std::setw(6)
-		  << static_cast<float>(i->second.tot_prefix) / i->second.n
-		  << " "
-		  << std::setw(5) << i->second.max_prefix
-		  << " |"
-		  << std::setw(5) << i->second.min_cycle
-		  << " "
-		  << std::setw(6)
-		  << static_cast<float>(i->second.tot_cycle) / i->second.n
-		  << " "
-		  << std::setw(5) << i->second.max_cycle
-		  << " |"
-		  << std::setw(5) << i->second.n
-		  << std::endl;
-      std::cout << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl
-		<< std::setw(32) << ""
-		<< " |        runs       |       total      |"
-		<< std::endl << std::setw(32) << "algorithm"
-		<< " |  min < mean < max | pre.  cyc.  runs |   n "
-		<< std::endl
-		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl;
-      for (ce_stats_type::const_iterator i = ce_stats.begin();
-                                                i != ce_stats.end(); ++i)
-	std::cout << std::setw(32) << i->first << " |"
-		  << std::setw(5)
-		  << i->second.min_run
-		  << " "
-		  << std::setw(6)
-		  << static_cast<float>(i->second.tot_prefix
-					+ i->second.tot_cycle) / i->second.n
-		  << " "
-		  << std::setw(5)
-		  << i->second.max_run
-		  << " |"
-		  << std::setw(5) << i->second.tot_prefix
-		  << " "
-		  << std::setw(5) << i->second.tot_cycle
-		  << " "
-		  << std::setw(5) << i->second.tot_prefix + i->second.tot_cycle
-		  << " |"
-		  << std::setw(5) << i->second.n
-		  << std::endl;
-
+      std::cout << std::endl
+		<< "Statistics about accepting runs:" << std::endl;
+      print_ar_stats(ar_stats);
+    }
+  if (!mar_stats.empty())
+    {
+      std::cout << std::endl
+		<< "Statistics about minimized accepting runs:" << std::endl;
+      print_ar_stats(mar_stats);
     }
 
   if (!failed_seeds.empty())
