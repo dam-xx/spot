@@ -74,7 +74,7 @@ namespace spot
     /// Remove all state which not lead to an accepting cycle.
     void prune_scc();
 
-    /// Remove some useless accepting condition.
+    /// Remove some useless acceptance condition.
     void prune_acc();
 
     /// Compute the maximal SCC of the automata.
@@ -172,12 +172,12 @@ namespace spot
     bool is_terminal(const spot::state* s,
 		     int n = -1);
 
-    // Return false if the scc contains all the accepting condition.
+    // Return false if the scc contains all the acceptance conditions.
     bool is_not_accepting(const spot::state* s,
 			  int n = -1);
 
-    /// If a scc maximal do not contains all the accepting condition
-    /// we can remove all the accepting condition in this scc.
+    /// If a scc maximal do not contains all the acceptance conditions
+    /// we can remove all the acceptance conditions in this scc.
     void remove_acc(const spot::state* s);
 
     /// Remove all the state which belong to the same scc that s.

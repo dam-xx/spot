@@ -44,14 +44,14 @@ namespace spot
     enum color {WHITE, BLUE, RED};
 
     /// \brief Emptiness checker on spot::tgba automata having at most one
-    /// accepting condition (i.e. a TBA).
+    /// acceptance condition (i.e. a TBA).
     template <typename heap>
     class magic_search_ : public emptiness_check, public ec_statistics
     {
     public:
       /// \brief Initialize the Magic Search algorithm on the automaton \a a
       ///
-      /// \pre The automaton \a a must have at most one accepting
+      /// \pre The automaton \a a must have at most one acceptance
       /// condition (i.e. it is a TBA).
       magic_search_(const tgba *a, size_t size, option_map o = option_map())
         : emptiness_check(a, o),
@@ -175,7 +175,7 @@ namespace spot
       /// State targeted by the red dfs.
       const state* target;
 
-      /// The unique accepting condition of the automaton \a a.
+      /// The unique acceptance condition of the automaton \a a.
       bdd all_cond;
 
       bool dfs_blue()

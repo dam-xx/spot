@@ -52,7 +52,7 @@ namespace spot
 
     struct gv04: public emptiness_check, public ec_statistics
     {
-      // The unique accepting condition of the automaton \a a,
+      // The unique acceptance condition of the automaton \a a,
       // or bddfalse if there is no.
       bdd accepting;
 

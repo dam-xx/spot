@@ -34,7 +34,7 @@ namespace spot
 
   /// \brief Returns an emptiness checker on the spot::tgba automaton \a a.
   ///
-  /// \pre The automaton \a a must have at least one accepting condition.
+  /// \pre The automaton \a a must have at least one acceptance condition.
   ///
   /// During the visit of \a a, the returned checker stores explicitely all
   /// the traversed states. The implemented algorithm is the following:

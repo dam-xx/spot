@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -59,7 +59,7 @@ namespace spot
     /// a and \c b, we'll return <tt>(Acc[a]\&!Acc[b]\&!Acc[c]) \c | \c
     /// (!Acc[a]\&Acc[b]\&!Acc[c])</tt>.
     ///
-    /// Accepting conditions are attributed to transitions and are
+    /// Acceptance conditions are attributed to transitions and are
     /// only concerned by atomic propositions (which label the
     /// transitions) and Next variables (the destination).  Typically,
     /// a transition should bear the variable \c Acc[b] if it doesn't

@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -415,11 +415,11 @@ namespace spot
 	  }
       }
 
-    // FIXME
-    // Be careful, we have to stock on s2 the accepting condition on the arc
+    // FIXME:
+    // Be careful, we have to stock on s2 the acceptance condition on the arc
     // leaving s1 (possible when the simulation is delayed). Since s2 simulate
     // s1, s2 has some label whose implies these of s1, so we can put the
-    // accepting conditions on this arcs.
+    // acceptance conditions on this arcs.
     for (tgba_explicit::state::const_iterator j = s1->begin();
 	 j != s1->end(); ++j)
       {

@@ -35,13 +35,13 @@ namespace spot
 
   /// \brief Returns an emptiness checker on the spot::tgba automaton \a a.
   ///
-  /// \pre The automaton \a a must have at most one accepting condition (i.e.
+  /// \pre The automaton \a a must have at most one acceptance condition (i.e.
   /// it is a TBA).
   ///
   /// During the visit of \a a, the returned checker stores explicitely all
   /// the traversed states.
   /// The method \a check() of the checker can be called several times
-  /// (until it returns a null pointer) to enumerate all the visited accepting
+  /// (until it returns a null pointer) to enumerate all the visited acceptance
   /// paths. The implemented algorithm is the following:
   ///
   /// \verbatim
@@ -101,7 +101,7 @@ namespace spot
 
   /// \brief Returns an emptiness checker on the spot::tgba automaton \a a.
   ///
-  /// \pre The automaton \a a must have at most one accepting condition (i.e.
+  /// \pre The automaton \a a must have at most one acceptance condition (i.e.
   /// it is a TBA).
   ///
   /// During the visit of \a a, the returned checker does not store explicitely

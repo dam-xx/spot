@@ -38,6 +38,11 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
 
     fail=false
 
+    # Check this before stripping comments and strings.
+    grep -i 'accepting cond' $file &&
+      diag 'accepting -> acceptance'
+
+    # Strip comments and strings.
     sed 's,[	 ]*//.*,,;s,"[^"]*","",g' < $file > $tmp
 
     grep '[	 ]$' $tmp &&

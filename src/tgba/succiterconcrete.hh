@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -64,7 +64,7 @@ namespace spot
 			///         atomic proposition and Next variables.
     bdd current_state_;	///< \brief Current successor, as a
 			///         conjunction of Now variables.
-    bdd current_acc_;   ///< \brief Accepting conditions for the current
+    bdd current_acc_;   ///< \brief Acceptance conditions for the current
 			///         transition.
   };
 }

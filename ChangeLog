@@ -1,5 +1,17 @@
 2005-02-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/sanity/style.test: Catch occurrences of "accepting condition".
+	* bench/emptchk/ltl-human.sh, bench/emptchk/ltl-random.sh,
+	src/sanity/style.test, src/tgba/bdddict.cc,
+	src/tgba/succiterconcrete.hh, src/tgba/tgbabddcoredata.hh,
+	src/tgba/tgbareduc.cc, src/tgba/tgbareduc.hh,
+	src/tgbaalgos/gv04.cc, src/tgbaalgos/gv04.hh,
+	src/tgbaalgos/magic.cc, src/tgbaalgos/magic.hh,
+	src/tgbaalgos/se05.cc, src/tgbaalgos/se05.hh,
+	src/tgbaalgos/tau03.cc, src/tgbaalgos/tau03.hh,
+	src/tgbaalgos/tau03opt.cc, src/tgbaalgos/tau03opt.hh,
+	src/tgbatest/dfs.test: Replace them by "acceptance condition".
+
 	* src/tgbaalgos/tau03opt.hh, src/tgbaalgos/tau03.hh: Include
 	misc/optionmap.hh.
 

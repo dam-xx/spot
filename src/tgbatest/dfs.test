@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -26,7 +26,7 @@
 set -e
 
 # All examples are TBA (i.e. they have a unique
-# accepting condition). Accepting arcs are
+# acceptance condition). Accepting arcs are
 # represented by double arrows.
 #
 # s1=>s2->s3->(large composant from s4 to s9)

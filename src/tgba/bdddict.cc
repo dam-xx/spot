@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -308,7 +308,7 @@ namespace spot
 	os << "  " << fi->second + 1 << " (x" << refs << "): Next[";
 	to_string(fi->first, os) << "]" << std::endl;
       }
-    os << "Accepting Conditions:" << std::endl;
+    os << "Acceptance Conditions:" << std::endl;
     for (fi = acc_map.begin(); fi != acc_map.end(); ++fi)
       {
 	os << "  " << fi->second << " (x"

@@ -32,7 +32,7 @@ namespace spot
   /// \brief Emptiness check based on Geldenhuys and Valmari's
   /// TACAS'04 paper.
   /// \ingroup emptiness_check_algorithms
-  /// \pre The automaton \a a must have at most one accepting condition.
+  /// \pre The automaton \a a must have at most one acceptance condition.
   ///
   /// The original algorithm, coming from the following paper, has only
   /// been slightly modified to work on transition-based automata.

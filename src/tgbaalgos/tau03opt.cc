@@ -57,7 +57,7 @@ namespace spot
     enum color {WHITE, CYAN, BLUE};
 
     /// \brief Emptiness checker on spot::tgba automata having at most one
-    /// accepting condition (i.e. a TBA).
+    /// acceptance condition (i.e. a TBA).
     template <typename heap>
     class tau03_opt_search : public emptiness_check, public ec_statistics
     {
@@ -160,7 +160,7 @@ namespace spot
       /// by the last dfs visiting it.
       heap h;
 
-      /// The unique accepting condition of the automaton \a a.
+      /// The unique acceptance condition of the automaton \a a.
       bdd all_acc;
 
       /// Whether to use the "condition stack".

@@ -35,7 +35,7 @@ namespace spot
 
   /// \brief Returns an emptiness check on the spot::tgba automaton \a a.
   ///
-  /// \pre The automaton \a a must have at most one accepting condition (i.e.
+  /// \pre The automaton \a a must have at most one acceptance condition (i.e.
   /// it is a TBA).
   ///
   /// During the visit of \a a, the returned checker stores explicitely all
@@ -105,7 +105,7 @@ namespace spot
                                         option_map o = option_map());
   /// \brief Returns an emptiness checker on the spot::tgba automaton \a a.
   ///
-  /// \pre The automaton \a a must have at most one accepting condition (i.e.
+  /// \pre The automaton \a a must have at most one acceptance condition (i.e.
   /// it is a TBA).
   ///
   /// During the visit of \a a, the returned checker does not store explicitely
