@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddop.c,v 1.6 2003/05/22 12:09:20 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddop.c,v 1.7 2003/07/17 14:09:04 aduret Exp $
   FILE:  bddop.c
   DESCR: BDD operators
   AUTH:  Jorn Lind
@@ -62,6 +62,12 @@
 #define CACHEID_APPEX        0x3
 #define CACHEID_APPAL        0x4
 #define CACHEID_APPUN        0x5
+#define CACHEID_EXISTC       0x6
+#define CACHEID_FORALLC      0x7
+#define CACHEID_UNIQUEC      0x8
+#define CACHEID_APPEXC       0x9
+#define CACHEID_APPALC       0xA
+#define CACHEID_APPUNC       0xB
 
 
    /* Number of boolean operators */
@@ -89,6 +95,7 @@ static int appexop;                 /* Current operator for appex */
 static int appexid;                 /* Current cache id for appex */
 static int quantid;                 /* Current cache id for quantifications */
 static int *quantvarset;            /* Current variable set for quant. */
+static int quantvarsetcomp;         /* Should quantvarset be complemented?  */
 static int quantvarsetID;           /* Current id used in quantvarset */
 static int quantlast;               /* Current last variable to be quant. */
 static int replaceid;               /* Current cache id for replace */
@@ -140,7 +147,7 @@ static double satcount_rec(int);
 static double satcountln_rec(int);
 static void   varprofile_rec(int);
 static double bdd_pathcount_rec(BDD);
-static int    varset2vartable(BDD);
+static int    varset2vartable(BDD, int);
 static int    varset2svartable(BDD);
 
 
@@ -164,8 +171,10 @@ static int    varset2svartable(BDD);
 
 #define log1p(a) (log(1.0+a))
 
-#define INVARSET(a) (quantvarset[a] == quantvarsetID) /* unsigned check */
-#define INSVARSET(a) (abs(quantvarset[a]) == quantvarsetID) /* signed check */
+/* unsigned check */
+#define INVARSET(a) ((quantvarset[a] == quantvarsetID) ^ quantvarsetcomp)
+/* signed check */
+#define INSVARSET(a) (abs(quantvarset[a]) == quantvarsetID)
 
 /*************************************************************************
   Setup and shutdown
@@ -1532,17 +1541,7 @@ static BDD simplify_rec(BDD f, BDD d)
 
 /*=== QUANTIFICATION ===================================================*/
 
-/*
-NAME    {* bdd\_exist *}
-SECTION {* operator *}
-SHORT   {* existential quantification of variables *}
-PROTO   {* BDD bdd_exist(BDD r, BDD var) *}
-DESCR   {* Removes all occurences in {\tt r} of variables in the set
-	   {\tt var} by existential quantification. *}
-ALSO    {* bdd\_forall, bdd\_unique, bdd\_makeset *}
-RETURN  {* The quantified BDD. *}
-*/
-BDD bdd_exist(BDD r, BDD var)
+static BDD quantify(BDD r, BDD var, int op, int comp, int id)
 {
    BDD res;
    firstReorder = 1;
@@ -1550,18 +1549,18 @@ BDD bdd_exist(BDD r, BDD var)
    CHECKa(r, bddfalse);
    CHECKa(var, bddfalse);
 
-   if (var < 2)  /* Empty set */
+   if (var < 2 && !comp)  /* Empty set */
       return r;
 
  again:
    if (setjmp(bddexception) == 0)
    {
-      if (varset2vartable(var) < 0)
+      if (varset2vartable(var, comp) < 0)
 	 return bddfalse;
 
       INITREF;
-      quantid = (var << 3) | CACHEID_EXIST; /* FIXME: range */
-      applyop = bddop_or;
+      quantid = (var << 4) | id; /* FIXME: range */
+      applyop = op;
 
       if (!firstReorder)
 	 bdd_disable_reorder();
@@ -1582,6 +1581,36 @@ BDD bdd_exist(BDD r, BDD var)
    return res;
 }
 
+/*
+NAME    {* bdd\_exist *}
+SECTION {* operator *}
+SHORT   {* existential quantification of variables *}
+PROTO   {* BDD bdd_exist(BDD r, BDD var) *}
+DESCR   {* Removes all occurences in {\tt r} of variables in the set
+	   {\tt var} by existential quantification. *}
+ALSO    {* bdd\_existcomp, bdd\_forall, bdd\_forallcomp, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
+RETURN  {* The quantified BDD. *}
+*/
+BDD bdd_exist(BDD r, BDD var)
+{
+   return quantify(r, var, bddop_or, 0, CACHEID_EXIST);
+}
+
+/*
+NAME    {* bdd\_existcomp *}
+SECTION {* operator *}
+SHORT   {* existential quantification of other variables *}
+PROTO   {* BDD bdd_existcomp(BDD r, BDD var) *}
+DESCR   {* Removes all occurences in {\tt r} of variables not in the set
+	   {\tt var} by existential quantification. *}
+ALSO    {* bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_forallcomp, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
+RETURN  {* The quantified BDD. *}
+*/
+BDD bdd_existcomp(BDD r, BDD var)
+{
+   return quantify(r, var, bddop_or, 1, CACHEID_EXISTC);
+}
+
 
 /*
 NAME    {* bdd\_forall *}
@@ -1590,47 +1619,27 @@ SHORT   {* universal quantification of variables *}
 PROTO   {* BDD bdd_forall(BDD r, BDD var) *}
 DESCR   {* Removes all occurences in {\tt r} of variables in the set
 	   {\tt var} by universal quantification. *}
-ALSO    {* bdd\_exist, bdd\_unique, bdd\_makeset *}
+ALSO    {* bdd\_exist, bdd\_existcomp, bdd\_forallcomp, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
 RETURN  {* The quantified BDD. *}
 */
 BDD bdd_forall(BDD r, BDD var)
 {
-   BDD res;
-   firstReorder = 1;
+   return quantify(r, var, bddop_and, 0, CACHEID_EXIST);
+}
 
-   CHECKa(r, bddfalse);
-   CHECKa(var, bddfalse);
-
-   if (var < 2)  /* Empty set */
-      return r;
-
- again:
-   if (setjmp(bddexception) == 0)
-   {
-      if (varset2vartable(var) < 0)
-	 return bddfalse;
-
-      INITREF;
-      quantid = (var << 3) | CACHEID_FORALL;
-      applyop = bddop_and;
-
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = quant_rec(r);
-      if (!firstReorder)
-	 bdd_enable_reorder();
-   }
-   else
-   {
-      bdd_checkreorder();
-
-      if (firstReorder-- == 1)
-	 goto again;
-      res = BDDZERO;  /* avoid warning about res being uninitialized */
-   }
-
-   checkresize();
-   return res;
+/*
+NAME    {* bdd\_forallcomp *}
+SECTION {* operator *}
+SHORT   {* universal quantification of other variables *}
+PROTO   {* BDD bdd_forallcomp(BDD r, BDD var) *}
+DESCR   {* Removes all occurences in {\tt r} of variables in the set
+	   {\tt var} by universal quantification. *}
+ALSO    {* bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
+RETURN  {* The quantified BDD. *}
+*/
+BDD bdd_forallcomp(BDD r, BDD var)
+{
+   return quantify(r, var, bddop_and, 1, CACHEID_EXISTC);
 }
 
 
@@ -1644,47 +1653,30 @@ DESCR   {* Removes all occurences in {\tt r} of variables in the set
 	   uses a XOR operator instead of an OR operator as in the
 	   existential quantification, and an AND operator as in the
 	   universal quantification. *}
-ALSO    {* bdd\_exist, bdd\_forall, bdd\_makeset *}
+ALSO    {* bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_forallcomp, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
 RETURN  {* The quantified BDD. *}
 */
 BDD bdd_unique(BDD r, BDD var)
 {
-   BDD res;
-   firstReorder = 1;
+   return quantify(r, var, bddop_xor, 0, CACHEID_UNIQUE);
+}
 
-   CHECKa(r, bddfalse);
-   CHECKa(var, bddfalse);
-
-   if (var < 2)  /* Empty set */
-      return r;
-
- again:
-   if (setjmp(bddexception) == 0)
-   {
-      if (varset2vartable(var) < 0)
-	 return bddfalse;
-
-      INITREF;
-      quantid = (var << 3) | CACHEID_UNIQUE;
-      applyop = bddop_xor;
-
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = quant_rec(r);
-      if (!firstReorder)
-	 bdd_enable_reorder();
-   }
-   else
-   {
-      bdd_checkreorder();
-
-      if (firstReorder-- == 1)
-	 goto again;
-      res = BDDZERO;  /* avoid warning about res being uninitialized */
-   }
-
-   checkresize();
-   return res;
+/*
+NAME    {* bdd\_uniquecomp *}
+SECTION {* operator *}
+SHORT   {* unique quantification of other variables *}
+PROTO   {* BDD bdd_uniquecomp(BDD r, BDD var) *}
+DESCR   {* Removes all occurences in {\tt r} of variables now in the set
+	   {\tt var} by unique quantification. This type of quantification
+	   uses a XOR operator instead of an OR operator as in the
+	   existential quantification, and an AND operator as in the
+	   universal quantification. *}
+ALSO    {* bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_forallcomp, bdd\_uniquecomp, bdd\_makeset *}
+RETURN  {* The quantified BDD. *}
+*/
+BDD bdd_uniquecomp(BDD r, BDD var)
+{
+   return quantify(r, var, bddop_xor, 1, CACHEID_UNIQUEC);
 }
 
 
@@ -1728,25 +1720,8 @@ static int quant_rec(int r)
 
 /*=== APPLY & QUANTIFY =================================================*/
 
-/*
-NAME    {* bdd\_appex *}
-SECTION {* operator *}
-SHORT   {* apply operation and existential quantification *}
-PROTO   {* BDD bdd_appex(BDD left, BDD right, int opr, BDD var) *}
-DESCR   {* Applies the binary operator {\tt opr} to the arguments
-	   {\tt left} and {\tt right} and then performs an existential
-	   quantification of the variables from the variable set
-	   {\tt var}. This is done in a bottom up manner such that both the
-	   apply and quantification is done on the lower nodes before
-	   stepping up to the higher nodes. This makes the {\tt bdd\_appex}
-	   function much more efficient than an apply operation followed
-	   by a quantification. If the operator is a conjunction then this
-	   is similar to the relational product of the two BDDs.
-	   \index{relational product} *}
-ALSO    {* bdd\_appall, bdd\_appuni, bdd\_apply, bdd\_exist, bdd\_forall, bdd\_unique, bdd\_makeset *}
-RETURN  {* The result of the operation. *}
-*/
-BDD bdd_appex(BDD l, BDD r, int opr, BDD var)
+static BDD appquantify(BDD l, BDD r, int opr, BDD var,
+		       int qop, int comp, int qid)
 {
    BDD res;
    firstReorder = 1;
@@ -1761,20 +1736,20 @@ BDD bdd_appex(BDD l, BDD r, int opr, BDD var)
       return bddfalse;
    }
 
-   if (var < 2)  /* Empty set */
+   if (var < 2 && !comp)  /* Empty set */
       return bdd_apply(l,r,opr);
 
  again:
    if (setjmp(bddexception) == 0)
    {
-      if (varset2vartable(var) < 0)
+      if (varset2vartable(var, comp) < 0)
 	 return bddfalse;
 
       INITREF;
-      applyop = bddop_or;
+      applyop = qop;
       appexop = opr;
       appexid = (var << 5) | (appexop << 1); /* FIXME: range! */
-      quantid = (appexid << 3) | CACHEID_APPEX;
+      quantid = (appexid << 4) | qid;
 
       if (!firstReorder)
 	 bdd_disable_reorder();
@@ -1793,6 +1768,51 @@ BDD bdd_appex(BDD l, BDD r, int opr, BDD var)
 
    checkresize();
    return res;
+}
+
+/*
+NAME    {* bdd\_appex *}
+SECTION {* operator *}
+SHORT   {* apply operation and existential quantification *}
+PROTO   {* BDD bdd_appex(BDD left, BDD right, int opr, BDD var) *}
+DESCR   {* Applies the binary operator {\tt opr} to the arguments
+	   {\tt left} and {\tt right} and then performs an existential
+	   quantification of the variables from the variable set
+	   {\tt var}. This is done in a bottom up manner such that both the
+	   apply and quantification is done on the lower nodes before
+	   stepping up to the higher nodes. This makes the {\tt bdd\_appex}
+	   function much more efficient than an apply operation followed
+	   by a quantification. If the operator is a conjunction then this
+	   is similar to the relational product of the two BDDs.
+	   \index{relational product} *}
+ALSO    {* bdd\_appexcomp, bdd\_appall, bdd\_appallcomp, bdd\_appuni, bdd\_appunicomp, bdd\_apply, bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_forallcomp, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
+RETURN  {* The result of the operation. *}
+*/
+BDD bdd_appex(BDD l, BDD r, int opr, BDD var)
+{
+   return appquantify(l, r, opr, var, bddop_or, 0, CACHEID_APPEX);
+}
+
+
+/*
+NAME    {* bdd\_appexcomp *}
+SECTION {* operator *}
+SHORT   {* apply operation and (complemented) existential quantification *}
+PROTO   {* BDD bdd_appexcomp(BDD left, BDD right, int opr, BDD var) *}
+DESCR   {* Applies the binary operator {\tt opr} to the arguments
+	   {\tt left} and {\tt right} and then performs an existential
+	   quantification of the variables which are not in the variable set
+	   {\tt var}. This is done in a bottom up manner such that both the
+	   apply and quantification is done on the lower nodes before
+	   stepping up to the higher nodes. This makes the {\tt bdd\_appexcomp}
+	   function much more efficient than an apply operation followed
+	   by a quantification.  *}
+ALSO    {* bdd\_appex, bdd\_appall, bdd\_appallcomp, bdd\_appuni, bdd\_appunicomp, bdd\_apply, bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_forallcomp, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
+RETURN  {* The result of the operation. *}
+*/
+BDD bdd_appexcomp(BDD l, BDD r, int opr, BDD var)
+{
+   return appquantify(l, r, opr, var, bddop_or, 1, CACHEID_APPEXC);
 }
 
 
@@ -1809,56 +1829,34 @@ DESCR   {* Applies the binary operator {\tt opr} to the arguments
 	   stepping up to the higher nodes. This makes the {\tt bdd\_appall}
 	   function much more efficient than an apply operation followed
 	   by a quantification. *}
-ALSO    {* bdd\_appex, bdd\_appuni, bdd\_apply, bdd\_exist, bdd\_forall, bdd\_unique, bdd\_makeset *}
+ALSO    {* bdd\_appex, bdd\_appexcomp, bdd\_appallcomp, bdd\_appuni, bdd\_appunicomp, bdd\_apply, bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_forallcomp, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
 RETURN  {* The result of the operation. *}
 */
 BDD bdd_appall(BDD l, BDD r, int opr, BDD var)
 {
-   BDD res;
-   firstReorder = 1;
+   return appquantify(l, r, opr, var, bddop_and, 0, CACHEID_APPAL);
+}
 
-   CHECKa(l, bddfalse);
-   CHECKa(r, bddfalse);
-   CHECKa(var, bddfalse);
 
-   if (opr<0 || opr>bddop_invimp)
-   {
-      bdd_error(BDD_OP);
-      return bddfalse;
-   }
-
-   if (var < 2)  /* Empty set */
-      return bdd_apply(l,r,opr);
-
- again:
-   if (setjmp(bddexception) == 0)
-   {
-      if (varset2vartable(var) < 0)
-	 return bddfalse;
-
-      INITREF;
-      applyop = bddop_and;
-      appexop = opr;
-      appexid = (var << 5) | (appexop << 1) | 1; /* FIXME: range! */
-      quantid = (appexid << 3) | CACHEID_APPAL;
-
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = appquant_rec(l, r);
-      if (!firstReorder)
-	 bdd_enable_reorder();
-   }
-   else
-   {
-      bdd_checkreorder();
-
-      if (firstReorder-- == 1)
-	 goto again;
-      res = BDDZERO;  /* avoid warning about res being uninitialized */
-   }
-
-   checkresize();
-   return res;
+/*
+NAME    {* bdd\_appallcomp *}
+SECTION {* operator *}
+SHORT   {* apply operation and (complemented) universal quantification *}
+PROTO   {* BDD bdd_appall(BDD left, BDD right, int opr, BDD var) *}
+DESCR   {* Applies the binary operator {\tt opr} to the arguments
+	   {\tt left} and {\tt right} and then performs an universal
+	   quantification of the variables which are not in the variable set
+	   {\tt var}. This is done in a bottom up manner such that both the
+	   apply and quantification is done on the lower nodes before
+	   stepping up to the higher nodes. This makes the
+	   {\tt bdd\_appallcomp} function much more efficient than an
+	   apply operation followed by a quantification. *}
+ALSO    {* bdd\_appex, bdd\_appexcomp, bdd\_appall, bdd\_appuni, bdd\_appunicomp, bdd\_apply, bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_forallcomp, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
+RETURN  {* The result of the operation. *}
+*/
+BDD bdd_appallcomp(BDD l, BDD r, int opr, BDD var)
+{
+   return appquantify(l, r, opr, var, bddop_and, 1, CACHEID_APPALC);
 }
 
 
@@ -1875,56 +1873,34 @@ DESCR   {* Applies the binary operator {\tt opr} to the arguments
 	   stepping up to the higher nodes. This makes the {\tt bdd\_appuni}
 	   function much more efficient than an apply operation followed
 	   by a quantification. *}
-ALSO    {* bdd\_appex, bdd\_appall, bdd\_apply, bdd\_exist, bdd\_unique, bdd\_forall, bdd\_makeset *}
+ALSO    {* bdd\_appex, bdd\_appexcomp, bdd\_appall, bdd\_appallcomp, bdd\_appuni, bdd\_appunicomp, bdd\_apply, bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_forallcomp, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
 RETURN  {* The result of the operation. *}
 */
 BDD bdd_appuni(BDD l, BDD r, int opr, BDD var)
 {
-   BDD res;
-   firstReorder = 1;
+   return appquantify(l, r, opr, var, bddop_xor, 0, CACHEID_APPUN);
+}
 
-   CHECKa(l, bddfalse);
-   CHECKa(r, bddfalse);
-   CHECKa(var, bddfalse);
 
-   if (opr<0 || opr>bddop_invimp)
-   {
-      bdd_error(BDD_OP);
-      return bddfalse;
-   }
-
-   if (var < 2)  /* Empty set */
-      return bdd_apply(l,r,opr);
-
- again:
-   if (setjmp(bddexception) == 0)
-   {
-      if (varset2vartable(var) < 0)
-	 return bddfalse;
-
-      INITREF;
-      applyop = bddop_xor;
-      appexop = opr;
-      appexid = (var << 5) | (appexop << 1) | 1; /* FIXME: range! */
-      quantid = (appexid << 3) | CACHEID_APPUN;
-
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = appquant_rec(l, r);
-      if (!firstReorder)
-	 bdd_enable_reorder();
-   }
-   else
-   {
-      bdd_checkreorder();
-
-      if (firstReorder-- == 1)
-	 goto again;
-      res = BDDZERO;  /* avoid warning about res being uninitialized */
-   }
-
-   checkresize();
-   return res;
+/*
+NAME    {* bdd\_appunicomp *}
+SECTION {* operator *}
+SHORT   {* apply operation and unique (complemented) quantification *}
+PROTO   {* BDD bdd_appunicomp(BDD left, BDD right, int opr, BDD var) *}
+DESCR   {* Applies the binary operator {\tt opr} to the arguments
+	   {\tt left} and {\tt right} and then performs a unique
+	   quantification of the variables which are not in the variable set
+	   {\tt var}. This is done in a bottom up manner such that both the
+	   apply and quantification is done on the lower nodes before
+	   stepping up to the higher nodes. This makes the
+	   {\tt bdd\_appunicomp} function much more efficient than an
+	   apply operation followed by a quantification. *}
+ALSO    {* bdd\_appex, bdd\_appexcomp, bdd\_appall, bdd\_appallcomp, bdd\_appuni, bdd\_apply, bdd\_exist, bdd\_existcomp, bdd\_forall, bdd\_forallcomp, bdd\_unique, bdd\_uniquecomp, bdd\_makeset *}
+RETURN  {* The result of the operation. *}
+*/
+BDD bdd_appunicomp(BDD l, BDD r, int opr, BDD var)
+{
+   return appquantify(l, r, opr, var, bddop_xor, 1, CACHEID_APPUNC);
 }
 
 
@@ -2062,8 +2038,9 @@ BDD bdd_support(BDD r)
 
    CHECKa(r, bddfalse);
 
+   /* Variable sets are conjunctions, so the empty support is bddtrue.  */
    if (r < 2)
-      return bddfalse;
+      return bddtrue;
 
       /* On-demand allocation of support set */
    if (supportSize < bddvarnum)
@@ -2770,14 +2747,15 @@ static double bdd_pathcount_rec(BDD r)
   Other internal functions
 *************************************************************************/
 
-static int varset2vartable(BDD r)
+static int varset2vartable(BDD r, int comp)
 {
    BDD n;
 
-   if (r < 2)
+   if (r < 2 && !comp)
       return bdd_error(BDD_VARSET);
 
    quantvarsetID++;
+   quantvarsetcomp = comp;
 
    if (quantvarsetID == INT_MAX)
    {
@@ -2790,6 +2768,11 @@ static int varset2vartable(BDD r)
       quantvarset[LEVEL(n)] = quantvarsetID;
       quantlast = LEVEL(n);
    }
+
+   /* When the varset is complemented, make sure all variables will
+      be tested.  */
+   if (comp)
+      quantlast = bddvarnum;
 
    return 0;
 }

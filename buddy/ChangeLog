@@ -1,3 +1,27 @@
+2003-07-17  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* rsc/bdd.h (bdd_existcomp, bdd_forallcomp,
+	bdd_uniquecomp, bdd_appexcomp, bdd_appallcomp,
+	bdd_appunicomp): Declare for C and C++.
+	* src/bddop.c (CACHEID_EXISTC, CACHEID_FORALLC,
+	CACHEID_UNIQUEC, CACHEID_APPEXC, CACHEID_APPALC,
+	CACHEID_APPUNCC): New macros.
+	(quatvarsetcomp): New variables.
+	(varset2vartable): Take a second argument to indicate negation,
+	set quatvarsetcomp.
+	(INVARSET): Honor quatvarsetcomp.
+	(quantify): New function, extracted from bdd_exist, bdd_forall,
+	and bdd_appunicomp.
+	(bdd_exist, bdd_forall, bdd_appunicomp): Use quantify.
+	(bdd_existcomp, bdd_forallcomp, bdd_appunicompcomp): New functions.
+	(appquantify): New function, extracted from bdd_appex, bdd_appall,
+	and bdd_appuni.
+	(bdd_appex, bdd_appall, bdd_appuni): Use appquantify.
+	(bdd_appexcomp, bdd_appallcomp, bdd_appunicomp): New functions.
+
+	* src/bddop.c (bdd_support): Return bddtrue when the support
+	is empty, because variable sets are conjunctions.
+
 2003-05-22  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/pairs.c (bdd_mergepairs): New function.

@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bdd.h,v 1.4 2003/05/22 15:07:27 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bdd.h,v 1.5 2003/07/17 14:09:04 aduret Exp $
   FILE:  bdd.h
   DESCR: C,C++ User interface for the BDD package
   AUTH:  Jorn Lind
@@ -293,11 +293,17 @@ extern BDD      bdd_compose(BDD, BDD, BDD);
 extern BDD      bdd_veccompose(BDD, bddPair*);
 extern BDD      bdd_simplify(BDD, BDD);
 extern BDD      bdd_exist(BDD, BDD);
+extern BDD      bdd_existcomp(BDD, BDD);
 extern BDD      bdd_forall(BDD, BDD);
+extern BDD      bdd_forallcomp(BDD, BDD);
 extern BDD      bdd_unique(BDD, BDD);
+extern BDD      bdd_uniquecomp(BDD, BDD);
 extern BDD      bdd_appex(BDD, BDD, int, BDD);
+extern BDD      bdd_appexcomp(BDD, BDD, int, BDD);
 extern BDD      bdd_appall(BDD, BDD, int, BDD);
+extern BDD      bdd_appallcomp(BDD, BDD, int, BDD);
 extern BDD      bdd_appuni(BDD, BDD, int, BDD);
+extern BDD      bdd_appunicomp(BDD, BDD, int, BDD);
 extern BDD      bdd_support(BDD);
 extern BDD      bdd_satone(BDD);
 extern BDD      bdd_satoneset(BDD, BDD, BDD);
@@ -489,11 +495,17 @@ private:
    friend bdd      bdd_restrict(const bdd &, const bdd &);
    friend bdd      bdd_constrain(const bdd &, const bdd &);
    friend bdd      bdd_exist(const bdd &, const bdd &);
+   friend bdd      bdd_existcomp(const bdd &, const bdd &);
    friend bdd      bdd_forall(const bdd &, const bdd &);
+   friend bdd      bdd_forallcomp(const bdd &, const bdd &);
    friend bdd      bdd_unique(const bdd &, const bdd &);
+   friend bdd      bdd_uniquecomp(const bdd &, const bdd &);
    friend bdd      bdd_appex(const bdd &, const bdd &, int, const bdd &);
+   friend bdd      bdd_appexcomp(const bdd &, const bdd &, int, const bdd &);
    friend bdd      bdd_appall(const bdd &, const bdd &, int, const bdd &);
+   friend bdd      bdd_appallcomp(const bdd &, const bdd &, int, const bdd &);
    friend bdd      bdd_appuni(const bdd &, const bdd &, int, const bdd &);
+   friend bdd      bdd_appunicomp(const bdd &, const bdd &, int, const bdd &);
    friend bdd      bdd_replace(const bdd &, bddPair*);
    friend bdd      bdd_compose(const bdd &, const bdd &, int);
    friend bdd      bdd_veccompose(const bdd &, bddPair*);
@@ -641,20 +653,38 @@ inline bdd bdd_ite(const bdd &f, const bdd &g, const bdd &h)
 inline bdd bdd_exist(const bdd &r, const bdd &var)
 { return bdd_exist(r.root, var.root); }
 
+inline bdd bdd_existcomp(const bdd &r, const bdd &var)
+{ return bdd_existcomp(r.root, var.root); }
+
 inline bdd bdd_forall(const bdd &r, const bdd &var)
 { return bdd_forall(r.root, var.root); }
+
+inline bdd bdd_forallcomp(const bdd &r, const bdd &var)
+{ return bdd_forallcomp(r.root, var.root); }
 
 inline bdd bdd_unique(const bdd &r, const bdd &var)
 { return bdd_unique(r.root, var.root); }
 
+inline bdd bdd_uniquecomp(const bdd &r, const bdd &var)
+{ return bdd_uniquecomp(r.root, var.root); }
+
 inline bdd bdd_appex(const bdd &l, const bdd &r, int op, const bdd &var)
 { return bdd_appex(l.root, r.root, op, var.root); }
+
+inline bdd bdd_appexcomp(const bdd &l, const bdd &r, int op, const bdd &var)
+{ return bdd_appexcomp(l.root, r.root, op, var.root); }
 
 inline bdd bdd_appall(const bdd &l, const bdd &r, int op, const bdd &var)
 { return bdd_appall(l.root, r.root, op, var.root); }
 
+inline bdd bdd_appallcomp(const bdd &l, const bdd &r, int op, const bdd &var)
+{ return bdd_appallcomp(l.root, r.root, op, var.root); }
+
 inline bdd bdd_appuni(const bdd &l, const bdd &r, int op, const bdd &var)
 { return bdd_appuni(l.root, r.root, op, var.root); }
+
+inline bdd bdd_appunicomp(const bdd &l, const bdd &r, int op, const bdd &var)
+{ return bdd_appunicomp(l.root, r.root, op, var.root); }
 
 inline bdd bdd_support(const bdd &r)
 { return bdd_support(r.root); }
