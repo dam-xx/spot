@@ -23,6 +23,7 @@
 #include "tgba/tgba.hh"
 #include "emptiness.hh"
 #include "tgba/bddprint.hh"
+#include <sstream>
 
 namespace spot
 {
@@ -36,6 +37,9 @@ namespace spot
     bdd all_acc = bddfalse;
     bdd expected_all_acc = a->all_acceptance_conditions();
     bool all_acc_seen = false;
+    typedef Sgi::hash_map<const state*, std::set<int>,
+                          state_ptr_hash, state_ptr_equal> state_map;
+    state_map seen;
 
     if (run->prefix.empty())
       {
@@ -62,7 +66,23 @@ namespace spot
 
     for (; i != l->end(); ++serial)
       {
-	os << "state " << serial << " in " << in << ": "
+	state_map::iterator o = seen.find(s);
+	std::ostringstream msg;
+	if (o != seen.end())
+	  {
+	    std::set<int>::const_iterator d;
+	    for (d = o->second.begin(); d != o->second.end(); ++d)
+	      msg << " == " << *d;
+	    o->second.insert(serial);
+	    delete s;
+	    s = o->first;
+	  }
+	else
+	  {
+	    seen[s].insert(serial);
+	  }
+
+	os << "state " << serial << " in " << in << msg.str() << ": "
 	   << a->format_state(s) << std::endl;
 
 	// expected outgoing transition
@@ -89,7 +109,6 @@ namespace spot
 
 	// browse the actual outgoing transitions
 	tgba_succ_iterator* j = a->succ_iter(s);
-	delete s;
 	for (j->first(); !j->done(); j->next())
 	  {
 	    if (j->current_condition() != label
@@ -163,6 +182,16 @@ namespace spot
 	   << std::endl;
 	return false;
       }
+
+    state_map::const_iterator o = seen.begin();
+    while (o != seen.end())
+      {
+	// Advance the iterator before deleting the "key" pointer.
+	const state* ptr = o->first;
+	++o;
+	delete ptr;
+      }
+
     return true;
   }
 }

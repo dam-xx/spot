@@ -1,5 +1,7 @@
 2004-10-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Note duplicate states.
+
 	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Verify the run is
 	accepting.
 
