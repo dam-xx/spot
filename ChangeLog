@@ -1,5 +1,8 @@
 2005-01-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/gtec/gtec.cc: Fake statistics count to match
+	how the algorithm will behave once remove_component() is revamped.
+
 	* src/tgbaalgos/emptiness_stats.hh (ars_statistics): Distinguish
 	states visited to compute the prefix and those for the cycle.
 	* src/tgbaalgos/gv04.cc, src/tgbaalgos/ndfs_result.hxx,
