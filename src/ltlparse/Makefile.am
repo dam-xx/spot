@@ -1,7 +1,7 @@
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-lib_LIBRARIES = libltlparse.a
+lib_LTLIBRARIES = libltlparse.la
 
 LTLPARSE_YY = ltlparse.yy
 FROM_LTLPARSE_YY_MAIN = ltlparse.cc
@@ -23,7 +23,7 @@ $(FROM_LTLPARSE_YY_OTHERS): $(LTLPARSE_YY)
 
 EXTRA_DIST = $(LTLPARSE_YY)
 
-libltlparse_a_SOURCES = \
+libltlparse_la_SOURCES = \
   fmterror.cc \
   $(FROM_LTLPARSE_YY) \
   ltlscan.ll \

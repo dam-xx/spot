@@ -1,8 +1,8 @@
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-lib_LIBRARIES = libltlvisit.a
-libltlvisit_a_SOURCES = \
+lib_LTLIBRARIES = libltlvisit.la
+libltlvisit_la_SOURCES = \
   clone.cc \
   clone.hh \
   dotty.cc \

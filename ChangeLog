@@ -1,5 +1,10 @@
 2003-04-29  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* configure.ac: Call AC_PROG_LIBTOOL.
+	* src/ltlast/Makefile.am, src/ltlenv/Makefile.am, 
+	src/ltlparse/Makefile.am, src/ltltest/Makefile.am,
+	src/ltlvisit/Makefile.am: Adust to build libtool libraries.
+
 	* src/ltlenv/defaultenv.hh: Do not include atomic_prop.hh here...
 	* src/ltlenv/defaultenv.cc: ... but here.
 

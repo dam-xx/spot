@@ -1,8 +1,8 @@
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-lib_LIBRARIES = libltlast.a
-libltlast_a_SOURCES = \
+lib_LTLIBRARIES = libltlast.la
+libltlast_la_SOURCES = \
   allnodes.hh \
   atomic_prop.cc \
   atomic_prop.hh \
