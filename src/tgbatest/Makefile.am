@@ -1,4 +1,4 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -28,10 +28,12 @@ check_SCRIPTS = defs
 check_PROGRAMS = \
   bddprod \
   explicit \
+  expldot \
   explprod \
   ltl2tgba \
   ltlprod \
   mixprod \
+  powerset \
   readsave \
   tgbaread \
   tripprod
@@ -40,10 +42,13 @@ check_PROGRAMS = \
 bddprod_SOURCES  = ltlprod.cc
 bddprod_CXXFLAGS = -DBDD_CONCRETE_PRODUCT
 explicit_SOURCES = explicit.cc
+expldot_SOURCES  = powerset.cc
+expldot_CXXFLAGS = -DDOTTY
 explprod_SOURCES = explprod.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
 ltlprod_SOURCES  = ltlprod.cc
 mixprod_SOURCES  = mixprod.cc
+powerset_SOURCES = powerset.cc
 readsave_SOURCES = readsave.cc
 tgbaread_SOURCES = tgbaread.cc
 tripprod_SOURCES = tripprod.cc

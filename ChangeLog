@@ -1,5 +1,9 @@
 2004-01-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/reachiter.cc (tgba_reachable_iterator::run)
+	Reuse s->second to avoid a hash lookup.
+	* src/tgbaalgos/save.cc (save_bfs::process_state): Delete dest.
+
 	* src/ltlparse/Makefile.am ($(FROM_LTLPARSE_YY_MAIN)):
 	Use $(FROM_LTLPARSE_YY_MAIN), not $@, because $@ can contains
 	VPATH and we do not want Bison to see absolute paths.
