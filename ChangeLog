@@ -1,3 +1,7 @@
+2004-06-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* buddy/: Merge buddy-2-3.
+
 2004-06-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/ltl2tgba.cc (main): Degeneralize before
