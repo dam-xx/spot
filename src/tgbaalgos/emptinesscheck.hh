@@ -52,15 +52,6 @@ namespace spot
     typedef std::list<state_proposition> cycle_path;
 
   public:
-    /// this function remove all accessible state from a given
-    /// state. In other words, it removes the strongly connected
-    /// component that contents this state.
-
-    /// \brief Emptiness check on spot::tgba
-    void
-    remove_component(const tgba& aut, seen& state_map,
-		     const spot::state* start_delete);
-
     /// This function returns true if the automata's language is empty,
     /// and builds a stack of SCC.
     ///
@@ -90,15 +81,20 @@ namespace spot
     std::ostream& print_result(std::ostream& os, const spot::tgba* aut,
 			       const tgba* restrict = 0) const;
 
+  private:
     std::stack<bdd> arc_accepting;
     std::stack<connected_component> root_component;
     seen seen_state_num;
     state_sequence suffix;
     cycle_path period;
-  private:
-    std::stack<pair_state_iter> todo;
-    std::vector<state_sequence> vec_sequence;
 
+    /// \brief Remove a strongly component from the hash.
+    ///
+    /// This function remove all accessible state from a given
+    /// state. In other words, it removes the strongly connected
+    /// component that contains this state.
+    void remove_component(const tgba& aut, seen& state_map,
+			  const spot::state* start_delete);
 
     /// Called by counter_example to find a path which traverses all
     /// accepting conditions in the accepted SCC.
