@@ -29,18 +29,12 @@ namespace spot
   }
 
   tgba_succ_iterator_concrete*
-  tgba_bdd_concrete::succ_iter(bdd state) const
+  tgba_bdd_concrete::succ_iter(state_bdd state) const
   {
-    bdd succ_set = bdd_replace(bdd_exist(data_.relation & state,
+    bdd succ_set = bdd_replace(bdd_exist(data_.relation & state.as_bdd(),
 					 data_.now_set),
 			       data_.next_to_now);
     return new tgba_succ_iterator_concrete(data_, succ_set);
-  }
-
-  tgba_succ_iterator_concrete*
-  tgba_bdd_concrete::init_iter() const
-  {
-    return new tgba_succ_iterator_concrete(data_, init_);
   }
 
   const tgba_bdd_dict&

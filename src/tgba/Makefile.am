@@ -9,6 +9,7 @@ libtgba_la_SOURCES = \
   dictunion.hh \
   ltl2tgba.cc \
   ltl2tgba.hh \
+  public.hh \
   state.hh \
   statebdd.cc \
   statebdd.hh \
