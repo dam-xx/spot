@@ -33,15 +33,14 @@
 ///     after the visit of previous successors).
 ///
 /// * Add a bit-state hashing version.
-///
-/// * Is it possible to reduce the tgba on-the-fly during the product: only the
-///   acceptance conditions are pertinent...
 
 //#define TRACE
 
-#ifdef TRACE
 #include <iostream>
-#include "tgba/bddprint.hh"
+#ifdef TRACE
+#define trace std::cerr
+#else
+#define trace while (0) std::cerr
 #endif
 
 #include <cassert>
@@ -105,7 +104,10 @@ namespace spot
         h.add_new_state(s0, CYAN, current_weight);
         push(st_blue, s0, bddfalse, bddfalse);
         if (dfs_blue())
-          return new emptiness_check_result(a_);
+          if (a_->number_of_acceptance_conditions() <=1)
+            return new result(*this);
+          else
+            return new emptiness_check_result(a_);
         return 0;
       }
 
@@ -173,17 +175,12 @@ namespace spot
         while (!st_blue.empty())
           {
             stack_item& f = st_blue.front();
-#           ifdef TRACE
-            std::cout << "DFS_BLUE treats: "
-                      << a_->format_state(f.s) << std::endl;
-#           endif
+            trace << "DFS_BLUE treats: " << a_->format_state(f.s) << std::endl;
             if (!f.it->done())
               {
                 const state *s_prime = f.it->current_state();
-#               ifdef TRACE
-                std::cout << "  Visit the successor: "
-                          << a_->format_state(s_prime) << std::endl;
-#               endif
+                trace << "  Visit the successor: "
+                      << a_->format_state(s_prime) << std::endl;
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
                 // Go down the edge (f.s, <label, acc>, s_prime)
@@ -192,9 +189,7 @@ namespace spot
                 typename heap::color_ref c_prime = h.get_color_ref(s_prime);
                 if (c_prime.is_white())
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is white, go down" << std::endl;
-#                   endif
+                    trace << "  It is white, go down" << std::endl;
                     current_weight += acc;
                     inc_states();
                     h.add_new_state(s_prime, CYAN, current_weight);
@@ -208,31 +203,20 @@ namespace spot
                       ((current_weight - c_prime.get_weight()) |
                           c.get_acc() | acc | c_prime.get_acc()) == all_acc)
                       {
-#                       ifdef TRACE
-                        std::cout << "  It is cyan and acceptance condition "
-                                  << "is reached, report cycle" << std::endl;
-#                       endif
+                        trace << "  It is cyan and acceptance condition "
+                              << "is reached, report cycle" << std::endl;
                         c_prime.cumulate_acc(c.get_acc() | acc);
                         push(st_red, s_prime, label, acc);
                         return true;
                       }
                     else
                       {
-#                       ifdef TRACE
-                        std::cout << "  It is cyan or blue and";
-#                       endif
+                        trace << "  It is cyan or blue and";
                         bdd acu = acc | c.get_acc();
                         if ((c_prime.get_acc() & acu) != acu)
                           {
-#                           ifdef TRACE
-                            bdd_print_acc(std::cout, a_->get_dict(), acu);
-                            std::cout << "  is not included in ";
-                            bdd_print_acc(std::cout, a_->get_dict(),
-					  c_prime.get_acc());
-                            std::cout << ", start a red dfs propagating: ";
-                            bdd_print_acc(std::cout, a_->get_dict(), acu);
-                            std::cout << std::endl;
-#                           endif
+                            trace << "  a propagation is needed, "
+                                  << "start a red dfs" << std::endl;
                             c_prime.cumulate_acc(acu);
                             push(st_red, s_prime, label, acc);
                             if (dfs_red(acu))
@@ -240,10 +224,8 @@ namespace spot
                           }
                         else
                           {
-#                           ifdef TRACE
-                            std::cout << " no propagation is needed, pop it."
-                                      << std::endl;
-#                           endif
+                            trace << " no propagation is needed, pop it."
+                                  << std::endl;
                             h.pop_notify(s_prime);
                           }
                       }
@@ -253,10 +235,7 @@ namespace spot
             // Backtrack the edge
             //        (predecessor of f.s in st_blue, <f.label, f.acc>, f.s)
               {
-#               ifdef TRACE
-                std::cout << "  All the successors have been visited"
-                          << std::endl;
-#               endif
+                trace << "  All the successors have been visited" << std::endl;
                 stack_item f_dest(f);
                 pop(st_blue);
                 current_weight -= f_dest.acc;
@@ -271,14 +250,10 @@ namespace spot
                     bdd acu = f_dest.acc | c.get_acc();
                     if ((c_prime.get_acc() & acu) != acu)
                       {
-#                       ifdef TRACE
-                        std::cout << "  The arc from "
-                                  << a_->format_state(st_blue.front().s)
-                                  << " to the current state implies to "
-                                  << " start a red dfs propagating ";
-                                  bdd_print_acc(std::cout, a_->get_dict(), acu);
-                        std::cout << std::endl;
-#                       endif
+                        trace << "  The arc from "
+                              << a_->format_state(st_blue.front().s)
+                              << " to the current state implies to "
+                              << " start a red dfs" << std::endl;
                         c_prime.cumulate_acc(acu);
                         push(st_red, f_dest.s, f_dest.label, f_dest.acc);
                         if (dfs_red(acu))
@@ -286,17 +261,13 @@ namespace spot
                       }
                     else
                       {
-#                       ifdef TRACE
-                        std::cout << "  Pop it" << std::endl;
-#                       endif
+                        trace << "  Pop it" << std::endl;
                         h.pop_notify(f_dest.s);
                       }
                   }
                 else
                   {
-#                   ifdef TRACE
-                    std::cout << "  Pop it" << std::endl;
-#                   endif
+                    trace << "  Pop it" << std::endl;
                     h.pop_notify(f_dest.s);
                   }
               }
@@ -311,17 +282,12 @@ namespace spot
         while (!st_red.empty())
           {
             stack_item& f = st_red.front();
-#           ifdef TRACE
-            std::cout << "DFS_RED treats: "
-                      << a_->format_state(f.s) << std::endl;
-#           endif
+            trace << "DFS_RED treats: " << a_->format_state(f.s) << std::endl;
             if (!f.it->done())
               {
                 const state *s_prime = f.it->current_state();
-#               ifdef TRACE
-                std::cout << "  Visit the successor: "
-                          << a_->format_state(s_prime) << std::endl;
-#               endif
+                trace << "  Visit the successor: "
+                      << a_->format_state(s_prime) << std::endl;
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
                 // Go down the edge (f.s, <label, acc>, s_prime)
@@ -330,54 +296,99 @@ namespace spot
                 typename heap::color_ref c_prime = h.get_color_ref(s_prime);
                 if (c_prime.is_white())
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is white, pop it" << std::endl;
-#                   endif
+                    trace << "  It is white, pop it" << std::endl;
                     delete s_prime;
                   }
                  else if (c_prime.get_color() == CYAN &&
                      ((current_weight - c_prime.get_weight()) |
                                 c_prime.get_acc() | acu) == all_acc)
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is cyan and acceptance condition "
-                              << "is reached, report cycle" << std::endl;
-#                   endif
+                    trace << "  It is cyan and acceptance condition "
+                          << "is reached, report cycle" << std::endl;
                     c_prime.cumulate_acc(acu);
                     push(st_red, s_prime, label, acc);
                     return true;
                   }
                 else if ((c_prime.get_acc() & acu) != acu)
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is cyan or blue and propagation "
-                              << "is needed, go down"
-                              << std::endl;
-#                   endif
+                    trace << "  It is cyan or blue and propagation "
+                          << "is needed, go down"
+                          << std::endl;
                     c_prime.cumulate_acc(acu);
                     push(st_red, s_prime, label, acc);
                   }
                 else
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is cyan or blue and no propagation "
-                              << "is needed , pop it" << std::endl;
-#                   endif
+                    trace << "  It is cyan or blue and no propagation "
+                          << "is needed , pop it" << std::endl;
                     h.pop_notify(s_prime);
                   }
               }
             else // Backtrack
               {
-#               ifdef TRACE
-                std::cout << "  All the successors have been visited, pop it"
-                          << std::endl;
-#               endif
+                trace << "  All the successors have been visited, pop it"
+                      << std::endl;
                 h.pop_notify(f.s);
                 pop(st_red);
               }
           }
         return false;
       }
+
+      class result: public emptiness_check_result
+      {
+      public:
+        result(tau03_opt_search& ms)
+          : emptiness_check_result(ms.a_),
+            ms_(ms)
+        {
+        }
+        virtual tgba_run* accepting_run()
+        {
+          assert(!ms_.st_blue.empty());
+          assert(!ms_.st_red.empty());
+
+          tgba_run* run = new tgba_run;
+
+          typename stack_type::const_reverse_iterator i, j, end;
+          tgba_run::steps* l;
+
+          const state* target = ms_.st_red.front().s;
+
+          l = &run->prefix;
+
+          i = ms_.st_blue.rbegin();
+          end = ms_.st_blue.rend(); --end;
+          j = i; ++j;
+          for (; i != end; ++i, ++j)
+            {
+              if (l == &run->prefix && i->s->compare(target) == 0)
+                l = &run->cycle;
+              tgba_run::step s = { i->s->clone(), j->label, j->acc };
+              l->push_back(s);
+            }
+
+          if (l == &run->prefix && i->s->compare(target) == 0)
+            l = &run->cycle;
+          assert(l == &run->cycle);
+
+          j = ms_.st_red.rbegin();
+          tgba_run::step s = { i->s->clone(), j->label, j->acc };
+          l->push_back(s);
+
+          i = j; ++j;
+          end = ms_.st_red.rend(); --end;
+          for (; i != end; ++i, ++j)
+            {
+              tgba_run::step s = { i->s->clone(), j->label, j->acc };
+              l->push_back(s);
+            }
+
+          return run;
+        }
+      private:
+        tau03_opt_search& ms_;
+      };
 
     };
 

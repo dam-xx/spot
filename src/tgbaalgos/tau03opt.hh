@@ -40,6 +40,7 @@ namespace spot
   /// \verbatim
   /// procedure check ()
   /// begin
+  ///   weight = 0; // the null vector
   ///   call dfs_blue(s0);
   /// end;
   ///
@@ -47,41 +48,52 @@ namespace spot
   /// begin
   ///   s.color = cyan;
   ///   s.acc = emptyset;
+  ///   s.weight = weight;
   ///   for all t in post(s) do
   ///     let (s, l, a, t) be the edge from s to t;
   ///     if t.color == white then
+  ///       for all b in a do
+  ///         weight[b] = weight[b] + 1;
+  ///       end for;
   ///       call dfs_blue(t);
-  ///     else if t.color == cyan && s.acc U a U t.acc == all_acc then
-  ///       report a cycle;
-  ///     end if;
-  ///   end for;
-  ///   for all t in post(s) do
-  ///     let (s, l, a, t) be the edge from s to t;
-  ///     if s.acc U a not included in t.acc then
-  ///       call dfs_red(t, a U s.acc);
+  ///       for all b in a do
+  ///         weight[b] = weight[b] - 1;
+  ///       end for;
+  ///     else
+  ///       let (s, l, a, t) be the edge from s to t;
+  ///       Acc = s.acc U a;
+  ///       if t.color == cyan &&
+  ///                 (Acc U support(weight -s.weight) U t.acc) == all_acc then
+  ///         report a cycle;
+  ///       else if Acc not included in t.acc then
+  ///         call dfs_red(t, Acc);
+  ///       end if;
   ///     end if;
   ///   end for;
   ///   s.color = blue;
   /// end;
   ///
-  /// procedure dfs_red(s, A)
+  /// procedure dfs_red(s, Acc)
   /// begin
-  ///   s.acc = s.acc U A;
   ///   for all t in post(s) do
   ///     let (s, l, a, t) be the edge from s to t;
-  ///     if t.color != white then
-  ///       if t.color == cyan && A U t.acc == all_acc then
-  ///         report a cycle;
-  ///       else if A not included in t.acc then
-  ///         call dfs_red(t, A);
-  ///       end if;
+  ///     if t.color == cyan &&
+  ///                 (Acc U support(weight -t.weight) U t.acc) == all_acc then
+  ///       report a cycle;
+  ///     else if t.color != white and Acc not included in t.acc then
+  ///       call dfs_red(t, Acc);
   ///     end if;
   ///   end for;
   /// end;
   /// \endverbatim
   ///
-  /// This algorithm is an optimisation of the one implemented in
-  /// spot::explicit_tau03_search.
+  /// This algorithm is a generalisation to TGBA of the one implemented in
+  /// spot::explicit_se05_search. It is based on the acceptance set labelling
+  /// of states used in spot::explicit_tau03_search. Moreover, it introduce
+  /// a slight optimisation based on vectors of integers counting for each
+  /// acceptance condition how many time the condition has been visited in
+  /// the path stored in the blue stack. Such a vector is associated to each
+  /// state of this stack.
   ///
   emptiness_check* explicit_tau03_opt_search(const tgba *a);
 

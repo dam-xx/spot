@@ -340,11 +340,11 @@ main(int argc, char** argv)
 	      spot::tgba* d = opt_n_acc > 1 ? degen : a;
 
 	      ec_obj.push_back(spot::explicit_magic_search(d));
-	      ec_name.push_back("explicit_magic_search");
+	      ec_name.push_back("explicit_magic");
 	      ec_safe.push_back(true);
 
 	      ec_obj.push_back(spot::bit_state_hashing_magic_search(d, 4096));
-	      ec_name.push_back("bit_state_hashing_magic_search");
+	      ec_name.push_back("bit_state_hashing_magic");
 	      ec_safe.push_back(false);
 
 	      ec_obj.push_back(spot::explicit_se05_search(d));
@@ -352,7 +352,7 @@ main(int argc, char** argv)
 	      ec_safe.push_back(true);
 
 	      ec_obj.push_back(spot::bit_state_hashing_se05_search(d, 4096));
-	      ec_name.push_back("bit_state_hashing_se05_search");
+	      ec_name.push_back("bit_state_hashing_se05");
 	      ec_safe.push_back(false);
 
 	      ec_obj.push_back(spot::explicit_gv04_check(d));
@@ -365,12 +365,12 @@ main(int argc, char** argv)
 	      spot::tgba* d = opt_n_acc == 0 ? degen : a;
 
               ec_obj.push_back(spot::explicit_tau03_search(d));
-              ec_name.push_back("explicit_tau03_search");
+              ec_name.push_back("explicit_tau03");
               ec_safe.push_back(true);
             }
 
           ec_obj.push_back(spot::explicit_tau03_opt_search(a));
-          ec_name.push_back("explicit_tau03_opt_search");
+          ec_name.push_back("explicit_tau03_opt");
           ec_safe.push_back(true);
 
 	  int n_ec = ec_obj.size();

@@ -21,8 +21,11 @@
 
 //#define TRACE
 
-#ifdef TRACE
 #include <iostream>
+#ifdef TRACE
+#define trace std::cerr
+#else
+#define trace while (0) std::cerr
 #endif
 
 #include <cassert>
@@ -178,17 +181,12 @@ namespace spot
         while (!st_blue.empty())
           {
             stack_item& f = st_blue.front();
-#           ifdef TRACE
-            std::cout << "DFS_BLUE treats: "
-                      << a_->format_state(f.s) << std::endl;
-#           endif
+            trace << "DFS_BLUE treats: " << a_->format_state(f.s) << std::endl;
             if (!f.it->done())
               {
                 const state *s_prime = f.it->current_state();
-#               ifdef TRACE
-                std::cout << "  Visit the successor: "
-                          << a_->format_state(s_prime) << std::endl;
-#               endif
+                trace << "  Visit the successor: "
+                      << a_->format_state(s_prime) << std::endl;
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
                 // Go down the edge (f.s, <label, acc>, s_prime)
@@ -197,9 +195,7 @@ namespace spot
                 typename heap::color_ref c = h.get_color_ref(s_prime);
                 if (c.is_white())
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is white, go down" << std::endl;
-#                   endif
+                    trace << "  It is white, go down" << std::endl;
                     inc_states();
                     h.add_new_state(s_prime, BLUE);
                     push(st_blue, s_prime, label, acc);
@@ -212,10 +208,8 @@ namespace spot
                         // the number of runs reported by successive
                         // calls to the check method. Without this
                         // functionnality, the test can be ommited.
-#                       ifdef TRACE
-                        std::cout << "  It is blue and the arc is "
-                                  << "accepting, start a red dfs" << std::endl;
-#                       endif
+                        trace << "  It is blue and the arc is "
+                              << "accepting, start a red dfs" << std::endl;
                         target = f.s;
                         c.set_color(RED);
                         push(st_red, s_prime, label, acc);
@@ -224,9 +218,7 @@ namespace spot
                       }
                     else
                       {
-#                       ifdef TRACE
-                        std::cout << "  It is blue or red, pop it" << std::endl;
-#                       endif
+                        trace << "  It is blue or red, pop it" << std::endl;
                         h.pop_notify(s_prime);
                       }
                   }
@@ -235,10 +227,7 @@ namespace spot
             // Backtrack the edge
             //        (predecessor of f.s in st_blue, <f.label, f.acc>, f.s)
               {
-#               ifdef TRACE
-                std::cout << "  All the successors have been visited"
-                          << std::endl;
-#               endif
+                trace << "  All the successors have been visited" << std::endl;
                 stack_item f_dest(f);
                 pop(st_blue);
                 typename heap::color_ref c = h.get_color_ref(f_dest.s);
@@ -250,12 +239,10 @@ namespace spot
                     // the number of runs reported by successive
                     // calls to the check method. Without this
                     // functionnality, the test can be ommited.
-#                   ifdef TRACE
-                    std::cout << "  It is blue and the arc from "
-                              << a_->format_state(st_blue.front().s)
-                              << " to it is accepting, start a red dfs"
-                              << std::endl;
-#                   endif
+                    trace << "  It is blue and the arc from "
+                          << a_->format_state(st_blue.front().s)
+                          << " to it is accepting, start a red dfs"
+                          << std::endl;
                     target = st_blue.front().s;
                     c.set_color(RED);
                     push(st_red, f_dest.s, f_dest.label, f_dest.acc);
@@ -264,10 +251,7 @@ namespace spot
                   }
                 else
                   {
-#                   ifdef TRACE
-                    std::cout << "  Pop it"
-                              << std::endl;
-#                   endif
+                    trace << "  Pop it" << std::endl;
                     h.pop_notify(f_dest.s);
                   }
               }
@@ -284,17 +268,12 @@ namespace spot
         while (!st_red.empty())
           {
             stack_item& f = st_red.front();
-#           ifdef TRACE
-            std::cout << "DFS_RED treats: "
-                      << a_->format_state(f.s) << std::endl;
-#           endif
+            trace << "DFS_RED treats: " << a_->format_state(f.s) << std::endl;
             if (!f.it->done())
               {
                 const state *s_prime = f.it->current_state();
-#               ifdef TRACE
-                std::cout << "  Visit the successor: "
-                          << a_->format_state(s_prime) << std::endl;
-#               endif
+                trace << "  Visit the successor: "
+                      << a_->format_state(s_prime) << std::endl;
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
                 // Go down the edge (f.s, <label, acc>, s_prime)
@@ -310,16 +289,12 @@ namespace spot
                     // to the visit of white state. Anyway, it is not necessary
                     // to visit white states either if a cycle can be missed
                     // with bit-state hashing search.
-#                   ifdef TRACE
-                    std::cout << "  It is white, pop it" << std::endl;
-#                   endif
+                    trace << "  It is white, pop it" << std::endl;
                     delete s_prime;
                   }
                 else if (c.get_color() == BLUE)
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is blue, go down" << std::endl;
-#                   endif
+                    trace << "  It is blue, go down" << std::endl;
                     c.set_color(RED);
                     push(st_red, s_prime, label, acc);
                     if (target->compare(s_prime) == 0)
@@ -327,18 +302,14 @@ namespace spot
                   }
                 else
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is red, pop it" << std::endl;
-#                   endif
+                    trace << "  It is red, pop it" << std::endl;
                     h.pop_notify(s_prime);
                   }
               }
             else // Backtrack
               {
-#               ifdef TRACE
-                std::cout << "  All the successors have been visited, pop it"
-                          << std::endl;
-#               endif
+                trace << "  All the successors have been visited, pop it"
+                      << std::endl;
                 h.pop_notify(f.s);
                 pop(st_red);
               }

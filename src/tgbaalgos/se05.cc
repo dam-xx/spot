@@ -21,8 +21,11 @@
 
 //#define TRACE
 
-#ifdef TRACE
 #include <iostream>
+#ifdef TRACE
+#define trace std::cerr
+#else
+#define trace while (0) std::cerr
 #endif
 
 #include <cassert>
@@ -53,7 +56,7 @@ namespace spot
       /// condition (i.e. it is a TBA).
       se05_search(const tgba *a, size_t size)
         : emptiness_check(a),
-          current_weight(0),
+          ec_statistics(),
           h(size),
           all_cond(a->all_acceptance_conditions())
       {
@@ -92,7 +95,7 @@ namespace spot
             assert(st_blue.empty());
             const state* s0 = a_->get_init_state();
             inc_states();
-            h.add_new_state(s0, CYAN, current_weight);
+            h.add_new_state(s0, CYAN);
             push(st_blue, s0, bddfalse, bddfalse);
             if (dfs_blue())
               return new result(*this);
@@ -160,10 +163,6 @@ namespace spot
         st.pop_front();
       }
 
-      /// \brief number of visited accepting arcs
-      /// in the blue stack.
-      int current_weight;
-
       /// \brief Stack of the blue dfs.
       stack_type st_blue;
 
@@ -182,17 +181,12 @@ namespace spot
         while (!st_blue.empty())
           {
             stack_item& f = st_blue.front();
-#           ifdef TRACE
-            std::cout << "DFS_BLUE treats: "
-                      << a_->format_state(f.s) << std::endl;
-#           endif
+            trace << "DFS_BLUE treats: " << a_->format_state(f.s) << std::endl;
             if (!f.it->done())
               {
                 const state *s_prime = f.it->current_state();
-#               ifdef TRACE
-                std::cout << "  Visit the successor: "
-                          << a_->format_state(s_prime) << std::endl;
-#               endif
+                trace << "  Visit the successor: "
+                      << a_->format_state(s_prime) << std::endl;
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
                 // Go down the edge (f.s, <label, acc>, s_prime)
@@ -201,25 +195,16 @@ namespace spot
                 typename heap::color_ref c = h.get_color_ref(s_prime);
                 if (c.is_white())
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is white, go down" << std::endl;
-#                   endif
-                    if (acc == all_cond)
-                      ++current_weight;
+                    trace << "  It is white, go down" << std::endl;
                     inc_states();
-                    h.add_new_state(s_prime, CYAN, current_weight);
+                    h.add_new_state(s_prime, CYAN);
                     push(st_blue, s_prime, label, acc);
                   }
                 else if (c.get_color() == CYAN && (acc == all_cond ||
-             (f.s->compare(s_prime) != 0 && f.acc == all_cond) // option SE05
-//                            current_weight > c.get_weight()  // option WEIGHT
-                                              /**/))
-// For Alexandre: combat style.test! ----------^
+                             (f.s->compare(s_prime) != 0 && f.acc == all_cond)))
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is cyan and acceptance condition "
-                              << "is reached, report cycle" << std::endl;
-#                   endif
+                    trace << "  It is cyan and acceptance condition "
+                          << "is reached, report cycle" << std::endl;
                     c.set_color(RED);
                     push(st_red, s_prime, label, acc);
                     return true;
@@ -230,10 +215,8 @@ namespace spot
                     // the number of runs reported by successive
                     // calls to the check method. Without this
                     // functionnality, the test can be ommited.
-#                   ifdef TRACE
-                    std::cout << "  It is cyan or blue and the arc is "
-                              << "accepting, start a red dfs" << std::endl;
-#                   endif
+                    trace << "  It is cyan or blue and the arc is "
+                          << "accepting, start a red dfs" << std::endl;
                     c.set_color(RED);
                     push(st_red, s_prime, label, acc);
                     if (dfs_red())
@@ -241,10 +224,7 @@ namespace spot
                   }
                 else
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is cyan, blue or red, pop it"
-                              << std::endl;
-#                   endif
+                    trace << "  It is cyan, blue or red, pop it" << std::endl;
                     h.pop_notify(s_prime);
                   }
               }
@@ -252,14 +232,9 @@ namespace spot
             // Backtrack the edge
             //        (predecessor of f.s in st_blue, <f.label, f.acc>, f.s)
               {
-#               ifdef TRACE
-                std::cout << "  All the successors have been visited"
-                          << std::endl;
-#               endif
+                trace << "  All the successors have been visited" << std::endl;
                 stack_item f_dest(f);
                 pop(st_blue);
-                if (f_dest.acc == all_cond)
-                  --current_weight;
                 typename heap::color_ref c = h.get_color_ref(f_dest.s);
                 assert(!c.is_white());
                 if (!st_blue.empty() &&
@@ -269,12 +244,10 @@ namespace spot
                     // the number of runs reported by successive
                     // calls to the check method. Without this
                     // functionnality, the test can be ommited.
-#                   ifdef TRACE
-                    std::cout << "  The arc from "
-                              << a_->format_state(st_blue.front().s)
-                              << " to the current state is accepting, start a "
-                              << "red dfs" << std::endl;
-#                   endif
+                    trace << "  The arc from "
+                          << a_->format_state(st_blue.front().s)
+                          << " to the current state is accepting, start a "
+                          << "red dfs" << std::endl;
                     c.set_color(RED);
                     push(st_red, f_dest.s, f_dest.label, f_dest.acc);
                     if (dfs_red())
@@ -282,9 +255,7 @@ namespace spot
                   }
                 else
                   {
-#                   ifdef TRACE
-                    std::cout << "  Pop it" << std::endl;
-#                   endif
+                    trace << "  Pop it" << std::endl;
                     c.set_color(BLUE);
                     h.pop_notify(f_dest.s);
                   }
@@ -300,17 +271,12 @@ namespace spot
         while (!st_red.empty())
           {
             stack_item& f = st_red.front();
-#           ifdef TRACE
-            std::cout << "DFS_RED treats: "
-                      << a_->format_state(f.s) << std::endl;
-#           endif
+            trace << "DFS_RED treats: " << a_->format_state(f.s) << std::endl;
             if (!f.it->done())
               {
                 const state *s_prime = f.it->current_state();
-#               ifdef TRACE
-                std::cout << "  Visit the successor: "
-                          << a_->format_state(s_prime) << std::endl;
-#               endif
+                trace << "  Visit the successor: "
+                      << a_->format_state(s_prime) << std::endl;
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
                 // Go down the edge (f.s, <label, acc>, s_prime)
@@ -325,45 +291,33 @@ namespace spot
                     // implying the report of a cycle.
                     // However, with a bit-state hashing search and due to
                     // collision, this property does not hold.
-#                   ifdef TRACE
-                    std::cout << "  It is white (due to collision), pop it"
-                              << std::endl;
-#                   endif
+                    trace << "  It is white (due to collision), pop it"
+                          << std::endl;
                     delete s_prime;
                   }
                 else if (c.get_color() == RED)
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is red, pop it"
-                              << std::endl;
-#                   endif
+                    trace << "  It is red, pop it" << std::endl;
                     h.pop_notify(s_prime);
                   }
                 else if (c.get_color() == CYAN)
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is cyan, report a cycle"
-                              << std::endl;
-#                   endif
+                    trace << "  It is cyan, report a cycle" << std::endl;
                     c.set_color(RED);
                     push(st_red, s_prime, label, acc);
                     return true;
                   }
                 else
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is blue, go down" << std::endl;
-#                   endif
+                    trace << "  It is blue, go down" << std::endl;
                     c.set_color(RED);
                     push(st_red, s_prime, label, acc);
                   }
               }
             else // Backtrack
               {
-#               ifdef TRACE
-                std::cout << "  All the successors have been visited, pop it"
-                          << std::endl;
-#               endif
+                trace << "  All the successors have been visited, pop it"
+                      << std::endl;
                 h.pop_notify(f.s);
                 pop(st_red);
               }
@@ -429,7 +383,7 @@ namespace spot
 
     class explicit_se05_search_heap
     {
-      typedef Sgi::hash_map<const state*, int,
+      typedef Sgi::hash_set<const state*,
                 state_ptr_hash, state_ptr_equal> hcyan_type;
       typedef Sgi::hash_map<const state*, color,
                 state_ptr_hash, state_ptr_equal> hash_type;
@@ -437,12 +391,12 @@ namespace spot
       class color_ref
       {
       public:
-        color_ref(hash_type* h, hcyan_type* hc, const state* s, int w)
-          : is_cyan(true), weight(w), ph(h), phc(hc), ps(s), pc(0)
+        color_ref(hash_type* h, hcyan_type* hc, const state* s)
+          : is_cyan(true), ph(h), phc(hc), ps(s), pc(0)
           {
           }
         color_ref(color* c)
-          : is_cyan(false), weight(0), ph(0), phc(0), ps(0), pc(c)
+          : is_cyan(false), ph(0), phc(0), ps(0), pc(c)
           {
           }
         color get_color() const
@@ -450,11 +404,6 @@ namespace spot
             if (is_cyan)
               return CYAN;
             return *pc;
-          }
-        int get_weight() const
-          {
-            assert(is_cyan);
-            return weight;
           }
         void set_color(color c)
           {
@@ -478,7 +427,6 @@ namespace spot
           }
       private:
         bool is_cyan;
-        int weight; // weight of a cyan node
         hash_type* ph; //point to the main hash table
         hcyan_type* phc; // point to the hash table hcyan
         const state* ps; // point to the state in hcyan
@@ -494,7 +442,7 @@ namespace spot
           hcyan_type::const_iterator sc = hc.begin();
           while (sc != hc.end())
             {
-              const state* ptr = sc->first;
+              const state* ptr = *sc;
               ++sc;
               delete ptr;
             }
@@ -522,20 +470,19 @@ namespace spot
                 }
               return color_ref(&(it->second)); // blue or red state
             }
-          if (s!=ic->first)
+          if (s!=*ic)
             {
               delete s;
-              s = ic->first;
+              s = *ic;
             }
-          return color_ref(&h, &hc, ic->first, ic->second); // cyan state
+          return color_ref(&h, &hc, *ic); // cyan state
         }
 
-      void add_new_state(const state* s, color c, int w=-1)
+      void add_new_state(const state* s, color c)
         {
           assert(hc.find(s)==hc.end() && h.find(s)==h.end());
-          assert(c!=CYAN || w>=0);
           if (c == CYAN)
-            hc.insert(std::make_pair(s, w));
+            hc.insert(s);
           else
             h.insert(std::make_pair(s, c));
         }
@@ -553,19 +500,19 @@ namespace spot
     class bsh_se05_search_heap
     {
     private:
-      typedef Sgi::hash_map<const state*, int,
+      typedef Sgi::hash_set<const state*,
                 state_ptr_hash, state_ptr_equal> hcyan_type;
     public:
       class color_ref
       {
       public:
-        color_ref(hcyan_type* h, const state* st, int w,
+        color_ref(hcyan_type* h, const state* st,
                     unsigned char *base, unsigned char offset)
-          : is_cyan(true), weight(w), phc(h), ps(st), b(base), o(offset*2)
+          : is_cyan(true), phc(h), ps(st), b(base), o(offset*2)
           {
           }
         color_ref(unsigned char *base, unsigned char offset)
-          : is_cyan(false), weight(0), phc(0), ps(0), b(base), o(offset*2)
+          : is_cyan(false), phc(0), ps(0), b(base), o(offset*2)
           {
           }
         color get_color() const
@@ -573,11 +520,6 @@ namespace spot
             if (is_cyan)
               return CYAN;
             return color(((*b) >> o) & 3U);
-          }
-        int get_weight() const
-          {
-            assert(is_cyan);
-            return weight;
           }
         void set_color(color c)
           {
@@ -595,7 +537,6 @@ namespace spot
           }
       private:
         bool is_cyan;
-        int weight;
         hcyan_type* phc;
         const state* ps;
         unsigned char *b;
@@ -618,16 +559,15 @@ namespace spot
           size_t ha = s->hash();
           hcyan_type::iterator ic = hc.find(s);
           if (ic!=hc.end())
-            return color_ref(&hc, ic->first, ic->second, &h[ha%size], ha%4);
+            return color_ref(&hc, *ic, &h[ha%size], ha%4);
           return color_ref(&h[ha%size], ha%4);
         }
 
-      void add_new_state(const state* s, color c, int w=-1)
+      void add_new_state(const state* s, color c)
         {
-          assert(c!=CYAN || w>=0);
           assert(get_color_ref(s).is_white());
           if (c==CYAN)
-            hc.insert(std::make_pair(s, w));
+            hc.insert(s);
           else
             {
               color_ref cr(get_color_ref(s));

@@ -1,3 +1,12 @@
+2004-11-25  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/tgbaalgos/magic.cc, src/tgbaalgos/magic.hh,
+	src/tgbaalgos/se05.cc, src/tgbaalgos/se05.hh,
+	src/tgbaalgos/tau03.cc, src/tgbaalgos/tau03opt.hh,
+	src/tgbaalgos/tau03opt.cc: Fix comments and debug traces
+
+	* src/tgbatest/randtgba.cc: Adjust names of algorithms.
+
 2004-11-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/randtgba.cc: Add option -D.

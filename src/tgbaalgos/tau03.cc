@@ -25,9 +25,11 @@
 
 //#define TRACE
 
-#ifdef TRACE
 #include <iostream>
-#include "tgba/bddprint.hh"
+#ifdef TRACE
+#define trace std::cerr
+#else
+#define trace while (0) std::cerr
 #endif
 
 #include <cassert>
@@ -155,17 +157,12 @@ namespace spot
         while (!st_blue.empty())
           {
             stack_item& f = st_blue.front();
-#           ifdef TRACE
-            std::cout << "DFS_BLUE treats: "
-                      << a_->format_state(f.s) << std::endl;
-#           endif
+            trace << "DFS_BLUE treats: " << a_->format_state(f.s) << std::endl;
             if (!f.it->done())
               {
                 const state *s_prime = f.it->current_state();
-#               ifdef TRACE
-                std::cout << "  Visit the successor: "
-                          << a_->format_state(s_prime) << std::endl;
-#               endif
+                trace << "  Visit the successor: "
+                      << a_->format_state(s_prime) << std::endl;
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
                 // Go down the edge (f.s, <label, acc>, s_prime)
@@ -174,18 +171,14 @@ namespace spot
                 typename heap::color_ref c_prime = h.get_color_ref(s_prime);
                 if (c_prime.is_white())
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is white, go down" << std::endl;
-#                   endif
+                    trace << "  It is white, go down" << std::endl;
                     inc_states();
                     h.add_new_state(s_prime, BLUE);
                     push(st_blue, s_prime, label, acc);
                   }
                 else
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is blue, pop it" << std::endl;
-#                   endif
+                    trace << "  It is blue, pop it" << std::endl;
                     h.pop_notify(s_prime);
                   }
               }
@@ -193,11 +186,9 @@ namespace spot
             // Backtrack the edge
             //        (predecessor of f.s in st_blue, <f.label, f.acc>, f.s)
               {
-#               ifdef TRACE
-                std::cout << "  All the successors have been visited"
-                          << ", rescan this successors"
-                          << std::endl;
-#               endif
+                trace << "  All the successors have been visited"
+                      << ", rescan this successors"
+                      << std::endl;
                 typename heap::color_ref c = h.get_color_ref(f.s);
                 assert(!c.is_white());
                 tgba_succ_iterator* i = a_->succ_iter(f.s);
@@ -205,11 +196,9 @@ namespace spot
                   {
                    inc_transitions();
                    const state *s_prime = i->current_state();
-#ifdef              TRACE
-                    std::cout << "DFS_BLUE rescanning the arc from "
-                              << a_->format_state(f.s) << "  to "
-                              << a_->format_state(s_prime) << std::endl;
-#                   endif
+                    trace << "DFS_BLUE rescanning the arc from "
+                          << a_->format_state(f.s) << "  to "
+                          << a_->format_state(s_prime) << std::endl;
                     bdd label = i->current_condition();
                     bdd acc = i->current_acceptance_conditions();
                     typename heap::color_ref c_prime = h.get_color_ref(s_prime);
@@ -217,19 +206,8 @@ namespace spot
                     bdd acu = acc | c.get_acc();
                     if ((c_prime.get_acc() & acu) != acu)
                       {
-#                       ifdef TRACE
-                        std::cout << "  ";
-                        bdd_print_acc(std::cout, a_->get_dict(), acu);
-                        std::cout << " is not included in ";
-                        bdd_print_acc(std::cout, a_->get_dict(),
-				      c_prime.get_acc());
-                        std::cout << std::endl;
-                        std::cout << "  Start a red dfs from "
-                                  << a_->format_state(s_prime)
-                                  << " propagating: ";
-                        bdd_print_acc(std::cout, a_->get_dict(), acu);
-                        std::cout << std::endl;
-#                       endif
+                        trace << "  a propagation is needed, go down"
+                              << std::endl;
                         c_prime.cumulate_acc(acu);
                         push(st_red, s_prime, label, acc);
                         dfs_red(acu);
@@ -238,18 +216,14 @@ namespace spot
                 delete i;
                 if (c.get_acc() == all_cond)
                   {
-#ifdef              TRACE
-                    std::cout << "DFS_BLUE propagation is successful, report a"
-                              << " cycle" << std::endl;
-#                   endif
+                    trace << "DFS_BLUE propagation is successful, report a"
+                          << " cycle" << std::endl;
                     return true;
                   }
                 else
                   {
-#ifdef              TRACE
-                    std::cout << "DFS_BLUE propagation is unsuccessful, pop it";
-                              << std::endl;
-#                   endif
+                    trace << "DFS_BLUE propagation is unsuccessful, pop it"
+                          << std::endl;
                     h.pop_notify(f.s);
                     pop(st_blue);
                  }
@@ -265,17 +239,12 @@ namespace spot
         while (!st_red.empty())
           {
             stack_item& f = st_red.front();
-#ifdef      TRACE
-            std::cout << "DFS_RED treats: "
-                      << a_->format_state(f.s) << std::endl;
-#           endif
+            trace << "DFS_RED treats: " << a_->format_state(f.s) << std::endl;
             if (!f.it->done())
               {
                 const state *s_prime = f.it->current_state();
-#ifdef          TRACE
-                std::cout << "  Visit the successor: "
-                          << a_->format_state(s_prime) << std::endl;
-#               endif
+                trace << "  Visit the successor: "
+                      << a_->format_state(s_prime) << std::endl;
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
                 // Go down the edge (f.s, <label, acc>, s_prime)
@@ -284,35 +253,27 @@ namespace spot
                 typename heap::color_ref c_prime = h.get_color_ref(s_prime);
                 if (c_prime.is_white())
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is white, pop it" << std::endl;
-#                   endif
+                    trace << "  It is white, pop it" << std::endl;
                     delete s_prime;
                   }
                  else if ((c_prime.get_acc() & acu) != acu)
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is blue and propagation "
-                              << "is needed, go down" << std::endl;
-#                   endif
+                    trace << "  It is blue and propagation "
+                          << "is needed, go down" << std::endl;
                     c_prime.cumulate_acc(acu);
                     push(st_red, s_prime, label, acc);
                   }
                 else
                   {
-#                   ifdef TRACE
-                    std::cout << "  It is blue and no propagation "
-                              << "is needed, pop it" << std::endl;
-#                   endif
+                    trace << "  It is blue and no propagation "
+                          << "is needed, pop it" << std::endl;
                     h.pop_notify(s_prime);
                   }
               }
             else // Backtrack
               {
-#               ifdef TRACE
-                std::cout << "  All the successors have been visited, pop it"
-                          << std::endl;
-#               endif
+                trace << "  All the successors have been visited, pop it"
+                      << std::endl;
                 h.pop_notify(f.s);
                 pop(st_red);
               }

@@ -47,29 +47,21 @@ namespace spot
   /// \verbatim
   /// procedure check ()
   /// begin
-  ///   weight = 0;
   ///   call dfs_blue(s0);
   /// end;
   ///
   /// procedure dfs_blue (s)
   /// begin
   ///   s.color = cyan;
-  ///   s.weight = weight;
   ///   for all t in post(s) do
   ///     if t.color == white then
-  ///       if the edge (s,t) is accepting then
-  ///         weight = weight + 1;
-  ///       end if;
   ///       call dfs_blue(t);
-  ///       if the edge (s,t) is accepting then
-  ///         weight = weight - 1;
-  ///       end if;
   ///     else if t.color == cyan and
   ///             (the edge (s,t) is accepting or
-  ///              weight > t.weight) then
+  ///              (it exists a predecessor p of s in st_blue and s != t and
+  ///              the arc between p and s is accepting)) then
   ///       report cycle;
-  ///     end if;
-  ///     if the edge (s,t) is accepting then
+  ///     else if the edge (s,t) is accepting then
   ///       call dfs_red(t);
   ///     end if;
   ///   end for;
@@ -83,15 +75,14 @@ namespace spot
   ///   end if;
   ///   s.color = red;
   ///   for all t in post(s) do
-  ///     if t.color != red then
+  ///     if t.color == blue then
   ///       call dfs_red(t);
   ///     end if;
   ///   end for;
   /// end;
   /// \endverbatim
   ///
-  /// It is an adaptation to TBA (and a slight extension) of the one
-  /// presented in
+  /// It is an adaptation to TBA of the one presented in
   /// \verbatim
   ///  @techreport{SE04,
   ///    author = {Stefan Schwoon and Javier Esparza},
@@ -106,12 +97,6 @@ namespace spot
   ///  }
   /// \endverbatim
   ///
-  /// The extention consists in the introduction of a weight associated
-  /// to each state in the blue stack (the cyan states). The weight of a
-  /// cyan state corresponds to the number of accepting arcs traversed to reach
-  /// it from the initial state. Weights are used to detect accepting cycle in
-  /// the blue dfs.
-  ///
   /// \sa spot::explicit_magic_search
   ///
   emptiness_check* explicit_se05_search(const tgba *a);
@@ -122,7 +107,7 @@ namespace spot
   /// it is a TBA).
   ///
   /// During the visit of \a a, the returned checker does not store explicitely
-  /// the traversed states but uses the bit-state hashing technicpresented in:
+  /// the traversed states but uses the bit-state hashing technic presented in:
   ///
   /// \verbatim
   /// @book{Holzmann91,
