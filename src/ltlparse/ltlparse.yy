@@ -1,4 +1,4 @@
-/* Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -50,68 +50,87 @@ using namespace spot::ltl;
    (%name-prefix doesn't work for the lalr1.cc skeleton
    at the time of writing.)  */
 #define yylex ltlyylex
+
+#define missing_right_op(res, op, str)			\
+  do							\
+    {							\
+      error_list.push_back(parse_error(op,		\
+       "missing right operand for \"" str "\""));	\
+      res = constant::false_instance();			\
+    }							\
+  while (0);
+
+#define missing_right_binop(res, left, op, str)	\
+  do						\
+    {						\
+      destroy(left);				\
+      missing_right_op(res, op, str);		\
+    }						\
+  while (0);
+
 %}
 
+
+/* All tokens.  */
+
+%token <token> PAR_OPEN "opening parenthesis" PAR_CLOSE "closing parenthesis"
+%token <token> OP_OR "or operator" OP_XOR "xor operator" OP_AND "and operation"
+%token <token> OP_IMPLIES "implication operator" OP_EQUIV "equivalent operator"
+%token <token> OP_U "until operator" OP_R "release operator"
+%token <token> OP_F "sometimes operator" OP_G "always operator"
+%token <token> OP_X "next operator"
+%token <str> ATOMIC_PROP "atomic proposition" OP_NOT "not operator"
+%token CONST_TRUE "constant true" CONST_FALSE "constant false"
+%token END_OF_INPUT "end of formula"
+
+
+/* Priorities.  */
+
 /* Logical operators.  */
-%left <token> OP_OR
-%left <token> OP_XOR
-%left <token> OP_AND
-%left <token> OP_IMPLIES OP_EQUIV
+%left OP_OR
+%left OP_XOR
+%left OP_AND
+%left OP_IMPLIES OP_EQUIV
 
 /* LTL operators.  */
-%left <token> OP_U OP_R
-%nonassoc <token> OP_F OP_G
-%nonassoc <token> OP_X
+%left OP_U OP_R
+%nonassoc OP_F OP_G
+%nonassoc OP_X
 
 /* Not has the most important priority.  */
-%nonassoc <token> OP_NOT
+%nonassoc OP_NOT
 
-/* Grouping (parentheses).  */
-%token <token> PAR_OPEN PAR_CLOSE
+%type <ltl> result subformula
 
-/* Atomic proposition.  */
-%token <str> ATOMIC_PROP
-
-/* Constants */
-%token CONST_TRUE
-%token CONST_FALSE
-%token END_OF_INPUT
-
-%type <ltl> result ltl_formula subformula
-
-%destructor { delete $$; } ATOMIC_PROP
-%destructor { spot::ltl::destroy($$); } result ltl_formula subformula
+/* At the time of writing (2004-01-05) there is a bug in CVS Bison: if
+   you give a token (such a ATOMIC_PROP) a name (such as "atomic
+   proposition"), then the %destructor should refer to that name.
+   References to ATOMIC_PROP are silently ignored.  */
+%destructor { delete $$; } "atomic proposition"
+%destructor { spot::ltl::destroy($$); } result subformula
 
 %%
-result:       ltl_formula END_OF_INPUT
+result:       subformula END_OF_INPUT
 	      { result = $$ = $1;
 		YYACCEPT;
 	      }
-	    | many_errors END_OF_INPUT
+	    | error END_OF_INPUT
 	      { error_list.push_back(parse_error(@1,
-				      "couldn't parse anything sensible"));
+				      "could not parse anything sensible"));
 		result = $$ = 0;
 		YYABORT;
+	      }
+	    | subformula error END_OF_INPUT
+	      { error_list.push_back(parse_error(@2,
+				      "ignoring trailing garbage"));
+		result = $$ = $1;
+		YYACCEPT;
 	      }
 	    | END_OF_INPUT
-	      { error_list.push_back(parse_error(@1, "empty input"));
+              { error_list.push_back(parse_error(@$, "empty input"));
 		result = $$ = 0;
 		YYABORT;
 	      }
-
-many_errors_diagnosed : many_errors
-	      { error_list.push_back(parse_error(@1,
-				     "unexpected input ignored")); }
-
-ltl_formula: subformula
-	      { $$ = $1; }
-	    | many_errors_diagnosed subformula
-	      { $$ = $2; }
-	    | ltl_formula many_errors_diagnosed
-	      { $$ = $1; }
-
-many_errors: error
-	    | many_errors error
 
 /* The reason we use `constant::false_instance()' for error recovery
    is that it isn't reference counted.  (Hence it can't leak references.)  */
@@ -144,96 +163,61 @@ subformula: ATOMIC_PROP
 		 "treating this parenthetical block as false"));
 		$$ = constant::false_instance();
 	      }
-	    | PAR_OPEN subformula many_errors_diagnosed PAR_CLOSE
-              { $$ = $2; }
-	    | PAR_OPEN subformula many_errors_diagnosed END_OF_INPUT
+	    | PAR_OPEN subformula END_OF_INPUT
 	      { error_list.push_back(parse_error(@1 + @2,
 				      "missing closing parenthesis"));
 		$$ = $2;
 	      }
-	    | PAR_OPEN many_errors_diagnosed END_OF_INPUT
+	    | PAR_OPEN error END_OF_INPUT
 	      { error_list.push_back(parse_error(@$,
                     "missing closing parenthesis, "
 		    "treating this parenthetical block as false"));
 		$$ = constant::false_instance();
 	      }
-	    | OP_NOT subformula
-	      { $$ = unop::instance(unop::Not, $2); }
 	    | subformula OP_AND subformula
 	      { $$ = multop::instance(multop::And, $1, $3); }
 	    | subformula OP_AND error
-	      {
-		destroy($1);
-		error_list.push_back(parse_error(@2,
-				     "missing right operand for OP_AND"));
-		$$ = constant::false_instance();
-	      }
+              { missing_right_binop($$, $1, @2, "and operator"); }
 	    | subformula OP_OR subformula
 	      { $$ = multop::instance(multop::Or, $1, $3); }
 	    | subformula OP_OR error
-	      {
-		destroy($1);
-		error_list.push_back(parse_error(@2,
-				     "missing right operand for OP_OR"));
-		$$ = constant::false_instance();
-	      }
+              { missing_right_binop($$, $1, @2, "or operator"); }
 	    | subformula OP_XOR subformula
 	      { $$ = binop::instance(binop::Xor, $1, $3); }
 	    | subformula OP_XOR error
-	      {
-		destroy($1);
-		error_list.push_back(parse_error(@2,
-				     "missing right operand for OP_XOR"));
-		$$ = constant::false_instance();
-	      }
+	      { missing_right_binop($$, $1, @2, "xor operator"); }
 	    | subformula OP_IMPLIES subformula
 	      { $$ = binop::instance(binop::Implies, $1, $3); }
 	    | subformula OP_IMPLIES error
-	      {
-		destroy($1);
-		error_list.push_back(parse_error(@2,
-				     "missing right operand for OP_IMPLIES"));
-		$$ = constant::false_instance();
-	      }
+	      { missing_right_binop($$, $1, @2, "implication operator"); }
 	    | subformula OP_EQUIV subformula
 	      { $$ = binop::instance(binop::Equiv, $1, $3); }
 	    | subformula OP_EQUIV error
-	      {
-		destroy($1);
-		error_list.push_back(parse_error(@2,
-				     "missing right operand for OP_EQUIV"));
-		$$ = constant::false_instance();
-	      }
+	      { missing_right_binop($$, $1, @2, "equivalent operator"); }
 	    | subformula OP_U subformula
 	      { $$ = binop::instance(binop::U, $1, $3); }
 	    | subformula OP_U error
-	      {
-		destroy($1);
-		error_list.push_back(parse_error(@2,
-				     "missing right operand for OP_U"));
-		$$ = constant::false_instance();
-	      }
+	      { missing_right_binop($$, $1, @2, "until operator"); }
 	    | subformula OP_R subformula
 	      { $$ = binop::instance(binop::R, $1, $3); }
 	    | subformula OP_R error
-	      {
-		destroy($1);
-		error_list.push_back(parse_error(@2,
-				     "missing right operand for OP_R"));
-		$$ = constant::false_instance();
-	      }
+	      { missing_right_binop($$, $1, @2, "release operator"); }
 	    | OP_F subformula
 	      { $$ = unop::instance(unop::F, $2); }
+	    | OP_F error
+	      { missing_right_op($$, @1, "sometimes operator"); }
 	    | OP_G subformula
 	      { $$ = unop::instance(unop::G, $2); }
+	    | OP_G error
+	      { missing_right_op($$, @1, "always operator"); }
 	    | OP_X subformula
 	      { $$ = unop::instance(unop::X, $2); }
-//	    | subformula many_errors
-//              { error_list->push_back(parse_error(@2,
-//		  "ignoring these unexpected trailing tokens"));
-//	        $$ = $1;
-//	      }
-
+	    | OP_X error
+	      { missing_right_op($$, @1, "next operator"); }
+	    | OP_NOT subformula
+	      { $$ = unop::instance(unop::Not, $2); }
+	    | OP_NOT error
+	      { missing_right_op($$, @1, "not operator"); }
 ;
 
 %%

@@ -1,10 +1,17 @@
+2004-01-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltltest/parseerr.test: Adjust.
+	* src/ltlparse/ltlparse.yy: Simplify error handling now that Bison
+	will call destructors.  Give each operator a full name, so that
+	Bison uses it in error messages.
+
 2003-12-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/ltleesrg.cc: New file.
 	* iface/gspn/Makefile.am (check_PROGRAMS): Add ltleesrg.
 	(ltleesrg_LDADD, ltleesrg_SOURCES): New variables.
 
-	* src/ltltest/defs.in (run): Reun valgrind with --leak-check=yes.
+	* src/ltltest/defs.in (run): Rerun valgrind with --leak-check=yes.
 	* src/ltlparse/ltlparse.yy: Add `%destructor's.
 
 2003-12-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
