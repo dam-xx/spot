@@ -6,6 +6,7 @@
 
 namespace spot
 {
+  /// A state whose representation is a BDD.
   class state_bdd: public state
   {
   public:
@@ -14,6 +15,7 @@ namespace spot
     {
     }
 
+    /// Return the BDD part of the state.
     bdd 
     as_bdd() const
     {
@@ -23,7 +25,7 @@ namespace spot
     virtual int compare(const state* other) const;
 
   protected:
-    bdd state_;
+    bdd state_;			///< BDD representation of the state.
   };
 }
 

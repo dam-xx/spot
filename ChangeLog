@@ -1,5 +1,10 @@
 2003-05-27  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/bddfactory.hh, src/tgba/statebdd.hh, 
+	src/tgba/succiterconcrete.hh, src/tgba/tgbabddconcrete.hh, 
+	src/tgba/tgbabddcoredata.hh, src/tgba/tgbabdddict.hh: Add
+	Doxygen comments.
+
 	* src/tgba/bddprint.hh (bdd_format_set): New function.
 	* src/tgba/bddprint.cc (bdd_format_set): Likewise.
 	* src/tgba/state.hh: Add Doxygen comments.
