@@ -1,3 +1,7 @@
+2005-01-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/randtgba.cc: Some fixes from Denis for ratio stats.
+
 2005-01-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlast/formula.hh (formula_ptr_less_than): Two

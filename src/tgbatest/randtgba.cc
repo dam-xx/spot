@@ -492,16 +492,16 @@ print_ar_stats(ar_stats_type& ar_stats)
 }
 
 void
-print_ratio_stats(int nbac, const ratio_stat_type& ratio_stats)
+print_ratio_stats(const std::string& s, const ratio_stat_type& ratio_stats)
 {
       std::cout << std::endl;
       std::ios::fmtflags old = std::cout.flags();
       std::cout << std::right << std::fixed << std::setprecision(1);
 
-      std::cout << "Ratios about emptiness checkers: ";
-      if (nbac >= 0)
-        std::cout << "(" << nbac << " acceptance conditions)";
-      std::cout << std::endl;
+      std::cout << "Ratios in case of non-emptiness (" << s << ")"
+                << std::endl;
+      std::cout << "<for all algorithms, the reference size is the one of"
+                << " the generalized automaton>" << std::endl;
       std::cout << std::setw(22) << ""
 		<< " |       % states        |    % transitions      |"
 		<< std::endl << std::setw(22) << "algorithm"
@@ -912,7 +912,7 @@ main(int argc, char** argv)
           else
             {
               spot::tgba* degen = 0;
-              if (opt_degen && real_n_acc != 1)
+              if (opt_degen && real_n_acc > 1)
                 degen = new spot::tgba_tba_proxy(a);
 
               int n_alg = sizeof(ec_algos) / sizeof(*ec_algos);
@@ -954,8 +954,7 @@ main(int argc, char** argv)
                         {
                           // Notice that ratios are computed w.r.t. the
                           // generalized automaton a.
-                          int nba = a->number_of_acceptance_conditions();
-                          ratio_stats[nba][algo].count(ecs, a);
+                          ratio_stats[real_n_acc][algo].count(ecs, a);
                           glob_ratio_stats[algo].count(ecs, a);
                         }
                     }
@@ -1164,11 +1163,18 @@ main(int argc, char** argv)
 
   if (!glob_ratio_stats.empty())
     {
-      print_ratio_stats(-1, glob_ratio_stats);
-      for (ratio_stats_type::const_iterator i = ratio_stats.begin();
-           i != ratio_stats.end(); ++i)
-        print_ratio_stats(i->first, i->second);
+      print_ratio_stats("all tests", glob_ratio_stats);
+      if (ratio_stats.size() > 1)
+        for (ratio_stats_type::const_iterator i = ratio_stats.begin();
+            i != ratio_stats.end(); ++i)
+          {
+            std::ostringstream s;
+            s << "tests with " << i->first << " acceptance conditions";
+            print_ratio_stats(s.str(), i->second);
+          }
+
     }
+
 
   if (!acss_stats.empty())
     {
