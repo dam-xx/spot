@@ -212,6 +212,11 @@ namespace spot
 	delete j;
 
 	// Sum acceptance conditions.
+	//
+	// (Beware l and i designate the next step to consider.
+	// Therefore if i is at the beginning of the cycle, `acc'
+	// contains the acceptance conditions of the last transition
+	// in the prefix; we should not account it.)
 	if (l == &run->cycle && i != l->begin())
 	  {
 	    all_acc |= acc;
