@@ -98,6 +98,7 @@ main(int argc, char **argv)
 	    {
 	      check = Couvreur2;
 	    }
+#ifdef SSP
 	  else if (!strcmp(argv[formula_index], "-e3"))
 	    {
 	      check = Couvreur3;
@@ -110,6 +111,7 @@ main(int argc, char **argv)
 	    {
 	      check = Couvreur5;
 	    }
+#endif
 	  else if (!strcmp(argv[formula_index], "-m"))
 	    {
 	      check = Magic;
@@ -230,7 +232,15 @@ main(int argc, char **argv)
 #ifndef SSP
 		    ce = new spot::counter_example(ecs);
 #else
-		    ce = spot::counter_example_ssp(ecs);
+		    switch (check)
+		      {
+		      case Couvreur:
+		      case Couvreur2:
+			ce = new spot::counter_example(ecs);
+			break;
+		      default:
+			ce = spot::counter_example_ssp(ecs);
+		      }
 #endif
 		    ce->print_result(std::cout, proj ? model : 0);
 		    ce->print_stats(std::cout);
