@@ -266,8 +266,8 @@ namespace spot
   {
     // Setup depth-first search from the initial state.
     todo.push_back(todo_item(0, 0));
-    inc_depth();
     todo.back().q.push_front(successor(bddtrue, ecs_->aut->get_init_state()));
+    inc_depth(2);
   }
 
   couvreur99_check_shy::~couvreur99_check_shy()
@@ -292,7 +292,7 @@ namespace spot
 	    if (spi.first == 0)
 	      delete q->s;
 	  }
-	dec_depth(todo.back().q.size());
+	dec_depth(todo.back().q.size() + 1);
 	todo.pop_back();
       }
     assert(depth() == 0);
@@ -317,10 +317,12 @@ namespace spot
 	    int index = todo.back().n;
 	    // Backtrack TODO.
 	    todo.pop_back();
+	    dec_depth();
 	    if (todo.empty())
 	      {
 		// This automaton recognizes no word.
 		set_states(ecs_->states());
+		assert(depth() == 0);
 		return 0;
 	      }
 
@@ -374,6 +376,7 @@ namespace spot
 	ecs_->root.push(num);
 	arc.push(succ.acc);
 	todo.push_back(todo_item(succ.s, num));
+	inc_depth();
 	succ_queue* new_queue = &todo.back().q;
 	tgba_succ_iterator* iter = ecs_->aut->succ_iter(succ.s);
 	succ_queue::iterator merge_end;
@@ -458,6 +461,7 @@ namespace spot
 		      }
 		    prev->q.splice(prev->q.end(), last->q);
 		    todo.pop_back();
+		    dec_depth();
 		  }
 		new_queue = &todo.back().q;
 	      }

@@ -1,3 +1,16 @@
+2005-01-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_shy::clear_todo,
+	couvreur99_check_shy::check): Sum all successors in the
+	todo stack AND all items on the stack.
+
+2005-01-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/emptiness_stats.hh (ec_statistics::depth): New function.
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_shy::clear_todo,
+	couvreur99_check_shy::check): Count all successors in the
+	todo stack rather than all items on the stack.
+
 2005-01-13  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbatest/randtgba.cc: Close the formula file and remove a trace.
