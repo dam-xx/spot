@@ -70,7 +70,9 @@ namespace spot
   class emptiness_check
   {
   public:
-    emptiness_check(const tgba* a);
+    emptiness_check(const tgba* a,
+		    const numbered_state_heap_factory* nshf
+		    = numbered_state_heap_hash_map_factory::instance());
     virtual ~emptiness_check();
 
     /// Check whether the automaton's language is empty.
@@ -103,7 +105,9 @@ namespace spot
   class emptiness_check_shy : public emptiness_check
   {
   public:
-    emptiness_check_shy(const tgba* a);
+    emptiness_check_shy(const tgba* a,
+			const numbered_state_heap_factory* nshf
+			= numbered_state_heap_hash_map_factory::instance());
     virtual ~emptiness_check_shy();
 
     virtual bool check();

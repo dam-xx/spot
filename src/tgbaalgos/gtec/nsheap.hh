@@ -81,6 +81,14 @@ namespace spot
     virtual const state* filter(const state* s) const = 0;
   };
 
+  /// Abstract factory for numbered_state_heap
+  class numbered_state_heap_factory
+  {
+  public:
+    virtual ~numbered_state_heap_factory() {}
+    virtual numbered_state_heap* build() const = 0;
+  };
+
   /// A straightforward implementation of numbered_state_heap with a hash map.
   class numbered_state_heap_hash_map : public numbered_state_heap
   {
@@ -103,6 +111,23 @@ namespace spot
 
     friend class numbered_state_heap_hash_map_const_iterator;
   };
+
+  /// \brief Factory for numbered_state_heap_hash_map.
+  ///
+  /// This class is a singleton.  Retrieve the instance using instance().
+  class numbered_state_heap_hash_map_factory:
+    public numbered_state_heap_factory
+  {
+  public:
+    virtual numbered_state_heap_hash_map* build() const;
+
+    /// Get the unique instance of this class.
+    static const numbered_state_heap_hash_map_factory* instance();
+  protected:
+    virtual ~numbered_state_heap_hash_map_factory() {}
+    numbered_state_heap_hash_map_factory();
+  };
+
 }
 
 #endif // SPOT_TGBAALGOS_GTEC_NSHEAP_HH

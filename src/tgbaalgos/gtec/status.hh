@@ -37,12 +37,13 @@ namespace spot
   class emptiness_check_status
   {
   public:
-    emptiness_check_status(const tgba* aut);
+    emptiness_check_status(const tgba* aut,
+			   const numbered_state_heap_factory* nshf);
     ~emptiness_check_status();
 
     const tgba* aut;
     scc_stack root;
-    numbered_state_heap_hash_map h; ///< Map of visited states.
+    numbered_state_heap* h;	///< Heap of visited states.
 
     /// Output statistics about this object.
     void print_stats(std::ostream& os) const;

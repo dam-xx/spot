@@ -23,19 +23,23 @@
 
 namespace spot
 {
-  emptiness_check_status::emptiness_check_status(const tgba* aut)
-    : aut(aut)
+  emptiness_check_status::emptiness_check_status
+    (const tgba* aut,
+     const numbered_state_heap_factory* nshf)
+      : aut(aut),
+	h(nshf->build())
   {
   }
 
   emptiness_check_status::~emptiness_check_status()
   {
+    delete h;
   }
 
   void
   emptiness_check_status::print_stats(std::ostream& os) const
   {
-    os << h.size() << " unique states visited" << std::endl;
+    os << h->size() << " unique states visited" << std::endl;
     os << root.size()
        << " strongly connected components in search stack"
        << std::endl;

@@ -1,5 +1,18 @@
 2004-04-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/gtec/nsheap.hh (numbered_state_heap_factory,
+	numbered_state_heap_hash_map_factory): New class.
+	* src/tgbaalgos/gtec/nsheap.cc (numbered_state_heap_hash_map_factory):
+	Implement it.
+	* src/tgbaalgos/gtec/gtec.hh (emptiness_check::emptiness_check,
+	emptiness_check_shy::emptiness_check_shy): Take a
+	numbered_state_heap_factory argument.
+	* tgbaalgos/gtec/status.hh
+	(emptiness_check_status::emptiness_check_status): Likewise.
+	(emptiness_check_status::h): Make it a numbered_state_heap*.
+	* src/tgbaalgos/gtec/ce.cc, tgbaalgos/gtec/gtec.cc,
+	tgbaalgos/gtec/status.cc: Adjust uses of ecs_->h.
+
 	* src/tgbaalgos/emptinesscheck.hh, src/tgbaalgos/emptinesscheck.cc:
 	Delete and split into ...
 	* src/tgbaalgos/gtec/ce.cc, src/tgbaalgos/gtec/ce.hh,

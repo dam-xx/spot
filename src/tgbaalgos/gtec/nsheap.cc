@@ -130,4 +130,22 @@ namespace spot
       delete s;
     return i->first;
   }
+
+  numbered_state_heap_hash_map_factory::numbered_state_heap_hash_map_factory()
+    : numbered_state_heap_factory()
+  {
+  }
+
+  numbered_state_heap_hash_map*
+  numbered_state_heap_hash_map_factory::build() const
+  {
+    return new numbered_state_heap_hash_map();
+  }
+
+  const numbered_state_heap_hash_map_factory*
+  numbered_state_heap_hash_map_factory::instance()
+  {
+    static numbered_state_heap_hash_map_factory f;
+    return &f;
+  }
 }

@@ -53,7 +53,7 @@ namespace spot
     assert(root.empty());
 
     // Build the set of states for all SCCs.
-    numbered_state_heap_const_iterator* i = ecs_->h.iterator();
+    numbered_state_heap_const_iterator* i = ecs_->h->iterator();
     for (i->first(); !i->done(); i->next())
       {
 	int index = i->get_index();
@@ -71,7 +71,7 @@ namespace spot
       }
     delete i;
 
-    suffix.push_front(ecs_->h.filter(ecs_->aut->get_init_state()));
+    suffix.push_front(ecs_->h->filter(ecs_->aut->get_init_state()));
 
     // We build a path trough each SCC in the stack.  For the
     // first SCC, the starting state is the initial state of the
