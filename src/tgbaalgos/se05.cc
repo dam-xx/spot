@@ -30,25 +30,25 @@ namespace spot
 {
   namespace
   {
-    enum color {WHITE, BLUE, RED};
+    enum color {WHITE, CYAN, BLUE, RED};
 
     /// \brief Emptiness checker on spot::tgba automata having at most one
     /// accepting condition (i.e. a TBA).
     template <typename heap>
-    class magic_search : public emptiness_check
+    class se05_search : public emptiness_check
     {
     public:
       /// \brief Initialize the Magic Search algorithm on the automaton \a a
       ///
       /// \pre The automaton \a a must have at most one accepting
       /// condition (i.e. it is a TBA).
-      magic_search(const tgba *a)
-        : a(a), all_cond(a->all_acceptance_conditions())
+      se05_search(const tgba *a)
+        : current_weight(0), a(a), all_cond(a->all_acceptance_conditions())
       {
         assert(a->number_of_acceptance_conditions() <= 1);
       }
 
-      virtual ~magic_search()
+      virtual ~se05_search()
       {
         // Release all iterators on the stacks.
         while (!st_blue.empty())
@@ -82,7 +82,7 @@ namespace spot
             assert(st_blue.empty());
             const state* s0 = a->get_init_state();
             ++nbn;
-            h.add_new_state(s0, BLUE);
+            h.add_new_state(s0, CYAN);
             push(st_blue, s0, bddfalse, bddfalse);
             if (dfs_blue())
               return new result(*this);
@@ -152,15 +152,16 @@ namespace spot
       /// \brief Stack of the blue dfs.
       stack_type st_blue;
 
+      /// \brief number of visited accepting arcs
+      /// in the blue stack. 
+      int current_weight;
+
       /// \brief Stack of the red dfs.
       stack_type st_red;
 
       /// \brief Map where each visited state is colored
       /// by the last dfs visiting it.
       heap h;
-
-      /// State targeted by the red dfs.
-      const state* target;
 
       /// The automata to check.
       const tgba* a;
@@ -184,19 +185,27 @@ namespace spot
                 if (c.is_null())
                 // Go down the edge (f.s, <label, acc>, s_prime)
                   {
+                    if (acc == all_cond)
+                      ++current_weight;
                     ++nbn;
-                    h.add_new_state(s_prime, BLUE);
+                    h.add_new_state(s_prime, CYAN, current_weight);
                     push(st_blue, s_prime, label, acc);
                   }
                 else // Backtrack the edge (f.s, <label, acc>, s_prime)
                   {
-                    if (c.get() == BLUE && acc == all_cond)
-                    // the test 'c.get() == BLUE' is added to limit
-                    // the number of runs reported by successive
-                    // calls to the check method. Without this
-                    // functionnality, the test can be ommited.
+                    if (c.get() == CYAN &&
+                          (acc == all_cond || current_weight > c.get_weight()))
                       {
-                        target = f.s;
+                        c.set(RED);
+                        push(st_red, s_prime, label, acc);
+                        return true;
+                      }
+                    else if (c.get() == BLUE && acc == all_cond)
+                      {
+                        // the test 'c.get() == BLUE' is added to limit
+                        // the number of runs reported by successive
+                        // calls to the check method. Without this
+                        // functionnality, the test can be ommited.
                         c.set(RED);
                         push(st_red, s_prime, label, acc);
                         if (dfs_red())
@@ -212,6 +221,8 @@ namespace spot
                 stack_item f_dest(f);
                 delete f.it;
                 st_blue.pop_front();
+                if (f_dest.acc == all_cond)
+                  --current_weight;
                 typename heap::color_ref c = h.get_color_ref(f_dest.s);
                 assert(!c.is_null());
                 if (c.get() == BLUE && f_dest.acc == all_cond
@@ -221,14 +232,16 @@ namespace spot
                 // calls to the check method. Without this
                 // functionnality, the test can be ommited.
                   {
-                    target = st_blue.front().s;
                     c.set(RED);
                     push(st_red, f_dest.s, f_dest.label, f_dest.acc);
                     if (dfs_red())
                       return true;
                   }
                 else
-                  h.pop_notify(f_dest.s);
+                  {
+                    c.set(BLUE);
+                    h.pop_notify(f_dest.s);
+                  }
               }
           }
         return false;
@@ -237,13 +250,11 @@ namespace spot
       bool dfs_red()
       {
         assert(!st_red.empty());
-        if (target->compare(st_red.front().s) == 0)
-          return true;
 
         while (!st_red.empty())
           {
             stack_item& f = st_red.front();
-            if (!f.it->done()) // Go down
+            if (!f.it->done())
               {
                 ++nbt;
                 const state *s_prime = f.it->current_state();
@@ -254,7 +265,7 @@ namespace spot
                 if (c.is_null())
                 // Notice that this case is taken into account only to  
                 // support successive calls to the check method. Without
-                // this functionnality, one can check assert(c.is_null()).
+                // this functionnality => assert(c.is_null())
                 // Go down the edge (f.s, <label, acc>, s_prime)
                   {
                     ++nbn;
@@ -263,12 +274,16 @@ namespace spot
                   }
                 else // Go down the edge (f.s, <label, acc>, s_prime)
                   {
-                    if (c.get() != RED)
+                    if (c.get() == CYAN)
                       {
                         c.set(RED);
                         push(st_red, s_prime, label, acc);
-                        if (target->compare(s_prime) == 0)
-                          return true;
+                        return true;
+                      }
+                    if (c.get() == BLUE)
+                      {
+                        c.set(RED);
+                        push(st_red, s_prime, label, acc);
                       }
                   }
               }
@@ -286,7 +301,7 @@ namespace spot
       class result: public emptiness_check_result
       {
       public:
-        result(magic_search& ms)
+        result(se05_search& ms)
           : ms_(ms)
         {
         }
@@ -300,6 +315,8 @@ namespace spot
           typename stack_type::const_reverse_iterator i, j, end;
           tgba_run::steps* l;
 
+          const state* target = ms_.st_red.front().s;
+
           l = &run->prefix;
 
           i = ms_.st_blue.rbegin();
@@ -307,11 +324,15 @@ namespace spot
           j = i; ++j;
           for (; i != end; ++i, ++j)
             {
+              if (l == &run->prefix && i->s->compare(target) == 0)
+                l = &run->cycle;
               tgba_run::step s = { i->s->clone(), j->label, j->acc };
               l->push_back(s);
             }
 
-          l = &run->cycle;
+          if (l == &run->prefix && i->s->compare(target) == 0)
+            l = &run->cycle;
+          assert(l == &run->cycle);
 
           j = ms_.st_red.rbegin();
           tgba_run::step s = { i->s->clone(), j->label, j->acc };
@@ -328,47 +349,82 @@ namespace spot
           return run;
         }
       private:
-        magic_search& ms_;
+        se05_search& ms_;
       };
 
     };
 
-    class explicit_magic_search_heap
+    class explicit_se05_search_heap
     {
+      typedef Sgi::hash_map<const state*, int,
+                state_ptr_hash, state_ptr_equal> hcyan_type;
+      typedef Sgi::hash_map<const state*, color,
+                state_ptr_hash, state_ptr_equal> hash_type;
     public:
       class color_ref
       {
       public:
-        color_ref(color* c) :p(c)
+        color_ref(hash_type* h, hcyan_type* hc, const state* s, int w)
+          : is_cyan(true), weight(w), ph(h), phc(hc), ps(s), pc(0)
+          {
+          }
+        color_ref(color* c)
+          : is_cyan(false), weight(0), ph(0), phc(0), ps(0), pc(c)
           {
           }
         int get() const
           {
-            return *p;
+            if (is_cyan)
+              return CYAN; // the color cyan is fixed to 0
+            return *pc;
+          }
+        int get_weight() const
+          {
+            assert(is_cyan);
+            return weight;
           }
         void set(color c)
           {
             assert(!is_null());
-            *p=c;
+            if (is_cyan)
+              {
+                phc->erase(ps);
+                ph->insert(std::make_pair(ps, c));
+              }
+            else
+              {
+                *pc=c;
+              }
           }
         bool is_null() const
           {
-            return p==0;
+            return !is_cyan && pc==0;
           }
       private:
-        color *p;
+        bool is_cyan;
+        int weight; // weight of a cyan node
+        hash_type* ph; //point to the main hash table
+        hcyan_type* phc; // point to the hash table hcyan
+        const state* ps; // point to the state in hcyan
+        color *pc; // point to the color of a state stored in main hash table
       };
 
-      explicit_magic_search_heap()
+      explicit_se05_search_heap()
         {
         }
 
-      ~explicit_magic_search_heap()
+      ~explicit_se05_search_heap()
         {
+          hcyan_type::const_iterator sc = hc.begin();
+          while (sc != hc.end())
+            {
+              const state* ptr = sc->first;
+              ++sc;
+              delete ptr;
+            }
           hash_type::const_iterator s = h.begin();
           while (s != h.end())
             {
-              // Advance the iterator before deleting the "key" pointer.
               const state* ptr = s->first;
               ++s;
               delete ptr;
@@ -377,21 +433,34 @@ namespace spot
 
       color_ref get_color_ref(const state*& s)
         {
-          hash_type::iterator it = h.find(s);
-          if (it==h.end())
-            return color_ref(0);
-          if (s!=it->first)
+          hcyan_type::iterator ic = hc.find(s);
+          if (ic==hc.end())
+            {
+              hash_type::iterator it = h.find(s);
+              if (it==h.end())
+                return color_ref(0); // unknown state
+              if (s!=it->first)
+                {
+                  delete s;
+                  s = it->first;
+                }
+              return color_ref(&(it->second)); // blue or red state
+            }
+          if (s!=ic->first)
             {
               delete s;
-              s = it->first;
+              s = ic->first;
             }
-          return color_ref(&(it->second));
+          return color_ref(&h, &hc, ic->first, ic->second); // cyan state
         }
 
-      void add_new_state(const state* s, color c)
+      void add_new_state(const state* s, color c, int w=0)
         {
-          assert(h.find(s)==h.end());
-          h.insert(std::make_pair(s, c));
+          assert(hc.find(s)==hc.end() && h.find(s)==h.end());
+          if (c == CYAN)
+            hc.insert(std::make_pair(s, w));
+          else
+            h.insert(std::make_pair(s, c));
         }
 
       void pop_notify(const state*)
@@ -400,16 +469,15 @@ namespace spot
 
     private:
 
-      typedef Sgi::hash_map<const state*, color,
-                state_ptr_hash, state_ptr_equal> hash_type;
       hash_type h;
+      hcyan_type hc;
     };
 
   } // anonymous
 
-  emptiness_check* explicit_magic_search(const tgba *a)
+  emptiness_check* explicit_se05_search(const tgba *a)
   {
-    return new magic_search<explicit_magic_search_heap>(a);
+    return new se05_search<explicit_se05_search_heap>(a);
   }
 
 }

@@ -62,6 +62,7 @@ libtgbaalgos_la_SOURCES = \
   replayrun.cc \
   rundotdec.cc \
   save.cc \
+  se05.cc \
   stats.cc \
   reductgba_sim.cc \
   reductgba_sim_del.cc

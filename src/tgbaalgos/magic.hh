@@ -22,107 +22,148 @@
 #ifndef SPOT_TGBAALGOS_MAGIC_HH
 # define SPOT_TGBAALGOS_MAGIC_HH
 
-#include "misc/hash.hh"
-#include <list>
-#include <utility>
-#include <ostream>
-#include "tgba/tgbatba.hh"
+#include "tgba/tgba.hh"
 #include "emptiness.hh"
 
 namespace spot
 {
-  /// \brief Emptiness check on spot::tgba_tba_proxy automata using
-  /// the Magic Search algorithm.
+  /// \brief Returns an emptiness check on the spot::tgba automaton \a a. 
   ///
-  /// This algorithm comes from
+  /// \pre The automaton \a a must have at most one accepting condition (i.e.
+  /// it is a TBA).
+  ///
+  /// The method \a check() of the returned checker can be called several times 
+  /// (until it returns a null pointer) to enumerate all the visited accepting 
+  /// paths. The method visits only a finite set of accepting paths.
+  /// 
+  /// The implemented algorithm is the following. 
+  ///
   /// \verbatim
-  /// @InProceedings{   godefroid.93.pstv,
-  ///   author        = {Patrice Godefroid and Gerard .J. Holzmann},
-  ///   title         = {On the verification of temporal properties},
-  ///   booktitle     = {Proceedings of the 13th IFIP TC6/WG6.1 International
-  ///                   Symposium on Protocol Specification, Testing, and
-  ///                   Verification (PSTV'93)},
-  ///   month         = {May},
-  ///   editor        = {Andr{\'e} A. S. Danthine and Guy Leduc
-  ///                    and Pierre Wolper},
-  ///   address       = {Liege, Belgium},
-  ///   pages         = {109--124},
-  ///   publisher     = {North-Holland},
-  ///   year          = {1993},
-  ///   series        = {IFIP Transactions},
-  ///   volume        = {C-16},
-  ///   isbn          = {0-444-81648-8}
-  /// }
+  /// procedure nested_dfs ()
+  /// begin
+  ///   call dfs_blue(s0);
+  /// end;
+  ///
+  /// procedure dfs_blue (s)
+  /// begin
+  ///   s.color = blue;
+  ///   for all t in post(s) do
+  ///     if t.color == white then
+  ///       call dfs_blue(t);
+  ///     end if;
+  ///     if (the edge (s,t) is accepting) then
+  ///       target = s;
+  ///       call dfs_red(t);
+  ///     end if;
+  ///   end for;
+  /// end;
+  ///
+  /// procedure dfs_red(s)
+  /// begin
+  ///   s.color = red;
+  ///   if s == target then
+  ///     report cycle
+  ///   end if;
+  ///   for all t in post(s) do
+  ///     if t.color != red then
+  ///       call dfs_red(t);
+  ///     end if;
+  ///   end for;
+  /// end;
   /// \endverbatim
-  struct magic_search : public emptiness_check
-  {
-    /// Initialize the Magic Search algorithm on the automaton \a a.
-    magic_search(const tgba_tba_proxy *a);
-    virtual ~magic_search();
+  ///
+  /// It is an adaptation to TBA of the Magic Search algorithm
+  /// which deals with accepting states and is presented in
+  ///
+  /// \verbatim
+  ///  Article{         courcoubertis.92.fmsd,
+  ///    author        = {Costas Courcoubetis and Moshe Y. Vardi and Pierre 
+  ///                    Wolper and Mihalis Yannakakis},
+  ///    title         = {Memory-Efficient Algorithm for the Verification of
+  ///                    Temporal Properties},
+  ///    journal       = {Formal Methods in System Design},
+  ///    pages         = {275--288},
+  ///    year          = {1992},
+  ///    volume        = {1}
+  ///  }
+  /// \endverbatim
+  emptiness_check* explicit_magic_search(const tgba *a);
 
-    /// \brief Perform a Magic Search.
-    ///
-    /// \return true iff the algorithm has found a new accepting
-    ///    path.
-    ///
-    /// check() can be called several times until it return false,
-    /// to enumerate all accepting paths.
-    virtual emptiness_check_result* check();
-
-  private:
-
-    // The names "stack", "h", and "x", are those used in the paper.
-
-    /// \brief  Records whether a state has be seen with the magic bit
-    /// on or off.
-    struct magic
-    {
-      bool seen_without : 1;
-      bool seen_with    : 1;
-    };
-
-    /// \brief A state for the spot::magic_search algorithm.
-    struct magic_state
-    {
-      const state* s;
-      bool m;			///< The state of the magic demon.
-    };
-
-    typedef std::pair<magic_state, tgba_succ_iterator*> state_iter_pair;
-    typedef std::list<state_iter_pair> stack_type;
-    stack_type stack;		///< Stack of visited states on the path.
-
-    typedef std::pair<bdd, bdd> tstack_item;
-    typedef std::list<tstack_item> tstack_type;
-    /// \brief Stack of transitions.
-    ///
-    /// This is an addition to the data from the paper.
-    tstack_type tstack;
-
-    typedef Sgi::hash_map<const state*, magic,
-			  state_ptr_hash, state_ptr_equal> hash_type;
-    hash_type h;		///< Map of visited states.
-
-    /// Append a new state to the current path.
-    void push(const state* s, bool m);
-    /// Check whether we already visited \a s with the Magic bit set to \a m.
-    bool has(const state* s, bool m) const;
-
-    const tgba_tba_proxy* a;	///< The automata to check.
-    /// The state for which we are currently seeking an SCC.
-    const state* x;
-
-#ifndef SWIG
-    class result: public emptiness_check_result
-    {
-    public:
-      result(magic_search& ms);
-      virtual tgba_run* accepting_run();
-    private:
-      magic_search& ms_;
-    };
-#endif // SWIG
-  };
+  /// \brief Returns an emptiness check on the spot::tgba automaton \a a. 
+  ///
+  /// \pre The automaton \a a must have at most one accepting condition (i.e.
+  /// it is a TBA).
+  ///  
+  /// The method \a check() of the returned checker can be called several times 
+  /// (until it returns a null pointer) to enumerate all the visited accepting 
+  /// paths. The method visits only a finite set of accepting paths.
+  /// 
+  /// The implemented algorithm is the following: 
+  /// 
+  /// procedure nested_dfs ()
+  /// begin
+  ///   weight = 0;
+  ///   call dfs_blue(s0);
+  /// end;
+  ///  
+  /// procedure dfs_blue (s)
+  /// begin
+  ///   s.color = cyan;
+  ///   s.weight = weight;
+  ///   for all t in post(s) do
+  ///     if t.color == white then
+  ///       if the edge (s,t) is accepting then
+  ///         weight = weight + 1;
+  ///       end if;
+  ///       call dfs_blue(t);
+  ///       if the edge (s,t) is accepting then
+  ///         weight = weight - 1;
+  ///       end if;
+  ///     else if t.color == cyan and 
+  ///             (the edge (s,t) is accepting or 
+  ///              weight > t.weight) then
+  ///       report cycle;
+  ///     end if;
+  ///     if the edge (s,t) is accepting then
+  ///       call dfs_red(t);
+  ///     end if;
+  ///   end for;
+  ///   s.color = blue;
+  /// end;
+  /// 
+  /// procedure dfs_red(s)
+  /// begin
+  ///   if s.color == cyan then
+  ///     report cycle;
+  ///   end if;
+  ///   s.color = red;
+  ///   for all t in post(s) do
+  ///     if t.color != red then
+  ///       call dfs_red(t);
+  ///     end if;
+  ///   end for;
+  /// end;
+  /// 
+  /// It is an adaptation to TBA and an extension of the one 
+  /// presented in
+  /// \verbatim
+  ///  InProceedings{   schwoon.05.tacas,
+  ///    author        = {Stephan Schwoon and Javier Esparza},
+  ///    title         = {A Note on On-The-Fly Verification Algorithms},
+  ///    booktitle     = {TACAS'05},
+  ///    pages         = {},
+  ///    year          = {2005},
+  ///    volume        = {},
+  ///    series        = {LNCS},
+  ///    publisher     = {Springer-Verlag}
+  ///  }
+  /// \endverbatim
+  ///
+  /// the extention consists in the introduction of a weight associated
+  /// to each state in the blue stack. The weight represents the number of
+  /// accepting arcs traversed to reach it from the initial state.
+  ///
+  emptiness_check* explicit_se05_search(const tgba *a);
 
 }
 

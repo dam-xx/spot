@@ -1,3 +1,16 @@
+2004-11-09  Poitrenaud Denis  <denis@src.lip6.fr>
+
+	* src/tgbaalgos/magic.cc: rewrite to externalize the heap and
+	prepare it to a bit state hashing version.
+	* src/tgbaalgos/magic.hh: adapt to the new interface of
+	magic_search and se05_search.
+	* src/tgbaalgos/se05.cc: new file.
+	* src/tgbaalgos/Makefile.am: Add it.
+	* src/tgbatest/ltl2tgba.cc: Add new emptiness check.
+	* src/tgbatest/emptchk.test: more tests.
+	* src/tgbatest/dfs.test: new file.
+	* src/tgbatest/Makefile.am: Add it.
+
 2004-11-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/emptiness.cc (print_tgba_run): Output the

@@ -119,7 +119,9 @@ syntax(char* prog)
 	    << "  couvreur99 (the default)" << std::endl
 	    << "  couvreur99_shy" << std::endl
 	    << "  magic_search" << std::endl
-	    << "  magic_search_repeated" << std::endl;
+	    << "  magic_search_repeated" << std::endl
+	    << "  se05_search" << std::endl
+	    << "  se05_search_repeated" << std::endl;
   exit(2);
 }
 
@@ -137,7 +139,7 @@ main(int argc, char** argv)
   int output = 0;
   int formula_index = 0;
   std::string echeck_algo;
-  enum { None, Couvreur, Couvreur2, MagicSearch } echeck = None;
+  enum { None, Couvreur, Couvreur2, MagicSearch, Se04Search } echeck = None;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
   bool magic_many = false;
   bool expect_counter_example = false;
@@ -344,6 +346,17 @@ main(int argc, char** argv)
       else if (echeck_algo == "magic_search_repeated")
 	{
 	  echeck = MagicSearch;
+	  degeneralize_opt = true;
+	  magic_many = true;
+	}
+      else if (echeck_algo == "se05_search")
+	{
+	  echeck = Se04Search;
+	  degeneralize_opt = true;
+	}
+      else if (echeck_algo == "se05_search_repeated")
+	{
+	  echeck = Se04Search;
 	  degeneralize_opt = true;
 	  magic_many = true;
 	}
@@ -569,7 +582,12 @@ main(int argc, char** argv)
 
 	case MagicSearch:
 	  ec_a = degeneralized;
-	  ec = new spot::magic_search(degeneralized);
+	  ec = spot::explicit_magic_search(degeneralized);
+	  break;
+
+	case Se04Search:
+	  ec_a = degeneralized;
+	  ec = spot::explicit_se05_search(degeneralized);
 	  break;
 	}
 
