@@ -1,3 +1,11 @@
+2004-12-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/nsheap.hh (numbered_state_heap::find): Clarify
+	comment.
+
+	* src/tgba/tgbareduc.hh: Include tgbaalgos/gtec/nsheap.hh,
+	not tgbaalgos/gtec/status.hh.
+
 2004-12-10  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/misc/timer.cc, src/tgbatest/randtgba.cc: Format the statistics.

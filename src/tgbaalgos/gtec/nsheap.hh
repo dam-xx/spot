@@ -60,10 +60,10 @@ namespace spot
     ///
     /// Returns a pair (0,0) if \a s is not in the heap.
     /// or a pair (p, i) if there is a clone \a p of \a s \a i
-    /// in the heap with index.  \a s will be freed if it is
-    /// different of \a p.
+    /// in the heap with index.  If \a s is in the heap and is different
+    /// from \a p it will be freed.
     ///
-    /// There are called by the algorithm to check whether a
+    /// These functions are called by the algorithm to check whether a
     /// successor is a new state to explore or an already visited
     /// state.
     ///
