@@ -1,3 +1,21 @@
+2003-08-28  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	Rewrite all std::map<const formula*, ...> as
+	Sgi::hash_map<const formula*, ...>.
+
+	* src/misc/hash.hh: New file.
+	* src/misc/Makefile.am (misc_HEADERS): Add it.
+	* src/ltlvisit/dotty.cc (dotty_visitor::map): Use a hash_map instead
+	of a map.
+	* src/tgba/bdddict.hh (bdd_dict::fv_map, bdd_dict::vf_map,
+	bdd_dict::ref_set, bdd_dict::var_map): Define as hash_map or
+	hash_set.
+	* src/tgbaalgos/ltl2tgba_fm.cc (translate_dict::fv_map,
+	translate_dict::vf_map): Likewise.
+	* src/tgba/tgbabddconcretefactory.hh
+	(tgba_bdd_concrete_factory::acc_map_): Likewise.
+	* src/tgba/tgbatba.hh, src/tgbaalgos/reachiter.hh: Include <map>.
+
 2003-08-25  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/state.hh (state_ptr_less_than): Make sure left is

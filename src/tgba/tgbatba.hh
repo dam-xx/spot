@@ -1,6 +1,7 @@
 #ifndef SPOT_TGBA_TGBATBA_HH
 # define SPOT_TGBA_TGBATBA_HH
 
+#include <map>
 #include "tgba.hh"
 #include "misc/bddlt.hh"
 

@@ -1,9 +1,9 @@
 #ifndef SPOT_TGBA_TGBABDDCONCRETEFACTORY_HH
 # define SPOT_TGBA_TGBABDDCONCRETEFACTORY_HH
 
+#include "misc/hash.hh"
 #include "ltlast/formula.hh"
 #include "tgbabddfactory.hh"
-#include <map>
 
 namespace spot
 {
@@ -64,7 +64,8 @@ namespace spot
   private:
     tgba_bdd_core_data data_;	///< Core data for the new automata.
 
-    typedef std::map<const ltl::formula*, bdd> acc_map_;
+    typedef Sgi::hash_map<const ltl::formula*, bdd,
+			  ptr_hash<ltl::formula> > acc_map_;
     acc_map_ acc_;		///< BDD associated to each accepting condition
   };
 

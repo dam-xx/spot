@@ -1,3 +1,4 @@
+#include "misc/hash.hh"
 #include "misc/bddalloc.hh"
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
@@ -48,9 +49,10 @@ namespace spot
       }
 
       /// Formula-to-BDD-variable maps.
-      typedef std::map<const ltl::formula*, int> fv_map;
+      typedef Sgi::hash_map<const ltl::formula*, int,
+			    ptr_hash<ltl::formula> > fv_map;
       /// BDD-variable-to-formula maps.
-      typedef std::map<int, const ltl::formula*> vf_map;
+      typedef Sgi::hash_map<int, const ltl::formula*> vf_map;
 
       fv_map a_map;	       ///< Maps formulae to "a" BDD variables
       vf_map a_formula_map;    ///< Maps "a" BDD variables to formulae

@@ -1,3 +1,4 @@
+#include "misc/hash.hh"
 #include "dotty.hh"
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
@@ -10,7 +11,7 @@ namespace spot
     class dotty_visitor : public const_visitor
     {
     public:
-      typedef std::map<const formula*, int> map;
+      typedef Sgi::hash_map<const formula*, int, ptr_hash<formula> > map;
       dotty_visitor(std::ostream& os, map& m)
 	: os_(os), father_(-1), node_(m)
       {

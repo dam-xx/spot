@@ -1,6 +1,7 @@
 #ifndef SPOT_TGBAALGOS_REACHITER_HH
 # define SPOT_TGBAALGOS_REACHITER_HH
 
+#include <map>
 #include "tgba/tgba.hh"
 #include <stack>
 #include <deque>
