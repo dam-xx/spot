@@ -33,6 +33,7 @@
 #include "tgba/tgba.hh"
 #include "misc/hash.hh"
 #include "emptiness.hh"
+#include "emptiness_stats.hh"
 #include "gv04.hh"
 
 namespace spot
@@ -51,7 +52,7 @@ namespace spot
       int acc;			  // Accepting state link.
     };
 
-    struct gv04: public emptiness_check
+    struct gv04: public emptiness_check, public ec_statistics
     {
       // The automata to check.
       const tgba* a;
@@ -68,7 +69,6 @@ namespace spot
       // Stack of visited states on the path.
       typedef std::vector<stack_entry> stack_type;
       stack_type stack;
-      size_t max_stack_size;
 
       int top;			// Top of SCC stack.
       int dftop;		// Top of DFS stack.
@@ -97,7 +97,6 @@ namespace spot
       virtual emptiness_check_result*
       check()
       {
-	max_stack_size = 0;
 	top = dftop = -1;
 	violation = false;
 	push(a->get_init_state(), false);
@@ -121,6 +120,7 @@ namespace spot
 		const state* s_prime = iter->current_state();
 		bool acc = iter->current_acceptance_conditions() == accepting;
 		iter->next();
+		inc_transitions();
 
 		trace << " Next successor: s_prime = "
 		      << a->format_state(s_prime)
@@ -153,6 +153,7 @@ namespace spot
 		    delete s_prime;
 		  }
 	      }
+	    set_states(h.size());
 	  }
 	if (violation)
 	  return new emptiness_check_result;
@@ -182,8 +183,7 @@ namespace spot
 
 	stack.push_back(ss);
 	dftop = top;
-
-	max_stack_size = std::max(max_stack_size, stack.size());
+	inc_depth();
       }
 
       void
@@ -201,6 +201,7 @@ namespace spot
 	      {
 		delete stack[i].nexttr;
 		stack.pop_back();
+		dec_depth();
 	      }
 	    top = dftop - 1;
 	  }
@@ -229,7 +230,8 @@ namespace spot
       print_stats(std::ostream& os) const
       {
 	os << h.size() << " unique states visited" << std::endl;
-	os << max_stack_size << " items max on stack" << std::endl;
+	os << transitions() << " transitions explored" << std::endl;
+	os << max_depth() << " items max on stack" << std::endl;
 	return os;
       }
 
