@@ -1,5 +1,9 @@
 2004-05-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/gtec/gtec.cc (emptiness_check::remove_component):
+	Do not try to erase state that are not found in H.
+	Report from Soheib Baarir.
+
 	* src/ltltest/reduc.test: Use ./defs and clean result.data.
 	* src/ltltest/Makefile.am (CLEANFILES): Clean result.data.
 
