@@ -1,5 +1,21 @@
 2004-01-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/eesrg.cc (format_state): Do not rewrite \n's,
+	just strip the last one.  Escaping must be done at output.
+	* iface/gspn/gspm.cc (format_state): Likewise.
+	* src/misc/escape.hh, src/misc/escape.cc: New files.
+	* src/misc/Makefile.am: Add them.
+	* src/tgba/bddprint.cc (bdd_format_accset): New function.
+	* src/tgba/bddprint.hh (bdd_format_accset): New function.
+	* src/tgbaalgos/dotty.cc (dotty_bfs::process_state):
+	Escape the state name using escape_str().
+	(dotty_bfs::process_link): Escape conditions and acceptance
+	conditions using escape_str().
+	* src/tgbaalgos/save.cc (save_bfs::start): Call print_acc().
+	(save_bfs::print_acc): New function extracted from save_bfs::start().
+	Escape each acceptance condition.
+	(save_bfs::process_state): Use escape_str() and print_acc()
+
 	* src/ltlvisit/tostring.cc
 	(to_string_visitor::visit(const atomic_prop*)): Quote propositions
 	that start with F, G, or X.

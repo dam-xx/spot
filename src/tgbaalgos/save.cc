@@ -24,6 +24,7 @@
 #include "tgba/bddprint.hh"
 #include "ltlvisit/tostring.hh"
 #include "reachiter.hh"
+#include "misc/escape.hh"
 
 namespace spot
 {
@@ -39,10 +40,34 @@ namespace spot
     void
     start()
     {
-      const bdd_dict* d = automata_->get_dict();
       os_ << "acc =";
+      print_acc(automata_->all_acceptance_conditions()) << ";" << std::endl;
+    }
 
-      bdd acc = automata_->all_acceptance_conditions();
+    void
+    process_state(const state* s, int, tgba_succ_iterator* si)
+    {
+      const bdd_dict* d = automata_->get_dict();
+      std::string cur = automata_->format_state(s);
+      for (si->first(); !si->done(); si->next())
+	{
+	  state* dest = si->current_state();
+	  os_ << "\"" << cur << "\", \""
+	      << automata_->format_state(dest) << "\", \"";
+	  escape_str(os_, bdd_format_formula(d, si->current_condition()));
+	  os_ << "\",";
+	  print_acc(si->current_acceptance_conditions()) << ";" << std::endl;
+	  delete dest;
+	}
+    }
+
+  private:
+    std::ostream& os_;
+
+    std::ostream&
+    print_acc(bdd acc)
+    {
+      const bdd_dict* d = automata_->get_dict();
       while (acc != bddfalse)
 	{
 	  bdd cube = bdd_satone(acc);
@@ -59,50 +84,14 @@ namespace spot
 		    d->acc_formula_map.find(v);
 		  assert(vi != d->acc_formula_map.end());
 		  os_ << " \"";
-		  ltl::to_string(vi->second, os_) << "\"";
+		  escape_str(os_, ltl::to_string(vi->second)) << "\"";
 		  break;
 		}
 	      cube = bdd_low(cube);
 	    }
 	}
-      os_ << ";" << std::endl;
+      return os_;
     }
-
-    void
-    process_state(const state* s, int, tgba_succ_iterator* si)
-    {
-      const bdd_dict* d = automata_->get_dict();
-      std::string cur = automata_->format_state(s);
-      for (si->first(); !si->done(); si->next())
-	{
-	  state* dest = si->current_state();
-	  os_ << "\"" << cur << "\", \""
-	      << automata_->format_state(dest) << "\", \"";
-	  std::string s = bdd_format_formula(d, si->current_condition());
-	  // Escape " and \ characters in s.
-	  for (std::string::const_iterator i = s.begin();
-	       i != s.end(); ++i)
-	    switch (*i)
-	      {
-	      case '\\':
-		os_ << "\\\\";
-		break;
-	      case '"':
-		os_ << "\\\"";
-		break;
-	      default:
-		os_ << *i;
-		break;
-	      }
-	  os_ << "\",";
-	  bdd_print_acc(os_, d, si->current_acceptance_conditions());
-	  os_ << ";" << std::endl;
-	  delete dest;
-	}
-    }
-
-  private:
-    std::ostream& os_;
   };
 
 

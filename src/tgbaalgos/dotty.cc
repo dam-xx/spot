@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,6 +23,7 @@
 #include "dotty.hh"
 #include "tgba/bddprint.hh"
 #include "reachiter.hh"
+#include "misc/escape.hh"
 
 namespace spot
 {
@@ -52,19 +53,20 @@ namespace spot
     void
     process_state(const state* s, int n, tgba_succ_iterator*)
     {
-      os_ << "  " << n << " [label=\""
-	  << automata_->format_state(s) << "\"]" << std::endl;
+      os_ << "  " << n << " [label=\"";
+      escape_str(os_, automata_->format_state(s)) << "\"]" << std::endl;
     }
 
     void
     process_link(int in, int out, const tgba_succ_iterator* si)
     {
       os_ << "  " << in << " -> " << out << " [label=\"";
-      bdd_print_formula(os_, automata_->get_dict(),
-			si->current_condition()) << "\\n";
-      bdd_print_accset(os_, automata_->get_dict(),
-		       si->current_acceptance_conditions()) << "\"]"
-							   << std::endl;
+      escape_str(os_, bdd_format_formula(automata_->get_dict(),
+					 si->current_condition())) << "\\n";
+      escape_str(os_,
+		 bdd_format_accset(automata_->get_dict(),
+				   si->current_acceptance_conditions()))
+	<< "\"]" << std::endl;
     }
 
   private:

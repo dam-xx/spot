@@ -19,7 +19,6 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include <sstream>
 #include <cstring>
 #include <map>
 #include <cassert>
@@ -422,7 +421,6 @@ namespace spot
   {
     const state_gspn_eesrg* s = dynamic_cast<const state_gspn_eesrg*>(state);
     assert(s);
-    std::ostringstream os;
     char* str;
     State gs = s->left();
     if (gs)
@@ -430,30 +428,19 @@ namespace spot
 	int err = print_state(gs, &str);
 	if (err)
 	  throw gspn_exeption("print_state()", err);
+	// Strip trailing \n...
+	unsigned len = strlen(str);
+	while (str[--len] == '\n')
+	  str[len] = 0;
       }
     else
       {
 	str = strdup("-1");
       }
 
-    // Rewrite all new lines as \\\n.
-    const char* pos = str;
-    while (*pos)
-      {
-	switch (*pos)
-	  {
-	    // Rewrite all new lines as \\n, and strip the last one.
-	  case '\n':
-	    if (pos[1])
-	      os << "\\n";
-	    break;
-	  default:
-	    os << *pos;
-	  }
-	++pos;
-      }
+    std::string res(str);
     free(str);
-    return os.str() + " * " + data_->operand->format_state(s->right());
+    return res + " * " + data_->operand->format_state(s->right());
   }
 
   state*

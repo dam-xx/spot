@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,7 +19,6 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include <sstream>
 #include <map>
 #include <cassert>
 #include "gspn.hh"
@@ -366,30 +365,17 @@ namespace spot
   {
     const state_gspn* s = dynamic_cast<const state_gspn*>(state);
     assert(s);
-    std::ostringstream os;
     char* str;
     int err = print_state(s->get_state(), &str);
     if (err)
       throw gspn_exeption("print_state()", err);
-
-    // Rewrite all new lines as \\\n.
-    const char* pos = str;
-    while (*pos)
-      {
-	switch (*pos)
-	  {
-	    // Rewrite all new lines as \\n, and strip the last one.
-	  case '\n':
-	    if (pos[1])
-	      os << "\\n";
-	    break;
-	  default:
-	    os << *pos;
-	  }
-	++pos;
-      }
+    // Strip trailing \n...
+    unsigned len = strlen(str);
+    while (str[--len] == '\n')
+      str[len] = 0;
+    std::string res(str);
     free(str);
-    return os.str();
+    return res;
   }
 
   bdd

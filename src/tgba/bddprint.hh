@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -66,6 +66,15 @@ namespace spot
   /// \return The BDD formated as a string.
   std::ostream& bdd_print_accset(std::ostream& os,
 				 const bdd_dict* dict, bdd b);
+
+  /// \brief Format a BDD as a set of acceptance conditions.
+  ///
+  /// This is used when saving a TGBA.
+  /// \param os The output stream.
+  /// \param dict The dictionary to use, to lookup variables.
+  /// \param b The BDD to print.
+  /// \return The BDD formated as a string.
+  std::string bdd_format_accset(const bdd_dict* dict, bdd b);
 
   /// \brief Print a BDD as a set.
   /// \param os The output stream.

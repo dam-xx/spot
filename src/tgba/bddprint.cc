@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -158,6 +158,14 @@ namespace spot
     if (first_done)
       *where << "}";
     return os;
+  }
+
+  std::string
+  bdd_format_accset(const bdd_dict* d, bdd b)
+  {
+    std::ostringstream os;
+    bdd_print_accset(os, d, b);
+    return os.str();
   }
 
   std::string

@@ -1,4 +1,4 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -27,6 +27,7 @@ miscdir = $(pkgincludedir)/misc
 misc_HEADERS = \
   bddalloc.hh \
   bddlt.hh \
+  escape.hh \
   hash.hh \
   minato.hh \
   version.hh
@@ -34,5 +35,6 @@ misc_HEADERS = \
 noinst_LTLIBRARIES = libmisc.la
 libmisc_la_SOURCES = \
   bddalloc.cc \
+  escape.cc \
   minato.cc \
   version.cc
