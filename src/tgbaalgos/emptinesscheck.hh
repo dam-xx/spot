@@ -44,8 +44,6 @@ namespace spot
 
   class emptiness_check
   {
-    typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
-    typedef std::pair<pair_state_iter, bdd> triplet;
     typedef std::map<const spot::state*, int, spot::state_ptr_less_than> seen;
     typedef std::list<const state*> state_sequence;
     typedef std::pair<const spot::state*, bdd> state_proposition;
@@ -82,7 +80,6 @@ namespace spot
 			       const tgba* restrict = 0) const;
 
   private:
-    std::stack<bdd> arc_accepting;
     std::stack<connected_component> root_component;
     seen seen_state_num;
     state_sequence suffix;

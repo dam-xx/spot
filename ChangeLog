@@ -1,5 +1,22 @@
 2003-10-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.hh
+	(emptiness_check::remove_component, emptiness_check::root_component,
+	emptiness_check::seen_state_num, emptiness_check::suffix): Move in
+	private part.
+	(emptiness_check::arc_accepting, emptiness_check::todo): Move ...
+	* src/tgbaalgos/emptinesscheck.cc
+	(emptiness_check::tgba_emptiness_check): ... as local variables
+	of this function.
+	* src/tgbaalgos/emptinesscheck.hh (emptiness_check::vec_component):
+	Move ...
+	(emptiness_check::counter_example): ... as local variable of this
+	function.
+	* src/tgbaalgos/emptinesscheck.hh (pair_state_iter, triplet):
+	Move ...
+	* src/tgbaalgos/emptinesscheck.cc (pair_state_iter, triplet):
+	... here.
+
 	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::print_result):
 	Indent output as in the magic search.
 

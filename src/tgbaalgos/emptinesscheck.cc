@@ -20,6 +20,9 @@
 
 namespace spot
 {
+  typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
+  typedef std::pair<pair_state_iter, bdd> triplet;
+
   connected_component::connected_component()
   {
     index = 0;
@@ -90,7 +93,8 @@ namespace spot
   bool
   emptiness_check::tgba_emptiness_check(const spot::tgba* aut_check)
   {
-
+    std::stack<pair_state_iter> todo;
+    std::stack<bdd> arc_accepting;
     int nbstate = 1;
     state* init = aut_check->get_init_state();
     seen_state_num[init] = 1;
@@ -238,9 +242,8 @@ namespace spot
 
     int comp_size = root_component.size();
     typedef std::vector<connected_component> vec_compo;
-    vec_compo vec_component;
-    vec_component.resize(comp_size);
-    vec_sequence.resize(comp_size);
+    vec_compo vec_component(comp_size);
+    std::vector<state_sequence> vec_sequence(comp_size);
     state_sequence seq;
     state_sequence tmp_lst;
     state_sequence best_lst;
