@@ -41,7 +41,8 @@ namespace spot
   }
 
   bool
-  replay_tgba_run(std::ostream& os, const tgba* a, const tgba_run* run)
+  replay_tgba_run(std::ostream& os, const tgba* a, const tgba_run* run,
+		  bool debug)
   {
     const state* s = a->get_init_state();
     int serial = 1;
@@ -58,47 +59,58 @@ namespace spot
       {
 	l = &run->cycle;
 	in = "cycle";
+	if (!debug)
+	  os << "No prefix.\nCycle:" << std::endl;
       }
     else
       {
 	l = &run->prefix;
 	in = "prefix";
+	if (!debug)
+	  os << "Prefix:" << std::endl;
       }
 
     tgba_run::steps::const_iterator i = l->begin();
 
     if (s->compare(i->s))
       {
-	os << "ERROR: First state of run (in " << in << "): "
-	   << a->format_state(i->s) << std::endl
-	   << "does not match initial state of automata: "
-	   << a->format_state(s) << std::endl;
+	if (debug)
+	  os << "ERROR: First state of run (in " << in << "): "
+	     << a->format_state(i->s) << std::endl
+	     << "does not match initial state of automata: "
+	     << a->format_state(s) << std::endl;
 	delete s;
 	return false;
       }
 
     for (; i != l->end(); ++serial)
       {
-	// Keep track of the serial associated to each state so we
-	// can note duplicate states and make the replay easier to read.
-	state_map::iterator o = seen.find(s);
-	std::ostringstream msg;
-	if (o != seen.end())
+	if (debug)
 	  {
-	    std::set<int>::const_iterator d;
-	    for (d = o->second.begin(); d != o->second.end(); ++d)
-	      msg << " == " << *d;
-	    o->second.insert(serial);
-	    delete s;
-	    s = o->first;
+	    // Keep track of the serial associated to each state so we
+	    // can note duplicate states and make the replay easier to read.
+	    state_map::iterator o = seen.find(s);
+	    std::ostringstream msg;
+	    if (o != seen.end())
+	      {
+		std::set<int>::const_iterator d;
+		for (d = o->second.begin(); d != o->second.end(); ++d)
+		  msg << " == " << *d;
+		o->second.insert(serial);
+		delete s;
+		s = o->first;
+	      }
+	    else
+	      {
+		seen[s].insert(serial);
+	      }
+	    os << "state " << serial << " in " << in << msg.str() << ": ";
 	  }
 	else
 	  {
-	    seen[s].insert(serial);
+	    os << "  ";
 	  }
-
-	os << "state " << serial << " in " << in << msg.str() << ": "
-	   << a->format_state(s) << std::endl;
+	os << a->format_state(s) << std::endl;
 
 	// expected outgoing transition
 	bdd label = i->label;
@@ -118,6 +130,8 @@ namespace spot
 		l = &run->cycle;
 		in = "cycle";
 		i = l->begin();
+		if (!debug)
+		  std::cout << "Cycle:" << std::endl;
 	      }
 	    next = l->begin()->s;
 	  }
@@ -144,37 +158,53 @@ namespace spot
 	  }
 	if (j->done())
 	  {
-	    os << "ERROR: no transition with label="
-	       << bdd_format_formula(a->get_dict(), label)
-	       << " and acc=" << bdd_format_accset(a->get_dict(), acc)
-	       << " leaving state " << serial
-	       << " for state " << a->format_state(next)
-	       << std::endl
-	       << "The following transitions leave state " << serial
-	       << ":" << std::endl;
-	    for (j->first(); !j->done(); j->next())
+	    if (debug)
 	      {
-		const state* s2 = j->current_state();
-		os << "  *";
-		print_annotation(os, a, j);
-		os << " label=" << bdd_format_formula(a->get_dict(),
-						     j->current_condition())
-		   << " and acc="
-		   << bdd_format_accset(a->get_dict(),
-					j->current_acceptance_conditions())
-		   << " going to " << a->format_state(s2) << std::endl;
-		delete s2;
+		os << "ERROR: no transition with label="
+		   << bdd_format_formula(a->get_dict(), label)
+		   << " and acc=" << bdd_format_accset(a->get_dict(), acc)
+		   << " leaving state " << serial
+		   << " for state " << a->format_state(next)
+		   << std::endl
+		   << "The following transitions leave state " << serial
+		   << ":" << std::endl;
+		for (j->first(); !j->done(); j->next())
+		  {
+		    const state* s2 = j->current_state();
+		    os << "  *";
+		    print_annotation(os, a, j);
+		    os << " label="
+		       << bdd_format_formula(a->get_dict(),
+					     j->current_condition())
+		       << " and acc="
+		       << bdd_format_accset(a->get_dict(),
+					    j->current_acceptance_conditions())
+		       << " going to " << a->format_state(s2) << std::endl;
+		    delete s2;
+		  }
 	      }
 	    delete j;
 	    delete s;
 	    return false;
 	  }
-	os << "transition";
-	print_annotation(os, a, j);
-	os << " with label="
-	   << bdd_format_formula(a->get_dict(), label)
-	   << " and acc=" << bdd_format_accset(a->get_dict(), acc)
-	   << std::endl;
+	if (debug)
+	  {
+	    os << "transition";
+	    print_annotation(os, a, j);
+	    os << " with label="
+	       << bdd_format_formula(a->get_dict(), label)
+	       << " and acc=" << bdd_format_accset(a->get_dict(), acc)
+	       << std::endl;
+	  }
+	else
+	  {
+	    os << "  |  ";
+	    print_annotation(os, a, j);
+	    bdd_print_formula(os, a->get_dict(), label);
+	    os << "\t";
+	    bdd_print_accset(os, a->get_dict(), acc);
+	    os << std::endl;
+	  }
 	delete j;
 
 	// Sum acceptance conditions.
@@ -184,22 +214,24 @@ namespace spot
 	    if (!all_acc_seen && all_acc == expected_all_acc)
 	      {
 		all_acc_seen = true;
-		os << "all acceptance conditions ("
-		   << bdd_format_accset(a->get_dict(), all_acc)
-		   << ") have been seen"
-		   << std::endl;
+		if (debug)
+		  os << "all acceptance conditions ("
+		     << bdd_format_accset(a->get_dict(), all_acc)
+		     << ") have been seen"
+		     << std::endl;
 	      }
 	  }
       }
     delete s;
     if (all_acc != expected_all_acc)
       {
-	os << "ERROR: The cycle's acceptance conditions ("
-	   << bdd_format_accset(a->get_dict(), all_acc) << ") do not"
-	   << std::endl
-	   << "match those of the automata ("
-	   << bdd_format_accset(a->get_dict(), expected_all_acc)
-	   << std::endl;
+	if (debug)
+	  os << "ERROR: The cycle's acceptance conditions ("
+	     << bdd_format_accset(a->get_dict(), all_acc) << ") do not"
+	     << std::endl
+	     << "match those of the automata ("
+	     << bdd_format_accset(a->get_dict(), expected_all_acc)
+	     << std::endl;
 	return false;
       }
 

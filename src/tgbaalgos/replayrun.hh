@@ -31,11 +31,20 @@ namespace spot
 
   /// \brief Replay a tgba_run on a tgba.
   ///
+  /// This is similar to print_tgba_run(), except that the run is
+  /// actually replayed on the automaton while it is printed.  Doing
+  /// so makes it possible to display transition annotations (returned
+  /// by spot::tgba::transition_annotation()).  The output will stop
+  /// if the run cannot be completed.
+  ///
   /// \param run the run to replay
   /// \param a the automata on which to replay that run
   /// \param os the stream on which the replay should be traced
+  /// \param debug if set the output will be more verbose and extra
+  ///              debugging informations will be output on failure
   /// \return true iff the run could be completed
-  bool replay_tgba_run(std::ostream& os, const tgba* a, const tgba_run* run);
+  bool replay_tgba_run(std::ostream& os, const tgba* a, const tgba_run* run,
+		       bool debug = false);
 }
 
 #endif // SPOT_TGBAALGOS_REPLAYRUN_HH
