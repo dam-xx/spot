@@ -81,7 +81,12 @@ typedef std::map<std::string, bdd> formula_cache;
   } acc_list
 
 %%
-tgba: acceptance_decl lines | lines;
+tgba: acceptance_decl lines
+      | acceptance_decl
+      { result->add_state("0"); }
+      | lines
+      |
+      { result->add_state("0"); };
 
 acceptance_decl: ACC_DEF acc_decl ';'
 

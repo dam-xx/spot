@@ -148,10 +148,10 @@ main(int argc, char** argv)
       exit(2);
     }
 
-  if (opt_r > opt_F)
+  if (opt_r > opt_f)
     {
       std::cerr << "-r's argument (" << opt_r << ") should not be larger than "
-		<< "-F's (" << opt_F << ")" << std::endl;
+		<< "-f's (" << opt_F << ")" << std::endl;
       exit(2);
     }
 
