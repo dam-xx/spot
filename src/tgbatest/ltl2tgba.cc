@@ -11,8 +11,9 @@
 void
 syntax(char* prog)
 {
-  std::cerr << "Usage: "<< prog << " [-d][-o][-r] formula" << std::endl
-	    << std::endl
+  std::cerr << "Usage: "<< prog << " [OPTIONS...] formula" << std::endl
+	    << std::endl 
+	    << "Options:" << std::endl
 	    << "  -a   display the accepting_conditions BDD, not the reachability graph"
 	    << std::endl
 	    << "  -A   same as -a, but as a set" << std::endl
