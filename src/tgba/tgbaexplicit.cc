@@ -35,19 +35,19 @@ namespace spot
   }
 
   state_explicit*
-  tgba_explicit_succ_iterator::current_state()
+  tgba_explicit_succ_iterator::current_state() const
   {
     return new state_explicit((*i_)->dest);
   }
 
   bdd
-  tgba_explicit_succ_iterator::current_condition()
+  tgba_explicit_succ_iterator::current_condition() const
   {
     return (*i_)->condition;
   }
 
   bdd
-  tgba_explicit_succ_iterator::current_accepting_conditions()
+  tgba_explicit_succ_iterator::current_accepting_conditions() const
   {
     return (*i_)->accepting_conditions & all_accepting_conditions_;
   }

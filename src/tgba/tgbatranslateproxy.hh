@@ -20,9 +20,9 @@ namespace spot
     bool done() const;
 
     // inspection
-    state* current_state();
-    bdd current_condition();
-    bdd current_accepting_conditions();
+    state* current_state() const;
+    bdd current_condition() const;
+    bdd current_accepting_conditions() const;
   protected:
     tgba_succ_iterator* iter_;
     bddPair* rewrite_;

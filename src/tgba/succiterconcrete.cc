@@ -129,21 +129,21 @@ namespace spot
   }
 
   state_bdd*
-  tgba_succ_iterator_concrete::current_state()
+  tgba_succ_iterator_concrete::current_state() const
   {
     assert(!done());
     return new state_bdd(current_state_);
   }
 
   bdd
-  tgba_succ_iterator_concrete::current_condition()
+  tgba_succ_iterator_concrete::current_condition() const
   {
     assert(!done());
     return bdd_exist(current_, data_.notvar_set);
   }
 
   bdd
-  tgba_succ_iterator_concrete::current_accepting_conditions()
+  tgba_succ_iterator_concrete::current_accepting_conditions() const
   {
     assert(!done());
     return current_acc_;

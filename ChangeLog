@@ -1,5 +1,13 @@
 2003-07-07  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/succiter.hh (current_state, current_conditions
+	current_accepting_conditions): Mark as const.
+	* src/tgba/succiterconcrete.cc, src/tgba/succiterconcrete.hh, 
+	src/tgba/tgbaexplicit.cc, src/tgba/tgbaexplicit.hh, 
+	src/tgba/tgbaproduct.cc, src/tgba/tgbaproduct.hh, 
+	src/tgba/tgbatranslateproxy.cc, src/tgba/tgbatranslateproxy.hh:
+	Likewise.
+
 	* iface/gspn/gspnlib.h: Fit 80 columns.
 	[__cplusplus]: Wrap everything under extern "C".
 

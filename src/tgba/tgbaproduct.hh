@@ -67,9 +67,9 @@ namespace spot
     bool done() const;
 
     // inspection
-    state_bdd_product* current_state();
-    bdd current_condition();
-    bdd current_accepting_conditions();
+    state_bdd_product* current_state() const;
+    bdd current_condition() const;
+    bdd current_accepting_conditions() const;
 
   private:
     //@{

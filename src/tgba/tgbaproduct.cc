@@ -124,19 +124,19 @@ namespace spot
 
 
   state_bdd_product*
-  tgba_product_succ_iterator::current_state()
+  tgba_product_succ_iterator::current_state() const
   {
     return new state_bdd_product(left_->current_state(),
 				 right_->current_state());
   }
 
   bdd
-  tgba_product_succ_iterator::current_condition()
+  tgba_product_succ_iterator::current_condition() const
   {
     return current_cond_;
   }
 
-  bdd tgba_product_succ_iterator::current_accepting_conditions()
+  bdd tgba_product_succ_iterator::current_accepting_conditions() const
   {
     return ((left_->current_accepting_conditions() & right_neg_)
 	    | (right_->current_accepting_conditions() & left_neg_));

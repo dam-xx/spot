@@ -39,7 +39,7 @@ namespace spot
   }
 
   state*
-  tgba_translate_proxy_succ_iterator::current_state()
+  tgba_translate_proxy_succ_iterator::current_state() const
   {
     state* s = iter_->current_state();
     s->translate(rewrite_);
@@ -47,13 +47,13 @@ namespace spot
   }
 
   bdd
-  tgba_translate_proxy_succ_iterator::current_condition()
+  tgba_translate_proxy_succ_iterator::current_condition() const
   {
     return bdd_replace(iter_->current_condition(), rewrite_);
   }
 
   bdd
-  tgba_translate_proxy_succ_iterator::current_accepting_conditions()
+  tgba_translate_proxy_succ_iterator::current_accepting_conditions() const
   {
     return bdd_replace(iter_->current_accepting_conditions(), rewrite_);
   }

@@ -30,9 +30,9 @@ namespace spot
     bool done() const;
 
     // inspection
-    state_bdd* current_state();
-    bdd current_condition();
-    bdd current_accepting_conditions();
+    state_bdd* current_state() const;
+    bdd current_condition() const;
+    bdd current_accepting_conditions() const;
 
   private:
     const tgba_bdd_core_data& data_; ///< Core data of the automaton.

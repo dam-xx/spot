@@ -105,9 +105,9 @@ namespace spot
     virtual void next();
     virtual bool done() const;
 
-    virtual state_explicit* current_state();
-    virtual bdd current_condition();
-    virtual bdd current_accepting_conditions();
+    virtual state_explicit* current_state() const;
+    virtual bdd current_condition() const;
+    virtual bdd current_accepting_conditions() const;
 
   private:
     const tgba_explicit::state* s_;

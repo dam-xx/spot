@@ -64,14 +64,14 @@ namespace spot
     /// in the iteration.  These actually correspond to the same
     /// destination.  It just means there were several transitions,
     /// with different conditions, leading to the same state.
-    virtual state* current_state() = 0;
+    virtual state* current_state() const = 0;
     /// \brief Get the condition on the transition leading to this successor.
     ///
     /// This is a boolean function of atomic propositions.
-    virtual bdd current_condition() = 0;
+    virtual bdd current_condition() const = 0;
     /// \brief Get the accepting conditions on the transition leading
     /// to this successor.
-    virtual bdd current_accepting_conditions() = 0;
+    virtual bdd current_accepting_conditions() const = 0;
 
     //@}
   };
