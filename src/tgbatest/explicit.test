@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -25,7 +25,7 @@
 
 set -e
 
-./explicit > stdout
+run 0 ./explicit > stdout
 
 cat >expected <<EOF
 digraph G {

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -32,5 +32,5 @@ s1, "s2", "a & !b", c d;
 "state 3", s1,,;
 EOF
 
-./ltl2tgba -e -X input
-./ltl2tgba -m -X input
+run 0 ./ltl2tgba -e -X input
+run 0 ./ltl2tgba -m -X input

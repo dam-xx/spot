@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -25,27 +25,27 @@
 
 set -e
 
-run()
+dorun()
 {
-  ./ltl2tgba -f -s "$1" >output1
-  ./ltl2tgba -f -S "$1" >output2
+  run 0 ./ltl2tgba -f -s "$1" >output1
+  run 0 ./ltl2tgba -f -S "$1" >output2
   test `wc -l <output1` = `wc -l <output2`
 
-  ./ltl2tgba -s "$1" >output1
-  ./ltl2tgba -S "$1" >output2
+  run 0 ./ltl2tgba -s "$1" >output1
+  run 0 ./ltl2tgba -S "$1" >output2
   test `wc -l <output1` = `wc -l <output2`
 }
 
-run 'a'
-run 'a U b'
-run 'X a'
-run 'a & b & c'
-run 'a | b | (c U (d & (g U (h ^ i))))'
-run 'Xa & (b U !a) & (b U !a)'
-run 'Fa & Xb & GFc & Gd'
-run 'Fa & Xa & GFc & Gc'
-run 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
-run '!((FF a) <=> (F x))'
-run '!((FF a) <=> (F a))'
-run 'Xa && (!a U b) && !b && X!b'
-run '(a U !b) && Gb'
+dorun 'a'
+dorun 'a U b'
+dorun 'X a'
+dorun 'a & b & c'
+dorun 'a | b | (c U (d & (g U (h ^ i))))'
+dorun 'Xa & (b U !a) & (b U !a)'
+dorun 'Fa & Xb & GFc & Gd'
+dorun 'Fa & Xa & GFc & Gc'
+dorun 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+dorun '!((FF a) <=> (F x))'
+dorun '!((FF a) <=> (F a))'
+dorun 'Xa && (!a U b) && !b && X!b'
+dorun '(a U !b) && Gb'

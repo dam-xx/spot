@@ -48,7 +48,7 @@ sed 's/"d" "c"/"c" "d"/g;s/!b & a/a \& !b/g' stdout > tmp_ && mv tmp_ stdout
 diff stdout expected
 
 mv stdout input
-./readsave input > stdout
+run 0 ./readsave input > stdout
 
 # Sort out some possible inversions in the output.
 # (The order is not guaranteed by SPOT.)

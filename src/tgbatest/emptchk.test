@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -27,22 +27,22 @@ set -e
 
 expect_ce()
 {
-  ./ltl2tgba -e "$1"
-  ./ltl2tgba -e -D "$1"
-  ./ltl2tgba -e -f "$1"
-  ./ltl2tgba -e -f -D "$1"
-  ./ltl2tgba -m "$1"
-  ./ltl2tgba -m -f "$1"
+  run 0 ./ltl2tgba -e "$1"
+  run 0 ./ltl2tgba -e -D "$1"
+  run 0 ./ltl2tgba -e -f "$1"
+  run 0 ./ltl2tgba -e -f -D "$1"
+  run 0 ./ltl2tgba -m "$1"
+  run 0 ./ltl2tgba -m -f "$1"
 }
 
 expect_no()
 {
-  ./ltl2tgba -E "$1"
-  ./ltl2tgba -E -D "$1"
-  ./ltl2tgba -E -f "$1"
-  ./ltl2tgba -E -f -D "$1"
-  ./ltl2tgba -M "$1"
-  ./ltl2tgba -M -f "$1"
+  run 0 ./ltl2tgba -E "$1"
+  run 0 ./ltl2tgba -E -D "$1"
+  run 0 ./ltl2tgba -E -f "$1"
+  run 0 ./ltl2tgba -E -f -D "$1"
+  run 0 ./ltl2tgba -M "$1"
+  run 0 ./ltl2tgba -M -f "$1"
 }
 
 expect_ce 'a'

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -46,7 +46,7 @@ acc = "p1" "p2" "p3";
 "s2 * s2", "s3 * s1", "(a & c)",  "p1" "p3";
 EOF
 
-./explprod input1 input2 > stdout
+run 0 ./explprod input1 input2 > stdout
 # Sort out some possible inversions in the output.
 # (The order is not guaranteed by SPOT.)
 perl -pe 's/("\w+") ("\w+")(?: ("\w+"))?/@{[sort $1, $2, $3]}/g;s/\(c & a\)/(a & c)/g;s/\(b & a\)/(a & b)/g' \

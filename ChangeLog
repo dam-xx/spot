@@ -1,3 +1,15 @@
+2004-01-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	Run valgrind in test cases.
+	* src/tgbatest/defs.in (VALGRIND, run): Define.
+	* src/tgbatest/bddprod.test, src/tgbatest/dupexp.test,
+	src/tgbatest/emptchk.test, src/tgbatest/emptchke.test,
+	src/tgbatest/explicit.test, src/tgbatest/explpro2.test,
+	src/tgbatest/explpro3.test, src/tgbatest/explprod.test,
+	src/tgbatest/ltl2tgba.test, src/tgbatest/ltlprod.test,
+	src/tgbatest/mixprod.test, src/tgbatest/readsave.test,
+	src/tgbatest/tgbaread.test, src/tgbatest/tripprod.test: Use run().
+
 2004-01-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/eesrg.cc (format_state): Do not rewrite \n's,
