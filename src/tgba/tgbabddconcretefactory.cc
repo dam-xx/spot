@@ -1,10 +1,14 @@
 #include "ltlvisit/clone.hh"
+#include "ltlvisit/destroy.hh"
 #include "tgbabddconcretefactory.hh"
 
 namespace spot
 {
   tgba_bdd_concrete_factory::~tgba_bdd_concrete_factory()
   {
+    promise_map_::iterator pi;
+    for (pi = prom_.begin(); pi != prom_.end(); ++pi)
+      destroy(pi->first);
   }
 
   int
@@ -51,23 +55,45 @@ namespace spot
     return num;
   }
 
-  int
-  tgba_bdd_concrete_factory::create_promise(const ltl::formula* f)
+  void
+  tgba_bdd_concrete_factory::declare_promise(bdd b,
+					     const ltl::formula* p)
   {
-    // Do not build a promise that already exists.
-    tgba_bdd_dict::fv_map::iterator sii = dict_.prom_map.find(f);
-    if (sii != dict_.prom_map.end())
-      return sii->second;
+    // Maintain a disjunction of BDDs associated to P.
+    // We will latter (in tgba_bdd_concrete_factory::finish())
+    // record this disjunction as equivalant to P.
+    promise_map_::iterator pi = prom_.find(p);
+    if (pi == prom_.end())
+      {
+	p = clone(p);
+	prom_[p] = b;
+      }
+    else
+      {
+	pi->second |= b;
+      }
+  }
 
-    f = clone(f);
+  void
+  tgba_bdd_concrete_factory::finish()
+  {
+    promise_map_::iterator pi;
+    for (pi = prom_.begin(); pi != prom_.end(); ++pi)
+      {
+	// Register a BDD variable for this promise.
+	int p = create_node();
+	const ltl::formula* f = clone(pi->first); // The promised formula.
+	dict_.prom_map[f] = p;
+	dict_.prom_formula_map[p] = f;
 
-    int num = create_node();
-    dict_.prom_map[f] = num;
-    dict_.prom_formula_map[num] = f;
+	bdd prom = ithvar(p);
+	// Keep track of all promises for easy existential quantification.
+	data_.declare_promise(prom);
 
-    // Keep track of all promises for easy existential quantification.
-    data_.declare_promise(ithvar(num));
-    return num;
+	// The promise P must hold if we have to verify any of the
+	// (BDD) formulae registered.
+	add_relation(bdd_apply(prom, pi->second, bddop_biimp));
+      }
   }
 
   const tgba_bdd_core_data&

@@ -65,18 +65,20 @@ namespace spot
 		   Fx  <=> x | XFx
 	       In other words:
 		   now <=> x | next
-
-		`x | next', doesn't actually encode the fact that x
-		should be fulfilled at some point.  We use the
-		`promise' variable for this purpose.
 	    */
 	    int v = fact_.create_state(node);
 	    bdd now = fact_.ithvar(v);
 	    bdd next = fact_.ithvar(v + 1);
-	    bdd promise = fact_.ithvar(fact_.create_promise(node->child()));
-	    fact_.add_relation(bdd_apply(now, (recurse(node->child())
-					       | (promise & next)),
-					 bddop_biimp));
+	    bdd x = recurse(node->child());
+	    fact_.add_relation(bdd_apply(now, x | next, bddop_biimp));
+	    /*
+	      `x | next', doesn't actually encode the fact that x
+	      should be fulfilled at eventually.  So we declare any
+	      transition going to NEXT without checking X as
+	      "promising x".  This promises will be checked by during
+	      the emptiness check.
+	    */
+	    fact_.declare_promise(next & !x, node->child());
 	    res_ = now;
 	    return;
 	  }
@@ -135,19 +137,18 @@ namespace spot
 	       f1 U f2 <=> f2 | (f1 & X(f1 U f2))
 	       In other words:
 		   now <=> f2 | (f1 & next)
-
-		The rightmost conjunction, f1 & next, doesn't actually
-		encode the fact that f2 should be fulfilled at some
-		point.  We use the `promise_f2' variable for this purpose.
 	    */
 	    int v = fact_.create_state(node);
 	    bdd now = fact_.ithvar(v);
 	    bdd next = fact_.ithvar(v + 1);
-	    bdd promise_f2 =
-	      fact_.ithvar(fact_.create_promise(node->second()));
-	    fact_.add_relation(bdd_apply(now,
-					 f2 | (promise_f2 & f1 & next),
-					 bddop_biimp));
+	    fact_.add_relation(bdd_apply(now, f2 | (f1 & next), bddop_biimp));
+	    /*
+	      The rightmost conjunction, f1 & next, doesn't actually
+	      encode the fact that f2 should be fulfilled eventually.
+	      We declare a promise for this purpose (see the comment
+	      in the unop::F case).
+	    */
+	    fact_.declare_promise(next & !f2, node->second());
 	    res_ = now;
 	    return;
 	  }
@@ -212,6 +213,7 @@ namespace spot
     tgba_bdd_concrete_factory fact;
     ltl_trad_visitor v(fact);
     f->accept(v);
+    fact.finish();
     tgba_bdd_concrete g(fact);
     g.set_init_state(v.result());
     return g;
