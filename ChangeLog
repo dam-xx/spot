@@ -1,6 +1,9 @@
 2003-08-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* configure.ac: Bump version to 0.0g.
+	
 	* configure.ac, NEWS: Bump version to 0.0f.
+
 	* iface/gspn/simple.test, iface/gspn/dcswave.test,
 	iface/gspn/dcswaveltl.test: Make sure the example directory
 	is writable.
