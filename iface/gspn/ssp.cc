@@ -175,17 +175,17 @@ namespace spot
   {
   public:
     tgba_succ_iterator_gspn_ssp(Succ_* succ_tgba,
-				  size_t size_tgba,
-				  bdd* bdd_arry,
-				  state** state_arry,
-				  size_t size_states,
-				  Props_* prop,
-				  int size_prop)
+				size_t size_tgba,
+				bdd* bdd_array,
+				state** state_array,
+				size_t size_states,
+				Props_* prop,
+				int size_prop)
       : successors_(succ_tgba),
 	size_succ_(size_tgba),
 	current_succ_(0),
-	bdd_array_(bdd_arry),
-	state_array_(state_arry),
+	bdd_array_(bdd_array),
+	state_array_(state_array),
 	size_states_(size_states),
 	props_(prop),
 	size_prop_(size_prop)
@@ -253,10 +253,7 @@ namespace spot
     current_acceptance_conditions() const
     {
       // There is no acceptance conditions in GSPN systems, so we just
-      // return those from OPERAND_.
-      // return operand_->current_acceptance_conditions();
-      // bdd * ac=(bdd *)successors_[current_succ_].arc->curr_acc_conds;
-      //return (*ac);
+      // return those from operand_.
       return bdd_array_[successors_[current_succ_].arc->curr_acc_conds];
     }
   private:
@@ -265,7 +262,7 @@ namespace spot
     // ALL_CONDS.
     Succ_* successors_;		/// array of successors
     size_t size_succ_;		/// size of successors_
-    size_t current_succ_;		/// current position in successors_
+    size_t current_succ_;	/// current position in successors_
 
     bdd * bdd_array_;
     state** state_array_;

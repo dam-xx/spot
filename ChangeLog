@@ -1,5 +1,7 @@
 2004-07-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/ssp.cc: Typos.
+
 	* iface/gspn/gspn.cc (tgba_succ_iterator_gspn::tgba_succ_iterator_gspn):
 	Set size_ to 1 when stuttering is needed, so that done() does not
 	return true immediately.
