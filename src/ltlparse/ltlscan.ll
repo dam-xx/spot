@@ -7,7 +7,7 @@
 #include "parsedecl.hh"
 
 /* Hack Flex so we read from a string instead of reading from a file.  */
-# define YY_INPUT(buf, result, max_size)				\
+#define YY_INPUT(buf, result, max_size)					\
   do {									\
     result = (max_size < to_parse_size) ? max_size : to_parse_size;	\
     memcpy(buf, to_parse, result);					\
@@ -16,13 +16,13 @@
   } while (0);
 
 #define YY_USER_ACTION \
-    yylloc->columns (yyleng);
+  yylloc->columns(yyleng);
 
-static const char *to_parse = 0;
+static const char* to_parse = 0;
 static size_t to_parse_size = 0;
 
 void
-flex_set_buffer(const char *buf)
+flex_set_buffer(const char* buf)
 {
   to_parse = buf;
   to_parse_size = strlen(to_parse);
@@ -33,7 +33,7 @@ flex_set_buffer(const char *buf)
 %%
 
 %{
-  yylloc->step ();
+  yylloc->step();
 %}
 
 "("			return PAR_OPEN;
@@ -72,7 +72,7 @@ flex_set_buffer(const char *buf)
 	          return ATOMIC_PROP;
 		}
 
-  /* Atomic propositions can also be inclosed in double quotes.  */
+  /* Atomic propositions can also be enclosed in double quotes.  */
 \"[^\"]*\"	{
 		  yylval->str = new std::string(yytext + 1, yyleng - 2);
 	          return ATOMIC_PROP;

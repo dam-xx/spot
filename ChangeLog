@@ -1,5 +1,7 @@
 2003-11-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlparse/ltlscan.ll: Cosmetics.
+
 	* configure.ac: Bump version to 0.0k.
 
 2003-11-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
