@@ -1,5 +1,8 @@
 2004-01-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* configure.ac: Bump version to 0.0n.
+	* NEWS: Update.
+
 	* src/tgbaalgos/emptinesscheck.hh (emptiness_check::check,
 	emptiness_check::check2): Document them.
 

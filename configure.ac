@@ -1,4 +1,4 @@
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -20,7 +20,7 @@
 # 02111-1307, USA.
 
 AC_PREREQ([2.57])
-AC_INIT([spot], [0.0m])
+AC_INIT([spot], [0.0n])
 AC_CONFIG_AUX_DIR([tools])
 AM_INIT_AUTOMAKE([gnits nostdinc 1.8])
 

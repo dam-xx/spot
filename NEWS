@@ -1,6 +1,17 @@
-New in spot 0.0m
+New in spot 0.0n (2004-01-13):
 
-New in spot 0.0l (2003-11-01):
+  * emptiness_check::check2() is a variant of Couvreur's emptiness check that
+    explores visited states first.
+  * Build the EESRG supporting code condinally, as the associated
+    GreatSPN changes have not yet been contributed to GreatSPN.
+  * Add a powerset algorithm (determinize TGBA ignoring acceptance
+    conditions, i.e., as if they were used to recognize finite languages).
+  * tgba_explicit::merge_transitions: merge transitions with same source,
+    destination, and acceptance condition.
+  * Run test cases within valgrind.
+  * Various bug fixes.
+
+New in spot 0.0l (2003-12-01):
 
   * Computation of prime implicants.  This simplify the output of
     ltl_to_tgba_fm, and allows conditions to be output as some of
@@ -9,7 +20,7 @@ New in spot 0.0l (2003-11-01):
   * tgba_explicit supports arbitrary binary formulae on transitions
     (only conjunctions were allowed).
 
-New in spot 0.0j (2003-10-03):
+New in spot 0.0j (2003-11-03):
 
   * Use hash_map's instead of map's almost everywhere.
   * New emptiness check, based on Couvreur's algorithm.
