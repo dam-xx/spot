@@ -1,5 +1,7 @@
 2003-06-19  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgbatest/ltl2tgba.cc: Handle the -o and -r options.
+	
 	* src/tgbatest/tripprod.test, src/tgbatest/explprod.test,
 	src/tgbatest/readsave.test: Adjust to reflect yesterday's
 	bddprint.cc change.

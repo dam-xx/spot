@@ -4,12 +4,19 @@
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
 #include "tgba/ltl2tgba.hh"
+#include "tgba/bddprint.hh"
+#include "tgba/tgbabddtranslatefactory.hh"
 #include "tgbaalgos/dotty.hh"
 
 void
 syntax(char* prog)
 {
-  std::cerr << prog << " [-d] formula" << std::endl;
+  std::cerr << "Usage: "<< prog << " [-d][-o][-r] formula" << std::endl
+	    << std::endl
+	    << "  -d   turn on traces during parsing" << std::endl
+	    << "  -o   re-order BDD variables in the automata" << std::endl
+	    << "  -r   display the relation BDD, not the reachability graph"
+	    << std::endl;
   exit(2);
 }
 
@@ -18,24 +25,41 @@ main(int argc, char** argv)
 {
   int exit_code = 0;
 
-  if (argc < 2)
-    syntax(argv[0]);
+  bool debug_opt = false;
+  bool defrag_opt = false;
+  bool rel_opt = false;
+  int formula_index = 0;
 
-  bool debug = false;
-  int formula_index = 1;
-
-  if (!strcmp(argv[1], "-d"))
+  for (;;)
     {
-      debug = true;
-      if (argc < 3)
+      if (argc < formula_index + 2)
 	syntax(argv[0]);
-      formula_index = 2;
+
+      ++formula_index;
+
+      if (!strcmp(argv[formula_index], "-d"))
+	{
+	  debug_opt = true;
+	}
+      else if (!strcmp(argv[formula_index], "-o"))
+	{
+	  defrag_opt = true;
+	}
+      else if (!strcmp(argv[formula_index], "-r"))
+	{
+	  rel_opt = true;
+	}
+      else
+	{
+	  break;
+	}
     }
+
 
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::parse_error_list pel;
   spot::ltl::formula* f = spot::ltl::parse(argv[formula_index],
-					   pel, env, debug);
+					   pel, env, debug_opt);
 
   exit_code =
     spot::ltl::format_parse_errors(std::cerr, argv[formula_index], pel);
@@ -44,7 +68,13 @@ main(int argc, char** argv)
     {
       spot::tgba_bdd_concrete a = spot::ltl_to_tgba(f);
       spot::ltl::destroy(f);
-      spot::dotty_reachable(std::cout, a);
+      if (defrag_opt)
+	a = spot::defrag(a);
+      if (rel_opt)
+	spot::bdd_print_dot(std::cout, a.get_dict(), 
+			    a.get_core_data().relation);
+      else
+	spot::dotty_reachable(std::cout, a);
     }
   else
     {
