@@ -46,8 +46,44 @@ flags specific to Spot:
 
   --enable-devel
     Enable debugging symbols, turn off aggressive optimizations, and
-    turn on assertions.  This options is effective by default in
+    turn on assertions.  This option is effective by default in
     development versions (version numbers ending with a letter).
+    It is equivalent to
+      --enable-debug
+      --enable-warnings
+      --enable-assert
+      --enable-optimizations=-O
+  --disable-devel
+    Disable development options.  This is the case by default in
+    releases (version numbers NOT ending with a letter).
+    It is equivalent to
+      --disable-debug
+      --disable-warnings
+      --disable-assert
+      --enable-optimizations
+
+Here are the meaning of the fine-tuning options, in case
+enable/disable-devel is not enough.
+
+  --disable-assert
+  --enable-assert
+    Control assertion checking.
+
+  --disable-warnings
+  --enable-warnings
+    Whether warnings should be output.  Note that during development
+    we consider warnings to be errors.
+
+  --disable-debug
+  --enable-debug
+    Whether to compile extra debugging code.
+
+  --enable-optimizations
+  --enable-optimizations=FLAGS
+  --disable-optimizations
+    Whether the compilation should be optimized.  When FLAGS are
+    given, use these as optimization flags.  Otherwise, pick working
+    flags from a built-in list.
 
 
 Layout of the source tree
@@ -64,9 +100,9 @@ src/            Sources for libspot.
    ltltest/     Tests for ltlast/, ltlenv/, ltlparse/, and ltlvisit/.
    misc/        Miscellaneous support files.
    tgba/        TGBA objects and cousins.
-   tgbaalgos/   Algorithms on TGBAs.
+   tgbaalgos/   Algorithms on TGBA.
       gtec/     Generalized Tarjan Emptiness-Check.
-   tgbaparse/   Parser for explicit TGBAs.
+   tgbaparse/   Parser for explicit TGBA.
    tgbatest/    Tests for tgba/, tgbaalgos/, and tgbaparse/.
 doc/	        Documentation for libspot.
    spot.html/   HTML reference manual.
@@ -84,8 +120,8 @@ iface/	        Interfaces to other libraries.
 Third party software
 --------------------
 
-buddy/   A patched version of BuDDy 2.2 (a BDD library).
-lbtt/    A patched version of lbtt 1.0.2 (an LTL to Büchi automata test bench).
+buddy/   A patched version of BuDDy 2.3 (a BDD library).
+lbtt/    A patched version of lbtt 1.1.2 (an LTL to Büchi automata test bench).
 
 
 Build-system stuff
@@ -93,3 +129,14 @@ Build-system stuff
 
 m4/      M4 macros used by configure.ac.
 tools/   Helper scripts used during the build.
+
+-------------------------------------------------------------------------------
+Local Variables:
+mode: text
+End:
+
+ LocalWords:  Python's BuDDy LBTT LTL Büchi lbtt gspn DIR GreatSPN Soheib Yann
+ LocalWords:  Baarir Thierry Mieg CVS Università di Torino devel src libspot ac
+ LocalWords:  ltlast ltlenv ltlparse ltlvisit ltltest misc tgba TGBA tgbaalgos
+ LocalWords:  gtec Tarjan tgbaparse tgbatest doc html PDF spotref pdf cgi
+ LocalWords:  CGI ltl iface BDD
