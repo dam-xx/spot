@@ -1,5 +1,6 @@
 nodist_noinst_SCRIPTS = ltl2tgba.py
 EXTRA_DIST = $(srcdir)/ltl2tgba.in README
+CLEANFILES = $(nodist_noinst_SCRIPTS)
 
 ltl2tgba.py: $(srcdir)/ltl2tgba.in Makefile
 	sed -e 's|[@]PYTHON[@]|@PYTHON@|g' \

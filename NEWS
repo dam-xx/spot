@@ -1,3 +1,12 @@
+New in spot 0.0h (2003-08-18):
+
+  * More python bindings:
+    - "import buddy" works (see wrap/python/tests/bddnqueen.py for an example),
+    - almost all the Spot API is now available via "import spot".
+  * wrap/python/cgi/ltl2tgba.py is an LTL-to-Büchi translator that
+    work as as a cgi script.
+  * Couvreur's FM'99 ltl-to-tgba translation.
+
 New in spot 0.0f (2003-08-01):
 
   * More python bindings, still only for the spot::ltl:: namespace.
@@ -5,7 +14,7 @@ New in spot 0.0f (2003-08-01):
   * The LTL scanner recognizes /\, \/, and xor.
   * Upgrade to lbtt 1.0.2.
   * tgba_tba_proxy is an on-the-fly degeneralizer.
-  * Implements the "magic search" algorithm.  
+  * Implements the "magic search" algorithm.
     (Works only on a tgba_tba_proxy.)
   * Tgba's output algorithms (save(), dotty()) now non-recursive.
   * During products, succ_iter will optimize its set of successors

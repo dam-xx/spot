@@ -1,5 +1,8 @@
 2003-08-18  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* configure.ac, NEWS: Bump version to 0.0h.
+	* wrap/python/cgi/Makefile.am (CLEANFILES): Clean ltl2tgba.py.
+
 	* wrap/python/tests/ltl2tgba.test: Run $srcdir/ltl2tgba.py, not
 	ltl2tgba.py.
 
