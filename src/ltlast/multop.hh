@@ -14,9 +14,10 @@ namespace spot
     public:
       enum type { Or, And };
 
-      // A multop has at least two arguments.
+      multop::multop(type op);
+      // A multop usually has at least two arguments.
       multop(type op, formula* first, formula* second);
-      // More argument can be added.
+      // More arguments can be added.
       void add(formula* f);
       
       virtual ~multop();

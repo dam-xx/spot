@@ -1,6 +1,8 @@
 #include <iostream>
 #include "ltlparse/public.hh"
 #include "ltlvisit/equals.hh"
+#include "ltlvisit/lunabbrev.hh"
+#include "ltlvisit/dump.hh"
 
 void
 syntax(char *prog)
@@ -27,6 +29,11 @@ main(int argc, char **argv)
 			
   if (spot::ltl::format_parse_errors(std::cerr, argv[2], p2))
     return 2;
+
+#ifdef LUNABBREV
+  f1 = spot::ltl::unabbreviate_logic(f1);
+  spot::ltl::dump(*f1, std::cout);
+#endif
 
   if (equals(f1, f2))
     return 0;

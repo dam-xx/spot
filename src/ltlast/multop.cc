@@ -7,6 +7,11 @@ namespace spot
 {
   namespace ltl
   {    
+    multop::multop(type op)
+      : op_(op)
+    {
+    }
+
     multop::multop(type op, formula* first, formula* second)
       : op_(op)
     {

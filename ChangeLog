@@ -1,5 +1,15 @@
 2003-04-16  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltlvisit/lunabbrev.cc, src/ltlvisit/lunabbrev.hh: New files.
+	* src/ltlvisit/Makefile.am (libltlvisit_a_SOURCES): Add them.
+	* src/ltlast/multop.cc (multop::multop(type)): New constructor.
+	* src/ltlast/multop.hh (multop::multop(type)): New constructor.
+	* src/ltltest/lunabbrev.test: New file.
+	* src/ltltest/Makefile.am (TESTS): Add lunabbrev.test.
+	(check_PROGRAMS): Add lunabbrev.
+	(lunabbrev_SOURCES, lunabbrev_CPPFLAGS): New variables.
+	* src/ltltest/equals.cc (main) [LUNABBREV]: Call unabbreviate_logic.
+
 	* src/ltltest/equals.test (check0, check1): Remove. Use check 0, and
 	check 1 instead.
 

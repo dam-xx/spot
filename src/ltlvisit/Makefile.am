@@ -8,4 +8,6 @@ libltlvisit_a_SOURCES = \
   dump.cc \
   dump.hh \
   equals.cc \
-  equals.hh
+  equals.hh \
+  lunabbrev.hh \
+  lunabbrev.cc
