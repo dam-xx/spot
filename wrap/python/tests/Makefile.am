@@ -10,4 +10,5 @@ TESTS = \
   ltlsimple.py \
   ltlparse.py \
   bddnqueen.py \
-  ltl2tgba.test
+  ltl2tgba.test \
+  interdep.py

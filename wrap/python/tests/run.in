@@ -4,10 +4,7 @@
 # unset, be quiet.
 test -n "$srcdir" && test -z "$VERBOSE" && exec >/dev/null 2>&1
 
-if test -z "$1"; then
-  echo "Usage: ./run something" 2>&1
-  exit 1
-fi
+test -z "$1" && PYTHONPATH=..:@srcdir@/.. exec @PYTHON@
 
 case $1 in
   *.py)

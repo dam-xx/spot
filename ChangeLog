@@ -1,9 +1,20 @@
 2003-08-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* wrap/python/Makefile.am (lib_LTLIBRARIES)
+	(libspotswigpy_la_SOURCES, libspotswigpy_la_CFLAGS)
+	(libspotswigpy_la_LDFLAGS): New variables.
+	(_spot_la_LIBADD, _buddy_la_LDFLAGS): Link with libspotswigpy.la
+	($(srcdir)/spot_wrap.cxx, $(srcdir)/buddy_wrap.cxx): Run
+	swig with -c.
+	* wrap/python/tests/libpy.c: New file.
+	* wrap/python/tests/run.in: Run python if no arguments are given.
+	* wrap/python/tests/interdep.py: New file.
+	* wrap/python/tests/Makefile.am (TESTS): Add interdep.py.
+
 	* wrap/python/spot.i: Declare spot::ltl_to_tgba as a constructor.
 	* wrap/python/tests/ltl2tgba.py: Do not force `thisown=1' on tgba
 	objects.
-	
+
 	* wrap/python/spot.i: Include headers from tgba/ and tgbaalgos/.
 	* wrap/python/tests/ltl2tgba.py, wrap/python/tests/ltl2tgba.test:
 	New files.

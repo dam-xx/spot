@@ -3,6 +3,8 @@
 %include "std_string.i"
 %include "std_list.i"
 
+%import "buddy.i"
+
 %{
 #include "ltlast/formula.hh"
 #include "ltlast/refformula.hh"
