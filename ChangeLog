@@ -1,3 +1,15 @@
+2003-07-22  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* m4/gspnlib.m4: Check for libgspnRG.a and libgspnSRG.a.
+	Define LIBGSPNRG_LDFLAGS and LIBGSPNSRG_LDFLAGS, not
+	LIBGSPN_LDFLAGS.
+	* iface/gspn/Makefile.am: Adjust, build dottygspn-rg and
+	dottygspn-srg instead of dottygspn.
+	* iface/gspn/gspn.cc (EVENT_TRUE): Undefine.
+	(tgba_gspn_private_::~tgba_gspn_private_): Free all_indexes.
+	* iface/gspn/dottygspn.cc (main): Destroy the automaton before
+	its dictionnary.
+
 2003-07-17  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	Now succ_iter() can fetch extra information from
@@ -22,7 +34,7 @@
 	(tgba_explicit::compute_support_conditions,
 	tgba_explicit::compute_support_variables): Implement them.
 	* src/tgba/tgbaexplicit.hh: Adjust.
-	* src/tgba/tgbaproduct.cc (tgba_product::succ_iter): Handle the 
+	* src/tgba/tgbaproduct.cc (tgba_product::succ_iter): Handle the
 	two new arguments.
 	(tgba_product::compute_support_conditions,
 	tgba_product::compute_support_variables): Implement them.

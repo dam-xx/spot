@@ -12,9 +12,11 @@ main(int argc, char **argv)
 
       spot::bdd_dict* dict = new spot::bdd_dict();
 
-      spot::tgba_gspn a(dict, env);
+      {
+	spot::tgba_gspn a(dict, env);
 
-      spot::dotty_reachable(std::cout, &a);
+	spot::dotty_reachable(std::cout, &a);
+      }
 
       delete dict;
     }

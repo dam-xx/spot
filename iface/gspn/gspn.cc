@@ -5,11 +5,6 @@
 #include "gspn.hh"
 #include "ltlvisit/destroy.hh"
 
-// FIXME: Override signed definition of EVENT_TRUE until this is fixed
-// in gspnlib.h.
-#undef EVENT_TRUE
-#define EVENT_TRUE 0U
-
 namespace spot
 {
 
@@ -87,7 +82,7 @@ namespace spot
 
 
     tgba_gspn_private_(bdd_dict* dict, const gspn_environment& env)
-      : refs(0), dict(dict), last_state_conds_input(0)
+      : refs(1), dict(dict), all_indexes(0), last_state_conds_input(0)
     {
       const gspn_environment::prop_map& p = env.get_prop_map();
 
@@ -130,6 +125,8 @@ namespace spot
       dict->unregister_all_my_variables(this);
       if (last_state_conds_input)
 	delete last_state_conds_input;
+      if (all_indexes)
+	delete[] all_indexes;
     }
 
     bdd index_to_bdd(AtomicProp index) const
@@ -149,7 +146,7 @@ namespace spot
 	{
 	  // Build the BDD of the conditions available on this state.
 	  unsigned char* cube = 0;
-	  // This is temporary. We ought to ask only what we need.
+	  // FIXME: This is temporary. We ought to ask only what we need.
 	  AtomicProp* want = all_indexes;
 	  size_t count = index_count;
 	  int res = satisfy(s->get_state(), want, &cube, count);
@@ -192,7 +189,7 @@ namespace spot
 	throw gspn_exeption("succ()", res);
       assert(successors_);
       // GSPN is expected to return a looping "dead" transition where
-      // there is no successor,
+      // there is no successor.
       assert(size_> 0);
     }
 

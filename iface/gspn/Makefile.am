@@ -8,7 +8,10 @@ libspotgspn_la_SOURCES = \
   gspn.cc \
   gspnlib.h
 
-check_PROGRAMS = dottygspn
+check_PROGRAMS = dottygspn-rg dottygspn-srg
 
-dottygspn_SOURCES = dottygspn.cc
-dottygspn_LDADD = libspotgspn.la $(LIBGSPN_LDFLAGS)
+dottygspn_rg_SOURCES = dottygspn.cc
+dottygspn_rg_LDADD = libspotgspn.la $(LIBGSPNRG_LDFLAGS)
+
+dottygspn_srg_SOURCES = dottygspn.cc
+dottygspn_srg_LDADD = libspotgspn.la $(LIBGSPNSRG_LDFLAGS)
