@@ -22,7 +22,9 @@ namespace spot
     data_.notvar_set = bdd_replace(in.notvar_set, rewrite);
     data_.var_set = bdd_replace(in.var_set, rewrite);
     data_.varandnext_set = bdd_replace(in.varandnext_set, rewrite);
+    data_.acc_set = bdd_replace(in.acc_set, rewrite);
     data_.notacc_set = bdd_replace(in.notacc_set, rewrite);
+    data_.negacc_set = bdd_replace(in.negacc_set, rewrite);
 
     init_ = bdd_replace(from.get_init_bdd(), rewrite);
 

@@ -1,3 +1,22 @@
+2003-07-02  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	Rewrite tgba_succ_iterator_concrete::next for the fourth time
+	(or is it the fifth?).
+
+	* src/tgba/succiterconcrete.hh
+	(tgba_succ_iterator_concrete::trans_dest_,
+	tgba_succ_iterator_concrete::trans_set_,
+	tgba_succ_iterator_concrete::trans_set_left_,
+	tgba_succ_iterator_concrete::neg_trans_set_): New attributes.
+	* src/tgba/succiterconcrete.cc
+	(tgba_succ_iterator_concrete::tgba_succ_iterator_concrete): Initialize
+	new members.
+	(tgba_succ_iterator_concrete::first): Likewise.
+	(tgba_succ_iterator_concrete::next): Rewrite.
+	* tgba/tgbabddcoredata.hh (tgba_bdd_core_data::acc_set): New attribute.
+	* tgba/tgbabddcoredata.cc, tgba/tgbabddtranslatefactory.cc: 
+	Handle acc_set.
+
 2003-07-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/tgbabddtranslatefactory.cc
