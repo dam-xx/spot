@@ -1,4 +1,5 @@
 #include <cassert>
+#include <sstream>
 #include "tostring.hh"
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
@@ -9,7 +10,7 @@ namespace spot
   namespace ltl
   {
 
-    class to_string_visitor : public spot::ltl::const_visitor
+    class to_string_visitor : public const_visitor
     {
     public:
       to_string_visitor(std::ostream& os = std::cout)
@@ -21,88 +22,87 @@ namespace spot
       ~to_string_visitor()
       {
       }
-
+      
       void 
-      visit(const spot::ltl::atomic_prop* ap)
+      visit(const atomic_prop* ap)
       {
-	   os_ << ap->name();
-    
+	os_ << ap->name();
       }
 
       void
-      visit(const spot::ltl::constant* c)
+      visit(const constant* c)
       {
 	os_ << c->val_name();
       }      
       
       void
-      visit(const spot::ltl::binop* bo)
+      visit(const binop* bo)
       {
 	os_ << "(";
 	bo->first()->accept(*this);
 	
 	switch(bo->op())
-	   {
-	      case spot::ltl::binop::Xor:
-	        os_ << " ^ ";
-	      break;
-	      case spot::ltl::binop::Implies:
-	        os_ << " => ";
-	      break;
-	      case spot::ltl::binop::Equiv:
-	        os_ << " <=> ";
-	      break;
-	      case spot::ltl::binop::U:
-	        os_ << " U ";
-	      break;
-	      case spot::ltl::binop::R:
-	        os_ << " R ";
-	      break;
-	   }
+	  {
+	  case binop::Xor:
+	    os_ << " ^ ";
+	    break;
+	  case binop::Implies:
+	    os_ << " => ";
+	    break;
+	  case binop::Equiv:
+	    os_ << " <=> ";
+	    break;
+	  case binop::U:
+	    os_ << " U ";
+	    break;
+	  case binop::R:
+	    os_ << " R ";
+	    break;
+	  }
 	
 	bo->second()->accept(*this);
 	os_ << ")";
       }
       
       void
-      visit(const spot::ltl::unop* uo)
+      visit(const unop* uo)
       {   
- 	 switch(uo->op())
-	   {
-	   case spot::ltl::unop::Not:
-	     os_ << "!";
-	     break;
-	   case spot::ltl::unop::X:
-	     os_ << "X";
-	     break;
-	   case spot::ltl::unop::F:
-	     os_ << "F";
-	     break;
-	   case spot::ltl::unop::G:
-	     os_ << "G";
-	       break;
-	   }
+	switch(uo->op())
+	  {
+	  case unop::Not:
+	    os_ << "!";
+	    break;
+	  case unop::X:
+	    os_ << "X";
+	    break;
+	  case unop::F:
+	    os_ << "F";
+	    break;
+	  case unop::G:
+	    os_ << "G";
+	    break;
+	  }
         
 	uo->child()->accept(*this);
       }
       
       void
-      visit(const spot::ltl::multop* mo)
+      visit(const multop* mo)
       {
 	os_ << "(";
 	unsigned max = mo->size();
 	mo->nth(0)->accept(*this);
-	 const char* ch = " ";
+	const char* ch = " ";
 	switch (mo->op())
-	       {
-	          case spot::ltl::multop::Or:
-	            ch = " | ";
-	          break; 
-	          case spot::ltl::multop::And:
-	            ch = " & ";
-	          break;
-	       }
-
+	  {
+	  case multop::Or:
+	    ch = " | ";
+	    break; 
+	  case multop::And:
+	    ch = " & ";
+	    break;
+	  }
+	
 	for (unsigned n = 1; n < max; ++n)
 	  {
 	    os_ << ch;
@@ -113,7 +113,7 @@ namespace spot
     private:
       std::ostream& os_;
     };
-
+    
     void 
     to_string(const formula& f, std::ostream& os)
     {
@@ -121,5 +121,12 @@ namespace spot
       f.accept(v);
     }
 
+    std::string 
+    to_string(const formula& f)
+    {
+      std::ostringstream os;
+      to_string(f, os);
+      return os.str();
+    }
   }
 }

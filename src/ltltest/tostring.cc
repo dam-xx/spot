@@ -1,5 +1,4 @@
 #include <iostream>
-#include <sstream>
 #include "ltlparse/public.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/equals.hh"
@@ -26,13 +25,12 @@ main(int argc, char **argv)
   // The string generated from an abstract tree should be parsable
   // again.
 
-  std::ostringstream os;
-  spot::ltl::to_string(*f1, os);
-  std::cout << os.str() << std::endl;
+  std::string f1s = spot::ltl::to_string(*f1);
+  std::cout << f1s << std::endl;
 
-  spot::ltl::formula* f2 = spot::ltl::parse(os.str(), p1);
+  spot::ltl::formula* f2 = spot::ltl::parse(f1s, p1);
 
-  if (spot::ltl::format_parse_errors(std::cerr, os.str(), p1))
+  if (spot::ltl::format_parse_errors(std::cerr, f1s, p1))
     return 2;
 
   // This second abstract tree should be equal to the first.
@@ -42,11 +40,10 @@ main(int argc, char **argv)
 
   // It should also map to the same string.
 
-  std::ostringstream os2;
-  spot::ltl::to_string(*f2, os2);
-  std::cout << os2.str() << std::endl;
+  std::string f2s = spot::ltl::to_string(*f2);
+  std::cout << f2s << std::endl;
 
-  if (os2.str() != os.str())
+  if (f2s != f1s)
     return 1;
 }
  

@@ -9,6 +9,7 @@ namespace spot
   namespace ltl
   {
     void to_string(const formula& f, std::ostream& os);
+    std::string to_string(const formula& f);
   }
 }
 
