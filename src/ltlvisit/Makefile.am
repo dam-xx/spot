@@ -6,4 +6,6 @@ libltlvisit_a_SOURCES = \
   dotty.cc \
   dotty.hh \
   dump.cc \
-  dump.hh 
+  dump.hh \
+  equals.cc \
+  equals.hh

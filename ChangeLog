@@ -1,5 +1,13 @@
 2003-04-16  Alexandre DURET-LUTZ  <aduret@circe.lip6.fr>
 
+	* src/ltlvisit/equals.cc, src/ltlvisit/equals.hh: New files.
+	* src/ltlvisit/Makefile.am (libltlvisit_a_SOURCES): Add equals.hh
+	and equals.cc.
+	* src/ltltest/equals.cc, src/ltltest/equals.test: New files.
+	* src/ltltest/Makefile.am (check_PROGRAMS): Add equals.
+	(equals_SOURCES): New variable.
+	(TESTS): Add equals.test.
+
 	* src/ltlast/multop.cc (multop::multop): Use multop::add.
 	(multop::add): If the formulae we add is itself a multop for the 
 	same operator, merge its children with ours.
