@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -31,6 +31,7 @@ namespace spot
   {
     /// \brief Clone and rewrite a formula to remove most of the
     /// abbreviated LTL and logical operators.
+    /// \ingroup ltl_visitor
     ///
     /// The rewriting performed on logical operator is
     /// the same as the one done by spot::ltl::unabbreviate_logic_visitor.

@@ -30,6 +30,7 @@ namespace spot
   {
     /// \brief Replace <code>true U f</code> and <code>false R g</code> by
     /// <code>F f</code> and <code>G g</code>.
+    /// \ingroup ltl_visitor
     class simplify_f_g_visitor : public clone_visitor
     {
       typedef clone_visitor super;
@@ -45,6 +46,7 @@ namespace spot
 
     /// \brief Replace <code>true U f</code> and <code>false R g</code> by
     /// <code>F f</code> and <code>G g</code>.
+    /// \ingroup ltl_rewriting
     formula* simplify_f_g(const formula* f);
   }
 }

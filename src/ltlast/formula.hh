@@ -30,8 +30,39 @@ namespace spot
 {
   namespace ltl
   {
+    /// \defgroup ltl LTL formulae
+    ///
+    /// This module gathers types and definitions related to LTL formulae.
+
+    /// \addtogroup ltl_essential Essential LTL types
+    /// \ingroup ltl
+
+    /// \addtogroup ltl_ast LTL Abstract Syntax Tree
+    /// \ingroup ltl
+
+    /// \addtogroup ltl_environment LTL environments
+    /// \ingroup ltl
+    /// LTL environment implementations.
+
+    /// \addtogroup ltl_algorithm Algorithms for LTL formulae
+    /// \ingroup ltl
+
+    /// \addtogroup ltl_io Input/Output of LTL formulae
+    /// \ingroup ltl_algorithm
+
+    /// \addtogroup ltl_visitor Derivable visitors
+    /// \ingroup ltl_algorithm
+
+    /// \addtogroup ltl_rewriting Rewriting LTL formulae
+    /// \ingroup ltl_algorithm
+
+    /// \addtogroup ltl_misc Miscellaneous algorithms for LTL formulae
+    /// \ingroup ltl_algorithm
+
 
     /// \brief An LTL formula.
+    /// \ingroup ltl_essential
+    /// \ingroup ltl_ast
     ///
     /// The only way you can work with a formula is to
     /// build a spot::ltl::visitor or spot::ltl::const_visitor.

@@ -29,6 +29,9 @@ namespace spot
 {
   namespace ltl
   {
+    /// \addtogroup ltl_misc
+    /// @{
+
     /// Set of atomic propositions.
     typedef std::set<spot::ltl::atomic_prop*> atomic_prop_set;
 
@@ -42,6 +45,8 @@ namespace spot
     ///        set containing all these atomic propositions if \c s is 0.
     atomic_prop_set*
     atomic_prop_collect(const formula* f, atomic_prop_set* s = 0);
+
+    /// @}
   }
 }
 #endif

@@ -29,6 +29,9 @@ namespace spot
 {
   namespace ltl
   {
+    /// \addtogroup ltl_io
+    /// @{
+
     /// \brief Output a formula as a (parsable) string.
     /// \param f The formula to translate.
     /// \param os The stream where it should be output.
@@ -46,6 +49,8 @@ namespace spot
     /// \brief Convert a formula into a (parsable by Spin) string.
     /// \param f The formula to translate.
     std::string to_spin_string(const formula* f);
+
+    /// @}
   }
 }
 

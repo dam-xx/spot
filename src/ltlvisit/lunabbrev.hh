@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -30,6 +30,7 @@ namespace spot
   {
     /// \brief Clone and rewrite a formula to remove most of the
     /// abbreviated logical operators.
+    /// \ingroup ltl_visitor
     ///
     /// This will rewrite binary operators such as binop::Implies,
     /// binop::Equals, and binop::Xor, using only unop::Not, multop::Or,
@@ -54,6 +55,7 @@ namespace spot
 
     /// \brief Clone and rewrite a formula to remove most of the abbreviated
     /// logical operators.
+    /// \ingroup ltl_rewriting
     ///
     /// This will rewrite binary operators such as binop::Implies,
     /// binop::Equals, and binop::Xor, using only unop::Not, multop::Or,

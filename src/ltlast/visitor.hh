@@ -31,6 +31,7 @@ namespace spot
   namespace ltl
   {
     /// \brief Formula visitor that can modify the formula.
+    /// \ingroup ltl_essential
     ///
     /// Writing visitors is the prefered way
     /// to traverse a formula, since it doesn't

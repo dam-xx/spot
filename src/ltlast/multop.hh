@@ -34,6 +34,7 @@ namespace spot
   {
 
     /// \brief Multi-operand operators.
+    /// \ingroup ltl_ast
     ///
     /// These operators are considered commutative and associative.
     class multop : public ref_formula

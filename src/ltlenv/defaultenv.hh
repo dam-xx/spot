@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -30,6 +30,7 @@ namespace spot
   {
 
     /// \brief A laxist environment.
+    /// \ingroup ltl_environment
     ///
     /// This environment recognizes all atomic propositions.
     ///

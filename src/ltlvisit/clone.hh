@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -30,6 +30,7 @@ namespace spot
   namespace ltl
   {
     /// \brief Clone a formula.
+    /// \ingroup ltl_visitor
     ///
     /// This visitor is public, because it's convenient
     /// to derive from it and override part of its methods.
@@ -56,6 +57,7 @@ namespace spot
     };
 
     /// \brief Clone a formula.
+    /// \ingroup ltl_essential
     formula* clone(const formula* f);
   }
 }

@@ -28,6 +28,10 @@ namespace spot
 {
   namespace ltl
   {
+
+    /// \brief Syntactic implication.
+    /// \ingroup ltl_misc
+    ///
     /// This comes from
     /// \verbatim
     /// @InProceedings{	  somenzi.00.cav,
@@ -42,14 +46,15 @@ namespace spot
     /// publisher	= {Springer-Verlag}
     /// }
     /// \endverbatim
-
-    /// \brief Syntactic implication.
     bool syntactic_implication(const formula* f1, const formula* f2);
 
     /// \brief Syntactic implication.
+    /// \ingroup ltl_misc
     ///
     /// If right==false, true if !f1 < f2, false otherwise.
     /// If right==true, true if f1 < !f2, false otherwise.
+    ///
+    /// \see syntactic_implication
     bool syntactic_implication_neg(const formula* f1, const formula* f2,
 				   bool right);
   }

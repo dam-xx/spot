@@ -30,6 +30,9 @@ namespace spot
   namespace ltl
   {
 
+    /// \addtogroup ltl_rewriting
+    /// @{
+
     /// Options for spot::ltl::reduce.
     enum reduce_options
       {
@@ -52,8 +55,10 @@ namespace spot
     ///            which optimizations to apply.
     /// \return the reduced formula
     formula* reduce(const formula* f, int opt = Reduce_All);
+    /// @}
 
     /// \brief Check whether a formula is a pure eventuality.
+    /// \ingroup ltl_misc
     ///
     /// Pure eventuality formulae are defined in
     /// \verbatim
@@ -76,6 +81,7 @@ namespace spot
     bool is_eventual(const formula* f);
 
     /// \brief Check whether a formula is purely universal.
+    /// \ingroup ltl_misc
     ///
     /// Purely universal formulae are defined in
     /// \verbatim

@@ -34,6 +34,7 @@ namespace spot
   {
 
     /// \brief A declarative environment.
+    /// \ingroup ltl_environment
     ///
     /// This environment recognizes all atomic propositions
     /// that have been previously declared.  It will reject other.

@@ -34,6 +34,9 @@ namespace spot
 {
   namespace ltl
   {
+    /// \addtogroup ltl_io
+    /// @{
+
     /// \brief A parse diagnostic with its location.
     typedef std::pair<yy::Location, std::string> parse_error;
     /// \brief A list of parser diagnostics, as filled by parse.
@@ -69,6 +72,8 @@ namespace spot
     bool format_parse_errors(std::ostream& os,
 			     const std::string& ltl_string,
 			     parse_error_list& error_list);
+
+    /// @}
   }
 }
 

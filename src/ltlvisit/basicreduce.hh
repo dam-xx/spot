@@ -28,12 +28,15 @@ namespace spot
 {
   namespace ltl
   {
-    /// Basic rewritings.
+    /// \brief Basic rewritings.
+    /// \ingroup ltl_rewriting
     formula* basic_reduce(const formula* f);
 
-    /// Whether a formula starts with GF.
+    /// \brief Whether a formula starts with GF.
+    /// \ingroup ltl_misc
     bool is_GF(const formula* f);
-    /// Whether a formula starts with FG.
+    /// \brief Whether a formula starts with FG.
+    /// \ingroup ltl_misc
     bool is_FG(const formula* f);
   }
 }

@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -31,6 +31,7 @@ namespace spot
   {
     /// \brief Apply an algorithm on each node of an AST,
     /// during a postfix traversal.
+    /// \ingroup ltl_visitor
     ///
     /// Override one or more of the postifix_visitor::doit methods
     /// with the algorithm to apply.

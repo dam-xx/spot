@@ -35,7 +35,8 @@ namespace spot
   namespace ltl
   {
 
-    /// Atomic propositions.
+    /// \brief Atomic propositions.
+    /// \ingroup ltl_ast
     class atomic_prop : public ref_formula
     {
     public:

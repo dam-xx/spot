@@ -21,13 +21,18 @@
 
 DOXYGEN = doxygen
 
-.PHONY: doc spot
+.PHONY: doc fast-doc
 
 all-local: $(srcdir)/stamp
 
 doc:
 	rm -f $(srcdir)/stamp
 	$(MAKE) $(srcdir)/stamp
+
+fast-doc:
+	$(MAKE) Doxyfile
+	$(DOXYGEN)
+	touch $(srcdir)/stamp
 
 $(srcdir)/stamp: $(srcdir)/Doxyfile.in $(top_srcdir)/configure.ac
 	$(MAKE) Doxyfile

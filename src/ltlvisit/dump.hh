@@ -30,6 +30,7 @@ namespace spot
   namespace ltl
   {
     /// \brief Dump a formula tree.
+    /// \ingroup ltl_io
     /// \param os The stream where it should be output.
     /// \param f The formula to dump.
     ///

@@ -1,5 +1,19 @@
 2004-11-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlast/atomic_prop.hh, src/ltlast/binop.hh,
+	src/ltlast/constant.hh, src/ltlast/formula.hh,
+	src/ltlast/multop.hh, src/ltlast/refformula.hh,
+	src/ltlast/unop.hh, src/ltlast/visitor.hh, src/ltlenv/declenv.hh,
+	src/ltlenv/defaultenv.hh, src/ltlenv/environment.hh,
+	src/ltlparse/public.hh, src/ltlvisit/apcollect.hh,
+	src/ltlvisit/basicreduce.hh, src/ltlvisit/clone.hh,
+	src/ltlvisit/destroy.hh, src/ltlvisit/dotty.hh,
+	src/ltlvisit/dump.hh, src/ltlvisit/length.hh,
+	src/ltlvisit/lunabbrev.hh, src/ltlvisit/nenoform.hh: Add Doxygen
+	groups for LTL algorithms and types.
+	* doc/Makefile.am (fast-doc): New target.
+
+
 	* src/misc/hashfunc.hh: Include cstddef to define size_t, and guard
 	the file for multiple inclusions.
 

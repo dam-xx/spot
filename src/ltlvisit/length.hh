@@ -29,6 +29,7 @@ namespace spot
   namespace ltl
   {
     /// \brief Compute the length of a formula.
+    /// \ingroup ltl_misc
     ///
     /// The length of a formula is the number of atomic properties,
     /// constants, and operators (logical and temporal) occurring in

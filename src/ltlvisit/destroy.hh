@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -29,6 +29,7 @@ namespace spot
   namespace ltl
   {
     /// \brief Destroys a formula
+    /// \ingroup ltl_essential
     void destroy(const formula *f);
   }
 }
