@@ -1,3 +1,7 @@
+2004-01-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba_fm.cc: Typos in comments.
+
 2004-01-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac, NEWS: Bump version to 0.0o.

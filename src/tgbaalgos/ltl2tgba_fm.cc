@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -40,8 +40,8 @@ namespace spot
   namespace
   {
 
-    // Helper dictionary.  We represent formula using a BDD to simplify
-    // them, and them translate the BDD back into formulae.
+    // Helper dictionary.  We represent formulae using BDDs to
+    // simplify them, and then translate BDDs back into formulae.
     //
     // The name of the variables are inspired from Couvreur's FM paper.
     //   "a" variables are promises (written "a" in the paper)
@@ -323,7 +323,7 @@ namespace spot
 	    {
 	      const formula* child = node->child();
 	      int x = dict_.register_next_variable(node);
-	      // GFy is pretty frequent and easy to optimize, to we
+	      // GFy is pretty frequent and easy to optimize, so we
 	      // want to detect it.
 	      const unop* Fy = dynamic_cast<const unop*>(child);
 	      if (Fy && Fy->op() == unop::F)
@@ -344,11 +344,13 @@ namespace spot
 	    }
 	  case unop::Not:
 	    {
+	      // r(!y) = !r(y)
 	      res_ = bdd_not(recurse(node->child()));
 	      return;
 	    }
 	  case unop::X:
 	    {
+	      // r(Xy) = Next[y]
 	      int x = dict_.register_next_variable(node->child());
 	      res_ = bdd_ithvar(x);
 	      return;
@@ -366,6 +368,7 @@ namespace spot
 
 	switch (node->op())
 	  {
+	    // r(f1 logical-op f2) = r(f1) logical-op r(f2)
 	  case binop::Xor:
 	    res_ = bdd_apply(f1, f2, bddop_xor);
 	    return;
