@@ -61,7 +61,10 @@ namespace spot
     node_type_form_visitor::node_type_form_visitor(){}
 
     node_type_form_visitor::type
-    node_type_form_visitor::result() const { return result_;}
+    node_type_form_visitor::result() const
+    {
+      return result_;
+    }
 
     void
     node_type_form_visitor::visit(const atomic_prop*)

@@ -134,7 +134,7 @@ namespace spot
 	      case binop::Xor:
 	      case binop::Equiv:
 	      case binop::Implies:
-		break;;
+		break;
 
 	      case binop::U:
 		/* a < b => a U b = b */
@@ -218,7 +218,7 @@ namespace spot
 		    f1 = *index;
 		    index++;
 		  }
-		for (; index != res->end();index++)
+		for (; index != res->end(); index++)
 		  {
 		    f2 = *index;
 		    /* a < b => a + b = b */
