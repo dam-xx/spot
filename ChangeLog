@@ -1,5 +1,8 @@
 2003-05-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/tgbabddtranslatefactory.cc 
+	(tgba_bdd_translate_factory::compute_pairs): Be quiet.
+
 	* src/Makefile.am (SUBDIRS): Add tgbaalgos.
 	(libspot_la_LIBADD): Add tgba/libtgbaalgos.
 	* src/tgbaalgos/Makefile.am: New file.

@@ -35,8 +35,6 @@ namespace spot
     tgba_bdd_dict::fv_map::const_iterator i_from;
     tgba_bdd_dict::fv_map::const_iterator i_to;
 
-    from.dump(std::cerr);
-
     for (i_from = from.now_map.begin(); i_from != from.now_map.end(); ++i_from)
       {
 	i_to = dict_.now_map.find(i_from->first);
