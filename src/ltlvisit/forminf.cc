@@ -35,22 +35,26 @@ namespace spot
     bool
     is_GF(const formula* f)
     {
-      if (node_type(f) == node_type_form_visitor::Unop)
-	if (dynamic_cast<const unop*>(f)->op() == unop::G)
-	  if (node_type(((const unop*)f)->child()) == node_type_form_visitor::Unop)
-	    if (dynamic_cast<const unop*>(dynamic_cast<const unop*>(f)->child())->op() == unop::F)
-	      return true;
+      const unop* op = dynamic_cast<const unop*>(f);
+      if (op && op->op() == unop::G)
+	{
+	  const unop* opchild = dynamic_cast<const unop*>(op->child());
+	  if (opchild && opchild->op() == unop::F)
+	    return true;
+	}
       return false;
     }
 
     bool
     is_FG(const formula* f)
     {
-      if (node_type(f) == node_type_form_visitor::Unop)
-	if (dynamic_cast<const unop*>(f)->op() == unop::F)
-	  if (node_type(((const unop*)f)->child()) == node_type_form_visitor::Unop)
-	    if (dynamic_cast<const unop*>(dynamic_cast<const unop*>(f)->child())->op() == unop::G)
-	      return true;
+      const unop* op = dynamic_cast<const unop*>(f);
+      if (op && op->op() == unop::F)
+	{
+	  const unop* opchild = dynamic_cast<const unop*>(op->child());
+	  if (opchild && opchild->op() == unop::G)
+	    return true;
+	}
       return false;
     }
 
@@ -60,36 +64,37 @@ namespace spot
     node_type_form_visitor::result() const { return result_;}
 
     void
-    node_type_form_visitor::visit(const atomic_prop* ap){
-      if (ap == NULL);
+    node_type_form_visitor::visit(const atomic_prop*)
+    {
       result_ = node_type_form_visitor::Atom;
     }
 
     void
-    node_type_form_visitor::visit(const constant* c){
-      if (c == NULL);
+    node_type_form_visitor::visit(const constant*)
+    {
       result_ = node_type_form_visitor::Const;
     }
 
     void
-    node_type_form_visitor::visit(const unop* uo){
-      if (uo == NULL);
+    node_type_form_visitor::visit(const unop*)
+    {
       result_ = node_type_form_visitor::Unop;
     }
 
     void
-    node_type_form_visitor::visit(const binop* bo){
-      if (bo == NULL);
+    node_type_form_visitor::visit(const binop*)
+    {
       result_ = node_type_form_visitor::Binop;
     }
 
     void
-    node_type_form_visitor::visit(const multop* mo){
-      if (mo == NULL);
+    node_type_form_visitor::visit(const multop*)
+    {
       result_ = node_type_form_visitor::Multop;
     }
 
-    node_type_form_visitor::type node_type(const formula* f)
+    node_type_form_visitor::type
+    node_type(const formula* f)
     {
       node_type_form_visitor v;
       assert(f != NULL);
@@ -102,12 +107,12 @@ namespace spot
     public:
 
       form_eventual_universal_visitor()
+	: eventual(false), universal(false)
       {
-	eventual = false;
-	universal = false;
       }
 
-      virtual ~form_eventual_universal_visitor()
+      virtual
+      ~form_eventual_universal_visitor()
       {
       }
 
@@ -124,15 +129,13 @@ namespace spot
       }
 
       void
-      visit(const atomic_prop* ap)
+      visit(const atomic_prop*)
       {
-	if (ap);
       }
 
       void
-      visit(const constant* c)
+      visit(const constant*)
       {
-	if (c->val());
       }
 
       void
@@ -168,14 +171,12 @@ namespace spot
 	  case binop::Implies:
 	    return;
 	  case binop::U:
-	    if (node_type(f1) == node_type_form_visitor::Const)
-	      if (dynamic_cast<const constant*>(f1)->val() == constant::True)
-		eventual = true;
+	    if (f1 == constant::true_instance())
+	      eventual = true;
 	    return;
 	  case binop::R:
-	    if (node_type(f1) == node_type_form_visitor::Const)
-	      if (dynamic_cast<const constant*>(f1)->val() == constant::False)
-		universal = true;
+	    if (f1 == constant::false_instance())
+	      universal = true;
 	    return;
 	  }
 	/* Unreachable code.  */
@@ -185,23 +186,22 @@ namespace spot
       void
       visit(const multop* mo)
       {
-	if (mo == NULL);
 	unsigned mos = mo->size();
 
 	eventual = true;
 	universal = true;
-	for (unsigned i = 0; i < mos; ++i){
-	  if (!(recurse_ev(mo->nth(i)))){
-	    eventual = false;
-	    break;
-	  }
-	}
-	for (unsigned i = 0; i < mos; ++i){
-	  if (!(recurse_un(mo->nth(i)))){
-	    universal = false;
-	    break;
-	  }
-	}
+	for (unsigned i = 0; i < mos; ++i)
+	  if (!recurse_ev(mo->nth(i)))
+	    {
+	      eventual = false;
+	      break;
+	    }
+	for (unsigned i = 0; i < mos; ++i)
+	  if (!recurse_un(mo->nth(i)))
+	    {
+	      universal = false;
+	      break;
+	    }
       }
 
       bool
@@ -220,7 +220,7 @@ namespace spot
 	return v.is_universal();
       }
 
-      protected:
+    protected:
       bool eventual;
       bool universal;
     };
@@ -247,12 +247,12 @@ namespace spot
     public:
 
       inf_form_right_recurse_visitor(const formula *f)
+	: result_(false), f(f)
       {
-	this->f = f;
-	result_ = false;
       }
 
-      virtual ~inf_form_right_recurse_visitor()
+      virtual
+      ~inf_form_right_recurse_visitor()
       {
       }
 
@@ -295,19 +295,20 @@ namespace spot
 	      result_ = true;
 	    return;
 	  case unop::X:
-	    if (node_type(f) == node_type_form_visitor::Unop)
-	      if (dynamic_cast<const unop*>(f)->op() == unop::X) {
-		result_ = inf_form(dynamic_cast<const unop*>(f)->child(),f1);
-	      }
+	    {
+	      const unop* op = dynamic_cast<const unop*>(f);
+	      if (op && op->op() == unop::X)
+		result_ = inf_form(op->child(), f1);
+	    }
 	    return;
 	  case unop::F:
 	    /* F(a) = true U a */
-	    result_ = inf_form(f,f1);
+	    result_ = inf_form(f, f1);
 	    return;
 	  case unop::G:
 	    /* G(a) = false R a */
 	    tmp = constant::false_instance();
-	    if (inf_form(f,tmp))
+	    if (inf_form(f, tmp))
 	      result_ = true;
 	    spot::ltl::destroy(tmp);
 	    return;
@@ -328,11 +329,11 @@ namespace spot
 	  case binop::Implies:
 	    return;
 	  case binop::U:
-	    if ((inf_form(f,f2)))
+	    if (inf_form(f, f2))
 	      result_ = true;
 	    return;
 	  case binop::R:
-	    if ((inf_form(f,f1)) && (inf_form(f,f2)))
+	    if (inf_form(f, f1) && inf_form(f, f2))
 	      result_ = true;
 	    return;
 	  }
@@ -343,20 +344,19 @@ namespace spot
       void
       visit(const multop* mo)
       {
-	if (mo == NULL);
 	multop::type op = mo->op();
 	unsigned mos = mo->size();
 	switch (op)
 	  {
 	  case multop::And:
-	    for (unsigned i = 0; (i < mos) ; ++i)
-	      if (!(inf_form(f,mo->nth(i))))
+	    for (unsigned i = 0; i < mos; ++i)
+	      if (!inf_form(f, mo->nth(i)))
 		return;
 	    result_ = true;
 	    break;
 	  case multop::Or:
 	    for (unsigned i = 0; i < mos && !result_; ++i)
-	      if ((inf_form(f,mo->nth(i))))
+	      if (inf_form(f, mo->nth(i)))
 		result_ = true;
 	    break;
 	  }
@@ -365,7 +365,8 @@ namespace spot
       bool
       recurse(const formula* f1, const formula* f2)
       {
-	if (f1 == f2) return true;
+	if (f1 == f2)
+	  return true;
 	inf_form_right_recurse_visitor v(f2);
 	const_cast<formula*>(f1)->accept(v);
 	return v.result();
@@ -383,33 +384,24 @@ namespace spot
     public:
 
       inf_form_left_recurse_visitor(const formula *f)
-      {
-	this->f = f;
-	result_ = false;
-      }
-
-      virtual ~inf_form_left_recurse_visitor()
+	: result_(false), f(f)
       {
       }
 
-      bool special_case(const formula* f2)
+      virtual
+      ~inf_form_left_recurse_visitor()
       {
-	if ((node_type(f) == node_type_form_visitor::Binop)
-	    && (node_type(f2) == node_type_form_visitor::Binop))
-	  if (dynamic_cast<const binop*>(f)->op() == dynamic_cast<const binop*>(f2)->op())
-	    if (inf_form(dynamic_cast<const binop*>(f2)->first(),dynamic_cast<const binop*>(f)->first())
-		&& inf_form(dynamic_cast<const binop*>(f2)->second(),dynamic_cast<const binop*>(f)->second()))
-	      return true;
-	return false;
       }
 
-      bool nodeX()
+      bool
+      special_case(const formula* f2)
       {
-	/*
-	  if (node_type(f) == node_type_form_visitor::Unop)
-	  if (dynamic_cast<const unop*>(f)->op() == unop::X)
+	const binop* fb = dynamic_cast<const binop*>(f);
+	const binop* f2b = dynamic_cast<const binop*>(f2);
+	if (fb && f2b && fb->op() == f2b->op()
+	    && inf_form(f2b->first(), fb->first())
+	    && inf_form(f2b->second(), fb->second()))
 	  return true;
-	*/
 	return false;
       }
 
@@ -422,7 +414,6 @@ namespace spot
       void
       visit(const atomic_prop* ap)
       {
-	if (this->nodeX()) return;
 	inf_form_right_recurse_visitor v(ap);
 	const_cast<formula*>(f)->accept(v);
 	result_ = v.result();
@@ -431,7 +422,6 @@ namespace spot
       void
       visit(const constant* c)
       {
-	if (this->nodeX()) return;
 	inf_form_right_recurse_visitor v(c);
 	switch (c->val())
 	  {
@@ -451,7 +441,6 @@ namespace spot
       visit(const unop* uo)
       {
 	const formula* f1 = uo->child();
-	const formula* tmp = NULL;
 	inf_form_right_recurse_visitor v(uo);
 	switch (uo->op())
 	  {
@@ -460,38 +449,46 @@ namespace spot
 	      result_ = true;
 	    return;
 	  case unop::X:
-	    if (node_type(f) == node_type_form_visitor::Unop)
-	      if (dynamic_cast<const unop*>(f)->op() == unop::X) {
-		result_ = inf_form(f1,dynamic_cast<const unop*>(f)->child());
-	      }
+	    {
+	      const unop* op = dynamic_cast<const unop*>(f);
+	      if (op && op->op() == unop::X)
+		result_ = inf_form(f1, op->child());
+	    }
 	    return;
 	  case unop::F:
-	    if (this->nodeX()) return;
-	    /* F(a) = true U a */
-	    tmp = binop::instance(binop::U,constant::true_instance(),clone(f1));
-	    if (this->special_case(tmp)){
-	      result_ = true;
+	    {
+	      /* F(a) = true U a */
+	      const formula* tmp = binop::instance(binop::U,
+						   constant::true_instance(),
+						   clone(f1));
+	      if (special_case(tmp))
+		{
+		  result_ = true;
+		  spot::ltl::destroy(tmp);
+		  return;
+		}
+	      if (inf_form(tmp, f))
+		result_ = true;
 	      spot::ltl::destroy(tmp);
 	      return;
 	    }
-	    if (inf_form(tmp,f))
-	      result_ = true;
-	    spot::ltl::destroy(tmp);
-	    return;
 	  case unop::G:
-	    if (this->nodeX()) return;
-	    /* F(a) = false R a */
-	    tmp = binop::instance(binop::R,
-				  constant::false_instance(),clone(f1));
-	    if (this->special_case(tmp)){
-	      result_ = true;
+	    {
+	      /* F(a) = false R a */
+	      const formula* tmp = binop::instance(binop::R,
+						   constant::false_instance(),
+						   clone(f1));
+	      if (special_case(tmp))
+		{
+		  result_ = true;
+		  spot::ltl::destroy(tmp);
+		  return;
+		}
+	      if (inf_form(f1, f))
+		result_ = true;
 	      spot::ltl::destroy(tmp);
 	      return;
 	    }
-	    if (inf_form(f1,f))
-	      result_ = true;
-	    spot::ltl::destroy(tmp);
-	    return;
 	  }
 	/* Unreachable code.  */
 	assert(0);
@@ -500,9 +497,7 @@ namespace spot
       void
       visit(const binop* bo)
       {
-	if (this->nodeX()) return;
-
-	if (this->special_case(bo))
+	if (special_case(bo))
 	  {
 	    result_ = true;
 	    return;
@@ -517,11 +512,11 @@ namespace spot
 	  case binop::Implies:
 	    return;
 	  case binop::U:
-	    if ((inf_form(f1,f)) && (inf_form(f2,f)))
+	    if (inf_form(f1, f) && inf_form(f2, f))
 	      result_ = true;
 	    return;
 	  case binop::R:
-	    if ((inf_form(f2,f)))
+	    if (inf_form(f2, f))
 	      result_ = true;
 	    return;
 	  }
@@ -532,20 +527,18 @@ namespace spot
       void
       visit(const multop* mo)
       {
-	if (this->nodeX()) return;
-
 	multop::type op = mo->op();
 	unsigned mos = mo->size();
 	switch (op)
 	  {
 	  case multop::And:
-	    for (unsigned i = 0; (i < mos) && !result_ ; ++i)
-	      if ((inf_form(mo->nth(i),f)))
+	    for (unsigned i = 0; (i < mos) && !result_; ++i)
+	      if (inf_form(mo->nth(i), f))
 		result_ = true;
 	    break;
 	  case multop::Or:
-	    for (unsigned i = 0; i < mos ; ++i)
-	      if (!(inf_form(mo->nth(i),f)))
+	    for (unsigned i = 0; i < mos; ++i)
+	      if (!inf_form(mo->nth(i), f))
 		return;
 	    result_ = true;
 	    break;
@@ -557,30 +550,27 @@ namespace spot
       const formula* f;
     };
 
-    bool inf_form(const formula* f1, const formula* f2)
+    bool
+    inf_form(const formula* f1, const formula* f2)
     {
-      /* f1 and f2 are unabbreviate */
-      if (f1 == f2) return true;
+      /* f1 and f2 are unabbreviated */
+      if (f1 == f2)
+	return true;
       inf_form_left_recurse_visitor v1(f2);
       inf_form_right_recurse_visitor v2(f1);
 
-      if ((node_type(f1) == node_type_form_visitor::Const) &&
-	  (node_type(f2) == node_type_form_visitor::Const))
-	if ((dynamic_cast<const constant*>(f2)->val() == constant::True) ||
-	    (dynamic_cast<const constant*>(f1)->val() == constant::False))
-	  {
-	    return true;
-	  }
+
+      if (f2 == constant::true_instance()
+	  || f1 == constant::false_instance())
+	return true;
 
       const_cast<formula*>(f1)->accept(v1);
-      if (v1.result()) {
+      if (v1.result())
 	return true;
-      }
 
       const_cast<formula*>(f2)->accept(v2);
-      if (v2.result()) {
+      if (v2.result())
 	return true;
-      }
 
       return false;
     }
@@ -590,11 +580,11 @@ namespace spot
       const formula* ftmp1;
       const formula* ftmp2;
       const formula* ftmp3 = unop::instance(unop::Not,
-					    (n == 0)? clone(f1) : clone(f2));
-      const formula* ftmp4 = spot::ltl::negative_normal_form((n == 0)? f2 : f1);
+					    (!n) ? clone(f1) : clone(f2));
+      const formula* ftmp4 = spot::ltl::negative_normal_form((!n) ? f2 : f1);
       const formula* ftmp5;
       const formula* ftmp6;
-      bool retour;
+      bool result;
 
       ftmp2 = spot::ltl::unabbreviate_logic(ftmp3);
       ftmp1 = spot::ltl::negative_normal_form(ftmp2);
@@ -603,9 +593,9 @@ namespace spot
       ftmp6 = spot::ltl::negative_normal_form(ftmp5);
 
       if (n == 0)
-	retour = inf_form(ftmp1, ftmp6);
+	result = inf_form(ftmp1, ftmp6);
       else
-	retour = inf_form(ftmp6, ftmp1);
+	result = inf_form(ftmp6, ftmp1);
 
       spot::ltl::destroy(ftmp1);
       spot::ltl::destroy(ftmp2);
@@ -614,8 +604,7 @@ namespace spot
       spot::ltl::destroy(ftmp5);
       spot::ltl::destroy(ftmp6);
 
-      return retour;
+      return result;
     }
-
   }
 }
