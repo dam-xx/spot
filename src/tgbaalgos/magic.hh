@@ -92,7 +92,8 @@ namespace spot
     typedef std::list<state_iter_pair> stack_type;
     stack_type stack;		///< Stack of visited states on the path.
 
-    typedef std::list<bdd> tstack_type;
+    typedef std::pair<bdd, bdd> tstack_item;
+    typedef std::list<tstack_item> tstack_type;
     /// \brief Stack of transitions.
     ///
     /// This is an addition to the data from the paper.

@@ -45,8 +45,7 @@ namespace spot
 	if (i->first.s->compare(ms_.x) == 0)
 	  l = &run->cycle;
 
-	// FIXME: We need to keep track of the acceptance condition.
-	tgba_run::step s = { i->first.s->clone(), *ti, bddfalse };
+	tgba_run::step s = { i->first.s->clone(), ti->first, ti->second };
 	l->push_back(s);
       }
 
@@ -140,18 +139,19 @@ namespace spot
 	  {
 	    const state* s_prime = i->current_state();
 	    bdd c = i->current_condition();
+	    bdd acc = i->current_acceptance_conditions();
 	    i->next();
 	    if (magic && 0 == s_prime->compare(x))
 	      {
 		delete s_prime;
-		tstack.push_front(c);
+		tstack.push_front (tstack_item(c, acc));
 		assert(stack.size() == tstack.size());
 		return new result(*this);
 	      }
 	    if (!has(s_prime, magic))
 	      {
 		push(s_prime, magic);
-		tstack.push_front(c);
+		tstack.push_front (tstack_item(c, acc));
 		goto recurse;
 	      }
 	    delete s_prime;

@@ -22,6 +22,7 @@
 #include "replayrun.hh"
 #include "tgba/tgba.hh"
 #include "emptiness.hh"
+#include "tgba/bddprint.hh"
 
 namespace spot
 {
@@ -56,69 +57,73 @@ namespace spot
 	return false;
       }
 
-    for (;;) // process the prefix then the cycle
+    for (; i != l->end(); ++serial)
       {
-	for (; i != l->end(); ++serial)
+	os << "state " << serial << " in " << in << ": "
+	   << a->format_state(s) << std::endl;
+
+	// expected outgoing transition
+	bdd label = i->label;
+	bdd acc = i->acc;
+
+	// compute the next expected state
+	const state* next;
+	++i;
+	if (i != l->end())
 	  {
-	    os << "state " << serial << " in " << in << ": "
-	       << a->format_state(s) << std::endl;
-
-	    // expected outgoing transition
-	    bdd label = i->label;
-	    bdd acc = i->acc;
-
-	    // compute the next expected state
-	    const state* next;
-	    ++i;
-	    if (i != l->end())
-	      next = i->s;
-	    else
-	      next = l->begin()->s;
-
-	    // browse the actual outgoing transition
-	    tgba_succ_iterator* j = a->succ_iter(s);
-	    delete s;
-	    for (j->first(); !j->done(); j->next())
-	      {
-		if (j->current_condition() != label
-		    || j->current_acceptance_conditions() != acc)
-		  continue;
-
-		const state* s2 = j->current_state();
-		if (s2->compare(next))
-		  {
-		    delete s2;
-		    continue;
-		  }
-		else
-		  {
-		    delete s;
-		    s = s2;
-		    break;
-		  }
-	      }
-	    if (j->done())
-	      {
-		os << "ERROR: no transition with label=" << label
-		   << " and acc=" << acc << " leaving state " << serial
-		   << std::endl;
-		delete j;
-		return false;
-	      }
-	    os << "transition with label=" << label
-	       << " and acc=" << acc << " found" << std::endl;
-	    delete j;
-	  }
-	if (l == &run->prefix)
-	  {
-	    l = &run->cycle;
-	    in = "cycle";
+	    next = i->s;
 	  }
 	else
 	  {
-	    break;
+	    if (l == &run->prefix)
+	      {
+		l = &run->cycle;
+		in = "cycle";
+		i = l->begin();
+	      }
+	    next = l->begin()->s;
 	  }
+
+	// browse the actual outgoing transitions
+	tgba_succ_iterator* j = a->succ_iter(s);
+	delete s;
+	for (j->first(); !j->done(); j->next())
+	  {
+	    if (j->current_condition() != label
+		|| j->current_acceptance_conditions() != acc)
+	      continue;
+
+	    const state* s2 = j->current_state();
+	    if (s2->compare(next))
+	      {
+		delete s2;
+		continue;
+	      }
+	    else
+	      {
+		s = s2;
+		break;
+	      }
+	  }
+	if (j->done())
+	  {
+	    os << "ERROR: no transition with label="
+	       << bdd_format_formula(a->get_dict(), label)
+	       << " and acc=" << bdd_format_accset(a->get_dict(), acc)
+	       << " leaving state " << serial
+	       << " and going to state "
+	       << a->format_state(next)
+	       << std::endl;
+	    delete j;
+	    return false;
+	  }
+	os << "transition with label="
+	   << bdd_format_formula(a->get_dict(), label)
+	   << " and acc=" << bdd_format_accset(a->get_dict(), acc)
+	   << std::endl;
+	delete j;
       }
+    delete s;
     return true;
   }
 }

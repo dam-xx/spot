@@ -1,5 +1,9 @@
 2004-10-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/magic.hh, src/tgbaalgos/magic.cc (magic_search):
+	Record the acceptance conditions in the accepting run.
+	* src/tgbaalgos/replayrun.cc (replay_tgba_run): Fix logic.
+
 	* src/tgbaalgos/replayrun.cc, src/tgbaalgos/replayrun.hh: New files.
 	Cannot test them because the run returned by the emptiness checks
 	are currently incomplete (they lack the acceptance conditions, and
