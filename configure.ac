@@ -3,6 +3,8 @@ AC_INIT([spot], [0.1])
 AC_CONFIG_AUX_DIR([tools])
 AM_INIT_AUTOMAKE([foreign nostdinc 1.7.3])
 
+adl_CHECK_PYTHON
+
 AC_PROG_CXX
 
 AM_PROG_LEX
@@ -28,5 +30,6 @@ AC_CONFIG_FILES([
   src/ltltest/defs
   src/ltlvisit/Makefile
   src/misc/Makefile
+  wrap/Makefile
 ])
 AC_OUTPUT

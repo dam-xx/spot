@@ -12,3 +12,5 @@ lunabbrev
 tunabbrev
 nenoform
 tunenoform
+.libs
+tostring

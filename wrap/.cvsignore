@@ -1,0 +1,9 @@
+.deps
+.libs
+Makefile
+Makefile.in
+*.la
+spot.py*
+*.lo
+*.loT
+spot_wrap.cxx

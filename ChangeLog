@@ -1,3 +1,11 @@
+2003-04-30  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
+
+	* m4/pypath.m4: New file.
+	* Makefile.am (SUBDIRS): Add wrap.
+	* wrap/Makefile.am: New file.
+	* wrap/spot.i: New file.  Preliminary bindings for Python.
+	* configure.ac: Call adl_CHECK_PYTHON and output wrap/Makefile.
+
 2003-04-29  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
 	* configure.ac: Call AC_PROG_LIBTOOL.

@@ -9,3 +9,6 @@ ltlscan.cc
 position.hh
 readltl
 stack.hh
+*.lo
+*.la
+.libs

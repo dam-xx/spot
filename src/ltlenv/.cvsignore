@@ -2,3 +2,6 @@
 Makefile
 Makefile.in
 libltlenv.a
+*.lo
+*.la
+.libs
