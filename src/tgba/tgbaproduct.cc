@@ -162,10 +162,10 @@ namespace spot
     return current_cond_;
   }
 
-  bdd tgba_succ_iterator_product::current_accepting_conditions() const
+  bdd tgba_succ_iterator_product::current_acceptance_conditions() const
   {
-    return ((left_->current_accepting_conditions() & right_neg_)
-	    | (right_->current_accepting_conditions() & left_neg_));
+    return ((left_->current_acceptance_conditions() & right_neg_)
+	    | (right_->current_acceptance_conditions() & left_neg_));
   }
 
   ////////////////////////////////////////////////////////////
@@ -176,16 +176,16 @@ namespace spot
   {
     assert(dict_ == right->get_dict());
 
-    bdd lna = left_->neg_accepting_conditions();
-    bdd rna = right_->neg_accepting_conditions();
+    bdd lna = left_->neg_acceptance_conditions();
+    bdd rna = right_->neg_acceptance_conditions();
     left_acc_complement_ = bdd_exist(lna, bdd_support(rna));
     right_acc_complement_ = bdd_exist(rna, bdd_support(lna));
 
-    all_accepting_conditions_ = ((left_->all_accepting_conditions()
+    all_acceptance_conditions_ = ((left_->all_acceptance_conditions()
 				  & right_acc_complement_)
-				 | (right_->all_accepting_conditions()
+				 | (right_->all_acceptance_conditions()
 				    & left_acc_complement_));
-    neg_accepting_conditions_ = lna & rna;
+    neg_acceptance_conditions_ = lna & rna;
 
     dict_->register_all_variables_of(&left_, this);
     dict_->register_all_variables_of(&right_, this);
@@ -279,15 +279,15 @@ namespace spot
   }
 
   bdd
-  tgba_product::all_accepting_conditions() const
+  tgba_product::all_acceptance_conditions() const
   {
-    return all_accepting_conditions_;
+    return all_acceptance_conditions_;
   }
 
   bdd
-  tgba_product::neg_accepting_conditions() const
+  tgba_product::neg_acceptance_conditions() const
   {
-    return neg_accepting_conditions_;
+    return neg_acceptance_conditions_;
   }
 
 }

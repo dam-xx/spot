@@ -58,7 +58,7 @@ namespace spot
   }
 
   void
-  tgba_bdd_concrete_factory::declare_accepting_condition(bdd b,
+  tgba_bdd_concrete_factory::declare_acceptance_condition(bdd b,
 							 const ltl::formula* a)
   {
     // Maintain a conjunction of BDDs associated to A.  We will latter
@@ -82,27 +82,27 @@ namespace spot
     acc_map_::iterator ai;
     for (ai = acc_.begin(); ai != acc_.end(); ++ai)
       {
-	// Register a BDD variable for this accepting condition.
-	int num = get_dict()->register_accepting_variable(ai->first, this);
-	// Keep track of all accepting conditions for easy
+	// Register a BDD variable for this acceptance condition.
+	int num = get_dict()->register_acceptance_variable(ai->first, this);
+	// Keep track of all acceptance conditions for easy
 	// existential quantification.
-	data_.declare_accepting_condition(bdd_ithvar(num));
+	data_.declare_acceptance_condition(bdd_ithvar(num));
       }
     for (ai = acc_.begin(); ai != acc_.end(); ++ai)
       {
 	bdd acc = bdd_ithvar(get_dict()->acc_map[ai->first]);
 
-	// Complete acc with all the other accepting conditions negated.
+	// Complete acc with all the other acceptance conditions negated.
 	acc &= bdd_exist(data_.negacc_set, acc);
 
 	// Any state matching the BDD formulae registered is part
-	// of this accepting set.
-	data_.accepting_conditions |= ai->second & acc;
+	// of this acceptance set.
+	data_.acceptance_conditions |= ai->second & acc;
 
-	// Keep track of all accepting conditions, so that we can
-	// easily check whether a transition satisfies all accepting
+	// Keep track of all acceptance conditions, so that we can
+	// easily check whether a transition satisfies all acceptance
 	// conditions.
-	data_.all_accepting_conditions |= acc;
+	data_.all_acceptance_conditions |= acc;
       }
 
     // Any constraint between Now variables also exist between Next

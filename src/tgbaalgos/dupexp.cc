@@ -84,7 +84,7 @@ namespace spot {
       tgba_explicit::transition* t =
 	out_->create_transition(name_[in], name_[out]);
       out_->add_conditions(t, si->current_condition());
-      out_->add_accepting_conditions(t, si->current_accepting_conditions());
+      out_->add_acceptance_conditions(t, si->current_acceptance_conditions());
     }
 
   private:

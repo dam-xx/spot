@@ -56,18 +56,18 @@ namespace spot
     /// can be turned into BDD using ithvar().
     int create_atomic_prop(const ltl::formula* f);
 
-    /// Declare an accepting condition.
+    /// Declare an acceptance condition.
     ///
     /// Formula such as 'f U g' or 'F g' make the promise
     /// that 'g' will be fulfilled eventually.  So once
     /// one of this formula has been translated into a BDD,
-    /// we use declare_accepting_condition() to associate
-    /// all other states to the accepting set of 'g'.
+    /// we use declare_acceptance_condition() to associate
+    /// all other states to the acceptance set of 'g'.
     ///
     /// \param b a BDD indicating which variables are in the
-    ///          accepting set
+    ///          acceptance set
     /// \param a the formula associated
-    void declare_accepting_condition(bdd b, const ltl::formula* a);
+    void declare_acceptance_condition(bdd b, const ltl::formula* a);
 
     const tgba_bdd_core_data& get_core_data() const;
     bdd_dict* get_dict() const;
@@ -78,7 +78,7 @@ namespace spot
     /// \brief Perfom final computations before the relation can be used.
     ///
     /// This function should be called after all propositions, state,
-    /// accepting conditions, and constraints have been declared, and
+    /// acceptance conditions, and constraints have been declared, and
     /// before calling get_code_data() or get_dict().
     void finish();
 
@@ -87,7 +87,7 @@ namespace spot
 
     typedef Sgi::hash_map<const ltl::formula*, bdd,
 			  ptr_hash<ltl::formula> > acc_map_;
-    acc_map_ acc_;		///< BDD associated to each accepting condition
+    acc_map_ acc_;		///< BDD associated to each acceptance condition
   };
 
 }

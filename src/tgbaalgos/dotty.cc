@@ -63,7 +63,7 @@ namespace spot
       bdd_print_formula(os_, automata_->get_dict(),
 			si->current_condition()) << "\\n";
       bdd_print_accset(os_, automata_->get_dict(),
-		       si->current_accepting_conditions()) << "\"]"
+		       si->current_acceptance_conditions()) << "\"]"
 							   << std::endl;
     }
 

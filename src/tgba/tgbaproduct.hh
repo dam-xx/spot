@@ -91,7 +91,7 @@ namespace spot
     // inspection
     state_product* current_state() const;
     bdd current_condition() const;
-    bdd current_accepting_conditions() const;
+    bdd current_acceptance_conditions() const;
 
   private:
     //@{
@@ -133,8 +133,8 @@ namespace spot
 
     virtual state* project_state(const state* s, const tgba* t) const;
 
-    virtual bdd all_accepting_conditions() const;
-    virtual bdd neg_accepting_conditions() const;
+    virtual bdd all_acceptance_conditions() const;
+    virtual bdd neg_acceptance_conditions() const;
 
   protected:
     virtual bdd compute_support_conditions(const state* state) const;
@@ -146,8 +146,8 @@ namespace spot
     const tgba* right_;
     bdd left_acc_complement_;
     bdd right_acc_complement_;
-    bdd all_accepting_conditions_;
-    bdd neg_accepting_conditions_;
+    bdd all_acceptance_conditions_;
+    bdd neg_acceptance_conditions_;
     // Disallow copy.
     tgba_product(const tgba_product&);
     tgba_product& tgba_product::operator=(const tgba_product&);

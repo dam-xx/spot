@@ -1,3 +1,43 @@
+2003-11-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* iface/gspn/eesrg.cc, iface/gspn/eesrg.hh, iface/gspn/gspn.cc,
+	iface/gspn/gspn.hh, src/tgba/bdddict.cc, src/tgba/bdddict.hh,
+	src/tgba/bddprint.hh, src/tgba/succiter.hh,
+	src/tgba/succiterconcrete.cc, src/tgba/succiterconcrete.hh,
+	src/tgba/tgba.hh, src/tgba/tgbabddconcrete.cc,
+	src/tgba/tgbabddconcrete.hh, src/tgba/tgbabddconcretefactory.cc,
+	src/tgba/tgbabddconcretefactory.hh, src/tgba/tgbabddcoredata.cc,
+	src/tgba/tgbabddcoredata.hh, src/tgba/tgbaexplicit.cc,
+	src/tgba/tgbaexplicit.hh, src/tgba/tgbaproduct.cc,
+	src/tgba/tgbaproduct.hh, src/tgba/tgbatba.cc, src/tgba/tgbatba.hh,
+	src/tgbaalgos/dotty.cc, src/tgbaalgos/dupexp.cc,
+	src/tgbaalgos/emptinesscheck.cc, src/tgbaalgos/emptinesscheck.hh,
+	src/tgbaalgos/lbtt.cc, src/tgbaalgos/lbtt.hh,
+	src/tgbaalgos/ltl2tgba_fm.cc, src/tgbaalgos/ltl2tgba_lacim.cc,
+	src/tgbaalgos/save.cc, src/tgbatest/explicit.cc,
+	src/tgbatest/ltl2tgba.cc, src/tgbaparse/tgbaparse.yy,
+	wrap/python/tests/ltl2tgba.py:
+	Rewrite `accepting condition' as `acceptance condition'.
+	The symbols which have been renamed are:
+	tgba::all_accepting_conditions
+	tgba::neg_accepting_conditions
+	succ_iterator::current_accepting_conditions
+	bdd_dict::register_accepting_variable
+	bdd_dict::register_accepting_variables
+	bdd_dict::is_registered_accepting_variable
+	tgba_bdd_concrete_factory::declare_accepting_condition
+	tgba_bdd_core_data::accepting_conditions
+	tgba_bdd_core_data::all_accepting_conditions
+	tgba_explicit::declare_accepting_condition
+	tgba_explicit::complement_all_accepting_conditions
+	tgba_explicit::has_accepting_condition
+	tgba_explicit::get_accepting_condition
+	tgba_explicit::add_accepting_condition
+	tgba_explicit::all_accepting_conditions
+	tgba_explicit::neg_accepting_conditions
+	state_tba_proxy::acceptance_cond
+	accepting_cond_splitter
+
 2003-11-26  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_trad_visitor::visit) <G>:

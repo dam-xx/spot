@@ -37,7 +37,7 @@ namespace spot
   ///
   /// TGBAs are transition-based, meanings their labels are put
   /// on arcs, not on nodes.  They use Generalized Büchi acceptance
-  /// conditions: there are several accepting sets (of
+  /// conditions: there are several acceptance sets (of
   /// transitions), and a path can be accepted only if it traverse
   /// at least one transition of each set infinitely often.
   ///
@@ -153,7 +153,7 @@ namespace spot
     ///    deleted by the caller.
     virtual state* project_state(const state* s, const tgba* t) const;
 
-    /// \brief Return the set of all accepting conditions used
+    /// \brief Return the set of all acceptance conditions used
     /// by this automaton.
     ///
     /// The goal of the emptiness check is to ensure that
@@ -161,19 +161,19 @@ namespace spot
     /// of these acceptiong conditions.  I.e., the union
     /// of the acceptiong conditions of all transition in
     /// the SCC should be equal to the result of this function.
-    virtual bdd all_accepting_conditions() const = 0;
+    virtual bdd all_acceptance_conditions() const = 0;
 
-    /// \brief Return the conjuction of all negated accepting
+    /// \brief Return the conjuction of all negated acceptance
     /// variables.
     ///
     /// For instance if the automaton uses variables <tt>Acc[a]</tt>,
-    /// <tt>Acc[b]</tt> and <tt>Acc[c]</tt> to describe accepting sets,
+    /// <tt>Acc[b]</tt> and <tt>Acc[c]</tt> to describe acceptance sets,
     /// this function should return <tt>!Acc[a]\&!Acc[b]\&!Acc[c]</tt>.
     ///
     /// This is useful when making products: each operand's condition
-    /// set should be augmented with the neg_accepting_conditions() of
+    /// set should be augmented with the neg_acceptance_conditions() of
     /// the other operand.
-    virtual bdd neg_accepting_conditions() const = 0;
+    virtual bdd neg_acceptance_conditions() const = 0;
 
   protected:
     /// Do the actual computation of tgba::support_conditions().

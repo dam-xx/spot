@@ -34,7 +34,7 @@ namespace spot
 
   tgba_explicit_succ_iterator::tgba_explicit_succ_iterator
   (const tgba_explicit::state* s, bdd all_acc)
-    : s_(s), all_accepting_conditions_(all_acc)
+    : s_(s), all_acceptance_conditions_(all_acc)
   {
   }
 
@@ -69,9 +69,9 @@ namespace spot
   }
 
   bdd
-  tgba_explicit_succ_iterator::current_accepting_conditions() const
+  tgba_explicit_succ_iterator::current_acceptance_conditions() const
   {
-    return (*i_)->accepting_conditions & all_accepting_conditions_;
+    return (*i_)->acceptance_conditions & all_acceptance_conditions_;
   }
 
 
@@ -110,9 +110,9 @@ namespace spot
 
 
   tgba_explicit::tgba_explicit(bdd_dict* dict)
-    : dict_(dict), init_(0), all_accepting_conditions_(bddfalse),
-      neg_accepting_conditions_(bddtrue),
-      all_accepting_conditions_computed_(false)
+    : dict_(dict), init_(0), all_acceptance_conditions_(bddfalse),
+      neg_acceptance_conditions_(bddtrue),
+      all_acceptance_conditions_computed_(false)
   {
   }
 
@@ -166,7 +166,7 @@ namespace spot
     transition* t = new transition;
     t->dest = d;
     t->condition = bddtrue;
-    t->accepting_conditions = bddfalse;
+    t->acceptance_conditions = bddfalse;
     s->push_back(t);
     return t;
   }
@@ -201,12 +201,12 @@ namespace spot
   }
 
   void
-  tgba_explicit::declare_accepting_condition(const ltl::formula* f)
+  tgba_explicit::declare_acceptance_condition(const ltl::formula* f)
   {
-    int v = dict_->register_accepting_variable(f, this);
+    int v = dict_->register_acceptance_variable(f, this);
     ltl::destroy(f);
     bdd neg = bdd_nithvar(v);
-    neg_accepting_conditions_ &= neg;
+    neg_acceptance_conditions_ &= neg;
 
     // Append neg to all acceptance conditions.
     ns_map::iterator i;
@@ -214,35 +214,35 @@ namespace spot
       {
 	tgba_explicit::state::iterator i2;
 	for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	  (*i2)->accepting_conditions &= neg;
+	  (*i2)->acceptance_conditions &= neg;
       }
 
-    all_accepting_conditions_computed_ = false;
+    all_acceptance_conditions_computed_ = false;
   }
 
   void
-  tgba_explicit::complement_all_accepting_conditions()
+  tgba_explicit::complement_all_acceptance_conditions()
   {
-    bdd all = all_accepting_conditions();
+    bdd all = all_acceptance_conditions();
     ns_map::iterator i;
     for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
       {
 	tgba_explicit::state::iterator i2;
 	for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
 	  {
-	    (*i2)->accepting_conditions = all - (*i2)->accepting_conditions;
+	    (*i2)->acceptance_conditions = all - (*i2)->acceptance_conditions;
 	  }
       }
   }
 
   bool
-  tgba_explicit::has_accepting_condition(const ltl::formula* f) const
+  tgba_explicit::has_acceptance_condition(const ltl::formula* f) const
   {
-    return dict_->is_registered_accepting_variable(f, this);
+    return dict_->is_registered_acceptance_variable(f, this);
   }
 
   bdd
-  tgba_explicit::get_accepting_condition(const ltl::formula* f)
+  tgba_explicit::get_acceptance_condition(const ltl::formula* f)
   {
     const ltl::constant* c = dynamic_cast<const ltl::constant*>(f);
     if (c)
@@ -258,34 +258,34 @@ namespace spot
 	assert(0);
       }
     bdd_dict::fv_map::iterator i = dict_->acc_map.find(f);
-    assert(has_accepting_condition(f));
+    assert(has_acceptance_condition(f));
     /* If this second assert fails and the first doesn't,
        things are badly broken.  This has already happened. */
     assert(i != dict_->acc_map.end());
     ltl::destroy(f);
     bdd v = bdd_ithvar(i->second);
-    v &= bdd_exist(neg_accepting_conditions_, v);
+    v &= bdd_exist(neg_acceptance_conditions_, v);
     return v;
   }
 
   void
-  tgba_explicit::add_accepting_condition(transition* t, const ltl::formula* f)
+  tgba_explicit::add_acceptance_condition(transition* t, const ltl::formula* f)
   {
-    bdd c = get_accepting_condition(f);
-    t->accepting_conditions |= c;
+    bdd c = get_acceptance_condition(f);
+    t->acceptance_conditions |= c;
   }
 
   void
-  tgba_explicit::add_accepting_conditions(transition* t, bdd f)
+  tgba_explicit::add_acceptance_conditions(transition* t, bdd f)
   {
     bdd sup = bdd_support(f);
-    dict_->register_accepting_variables(sup, this);
+    dict_->register_acceptance_variables(sup, this);
     while (sup != bddtrue)
       {
-	neg_accepting_conditions_ &= bdd_nithvar(bdd_var(sup));
+	neg_acceptance_conditions_ &= bdd_nithvar(bdd_var(sup));
 	sup = bdd_high(sup);
       }
-    t->accepting_conditions |= f;
+    t->acceptance_conditions |= f;
   }
 
   state*
@@ -307,7 +307,7 @@ namespace spot
     (void) global_state;
     (void) global_automaton;
     return new tgba_explicit_succ_iterator(s->get_state(),
-					   all_accepting_conditions());
+					   all_acceptance_conditions());
   }
 
   bdd
@@ -355,38 +355,38 @@ namespace spot
   }
 
   bdd
-  tgba_explicit::all_accepting_conditions() const
+  tgba_explicit::all_acceptance_conditions() const
   {
-    if (!all_accepting_conditions_computed_)
+    if (!all_acceptance_conditions_computed_)
       {
 	bdd all = bddfalse;
 
-	// Build all_accepting_conditions_ from neg_accepting_conditions_
+	// Build all_acceptance_conditions_ from neg_acceptance_conditions_
 	// I.e., transform !A & !B & !C into
 	//        A & !B & !C
 	//     + !A &  B & !C
 	//     + !A & !B &  C
-	bdd cur = neg_accepting_conditions_;
+	bdd cur = neg_acceptance_conditions_;
 	while (cur != bddtrue)
 	  {
 	    assert(cur != bddfalse);
 
 	    bdd v = bdd_ithvar(bdd_var(cur));
-	    all |= v & bdd_exist(neg_accepting_conditions_, v);
+	    all |= v & bdd_exist(neg_acceptance_conditions_, v);
 
 	    assert(bdd_high(cur) != bddtrue);
 	    cur = bdd_low(cur);
 	  }
-	all_accepting_conditions_ = all;
-	all_accepting_conditions_computed_ = true;
+	all_acceptance_conditions_ = all;
+	all_acceptance_conditions_computed_ = true;
       }
-    return all_accepting_conditions_;
+    return all_acceptance_conditions_;
   }
 
   bdd
-  tgba_explicit::neg_accepting_conditions() const
+  tgba_explicit::neg_acceptance_conditions() const
   {
-    return neg_accepting_conditions_;
+    return neg_acceptance_conditions_;
   }
 
 }

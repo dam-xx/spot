@@ -59,8 +59,8 @@ namespace spot
 	      const tgba* global_automaton = 0) const;
     virtual bdd_dict* get_dict() const;
     virtual std::string format_state(const state* state) const;
-    virtual bdd all_accepting_conditions() const;
-    virtual bdd neg_accepting_conditions() const;
+    virtual bdd all_acceptance_conditions() const;
+    virtual bdd neg_acceptance_conditions() const;
   protected:
     virtual bdd compute_support_conditions(const spot::state* state) const;
     virtual bdd compute_support_variables(const spot::state* state) const;

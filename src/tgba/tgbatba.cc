@@ -30,7 +30,7 @@ namespace spot
   /// \brief A state for spot::tgba_tba_proxy.
   ///
   /// This state is in fact a pair of state: the state from the tgba
-  /// automaton, and the "counter" (we use the accepting set
+  /// automaton, and the "counter" (we use the acceptance set
   /// BDD variable instead of an integer counter).
   class state_tba_proxy : public state
   {
@@ -44,7 +44,7 @@ namespace spot
     state_tba_proxy(const state_tba_proxy& o)
       : state(),
 	s_(o.real_state()->clone()),
-	acc_(o.accepting_cond())
+	acc_(o.acceptance_cond())
     {
     }
 
@@ -61,7 +61,7 @@ namespace spot
     }
 
     bdd
-    accepting_cond() const
+    acceptance_cond() const
     {
       return acc_;
     }
@@ -74,14 +74,14 @@ namespace spot
       int res = s_->compare(o->real_state());
       if (res != 0)
 	return res;
-      return acc_.id() - o->accepting_cond().id();
+      return acc_.id() - o->acceptance_cond().id();
     }
 
     virtual size_t
     hash() const
     {
-      // We expect to have many more state than accepting conditions.
-      // Hence we keep only 8 bits for accepting conditions.
+      // We expect to have many more state than acceptance conditions.
+      // Hence we keep only 8 bits for acceptance conditions.
       return (s_->hash() << 8) + (acc_.id() & 0xFF);
     }
 
@@ -103,9 +103,9 @@ namespace spot
   public:
     tgba_tba_proxy_succ_iterator(tgba_succ_iterator* it,
 				 bdd acc, bdd next_acc,
-				 bdd the_accepting_cond)
+				 bdd the_acceptance_cond)
       : it_(it), acc_(acc), next_acc_(next_acc),
-	the_accepting_cond_(the_accepting_cond)
+	the_acceptance_cond_(the_acceptance_cond)
     {
     }
 
@@ -142,10 +142,10 @@ namespace spot
     {
       state* s = it_->current_state();
       bdd acc;
-      // Transition in the ACC_ accepting set should be directed
-      // to the NEXT_ACC_ accepting set.
+      // Transition in the ACC_ acceptance set should be directed
+      // to the NEXT_ACC_ acceptance set.
       if (acc_ == bddtrue
-	  || (acc_ & it_->current_accepting_conditions()) == acc_)
+	  || (acc_ & it_->current_acceptance_conditions()) == acc_)
 	acc = next_acc_;
       else
 	acc = acc_;
@@ -159,31 +159,31 @@ namespace spot
     }
 
     bdd
-    current_accepting_conditions() const
+    current_acceptance_conditions() const
     {
-      return the_accepting_cond_;
+      return the_acceptance_cond_;
     }
 
   protected:
     tgba_succ_iterator* it_;
     bdd acc_;
     bdd next_acc_;
-    bdd the_accepting_cond_;
+    bdd the_acceptance_cond_;
   };
 
 
   tgba_tba_proxy::tgba_tba_proxy(const tgba* a)
     : a_(a)
   {
-    bdd all = a_->all_accepting_conditions();
+    bdd all = a_->all_acceptance_conditions();
 
-    // We will use one accepting condition for this automata.
+    // We will use one acceptance condition for this automata.
     // Let's call it Acc[True].
     int v = get_dict()
-      ->register_accepting_variable(ltl::constant::true_instance(), this);
-    the_accepting_cond_ = bdd_ithvar(v);
+      ->register_acceptance_variable(ltl::constant::true_instance(), this);
+    the_acceptance_cond_ = bdd_ithvar(v);
 
-    // Now build the "cycle" of accepting conditions.
+    // Now build the "cycle" of acceptance conditions.
 
     bdd last = bdd_satone(all);
     all -= last;
@@ -225,13 +225,13 @@ namespace spot
 
     tgba_succ_iterator* it = a_->succ_iter(s->real_state(),
 					   global_state, global_automaton);
-    bdd acc = s->accepting_cond();
+    bdd acc = s->acceptance_cond();
     cycle_map::const_iterator i = acc_cycle_.find(acc);
     assert(i != acc_cycle_.end());
     return
       new tgba_tba_proxy_succ_iterator(it, acc, i->second,
 				       (acc == bddtrue)
-				       ? the_accepting_cond_ : bddfalse);
+				       ? the_acceptance_cond_ : bddfalse);
   }
 
   bdd_dict*
@@ -246,7 +246,7 @@ namespace spot
     const state_tba_proxy* s = dynamic_cast<const state_tba_proxy*>(state);
     assert(s);
     return a_->format_state(s->real_state()) + "("
-      + bdd_format_set(get_dict(), s->accepting_cond()) + ")";
+      + bdd_format_set(get_dict(), s->acceptance_cond()) + ")";
   }
 
   state*
@@ -261,15 +261,15 @@ namespace spot
 
 
   bdd
-  tgba_tba_proxy::all_accepting_conditions() const
+  tgba_tba_proxy::all_acceptance_conditions() const
   {
-    return the_accepting_cond_;
+    return the_acceptance_cond_;
   }
 
   bdd
-  tgba_tba_proxy::neg_accepting_conditions() const
+  tgba_tba_proxy::neg_acceptance_conditions() const
   {
-    return !the_accepting_cond_;
+    return !the_acceptance_cond_;
   }
 
   bool
@@ -278,7 +278,7 @@ namespace spot
     const state_tba_proxy* s =
       dynamic_cast<const state_tba_proxy*>(state);
     assert(s);
-    return bddtrue == s->accepting_cond();
+    return bddtrue == s->acceptance_cond();
   }
 
   bdd

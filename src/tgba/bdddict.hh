@@ -51,8 +51,8 @@ namespace spot
     vf_map now_formula_map;	///< Maps "Now" BDD variables to formulae
     fv_map var_map;		///< Maps atomic propositions to BDD variables
     vf_map var_formula_map;     ///< Maps BDD variables to atomic propositions
-    fv_map acc_map;		///< Maps accepting conditions to BDD variables
-    vf_map acc_formula_map;	///< Maps BDD variables to accepting conditions
+    fv_map acc_map;		///< Maps acceptance conditions to BDD variables
+    vf_map acc_formula_map;	///< Maps BDD variables to acceptance conditions
 
     /// \brief Map Next variables to Now variables.
     ///
@@ -100,23 +100,23 @@ namespace spot
     /// \brief Register an atomic proposition.
     ///
     /// Return (and maybe allocate) a BDD variable designating an
-    /// accepting set associated to formula \a f.  The \a for_me
+    /// acceptance set associated to formula \a f.  The \a for_me
     /// argument should point to the object using this BDD variable,
     /// this is used for reference counting.  It is perfectly safe to
     /// call this function several time with the same arguments.
     ///
     /// \return The variable number.  Use bdd_ithvar() or bdd_nithvar()
     ///   to convert this to a BDD.
-    int register_accepting_variable(const ltl::formula* f, const void* for_me);
+    int register_acceptance_variable(const ltl::formula* f, const void* for_me);
 
-    /// \brief Register BDD variables as accepting variables.
+    /// \brief Register BDD variables as acceptance variables.
     ///
-    /// Register all variables occurring in \a f as accepting variables
-    /// used by \a for_me.  This assumes that these accepting variables
+    /// Register all variables occurring in \a f as acceptance variables
+    /// used by \a for_me.  This assumes that these acceptance variables
     /// are already known from the dictionary (i.e., they have already
-    /// been registered by register_accepting_variable() for another
+    /// been registered by register_acceptance_variable() for another
     /// automaton).
-    void register_accepting_variables(bdd f, const void* for_me);
+    void register_acceptance_variables(bdd f, const void* for_me);
 
     /// \brief Duplicate the variable usage of another object.
     ///
@@ -135,7 +135,7 @@ namespace spot
     /// Check whether formula \a f has already been registered by \a by_me.
     bool is_registered_proposition(const ltl::formula* f, const void* by_me);
     bool is_registered_state(const ltl::formula* f, const void* by_me);
-    bool is_registered_accepting_variable(const ltl::formula* f,
+    bool is_registered_acceptance_variable(const ltl::formula* f,
 					  const void* by_me);
     /// @}
 

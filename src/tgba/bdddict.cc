@@ -102,11 +102,11 @@ namespace spot
   }
 
   int
-  bdd_dict::register_accepting_variable(const ltl::formula* f,
+  bdd_dict::register_acceptance_variable(const ltl::formula* f,
 					const void* for_me)
   {
     int num;
-    // Do not build an accepting variable that already exists.
+    // Do not build an acceptance variable that already exists.
     fv_map::iterator sii = acc_map.find(f);
     if (sii != acc_map.end())
       {
@@ -124,7 +124,7 @@ namespace spot
   }
 
   void
-  bdd_dict::register_accepting_variables(bdd f, const void* for_me)
+  bdd_dict::register_acceptance_variables(bdd f, const void* for_me)
   {
     if (f == bddtrue || f == bddfalse)
       return;
@@ -133,8 +133,8 @@ namespace spot
     assert(i != acc_formula_map.end());
     var_refs[i->first].insert(for_me);
 
-    register_accepting_variables(bdd_high(f), for_me);
-    register_accepting_variables(bdd_low(f), for_me);
+    register_acceptance_variables(bdd_high(f), for_me);
+    register_acceptance_variables(bdd_low(f), for_me);
   }
 
 
@@ -231,7 +231,7 @@ namespace spot
   }
 
   bool
-  bdd_dict::is_registered_accepting_variable(const ltl::formula* f,
+  bdd_dict::is_registered_acceptance_variable(const ltl::formula* f,
 					     const void* by_me)
   {
     fv_map::iterator fi = acc_map.find(f);

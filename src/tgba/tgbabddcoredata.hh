@@ -39,21 +39,21 @@ namespace spot
     ///     to the next state
     bdd relation;
 
-    /// \brief encodes the accepting conditions
+    /// \brief encodes the acceptance conditions
     ///
     /// <tt>a U b</tt>, or <tt>F b</tt>, both imply that \c b should
     /// be verified eventually.  We encode this with generalized Büchi
-    /// acceptating conditions.  An accepting set, called
+    /// acceptating conditions.  An acceptance set, called
     /// <tt>Acc[b]</tt>, hold all the state that do not promise to
     /// verify \c b eventually.  (I.e., all the states that contain \c
     /// b, or do not contain <tt>a U b</tt>, or <tt>F b</tt>.)
     ///
-    /// The spot::succ_iter::current_accepting_conditions() method
-    /// will return the \c Acc[x] variables of the accepting sets
+    /// The spot::succ_iter::current_acceptance_conditions() method
+    /// will return the \c Acc[x] variables of the acceptance sets
     /// in which a transition is.  Actually we never return \c Acc[x]
-    /// alone, but \c Acc[x] and all other accepting variables negated.
+    /// alone, but \c Acc[x] and all other acceptance variables negated.
     ///
-    /// So if there is three accepting set \c a, \c b, and \c c, and a
+    /// So if there is three acceptance set \c a, \c b, and \c c, and a
     /// transition is in set \c a, we'll return <tt>
     /// Acc[a]&!Acc[b]&!Acc[c]</tt>. If the transition is in both \c
     /// a and \c b, we'll return <tt>(Acc[a]\&!Acc[b]\&!Acc[c]) \c | \c
@@ -66,22 +66,22 @@ namespace spot
     /// check for `b' and have a destination of the form <tt>a U b</tt>,
     /// or <tt>F b</tt>.
     ///
-    /// To summarize, \c accepting_conditions contains three kinds of
+    /// To summarize, \c acceptance_conditions contains three kinds of
     /// variables:
     /// \li "Next" variables, that encode the destination state,
     /// \li atomic propositions, which are things to verify before going on
     ///     to the next state,
     /// \li "Acc" variables.
-    bdd accepting_conditions;
+    bdd acceptance_conditions;
 
-    /// \brief The set of all accepting conditions used by the Automaton.
+    /// \brief The set of all acceptance conditions used by the Automaton.
     ///
     /// The goal of the emptiness check is to ensure that
     /// a strongly connected component walks through each
     /// of these acceptiong conditions.  I.e., the union
     /// of the acceptiong conditions of all transition in
     /// the SCC should be equal to the result of this function.
-    bdd all_accepting_conditions;
+    bdd all_acceptance_conditions;
 
     /// The conjunction of all Now variables, in their positive form.
     bdd now_set;
@@ -105,12 +105,12 @@ namespace spot
     /// and atomic propositions.
     bdd varandnext_set;
     /// \brief The (positive) conjunction of all variables which are
-    /// accepting conditions.
+    /// acceptance conditions.
     bdd acc_set;
     /// \brief The (positive) conjunction of all variables which are not
-    /// accepting conditions.
+    /// acceptance conditions.
     bdd notacc_set;
-    /// \brief The negative conjunction of all variables which are accepting
+    /// \brief The negative conjunction of all variables which are acceptance
     /// conditions.
     bdd negacc_set;
 
@@ -139,9 +139,9 @@ namespace spot
     /// \brief Update the variable sets to take a new automic proposition into
     /// account.
     void declare_atomic_prop(bdd var);
-    /// \brief Update the variable sets to take a new accepting condition
+    /// \brief Update the variable sets to take a new acceptance condition
     /// into account.
-    void declare_accepting_condition(bdd prom);
+    void declare_acceptance_condition(bdd prom);
   };
 }
 

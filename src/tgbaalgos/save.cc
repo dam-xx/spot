@@ -42,7 +42,7 @@ namespace spot
       const bdd_dict* d = automata_->get_dict();
       os_ << "acc =";
 
-      bdd acc = automata_->all_accepting_conditions();
+      bdd acc = automata_->all_acceptance_conditions();
       while (acc != bddfalse)
 	{
 	  bdd cube = bdd_satone(acc);
@@ -79,7 +79,7 @@ namespace spot
 	  os_ << "\"" << cur << "\", \""
 	      << automata_->format_state(dest) << "\", \"";
 	  bdd_print_formula(os_, d, si->current_condition()) << "\",";
-	  bdd_print_acc(os_, d, si->current_accepting_conditions());
+	  bdd_print_acc(os_, d, si->current_acceptance_conditions());
 	  os_ << ";" << std::endl;
 	}
     }

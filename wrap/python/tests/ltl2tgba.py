@@ -31,7 +31,7 @@ def usage(prog):
     print "Usage: ", prog, """ [OPTIONS...] formula
 
 Options:
-  -a   display the accepting_conditions BDD, not the reachability graph
+  -a   display the acceptance_conditions BDD, not the reachability graph
   -A   same as -a, but as a set
   -d   turn on traces during parsing
   -D   degeneralize the automaton
@@ -115,7 +115,7 @@ if f:
     elif output == 2:
         if concrete:
             spot.bdd_print_dot(cout, concrete.get_dict(),
-                               concrete.get_core_data().accepting_conditions)
+                               concrete.get_core_data().acceptance_conditions)
     elif output == 3:
         if concrete:
             spot.bdd_print_set(cout, concrete.get_dict(),
@@ -124,7 +124,7 @@ if f:
     elif output == 4:
         if concrete:
             spot.bdd_print_set(cout, concrete.get_dict(),
-                               concrete.get_core_data().accepting_conditions)
+                               concrete.get_core_data().acceptance_conditions)
         print
     elif output == 5:
         a.get_dict().dump(cout)

@@ -26,8 +26,8 @@ namespace spot
 {
   tgba_bdd_core_data::tgba_bdd_core_data(bdd_dict* dict)
     : relation(bddtrue),
-      accepting_conditions(bddfalse),
-      all_accepting_conditions(bddfalse),
+      acceptance_conditions(bddfalse),
+      all_acceptance_conditions(bddfalse),
       now_set(bddtrue),
       next_set(bddtrue),
       nownext_set(bddtrue),
@@ -45,8 +45,8 @@ namespace spot
 
   tgba_bdd_core_data::tgba_bdd_core_data(const tgba_bdd_core_data& copy)
     : relation(copy.relation),
-      accepting_conditions(copy.accepting_conditions),
-      all_accepting_conditions(copy.all_accepting_conditions),
+      acceptance_conditions(copy.acceptance_conditions),
+      all_acceptance_conditions(copy.all_acceptance_conditions),
       now_set(copy.now_set),
       next_set(copy.next_set),
       nownext_set(copy.nownext_set),
@@ -66,10 +66,10 @@ namespace spot
   tgba_bdd_core_data::tgba_bdd_core_data(const tgba_bdd_core_data& left,
 					   const tgba_bdd_core_data& right)
     : relation(left.relation & right.relation),
-      accepting_conditions(left.accepting_conditions
-			   | right.accepting_conditions),
-      all_accepting_conditions(left.all_accepting_conditions
-			       | right.all_accepting_conditions),
+      acceptance_conditions(left.acceptance_conditions
+			   | right.acceptance_conditions),
+      all_acceptance_conditions(left.all_acceptance_conditions
+			       | right.all_acceptance_conditions),
       now_set(left.now_set & right.now_set),
       next_set(left.next_set & right.next_set),
       nownext_set(left.nownext_set & right.nownext_set),
@@ -122,7 +122,7 @@ namespace spot
   }
 
   void
-  tgba_bdd_core_data::declare_accepting_condition(bdd acc)
+  tgba_bdd_core_data::declare_acceptance_condition(bdd acc)
   {
     notnow_set &= acc;
     notnext_set &= acc;

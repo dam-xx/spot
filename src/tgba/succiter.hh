@@ -32,7 +32,7 @@ namespace spot
   /// This class provides the basic functionalities required to
   /// iterate over the successors of a state, as well as querying
   /// transition labels.  Because transitions are never explicitely
-  /// encoded, labels (conditions and accepting conditions) can only
+  /// encoded, labels (conditions and acceptance conditions) can only
   /// be queried while iterating over the successors.
   class tgba_succ_iterator
   {
@@ -90,9 +90,9 @@ namespace spot
     ///
     /// This is a boolean function of atomic propositions.
     virtual bdd current_condition() const = 0;
-    /// \brief Get the accepting conditions on the transition leading
+    /// \brief Get the acceptance conditions on the transition leading
     /// to this successor.
-    virtual bdd current_accepting_conditions() const = 0;
+    virtual bdd current_acceptance_conditions() const = 0;
 
     //@}
   };

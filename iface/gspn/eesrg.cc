@@ -319,11 +319,11 @@ namespace spot
     }
 
     virtual bdd
-    current_accepting_conditions() const
+    current_acceptance_conditions() const
     {
       // There is no acceptance conditions in GSPN systems, so we just
       // return those from OPERAND_.
-      return operand_->current_accepting_conditions();
+      return operand_->current_acceptance_conditions();
     }
   private:
     State state_;
@@ -457,16 +457,16 @@ namespace spot
   }
 
   bdd
-  tgba_gspn_eesrg::all_accepting_conditions() const
+  tgba_gspn_eesrg::all_acceptance_conditions() const
   {
-    // There is no accepting conditions in GSPN systems.
+    // There is no acceptance conditions in GSPN systems.
     return bddfalse;
   }
 
   bdd
-  tgba_gspn_eesrg::neg_accepting_conditions() const
+  tgba_gspn_eesrg::neg_acceptance_conditions() const
   {
-    // There is no accepting conditions in GSPN systems.
+    // There is no acceptance conditions in GSPN systems.
     return bddtrue;
   }
 

@@ -98,12 +98,12 @@ namespace spot
 	    /*
 	      `x | next', doesn't actually encode the fact that x
 	      should be fulfilled eventually.  We ensure this by
-	      creating a new generalized Büchi accepting set, Acc[x],
+	      creating a new generalized Büchi acceptance set, Acc[x],
 	      and leave out of this set any transition going off NOW
-	      without checking X.  Such accepting conditions are
+	      without checking X.  Such acceptance conditions are
 	      checked for during the emptiness check.
 	    */
-	    fact_.declare_accepting_condition(x | !now, node->child());
+	    fact_.declare_acceptance_condition(x | !now, node->child());
 	    res_ = now;
 	    return;
 	  }
@@ -181,10 +181,10 @@ namespace spot
 	    /*
 	      The rightmost conjunction, f1 & next, doesn't actually
 	      encode the fact that f2 should be fulfilled eventually.
-	      We declare an accepting condition for this purpose (see
+	      We declare an acceptance condition for this purpose (see
 	      the comment in the unop::F case).
 	    */
-	    fact_.declare_accepting_condition(f2 | !now, node->second());
+	    fact_.declare_acceptance_condition(f2 | !now, node->second());
 	    res_ = now;
 	    return;
 	  }

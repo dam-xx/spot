@@ -34,14 +34,14 @@
 
 namespace spot
 {
-  // At some point we'll need to print an accepting set into LBTT's
-  // format.  LBTT expects numbered accepting sets, so first we'll
-  // number each accepting condition, and latter when we have to print
+  // At some point we'll need to print an acceptance set into LBTT's
+  // format.  LBTT expects numbered acceptance sets, so first we'll
+  // number each acceptance condition, and latter when we have to print
   // them we'll just have to look up each of them.
-  class accepting_cond_splitter
+  class acceptance_cond_splitter
   {
   public:
-    accepting_cond_splitter(bdd all_acc)
+    acceptance_cond_splitter(bdd all_acc)
     {
       unsigned count = 0;
       while (all_acc != bddfalse)
@@ -105,7 +105,7 @@ namespace spot
   }
 
   // Each state in the produced automata corresponds to
-  // a (state, accepting set) pair for the source automata.
+  // a (state, acceptance set) pair for the source automata.
 
   typedef std::pair<state*, bdd> state_acc_pair;
 
@@ -128,7 +128,7 @@ namespace spot
     bool
     operator()(const state_acc_pair& that) const
     {
-      // We assume there will be far more states than accepting conditions.
+      // We assume there will be far more states than acceptance conditions.
       // Hence we keep only 8 bits for the latter.
       return (that.first->hash() << 8) + (that.second.id() & 0xFF);
     }
@@ -173,18 +173,18 @@ namespace spot
 	return;
       }
 
-    // Browse the successors of STATE to gather accepting
+    // Browse the successors of STATE to gather acceptance
     // conditions of outgoing transitions.
     bdd_set acc_seen;
     tgba_succ_iterator* si = g->succ_iter(state);
     for (si->first(); !si->done(); si->next())
       {
-	acc_seen.insert(si->current_accepting_conditions());
+	acc_seen.insert(si->current_acceptance_conditions());
       }
 
     // Order the creation of the supplementary initial state if needed.
-    // Use bddtrue as accepting condition because it cannot conflict
-    // with other (state, accepting cond) pairs in the maps.
+    // Use bddtrue as acceptance condition because it cannot conflict
+    // with other (state, acceptance cond) pairs in the maps.
     if (init && acc_seen.size() > 1)
       {
 	state_acc_pair p(state, bddtrue);
@@ -219,7 +219,7 @@ namespace spot
 
     fill_todo(todo, seen, acp_seen,
 	      g->get_init_state(), g, mmp, state_number, true);
-    accepting_cond_splitter acs(g->all_accepting_conditions());
+    acceptance_cond_splitter acs(g->all_acceptance_conditions());
 
     while(! todo.empty())
       {
@@ -227,12 +227,12 @@ namespace spot
 	todo.erase(todo.begin());
 	unsigned number = acp_seen[sap];
 
-	// number == 0 is the initial state.  bddtrue as an accepting
+	// number == 0 is the initial state.  bddtrue as an acceptance
 	// conditions indicates a "fake" initial state introduced
 	// because the original initial state was split into many
-	// states (with different accepting conditions).
+	// states (with different acceptance conditions).
 	// As this "fake" state has no input transitions, there is
-	// no point in computing any accepting conditions.
+	// no point in computing any acceptance conditions.
 	body << number << (number ? " 0 " : " 1 ");
 	if (sap.second != bddtrue)
 	  acs.split(body, sap.second);
@@ -241,12 +241,12 @@ namespace spot
 	tgba_succ_iterator* si = g->succ_iter(sap.first);
 	for (si->first(); !si->done(); si->next())
 	  {
-	    // We have put the accepting conditions on the state,
-	    // so draw only outgoing transition with these accepting
+	    // We have put the acceptance conditions on the state,
+	    // so draw only outgoing transition with these acceptance
 	    // conditions.
 
 	    if (sap.second != bddtrue
-		&& si->current_accepting_conditions() != sap.second)
+		&& si->current_acceptance_conditions() != sap.second)
 	      continue;
 
 	    minmax_pair destrange;

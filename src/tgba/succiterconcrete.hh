@@ -35,13 +35,13 @@ namespace spot
     /// \brief Build a spot::tgba_succ_iterator_concrete.
     ///
     /// \param successors The set of successors with ingoing
-    ///   conditions and accepting conditions, represented as a BDD.
+    ///   conditions and acceptance conditions, represented as a BDD.
     ///   The job of this iterator will be to enumerate the
     ///   satisfactions of that BDD and split them into destination
-    ///   states and conditions, and compute accepting conditions.
+    ///   states and conditions, and compute acceptance conditions.
     /// \param d The core data of the automata.
     ///   These contains sets of variables useful to split a BDD, and
-    ///   compute accepting conditions.
+    ///   compute acceptance conditions.
     tgba_succ_iterator_concrete(const tgba_bdd_core_data& d, bdd successors);
     virtual ~tgba_succ_iterator_concrete();
 
@@ -53,7 +53,7 @@ namespace spot
     // inspection
     state_bdd* current_state() const;
     bdd current_condition() const;
-    bdd current_accepting_conditions() const;
+    bdd current_acceptance_conditions() const;
 
   private:
     const tgba_bdd_core_data& data_; ///< Core data of the automaton.

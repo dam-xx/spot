@@ -35,14 +35,14 @@ namespace spot
   /// be degeneralized on the fly.
   ///
   /// This automaton is a spot::tgba, but it will always have exactly
-  /// one accepting condition.
+  /// one acceptance condition.
   ///
   /// The degeneralization is done by synchronizing the input
   /// automaton with a "counter" automaton such as the one shown in
   /// "On-the-fly Verification of Linear Temporal Logic" (Jean-Michel
   /// Couveur, FME99).
   ///
-  /// If the input automaton uses N accepting conditions, the output
+  /// If the input automaton uses N acceptance conditions, the output
   /// automaton can have at most max(N,1)+1 times more states and
   /// transitions.
   class tgba_tba_proxy : public tgba
@@ -65,8 +65,8 @@ namespace spot
 
     virtual state* project_state(const state* s, const tgba* t) const;
 
-    virtual bdd all_accepting_conditions() const;
-    virtual bdd neg_accepting_conditions() const;
+    virtual bdd all_acceptance_conditions() const;
+    virtual bdd neg_acceptance_conditions() const;
 
     bool state_is_accepting(const state* state) const;
 
@@ -78,7 +78,7 @@ namespace spot
     const tgba* a_;
     typedef std::map<bdd, bdd, bdd_less_than> cycle_map;
     cycle_map acc_cycle_;
-    bdd the_accepting_cond_;
+    bdd the_acceptance_cond_;
     // Disallow copy.
     tgba_tba_proxy(const tgba_tba_proxy&);
     tgba_tba_proxy& tgba_tba_proxy::operator=(const tgba_tba_proxy&);

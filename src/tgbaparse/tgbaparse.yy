@@ -64,9 +64,9 @@ typedef std::pair<bool, spot::ltl::formula*> pair;
 %token ACC_DEF
 
 %%
-tgba: accepting_decl lines | lines;
+tgba: acceptance_decl lines | lines;
 
-accepting_decl: ACC_DEF acc_decl ';'
+acceptance_decl: ACC_DEF acc_decl ';'
 
 /* At least one line.  */
 lines: line
@@ -85,7 +85,7 @@ line: strident ',' strident ',' cond_list ',' acc_list ';'
 	     result->add_condition(t, i->second);
 	 std::list<formula*>::iterator i2;
 	 for (i2 = $7->begin(); i2 != $7->end(); ++i2)
-	     result->add_accepting_condition(t, *i2);
+	     result->add_acceptance_condition(t, *i2);
 	 delete $1;
 	 delete $3;
 	 delete $5;
@@ -152,10 +152,10 @@ acc_list:
 	 else if (*$2 != "" && *$2 != "false")
 	   {
 	     formula* f = parse_environment.require(*$2);
-	     if (! result->has_accepting_condition(f))
+	     if (! result->has_acceptance_condition(f))
 	       {
 		 error_list.push_back(spot::tgba_parse_error(@2,
-			 "undeclared accepting condition"));
+			 "undeclared acceptance condition"));
 		 destroy(f);
 		 delete $2;
 		 YYERROR;
@@ -172,7 +172,7 @@ acc_decl:
        | acc_decl strident
        {
 	 formula* f = parse_environment.require(*$2);
-	 result->declare_accepting_condition(f);
+	 result->declare_acceptance_condition(f);
 	 delete $2;
        }
        ;

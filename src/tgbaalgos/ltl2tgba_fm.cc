@@ -112,7 +112,7 @@ namespace spot
       register_a_variable(const formula* f)
       {
 	int num;
-	// Do not build an accepting variable that already exists.
+	// Do not build an acceptance variable that already exists.
 	fv_map::iterator sii = a_map.find(f);
 	if (sii != a_map.end())
 	  {
@@ -243,16 +243,16 @@ namespace spot
 	    bdd high = bdd_high(b);
 	    if (high == bddfalse)
 	      {
-		// Simply ignore negated accepting variables.
+		// Simply ignore negated acceptance variables.
 		b = bdd_low(b);
 	      }
 	    else
 	      {
 		formula* ac = var_to_formula(var);
 
-		if (! a->has_accepting_condition(ac))
-		  a->declare_accepting_condition(clone(ac));
-		a->add_accepting_condition(t, ac);
+		if (! a->has_acceptance_condition(ac))
+		  a->declare_acceptance_condition(clone(ac));
+		a->add_acceptance_condition(t, ac);
 
 		atomic_prop::instance_count();
 		b = high;
@@ -501,8 +501,8 @@ namespace spot
 	 i != formulae_seen.end(); ++i)
       destroy(*i);
 
-    // Turn all promises into real accepting conditions.
-    a->complement_all_accepting_conditions();
+    // Turn all promises into real acceptance conditions.
+    a->complement_all_acceptance_conditions();
     return a;
   }
 

@@ -259,9 +259,9 @@ namespace spot
     }
 
     virtual bdd
-    current_accepting_conditions() const
+    current_acceptance_conditions() const
     {
-      // There is no accepting conditions in GSPN systems.
+      // There is no acceptance conditions in GSPN systems.
       return bddfalse;
     }
   private:
@@ -393,16 +393,16 @@ namespace spot
   }
 
   bdd
-  tgba_gspn::all_accepting_conditions() const
+  tgba_gspn::all_acceptance_conditions() const
   {
-    // There is no accepting conditions in GSPN systems.
+    // There is no acceptance conditions in GSPN systems.
     return bddfalse;
   }
 
   bdd
-  tgba_gspn::neg_accepting_conditions() const
+  tgba_gspn::neg_acceptance_conditions() const
   {
-    // There is no accepting conditions in GSPN systems.
+    // There is no acceptance conditions in GSPN systems.
     return bddtrue;
   }
 

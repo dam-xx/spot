@@ -46,7 +46,7 @@ namespace spot
     struct transition
     {
       bdd condition;
-      bdd accepting_conditions;
+      bdd acceptance_conditions;
       state* dest;
     };
 
@@ -59,12 +59,12 @@ namespace spot
     void add_neg_condition(transition* t, const ltl::formula* f);
     /// This assumes that all variables in \a f are known from dict.
     void add_conditions(transition* t, bdd f);
-    void declare_accepting_condition(const ltl::formula* f);
-    bool has_accepting_condition(const ltl::formula* f) const;
-    void add_accepting_condition(transition* t, const ltl::formula* f);
-    /// This assumes that all accepting conditions in \a f are known from dict.
-    void add_accepting_conditions(transition* t, bdd f);
-    void complement_all_accepting_conditions();
+    void declare_acceptance_condition(const ltl::formula* f);
+    bool has_acceptance_condition(const ltl::formula* f) const;
+    void add_acceptance_condition(transition* t, const ltl::formula* f);
+    /// This assumes that all acceptance conditions in \a f are known from dict.
+    void add_acceptance_conditions(transition* t, bdd f);
+    void complement_all_acceptance_conditions();
 
     // tgba interface
     virtual ~tgba_explicit();
@@ -76,8 +76,8 @@ namespace spot
     virtual bdd_dict* get_dict() const;
     virtual std::string format_state(const spot::state* state) const;
 
-    virtual bdd all_accepting_conditions() const;
-    virtual bdd neg_accepting_conditions() const;
+    virtual bdd all_acceptance_conditions() const;
+    virtual bdd neg_acceptance_conditions() const;
 
   protected:
     virtual bdd compute_support_conditions(const spot::state* state) const;
@@ -85,7 +85,7 @@ namespace spot
 
     state* add_state(const std::string& name);
     bdd get_condition(const ltl::formula* f);
-    bdd get_accepting_condition(const ltl::formula* f);
+    bdd get_acceptance_condition(const ltl::formula* f);
 
     typedef Sgi::hash_map<const std::string, tgba_explicit::state*,
 			  string_hash> ns_map;
@@ -95,9 +95,9 @@ namespace spot
     sn_map state_name_map_;
     bdd_dict* dict_;
     tgba_explicit::state* init_;
-    mutable bdd all_accepting_conditions_;
-    bdd neg_accepting_conditions_;
-    mutable bool all_accepting_conditions_computed_;
+    mutable bdd all_acceptance_conditions_;
+    bdd neg_acceptance_conditions_;
+    mutable bool all_acceptance_conditions_computed_;
 
   private:
     // Disallow copy.
@@ -146,12 +146,12 @@ namespace spot
 
     virtual state_explicit* current_state() const;
     virtual bdd current_condition() const;
-    virtual bdd current_accepting_conditions() const;
+    virtual bdd current_acceptance_conditions() const;
 
   private:
     const tgba_explicit::state* s_;
     tgba_explicit::state::const_iterator i_;
-    bdd all_accepting_conditions_;
+    bdd all_acceptance_conditions_;
   };
 
 }

@@ -76,8 +76,8 @@ namespace spot
     /// rules, etc.
     const tgba_bdd_core_data& get_core_data() const;
 
-    virtual bdd all_accepting_conditions() const;
-    virtual bdd neg_accepting_conditions() const;
+    virtual bdd all_acceptance_conditions() const;
+    virtual bdd neg_acceptance_conditions() const;
 
   protected:
     virtual bdd compute_support_conditions(const state* state) const;

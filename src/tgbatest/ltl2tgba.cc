@@ -24,7 +24,7 @@ syntax(char* prog)
             << "       "<< prog << " -X [OPTIONS...] file" << std::endl
 	    << std::endl
 	    << "Options:" << std::endl
-	    << "  -a   display the accepting_conditions BDD, not the "
+	    << "  -a   display the acceptance_conditions BDD, not the "
 	    << "reachability graph"
 	    << std::endl
 	    << "  -A   same as -a, but as a set" << std::endl
@@ -262,7 +262,7 @@ main(int argc, char** argv)
 	  if (concrete)
 	    spot::bdd_print_dot(std::cout, concrete->get_dict(),
 				concrete->
-				get_core_data().accepting_conditions);
+				get_core_data().acceptance_conditions);
 	  break;
 	case 3:
 	  if (concrete)
@@ -273,7 +273,7 @@ main(int argc, char** argv)
 	  if (concrete)
 	    spot::bdd_print_set(std::cout, concrete->get_dict(),
 				concrete->
-				get_core_data().accepting_conditions);
+				get_core_data().acceptance_conditions);
 	  break;
 	case 5:
 	  a->get_dict()->dump(std::cout);

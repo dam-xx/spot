@@ -47,7 +47,7 @@ namespace spot
   /// \return The BDD formated as a string.
   std::string bdd_format_sat(const bdd_dict* dict, bdd b);
 
-  /// \brief Print a BDD as a list of accepting conditions.
+  /// \brief Print a BDD as a list of acceptance conditions.
   ///
   /// This is used when saving a TGBA.
   /// \param os The output stream.
@@ -57,7 +57,7 @@ namespace spot
   std::ostream& bdd_print_acc(std::ostream& os,
 			      const bdd_dict* dict, bdd b);
 
-  /// \brief Print a BDD as a set of accepting conditions.
+  /// \brief Print a BDD as a set of acceptance conditions.
   ///
   /// This is used when saving a TGBA.
   /// \param os The output stream.

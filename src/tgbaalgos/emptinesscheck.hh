@@ -80,7 +80,7 @@ namespace spot
       connected_component(int index = -1);
 
       int index;
-      /// The bdd condition is the union of all accepting condition of
+      /// The bdd condition is the union of all acceptance conditions of
       /// transitions which connect the states of the connected component.
       bdd condition;
     };
@@ -121,7 +121,7 @@ namespace spot
     void remove_component(const state* start_delete);
 
     /// Called by counter_example to find a path which traverses all
-    /// accepting conditions in the accepted SCC.
+    /// acceptance conditions in the accepted SCC.
     void accepting_path (const connected_component_set& scc,
 			 const state* start, bdd acc_to_traverse);
 

@@ -147,13 +147,13 @@ namespace spot
   }
 
   bdd
-  tgba_bdd_concrete::all_accepting_conditions() const
+  tgba_bdd_concrete::all_acceptance_conditions() const
   {
-    return data_.all_accepting_conditions;
+    return data_.all_acceptance_conditions;
   }
 
   bdd
-  tgba_bdd_concrete::neg_accepting_conditions() const
+  tgba_bdd_concrete::neg_acceptance_conditions() const
   {
     return data_.negacc_set;
   }

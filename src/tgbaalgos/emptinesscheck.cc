@@ -181,7 +181,7 @@ namespace spot
 	// (destination state, acceptance conditions of the arc)
 	// we are interested in...
 	const state* dest = succ->current_state();
-	bdd acc = succ->current_accepting_conditions();
+	bdd acc = succ->current_acceptance_conditions();
 	// ... and point the iterator to the next successor, for
 	// the next iteration.
 	succ->next();
@@ -242,7 +242,7 @@ namespace spot
 	// Accumulate all acceptance conditions into the merged SCC.
 	root.top().condition |= acc;
 
-	if (root.top().condition == aut_->all_accepting_conditions())
+	if (root.top().condition == aut_->all_acceptance_conditions())
 	  {
 	    // We have found an accepting SCC.
 	    // Release all iterators in TODO.
@@ -559,7 +559,7 @@ namespace spot
 	      }
 
 	    dest = h_filt(dest);
-	    bdd acc = iter->current_accepting_conditions() | todo.top().acc;
+	    bdd acc = iter->current_acceptance_conditions() | todo.top().acc;
 	    path.push_back(state_proposition(dest, iter->current_condition()));
 
 	    // Advance iterator for next step.
@@ -604,7 +604,7 @@ namespace spot
 		    // acceptance conditions of acc_restrict.
 		    //
 		    // FIXME: It would be better to count the number
-		    // of accepting conditions.
+		    // of acceptance conditions.
 		    if (bddtrue != (best_acc_restrict >> acc_restrict))
 		      continue;
 		  }
