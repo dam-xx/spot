@@ -272,7 +272,6 @@ namespace spot
           if (!f.it->done())
             {
               const state *s_prime = f.it->current_state();
-	      inc_ars_cycle_states();
               ndfsr_trace << "  Visit the successor: "
                           << a_->format_state(s_prime) << std::endl;
               bdd label = f.it->current_condition();
@@ -287,6 +286,7 @@ namespace spot
                     }
                   else if (seen.find(s_prime) == seen.end())
                     {
+		      inc_ars_cycle_states();
                       ndfsr_trace << "  it is not seen, go down" << std::endl;
                       seen.insert(s_prime);
                       tgba_succ_iterator* i = a_->succ_iter(s_prime);
@@ -295,6 +295,7 @@ namespace spot
                     }
                   else if ((acc & covered_acc) != acc)
                     {
+		      inc_ars_cycle_states();
                       ndfsr_trace << "  a propagation is needed, "
                                   << "start a search" << std::endl;
                       if (search(s_prime, target, dead))
@@ -398,7 +399,6 @@ namespace spot
 
       const state* filter(const state* s)
       {
-	ars->inc_ars_cycle_states();
         if (!h.has_been_visited(s)
 	    || seen.find(s) != seen.end()
 	    || dead.find(s) != dead.end())
@@ -406,6 +406,7 @@ namespace spot
             delete s;
             return 0;
           }
+	ars->inc_ars_cycle_states();
         seen.insert(s);
         return s;
       }
@@ -491,11 +492,6 @@ namespace spot
 
       const state* filter(const state* s)
       {
-	if (cycle)
-	  ars->inc_ars_cycle_states();
-	else
-	  ars->inc_ars_prefix_states();
-
         ndfsr_trace << "filter: " << a_->format_state(s);
         if (!h.has_been_visited(s) || seen.find(s) != seen.end())
           {
@@ -507,6 +503,10 @@ namespace spot
             return 0;
           }
         ndfsr_trace << " OK" << std::endl;
+	if (cycle)
+	  ars->inc_ars_cycle_states();
+	else
+	  ars->inc_ars_prefix_states();
         seen.insert(s);
         return s;
       }

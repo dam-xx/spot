@@ -1,3 +1,10 @@
+2005-01-26  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gv04.cc, src/tgbaalgos/ndfs_result.hxx,
+	src/tgbaalgos/gtec/ce.cc: Do not account for states that are
+	computed but not visited by the BFS&DFS used to construct
+	accepting runs.
+
 2005-01-25  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbatest/randtgba.cc: Complete performance measurements.

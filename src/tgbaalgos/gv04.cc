@@ -339,7 +339,6 @@ namespace spot
 	    virtual const state*
 	    filter(const state* s)
 	    {
-	      r->inc_ars_cycle_states();
 	      // Do not escape the SCC
 	      hash_type::const_iterator j = data.h.find(s);
 	      if (// This state was never visited so far.
@@ -354,6 +353,7 @@ namespace spot
 		  delete s;
 		  return 0;
 		}
+	      r->inc_ars_cycle_states();
 	      delete s;
 	      return j->first;
 	    }
