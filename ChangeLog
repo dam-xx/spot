@@ -1,5 +1,8 @@
 2003-04-29  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltlenv/defaultenv.hh: Do not include atomic_prop.hh here...
+	* src/ltlenv/defaultenv.cc: ... but here.
+
 	* src/ltltest/tostring.test: Simplify with set -e.  Move the
 	description of the test ...
 	* src/ltltest/tostring.cc: ... here, where it is actually coded.

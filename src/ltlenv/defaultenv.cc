@@ -1,3 +1,4 @@
+#include "ltlast/atomic_prop.hh"
 #include "defaultenv.hh"
 
 namespace spot

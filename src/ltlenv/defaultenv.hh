@@ -2,7 +2,6 @@
 # define SPOT_LTLENV_DEFAULT_ENVIRONMENT_HH
 
 # include "environment.hh"
-# include "ltlast/atomic_prop.hh"
 
 namespace spot
 {
