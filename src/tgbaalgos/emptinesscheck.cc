@@ -66,21 +66,14 @@ namespace spot
     return s.empty();
   }
 
-  typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
+  //////////////////////////////////////////////////////////////////////
 
-  bool
-  emptiness_check::connected_component_set::has_state(const state* s) const
-  {
-    return states.find(s) != states.end();
-  }
-
-
-  emptiness_check::emptiness_check(const tgba* a)
-    : aut_(a)
+  emptiness_check_status::emptiness_check_status(const tgba* aut)
+    : aut(aut)
   {
   }
 
-  emptiness_check::~emptiness_check()
+  emptiness_check_status::~emptiness_check_status()
   {
     // Free keys in H.
     hash_type::iterator i = h.begin();
@@ -94,13 +87,39 @@ namespace spot
   }
 
   const state*
-  emptiness_check::h_filt(const state* s) const
+  emptiness_check_status::h_filt(const state* s) const
   {
     hash_type::const_iterator i = h.find(s);
     assert(i != h.end());
     if (s != i->first)
       delete s;
     return i->first;
+  }
+
+
+
+  //////////////////////////////////////////////////////////////////////
+
+  typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
+
+
+
+
+  bool
+  emptiness_check::connected_component_set::has_state(const state* s) const
+  {
+    return states.find(s) != states.end();
+  }
+
+
+  emptiness_check::emptiness_check(const tgba* a)
+  {
+    ecs_ = new emptiness_check_status(a);
+  }
+
+  emptiness_check::~emptiness_check()
+  {
+    delete ecs_;
   }
 
   void
@@ -115,10 +134,10 @@ namespace spot
     // (FROM should be in H, otherwise it means all reachable
     // states from FROM have already been removed and there is no
     // point in calling remove_component.)
-    hash_type::iterator hi = h.find(from);
+    emptiness_check_status::hash_type::iterator hi = ecs_->h.find(from);
     assert(hi->second != -1);
     hi->second = -1;
-    tgba_succ_iterator* i = aut_->succ_iter(from);
+    tgba_succ_iterator* i = ecs_->aut->succ_iter(from);
 
     for (;;)
       {
@@ -126,13 +145,13 @@ namespace spot
 	for (i->first(); !i->done(); i->next())
 	  {
 	    state* s = i->current_state();
-	    hash_type::iterator hi = h.find(s);
-	    assert(hi != h.end());
+	    emptiness_check_status::hash_type::iterator hi = ecs_->h.find(s);
+	    assert(hi != ecs_->h.end());
 
 	    if (hi->second != -1)
 	      {
 		hi->second = -1;
-		to_remove.push(aut_->succ_iter(s));
+		to_remove.push(ecs_->aut->succ_iter(s));
 	      }
 	    delete s;
 	  }
@@ -165,18 +184,18 @@ namespace spot
 
     // Setup depth-first search from the initial state.
     {
-      state* init = aut_->get_init_state();
-      h[init] = 1;
-      root.push(1);
+      state* init = ecs_->aut->get_init_state();
+      ecs_->h[init] = 1;
+      ecs_->root.push(1);
       arc.push(bddfalse);
-      tgba_succ_iterator* iter = aut_->succ_iter(init);
+      tgba_succ_iterator* iter = ecs_->aut->succ_iter(init);
       iter->first();
       todo.push(pair_state_iter(init, iter));
     }
 
     while (!todo.empty())
       {
-	assert(root.size() == arc.size());
+	assert(ecs_->root.size() == arc.size());
 
 	// We are looking at the next successor in SUCC.
 	tgba_succ_iterator* succ = todo.top().second;
@@ -193,14 +212,14 @@ namespace spot
 	    // When backtracking the root of an SCC, we must also
 	    // remove that SCC from the ARC/ROOT stacks.  We must
 	    // discard from H all reachable states from this SCC.
-	    hash_type::iterator i = h.find(curr);
-	    assert(i != h.end());
-	    assert(!root.empty());
-	    if (root.top().index == i->second)
+	    emptiness_check_status::hash_type::iterator i = ecs_->h.find(curr);
+	    assert(i != ecs_->h.end());
+	    assert(!ecs_->root.empty());
+	    if (ecs_->root.top().index == i->second)
 	      {
 		assert(!arc.empty());
 		arc.pop();
-		root.pop();
+		ecs_->root.pop();
 		remove_component(curr);
 	      }
 
@@ -220,15 +239,15 @@ namespace spot
 	// We do not need SUCC from now on.
 
 	// Are we going to a new state?
-	hash_type::iterator i = h.find(dest);
-	if (i == h.end())
+	emptiness_check_status::hash_type::iterator i = ecs_->h.find(dest);
+	if (i == ecs_->h.end())
 	  {
 	    // Yes.  Number it, stack it, and register its successors
 	    // for later processing.
-	    h[dest] = ++num;
-	    root.push(num);
+	    ecs_->h[dest] = ++num;
+	    ecs_->root.push(num);
 	    arc.push(acc);
-	    tgba_succ_iterator* iter = aut_->succ_iter(dest);
+	    tgba_succ_iterator* iter = ecs_->aut->succ_iter(dest);
 	    iter->first();
 	    todo.push(pair_state_iter(dest, iter));
 	    continue;
@@ -256,24 +275,24 @@ namespace spot
 	// top of ROOT that have an index greater to the one of
 	// the SCC of S2 (called the "threshold").
 	int threshold = i->second;
-	while (threshold < root.top().index)
+	while (threshold < ecs_->root.top().index)
 	  {
-	    assert(!root.empty());
+	    assert(!ecs_->root.empty());
 	    assert(!arc.empty());
-	    acc |= root.top().condition;
+	    acc |= ecs_->root.top().condition;
 	    acc |= arc.top();
-	    root.pop();
+	    ecs_->root.pop();
 	    arc.pop();
 	  }
 	// Note that we do not always have
-	//  threshold == root.top().index
+	//  threshold == ecs_->root.top().index
 	// after this loop, the SCC whose index is threshold might have
 	// been merged with a lower SCC.
 
 	// Accumulate all acceptance conditions into the merged SCC.
-	root.top().condition |= acc;
+	ecs_->root.top().condition |= acc;
 
-	if (root.top().condition == aut_->all_acceptance_conditions())
+	if (ecs_->root.top().condition == ecs_->aut->all_acceptance_conditions())
 	  {
 	    // We have found an accepting SCC.
 	    // Release all iterators in TODO.
@@ -316,11 +335,11 @@ namespace spot
 
     // Setup depth-first search from the initial state.
     todo.push(pair_state_successors(0, succ_queue()));
-    todo.top().second.push_front(successor(bddtrue, aut_->get_init_state()));
+    todo.top().second.push_front(successor(bddtrue, ecs_->aut->get_init_state()));
 
     for (;;)
       {
-	assert(root.size() == arc.size());
+	assert(ecs_->root.size() == arc.size());
 
 	// Get the successors of the current state.
 	succ_queue& queue = todo.top().second;
@@ -331,8 +350,8 @@ namespace spot
 	succ_queue::iterator q = queue.begin();
 	while (q != queue.end())
 	  {
-	    hash_type::iterator i = h.find(q->s);
-	    if (i == h.end())
+	    emptiness_check_status::hash_type::iterator i = ecs_->h.find(q->s);
+	    if (i == ecs_->h.end())
 	      {
 		// Skip unknown states.
 		++q;
@@ -358,25 +377,25 @@ namespace spot
 		// (called the "threshold").
 		int threshold = i->second;
 		bdd acc = q->acc;
-		while (threshold < root.top().index)
+		while (threshold < ecs_->root.top().index)
 		  {
-		    assert(!root.empty());
+		    assert(!ecs_->root.empty());
 		    assert(!arc.empty());
-		    acc |= root.top().condition;
+		    acc |= ecs_->root.top().condition;
 		    acc |= arc.top();
-		    root.pop();
+		    ecs_->root.pop();
 		    arc.pop();
 		  }
 		// Note that we do not always have
-		//  threshold == root.top().index
+		//  threshold == ecs_->root.top().index
 		// after this loop, the SCC whose index is threshold
 		// might have been merged with a lower SCC.
 
 		// Accumulate all acceptance conditions into the
 		// merged SCC.
-		root.top().condition |= acc;
+		ecs_->root.top().condition |= acc;
 
-		if (root.top().condition == aut_->all_acceptance_conditions())
+		if (ecs_->root.top().condition == ecs_->aut->all_acceptance_conditions())
 		  {
 		    // We have found an accepting SCC.  Clean up TODO.
 		    // We must delete all states of apparing in TODO
@@ -387,8 +406,8 @@ namespace spot
 			for (succ_queue::iterator q = queue.begin();
 			     q != queue.end(); ++q)
 			  {
-			    hash_type::iterator i = h.find(q->s);
-			    if (i == h.end() || i->first != q->s)
+			    emptiness_check_status::hash_type::iterator i = ecs_->h.find(q->s);
+			    if (i == ecs_->h.end() || i->first != q->s)
 			      delete q->s;
 			  }
 			todo.pop();
@@ -421,14 +440,14 @@ namespace spot
 	    // When backtracking the root of an SCC, we must also
 	    // remove that SCC from the ARC/ROOT stacks.  We must
 	    // discard from H all reachable states from this SCC.
-	    hash_type::iterator i = h.find(curr);
-	    assert(i != h.end());
-	    assert(!root.empty());
-	    if (root.top().index == i->second)
+	    emptiness_check_status::hash_type::iterator i = ecs_->h.find(curr);
+	    assert(i != ecs_->h.end());
+	    assert(!ecs_->root.empty());
+	    if (ecs_->root.top().index == i->second)
 	      {
 		assert(!arc.empty());
 		arc.pop();
-		root.pop();
+		ecs_->root.pop();
 		remove_component(curr);
 	      }
 	    continue;
@@ -441,12 +460,12 @@ namespace spot
 	// stacks.
 	successor succ = queue.front();
 	queue.pop_front();
-	h[succ.s] = ++num;
-	root.push(num);
+	ecs_->h[succ.s] = ++num;
+	ecs_->root.push(num);
 	arc.push(succ.acc);
 	todo.push(pair_state_successors(succ.s, succ_queue()));
 	succ_queue& new_queue = todo.top().second;
-	tgba_succ_iterator* iter = aut_->succ_iter(succ.s);
+	tgba_succ_iterator* iter = ecs_->aut->succ_iter(succ.s);
 	for (iter->first(); ! iter->done(); iter->next())
 	  new_queue.push_back(successor(iter->current_acceptance_conditions(),
 					iter->current_state()));
@@ -459,21 +478,21 @@ namespace spot
   emptiness_check::print_result(std::ostream& os, const tgba* restrict) const
   {
     os << "Prefix:" << std::endl;
-    const bdd_dict* d = aut_->get_dict();
+    const bdd_dict* d = ecs_->aut->get_dict();
     for (state_sequence::const_iterator i_se = suffix.begin();
 	 i_se != suffix.end(); ++i_se)
       {
 	os << "  ";
 	if (restrict)
 	  {
-	    const state* s = aut_->project_state(*i_se, restrict);
+	    const state* s = ecs_->aut->project_state(*i_se, restrict);
 	    assert(s);
 	    os << restrict->format_state(s) << std::endl;
 	    delete s;
 	  }
 	else
 	  {
-	    os << aut_->format_state(*i_se) << std::endl;
+	    os << ecs_->aut->format_state(*i_se) << std::endl;
 	  }
       }
     os << "Cycle:" <<std::endl;
@@ -484,14 +503,14 @@ namespace spot
 	os << "  ";
 	if (restrict)
 	  {
-	    const state* s = aut_->project_state(it->first, restrict);
+	    const state* s = ecs_->aut->project_state(it->first, restrict);
 	    assert(s);
 	    os << restrict->format_state(s) << std::endl;
 	    delete s;
 	  }
 	else
 	  {
-	    os << aut_->format_state(it->first) << std::endl;
+	    os << ecs_->aut->format_state(it->first) << std::endl;
 	  }
       }
     return os;
@@ -500,22 +519,23 @@ namespace spot
   void
   emptiness_check::counter_example()
   {
-    assert(!root.empty());
+    assert(!ecs_->root.empty());
     assert(suffix.empty());
 
-    int comp_size = root.size();
+    int comp_size = ecs_->root.size();
     // Transform the stack of connected component into an array.
     connected_component_set* scc = new connected_component_set[comp_size];
     for (int j = comp_size - 1; 0 <= j; --j)
       {
-	scc[j].index = root.top().index;
-	scc[j].condition = root.top().condition;
-	root.pop();
+	scc[j].index = ecs_->root.top().index;
+	scc[j].condition = ecs_->root.top().condition;
+	ecs_->root.pop();
       }
-    assert(root.empty());
+    assert(ecs_->root.empty());
 
     // Build the set of states for all SCCs.
-    for (hash_type::iterator i = h.begin(); i != h.end(); ++i)
+    for (emptiness_check_status::hash_type::iterator i = ecs_->h.begin();
+	 i != ecs_->h.end(); ++i)
       {
 	int index = i->second;
 	// Skip states from dead SCCs.
@@ -531,7 +551,7 @@ namespace spot
 	scc[j - 1].states.insert(i->first);
       }
 
-    suffix.push_front(h_filt(aut_->get_init_state()));
+    suffix.push_front(ecs_->h_filt(ecs_->aut->get_init_state()));
 
     // We build a path trough each SCC in the stack.  For the
     // first SCC, the starting state is the initial state of the
@@ -552,7 +572,7 @@ namespace spot
 	// Initial state of the BFS.
 	const state* start = suffix.back();
 	{
-	  tgba_succ_iterator* i = aut_->succ_iter(start);
+	  tgba_succ_iterator* i = ecs_->aut->succ_iter(start);
 	  todo.push_back(pair_state_iter(start, i));
 	}
 
@@ -575,7 +595,7 @@ namespace spot
 		      {
 			state_sequence seq;
 
-			seq.push_front(h_filt(dest));
+			seq.push_front(ecs_->h_filt(dest));
 			while (src->compare(start))
 			  {
 			    seq.push_front(src);
@@ -596,11 +616,11 @@ namespace spot
 		    continue;
 		  }
 
-		dest = h_filt(dest);
+		dest = ecs_->h_filt(dest);
 		if (father.find(dest) == father.end())
 		  {
 		    todo.push_back(pair_state_iter(dest,
-						   aut_->succ_iter(dest)));
+						   ecs_->aut->succ_iter(dest)));
 		    father[dest] = src;
 		  }
 	      }
@@ -634,7 +654,7 @@ namespace spot
 
     // Initial state.
     {
-      tgba_succ_iterator* i = aut_->succ_iter(from);
+      tgba_succ_iterator* i = ecs_->aut->succ_iter(from);
       todo.push_back(pair_state_iter(from, i));
     }
 
@@ -653,7 +673,7 @@ namespace spot
 		delete dest;
 		continue;
 	      }
-	    dest = h_filt(dest);
+	    dest = ecs_->h_filt(dest);
 
 	    bdd cond = i->current_condition();
 
@@ -681,7 +701,7 @@ namespace spot
 	      }
 
 	    // Common case: record backlinks and continue BFS.
-	    todo.push_back(pair_state_iter(dest, aut_->succ_iter(dest)));
+	    todo.push_back(pair_state_iter(dest, ecs_->aut->succ_iter(dest)));
 	    father[dest] = state_proposition(src, cond);
 	  }
 	delete i;
@@ -719,7 +739,7 @@ namespace spot
       {
 	// Initial state.
 	{
-	  tgba_succ_iterator* i = aut_->succ_iter(start);
+	  tgba_succ_iterator* i = ecs_->aut->succ_iter(start);
 	  i->first();
 	  todo.push(triplet(start, i, bddfalse));
 	  seen.insert(start);
@@ -761,7 +781,7 @@ namespace spot
 		continue;
 	      }
 
-	    dest = h_filt(dest);
+	    dest = ecs_->h_filt(dest);
 	    bdd acc = iter->current_acceptance_conditions() | todo.top().acc;
 	    path.push_back(state_proposition(dest, iter->current_condition()));
 
@@ -771,7 +791,7 @@ namespace spot
 	    if (seen.find(dest) == seen.end())
 	      {
 		// A new state: continue the DFS.
-		tgba_succ_iterator* di = aut_->succ_iter(dest);
+		tgba_succ_iterator* di = ecs_->aut->succ_iter(dest);
 		di->first();
 		todo.push(triplet(dest, di, acc));
 		seen.insert(dest);
@@ -845,10 +865,10 @@ namespace spot
   void
   emptiness_check::print_stats(std::ostream& os) const
   {
-    os << h.size() << " unique states visited" << std::endl;
+    os << ecs_->h.size() << " unique states visited" << std::endl;
     os << suffix.size() << " states in suffix" << std::endl;
     os << period.size() << " states in period" << std::endl;
-    os << root.size()
+    os << ecs_->root.size()
        << " strongly connected components in search stack"
        << std::endl;
   }

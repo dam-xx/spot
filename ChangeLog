@@ -1,5 +1,10 @@
 2004-04-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgo/semptinesscheck.hh (emptiness_check_status): New class,
+	extracted from ...
+	(emptiness_check): ... here.
+	* src/tgbaalgos/emptinesscheck.cc: Adjust.
+
 	* src/tgbaalgo/semptinesscheck.hh (scc_stack): New class, extracted
 	from ...
 	(emptiness_check): ... here.

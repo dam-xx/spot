@@ -56,6 +56,26 @@ namespace spot
     std::stack<connected_component> s;
   };
 
+  class emptiness_check_status
+  {
+  public:
+    emptiness_check_status(const tgba* aut);
+    ~emptiness_check_status();
+
+    /// \brief Return a state which is equal to \a s, but is in \c h,
+    /// and free \a s if it is different.  Doing so simplify memory
+    /// management, because we don't have to track which state need
+    /// to be kept or deallocated: all key in \c h should last for
+    /// the whole life of the emptiness_check.
+    const state* h_filt(const state* s) const;
+
+    const tgba* aut;
+    scc_stack root;
+    typedef Sgi::hash_map<const state*, int,
+			  state_ptr_hash, state_ptr_equal> hash_type;
+    hash_type h;		///< Map of visited states.
+  };
+
   /// \brief Check whether the language of an automate is empty.
   ///
   /// This is based on the following paper.
@@ -136,21 +156,9 @@ namespace spot
       bool has_state(const state* s) const;
     };
 
-    const tgba* aut_;
-    scc_stack root;
+    emptiness_check_status* ecs_;
     state_sequence suffix;
     cycle_path period;
-
-    typedef Sgi::hash_map<const state*, int,
-			  state_ptr_hash, state_ptr_equal> hash_type;
-    hash_type h;		///< Map of visited states.
-
-    /// \brief Return a state which is equal to \a s, but is in \c h,
-    /// and free \a s if it is different.  Doing so simplify memory
-    /// management, because we don't have to track which state need
-    /// to be kept or deallocated: all key in \c h should last for
-    /// the whole life of the emptiness_check.
-    const state* h_filt(const state* s) const;
 
     /// \brief Remove a strongly component from the hash.
     ///
