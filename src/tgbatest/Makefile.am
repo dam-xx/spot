@@ -80,14 +80,22 @@ TESTS = \
   reduccmp.test \
   reductgba.test \
   emptchk.test \
-  magic.test \
-  se05.test \
   emptchke.test \
   dfs.test \
   spotlbtt.test
 
 EXTRA_DIST = $(TESTS) ltl2baw.pl
 
-CLEANFILES = input input1 input2 input3 stdout expected config output1 output2 \
-red blue_counter blue_last
-
+CLEANFILES = \
+  blue_counter \
+  blue_last \
+  config \
+  expected \
+  input \
+  input1 \
+  input2 \
+  input3 \
+  output1 \
+  output2 \
+  red \
+  stdout

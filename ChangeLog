@@ -1,5 +1,8 @@
 2004-11-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/Makefile.am (TESTS): Remove non-existing magic.test
+	and se05.test.
+
 	* src/tgbatest/ltl2tgba.cc (syntax): Fix old typos and reword
 	some help strings.
 
