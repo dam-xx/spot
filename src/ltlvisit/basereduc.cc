@@ -21,7 +21,6 @@
 
 #include "reducform.hh"
 #include "ltlast/allnodes.hh"
-#include "ltlvisit/clone.hh"
 #include <cassert>
 
 #include "ltlvisit/destroy.hh"

@@ -21,11 +21,6 @@
 
 #include "reducform.hh"
 #include "ltlast/allnodes.hh"
-#include <cassert>
-
-#include "lunabbrev.hh"
-#include "nenoform.hh"
-#include "ltlvisit/destroy.hh"
 
 namespace spot
 {

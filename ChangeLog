@@ -1,5 +1,8 @@
 2004-05-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlvisit/basereduc.cc, src/ltlvisit/formlength.cc: Remove
+	useless includes.
+
 	* AUTHORS: Update.
 
 	* src/ltlvisit/reducform.hh: Update Doxygen comments for
