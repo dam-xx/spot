@@ -111,7 +111,7 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
       diag 'No useless parentheses after delete.'
 
     grep -e 'return[	 ]*[(][^(]*[)];' $tmp &&
-      diag 'No useless parentheses after delete.'
+      diag 'No useless parentheses after return.'
 
     grep  'NULL' $tmp &&
       diag 'Use 0 instead of NULL.  NULL is not portable.'
