@@ -31,12 +31,12 @@ expect_ce()
   run 0 ./ltl2tgba -e -D "$1"
   run 0 ./ltl2tgba -e -f "$1"
   run 0 ./ltl2tgba -e -f -D "$1"
-  run 0 ./ltl2tgba -e2 "$1"
-  run 0 ./ltl2tgba -e2 -D "$1"
-  run 0 ./ltl2tgba -e2 -f "$1"
-  run 0 ./ltl2tgba -e2 -f -D "$1"
-  run 0 ./ltl2tgba -m "$1"
-  run 0 ./ltl2tgba -m -f "$1"
+  run 0 ./ltl2tgba -ecouvreur99_shy "$1"
+  run 0 ./ltl2tgba -ecouvreur99_shy -D "$1"
+  run 0 ./ltl2tgba -ecouvreur99_shy -f "$1"
+  run 0 ./ltl2tgba -ecouvreur99_shy -f -D "$1"
+  run 0 ./ltl2tgba -emagic_search "$1"
+  run 0 ./ltl2tgba -emagic_search -f "$1"
 }
 
 expect_no()
@@ -45,12 +45,12 @@ expect_no()
   run 0 ./ltl2tgba -E -D "$1"
   run 0 ./ltl2tgba -E -f "$1"
   run 0 ./ltl2tgba -E -f -D "$1"
-  run 0 ./ltl2tgba -E2 "$1"
-  run 0 ./ltl2tgba -E2 -D "$1"
-  run 0 ./ltl2tgba -E2 -f "$1"
-  run 0 ./ltl2tgba -E2 -f -D "$1"
-  run 0 ./ltl2tgba -M "$1"
-  run 0 ./ltl2tgba -M -f "$1"
+  run 0 ./ltl2tgba -Ecouvreur99_shy "$1"
+  run 0 ./ltl2tgba -Ecouvreur99_shy -D "$1"
+  run 0 ./ltl2tgba -Ecouvreur99_shy -f "$1"
+  run 0 ./ltl2tgba -Ecouvreur99_shy -f -D "$1"
+  run 0 ./ltl2tgba -Emagic_search "$1"
+  run 0 ./ltl2tgba -Emagic_search -f "$1"
 }
 
 expect_ce 'a'
@@ -67,5 +67,6 @@ expect_no '!((FF a) <=> (F a))'
 expect_no 'Xa && (!a U b) && !b && X!b'
 expect_no '(a U !b) && Gb'
 
-# Expect at least four counter-examples.
-test `./ltl2tgba -n 'FFx <=> Fx' | grep Prefix: | wc -l` -ge 4
+# Expect at least four accepting runs
+test `./ltl2tgba -emagic_search_repeated 'FFx <=> Fx' |
+      grep Prefix: | wc -l` -ge 4

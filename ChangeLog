@@ -1,5 +1,9 @@
 2004-10-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/ltl2tgba.cc: Replace -e, -E, -m, -M, and -n by
+	-eALGO and -EALGO to ease the addition of new algorithms.
+	* src/tgbatest/emptchk.test, src/tgbatest/emptchke.test: Adjust.
+
 	* src/misc/version.cc: Fix trailing whitespace.
 	* src/sanity/style.test: Diagnose trailing whitespace.
 

@@ -33,5 +33,5 @@ s1, "s2", "a & !b", c d;
 EOF
 
 run 0 ./ltl2tgba -e -X input
-run 0 ./ltl2tgba -e2 -X input
-run 0 ./ltl2tgba -m -X input
+run 0 ./ltl2tgba -ecouvreur99_shy -X input
+run 0 ./ltl2tgba -emagic_search -X input

@@ -58,24 +58,13 @@ syntax(char* prog)
 	    << "  -A    same as -a, but as a set" << std::endl
 	    << "  -d    turn on traces during parsing" << std::endl
 	    << "  -D    degeneralize the automaton" << std::endl
-	    << "  -e    emptiness-check (Couvreur), expect and compute "
-	    << "a counter-example" << std::endl
-	    << "  -e2   emptiness-check (Couvreur variant), expect and compute "
-	    << "a counter-example" << std::endl
-	    << "  -E    emptiness-check (Couvreur), expect no counter-example "
+	    << "  -eALGO emptiness-check, expect and compute an accepting run"
 	    << std::endl
-	    << "  -E2   emptiness-check (Couvreur variant), expect no "
-	    << "counter-example " << std::endl
+	    << "  -EALGO emptiness-check, expect no accepting run" << std::endl
             << "  -f    use Couvreur's FM algorithm for translation"
 	    << std::endl
             << "  -F    read the formula from the file" << std::endl
             << "  -L    fair-loop approximation (implies -f)" << std::endl
-	    << "  -m    magic-search (implies -D), expect a counter-example"
-	    << std::endl
-	    << "  -M    magic-search (implies -D), expect no counter-example"
-	    << std::endl
-	    << "  -n    same as -m, but display more counter-examples"
-	    << std::endl
 	    << "  -N    display the never clain for Spin "
 	    << "(implies -D)" << std::endl
             << "  -p    branching postponement (implies -f)" << std::endl
@@ -121,7 +110,14 @@ syntax(char* prog)
 	    << "  -X    do not compute an automaton, read it from a file"
 	    << std::endl
 	    << "  -y    do not merge states with same symbolic representation "
-	    << "(implies -f)" << std::endl;
+	    << "(implies -f)" << std::endl
+	    << std::endl
+	    << "Where ALGO should be one of:" << std::endl
+	    << "  couvreur99" << std::endl
+	    << "  couvreur99_shy" << std::endl
+	    << "  magic_search" << std::endl
+	    << "  magic_search_repeated" << std::endl
+    ;
   exit(2);
 }
 
@@ -138,6 +134,7 @@ main(int argc, char** argv)
   bool file_opt = false;
   int output = 0;
   int formula_index = 0;
+  std::string echeck_algo;
   enum { None, Couvreur, Couvreur2, MagicSearch } echeck = None;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
   bool magic_many = false;
@@ -176,27 +173,21 @@ main(int argc, char** argv)
 	{
 	  degeneralize_opt = true;
 	}
-      else if (!strcmp(argv[formula_index], "-e"))
+      else if (!strncmp(argv[formula_index], "-e", 2))
 	{
-	  echeck = Couvreur;
+	  if (argv[formula_index][2] != 0)
+	    echeck_algo = argv[formula_index] + 2;
+	  else
+	    echeck_algo = "couvreur99";
 	  expect_counter_example = true;
 	  output = -1;
 	}
-      else if (!strcmp(argv[formula_index], "-e2"))
+      else if (!strncmp(argv[formula_index], "-E", 2))
 	{
-	  echeck = Couvreur2;
-	  expect_counter_example = true;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-E"))
-	{
-	  echeck = Couvreur;
-	  expect_counter_example = false;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-E2"))
-	{
-	  echeck = Couvreur2;
+	  if (argv[formula_index][2] != 0)
+	    echeck_algo = argv[formula_index] + 2;
+	  else
+	    echeck_algo = "couvreur99";
 	  expect_counter_example = false;
 	  output = -1;
 	}
@@ -212,28 +203,6 @@ main(int argc, char** argv)
 	{
 	  fair_loop_approx = true;
 	  fm_opt = true;
-	}
-      else if (!strcmp(argv[formula_index], "-m"))
-	{
-	  echeck = MagicSearch;
-	  degeneralize_opt = true;
-	  expect_counter_example = true;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-M"))
-	{
-	  echeck = MagicSearch;
-	  degeneralize_opt = true;
-	  expect_counter_example = false;
-	  output = -1;
-	}
-      else if (!strcmp(argv[formula_index], "-n"))
-	{
-	  echeck = MagicSearch;
-	  degeneralize_opt = true;
-	  expect_counter_example = true;
-	  output = -1;
-	  magic_many = true;
 	}
       else if (!strcmp(argv[formula_index], "-N"))
 	{
@@ -349,6 +318,32 @@ main(int argc, char** argv)
 	  break;
 	}
     }
+
+  if (echeck_algo == "couvreur99")
+    {
+      echeck = Couvreur;
+    }
+  else if (echeck_algo == "couvreur99_shy")
+    {
+      echeck = Couvreur2;
+    }
+  else if (echeck_algo == "magic_search")
+    {
+      echeck = MagicSearch;
+      degeneralize_opt = true;
+    }
+  else if (echeck_algo == "magic_search_repeated")
+    {
+      echeck = MagicSearch;
+      degeneralize_opt = true;
+      magic_many = true;
+    }
+  else
+    {
+      std::cerr << "unknown emptiness-check: " << echeck_algo << std::endl;
+      syntax(argv[0]);
+    }
+
 
   std::string input;
 
