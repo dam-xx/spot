@@ -101,12 +101,12 @@ namespace spot
 	    res1->push_back(clone(mo->nth(i)));
 	destroy(mo);
 	multop::vec* res3 = new multop::vec;
-	if (res1->size())
+	if (!res1->empty())
 	  res3->push_back(unop::instance(op,
 					 multop::instance(op_child, res1)));
 	else
 	  delete res1;
-	if (resGF->size())
+	if (!resGF->empty())
 	  res3->push_back(multop::instance(op_child, resGF));
 	else
 	  delete resGF;
@@ -518,27 +518,27 @@ namespace spot
 	delete res;
 
 
-	if (tmpX && tmpX->size())
+	if (tmpX && !tmpX->empty())
 	  tmpOther->push_back(unop::instance(unop::X,
 					     multop::instance(mo->op(),
 							      tmpX)));
-	else if (tmpX && !tmpX->size())
+	else if (tmpX)
 	  delete tmpX;
 
 
-	if (tmpU && tmpU->size())
+	if (tmpU && !tmpU->empty())
 	  tmpOther->push_back(multop::instance(mo->op(), tmpU));
-	else if (tmpU && !tmpU->size())
+	else if (tmpU)
 	  delete tmpU;
 
 
-	if (tmpR && tmpR->size())
+	if (tmpR && !tmpR->empty())
 	  tmpOther->push_back(multop::instance(mo->op(), tmpR));
-	else if (tmpR && !tmpR->size())
+	else if (tmpR)
 	  delete tmpR;
 
 
-	if (tmpGF && tmpGF->size())
+	if (tmpGF && !tmpGF->empty())
 	  {
 	    formula* ftmp
 	      = unop::instance(unop::G,
@@ -547,11 +547,11 @@ namespace spot
 							       tmpGF)));
 	    tmpOther->push_back(ftmp);
 	  }
-	else if (tmpGF && !tmpGF->size())
+	else if (tmpGF)
 	  delete tmpGF;
 
 
-	if (tmpFG && tmpFG->size())
+	if (tmpFG && !tmpFG->empty())
 	  {
 	    formula* ftmp = 0;
 	    if (mo->op() == multop::And)
@@ -566,7 +566,7 @@ namespace spot
 				 multop::instance(mo->op(), tmpFG));
 	    tmpOther->push_back(ftmp);
 	  }
-	else if (tmpFG && !tmpFG->size())
+	else if (tmpFG)
 	  delete tmpFG;
 
 

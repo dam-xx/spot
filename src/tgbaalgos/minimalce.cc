@@ -174,7 +174,7 @@ namespace spot
 	  ++id;
 	}
 
-      assert(cycle.size() != 0);
+      assert(!cycle.empty());
       is = cycle.end();
       is--;
       id = cycle.begin();
@@ -593,7 +593,7 @@ namespace spot
     recurse_find(s, os);
     //std::cout << "nb_found : " << nb_found << std::endl;
 
-    if (min_ce->size() == 0)
+    if (min_ce->empty())
       {
 	delete min_ce;
 	min_ce = 0;
@@ -629,7 +629,7 @@ namespace spot
     hash_type::iterator i;
     tgba_succ_iterator* iter = 0;
 
-    if (!h_lenght.size())
+    if (h_lenght.empty())
       {
 	// it's a new search
 	//std::cout << "it's a new search" << std::endl;
@@ -670,7 +670,7 @@ namespace spot
 
 	    const state* succ = iter->current_state();
 
-	    if ((min_ce->size() == 0) ||
+	    if (min_ce->empty() ||
 		((int)stack.size() + 1 <= min_ce->size()))
 	      {
 		int depth = in_stack(succ, os);
@@ -750,7 +750,7 @@ namespace spot
 		  }
 
 		else if ((h_lenght[succ] > (int)stack.size() + 1) &&
-			 (min_ce->size() != 0))
+			 !min_ce->empty())
 		  {
 		    s = succ;
 		    iter->next();
@@ -832,7 +832,7 @@ namespace spot
 
 	const state* succ = iter->current_state();
 
-	if ((min_ce->size() == 0) ||
+	if (min_ce->empty() ||
 	    ((int)stack.size() + 1 <= min_ce->size()))
 	  {
 	    int depth = in_stack(succ, os);
@@ -872,7 +872,7 @@ namespace spot
 		recurse_find(succ, os, mode);
 	      }
 	    else if ((h_lenght[succ] > (int)stack.size() + 1) &&
-		     (min_ce->size() != 0))
+		     !min_ce->empty())
 	      {
 		//std::cout << "recurse 3 : " << stack.size() << " ";
 		mode = careful;
@@ -946,7 +946,7 @@ namespace spot
     //std::cout << os.str() << "save counter" << std::endl;
 
     nb_found++;
-    if (!min_ce->size())
+    if (min_ce->empty())
       delete min_ce;
 
     min_ce = new ce::counter_example(a);

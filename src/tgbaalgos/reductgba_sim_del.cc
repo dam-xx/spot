@@ -72,7 +72,7 @@ namespace spot
     // We take the max of the progress measure of the successor node
     // because we are on a spoiler.
 
-    if (lnode_succ->size() == 0)
+    if (lnode_succ->empty())
       progress_measure_ = nb_spoiler_loose_ + 1;
 
     if (progress_measure_ >= nb_spoiler_loose_ + 1)
@@ -229,7 +229,7 @@ namespace spot
     // We take the min of the progress measure of the successor node
     // because we are on a duplicator.
 
-    if (lnode_succ->size() == 0)
+    if (lnode_succ->empty())
       progress_measure_ = nb_spoiler_loose_ + 1;
 
     if (progress_measure_ >= nb_spoiler_loose_ + 1)

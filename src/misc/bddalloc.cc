@@ -85,7 +85,7 @@ namespace spot
   {
     // If we already have some free variable at the end
     // of the variable space, allocate just the difference.
-    if (fl.size() > 0 && fl.back().first + fl.back().second == lvarnum)
+    if (!fl.empty() && fl.back().first + fl.back().second == lvarnum)
       {
 	int res = fl.back().first;
 	int endvar = fl.back().second;

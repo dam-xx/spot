@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -44,7 +44,7 @@ namespace spot
   bdd
   minato_isop::next()
   {
-    while (todo_.size())
+    while (!todo_.empty())
       {
 	local_vars& l = todo_.top();
 	switch (l.step)

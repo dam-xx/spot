@@ -1,3 +1,15 @@
+2004-09-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/sanity/style.test: Warn about places where size() is used
+	instead of empty().
+	* src/misc/bddalloc.cc (bdd_allocator::extend): Use empty() rather
+	than size() when checking emptiness of lists.
+	* src/tgbaalgos/reductgba_sim_del.cc, src/tgbaalgos/minimalce.cc,
+	src/ltlvisit/basicreduce.cc, src/ltlvisit/reduce.cc,
+	src/tgbaalgos/gtec/ce.cc, src/tgbaalgos/ltl2tgba_fm.cc,
+	src/misc/minato.cc: Likewise.
+	* src/ltlast/multop.cc (multop::instance): Call ->size() only once.
+
 2004-09-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	Update to SWIG 1.3.22.

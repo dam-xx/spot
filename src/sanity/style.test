@@ -108,18 +108,23 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
     grep '{.*{' $tmp &&
       diag 'No two { on the same line.'
 
-    grep -e 'delete[	 ]*[(][^(]*[)];' $tmp &&
+    grep 'delete[	 ]*[(][^(]*[)];' $tmp &&
       diag 'No useless parentheses after delete.'
 
-    grep -e 'return[	 ]*[(][^(]*[)];' $tmp &&
+    grep 'return[	 ]*[(][^(]*[)];' $tmp &&
       diag 'No useless parentheses after return.'
 
     grep 'NULL' $tmp &&
       diag 'Use 0 instead of NULL.  NULL is not portable.'
 
+    # std::list::size() can be O(n).  Better use empty() whenever
+    # possible, even for other containers.
+    grep -E '(->|[.])size\(\) [=!]= 0|![a-zA-Z0-9_]*(->|[.])size\(\)|(if |while |assert)\([a-zA-Z0-9_]*(->|[.])size\(\)\)' $tmp &&
+      diag 'Prefer empty() to check emptiness.'
+
     case $file in
       *.hh | *.hxx)
-        if grep -e '(cout|cerr|clog)' $tmp >/dev/null; then
+        if grep -E '(cout|cerr|clog)' $tmp >/dev/null; then
           :
 	else
           grep '#.*include.*<iostream>' $tmp &&

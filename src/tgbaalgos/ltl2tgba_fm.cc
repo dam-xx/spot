@@ -552,7 +552,7 @@ namespace spot
 
       ~formula_canonizer()
       {
-	while (f2b_.size())
+	while (!f2b_.empty())
 	  {
 	    formula_to_bdd_map::iterator i = f2b_.begin();
 	    const formula* f = i->first;

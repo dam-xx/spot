@@ -338,9 +338,9 @@ namespace spot
 		todo.pop();
 		delete iter;
 		seen.erase(s);
-		if (todo.size())
+		if (!todo.empty())
 		  {
-		    assert(path.size());
+		    assert(!path.empty());
 		    path.pop_back();
 		  }
 		continue;
@@ -377,7 +377,7 @@ namespace spot
 
 	    // If we already have a best path, let see if the current
 	    // one is better.
-	    if (best_path.size())
+	    if (!best_path.empty())
 	      {
 		// When comparing the merits of two paths, only the
 		// acceptance conditions we are trying the traverse
@@ -491,9 +491,9 @@ namespace spot
 		todo.pop();
 		delete iter;
 		seen.erase(s);
-		if (todo.size())
+		if (!todo.empty())
 		  {
-		    assert(path.size());
+		    assert(!path.empty());
 		    path.pop_back();
 		  }
 		continue;
@@ -530,7 +530,7 @@ namespace spot
 
 	    // If we already have a best path, let see if the current
 	    // one is better.
-	    if (best_path.size())
+	    if (!best_path.empty())
 	      {
 		// When comparing the merits of two paths, only the
 		// acceptance conditions we are trying the traverse

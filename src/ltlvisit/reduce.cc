@@ -268,7 +268,7 @@ namespace spot
 
 	  }
 
-	if (res->size())
+	if (!res->empty())
 	  {
 	    result_ = multop::instance(mo->op(), res);
 	    return;

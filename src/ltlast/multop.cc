@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -152,7 +152,8 @@ namespace spot
 	  }
 	}
 
-      if (v->size() == 0)
+      vec::size_type s = v->size();
+      if (s == 0)
 	{
 	  delete v;
 	  switch (op)
@@ -165,7 +166,7 @@ namespace spot
 	  /* Unreachable code.  */
 	  assert(0);
 	}
-      if (v->size() == 1)
+      else if (s == 1)
 	{
 	  formula* res = (*v)[0];
 	  delete v;
