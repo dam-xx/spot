@@ -29,6 +29,11 @@ namespace spot
 
     /// Whether this dictionary contains \a other.
     bool contains(const tgba_bdd_dict& other) const;
+
+    tgba_bdd_dict();
+    tgba_bdd_dict(const tgba_bdd_dict& other);
+    tgba_bdd_dict& operator=(const tgba_bdd_dict& other);
+    ~tgba_bdd_dict();
   };
 }
 

@@ -1,6 +1,7 @@
+#include "ltlvisit/clone.hh"
 #include "tgbabddconcretefactory.hh"
 
-namespace spot 
+namespace spot
 {
   tgba_bdd_concrete_factory::~tgba_bdd_concrete_factory()
   {
@@ -14,8 +15,9 @@ namespace spot
     if (sii != dict_.now_map.end())
       return sii->second;
 
-    int num = create_pair();
+    f = clone(f);
 
+    int num = create_pair();
     dict_.now_map[f] = num;
     dict_.now_formula_map[num] = f;
 
@@ -37,6 +39,8 @@ namespace spot
     if (sii != dict_.var_map.end())
       return sii->second;
 
+    f = clone(f);
+
     int num = create_node();
     dict_.var_map[f] = num;
     dict_.var_formula_map[num] = f;
@@ -54,6 +58,8 @@ namespace spot
     tgba_bdd_dict::fv_map::iterator sii = dict_.prom_map.find(f);
     if (sii != dict_.prom_map.end())
       return sii->second;
+
+    f = clone(f);
 
     int num = create_node();
     dict_.prom_map[f] = num;

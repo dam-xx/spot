@@ -1,5 +1,21 @@
 2003-06-06  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/ltlvisit/clone.cc (clone): New const version.
+	* src/ltlvisit/clone.hh (clone): Likewise.
+	* src/ltlvisit/destroy.cc (destroy): New const version.
+	* src/ltlvisit/destroy.hh (destroy): Likewise.
+	* src/tgba/tgbabddconcretefactory.cc
+	(tgba_bdd_concrete_factory::create_state,
+	tgba_bdd_concrete_factory::create_atomic_prop,
+	tgba_bdd_concrete_factory::promise): Clone new formulae.
+	* src/tgba/tgbabdddict.cc (tgba_bdd_dict::tgba_bdd_dict,
+	tgba_bdd_dict::~tgba_bdd_dict, tgba_bdd_dict::operator=): New methods
+	that clone and destroy formulae.
+	* src/tgbatest/ltl2tgba.test, src/tgbatest/ltl2tgba.cc: New files.
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Add ltl2tgba.
+	(ltl2tgba_SOURCES): New variable.
+	(TESTS): Add ltl2tgba.test.
+
 	* src/ltltest/equals.cc, src/ltltest/readltl.cc,
 	src/tgba/bddprint.cc, src/ltltest/tostring.cc: Include <cassert>.
 

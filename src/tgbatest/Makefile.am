@@ -6,17 +6,19 @@ check_SCRIPTS = defs
 check_PROGRAMS = \
   explicit \
   readsave \
-  tgbaread
-
+  tgbaread \
+  ltl2tgba
 
 explicit_SOURCES = explicit.cc
+ltl2tgba_SOURCES = ltl2tgba.cc
 readsave_SOURCES = readsave.cc
 tgbaread_SOURCES = tgbaread.cc
 
 TESTS = \
   explicit.test \
   tgbaread.test \
-  readsave.test
+  readsave.test \
+  ltl2tgba.test
 
 EXTRA_DIST = $(TESTS)
 

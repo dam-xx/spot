@@ -9,6 +9,8 @@ namespace spot
   {
     /// \brief Destroys a formula
     void destroy(formula *f);
+    /// \brief Destroys a formula
+    void destroy(const formula *f);
   }
 }
 

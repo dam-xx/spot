@@ -1,5 +1,7 @@
 #include "tgbabdddict.hh"
 #include "ltlvisit/tostring.hh"
+#include "ltlvisit/clone.hh"
+#include "ltlvisit/destroy.hh"
 
 namespace spot
 {
@@ -53,6 +55,49 @@ namespace spot
 	  return false;
       }
     return true;
+  }
+
+  tgba_bdd_dict::tgba_bdd_dict()
+  {
+  }
+
+  tgba_bdd_dict::tgba_bdd_dict(const tgba_bdd_dict& other)
+    : now_map(other.now_map),
+      now_formula_map(other.now_formula_map),
+      var_map(other.var_map),
+      var_formula_map(other.var_formula_map),
+      prom_map(other.prom_map),
+      prom_formula_map(other.prom_formula_map)
+  {
+    fv_map::iterator i;
+    for (i = now_map.begin(); i != now_map.end(); ++i)
+      ltl::clone(i->first);
+    for (i = var_map.begin(); i != var_map.end(); ++i)
+      ltl::clone(i->first);
+    for (i = prom_map.begin(); i != prom_map.end(); ++i)
+      ltl::clone(i->first);
+  }
+
+  tgba_bdd_dict&
+  tgba_bdd_dict::operator=(const tgba_bdd_dict& other)
+  {
+    if (this != &other)
+      {
+	this->~tgba_bdd_dict();
+	new (this) tgba_bdd_dict(other);
+      }
+    return *this;
+  }
+
+  tgba_bdd_dict::~tgba_bdd_dict()
+  {
+    fv_map::iterator i;
+    for (i = now_map.begin(); i != now_map.end(); ++i)
+      ltl::destroy(i->first);
+    for (i = var_map.begin(); i != var_map.end(); ++i)
+      ltl::destroy(i->first);
+    for (i = prom_map.begin(); i != prom_map.end(); ++i)
+      ltl::destroy(i->first);
   }
 
 }

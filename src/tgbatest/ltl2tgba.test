@@ -1,0 +1,15 @@
+#!/bin/sh
+
+. ./defs
+
+set -e
+
+# We don't check the output, but just running these might be enough to
+# trigger assertions.
+
+./ltl2tgba a
+./ltl2tgba 'a U b'
+./ltl2tgba 'X a'
+./ltl2tgba 'a & b & c'
+./ltl2tgba 'a | b | (c U (d & (g U (h ^ i))))'
+./ltl2tgba 'Xa & (b U !a) & (b U !a)'

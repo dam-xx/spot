@@ -70,5 +70,10 @@ namespace spot
       return v.result();
     }
 
+    formula*
+    clone(const formula* f)
+    {
+      return clone(const_cast<formula*>(f));
+    }
   }
 }
