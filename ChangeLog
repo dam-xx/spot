@@ -1,5 +1,7 @@
 2004-02-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlparse/ltlparse.yy: Typo.
+
 	* wrap/python/cgi/ltl2tgba.in: Use render_dot when
 	showing formula.
 	* wrap/python/cgi/README: Mention unique_id.

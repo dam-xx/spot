@@ -74,7 +74,7 @@ using namespace spot::ltl;
 /* All tokens.  */
 
 %token <token> PAR_OPEN "opening parenthesis" PAR_CLOSE "closing parenthesis"
-%token <token> OP_OR "or operator" OP_XOR "xor operator" OP_AND "and operation"
+%token <token> OP_OR "or operator" OP_XOR "xor operator" OP_AND "and operator"
 %token <token> OP_IMPLIES "implication operator" OP_EQUIV "equivalent operator"
 %token <token> OP_U "until operator" OP_R "release operator"
 %token <token> OP_F "sometimes operator" OP_G "always operator"
