@@ -616,8 +616,8 @@ namespace spot
 	  {
 	    const state* dest = i->current_state();
 
-	    // Do not escape this SCC.
-	    if (!scc.has_state(dest))
+	    // Do not escape this SCC or visit a state already visited.
+	    if (!scc.has_state(dest) || father.find(dest) != father.end())
 	      {
 		delete dest;
 		continue;
