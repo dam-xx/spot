@@ -9,3 +9,6 @@ readsave
 ltl2tgba
 ltlprod
 bddprod
+explprod
+*.ps
+*.dot
