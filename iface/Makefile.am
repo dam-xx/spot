@@ -1,1 +1,3 @@
-SUBDIRS = gspn
+if WITH_GSPN
+  SUBDIRS = gspn
+endif

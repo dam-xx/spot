@@ -1,3 +1,9 @@
+2003-07-31  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgbaalgos/magic.cc, src/tgbaalgos/reachiter.cc: Include cassert.
+	* iface/Makefile.am (SUBDIRS): Recurse in gspn only if condition
+	WITH_GSPN.
+
 2003-07-30  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* iface/gspn/gspn.cc (tgba_gspn::format_state): Call gspn's

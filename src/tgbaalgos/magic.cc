@@ -1,4 +1,5 @@
 #include <iterator>
+#include <cassert>
 #include "magic.hh"
 #include "tgba/bddprint.hh"
 
