@@ -51,13 +51,13 @@ EXTRA_lbtt_SOURCES = gnu-getopt.h Config-parse.h
 lbtt_LDADD = $(LIBOBJS) $(READLINELIBS)
 
 lbtt_translate_SOURCES = \
-  ObstackAlloc.h \
   BitArray.h \
   BitArray.cc \
   Exception.h \
   ExternalTranslator.h \
   ExternalTranslator.cc \
   FormulaWriter.h \
+  LbttAlloc.h \
   LbtWrapper.h \
   LtlFormula.h \
   LtlFormula.cc \

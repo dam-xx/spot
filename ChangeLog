@@ -1,5 +1,8 @@
 2004-02-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* lbtt/src/Makefile.am (lbtt_translate_SOURCES): Fix leftover
+	from 1.0.3 merge.
+
 	* wrap/python/cgi/ltl2tgba.in: Process ltl2tgba.opt if it exists.
 
 	* wrap/python/cgi/ltl2tgba.in: Color translators and their options.
