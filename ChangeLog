@@ -1,0 +1,18 @@
+2003-04-15  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
+
+	* HACKING, Makefile.am, configure.ac, m4/gccwarn.m4,
+	src/Makefile.am, src/ltlast/Makefile.am, src/ltlast/allnodes.hh,
+	src/ltlast/atomic_prop.cc, src/ltlast/atomic_prop.hh,
+	src/ltlast/binop.cc, src/ltlast/binop.hh, src/ltlast/constant.cc,
+	src/ltlast/constant.hh, src/ltlast/formulae.hh,
+	src/ltlast/multop.cc, src/ltlast/multop.hh, src/ltlast/predecl.hh,
+	src/ltlast/unop.cc, src/ltlast/unop.hh, src/ltlast/visitor.hh,
+	src/ltlparse/Makefile.am, src/ltlparse/ltlparse.yy,
+	src/ltlparse/ltlscan.ll, src/ltlparse/parsedecl.hh,
+	src/ltlparse/public.hh, src/ltlvisit/Makefile.am,
+	src/ltlvisit/dotty.cc, src/ltlvisit/dotty.hh,
+	src/ltlvisit/dump.cc, src/ltlvisit/dump.hh,
+	src/ltlvisit/rewrite.cc, src/ltlvisit/rewrite.hh,
+	src/ltltest/Makefile.am, src/ltltest/defs.in, src/ltltest/readltl.cc, 
+	src/ltltest/parse.test, src/ltltest/parseerr.test, 
+	src/misc/Makefile.am, src/misc/const_sel.hh: New files.
