@@ -41,7 +41,8 @@ namespace spot
 	result_ = 0;
       }
 
-      virtual ~length_form_visitor()
+      virtual
+      ~length_form_visitor()
       {
       }
 
@@ -52,30 +53,26 @@ namespace spot
       }
 
       void
-      visit(const atomic_prop* ap)
+      visit(const atomic_prop*)
       {
-	if (ap);
 	result_ = 1;
       }
 
       void
-      visit(const constant* c)
+      visit(const constant*)
       {
-	if (c);
 	result_ = 1;
       }
 
       void
       visit(const unop* uo)
       {
-	if (uo);
 	result_ = 1 + form_length(uo->child());
       }
 
       void
       visit(const binop* bo)
       {
-	if (bo);
 	result_ = 1 + form_length(bo->first()) + form_length(bo->second());
       }
 
