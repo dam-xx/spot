@@ -1,5 +1,8 @@
 2003-08-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgbatest/tgbaread.test, src/tgbatest/explicit.test:
+	Adjust expected output after 2003-08-07's change.
+
 	* src/tgba/bdddict.hh: Typo in comments.
 
 	* src/ltlenv/environment.hh: Typo in comments.

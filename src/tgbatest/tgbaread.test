@@ -15,8 +15,7 @@ EOF
 
 cat >expected <<EOF
 digraph G {
-  size="7.26,10.69"
-  0 [label="", style=invis]
+  0 [label="", style=invis, height=0]
   0 -> 1
   1 [label="s1"]
   1 -> 2 [label="<a:1, b:0>\n<Acc[c]:0, Acc[d]:1><Acc[c]:1, Acc[d]:0>"]

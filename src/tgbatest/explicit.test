@@ -8,8 +8,7 @@ set -e
 
 cat >expected <<EOF
 digraph G {
-  size="7.26,10.69"
-  0 [label="", style=invis]
+  0 [label="", style=invis, height=0]
   0 -> 1
   1 [label="state 0"]
   1 -> 2 [label="T\n<Acc[p]:0, Acc[q]:1, Acc[r]:0><Acc[p]:1, Acc[q]:0, Acc[r]:0>"]
