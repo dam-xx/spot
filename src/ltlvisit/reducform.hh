@@ -25,23 +25,10 @@
 #include "ltlast/formula.hh"
 #include "ltlast/visitor.hh"
 
-// For debug
-#include "ltlvisit/dump.hh"
-
 namespace spot
 {
   namespace ltl
   {
-    /// \brief Reduce a formula \a f using Basic rewriting, implies relation,
-    /// and class of eventuality and univerality formula.
-    /// Put the formula in negative normal form with
-    /// spot::ltl::negative_normal_form.
-    /// option are:
-    /// Base for spot::ltl::Basic_reduce_form,
-    /// Inf for spot::ltl:: reduce_inf_form,
-    /// EventualUniversal for spot::ltl::reduce_eventuality_universality_form,
-    /// BRI for spot::ltl::reduce_form.
-
     enum option {Base,
 		 Inf,
 		 InfBase,
@@ -49,30 +36,48 @@ namespace spot
 		 EventualUniversalBase,
 		 InfEventualUniversal,
 		 BRI};
-    formula* reduce(const formula* f, option o = BRI);
+
+    /// \brief Reduce a formula \a f using Basic rewriting, implies
+    /// relation, and class of eventuality and univerality formula.
+    ///
+    /// Put the formula in negative normal form with
+    /// spot::ltl::negative_normal_form and then reduce it according
+    /// to options:
+    /// Base for spot::ltl::Basic_reduce_form,
+    /// Inf for spot::ltl::reduce_inf_form,
+    /// EventualUniversal for spot::ltl::reduce_eventuality_universality_form,
+    /// BRI for spot::ltl::reduce_form.
+    formula* reduce(const formula* f, option opt = BRI);
 
     /// Implement basic rewriting.
     formula* basic_reduce_form(const formula* f);
 
-    /// Use by spot::ltl::reduce
     /// Implement rewritings rules using implies relation,
     /// and class of eventuality and univerality formula.
     formula* reduce_form(const formula* f, option o = BRI);
 
-    /// detect easy case of implies.
+    /// Detect easy case of implies.
+    /// True if f1 < f2, false otherwise.
     bool inf_form(const formula* f1, const formula* f2);
-    /// true if f1 < f2, false otherwise.
+    /// Detect easy case of implies.
+    /// If n = 0, true if !f1 < f2, false otherwise.
+    /// If n = 1, true if f1 < !f2, false otherwise.
     bool infneg_form(const formula* f1, const formula* f2, int n);
-    /// true if !f1 < f2, false otherwise.
 
-    /// detect if a formula is of class eventuality or universality.
+    /// \brief Check whether a formula is eventual.
+    ///
+    /// FIXME: Describe what eventual formulae are.  Cite paper.
     bool is_eventual(const formula* f);
+
+    /// \brief Check whether a formula is universal.
+    ///
+    /// FIXME: Describe what universal formulae are.  Cite paper.
     bool is_universal(const formula* f);
 
-    /// For test.
+    /// Length of a formula.
     int form_length(const formula* f);
 
-    /// To know the first node of a formula.
+    /// Type the first node of a formula.
     class node_type_form_visitor : public const_visitor
     {
     public:
@@ -90,8 +95,9 @@ namespace spot
     };
     node_type_form_visitor::type node_type(const formula* f);
 
-    /// detect if a formula is of form GF or FG.
+    /// Whether a formula starts with GF.
     bool is_GF(const formula* f);
+    /// Whether a formula starts with FG.
     bool is_FG(const formula* f);
   }
 }

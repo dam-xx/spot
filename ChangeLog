@@ -1,5 +1,7 @@
 2004-05-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlvisit/reducform.hh: Fix some Doxygen comments.
+
 	* src/tgbatest/ltl2tgba.cc (syntax): Keep options sorted.
 
 	* src/sanity/Makefile.am (EXTRA_DIST): Distribute 80columns.test
