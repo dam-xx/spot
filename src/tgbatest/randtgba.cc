@@ -21,7 +21,9 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
+#include <utility>
 #include "ltlvisit/apcollect.hh"
 #include "ltlvisit/destroy.hh"
 #include "tgbaalgos/randomgraph.hh"
@@ -46,7 +48,8 @@ syntax(char* prog)
 	    << std::endl
 	    << "Options:" << std::endl
 	    << "  -a N F  number of acceptance conditions and probability that"
-	    << " one is true [0 0.0]" << std::endl
+	    << " one is true" << std::endl
+	    << "            [0 0.0]" << std::endl
 	    << "  -d F    density of the graph [0.2]" << std::endl
 	    << "  -e N    compare result of all "
 	    << "emptiness checks on N randomly generated graphs" << std::endl
@@ -57,6 +60,10 @@ syntax(char* prog)
 	    << "  -s N    seed for the random number generator" << std::endl
 	    << "  -t F    probability of the atomic propositions to be true"
 	    << " [0.5]" << std::endl
+	    << "  -z      display statistics about computed counter-examples"
+	    << std::endl
+	    << "  -Z      like -z, but print extra statistics after the run"
+	    << " of each algorithm" << std::endl
 	    << "Where:" << std::endl
 	    << "  F      are floats between 0.0 and 1.0 inclusive" << std::endl
 	    << "  N      are positive integers" << std::endl
@@ -91,6 +98,48 @@ to_float(const char* s)
   return res;
 }
 
+struct ce_stat
+{
+  int min_prefix;
+  int max_prefix;
+  int tot_prefix;
+  int min_cycle;
+  int max_cycle;
+  int tot_cycle;
+  int min_run;
+  int max_run;
+  int n;
+
+  ce_stat()
+    : n(0)
+  {
+  }
+
+  void
+  count(const spot::tgba_run* run)
+  {
+    int p = run->prefix.size();
+    int c = run->cycle.size();
+    if (n++)
+      {
+	min_prefix = std::min(min_prefix, p);
+	max_prefix = std::max(max_prefix, p);
+	tot_prefix += p;
+	min_cycle = std::min(min_cycle, c);
+	max_cycle = std::max(max_cycle, c);
+	tot_cycle += c;
+	min_run = std::min(min_run, c + p);
+	max_run = std::max(max_run, c + p);
+      }
+    else
+      {
+	min_prefix = max_prefix = tot_prefix = p;
+	min_cycle = max_cycle = tot_cycle = c;
+	min_run = max_run = c + p;
+      }
+  }
+};
+
 int
 main(int argc, char** argv)
 {
@@ -100,6 +149,9 @@ main(int argc, char** argv)
   int opt_n = 20;
   float opt_t = 0.5;
 
+  bool opt_z = false;
+  bool opt_Z = false;
+
   bool opt_dot = false;
   int opt_ec = 0;
   int opt_ec_seed = 0;
@@ -108,6 +160,9 @@ main(int argc, char** argv)
   int argn = 0;
 
   int exit_code = 0;
+
+  typedef std::map<std::string, ce_stat> stats_type;
+  stats_type stats;
 
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* ap = new spot::ltl::atomic_prop_set;
@@ -164,6 +219,14 @@ main(int argc, char** argv)
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
 	  opt_t = to_float(argv[++argn]);
+	}
+      else if (!strcmp(argv[argn], "-z"))
+	{
+	  opt_z = true;
+	}
+      else if (!strcmp(argv[argn], "-Z"))
+	{
+	  opt_Z = opt_z = true;
 	}
       else
 	{
@@ -245,8 +308,9 @@ main(int argc, char** argv)
 
 	  for (int i = 0; i < n_ec; ++i)
 	    {
+	      std::string algo = ec_name[i];
 	      std::cout.width(32);
-	      std::cout << ec_name[i] << ": ";
+	      std::cout << algo << ": ";
 	      spot::emptiness_check_result* res = ec_obj[i]->check();
 	      if (res)
 		{
@@ -266,7 +330,13 @@ main(int argc, char** argv)
 			  else
 			    {
 			      std::cout << ", computed OK";
+			      if (opt_z)
+				stats[algo].count(run);
 			    }
+			  if (opt_z)
+			    std::cout << " [" << run->prefix.size()
+				      << " + " << run->cycle.size()
+				      << "]";
 			  delete run;
 			}
 		      else
@@ -291,6 +361,9 @@ main(int argc, char** argv)
 		    }
 
 		}
+
+	      if (opt_Z)
+		ec_obj[i]->print_stats(std::cout);
 	      delete ec_obj[i];
 	    }
 
@@ -313,6 +386,67 @@ main(int argc, char** argv)
 	}
     }
   while (opt_ec);
+
+  if (!stats.empty())
+    {
+      std::cout << "Statistics about counter-examples:" << std::endl;
+      std::cout << std::setw(32) << ""
+		<< " |       prefix      |       cycle       |"
+		<< std::endl << std::setw(32) << "algorithm"
+		<< " |  min < mean < max |  min < mean < max |   n "
+		<< std::endl
+		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl << std::setprecision(3);
+      for (stats_type::const_iterator i = stats.begin(); i != stats.end(); ++i)
+	std::cout << std::setw(32) << i->first << " |"
+		  << std::setw(5) << i->second.min_prefix
+		  << " "
+		  << std::setw(6)
+		  << static_cast<float>(i->second.tot_prefix) / i->second.n
+		  << " "
+		  << std::setw(5) << i->second.max_prefix
+		  << " |"
+		  << std::setw(5) << i->second.min_cycle
+		  << " "
+		  << std::setw(6)
+		  << static_cast<float>(i->second.tot_cycle) / i->second.n
+		  << " "
+		  << std::setw(5) << i->second.max_cycle
+		  << " |"
+		  << std::setw(5) << i->second.n
+		  << std::endl;
+      std::cout << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl
+		<< std::setw(32) << ""
+		<< " |        runs       |       total      |"
+		<< std::endl << std::setw(32) << "algorithm"
+		<< " |  min < mean < max | pre.  cyc.  runs |   n "
+		<< std::endl
+		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl;
+      for (stats_type::const_iterator i = stats.begin(); i != stats.end(); ++i)
+	std::cout << std::setw(32) << i->first << " |"
+		  << std::setw(5)
+		  << i->second.min_run
+		  << " "
+		  << std::setw(6)
+		  << static_cast<float>(i->second.tot_prefix
+					+ i->second.tot_cycle) / i->second.n
+		  << " "
+		  << std::setw(5)
+		  << i->second.max_run
+		  << " |"
+		  << std::setw(5) << i->second.tot_prefix
+		  << " "
+		  << std::setw(5) << i->second.tot_cycle
+		  << " "
+		  << std::setw(5) << i->second.tot_prefix + i->second.tot_cycle
+		  << " |"
+		  << std::setw(5) << i->second.n
+		  << std::endl;
+
+    }
+
   if (!failed_seeds.empty())
     {
       exit_code = 1;
