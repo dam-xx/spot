@@ -1,5 +1,9 @@
 2003-10-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.cc
+	(emptiness_check::tgba_emptiness_check,
+	emptiness_check::accepting_path): Simplify BDD operations.
+
 	* src/tgbaalgos/emptinesscheck.cc, src/tgbaalgos/emptinesscheck.hh:
 	Reindent.
 	(emptiness_check::~emptiness_check, emptiness_check::emptiness_check):

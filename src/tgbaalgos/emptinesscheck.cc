@@ -151,11 +151,7 @@ namespace spot
 		assert(!root_component.empty());
 		connected_component comp = root_component.top();
 		root_component.pop();
-		bdd new_condition = bddfalse;
-		new_condition = bdd_apply(new_condition, current_accepting,
-					  bddop_or);
-		new_condition = bdd_apply(new_condition, comp.condition,
-					  bddop_or);
+		bdd new_condition = current_accepting;
 		int current_index = seen_state_num[current_state];
 		while (comp.index > current_index)
 		  {
@@ -165,16 +161,13 @@ namespace spot
 		    assert(!root_component.empty());
 		    comp = root_component.top();
 		    root_component.pop();
-		    new_condition = bdd_apply(new_condition,comp.condition,
-					      bddop_or);
+		    new_condition |= comp.condition;
 		    assert(!arc_accepting.empty());
 		    bdd arc_acc = arc_accepting.top();
 		    arc_accepting.pop();
-		    new_condition = bdd_apply(new_condition, arc_acc,
-					      bddop_or);
+		    new_condition |= arc_acc;
 		  }
-		comp.condition = bdd_apply(comp.condition, new_condition,
-					   bddop_or);
+		comp.condition |= new_condition;
 		if (aut_check->all_accepting_conditions() == comp.condition)
 		  {
 		    // A failure SCC is find, the automata is not empty.
@@ -482,8 +475,7 @@ namespace spot
 		    tgba_succ_iterator* c_iter =
 		      aut_counter->succ_iter(curr_state);
 		    bdd curr_bdd =
-		      bdd_apply(iter_->current_accepting_conditions(),
-				step_.second, bddop_or);
+		      iter_->current_accepting_conditions() | step_.second;
 		    c_iter->first();
 		    todo_path.push(triplet(pair_state_iter(curr_state, c_iter),
 					   curr_bdd));
@@ -498,9 +490,9 @@ namespace spot
 			bdd last_ = iter_->current_accepting_conditions();
 			bdd prop_ = iter_->current_condition();
 			tmp_lst.push_back(state_proposition(curr_state, prop_));
-			tmp_acc = bdd_apply(last_, step_.second, bddop_or);
-			bdd curr_in = bdd_apply(tmp_acc, to_accept, bddop_and);
-			bdd best_in = bdd_apply(best_acc, to_accept, bddop_and);
+			tmp_acc = last_ | step_.second;
+			bdd curr_in = tmp_acc & to_accept;
+			bdd best_in = best_acc & to_accept;
 			if (curr_in == best_in)
 			  {
 			    if (tmp_lst.size() < best_lst.size())
@@ -514,8 +506,7 @@ namespace spot
 			  }
 			else
 			  {
-			    if (bddtrue == bdd_apply(best_in, curr_in,
-						     bddop_imp))
+			    if (bddtrue == (best_in >> curr_in))
 			      {
 				cycle_path tmp(tmp_lst);
 				best_lst = tmp;
@@ -527,7 +518,7 @@ namespace spot
 		      {
 			bdd last_ = iter_->current_accepting_conditions();
 			bdd prop_ = iter_->current_condition();
-		        tmp_acc = bdd_apply(last_, step_.second, bddop_or);
+		        tmp_acc = last_ | step_.second;
 			tmp_lst.push_back(state_proposition(curr_state,
 							    prop_));
 			cycle_path tmp(tmp_lst);
@@ -546,13 +537,12 @@ namespace spot
 
     if (best_acc != to_accept)
       {
-	bdd rec_to_acc = bdd_apply(to_accept, !best_acc, bddop_and);
+	bdd rec_to_acc = to_accept - best_acc;
 	emptiness_check::accepting_path(aut_counter, comp_path,
 					periode.back().first, rec_to_acc);
       }
     else
       {
-	bdd rec_to_acc = bdd_apply(to_accept, !best_acc, bddop_and);
 	if (!periode.empty())
 	  {
 	    /// The path contains all accepting conditions. Then we
