@@ -33,7 +33,8 @@
 #include "tgbaalgos/lbtt.hh"
 #include "tgba/tgbatba.hh"
 #include "tgbaalgos/magic.hh"
-#include "tgbaalgos/emptinesscheck.hh"
+#include "tgbaalgos/gtec/gtec.hh"
+#include "tgbaalgos/gtec/ce.hh"
 #include "tgbaparse/public.hh"
 #include "tgbaalgos/dupexp.hh"
 

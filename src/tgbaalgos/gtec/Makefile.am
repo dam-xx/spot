@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -19,36 +19,24 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-SUBDIRS = gtec
-
-AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
+AM_CPPFLAGS = -I$(srcdir)/../.. $(BUDDY_CPPFLAGS)
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-tgbaalgosdir = $(pkgincludedir)/tgbaalgos
+gtecdir = $(pkgincludedir)/tgbaalgos/gtec
 
-tgbaalgos_HEADERS = \
-  dotty.hh \
-  dupexp.hh \
-  lbtt.hh \
-  ltl2tgba_fm.hh \
-  ltl2tgba_lacim.hh \
-  magic.hh \
-  powerset.hh \
-  reachiter.hh \
-  save.hh \
-  stats.hh
+gtec_HEADERS = \
+  ce.hh \
+  explscc.hh \
+  gtec.hh \
+  nsheap.hh \
+  sccstack.hh \
+  status.hh
 
-noinst_LTLIBRARIES = libtgbaalgos.la
-libtgbaalgos_la_SOURCES = \
-  dotty.cc \
-  dupexp.cc \
-  lbtt.cc \
-  ltl2tgba_fm.cc \
-  ltl2tgba_lacim.cc \
-  magic.cc \
-  powerset.cc \
-  reachiter.cc \
-  save.cc \
-  stats.cc
-
-libtgbaalgos_la_LIBADD = gtec/libgtec.la
+noinst_LTLIBRARIES = libgtec.la
+libgtec_la_SOURCES = \
+  ce.cc \
+  explscc.cc \
+  gtec.cc \
+  nsheap.cc \
+  sccstack.cc \
+  status.cc

@@ -35,7 +35,8 @@
 #include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"
 #include "tgbaalgos/magic.hh"
-#include "tgbaalgos/emptinesscheck.hh"
+#include "tgbaalgos/gtec/gtec.hh"
+#include "tgbaalgos/gtec/ce.hh"
 
 
 void

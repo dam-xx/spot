@@ -64,6 +64,7 @@ AC_CONFIG_FILES([
   src/ltlvisit/Makefile
   src/tgba/Makefile
   src/tgbaalgos/Makefile
+  src/tgbaalgos/gtec/Makefile
   src/tgbaparse/Makefile
   src/tgbatest/Makefile
   src/tgbatest/defs

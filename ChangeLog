@@ -1,8 +1,28 @@
+2004-04-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/emptinesscheck.hh, src/tgbaalgos/emptinesscheck.cc:
+	Delete and split into ...
+	* src/tgbaalgos/gtec/ce.cc, src/tgbaalgos/gtec/ce.hh,
+	src/tgbaalgos/gtec/explscc.cc, src/tgbaalgos/gtec/explscc.hh,
+	src/tgbaalgos/gtec/gtec.cc, src/tgbaalgos/gtec/gtec.hh,
+	src/tgbaalgos/gtec/nsheap.cc, src/tgbaalgos/gtec/nsheap.hh,
+	src/tgbaalgos/gtec/sccstack.cc, src/tgbaalgos/gtec/sccstack.hh,
+	src/tgbaalgos/gtec/status.cc, src/tgbaalgos/gtec/status.hh: ...
+	these new files.
+	* src/tgbaalgos/gtec/Makefile.am: New file.
+	* src/tgbaalgos/Makefile.am (SUBDIRS, libtgbaalgos_la_LIBADD):
+	Recurse into gtec and link gtec/libgtec.la.
+	(tgbaalgos_HEADERS, libtgbaalgos_la_SOURCES): Remove emptinesscheck.hh
+	and emptinesscheck.cc.
+	* configure.ac: Output src/tgbalagos/gtec/Makefile.
+	* iface/gspn/ltlgspn.cc, src/tgbatest/ltl2tgba.cc: Update includes.
+	* README: Update tree description.
+
 2004-04-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
-	* tgbaalgos/emptinesscheck.hh (numbered_state_heap_const_iterator,
+	* src/tgbaalgos/emptinesscheck.hh (numbered_state_heap_const_iterator,
 	numbered_state_heap, numbered_state_heap_hash_map): New classes.
-	* tgbaalgos/emptinesscheck.cc
+	* src/tgbaalgos/emptinesscheck.cc
 	(numbered_state_heap_hash_map_const_iterator): New class.
 	(numbered_state_heap_hash_map): Implement it.
 

@@ -65,6 +65,7 @@ src/            Sources for libspot.
    misc/        Miscellaneous support files.
    tgba/        TGBA objects and cousins.
    tgbaalgos/   Algorithms on TGBAs.
+      gtec/     Generalized Tarjan Emptiness-Check.
    tgbaparse/   Parser for explicit TGBAs.
    tgbatest/    Tests for tgba/, tgbaalgos/, and tgbaparse/.
 doc/	        Documentation for libspot.
