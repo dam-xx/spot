@@ -33,6 +33,7 @@
 #include "tgbaalgos/dotty.hh"
 #include "misc/random.hh"
 #include "tgba/tgbatba.hh"
+#include "misc/timer.hh"
 
 #include "tgbaalgos/emptiness.hh"
 #include "tgbaalgos/emptiness_stats.hh"
@@ -44,6 +45,65 @@
 #include "tgbaalgos/tau03.hh"
 #include "tgbaalgos/tau03opt.hh"
 #include "tgbaalgos/replayrun.hh"
+
+
+spot::emptiness_check*
+couvreur99_cons(const spot::tgba* a)
+{
+  return new spot::couvreur99_check(a);
+}
+
+spot::emptiness_check*
+couvreur99_shy_cons(const spot::tgba* a)
+{
+  return new spot::couvreur99_check_shy(a);
+}
+
+spot::emptiness_check*
+bsh_ms_cons(const spot::tgba* a)
+{
+  return spot::bit_state_hashing_magic_search(a, 4096);
+}
+
+spot::emptiness_check*
+bsh_se05_cons(const spot::tgba* a)
+{
+  return spot::bit_state_hashing_se05_search(a, 4096);
+}
+
+struct ec_algo
+{
+  const char* name;
+  spot::emptiness_check* (*construct)(const spot::tgba*);
+  unsigned int min_acc;
+  unsigned int max_acc;
+  bool safe;
+};
+ec_algo ec_algos[] =
+  {
+    { "couvreur99",            couvreur99_cons,                 0, -1U, true },
+    { "couvreur99_shy",        couvreur99_shy_cons,             0, -1U, true },
+    { "explicit_magic_search", spot::explicit_magic_search,     0,   1, true },
+    { "bit_state_hashing_magic_search",
+                               bsh_ms_cons,                     0,   1, false },
+    { "explicit_se05",         spot::explicit_se05_search,      0,   1, true },
+    { "bit_state_hashing_se05",
+                               bsh_se05_cons,                   0,   1, false },
+    { "explicit_gv04",         spot::explicit_gv04_check,       0,   1, true },
+    { "explicit_tau03",        spot::explicit_tau03_search,     1, -1U, true },
+    { "explicit_tau03_opt",    spot::explicit_tau03_opt_search, 0, -1U, true },
+  };
+
+spot::emptiness_check*
+cons_emptiness_check(int num, const spot::tgba* a,
+		     const spot::tgba* degen, unsigned int n_acc)
+{
+  if (n_acc < ec_algos[num].min_acc || n_acc > ec_algos[num].max_acc)
+    a = degen;
+  if (a)
+    return ec_algos[num].construct(a);
+  return 0;
+}
 
 void
 syntax(char* prog)
@@ -66,6 +126,8 @@ syntax(char* prog)
 	    << "  -n N    number of nodes of the graph [20]" << std::endl
 	    << "  -r      compute and replay acceptance runs (implies -e)"
 	    << std::endl
+	    << "  -R N    repeat each emptiness-check and accepting run "
+	    << "computation N times" << std::endl
 	    << "  -s N    seed for the random number generator" << std::endl
 	    << "  -t F    probability of the atomic propositions to be true"
 	    << " [0.5]" << std::endl
@@ -275,6 +337,8 @@ main(int argc, char** argv)
   bool opt_z = false;
   bool opt_Z = false;
 
+  int opt_R = 0;
+
   bool opt_dot = false;
   int opt_ec = 0;
   int opt_ec_seed = 0;
@@ -341,6 +405,12 @@ main(int argc, char** argv)
 	  if (!opt_ec)
 	    opt_ec = 1;
 	}
+      else if (!strcmp(argv[argn], "-R"))
+	{
+	  if (argc < argn + 2)
+	    syntax(argv[0]);
+	  opt_R = to_int(argv[++argn]);
+	}
       else if (!strcmp(argv[argn], "-s"))
 	{
 	  if (argc < argn + 2)
@@ -371,7 +441,8 @@ main(int argc, char** argv)
 
   spot::bdd_dict* dict = new spot::bdd_dict();
 
-
+  spot::timer_map tm_ec;
+  spot::timer_map tm_ar;
   std::set<int> failed_seeds;
   do
     {
@@ -397,69 +468,36 @@ main(int argc, char** argv)
 	  if (opt_degen && opt_n_acc != 1)
 	    degen = new spot::tgba_tba_proxy(a);
 
-	  std::vector<spot::emptiness_check*> ec_obj;
-	  std::vector<std::string> ec_name;
-	  std::vector<bool> ec_safe;
-
-	  ec_obj.push_back(new spot::couvreur99_check(a));
-	  ec_name.push_back("couvreur99");
-	  ec_safe.push_back(true);
-
-	  ec_obj.push_back(new spot::couvreur99_check_shy(a));
-	  ec_name.push_back("couvreur99_shy");
-	  ec_safe.push_back(true);
-
-	  if (opt_n_acc <= 1 || opt_degen)
-	    {
-	      spot::tgba* d = opt_n_acc > 1 ? degen : a;
-
-	      ec_obj.push_back(spot::explicit_magic_search(d));
-	      ec_name.push_back("explicit_magic_search");
-	      ec_safe.push_back(true);
-
-	      ec_obj.push_back(spot::bit_state_hashing_magic_search(d, 4096));
-	      ec_name.push_back("bit_state_hashing_magic_search");
-	      ec_safe.push_back(false);
-
-	      ec_obj.push_back(spot::explicit_se05_search(d));
-	      ec_name.push_back("explicit_se05");
-	      ec_safe.push_back(true);
-
-	      ec_obj.push_back(spot::bit_state_hashing_se05_search(d, 4096));
-	      ec_name.push_back("bit_state_hashing_se05");
-	      ec_safe.push_back(false);
-
-	      ec_obj.push_back(spot::explicit_gv04_check(d));
-	      ec_name.push_back("explicit_gv04");
-	      ec_safe.push_back(true);
-	    }
-
-	  if (opt_n_acc >= 1 || opt_degen)
-	    {
-	      spot::tgba* d = opt_n_acc == 0 ? degen : a;
-
-              ec_obj.push_back(spot::explicit_tau03_search(d));
-              ec_name.push_back("explicit_tau03");
-              ec_safe.push_back(true);
-            }
-
-          ec_obj.push_back(spot::explicit_tau03_opt_search(a));
-          ec_name.push_back("explicit_tau03_opt");
-          ec_safe.push_back(true);
-
-	  int n_ec = ec_obj.size();
+	  int n_alg = sizeof(ec_algos) / sizeof(*ec_algos);
+	  int n_ec = 0;
 	  int n_empty = 0;
 	  int n_non_empty = 0;
 	  int n_maybe_empty = 0;
 
-	  for (int i = 0; i < n_ec; ++i)
+	  for (int i = 0; i < n_alg; ++i)
 	    {
-	      std::string algo = ec_name[i];
+	      spot::emptiness_check* ec;
+	      spot::emptiness_check_result* res;
+	      ec = cons_emptiness_check(i, a, degen, opt_n_acc);
+	      if (!ec)
+		continue;
+	      ++n_ec;
+	      std::string algo = ec_algos[i].name;
 	      std::cout.width(32);
 	      std::cout << algo << ": ";
-	      spot::emptiness_check_result* res = ec_obj[i]->check();
+	      tm_ec.start(algo);
+	      for (int count = opt_R;;)
+		{
+		  res = ec->check();
+		  if (count-- <= 0)
+		    break;
+		  delete res;
+		  delete ec;
+		  ec = cons_emptiness_check(i, a, degen, opt_n_acc);
+		}
+	      tm_ec.stop(algo);
 	      const spot::ec_statistics* ecs =
-                       dynamic_cast<const spot::ec_statistics*>(ec_obj[i]);
+                       dynamic_cast<const spot::ec_statistics*>(ec);
               if (opt_z && ecs)
 		ec_stats[algo].count(ecs);
 	      if (res)
@@ -468,9 +506,23 @@ main(int argc, char** argv)
 		  ++n_non_empty;
 		  if (opt_replay)
 		    {
-		      spot::tgba_run* run = res->accepting_run();
-		      if (run)
+		      spot::tgba_run* run;
+		      tm_ar.start(algo);
+		      for (int count = opt_R;;)
 			{
+			  run = res->accepting_run();
+			  if (count-- <= 0 || !run)
+			    break;
+			  delete run;
+			}
+		      if (!run)
+			{
+			  tm_ar.cancel(algo);
+			  std::cout << " exists, not computed";
+			}
+		      else
+			{
+			  tm_ar.stop(algo);
 			  std::ostringstream s;
 			  if (!spot::replay_tgba_run(s, res->automaton(), run))
 			    {
@@ -515,17 +567,13 @@ main(int argc, char** argv)
 			    }
 			  delete run;
 			}
-		      else
-			{
-			  std::cout << " exists, not computed";
-			}
 		    }
 		  std::cout << std::endl;
 		  delete res;
 		}
 	      else
 		{
-		  if (ec_safe[i])
+		  if (ec_algos[i].safe)
 		    {
 		      std::cout << "empty language" << std::endl;
 		      ++n_empty;
@@ -539,8 +587,8 @@ main(int argc, char** argv)
 		}
 
 	      if (opt_Z)
-		ec_obj[i]->print_stats(std::cout);
-	      delete ec_obj[i];
+		ec->print_stats(std::cout);
+	      delete ec;
 	    }
 
 	  assert(n_empty + n_non_empty + n_maybe_empty == n_ec);
@@ -630,6 +678,22 @@ main(int argc, char** argv)
       std::cout << std::endl
 		<< "Statistics about reduced accepting runs:" << std::endl;
       print_ar_stats(mar_stats);
+    }
+
+  if (opt_z)
+    {
+      if (!tm_ec.empty())
+	{
+	  std::cout << std::endl
+		    << "emptiness checks cumulated timings:" << std::endl;
+	  tm_ec.print(std::cout);
+	}
+      if (!tm_ar.empty())
+	{
+	  std::cout << std::endl
+		    << "accepting runs cumulated timings:" << std::endl;
+	  tm_ar.print(std::cout);
+	}
     }
 
   if (!failed_seeds.empty())

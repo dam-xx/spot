@@ -35,6 +35,7 @@ misc_HEADERS = \
   minato.hh \
   modgray.hh \
   random.hh \
+  timer.hh \
   version.hh
 
 noinst_LTLIBRARIES = libmisc.la
@@ -46,4 +47,5 @@ libmisc_la_SOURCES = \
   minato.cc \
   modgray.cc \
   random.cc \
+  timer.cc \
   version.cc

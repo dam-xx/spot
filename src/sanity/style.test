@@ -110,7 +110,7 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
     grep '[	 ];' $tmp &&
       diag 'No space before semicolon.'
 
-    grep -v 'for (;;)' $tmp | grep ';[^	 ")]' &&
+    grep -v 'for (.*;;)' $tmp | grep ';[^	 ")]' &&
       diag 'Must have space or newline after semicolon.'
 
     grep '}.*}' $tmp &&

@@ -1,3 +1,11 @@
+2004-11-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/misc/timer.hh, src/misc/timer.cc: New files.
+	* src/misc/Makefile.am (misc_HEADERS, libmisc_la_SOURCES): Add them.
+	* src/tgbatest/randtgba.cc: Use time_map to measure the algorithms.
+	Add the -R option.
+	* src/sanity/style.sh: Let me use `for (.*;;)'.
+
 2004-11-29  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgbaalgos/tau03opt.cc: Add a first version of the computation of
