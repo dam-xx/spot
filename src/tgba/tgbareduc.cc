@@ -940,7 +940,7 @@ namespace spot
     while (all != bddfalse)
       {
 	all -= bdd_satone(all);
-	count++;
+	++count;
       }
     return count;
   }
@@ -958,7 +958,7 @@ namespace spot
 	if (((*i)->first)->compare((*i)->second) == 0)
 	  continue;
 
-	  n++;
+	  ++n;
 	  os << "couple " << n
 	     << std::endl
 	     << "  " << " [label=\""

@@ -109,8 +109,7 @@ namespace spot
   void
   tarjan_on_fly::push(const state* s)
   {
-    h[s] = top;
-    top++;
+    h[s] = top++;
 
     struct_state ss = { s, 0, top, dftop, 0 };
 

@@ -479,12 +479,12 @@ main(int argc, char** argv)
 	  unobservables = new spot::ltl::atomic_prop_set;
 	  fm_opt = true;
 	  // Parse -U's argument.
-	  const char* tok = strtok(argv[formula_index] + 2, ",; \t");
+	  const char* tok = strtok(argv[formula_index] + 2, ", \t;");
 	  while (tok)
 	    {
 	      unobservables->insert
 		(static_cast<spot::ltl::atomic_prop*>(env.require(tok)));
-	      tok = strtok(0, ",; \t");
+	      tok = strtok(0, ", \t;");
 	    }
 	}
       else if (!strcmp(argv[formula_index], "-v"))

@@ -51,10 +51,10 @@ namespace spot
     : spoiler_node(d_node, s_node, num),
       acceptance_condition_visited_(a)
   {
-    nb_spoiler++;
+    ++nb_spoiler;
     progress_measure_ = 0;
     if (acceptance_condition_visited_ != bddfalse)
-      nb_spoiler_loose_++;
+      ++nb_spoiler_loose_;
     lead_2_acc_all_ = false;
 
     seen_ = false;
@@ -62,8 +62,8 @@ namespace spot
 
   spoiler_node_delayed::~spoiler_node_delayed()
   {
-     if (acceptance_condition_visited_ != bddfalse)
-      nb_spoiler_loose_--;
+    if (acceptance_condition_visited_ != bddfalse)
+      --nb_spoiler_loose_;
   }
 
   bool
@@ -110,7 +110,7 @@ namespace spot
     // then we increment the progress measure of 1.
     if ((acceptance_condition_visited_ != bddfalse) &&
 	(tmpmax < (nb_spoiler_loose_ + 1)))
-      tmpmax++;
+      ++tmpmax;
 
     change = (progress_measure_ < tmpmax);
 
@@ -211,7 +211,7 @@ namespace spot
 						   int num)
     : duplicator_node(d_node, s_node, l, a, num)
   {
-    nb_duplicator++;
+    ++nb_duplicator;
     progress_measure_ = 0;
     all_acc_cond |= a;
     lead_2_acc_all_ = false;
@@ -348,7 +348,7 @@ namespace spot
       {
 	sub_set_acc_cond_.push_back(bdd_satone(all));
         all -= bdd_satone(all);
-	count++;
+	++count;
       }
     return count;
   }
@@ -369,7 +369,7 @@ namespace spot
 	     i2 != tgba_state_.end(); ++i2)
 	  {
 	    //std::cout << "add spoiler node" << std::endl;
-	    nb_spoiler++;
+	    ++nb_spoiler;
 	    spoiler_node_delayed* n1
 	      = new spoiler_node_delayed(*i1, *i2,
 					 bddfalse,

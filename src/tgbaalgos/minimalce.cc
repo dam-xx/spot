@@ -176,7 +176,7 @@ namespace spot
 
       assert(!cycle.empty());
       is = cycle.end();
-      is--;
+      --is;
       id = cycle.begin();
       strs = automata_->format_state(is->first);
       strd = automata_->format_state(id->first);
@@ -647,7 +647,7 @@ namespace spot
 	iter = a->succ_iter(s);
 	iter->first();
 	stack.push_front(state_pair(s, iter));
-	depth_mode++;
+	++depth_mode;
       }
     else
       s = stack.front().first;
@@ -722,7 +722,7 @@ namespace spot
 		    iter = a->succ_iter(s);
 		    iter->first();
 		    stack.push_front(state_pair(s, iter));
-		    depth_mode++;
+		    ++depth_mode;
 		    goto recurse;
 		  }
 
@@ -745,7 +745,7 @@ namespace spot
 		    iter = a->succ_iter(s);
 		    iter->first();
 		    stack.push_front(state_pair(s, iter));
-		    depth_mode++;
+		    ++depth_mode;
 		    goto recurse;
 		  }
 
@@ -772,7 +772,7 @@ namespace spot
 		    iter = a->succ_iter(s);
 		    iter->first();
 		    stack.push_front(state_pair(s, iter));
-		    depth_mode++;
+		    ++depth_mode;
 		    goto recurse;
 		  }
 		else
@@ -786,7 +786,7 @@ namespace spot
 
 	delete iter;
 
-	depth_mode--;
+	--depth_mode;
 	if (depth_mode_memory == depth_mode)
 	  {
 	    depth_mode_memory = -1;
@@ -945,7 +945,7 @@ namespace spot
   {
     //std::cout << os.str() << "save counter" << std::endl;
 
-    nb_found++;
+    ++nb_found;
     if (min_ce->empty())
       delete min_ce;
 

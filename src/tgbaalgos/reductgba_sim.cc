@@ -306,7 +306,7 @@ namespace spot
 	 i1 != spoiler_vertice_.end(); ++i1)
       {
 	os << (*i1)->to_string(automata_);
-	n++;
+	++n;
 	if (n > 20)
 	  {
 	    n = 0;
@@ -326,7 +326,7 @@ namespace spot
 	 i2 != duplicator_vertice_.end(); ++i2)
       {
 	os << (*i2)->to_string(automata_);
-	n++;
+	++n;
 	if (n > 20)
 	  {
 	    n = 0;
@@ -508,7 +508,7 @@ namespace spot
 				      si->current_acceptance_conditions()))
 		      {
 			(*j)->add_succ(*i);
-			nb_ds++;
+			++nb_ds;
 		      }
 		    delete s;
 		  }
@@ -529,7 +529,7 @@ namespace spot
 				    si->current_acceptance_conditions()))
 		      {
 			(*i)->add_succ(*j);
-			nb_sd++;
+			++nb_sd;
 		      }
 		    delete s;
 		  }

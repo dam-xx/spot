@@ -1,5 +1,11 @@
 2004-09-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/sanity/style.test: Suggest ++i over i++ when it does not
+	matter, for consistency.
+	* src/tgbaalgos/tarjan_on_fly.cc, iface/gspn/ssp.cc,
+	src/tgbaalgos/reductgba_sim_del.cc, src/tgbaalgos/reductgba_sim.cc,
+	src/tgbaalgos/minimalce.cc, src/tgba/tgbareduc.cc: Adjust.
+
 	* src/tgbaalgos/ltl2tgba_fm.hh (ltl_to_tgba_fm): New unobs argument.
 	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Handle unobs.
 	* src/tgbatest/ltl2tgba.cc (syntax, main): New -U option.

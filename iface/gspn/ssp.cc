@@ -225,7 +225,7 @@ namespace spot
     virtual void
     next()
     {
-      current_succ_++;
+      ++current_succ_;
     }
 
     virtual bool
@@ -379,13 +379,13 @@ namespace spot
 	    bdd_array = bdd_realloc(bdd_array, size_bdd, size_bdd + 1);
 	    bdd_array[size_bdd] = i->current_acceptance_conditions();
 	    props_[nb_arc_props].arc->curr_acc_conds = size_bdd;
-	    size_bdd++;
+	    ++size_bdd;
 
             state_array = (state**) realloc(state_array,
 					    (size_states + 1) * sizeof(state*));
 	    state_array[size_states] = i->current_state();
 	    props_[nb_arc_props].arc->curr_state = size_states;
-            size_states++;
+            ++size_states;
 
 	    while (all_conds_ != bddfalse)
 	      {
