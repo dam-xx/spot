@@ -10,10 +10,10 @@ _spot_la_LDFLAGS = -avoid-version -module
 _spot_la_LIBADD = $(top_builddir)/src/libspot.la
 
 EXTRA_DIST = ltihooks.py spot.i
-spot_wrap.cxx: spot.i
-	swig -c++ -python -I$(top_srcdir)/src spot.i
+spot_wrap.cxx: $(srcdir)/spot.i
+	swig -c++ -python -I$(top_srcdir)/src $(srcdir)/spot.i
 
-spot.py: spot.i
+spot.py: $(srcdir)/spot.i
 	$(MAKE) $(AM_MAKEFLAGS) spot_wrap.cxx
 
 MAINTAINERCLEANFILES = spot_wrap.cxx spot.py
