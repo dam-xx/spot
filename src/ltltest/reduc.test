@@ -26,16 +26,14 @@
 
 set -e
 
-FICH=${1-$srcdir/formules.ltl}
+FICH=${1-$srcdir/formulae.txt}
 
 for opt in 0 1 2 3; do
   rm -f result.data
 
   cat $FICH |
   while read f; do
-      if [ -n "$f" ] && [ "$f" != "####" ]; then
-	  ./reduc $opt "$f" >> result.data
-      fi
+    ./reduc $opt "$f" >> result.data
   done
 
   test $? == 0 || exit 1

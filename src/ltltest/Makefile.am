@@ -57,7 +57,7 @@ tunenoform_SOURCES = equals.cc
 tunenoform_CPPFLAGS = $(AM_CPPFLAGS) -DNENOFORM -DTUNABBREV
 
 
-EXTRA_DIST = $(TESTS)
+EXTRA_DIST = $(TESTS) formulae.txt
 
 # Ordered by strength of the test.  Test basic features first.
 TESTS = \

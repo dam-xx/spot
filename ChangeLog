@@ -1,3 +1,11 @@
+2004-05-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltltest/Makefile.am (EXTRA_DIST): Distribute formulae.txt.
+	* src/ltltest/formulae.txt: New files (2200 LTL formulea generated
+	by Wring).
+	* src/ltltest/formules.ltl: Delete.
+	* src/reduc.test: Read formulae.txt.
+
 2004-05-24  Soheib Baarir  <Souheib.Baarir@lip6.fr>
 
 	* iface/gspn/ssp.hh (gspn_ssp_interface::gspn_ssp_interface): Add
