@@ -88,6 +88,16 @@ syntax(char* prog)
 	    << "  -r4  reduce formula using all rules" << std::endl
 	    << "  -rd  display the reduce formula" << std::endl
 	    << "  -R   same as -r, but as a set" << std::endl
+	    << "  -R1  use direct simulation to reduce the automata "
+	    << "(implies -L)"
+	    << std::endl
+	    << "  -R2  use delayed simulation to reduce the automata, incorrect"
+	    << "(implies -L)"
+	    << std::endl
+	    << "  -R3  use SCC to reduce the automata"
+	    << std::endl
+	    << "  -Rd  to display simulation relation"
+	    << std::endl
 	    << "  -s   convert to explicit automata, and number states "
 	    << "in DFS order" << std::endl
 	    << "  -S   convert to explicit automata, and number states "
@@ -102,17 +112,7 @@ syntax(char* prog)
 	    << "  -X   do not compute an automaton, read it from a file"
 	    << std::endl
 	    << "  -y   do not merge states with same symbolic representation "
-	    << "(implies -f)" << std::endl
-	    << "  -R1  use direct simulation to reduce the automata "
-	    << "(implies -L)"
-	    << std::endl
-	    << "  -R2  use delayed simulation to reduce the automata, incorrect"
-	    << "(implies -L)"
-	    << std::endl
-	    << "  -R3  use SCC to reduce the automata"
-	    << std::endl
-	    << "  -Rd  to display simulation relation"
-	    << std::endl;
+	    << "(implies -f)" << std::endl;
   exit(2);
 }
 
@@ -392,12 +392,6 @@ main(int argc, char** argv)
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 	}
-
-      /*
-	spot::tgba* aut_red = 0;
-	if (reduc_aut != spot::Reduce_None)
-	a = aut_red = spot::reduc_tgba_sim(a, reduc_aut);
-      */
 
       spot::tgba_reduc* aut_red = 0;
       if (reduc_aut != spot::Reduce_None)

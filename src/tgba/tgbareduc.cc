@@ -131,17 +131,15 @@ namespace spot
     const state_explicit* se = dynamic_cast<const state_explicit*>(s);
     assert(se);
     sn_map::const_iterator i = state_name_map_.find(se->get_state());
-    //seen_map::const_iterator j = si_.find(s);
+    seen_map::const_iterator j = si_.find(s);
     assert(i != state_name_map_.end());
-    /*
     if (j != si_.end()) // SCC have been computed
       {
 	os << ", SCC " << j->second;
 	return i->second + std::string(os.str());
       }
     else
-    */
-    return i->second;
+      return i->second;
   }
 
   int
@@ -244,8 +242,10 @@ namespace spot
     bdd cond_simul;
     bdd acc_simul;
     std::list<state*> ltmp;
-    const tgba_explicit::state* s1 = name_state_map_[this->format_state(s)];
-    const tgba_explicit::state* s2 = name_state_map_[this->format_state(simul)];
+    const tgba_explicit::state* s1 =
+      name_state_map_[tgba_explicit::format_state(s)];
+    const tgba_explicit::state* s2 =
+      name_state_map_[tgba_explicit::format_state(simul)];
 
     sp_map::iterator i = state_predecessor_map_.find(s1);
     if (i == state_predecessor_map_.end()) // 0 predecessor
@@ -325,11 +325,13 @@ namespace spot
     // But it can be have some predecessor in state_predecessor_map_ !!
     // So, we remove from it.
 
-    ns_map::iterator k = name_state_map_.find(format_state(s));
+    ns_map::iterator k =
+      name_state_map_.find(tgba_explicit::format_state(s));
     if (k == name_state_map_.end()) // 0 predecessor
 	return;
 
-    tgba_explicit::state* st = name_state_map_[format_state(s)];
+    tgba_explicit::state* st =
+      name_state_map_[tgba_explicit::format_state(s)];
 
     // for all successor q of s, we remove s of the predecessor of q.
 
@@ -370,8 +372,10 @@ namespace spot
   void
   tgba_reduc::merge_state(const spot::state* sim1, const spot::state* sim2)
   {
-    const tgba_explicit::state* s1 = name_state_map_[this->format_state(sim1)];
-    const tgba_explicit::state* s2 = name_state_map_[this->format_state(sim2)];
+    const tgba_explicit::state* s1 =
+      name_state_map_[tgba_explicit::format_state(sim1)];
+    const tgba_explicit::state* s2 =
+      name_state_map_[tgba_explicit::format_state(sim2)];
     const tgba_explicit::state* stmp = s1;
     const spot::state* simtmp = sim1;
 
@@ -424,6 +428,7 @@ namespace spot
 
   /////////////////////////////////////////
 
+  // From gtec.cc
   void
   tgba_reduc::remove_component(const spot::state* from)
   {
@@ -459,6 +464,7 @@ namespace spot
       }
   }
 
+  // From gtec.cc
   void
   tgba_reduc::compute_scc()
   {
@@ -558,6 +564,8 @@ namespace spot
   void
   tgba_reduc::delete_scc()
   {
+    std::cout << "delete_scc" << std::endl;
+
     bool change = true;
     Sgi::hash_map<int, const spot::state*>::iterator i;
     Sgi::hash_map<int, const spot::state*>::iterator itmp;
@@ -570,75 +578,21 @@ namespace spot
 	change = false;
 	for (i = state_scc_v_.begin(); i != state_scc_v_.end();)
 	  {
-	    //std::cout << "Is terminal ? : " << std::endl;
-	    if (is_terminal(i->second))
+	    std::cout << "delete_scc : ["
+		      << this->format_state(i->second)
+		      << "]"
+		      << "is_terminal ??" << std::endl;
+	      if (is_terminal(i->second))
 	      {
-		//std::cout << " YES" << std::endl;
-		change = true;
-		this->remove_scc(const_cast<spot::state*>(i->second));
+		//change = true;
+		change = false;
+		//this->remove_scc(const_cast<spot::state*>(i->second));
 		itmp = i;
-		++i;
-		state_scc_v_.erase(itmp);
+		//state_scc_v_.erase(itmp);
 	      }
-	    else
-	      {
-		++i;
-		//std::cout << " NO "<< std::endl;
-	      }
+	    ++i;
 	  }
       }
-  }
-
-  bool
-  tgba_reduc::is_alpha_ball(const spot::state* s, int n)
-  {
-    /// FIXME
-
-    bool b = false;
-
-    seen_map::const_iterator i;
-    if (n == -1)
-      {
-	acc_ == bddfalse;
-	b = true;
-	assert(seen_ == NULL);
-	seen_ = new seen_map();
-	i = si_.find(s);
-	assert(i->first != NULL);
-	n = i->second;
-      }
-
-    seen_map::const_iterator sm = seen_->find(s);
-    if (sm == seen_->end())
-      {
-	seen_->insert(std::pair<const spot::state*, int>(s, 1));
-	i = si_.find(s);
-	assert(i->first != 0);
-	if (n != i->second)
-	    return false;
-      }
-    else
-      {
-	return true;
-      }
-
-    bool ret = true;
-    tgba_succ_iterator* j = this->succ_iter(s);
-    for (j->first(); !j->done(); j->next())
-      {
-	acc_ |= j->current_acceptance_conditions();
-	ret &= this->is_terminal(j->current_state(), n);
-      }
-
-    if (b)
-      {
-	delete seen_;
-	seen_ = NULL;
-	if (acc_ == this->all_acceptance_conditions())
-	  ret = false;
-      }
-
-    return ret;
   }
 
   bool
@@ -650,12 +604,18 @@ namespace spot
     // So we can remove it safely without change the
     // automaton language.
 
+    std::cout << "is_terminal : ["
+	      << this->format_state(s)
+	      << "]"
+	      << std::endl;
+
     bool b = false;
 
+    // First call of is_terminal //
     seen_map::const_iterator i;
     if (n == -1)
       {
-	acc_ == bddfalse;
+	acc_ = bddfalse;
 	b = true;
 	assert(seen_ == NULL);
 	seen_ = new seen_map();
@@ -663,11 +623,13 @@ namespace spot
 	assert(i->first != NULL);
 	n = i->second;
       }
+    ///////////////////////////////
 
     seen_map::const_iterator sm = seen_->find(s);
     if (sm == seen_->end())
       {
 	// this state is visited for the first time.
+	std::cout << "first time" << std::endl;
 	seen_->insert(std::pair<const spot::state*, int>(s, 1));
 	i = si_.find(s);
 	assert(i->first != 0);
@@ -675,19 +637,27 @@ namespace spot
 	    return false;
       }
     else
+      // This state is already visited.
       {
-	// This state is already visited.
+	std::cout << "second time" << std::endl;
 	return true;
       }
 
     bool ret = true;
+    spot::state* s2;
     tgba_succ_iterator* j = this->succ_iter(s);
+    int nb_succ = 0;
     for (j->first(); !j->done(); j->next())
       {
+	std::cout << "successor " << nb_succ++ << std::endl;
+	s2 = j->current_state();
 	acc_ |= j->current_acceptance_conditions();
-	ret &= this->is_terminal(j->current_state(), n);
+	ret &= this->is_terminal(s2, n);
+	delete s2;
       }
+    delete j;
 
+    // First call of is_terminal //
     if (b)
       {
 	delete seen_;
@@ -695,6 +665,7 @@ namespace spot
 	if (acc_ == this->all_acceptance_conditions())
 	  ret = false;
       }
+    ///////////////////////////////
 
     return ret;
   }
@@ -703,6 +674,8 @@ namespace spot
   tgba_reduc::remove_scc(spot::state* s)
   {
     // To remove a scc, we remove all his state.
+
+    std::cout << "remove_scc" << std::endl;
 
     seen_map::iterator sm = si_.find(s);
     sm = si_.find(s);
@@ -746,6 +719,62 @@ namespace spot
 	delete seen_;
 	seen_ = NULL;
       }
+  }
+
+  bool
+  tgba_reduc::is_alpha_ball(const spot::state* s, bdd label, int n)
+  {
+    /// FIXME
+    // a SCC is alpha ball if she's terminal but with some acceptance
+    // condition, and all transition have the same label.
+    // So we replace this SCC by a single state.
+
+    bool b = false;
+
+    seen_map::const_iterator i;
+    if ((n == -1) &&
+	(label == bddfalse))
+      {
+	acc_ == bddfalse;
+	b = true;
+	assert(seen_ == NULL);
+	seen_ = new seen_map();
+	i = si_.find(s);
+	assert(i->first != NULL);
+	n = i->second;
+      }
+
+    seen_map::const_iterator sm = seen_->find(s);
+    if (sm == seen_->end())
+      {
+	seen_->insert(std::pair<const spot::state*, int>(s, 1));
+	i = si_.find(s);
+	assert(i->first != 0);
+	if (n != i->second)
+	    return false;
+      }
+    else
+      {
+	return true;
+      }
+
+    bool ret = true;
+    tgba_succ_iterator* j = this->succ_iter(s);
+    for (j->first(); !j->done(); j->next())
+      {
+	acc_ |= j->current_acceptance_conditions();
+	ret &= this->is_terminal(j->current_state(), n);
+      }
+
+    if (b)
+      {
+	delete seen_;
+	seen_ = NULL;
+	if (acc_ == this->all_acceptance_conditions())
+	  ret = false;
+      }
+
+    return ret;
   }
 
   //////// JUST FOR DEBUG //////////

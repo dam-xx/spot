@@ -39,6 +39,7 @@ check_PROGRAMS = \
   powerset \
   readsave \
   reductgba \
+  reduccmp \
   tgbaread \
   tripprod
 
@@ -55,12 +56,15 @@ mixprod_SOURCES  = mixprod.cc
 powerset_SOURCES = powerset.cc
 readsave_SOURCES = readsave.cc
 reductgba_SOURCES = reductgba.cc
+reduccmp_SOURCES = reductgba.cc
+reduccmp_CXXFLAGS = -DREDUCCMP
 tgbaread_SOURCES = tgbaread.cc
 tripprod_SOURCES = tripprod.cc
 
 # Keep this sorted by STRENGTH.  Test basic things first,
 # because such failures will be easier to diagnose and fix.
 TESTS = \
+  reduccmp.test \
   reductgba.test \
   explicit.test \
   tgbaread.test \

@@ -33,7 +33,6 @@ namespace spot
   {
     num_ = num;
     sc_ = new state_couple(d_node, s_node);
-    //lnode_succ = new Sgi::vector<spoiler_node*>;
     lnode_succ = new sn_v;
     lnode_pred = new sn_v;
     this->not_win = false;
@@ -48,33 +47,48 @@ namespace spot
     delete sc_;
   }
 
-  void
+  bool
   spoiler_node::add_succ(spoiler_node* n)
   {
+    /*
+      bool exist = false;
+      for (sn_v::iterator i = lnode_succ->begin();
+      i != lnode_succ->end();)
+      if (*i == n)
+      exist = true;
+      if (exist)
+      return false;
+    */
     lnode_succ->push_back(n);
+    return true;
   }
 
   void
   spoiler_node::del_succ(spoiler_node* n)
   {
-    //std::cout << "del_succ : begin" << std::endl;
     for (sn_v::iterator i = lnode_succ->begin();
 	 i != lnode_succ->end();)
       {
 	if (*i == n)
 	  {
-	    //std::cout << "erase" << std::endl;
 	    i = lnode_succ->erase(i);
 	  }
 	else
 	  ++i;
       }
-    //std::cout << "del_succ : end" << std::endl;
   }
 
   void
   spoiler_node::add_pred(spoiler_node* n)
   {
+    /*
+      bool exist = false;
+      for (sn_v::iterator i = lnode_pred->begin();
+      i != lnode_pred->end();)
+      if (*i == n)
+      exist = true;
+      if (!exist)
+    */
     lnode_pred->push_back(n);
   }
 

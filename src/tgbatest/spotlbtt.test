@@ -94,14 +94,14 @@ Algorithm
 Algorithm
 {
    Name = "Spot (Couvreur -- FM), post reduction"
-   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -R1 -R2 -F -f -t'"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -R1 -F -f -t'"
    Enabled = yes
 }
 
 Algorithm
 {
    Name = "Spot (Couvreur -- FM), pre + post reduction"
-   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r4 -R1 -R2 -F -f -t'"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r4 -R1 -F -f -t'"
    Enabled = yes
 }
 

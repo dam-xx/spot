@@ -25,24 +25,67 @@
 
 set -e
 
-check ()
+check()
 {
-  run 0 ./reductgba "$1"
+  run 0 ./reductgba "$1" "$2"
 }
 
 # We don't check the output, but just running these might be enough to
 # trigger assertions.
 
-check 'a'
-check 'a U b'
-check 'a U Fb'
-check 'X a'
-check 'a & b & c'
-check 'a | b | (c U (d & (g U (h ^ i))))'
-check 'Xa & (b U !a) & (b U !a)'
-check 'Fa & Xb & GFc & Gd'
-check 'Fa & Xa & GFc & Gc'
-check 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
-check 'a R (b R c)'
-check '(a U b) U (c U d)'
-check '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
+# No reduction
+check 0 'Fa & Xb & GFc & Gd'
+check 0 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+
+check 1 a
+check 1 'a U b'
+check 1 'X a'
+check 1 'a & b & c'
+check 1 'a | b | (c U (d & (g U (h ^ i))))'
+check 1 'Xa & (b U !a) & (b U !a)'
+check 1 'Fa & Xb & GFc & Gd'
+check 1 'Fa & Xa & GFc & Gc'
+check 1 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+check 1 'a R (b R c)'
+check 1 '(a U b) U (c U d)'
+check 1 '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
+
+#reduction
+check 1 'a U Fb'
+
+
+#check 0 a
+#check 0 'a U b'
+#check 0 'a U Fb'
+
+#check 3 a
+#check 3 'a U b'
+#check 3 'a U Fb'
+
+#check 0 a
+#check 0 'a U b'
+#check 0 'a U Fb'
+#check 0 'X a'
+#check 0 'a & b & c'
+#check 0 'a | b | (c U (d & (g U (h ^ i))))'
+#check 0 'Xa & (b U !a) & (b U !a)'
+#check 0 'Fa & Xb & GFc & Gd'
+#check 0 'Fa & Xa & GFc & Gc'
+#check 0 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+#check 0 'a R (b R c)'
+#check 0 '(a U b) U (c U d)'
+#check 0 '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
+
+#check 3 a
+#check 3 'a U b'
+#check 3 'a U Fb'
+#check 3 'X a'
+#check 3 'a & b & c'
+#check 3 'a | b | (c U (d & (g U (h ^ i))))'
+#check 3 'Xa & (b U !a) & (b U !a)'
+#check 3 'Fa & Xb & GFc & Gd'
+#check 3 'Fa & Xa & GFc & Gc'
+#check 3 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+#check 3 'a R (b R c)'
+#check 3 '(a U b) U (c U d)'
+#check 3 '((Xp2)U(X(1)))*(p1 R(p2 R p0))'

@@ -311,7 +311,7 @@ namespace spot
     */
   }
 
-
+  /*
   void
   parity_game_graph_delayed::build_couple()
   {
@@ -512,8 +512,8 @@ namespace spot
 	  }
       }
   }
+  */
 
-  /*
   // We build only node which are reachable
   void
   parity_game_graph_delayed::build_couple()
@@ -546,13 +546,15 @@ namespace spot
     // We create when it's possible a duplicator node
     // and recursively his successor.
 
-    spot::state* s1 = NULL;
-    bool exist_pred = false;
+    //spot::state* s1 = NULL;
+    //bool exist_pred = false;
 
     sn_v::iterator i1;
     for (i1 = spoiler_vertice_.begin(); i1 != spoiler_vertice_.end(); ++i1)
       {
+	/*
 	exist_pred = false;
+
 	// We check if there is a predecessor only if the duplicator
 	// is the initial state.
 	s1 = automata_->get_init_state();
@@ -577,6 +579,7 @@ namespace spot
 
 	if (!exist_pred)
 	  continue;
+	*/
 
 	// We add a link between a spoiler and a (new) duplicator.
 	// The acc of the duplicator must contains the
@@ -590,10 +593,15 @@ namespace spot
   void
   parity_game_graph_delayed::build_recurse_successor_spoiler(spoiler_node* sn)
   {
+    std::cout << "build_recurse_successor_spoiler" << std::endl;
+
     tgba_succ_iterator* si = automata_->succ_iter(sn->get_spoiler_node());
 
+    int i = 0;
     for (si->first(); !si->done(); si->next())
       {
+	std::cout << "transition " << i++ << std::endl;
+
 	bdd btmp = si->current_acceptance_conditions() |
 	  dynamic_cast<spoiler_node_delayed*>(sn)->
 	  get_acceptance_condition_visited();
@@ -614,10 +622,18 @@ namespace spot
 						nb_node_parity_game++);
 		duplicator_vertice_.push_back(dn);
 
-		sn->add_succ(dn);
+		// dn is already a successor of sn.
+		if (!(sn->add_succ(dn)))
+		  continue;
 		(dn)->add_pred(sn);
 
-		build_recurse_successor_duplicator(dn);
+		/* TEST
+		   bdd btmp2 =
+		   dynamic_cast<spoiler_node_delayed*>(sn)->
+		   get_acceptance_condition_visited();
+		*/
+
+		build_recurse_successor_duplicator(dn, sn);
 	      }
 	    delete s;
 	  }
@@ -629,12 +645,18 @@ namespace spot
 
   void
   parity_game_graph_delayed::
-    build_recurse_successor_duplicator(duplicator_node* dn)
+  build_recurse_successor_duplicator(duplicator_node* dn,
+				     spoiler_node* sn)
   {
-    tgba_succ_iterator* si = automata_->succ_iter(sn->get_spoiler_node());
+    std::cout << "build_recurse_successor_duplicator" << std::endl;
 
+    tgba_succ_iterator* si = automata_->succ_iter(dn->get_duplicator_node());
+
+    int i = 0;
     for (si->first(); !si->done(); si->next())
       {
+	std::cout << "transition " << i++ << std::endl;
+
 	bdd btmp =
 	  dynamic_cast<spoiler_node_delayed*>(sn)->
 	    get_acceptance_condition_visited();
@@ -648,17 +670,19 @@ namespace spot
 	    s  = si->current_state();
 	    if (s->compare(*i1) == 0)
 	      {
-		spoiler_node_delayed* sn
+		spoiler_node_delayed* sn_n
 		  = new spoiler_node_delayed(sn->get_spoiler_node(),
 					     *i1,
-					     bddtmp2,
+					     btmp2,
 					     nb_node_parity_game++);
-		spoiler_vertice_.push_back(n1);
+		spoiler_vertice_.push_back(sn_n);
 
-		sn->add_succ(dn);
-		(dn)->add_pred(sn);
+		// dn is already a successor of sn.
+		if (!(dn->add_succ(sn_n)))
+		  continue;
+		(sn_n)->add_pred(dn);
 
-		build_recurse_successor_spoiler(sn);
+		build_recurse_successor_spoiler(sn_n);
 
 	      }
 	    delete s;
@@ -668,7 +692,7 @@ namespace spot
     delete si;
 
   }
-  */
+
 
   void
   parity_game_graph_delayed::add_dup_node(state*,
@@ -686,6 +710,7 @@ namespace spot
 
     while (change)
       {
+	std::cout << "prune::change = true" << std::endl;
 	change = false;
 	for (Sgi::vector<duplicator_node*>::iterator i
 	       = duplicator_vertice_.begin();
@@ -716,7 +741,7 @@ namespace spot
 	      ++i;
 	  }
       }
-
+    std::cout << "prune::change = false" << std::endl;
   }
 
   void
@@ -728,6 +753,7 @@ namespace spot
 
     while (change)
       {
+	std::cout << "lift::change = true" << std::endl;
 	change = false;
 	for (Sgi::vector<duplicator_node*>::iterator i
 	       = duplicator_vertice_.begin();
@@ -742,7 +768,7 @@ namespace spot
 	    change |= (*i)->set_win();
 	  }
       }
-
+    std::cout << "lift::change = false" << std::endl;
   }
 
   simulation_relation*
@@ -792,10 +818,15 @@ namespace spot
       return;
       this->build_sub_set_acc_cond();
     */
+    std::cout << "build couple" << std::endl;
     this->build_couple();
+    std::cout << "build link" << std::endl;
     this->build_link();
+    std::cout << "prune" << std::endl;
     this->prune();
+    std::cout << "lift" << std::endl;
     this->lift();
+    std::cout << "END" << std::endl;
     //this->print(std::cout);
   }
 

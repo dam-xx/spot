@@ -132,7 +132,10 @@ namespace spot
 		 int num);
     virtual ~spoiler_node();
 
-    void add_succ(spoiler_node* n);
+    /// \brief Add a successor.
+    /// Return true if \a n wasn't yet in the list of successor,
+    /// false eitherwise.
+    bool add_succ(spoiler_node* n);
     void del_succ(spoiler_node* n);
     virtual void add_pred(spoiler_node* n);
     virtual void del_pred();
@@ -300,7 +303,8 @@ namespace spot
     virtual void build_couple();
     virtual void build_link();
     void build_recurse_successor_spoiler(spoiler_node* sn);
-    void build_recurse_successor_duplicator(duplicator_node* dn);
+    void build_recurse_successor_duplicator(duplicator_node* dn,
+					    spoiler_node* sn);
 
     /// \brief The Jurdzinski's lifting algorithm.
     void lift();

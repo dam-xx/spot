@@ -139,6 +139,7 @@ namespace spot
     /// }
     /// \endverbatim
     bool is_alpha_ball(const spot::state* s,
+		       bdd label = bddfalse,
 		       int n = -1);
 
     // Return true if we can't reach a state with

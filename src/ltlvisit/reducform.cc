@@ -201,81 +201,71 @@ namespace spot
 
 	if (opt_ & Reduce_Syntactic_Implications)
 	  {
-	    formula* f1;
-	    formula* f2;
-	    multop::vec::iterator index = res->begin();
-	    multop::vec::iterator indextmp = index;
-	    switch (mo->op())
-	      {
-	      case multop::Or:
-		if (index != res->end())
-		  break;
-		f1 = *index++;
-		for (; index != res->end(); index++)
-		  {
-		    f2 = *index;
-		    /* a < b => a + b = b */
-		    if (syntactic_implication(f1, f2)) // f1 < f2
-		      {
-			f1 = f2;
-			destroy(*indextmp);
-			res->erase(indextmp);
-			indextmp = index;
-			index--;
-		      }
-		    else if (syntactic_implication(f2, f1)) // f2 < f1
-		      {
-			destroy(*index);
-			res->erase(index);
-			index--;
-		      }
-		  }
-		break;
 
-	      case multop::And:
-		if (index != res->end())
-		  break;
-		f1 = *index++;
-		for (; index != res->end(); index++)
+	    bool removed = true;;
+	    multop::vec::iterator f1;
+	    multop::vec::iterator f2;
+
+	    while (removed)
+	      {
+		removed = false;
+		f2 = f1 = res->begin();
+		++f1;
+		while (f1 != res->end())
 		  {
-		    f2 = *index;
-		    /* a < b => a & b = a */
-		    if (syntactic_implication(f1, f2)) // f1 < f2
+		    assert(f1 != f2);
+		    // a < b => a + b = b
+		    // a < b => a & b = a
+		    if ((syntactic_implication(*f1, *f2) && // f1 < f2
+			 (mo->op() == multop::Or)) ||
+			((syntactic_implication(*f2, *f1)) && // f2 < f1
+			 (mo->op() == multop::And)))
 		      {
-			destroy(*index);
-			res->erase(index);
-			index--;
+			// We keep f2
+			destroy(*f1);
+			res->erase(f1);
+			removed = true;
+			break;
 		      }
-		    else if (syntactic_implication(f2, f1)) // f2 < f1
+		    else if ((syntactic_implication(*f2, *f1) && // f2 < f1
+			      (mo->op() == multop::Or)) ||
+			     ((syntactic_implication(*f1,* f2)) && // f1 < f2
+			      (mo->op() == multop::And)))
 		      {
-			f1 = f2;
-			destroy(*indextmp);
-			res->erase(indextmp);
-			indextmp = index;
-			index--;
+			// We keep f1
+			destroy(*f2);
+			res->erase(f2);
+			removed = true;
+			break;
 		      }
+		    else
+		      ++f1;
 		  }
-		break;
 	      }
 
+	    // FIXME
 	    /* f1 < !f2 => f1 & f2 = false
 	       !f1 < f2 => f1 | f2 = true */
-	    for (index = res->begin(); index != res->end(); index++)
-	      for (indextmp = res->begin(); indextmp != res->end(); indextmp++)
-		if (index != indextmp
-		    && syntactic_implication_neg(*index, *indextmp,
-						 mo->op() != multop::Or))
+	    for (f1 = res->begin(); f1 != res->end(); f1++)
+	      for (f2 = res->begin(); f2 != res->end(); f2++)
+		if (f1 != f2 &&
+		    syntactic_implication_neg(*f1, *f2,
+					      mo->op() !=  multop::Or))
 		  {
 		    for (multop::vec::iterator j = res->begin();
 			 j != res->end(); j++)
 		      destroy(*j);
+		    res->clear();
+		    delete res;
 		    if (mo->op() == multop::Or)
 		      result_ = constant::true_instance();
 		    else
 		      result_ = constant::false_instance();
 		    return;
 		  }
+
 	  }
+
 	if (res->size())
 	  {
 	    result_ = multop::instance(mo->op(), res);

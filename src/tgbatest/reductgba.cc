@@ -45,81 +45,107 @@
 void
 syntax(char* prog)
 {
-  std::cerr << prog << " option formula1" << std::endl;
+#ifdef REDUCCMP
+  std::cerr << prog << " option file" << std::endl;
+#else
+  std::cerr << prog << " option formula" << std::endl;
+#endif
   exit(2);
 }
 
 int
 main(int argc, char** argv)
 {
-  if (argc < 2)
+  if (argc < 3)
     syntax(argv[0]);
+
+  int o = spot::ltl::Reduce_None;
+  switch (atoi(argv[1]))
+    {
+    case 0:
+      o = spot::Reduce_Scc;
+      break;
+    case 1:
+      o = spot::Reduce_Dir_Sim;
+      break;
+    case 2:
+      o = spot::Reduce_Del_Sim;
+      break;
+    case 3:
+      o = spot::Reduce_Dir_Sim | spot::Reduce_Scc;
+      break;
+    case 4:
+      o = spot::Reduce_Del_Sim | spot::Reduce_Scc;
+      break;
+    case 5:
+      // No Reduction
+      break;
+    default:
+      return 2;
+  }
 
   int exit_code = 0;
   spot::simulation_relation* rel = NULL;
   spot::tgba* automata = NULL;
-  spot::tgba* aut_red = NULL;
   spot::tgba_reduc* automatareduc = NULL;
 
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::bdd_dict* dict = new spot::bdd_dict();
-  spot::ltl::parse_error_list p1;
-  spot::ltl::formula* f = spot::ltl::parse(argv[1], p1, env);
 
-  //std::cout << "Compute the automata" << std::endl;
+#ifdef REDUCCMP
+  spot::tgba_parse_error_list pel;
+  automata = spot::tgba_parse(argv[2], pel, dict, env, false);
+  if (spot::format_tgba_parse_errors(std::cerr, pel))
+    return 2;
+#else
+  spot::ltl::parse_error_list p1;
+  spot::ltl::formula* f = spot::ltl::parse(argv[2], p1, env);
+  if (spot::ltl::format_parse_errors(std::cerr, argv[2], p1))
+    return 2;
   automata = spot::ltl_to_tgba_fm(f, dict,
 				  false, true,
 				  false, true);
+#endif
 
-  //std::cout << "Display the automata" << std::endl;
   spot::dotty_reachable(std::cout, automata);
-
-  //std::cout << "Initialize the reduction automata" << std::endl;
   automatareduc = new spot::tgba_reduc(automata);
 
-  //aut_red = spot::reduc_tgba_sim(automata);
-
-  //std::cout << "Compute the simulation relation" << std::endl;
-  //rel = spot::get_direct_relation_simulation(automatareduc);
-  rel = spot::get_delayed_relation_simulation(automatareduc);
-  //rel = NULL;
-
-  //std::cout << "Display of the parity game" << std::endl;
-
-  //std::cout << "Display of the simulation relation" << std::endl;
-  if (rel != NULL)
-    automatareduc->display_rel_sim(rel, std::cout);
-
-  //std::cout << "Prune automata using simulation relation" << std::endl;
-  if (rel != NULL)
-    automatareduc->prune_automata(rel);
-
-  //automatareduc->compute_scc();
-  //std::cout << "Prune automata using scc" << std::endl;
-  //automatareduc->prune_scc();
-
-  //std::cout << "Display of scc" << std::endl;
-  //automatareduc->display_scc(std::cout);
-
+  if (o & spot::Reduce_Dir_Sim)
+    {
+      rel = spot::get_direct_relation_simulation(automatareduc);
+      automatareduc->prune_automata(rel);
+    }
+  else if (o & spot::Reduce_Del_Sim)
+    {
+      rel = spot::get_delayed_relation_simulation(automatareduc);
+      automatareduc->quotient_state(rel);
+    }
 
   if (rel != NULL)
+    {
+      automatareduc->display_rel_sim(rel, std::cout);
       spot::free_relation_simulation(rel);
+    }
+
+  if (o & spot::Reduce_Scc)
+    {
+      automatareduc->prune_scc();
+      //automatareduc->display_scc(std::cout);
+    }
 
   if (automatareduc != NULL)
     {
-      std::cout << "Display of the minimize automata" << std::endl;
-      std::cout << std::endl;
       spot::dotty_reachable(std::cout, automatareduc);
     }
 
-  if (aut_red != NULL)
-    delete aut_red;
   if (automata != NULL)
     delete automata;
   if (automatareduc != NULL)
     delete automatareduc;
+#ifndef REDUCCMP
   if (f != NULL)
     spot::ltl::destroy(f);
+#endif
 
   assert(spot::ltl::atomic_prop::instance_count() == 0);
   assert(spot::ltl::unop::instance_count() == 0);

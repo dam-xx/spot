@@ -84,11 +84,8 @@ main(int argc, char** argv)
   spot::ltl::formula* tmp;
   tmp = f1;
   f1 = spot::ltl::reduce(f1);
-  //std::string f2s = spot::ltl::to_string(f2);
-  //std::string f1s = spot::ltl::to_string(f1);
   spot::ltl::destroy(tmp);
   spot::ltl::dump(std::cout, f1);
-  //std::cout << f1s << " // " << f2s << std::endl;
 #endif
 
   int exit_code = f1 != f2;

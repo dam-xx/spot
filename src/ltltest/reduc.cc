@@ -179,6 +179,5 @@ main(int argc, char** argv)
   assert(spot::ltl::binop::instance_count() == 0);
   assert(spot::ltl::multop::instance_count() == 0);
 
-  //return exit_code;
-  return 0;
+  return exit_code;
 }

@@ -25,6 +25,38 @@
 
 . ./defs || exit 1
 
+# No reduction
+run 0 ./reduccmp 'a U b' 'a U b'
+run 0 ./reduccmp 'a R b' 'a R b'
+run 0 ./reduccmp 'a & b' 'a & b'
+run 0 ./reduccmp 'a | b' 'a | b'
+run 0 ./reduccmp 'a & (a U b)' 'a & (a U b)'
+run 0 ./reduccmp 'a | (a U b)' 'a | (a U b)'
+
+# Syntactic reduction
+run 0 ./reduccmp 'a & (!b R !a)' 'false'
+run 0 ./reduccmp '(!b R !a) & a' 'false'
+run 0 ./reduccmp '(!b R !a) | a' 'true'
+run 0 ./reduccmp 'a | (!b R !a)' 'true'
+
+run 0 ./reduccmp 'a & (!b R !a) & c' 'false'
+run 0 ./reduccmp 'c & (!b R !a) & a' 'false'
+run 0 ./reduccmp 'a | (!b R !a) | c' 'true'
+run 0 ./reduccmp 'c | (!b R !a) | a' 'true'
+
+run 0 ./reduccmp 'a & (b U a)' 'a'
+run 0 ./reduccmp '(b U a) & a' 'a'
+run 0 ./reduccmp 'a | (b U a)' '(b U a)'
+run 0 ./reduccmp '(b U a) | a' '(b U a)'
+run 0 ./reduccmp 'a U (b U a)' '(b U a)'
+
+run 0 ./reduccmp 'a & (b U a) & a' 'a'
+run 0 ./reduccmp 'a & (b U a) & a' 'a'
+run 0 ./reduccmp 'a | (b U a) | a' '(b U a)'
+run 0 ./reduccmp 'a | (b U a) | a' '(b U a)'
+run 0 ./reduccmp 'a U (b U a)' '(b U a)'
+
+
 # Basics reduction
 run 0 ./reduccmp 'X(true)' 'true'
 run 0 ./reduccmp 'X(false)' 'false'
@@ -67,8 +99,3 @@ run 0 ./reduccmp 'Ga' 'Ga'
 run 0 ./reduccmp 'GFGa' 'FGa'
 run 0 ./reduccmp 'b R Ga' 'Ga'
 run 0 ./reduccmp 'b R FGa' 'FGa'
-
-# Syntactic reduction
-run 0 ./reduccmp 'a & (b U a)' 'a'
-run 0 ./reduccmp 'a | (b U a)' '(b U a)'
-run 0 ./reduccmp 'a U (b U a)' '(b U a)'

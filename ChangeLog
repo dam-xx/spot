@@ -1,3 +1,20 @@
+2004-06-17  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/tgbatest/spotlbtt.test: We don't check the post-reduction
+	with scc and delayed simulation.
+
+	* src/tgbatest/ltl2tgba.cc: Adjust parameters.
+	* src/tgbatest/reductgba.cc, src/tgbatest/Makefile.am: More Test.
+	* src/tgbaalgos/reductgba_sim_del.cc: Not finish, lot of bugs.
+	* src/tgbaalgos/reductgba_sim.hh, src/tgbaalgos/reductgba_sim.cc:
+	Remove some useless comments.
+	* src/tgba/tgbareduc.cc, src/tgba/tgbareduc.hh: Bug in SCC.
+
+	* src/ltlvisit/reducform.cc: Correct some bug for multop.
+	* src/ltltest/reduccmp.test: More Test.
+	* src/ltltest/reduc.cc: Thinko
+	* src/ltltest/equals.cc: Reduction compare
+
 2004-06-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/ssp.cc (emptiness_check_shy_ssp::find_state): Free s.
