@@ -73,6 +73,15 @@ namespace spot
   /// tgba_succ_iterators: it must compute all successors of a state
   /// at once in order to decide which to explore first, and must keep
   /// a list of all unexplored successors in its DFS stack.
+  ///
+  /// The \c poprem parameter specifies how the algorithm should
+  /// handle the destruction of non-accepting maximal strongly
+  /// connected components.  If \c poprem is true, the algorithm will
+  /// keep a list of all states of a SCC that are fully processed and
+  /// should be removed once the MSCC is popped.  If \c poprem is
+  /// false, the MSCC will be traversed again (i.e. generating the
+  /// successors of the root recursively) for deletion.  This is
+  /// a choice between memory and speed.
   class couvreur99_check: public emptiness_check, public ec_statistics
   {
   public:
