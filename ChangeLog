@@ -1,3 +1,28 @@
+2003-05-27  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/succiter.hh (tgba_succ_iterator::current_state):
+	Return a state*, not a state_bdd.
+	* src/tgba/succiterconcrete.hh
+	(tgba_succ_iterator_concrete::current_state): Return a state_bdd*,
+	not a state_bdd.
+	* src/tgba/state.hh (state::as_bdd): New abstract method.
+	* src/tgba/statebdd.hh (state_bdd::as_bdd): Move definitions ...
+	* src/tgba/statebdd.cc (state_bdd::as_bdd): ... here.
+	* src/tgba/tgba.hh: Add Doxygen comments.
+	(tgba::succ_iter, tgba::get_init_state): Use state*, not state_bdd.
+	* src/tgba/tgbabddconcrete.hh (tgba_bdd_concrete::get_init_state):
+	Return a state_bdd*, not a state_bdd.
+	(tgba_bdd_concrete::get_init_bdd): New method.
+	(tgba_bdd_concrete::succ_uter): Take a state* as argument.
+	* src/tgba/tgbabddconcrete.cc: Likewise.
+	* src/tgba/tgbabddtranslatefactory.cc
+	(tgba_bdd_translate_factory::tgba_bdd_translate_factory): Use
+	tgba_bdd_concrete::get_init_bdd.
+	* src/tgbaalgos/dotty.cc (dotty_state, dotty_rec, dotty): Adjust
+	to use state* instead of state_bdd.
+	* src/tgba/succlist.hh: Delete.  (Leftover from a previous
+	draft.)
+
 2003-05-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgbaalgos/dotty.cc, src/tgbaalgos/dotty.hh: New files.

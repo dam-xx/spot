@@ -1,6 +1,8 @@
 #ifndef SPOT_TGBA_STATE_HH
 # define SPOT_TGBA_STATE_HH
 
+#include <bdd.h>
+
 namespace spot
 {
   class state
@@ -15,6 +17,8 @@ namespace spot
     // This method should not be called to compare state from
     // different automata.
     virtual int compare(const state& other) const = 0;
+
+    virtual bdd as_bdd() const = 0;
 
     virtual ~state()
     {

@@ -1,6 +1,7 @@
 #ifndef SPOT_TGBA_SUCCITERCONCRETE_HH
 # define SPOT_TGBA_SUCCITERCONCRETE_HH
 
+#include "statebdd.hh"
 #include "succiter.hh"
 #include "tgbabddcoredata.hh"
 
@@ -11,17 +12,17 @@ namespace spot
   public:
     tgba_succ_iterator_concrete(const tgba_bdd_core_data& d, bdd successors);
     virtual ~tgba_succ_iterator_concrete();
-  
+
     // iteration
     void first();
     void next();
     bool done();
-  
+
     // inspection
-    state_bdd current_state();
+    state_bdd* current_state();
     bdd current_condition();
     bdd current_promise();
-  
+
   private:
     const tgba_bdd_core_data& data_;
     bdd succ_set_;		// The set of successors.

@@ -22,16 +22,24 @@ namespace spot
     init_ = s;
   }
 
-  state_bdd
+  state_bdd*
   tgba_bdd_concrete::get_init_state() const
+  {
+    return new state_bdd(init_);
+  }
+
+  bdd
+  tgba_bdd_concrete::get_init_bdd() const
   {
     return init_;
   }
 
   tgba_succ_iterator_concrete*
-  tgba_bdd_concrete::succ_iter(state_bdd state) const
+  tgba_bdd_concrete::succ_iter(const state* state) const
   {
-    bdd succ_set = bdd_replace(bdd_exist(data_.relation & state.as_bdd(),
+    const state_bdd* s = dynamic_cast<const state_bdd*>(state);
+    assert(s);
+    bdd succ_set = bdd_replace(bdd_exist(data_.relation & s->as_bdd(),
 					 data_.now_set),
 			       data_.next_to_now);
     return new tgba_succ_iterator_concrete(data_, succ_set);

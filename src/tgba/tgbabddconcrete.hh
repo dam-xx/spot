@@ -16,9 +16,10 @@ namespace spot
     ~tgba_bdd_concrete();
 
     void set_init_state(bdd s);
-    state_bdd get_init_state() const;
+    state_bdd* get_init_state() const;
+    bdd get_init_bdd() const;
 
-    tgba_succ_iterator_concrete* succ_iter(state_bdd state) const;
+    tgba_succ_iterator_concrete* succ_iter(const state* state) const;
 
     const tgba_bdd_dict& get_dict() const;
     const tgba_bdd_core_data& get_core_data() const;

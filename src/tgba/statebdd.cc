@@ -13,4 +13,11 @@ namespace spot
     assert(o);
     return o->as_bdd().id() - state_.id();
   }
+
+  bdd
+  state_bdd::as_bdd() const
+  {
+    return state_;
+  }
+
 }

@@ -18,7 +18,7 @@ namespace spot
     data_.notvar_set = bdd_replace(in.notvar_set, rewrite);
     data_.notprom_set = bdd_replace(in.notprom_set, rewrite);
 
-    init_ = bdd_replace(from.get_init_state().as_bdd(), rewrite);
+    init_ = bdd_replace(from.get_init_bdd(), rewrite);
 
     bdd_freepair(rewrite);
   }
