@@ -66,7 +66,7 @@ main(int argc, char **argv)
 	    }
 	  ++formula_index;
 	}
-      if (argc < formula_index + 4)
+      if (argc < formula_index + 3)
 	syntax(argv[0]);
 
 
