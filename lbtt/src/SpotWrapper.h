@@ -1,8 +1,8 @@
 /*
- *  Copyright (C) 2003
+ *  Copyright (C) 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
- *  Derived from SpinWrapper.h by Alexandre Duret-Lutz <aduret@src.lip6.fr>.
+ *  Derived from SpinWrapper.h by Alexandre Duret-Lutz <adl@src.lip6.fr>.
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
