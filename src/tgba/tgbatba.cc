@@ -91,6 +91,7 @@ namespace spot
     virtual
     ~tgba_tba_proxy_succ_iterator()
     {
+      delete it_;
     }
 
     // iteration

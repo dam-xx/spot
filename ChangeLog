@@ -1,5 +1,9 @@
 2003-10-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgba/tgbatba.cc
+	(tgba_tba_proxy_succ_iterator::~tgba_tba_proxy_succ_iterator):
+	Delete the proxied iterator.
+
 	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::counter_example):
 	Remove unused tmp_last, best_lst, and tmp_acc variables.
 
