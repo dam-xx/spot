@@ -117,6 +117,7 @@ namespace spot
 	  // If an exception occurs during the loop, we need to clean
 	  // all BDD variables which have been registered so far.
 	  dict->unregister_all_my_variables(this);
+	  throw;
 	}
     }
 
