@@ -49,7 +49,7 @@ namespace spot
       if (f_)
         {
           os_ << " /* ";
-          to_spin_string(f_, os_);
+          to_string(f_, os_);
           os_ << " */";
         }
       os_ << std::endl;
@@ -63,7 +63,7 @@ namespace spot
         os_ << "  fi;" << std::endl;
       if (accept_all_ != -1)
         {
-          os_ << "accept_all :" << std::endl;
+          os_ << "accept_all:" << std::endl;
           os_ << "  skip" << std::endl;
         }
       os_ << "}" << std::endl;
@@ -125,7 +125,7 @@ namespace spot
         {
           if (fi_needed_ != 0)
             os_ << "  fi;" << std::endl;
-          os_ << get_state_label(s, n) << " : ";
+          os_ << get_state_label(s, n) << ": ";
           os_ << "/* " << automata_->format_state(s) << " */" ;
           os_ << std::endl;
           os_ << "  if" << std::endl;
@@ -144,7 +144,7 @@ namespace spot
             {
               if (fi_needed_)
                 os_ << "  fi;" << std::endl;
-              os_ << get_state_label(s, n) << " : ";
+              os_ << get_state_label(s, n) << ": ";
               os_ << "/* " << automata_->format_state(s) << " */";
               os_ << std::endl;
               os_ << "  if" << std::endl;

@@ -1,3 +1,9 @@
+2004-05-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/neverclaim.cc (never_claim_bfs): Do not output
+	space before colon, and do not output the top-level formula using
+	Spin's syntax.
+
 2004-05-14  Thomas Martinez  <martinez@src.lip6.fr>
 
 	* src/tgbatest/ltl2tgba.cc (main): Thinko.
