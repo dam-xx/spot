@@ -19,6 +19,10 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+#ifndef SPOT_MISC_HASHFUNC_HH
+# define SPOT_MISC_HASHFUNC_HH
+# include <cstddef>
+
 namespace spot
 {
   /// \brief Thomas Wang's 32 bit hash function.
@@ -38,3 +42,5 @@ namespace spot
     return key;
   }
 }
+
+#endif // SPOT_MISC_HASHFUNC_HH

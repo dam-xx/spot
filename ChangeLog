@@ -1,5 +1,8 @@
 2004-11-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/misc/hashfunc.hh: Include cstddef to define size_t, and guard
+	the file for multiple inclusions.
+
 	* src/tgba/bdddict.hh, src/tgba/state.hh, src/tgba/statebdd.hh,
 	src/tgba/succiter.hh, src/tgba/succiterconcrete.hh,
 	src/tgba/tgba.hh, src/tgba/tgbabddconcrete.hh,
