@@ -22,7 +22,8 @@
 #ifndef SPOT_MISC_LTSTR_HH
 #  define SPOT_MISC_LTSTR_HH
 
-#include <cstring>
+#  include <cstring>
+#  include <functional>
 
 namespace spot
 {
