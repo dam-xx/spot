@@ -313,7 +313,7 @@ namespace spot
 	    tmp = constant::false_instance();
 	    if (inf_form(f, tmp))
 	      result_ = true;
-	    spot::ltl::destroy(tmp);
+	    destroy(tmp);
 	    return;
 	  }
 	/* Unreachable code.  */
@@ -467,12 +467,12 @@ namespace spot
 	      if (special_case(tmp))
 		{
 		  result_ = true;
-		  spot::ltl::destroy(tmp);
+		  destroy(tmp);
 		  return;
 		}
 	      if (inf_form(tmp, f))
 		result_ = true;
-	      spot::ltl::destroy(tmp);
+	      destroy(tmp);
 	      return;
 	    }
 	  case unop::G:
@@ -484,12 +484,12 @@ namespace spot
 	      if (special_case(tmp))
 		{
 		  result_ = true;
-		  spot::ltl::destroy(tmp);
+		  destroy(tmp);
 		  return;
 		}
 	      if (inf_form(f1, f))
 		result_ = true;
-	      spot::ltl::destroy(tmp);
+	      destroy(tmp);
 	      return;
 	    }
 	  }
@@ -584,28 +584,28 @@ namespace spot
       const formula* ftmp2;
       const formula* ftmp3 = unop::instance(unop::Not,
 					    (!n) ? clone(f1) : clone(f2));
-      const formula* ftmp4 = spot::ltl::negative_normal_form((!n) ? f2 : f1);
+      const formula* ftmp4 = negative_normal_form((!n) ? f2 : f1);
       const formula* ftmp5;
       const formula* ftmp6;
       bool result;
 
-      ftmp2 = spot::ltl::unabbreviate_logic(ftmp3);
-      ftmp1 = spot::ltl::negative_normal_form(ftmp2);
+      ftmp2 = unabbreviate_logic(ftmp3);
+      ftmp1 = negative_normal_form(ftmp2);
 
-      ftmp5 = spot::ltl::unabbreviate_logic(ftmp4);
-      ftmp6 = spot::ltl::negative_normal_form(ftmp5);
+      ftmp5 = unabbreviate_logic(ftmp4);
+      ftmp6 = negative_normal_form(ftmp5);
 
       if (n == 0)
 	result = inf_form(ftmp1, ftmp6);
       else
 	result = inf_form(ftmp6, ftmp1);
 
-      spot::ltl::destroy(ftmp1);
-      spot::ltl::destroy(ftmp2);
-      spot::ltl::destroy(ftmp3);
-      spot::ltl::destroy(ftmp4);
-      spot::ltl::destroy(ftmp5);
-      spot::ltl::destroy(ftmp6);
+      destroy(ftmp1);
+      destroy(ftmp2);
+      destroy(ftmp3);
+      destroy(ftmp4);
+      destroy(ftmp5);
+      destroy(ftmp6);
 
       return result;
     }

@@ -101,7 +101,7 @@ namespace spot
 						  basic_reduce_form(mo->nth(1))));
 		    res->push_back(basic_reduce_form(mo->nth(0)));
 		    result_ = multop::instance(mo->op(), res);
-		    spot::ltl::destroy(mo);
+		    destroy(mo);
 		    return;
 		  }
 		if (is_GF(mo->nth(1)))
@@ -111,7 +111,7 @@ namespace spot
 						  basic_reduce_form(mo->nth(0))));
 		    res->push_back(basic_reduce_form(mo->nth(1)));
 		    result_ = multop::instance(mo->op(), res);
-		    spot::ltl::destroy(mo);
+		    destroy(mo);
 		    return;
 		  }
 	      }
@@ -135,7 +135,7 @@ namespace spot
 		  unop::instance(unop::X,
 				 unop::instance(unop::F,
 						basic_reduce_form(u->child())));
-		spot::ltl::destroy(u);
+		destroy(u);
 	      return;
 	    }
 
@@ -152,7 +152,7 @@ namespace spot
 						      basic_reduce_form(mo->nth(1))));
 			res->push_back(basic_reduce_form(mo->nth(0)));
 			result_ = multop::instance(mo->op(), res);
-			spot::ltl::destroy(mo);
+			destroy(mo);
 			return;
 		      }
 		    if (is_GF(mo->nth(1)))
@@ -162,7 +162,7 @@ namespace spot
 						      basic_reduce_form(mo->nth(0))));
 			res->push_back(basic_reduce_form(mo->nth(1)));
 			result_ = multop::instance(mo->op(), res);
-			spot::ltl::destroy(mo);
+			destroy(mo);
 			return;
 		      }
 		  }
@@ -185,7 +185,7 @@ namespace spot
 	      {
 		result_ = unop::instance(unop::G,
 					 basic_reduce_form(bo->second()));
-		spot::ltl::destroy(bo);
+		destroy(bo);
 		return;
 	      }
 
@@ -197,7 +197,7 @@ namespace spot
 		  unop::instance(unop::X,
 				 unop::instance(unop::G,
 						basic_reduce_form(u->child())));
-		spot::ltl::destroy(u);
+		destroy(u);
 		return;
 	      }
 
@@ -214,7 +214,7 @@ namespace spot
 						      basic_reduce_form(mo->nth(1))));
 			res->push_back(basic_reduce_form(mo->nth(0)));
 			result_ = multop::instance(mo->op(), res);
-			spot::ltl::destroy(mo);
+			destroy(mo);
 			return;
 		      }
 		    if (is_GF(mo->nth(1)))
@@ -224,7 +224,7 @@ namespace spot
 						      basic_reduce_form(mo->nth(0))));
 			res->push_back(basic_reduce_form(mo->nth(1)));
 			result_ = multop::instance(mo->op(), res);
-			spot::ltl::destroy(mo);
+			destroy(mo);
 			return;
 		      }
 		  }
@@ -289,9 +289,9 @@ namespace spot
 				       basic_reduce_form(fu1->child()),
 				       basic_reduce_form(fu2->child()));
 		result_ = unop::instance(unop::X, basic_reduce_form(ftmp));
-		spot::ltl::destroy(f1);
-		spot::ltl::destroy(f2);
-		spot::ltl::destroy(ftmp);
+		destroy(f1);
+		destroy(f2);
+		destroy(ftmp);
 		return;
 	      }
 
@@ -322,9 +322,9 @@ namespace spot
 				       basic_reduce_form(fu1->child()),
 				       basic_reduce_form(fu2->child()));
 		result_ = unop::instance(unop::X, basic_reduce_form(ftmp));
-		spot::ltl::destroy(f1);
-		spot::ltl::destroy(f2);
-		spot::ltl::destroy(ftmp);
+		destroy(f1);
+		destroy(f2);
+		destroy(ftmp);
 		return;
 	    }
 
@@ -448,7 +448,7 @@ namespace spot
 				  ->push_back(basic_reduce_form(bo->second()));
 				if (j != i)
 				  {
-				    spot::ltl::destroy(*j);
+				    destroy(*j);
 				    *j = NULL;
 				  }
 			      }
@@ -467,7 +467,7 @@ namespace spot
 		    tmpOther->push_back(basic_reduce_form(*i));
 		    break;
 		  }
-		spot::ltl::destroy(*i);
+		destroy(*i);
 	      }
 
 	    delete(tmpGF);
@@ -576,7 +576,7 @@ namespace spot
 		    tmpOther->push_back(basic_reduce_form(*i));
 		    break;
 		  }
-		spot::ltl::destroy(*i);
+		destroy(*i);
 	      }
 
 	    delete(tmpFG);

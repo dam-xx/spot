@@ -1,5 +1,8 @@
 2004-05-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlvisit/basereduc.cc, src/ltlvisit/reducform.cc,
+	src/ltlvisit/forminf.cc: Remove superfluous spot::ltl:: prefixes.
+
 	* wrap/python/cgi/ltl2tgba.in: Typos.
 
 2004-05-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>

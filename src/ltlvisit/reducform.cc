@@ -141,14 +141,14 @@ namespace spot
 		if (inf)
 		  {
 		    result_ = f2;
-		    spot::ltl::destroy(f1);
+		    destroy(f1);
 		    return;
 		  }
 		/* !b < a => a U b = Fb */
 		if (infnegleft)
 		  {
 		    result_ = unop::instance(unop::F, f2);
-		    spot::ltl::destroy(f1);
+		    destroy(f1);
 		    return;
 		  }
 		/* a < b => a U (b U c) = (b U c) */
@@ -157,7 +157,7 @@ namespace spot
 		    && inf_form(f1, dynamic_cast<binop*>(f2)->first()))
 		  {
 		    result_ = f2;
-		    spot::ltl::destroy(f1);
+		    destroy(f1);
 		    return;
 		  }
 		break;
@@ -167,14 +167,14 @@ namespace spot
 		if (infinv)
 		  {
 		    result_ = f2;
-		    spot::ltl::destroy(f1);
+		    destroy(f1);
 		    return;
 		  }
 		/* b < !a => a R b = Gb */
 		if (infnegright)
 		  {
 		    result_ = unop::instance(unop::G, f2);
-		    spot::ltl::destroy(f1);
+		    destroy(f1);
 		    return;
 		  }
 		/* b < a => a R (b R c) = b R c */
@@ -183,7 +183,7 @@ namespace spot
 		    && inf_form(dynamic_cast<binop*>(f2)->first(), f1))
 		  {
 		    result_ = f2;
-		    spot::ltl::destroy(f1);
+		    destroy(f1);
 		    return;
 		  }
 		break;
@@ -225,14 +225,14 @@ namespace spot
 		    if (inf_form(f1, f2)) // f1 < f2
 		      {
 			f1 = f2;
-			spot::ltl::destroy(*indextmp);
+			destroy(*indextmp);
 			res->erase(indextmp);
 			indextmp = index;
 			index--;
 		      }
 		    else if (inf_form(f2, f1)) // f2 < f1
 		      {
-			spot::ltl::destroy(*index);
+			destroy(*index);
 			res->erase(index);
 			index--;
 		      }
@@ -252,14 +252,14 @@ namespace spot
 		    /* a < b => a & b = a */
 		    if (inf_form(f1, f2)) // f1 < f2
 		      {
-			spot::ltl::destroy(*index);
+			destroy(*index);
 			res->erase(index);
 			index--;
 		      }
 		    else if (inf_form(f2, f1)) // f2 < f1
 		      {
 			f1 = f2;
-			spot::ltl::destroy(*indextmp);
+			destroy(*indextmp);
 			res->erase(indextmp);
 			indextmp = index;
 			index--;
@@ -278,7 +278,7 @@ namespace spot
 		  {
 		    for (multop::vec::iterator j = res->begin();
 			 j != res->end(); j++)
-		      spot::ltl::destroy(*j);
+		      destroy(*j);
 		    if (mo->op() == multop::Or)
 		      result_ = constant::true_instance();
 		    else
@@ -308,18 +308,18 @@ namespace spot
     formula*
     reduce_form(const formula* f, option o)
     {
-      spot::ltl::formula* ftmp1 = NULL;
-      spot::ltl::formula* ftmp2 = NULL;
+      formula* ftmp1 = NULL;
+      formula* ftmp2 = NULL;
       reduce_form_visitor v(o);
 
       if (o == BRI || o == InfBase ||
 	  o == EventualUniversalBase)
 	{
-	  ftmp1 = spot::ltl::basic_reduce_form(f);
+	  ftmp1 = basic_reduce_form(f);
 	  const_cast<formula*>(ftmp1)->accept(v);
-	  ftmp2 = spot::ltl::basic_reduce_form(v.result());
-	  spot::ltl::destroy(ftmp1);
-	  spot::ltl::destroy(v.result());
+	  ftmp2 = basic_reduce_form(v.result());
+	  destroy(ftmp1);
+	  destroy(v.result());
 
 	  return ftmp2;
 	}
@@ -336,41 +336,41 @@ namespace spot
     formula*
     reduce(const formula* f, option o)
     {
-      spot::ltl::formula* ftmp1;
-      spot::ltl::formula* ftmp2;
-      spot::ltl::formula* ftmp3;
+      formula* ftmp1;
+      formula* ftmp2;
+      formula* ftmp3;
 
-      ftmp1 = spot::ltl::unabbreviate_logic(f);
-      ftmp2 = spot::ltl::negative_normal_form(ftmp1);
+      ftmp1 = unabbreviate_logic(f);
+      ftmp2 = negative_normal_form(ftmp1);
 
       switch (o)
 	{
 	case Base:
-	  ftmp3 = spot::ltl::basic_reduce_form(ftmp2);
+	  ftmp3 = basic_reduce_form(ftmp2);
 	  break;
 	case Inf:
-	  ftmp3 = spot::ltl::reduce_form(ftmp2, o);
+	  ftmp3 = reduce_form(ftmp2, o);
 	  break;
 	case InfBase:
-	  ftmp3 = spot::ltl::reduce_form(ftmp2, o);
+	  ftmp3 = reduce_form(ftmp2, o);
 	  break;
 	case EventualUniversal:
-	  ftmp3 = spot::ltl::reduce_form(ftmp2, o);
+	  ftmp3 = reduce_form(ftmp2, o);
 	  break;
 	case EventualUniversalBase:
-	  ftmp3 = spot::ltl::reduce_form(ftmp2, o);
+	  ftmp3 = reduce_form(ftmp2, o);
 	  break;
 	case InfEventualUniversal:
-	  ftmp3 = spot::ltl::reduce_form(ftmp2, o);
+	  ftmp3 = reduce_form(ftmp2, o);
 	  break;
 	case BRI:
-	  ftmp3 = spot::ltl::reduce_form(ftmp2, o);
+	  ftmp3 = reduce_form(ftmp2, o);
 	  break;
 	default:
 	  assert(0);
 	}
-      spot::ltl::destroy(ftmp1);
-      spot::ltl::destroy(ftmp2);
+      destroy(ftmp1);
+      destroy(ftmp2);
 
       return ftmp3;
     }
