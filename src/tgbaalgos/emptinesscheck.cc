@@ -29,13 +29,44 @@
 
 namespace spot
 {
-  typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
 
-  emptiness_check::connected_component::connected_component(int i)
+  scc_stack::connected_component::connected_component(int i)
   {
     index = i;
     condition = bddfalse;
   }
+
+  scc_stack::connected_component&
+  scc_stack::top()
+  {
+    return s.top();
+  }
+
+  void
+  scc_stack::pop()
+  {
+    s.pop();
+  }
+
+  void
+  scc_stack::push(int index)
+  {
+    s.push(connected_component(index));
+  }
+
+  size_t
+  scc_stack::size() const
+  {
+    return s.size();
+  }
+
+  bool
+  scc_stack::empty() const
+  {
+    return s.empty();
+  }
+
+  typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
 
   bool
   emptiness_check::connected_component_set::has_state(const state* s) const
@@ -136,7 +167,7 @@ namespace spot
     {
       state* init = aut_->get_init_state();
       h[init] = 1;
-      root.push(connected_component(1));
+      root.push(1);
       arc.push(bddfalse);
       tgba_succ_iterator* iter = aut_->succ_iter(init);
       iter->first();
@@ -195,7 +226,7 @@ namespace spot
 	    // Yes.  Number it, stack it, and register its successors
 	    // for later processing.
 	    h[dest] = ++num;
-	    root.push(connected_component(num));
+	    root.push(num);
 	    arc.push(acc);
 	    tgba_succ_iterator* iter = aut_->succ_iter(dest);
 	    iter->first();
@@ -411,7 +442,7 @@ namespace spot
 	successor succ = queue.front();
 	queue.pop_front();
 	h[succ.s] = ++num;
-	root.push(connected_component(num));
+	root.push(num);
 	arc.push(succ.acc);
 	todo.push(pair_state_successors(succ.s, succ_queue()));
 	succ_queue& new_queue = todo.top().second;

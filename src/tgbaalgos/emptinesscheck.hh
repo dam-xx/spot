@@ -32,6 +32,30 @@
 namespace spot
 {
 
+  class scc_stack
+  {
+  public:
+    struct connected_component
+    {
+      // During the Depth path we keep the connected component that we met.
+    public:
+      connected_component(int index = -1);
+
+      int index;
+      /// The bdd condition is the union of all acceptance conditions of
+      /// transitions which connect the states of the connected component.
+      bdd condition;
+    };
+
+    connected_component& top();
+    void pop();
+    void push(int index);
+    size_t size() const;
+    bool empty() const;
+
+    std::stack<connected_component> s;
+  };
+
   /// \brief Check whether the language of an automate is empty.
   ///
   /// This is based on the following paper.
@@ -100,19 +124,7 @@ namespace spot
 
   private:
 
-    struct connected_component
-    {
-      // During the Depth path we keep the connected component that we met.
-    public:
-      connected_component(int index = -1);
-
-      int index;
-      /// The bdd condition is the union of all acceptance conditions of
-      /// transitions which connect the states of the connected component.
-      bdd condition;
-    };
-
-    struct connected_component_set: public connected_component
+    struct connected_component_set: public scc_stack::connected_component
     {
       typedef Sgi::hash_set<const state*,
 			    state_ptr_hash, state_ptr_equal> set_type;
@@ -125,7 +137,7 @@ namespace spot
     };
 
     const tgba* aut_;
-    std::stack<connected_component> root;
+    scc_stack root;
     state_sequence suffix;
     cycle_path period;
 
