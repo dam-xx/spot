@@ -38,12 +38,17 @@ sys.path.insert(0, '@pythondir@')
 # Directory for temporary files (images and other auxiliary files).
 imgdir = 'spotimg'
 
+# Extra HTML headers.
+extra_header = ''
+# extra_header = '<LINK REL="stylesheet" TYPE="text/css" HREF="style.css">'
+
 import spot
 import buddy
 
 def print_footer():
     print '<hr>'
     print 'ltl2tgba.py @PACKAGE_VERSION@; Spot', spot.version()
+    print '</BODY></HTML>'
 
 # We want the script to kill itself whenever it run for more than 30
 # seconds.  `dot' can be very long at drawing huge graphs, and may
@@ -161,31 +166,39 @@ def render_bdd(basename, dictionary, bdd):
     render_dot(basename)
 
 
-print "<TITLE>LTL-to-B&uuml;chi test</TITLE>"
-print """<H1><a href="http://spot.lip6.fr/">Spot</a>'s on-line
-LTL-to-B&uuml;chi translator</H1>"""
+print """
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML lang="en"><HEAD>
+<TITLE>Spot's on-line LTL-to-Buchi translator</TITLE>
+<META NAME="keywords" CONTENT="Spot,LTL,automata,B&uuml;chi,translation,TGBA">
+%s</HEAD>
+<BODY>
+<H1><a href="http://spot.lip6.fr/">Spot</a>'s on-line
+LTL-to-B&uuml;chi translator</H1>""" % extra_header
 
 formula = form.getfirst('formula', '')
 
-
+#F8F0E8
+color_fm = '#E0D8E0'
+color_lacim = "#F8D8E8"
 
 options = [(
-    'Common options', 0, [
+    'Common options', 0, '', [
     ('show_formula_png',    'draw the formula',                            0),
     ('show_automaton_png',  'draw Büchi automaton',                        1),
     ('show_degen_png',      'draw degeneralized Büchi automaton',          0),
     ('show_lbtt',           'convert automaton for LBTT',                  0),
     ]), (
-    'Debugging options', 0, [
+    'Debugging options', 0, '', [
     ('show_parse',          'show traces during parsing',                  0),
     ('show_dictionnay',     'print BDD dictionary',                        0),
     ]), (
-    'Couvreur/FM options', 1, [
+    'Couvreur/FM options', 1, color_fm, [
     ('opt_exprop',          'optimize determinism',                        1),
     ('opt_symb_merge',
      'merge states with same symbolic successor representation',           1),
     ]), (
-    'Couvreur/Lacim options', 1, [
+    'Couvreur/LaCIM options', 1, color_lacim, [
     ('show_relation_set',
      'print the transition relation as a BDD set',                         0),
     ('show_relation_png',
@@ -198,8 +211,8 @@ options = [(
 
 default_translator = 'trans_fm';
 translators = [
-    ('trans_fm',        'Convreur/FM'),
-    ('trans_lacim',     'Convreur/LaCIM'),
+    ('trans_fm',    'Couvreur/FM',    color_fm),
+    ('trans_lacim', 'Couvreur/LaCIM', color_lacim),
     ]
 
 print ("""<FORM action="%s" method="post"><P>
@@ -276,19 +289,21 @@ column = [[], []]
 
 column[0].append("<TH>Algorithm</TH>")
 trans = form.getfirst("trans", default_translator)
-for opt, desc, in translators:
+for opt, desc, color in translators:
     if trans == opt:
 	str = "checked"
     else:
 	str = ""
     globals()[opt] = str
-    s = '<TD><INPUT type="radio" name="trans" value="%s" %s>%s</TD>'
-    column[0].append(s % (opt, str, desc))
+    s = '<TD bgcolor=%s><INPUT type="radio" name="trans" value="%s" %s>%s</TD>'
+    column[0].append(s % (color, opt, str, desc))
 
 print """</TD></TR></TABLE><TABLE>"""
 
-for opt_group, opt_column, opt_list in options:
-    column[opt_column].append("<TH>" + opt_group + "</TH>")
+for opt_group, opt_column, opt_color, opt_list in options:
+    if opt_color:
+        opt_color = ' bgcolor="%s"' % opt_color
+    column[opt_column].append(("<TH%s>" % opt_color) + opt_group + "</TH>")
     for opt, desc, arg, in opt_list:
         if formula:
             val = int(form.getfirst(opt, 0))
@@ -299,8 +314,8 @@ for opt_group, opt_column, opt_list in options:
         else:
             str = ""
         globals()[opt] = val
-        s = '<TD><INPUT type="checkbox" name="%s" value="1"%s>%s</TD>'
-        column[opt_column].append(s % (opt, str, desc))
+        s = '<TD%s><INPUT type="checkbox" name="%s" value="1"%s>%s</TD>'
+        column[opt_column].append(s % (opt_color, opt, str, desc))
 
 print '<TABLE>'
 width = range(len(column))
