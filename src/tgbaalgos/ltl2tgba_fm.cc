@@ -21,6 +21,7 @@
 
 #include "misc/hash.hh"
 #include "misc/bddalloc.hh"
+#include "misc/bddlt.hh"
 #include "misc/minato.hh"
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
@@ -253,8 +254,6 @@ namespace spot
 		if (! a->has_acceptance_condition(ac))
 		  a->declare_acceptance_condition(clone(ac));
 		a->add_acceptance_condition(t, ac);
-
-		atomic_prop::instance_count();
 		b = high;
 	      }
 	    assert(b != bddfalse);
@@ -448,8 +447,8 @@ namespace spot
     formula* f2 = negative_normal_form(f1);
     destroy(f1);
 
-    std::set<formula*> formulae_seen;
-    std::set<formula*> formulae_to_translate;
+    std::set<const formula*> formulae_seen;
+    std::set<const formula*> formulae_to_translate;
 
     formulae_seen.insert(f2);
     formulae_to_translate.insert(f2);
@@ -461,7 +460,7 @@ namespace spot
     while (!formulae_to_translate.empty())
       {
 	// Pick one formula.
-	formula* f = *formulae_to_translate.begin();
+	const formula* f = *formulae_to_translate.begin();
 	formulae_to_translate.erase(formulae_to_translate.begin());
 
 	// Translate it into a BDD to simplify it.
@@ -487,16 +486,26 @@ namespace spot
 	//
 	// Therefore we now factor all variables.  This may lead to more
 	// transitions than necessary (e.g.,  r(f + g) = f + g  will be
-	// coded as two transitions), but we later call merge_transitions()
-	// to gather transitions with same source/destination and acceptance
-	// conditions.
+	// coded as two transitions), but we later merge all transitions
+	// with same source/destination and acceptance conditions.  This
+	// is the goal of the `dests' hash.
 	//
-	// Note that this is still not optimal.  For instance it would
-	// be better to encode `f U g' as
+	// Note that this is still not optimal.  For instance it us
+	// better to encode `f U g' as
 	//     r(f U g) = g + a(g).r(X(f U g)).f.!g
-	// because that leads to a deterministic automaton.  However it
-	// is not clear how to formalize this generally (replace `g'
-	// by an arbitrary boolean function when thinking about it).
+	// because that leads to a deterministic automaton.  In order
+	// to handle this, we take the conditions of any transition
+	// going to true (it's `g' here), and remove it from the other
+	// transitions.
+	// It might be interesting to look at ways to generalize this.
+	// (Replace `g' by an arbitrary boolean function when thinking
+	// about it).
+
+	typedef std::map<bdd, bdd, bdd_less_than> prom_map;
+	typedef Sgi::hash_map<const formula*, prom_map, ptr_hash<formula> >
+	  dest_map;
+	dest_map dests;
+	// Compute all outgoing arcs.
 	minato_isop isop(res);
 	bdd cube;
 	while ((cube = isop.next()) != bddfalse)
@@ -504,14 +513,57 @@ namespace spot
 	    formula* dest =
 	      d.conj_bdd_to_formula(bdd_existcomp(cube, d.next_set));
 
-	    std::string next = to_string(dest);
+	    bdd promises = bdd_existcomp(cube, d.a_set);
 
-	    tgba_explicit::transition* t = a->create_transition(now, next);
+	    bdd conds = bdd_existcomp(cube, d.var_set);
+	    dest_map::iterator i = dests.find(dest);
+	    if (i == dests.end())
+	      {
+		dests[dest][promises] = conds;
+	      }
+	    else
+	      {
+		i->second[promises] |= conds;
+		destroy(dest);
+	      }
+	  }
 
-	    a->add_condition(t,
-			     d.bdd_to_formula(bdd_existcomp(cube, d.var_set)));
-	    d.conj_bdd_to_acc(a, bdd_existcomp(cube, d.a_set), t);
+	// Check for an arc going to True.  Register it first, that
+	// way it will be explored before the other during the model
+	// checking.
+	dest_map::const_iterator i = dests.find(constant::true_instance());
+	bdd cond_for_true = bddfalse;
+	if (i != dests.end())
+	  {
+	    // Transitions going to True are not expected to make any promises.
+	    assert(i->second.size() == 1);
+	    prom_map::const_iterator j = i->second.find(bddtrue);
+	    assert(j != i->second.end());
 
+	    cond_for_true = j->second;
+	    tgba_explicit::transition* t =
+	      a->create_transition(now, constant::true_instance()->val_name());
+	    a->add_condition(t, d.bdd_to_formula(cond_for_true));
+	  }
+
+	// Register other transitions.
+	for (i = dests.begin(); i != dests.end(); ++i)
+	  {
+	    const formula* dest = i->first;
+
+	    if (dest != constant::true_instance())
+	      {
+		std::string next = to_string(dest);
+		for (prom_map::const_iterator j = i->second.begin();
+		     j != i->second.end(); ++j)
+		  {
+		    tgba_explicit::transition* t =
+		      a->create_transition(now, next);
+		    a->add_condition(t, d.bdd_to_formula(j->second
+							 - cond_for_true));
+		    d.conj_bdd_to_acc(a, j->first, t);
+		  }
+	      }
 	    if (formulae_seen.find(dest) == formulae_seen.end())
 	      {
 		formulae_seen.insert(dest);
@@ -525,12 +577,10 @@ namespace spot
       }
 
     // Free all formulae.
-    for (std::set<formula*>::iterator i = formulae_seen.begin();
+    for (std::set<const formula*>::iterator i = formulae_seen.begin();
 	 i != formulae_seen.end(); ++i)
       destroy(*i);
 
-    // Merge transitions if we can.
-    a->merge_transitions();
     // Turn all promises into real acceptance conditions.
     a->complement_all_acceptance_conditions();
     return a;

@@ -1,5 +1,11 @@
 2004-01-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Merge transitions
+	with same destination and acceptance conditions directly, without
+	calling a->merge_transition().  If one transitions goes to "True",
+	subtract its conditions from all other transitions; this optimizes
+	a U b.
+
 	* src/ltlast/refformula.hh (ref_formula::ref_count_): New method.
 	* src/ltlast/refformula.cc (ref_formula::ref_count_): New method.
 	* src/ltlast/atomic_prop.hh (atomic_prop::dump_instance): New method.
