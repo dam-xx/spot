@@ -112,7 +112,7 @@ namespace spot
     multop::add_sorted(vec* v, formula* f)
     {
       // Keep V sorted.  When adding a new multop, iterate over all
-      // element until we find either an identicalle element, or the
+      // element until we find either an identical element, or the
       // place where the new one should be inserted.
       vec::iterator i;
       for (i = v->begin(); i != v->end(); ++i)
@@ -121,7 +121,7 @@ namespace spot
 	    break;
 	  if (*i == f)
 	    {
-	      // F is arleady a child.  Drop it.
+	      // F is already a child.  Drop it.
 	      destroy(f);
 	      return;
 	    }
