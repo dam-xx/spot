@@ -4,7 +4,7 @@
 	* src/ltlparse/parsedecl.hh (YY_DECL): Rename yylex to ltlyylex.
 	* src/ltlparse/ltlparse.yy: Define yylex as ltlyylex.
 
-2003-06-03  Alexandre Duret-Lutz  <adl@gnu.org>
+2003-06-03  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/dictunion.cc, src/tgba/ltl2tgba.cc,
 	src/tgba/succiterconcrete.cc, src/tgba/tgbabddconcrete.cc,
