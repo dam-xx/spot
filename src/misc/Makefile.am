@@ -31,6 +31,7 @@ misc_HEADERS = \
   escape.hh \
   freelist.hh \
   hash.hh \
+  hashfunc.hh \
   minato.hh \
   modgray.hh \
   random.hh \

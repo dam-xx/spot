@@ -1,3 +1,10 @@
+2004-11-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/misc/hashfunc.hh (wang32_hash): New file and function,
+	extracted from...
+	* src/evtgba/product.cc (evtgba_product_state::hash): ... here.
+	* src/misc/Makefile.am (misc_HEADERS): Add hashfunc.hh.
+
 2004-11-15  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* src/tgbatest/ltl2tgba.cc (main): For non-generalized emptiness

@@ -20,6 +20,7 @@
 // 02111-1307, USA.
 
 #include "product.hh"
+#include "misc/hashfunc.hh"
 #include "misc/modgray.hh"
 #include <cstdlib>
 #include <set>
@@ -75,23 +76,9 @@ namespace spot
       size_t
       hash() const
       {
-	// We assume that size_t has at least 32bits.
 	size_t res = 0;
 	for (int i = 0; i != n_; ++i)
-	  {
-	    size_t key = s_[i]->hash();
-
-	    // Thomas Wang's 32 bit hash Function
-	    // http://www.concentric.net/~Ttwang/tech/inthash.htm
-	    key += ~(key << 15);
-	    key ^=  (key >> 10);
-	    key +=  (key << 3);
-	    key ^=  (key >> 6);
-	    key += ~(key << 11);
-	    key ^=  (key >> 16);
-
-	    res ^= key;
-	  }
+	  res ^= wang32_hash(s_[i]->hash());
 	return res;
       }
 
