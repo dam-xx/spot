@@ -1,8 +1,13 @@
 2003-07-07  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* configure.ac: Output iface/Makefile and iface/gspn/Makefile.
+	* iface/Makefile.am, iface/gspn/Makefile.am: New files.
+	* Makefile.am (SUBDIRS): Add iface.
+	* iface/gspn/gspnlib.h: New file, from Yann and Souheib.
+
 	* src/tgba/tgbabddcoredata.cc (tgba_bdd_core_data::tgba_bdd_core_data,
 	tgba_bdd_core_data::translate): Handle all_accepting_conditions.
-	* src/tgba/tgbabddconcretefactory.cc 
+	* src/tgba/tgbabddconcretefactory.cc
 	(tgba_bdd_concrete_factory::finish): Fill all_accepting_conditions.
 
 2003-07-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
