@@ -43,5 +43,9 @@ $(srcdir)/spotref.pdf: $(srcdir)/stamp
 	  && texi2dvi --pdf refman.tex \
 	  && cd .. && mv -f spot.latex/refman.pdf $@
 
-EXTRA_DIST = $(srcdir)/stamp $(srcdir)/spot.html \
-	mainpage.dox $(srcdir)/spotref.pdf
+EXTRA_DIST = \
+  footer.html \
+  mainpage.dox \
+  $(srcdir)/stamp \
+  $(srcdir)/spot.html \
+  $(srcdir)/spotref.pdf

@@ -1,5 +1,9 @@
 2004-07-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* doc/footer.html: New file, link to RefDocComments on the wiki.
+	* doc/Doxyfile.in (HTML_FOOTER): Use footer.html.
+	* doc/Makefile.am (EXTRA_DIST): Add footer.html.
+
 	* THANKS: Fill in.
 
 	* src/tgbatest/ltl2baw.pl: Do not use -T anymore.  Fix comments.
