@@ -214,6 +214,7 @@ syntax(char* prog)
   exit(2);
 }
 
+
 int
 to_int(const char* s)
 {
@@ -222,6 +223,32 @@ to_int(const char* s)
   if (*endptr)
     {
       std::cerr << "Failed to parse `" << s << "' as an integer." << std::endl;
+      exit(1);
+    }
+  return res;
+}
+
+int
+to_int_pos(const char* s, const char* arg)
+{
+  int res = to_int(s);
+  if (res <= 0)
+    {
+      std::cerr << "argument of " << arg
+		<< " (" << res << ") must be positive" << std::endl;
+      exit(1);
+    }
+  return res;
+}
+
+int
+to_int_nonneg(const char* s, const char* arg)
+{
+  int res = to_int(s);
+  if (res < 0)
+    {
+      std::cerr << "argument of " << arg
+		<< " (" << res << ") must be nonnegative" << std::endl;
       exit(1);
     }
   return res;
@@ -236,6 +263,19 @@ to_float(const char* s)
   if (*endptr)
     {
       std::cerr << "Failed to parse `" << s << "' as a float." << std::endl;
+      exit(1);
+    }
+  return res;
+}
+
+float
+to_float_nonneg(const char* s, const char* arg)
+{
+  float res = to_float(s);
+  if (res < 0)
+    {
+      std::cerr << "argument of " << arg
+		<< " (" << res << ") must be nonnegative" << std::endl;
       exit(1);
     }
   return res;
@@ -1086,14 +1126,14 @@ main(int argc, char** argv)
 	{
 	  if (argc < argn + 3)
 	    syntax(argv[0]);
-	  opt_n_acc = to_int(argv[++argn]);
-	  opt_a = to_float(argv[++argn]);
+	  opt_n_acc = to_int_nonneg(argv[++argn], "-a");
+	  opt_a = to_float_nonneg(argv[++argn], "-a");
 	}
       else if (!strcmp(argv[argn], "-d"))
 	{
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
-	  opt_d = to_float(argv[++argn]);
+	  opt_d = to_float_nonneg(argv[++argn], "-d");
 	}
       else if (!strcmp(argv[argn], "-D"))
 	{
@@ -1105,7 +1145,7 @@ main(int argc, char** argv)
 	{
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
-	  opt_ec = to_int(argv[++argn]);
+	  opt_ec = to_int_nonneg(argv[++argn], "-e");
 	}
       else if (!strcmp(argv[argn], "-g"))
 	{
@@ -1140,7 +1180,7 @@ main(int argc, char** argv)
 	{
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
-	  opt_n = to_int(argv[++argn]);
+	  opt_n = to_int_pos(argv[++argn], "-n");
 	}
       else if (!strcmp(argv[argn], "-O"))
 	{
@@ -1171,20 +1211,20 @@ main(int argc, char** argv)
 	{
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
-	  opt_R = to_int(argv[++argn]);
+	  opt_R = to_int_pos(argv[++argn], "-R");
 	}
       else if (!strcmp(argv[argn], "-s"))
 	{
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
-	  opt_ec_seed = to_int(argv[++argn]);
+	  opt_ec_seed = to_int_nonneg(argv[++argn], "-s");
 	  spot::srand(opt_ec_seed);
 	}
       else if (!strcmp(argv[argn], "-t"))
 	{
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
-	  opt_t = to_float(argv[++argn]);
+	  opt_t = to_float_nonneg(argv[++argn], "-t");
 	}
       else if (!strcmp(argv[argn], "-z"))
 	{
@@ -1202,13 +1242,13 @@ main(int argc, char** argv)
 	{
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
-	  opt_f = to_int(argv[++argn]);
+	  opt_f = to_int_pos(argv[++argn], "-f");
 	}
       else if (!strcmp(argv[argn], "-F"))
 	{
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
-	  opt_F = to_int(argv[++argn]);
+	  opt_F = to_int_nonneg(argv[++argn], "-F");
 	}
       else if (!strcmp(argv[argn], "-p"))
 	{
@@ -1220,7 +1260,7 @@ main(int argc, char** argv)
 	{
 	  if (argc < argn + 2)
 	    syntax(argv[0]);
-	  opt_l = to_int(argv[++argn]);
+	  opt_l = to_int_nonneg(argv[++argn], "-l");
 	}
       else if (!strcmp(argv[argn], "-u"))
 	{

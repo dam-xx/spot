@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -33,7 +33,7 @@ namespace spot
   /// \brief Construct a tgba randomly.
   /// \ingroup tgba_misc
   ///
-  /// \param n The number of states wanted in the automata.  All states
+  /// \param n The number of states wanted in the automata (>0).  All states
   ///          will be connected, and there will be no dead state.
   /// \param d The density of the automata.  This is the probability
   ///          (between 0.0 and 1.0), to add a transition between two

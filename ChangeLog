@@ -1,5 +1,8 @@
 2005-02-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/randomgraph.cc (random_graph): Make sure n > 0.
+	* src/tgbatest/randtgba.cc: Check the range of all arguments.
+
 	* bench/emptchk/models/eeaean1.pml: New file, from schwoon.05.tacas.
 	* bench/emptchk/Makefile.am: Distribute models/eeaean1.pml
 	and build models/eeaean1.tgba.
