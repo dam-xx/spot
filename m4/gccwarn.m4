@@ -25,7 +25,6 @@ EOF
   ac_cv_prog_gxx_warn_flags="-W -Wall"
   for cf_opt in \
    Wcast-align \
-   Winline \
    Wpointer-arith \
    Wwrite-strings \
    Wstrict-prototypes \
@@ -43,4 +42,3 @@ EOF
 fi
 AC_SUBST([WARNING_CXXFLAGS], ["${ac_cv_prog_gxx_warn_flags}"])
 ])
-

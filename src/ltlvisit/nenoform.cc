@@ -1,5 +1,6 @@
 #include "nenoform.hh"
 #include "ltlast/allnodes.hh"
+#include <cassert>
 
 namespace spot
 {

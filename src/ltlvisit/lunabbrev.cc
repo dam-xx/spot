@@ -1,6 +1,7 @@
 #include "ltlast/allnodes.hh"
 #include "ltlvisit/clone.hh"
 #include "lunabbrev.hh"
+#include <cassert>
 
 namespace spot
 {

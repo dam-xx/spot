@@ -1,5 +1,6 @@
 #include "atomic_prop.hh"
 #include "visitor.hh"
+#include <cassert>
 
 namespace spot
 {

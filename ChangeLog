@@ -1,3 +1,10 @@
+2003-05-23  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* m4/gccwarn.m4: Do not use -Winline, this is inappropriate
+	with STL.
+	* src/ltlast/atomic_prop.cc, src/ltlvisit/lunabbrev.cc,
+	src/ltlvisit/nenoform.cc: Include <cassert>.
+
 2003-05-16  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltlvisit/dotty.cc: Rewrite to display formulae as
