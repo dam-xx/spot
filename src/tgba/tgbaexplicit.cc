@@ -70,6 +70,13 @@ namespace spot
     return o->get_state() - get_state();
   }
 
+  size_t
+  state_explicit::hash() const
+  {
+    return
+      reinterpret_cast<const char*>(get_state()) - static_cast<const char*>(0);
+  }
+
   state_explicit*
   state_explicit::clone() const
   {

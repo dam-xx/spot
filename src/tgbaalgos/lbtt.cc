@@ -1,3 +1,4 @@
+#include "misc/hash.hh"
 #include <map>
 #include <set>
 #include <string>
@@ -86,30 +87,41 @@ namespace spot
 
   typedef std::pair<state*, bdd> state_acc_pair;
 
-  struct state_acc_pair_less_than
+  struct state_acc_pair_equal
   {
     bool
     operator()(const state_acc_pair& left, const state_acc_pair& right) const
     {
-      int cmp = left.first->compare(right.first);
-      if (cmp < 0)
-	return true;
-      if (cmp > 0)
+      if (left.first->compare(right.first))
 	return false;
-      return left.second.id() < right.second.id();
+      return left.second.id() == right.second.id();
+    }
+  };
+
+  struct state_acc_pair_hash
+  {
+    bool
+    operator()(const state_acc_pair& that) const
+    {
+      // We assume there will be far more states than accepting conditions.
+      // Hence we keep only 8 bits for the latter.
+      return (that.first->hash() << 8) + (that.second.id() & 0xFF);
     }
   };
 
   // Each state of the produced automata is numbered.  Map of state seen.
-  typedef std::map<state_acc_pair, unsigned, state_acc_pair_less_than> acp_seen_map;
+  typedef Sgi::hash_map<state_acc_pair, unsigned, state_acc_pair_hash,
+			state_acc_pair_equal> acp_seen_map;
 
   // Set of states yet to produce.
-  typedef std::set<state_acc_pair, state_acc_pair_less_than> todo_set;
+  typedef Sgi::hash_set<state_acc_pair, state_acc_pair_hash,
+			state_acc_pair_equal> todo_set;
 
   // Each *source* state corresponds to several states in the produced
   // automata.  A minmax_pair specifies the range of such associated states.
   typedef std::pair<unsigned, unsigned> minmax_pair;
-  typedef std::map<state*, minmax_pair, state_ptr_less_than> seen_map;
+  typedef Sgi::hash_map<state*, minmax_pair,
+			state_ptr_hash, state_ptr_equal> seen_map;
 
   // Take a STATE from the source automaton, and fill TODO with
   // the list of associated states to output.  Return the correponding
@@ -230,8 +242,14 @@ namespace spot
     os << state_number << " " << acs.count() << std::endl;
     os << body.str();
     // Finally delete all states used as keys in m.
-    for (seen_map::iterator i = seen.begin(); i != seen.end(); ++i)
-      delete i->first;
+    seen_map::const_iterator s = seen.begin();
+    while (s != seen.end())
+      {
+	// Advance the iterator before deleting the "key" pointer.
+	const state* ptr = s->first;
+	++s;
+	delete ptr;
+      }
     return os;
   }
 }

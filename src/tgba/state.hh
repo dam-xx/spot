@@ -1,6 +1,7 @@
 #ifndef SPOT_TGBA_STATE_HH
 # define SPOT_TGBA_STATE_HH
 
+#include <cstddef>
 #include <bdd.h>
 
 namespace spot
@@ -21,6 +22,27 @@ namespace spot
     ///
     /// \sa spot::state_ptr_less_than
     virtual int compare(const state* other) const = 0;
+
+    /// \brief Hash a state.
+    ///
+    /// This method returns an integer that can be used as a
+    /// hash value for this state.
+    ///
+    /// Note that the hash value is guaranteed to be unique for all
+    /// equal states (in compare()'s sense) for only has long has one
+    /// of these states exists.  So it's OK to use a spot::state as a
+    /// key in a \c hash_map because the mere use of the state as a
+    /// key in the hash will ensure the state continues to exist.
+    ///
+    /// However if you create the state, get its hash key, delete the
+    /// state, recreate the same state, and get its hash key, you may
+    /// obtain two different hash keys if the same state were not
+    /// already used elsewhere.  In practice this weird situation can
+    /// occur only when the state is BDD-encoded, because BDD numbers
+    /// (used to build the hash value) can be reused for other
+    /// formulas.  That probably doesn't matter, since the hash value
+    /// is meant to be used in a \c hash_map, but it had to be noted.
+    virtual size_t hash() const = 0;
 
     /// Duplicate a state.
     virtual state* clone() const = 0;
@@ -48,6 +70,50 @@ namespace spot
     {
       assert(left);
       return left->compare(right) < 0;
+    }
+  };
+
+  /// \brief An Equivalence Relation for \c state*.
+  ///
+  /// This is meant to be used as a comparison functor for
+  /// Sgi \c hash_map whose key are of type \c state*.
+  ///
+  /// For instance here is how one could declare
+  /// a map of \c state*.
+  /// \code
+  ///   // Remember how many times each state has been visited.
+  ///   Sgi::hash_map<spot::state*, int, spot::state_ptr_less_than,
+  ///                                    spot::state_ptr_equal> seen;
+  /// \endcode
+  struct state_ptr_equal
+  {
+    bool
+    operator()(const state* left, const state* right) const
+    {
+      assert(left);
+      return 0 == left->compare(right);
+    }
+  };
+
+  /// \brief Hash Function for \c state*.
+  ///
+  /// This is meant to be used as a hash functor for
+  /// Sgi's \c hash_map whose key are of type \c state*.
+  ///
+  /// For instance here is how one could declare
+  /// a map of \c state*.
+  /// \code
+  ///   // Remember how many times each state has been visited.
+  ///   Sgi::hash_map<spot::state*, int, spot::state_ptr_less_than,
+  ///                                    spot::state_ptr_equal> seen;
+  /// \endcode
+  struct state_ptr_hash
+  {
+    size_t
+    operator()(const state* that) const
+    {
+      assert(that);
+      return that->hash();
     }
   };
 

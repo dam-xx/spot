@@ -1,8 +1,8 @@
 #ifndef SPOT_TGBA_TGBAEXPLICIT_HH
 # define SPOT_TGBA_TGBAEXPLICIT_HH
 
+#include "misc/hash.hh"
 #include <list>
-#include <map>
 #include "tgba.hh"
 #include "ltlast/formula.hh"
 
@@ -62,8 +62,10 @@ namespace spot
     bdd get_condition(ltl::formula* f);
     bdd get_accepting_condition(ltl::formula* f);
 
-    typedef std::map<const std::string, tgba_explicit::state*> ns_map;
-    typedef std::map<const tgba_explicit::state*, std::string> sn_map;
+    typedef Sgi::hash_map<const std::string, tgba_explicit::state*,
+			  string_hash> ns_map;
+    typedef Sgi::hash_map<const tgba_explicit::state*, std::string,
+			  ptr_hash<tgba_explicit::state> > sn_map;
     ns_map name_state_map_;
     sn_map state_name_map_;
     bdd_dict* dict_;
@@ -89,7 +91,7 @@ namespace spot
     }
 
     virtual int compare(const spot::state* other) const;
-
+    virtual size_t hash() const;
     virtual state_explicit* clone() const;
 
     virtual ~state_explicit()

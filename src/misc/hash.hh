@@ -1,13 +1,19 @@
 #ifndef SPOT_MISC_HASH_HH
 #  define SPOT_MISC_HASH_HH
 
-// See the G++ FAQ for details about this.
+#  include <string>
 
+// See the G++ FAQ for details about the following.
 #  ifdef __GNUC__
 #  if __GNUC__ < 3
 #    include <hash_map.h>
 #    include <hash_set.h>
-    namespace Sgi { using ::hash_map; }; // inherit globals
+    namespace Sgi
+    { // inherit globals
+      using ::hash_map;
+      using ::hash_set;
+      using ::hash;
+    };
 #  else
 #    include <ext/hash_map>
 #    include <ext/hash_set>
@@ -30,9 +36,20 @@ namespace spot
   template <class T>
   struct ptr_hash
   {
-    size_t operator()(const T* f) const
+    size_t operator()(const T* p) const
     {
-      return reinterpret_cast<const char*>(f) - static_cast<const char*>(0);
+      return reinterpret_cast<const char*>(p) - static_cast<const char*>(0);
+    }
+  };
+
+  /// A hash function for strings.
+  struct string_hash : Sgi::hash<const char*>
+  {
+    size_t operator()(const std::string& s) const
+    {
+      // We are living dangerously.  Be sure to call operator()
+      // from the super-class, not this one.
+      return Sgi::hash<const char*>::operator()(s.c_str());
     }
   };
 }

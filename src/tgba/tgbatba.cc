@@ -56,6 +56,14 @@ namespace spot
       return acc_.id() - o->accepting_cond().id();
     }
 
+    virtual size_t
+    hash() const
+    {
+      // We expect to have many more state than accepting conditions.
+      // Hence we keep only 8 bits for accepting conditions.
+      return (s_->hash() << 8) + (acc_.id() & 0xFF);
+    }
+
     virtual
     state_tba_proxy* clone() const
     {

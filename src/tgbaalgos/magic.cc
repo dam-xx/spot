@@ -12,8 +12,14 @@ namespace spot
 
   magic_search::~magic_search()
   {
-    for (hash_type::iterator i = h.begin(); i != h.end(); ++i)
-      delete i->first;
+    hash_type::const_iterator s = h.begin();
+    while (s != h.end())
+      {
+	// Advance the iterator before deleting the "key" pointer.
+	const state* ptr = s->first;
+	++s;
+	delete ptr;
+      }
     if (x)
       delete x;
   }

@@ -48,6 +48,12 @@ namespace spot
 	- reinterpret_cast<char*>(get_state());
     }
 
+    virtual size_t
+    hash() const
+    {
+      return reinterpret_cast<char*>(get_state()) - static_cast<char*>(0);
+    }
+
     virtual state_gspn* clone() const
     {
       return new state_gspn(get_state());

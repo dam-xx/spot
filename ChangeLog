@@ -1,5 +1,27 @@
 2003-08-29  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/state.hh (state::hash): New method.
+	(state_ptr_equal, state_ptr_hash): New functors.
+	* src/tgba/statebdd.hh, src/tgba/statebdd.cc (state_bdd::hash):
+	New method.
+	* src/tgba/tgbaexplicit.hh, src/tgba/tgbaexplicit.cc
+	(state_explicit::hash): New method.
+	(ns_map, sn_map): Use Sgi::hash_map instead of std::map.
+	* src/tgba/tgbaproduct.hh, src/tgba/tgbaproduct.cc
+	(state_product::hash): New method.
+	* src/tgba/tgbatba.cc (state_tba_proxy::hash): New method.
+	* src/tgbaalgos/lbtt.cc (acp_seen, todo_set, seen_map): Redefine
+	using Sgi::hash_map or Sgi::hash_set.
+	(lbtt_reachable): Don't erase a key that is pointed to by an
+	iterator.
+	* src/tgbaalgos/reachiter.cc
+	(tgba_reachable_iterator::~tgba_reachable_iterator): Likewise.
+	* src/tgbaalgos/magic.cc (magic_search::~magic_search()): Likewise.
+	* src/tgbaalgos/magic.hh (hash_type): Redefine using Sgi::hash_map.
+	* src/tgbaalgos/reachiter.hh (seen_map): Redefine using Sgi::hash_map.
+	* iface/gspn/gspn.cc (state_gspn::hash): New method.
+	* src/misc/hash.hh (string_hash): New functor.
+
 	* src/tgba/tgbaexplicit.cc (tgba_explicit::all_accepting_conditions)
 	Compute all_accepting_conditions_ from neg_accepting_conditions_,
 	not by browsing the dictionary.  The dictionary also contains

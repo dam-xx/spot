@@ -56,7 +56,8 @@ namespace spot
   protected:
     const tgba* automata_;	///< The spot::tgba to explore.
 
-    typedef std::map<const state*, int, state_ptr_less_than> seen_map;
+    typedef Sgi::hash_map<const state*, int,
+			  state_ptr_hash, state_ptr_equal> seen_map;
     seen_map seen;		///< States already seen.
   };
 

@@ -13,8 +13,14 @@ namespace spot
 
   tgba_reachable_iterator::~tgba_reachable_iterator()
   {
-    for (seen_map::const_iterator s = seen.begin(); s != seen.end(); ++s)
-      delete s->first;
+    seen_map::const_iterator s = seen.begin();
+    while (s != seen.end())
+      {
+	// Advance the iterator before deleting the "key" pointer.
+	const state* ptr = s->first;
+	++s;
+	delete ptr;
+      }
   }
 
   void

@@ -23,6 +23,7 @@ namespace spot
     }
 
     virtual int compare(const state* other) const;
+    virtual size_t hash() const;
     virtual state_bdd* clone() const;
 
   protected:

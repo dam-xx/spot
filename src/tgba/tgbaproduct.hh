@@ -43,6 +43,7 @@ namespace spot
     }
 
     virtual int compare(const state* other) const;
+    virtual size_t hash() const;
     virtual state_product* clone() const;
 
   private:

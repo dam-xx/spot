@@ -1,6 +1,7 @@
 #ifndef SPOT_TGBAALGOS_MAGIC_HH
 # define SPOT_TGBAALGOS_MAGIC_HH
 
+#include "misc/hash.hh"
 #include <list>
 #include <utility>
 #include <ostream>
@@ -82,8 +83,8 @@ namespace spot
     /// This is an addition to the data from the paper.
     tstack_type tstack;
 
-    // FIXME: use a hash_map.
-    typedef std::map<const state*, magic, state_ptr_less_than> hash_type;
+    typedef Sgi::hash_map<const state*, magic,
+			  state_ptr_hash, state_ptr_equal> hash_type;
     hash_type h;		///< Map of visited states.
 
     /// Append a new state to the current path.

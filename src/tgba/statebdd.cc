@@ -16,6 +16,12 @@ namespace spot
     return o->as_bdd().id() - state_.id();
   }
 
+  size_t
+  state_bdd::hash() const
+  {
+    return state_.id();
+  }
+
   /// Duplicate a state.
   state_bdd*
   state_bdd::clone() const
