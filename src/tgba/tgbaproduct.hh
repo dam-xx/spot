@@ -11,24 +11,24 @@ namespace spot
   ///
   /// This state is in fact a pair of state: the state from the left
   /// automaton and that of the right.
-  class state_bdd_product : public state
+  class state_product : public state
   {
   public:
     /// \brief Constructor
     /// \param left The state from the left automaton.
     /// \param right The state from the right automaton.
-    /// These state are acquired by spot::state_bdd_product, and will
+    /// These states are acquired by spot::state_product, and will
     /// be deleted on destruction.
-    state_bdd_product(state* left, state* right)
+    state_product(state* left, state* right)
       :	left_(left),
 	right_(right)
     {
     }
 
     /// Copy constructor
-    state_bdd_product(const state_bdd_product& o);
+    state_product(const state_product& o);
 
-    virtual ~state_bdd_product();
+    virtual ~state_product();
 
     state*
     left() const
@@ -43,7 +43,7 @@ namespace spot
     }
 
     virtual int compare(const state* other) const;
-    virtual state_bdd_product* clone() const;
+    virtual state_product* clone() const;
 
   private:
     state* left_;		///< State from the left automaton.
@@ -52,14 +52,14 @@ namespace spot
 
 
   /// \brief Iterate over the successors of a product computed on the fly.
-  class tgba_product_succ_iterator: public tgba_succ_iterator
+  class tgba_succ_iterator_product: public tgba_succ_iterator
   {
   public:
-    tgba_product_succ_iterator(tgba_succ_iterator* left,
+    tgba_succ_iterator_product(tgba_succ_iterator* left,
 			       tgba_succ_iterator* right,
 			       bdd left_neg, bdd right_neg);
 
-    virtual ~tgba_product_succ_iterator();
+    virtual ~tgba_succ_iterator_product();
 
     // iteration
     void first();
@@ -67,7 +67,7 @@ namespace spot
     bool done() const;
 
     // inspection
-    state_bdd_product* current_state() const;
+    state_product* current_state() const;
     bdd current_condition() const;
     bdd current_accepting_conditions() const;
 
@@ -100,7 +100,7 @@ namespace spot
 
     virtual state* get_init_state() const;
 
-    virtual tgba_product_succ_iterator*
+    virtual tgba_succ_iterator_product*
     succ_iter(const state* local_state,
 	      const state* global_state = 0,
 	      const tgba* global_automaton = 0) const;

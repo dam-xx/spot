@@ -1,5 +1,9 @@
 2003-08-20  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* tgba/tgbaproduct.cc, tgba/tgbaproduct.hh:
+	(state_bdd_product, tgba_product_succ_iterator): Rename as ...
+	(state_product, tgba_succ_iterator_product): ... these.
+
 	* iface/gspn/dcswavefm.test: New file.
 	* iface/gspn/Makefile.am (check_PROGRAMS): Add fmgspn-rg and
 	fmgspn-srg.

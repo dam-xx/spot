@@ -6,25 +6,25 @@ namespace spot
 {
 
   ////////////////////////////////////////////////////////////
-  // state_bdd_product
+  // state_product
 
-  state_bdd_product::state_bdd_product(const state_bdd_product& o)
+  state_product::state_product(const state_product& o)
     : state(),
       left_(o.left()->clone()),
       right_(o.right()->clone())
   {
   }
 
-  state_bdd_product::~state_bdd_product()
+  state_product::~state_product()
   {
     delete left_;
     delete right_;
   }
 
   int
-  state_bdd_product::compare(const state* other) const
+  state_product::compare(const state* other) const
   {
-    const state_bdd_product* o = dynamic_cast<const state_bdd_product*>(other);
+    const state_product* o = dynamic_cast<const state_product*>(other);
     assert(o);
     int res = left_->compare(o->left());
     if (res != 0)
@@ -32,16 +32,16 @@ namespace spot
     return right_->compare(o->right());
   }
 
-  state_bdd_product*
-  state_bdd_product::clone() const
+  state_product*
+  state_product::clone() const
   {
-    return new state_bdd_product(*this);
+    return new state_product(*this);
   }
 
   ////////////////////////////////////////////////////////////
-  // tgba_product_succ_iterator
+  // tgba_succ_iterator_product
 
-  tgba_product_succ_iterator::tgba_product_succ_iterator
+  tgba_succ_iterator_product::tgba_succ_iterator_product
   (tgba_succ_iterator* left, tgba_succ_iterator* right,
    bdd left_neg, bdd right_neg)
     : left_(left), right_(right),
@@ -50,7 +50,7 @@ namespace spot
   {
   }
 
-  tgba_product_succ_iterator::~tgba_product_succ_iterator()
+  tgba_succ_iterator_product::~tgba_succ_iterator_product()
   {
     delete left_;
     if (right_)
@@ -58,7 +58,7 @@ namespace spot
   }
 
   void
-  tgba_product_succ_iterator::step_()
+  tgba_succ_iterator_product::step_()
   {
     left_->next();
     if (left_->done())
@@ -69,7 +69,7 @@ namespace spot
   }
 
   void
-  tgba_product_succ_iterator::next_non_false_()
+  tgba_succ_iterator_product::next_non_false_()
   {
     while (!done())
       {
@@ -87,7 +87,7 @@ namespace spot
   }
 
   void
-  tgba_product_succ_iterator::first()
+  tgba_succ_iterator_product::first()
   {
     if (!right_)
       return;
@@ -108,33 +108,33 @@ namespace spot
   }
 
   void
-  tgba_product_succ_iterator::next()
+  tgba_succ_iterator_product::next()
   {
     step_();
     next_non_false_();
   }
 
   bool
-  tgba_product_succ_iterator::done() const
+  tgba_succ_iterator_product::done() const
   {
     return !right_ || right_->done();
   }
 
 
-  state_bdd_product*
-  tgba_product_succ_iterator::current_state() const
+  state_product*
+  tgba_succ_iterator_product::current_state() const
   {
-    return new state_bdd_product(left_->current_state(),
-				 right_->current_state());
+    return new state_product(left_->current_state(),
+			     right_->current_state());
   }
 
   bdd
-  tgba_product_succ_iterator::current_condition() const
+  tgba_succ_iterator_product::current_condition() const
   {
     return current_cond_;
   }
 
-  bdd tgba_product_succ_iterator::current_accepting_conditions() const
+  bdd tgba_succ_iterator_product::current_accepting_conditions() const
   {
     return ((left_->current_accepting_conditions() & right_neg_)
 	    | (right_->current_accepting_conditions() & left_neg_));
@@ -166,17 +166,17 @@ namespace spot
   state*
   tgba_product::get_init_state() const
   {
-    return new state_bdd_product(left_->get_init_state(),
-				 right_->get_init_state());
+    return new state_product(left_->get_init_state(),
+			     right_->get_init_state());
   }
 
-  tgba_product_succ_iterator*
+  tgba_succ_iterator_product*
   tgba_product::succ_iter(const state* local_state,
 			  const state* global_state,
 			  const tgba* global_automaton) const
   {
-    const state_bdd_product* s =
-      dynamic_cast<const state_bdd_product*>(local_state);
+    const state_product* s =
+      dynamic_cast<const state_product*>(local_state);
     assert(s);
 
     // If global_automaton is not specified, THIS is the root of a
@@ -191,7 +191,7 @@ namespace spot
 					      global_state, global_automaton);
     tgba_succ_iterator* ri = right_->succ_iter(s->right(),
 					       global_state, global_automaton);
-    return new tgba_product_succ_iterator(li, ri,
+    return new tgba_succ_iterator_product(li, ri,
 					  left_->neg_accepting_conditions(),
 					  right_->neg_accepting_conditions());
   }
@@ -199,8 +199,7 @@ namespace spot
   bdd
   tgba_product::compute_support_conditions(const state* in) const
   {
-    const state_bdd_product* s =
-      dynamic_cast<const state_bdd_product*>(in);
+    const state_product* s = dynamic_cast<const state_product*>(in);
     assert(s);
     bdd lsc = left_->support_conditions(s->left());
     bdd rsc = right_->support_conditions(s->right());
@@ -210,8 +209,7 @@ namespace spot
   bdd
   tgba_product::compute_support_variables(const state* in) const
   {
-    const state_bdd_product* s =
-      dynamic_cast<const state_bdd_product*>(in);
+    const state_product* s = dynamic_cast<const state_product*>(in);
     assert(s);
     bdd lsc = left_->support_variables(s->left());
     bdd rsc = right_->support_variables(s->right());
@@ -227,7 +225,7 @@ namespace spot
   std::string
   tgba_product::format_state(const state* state) const
   {
-    const state_bdd_product* s = dynamic_cast<const state_bdd_product*>(state);
+    const state_product* s = dynamic_cast<const state_product*>(state);
     assert(s);
     return (left_->format_state(s->left())
 	    + " * "
@@ -237,7 +235,7 @@ namespace spot
   state*
   tgba_product::project_state(const state* s, const tgba* t) const
   {
-    const state_bdd_product* s2 = dynamic_cast<const state_bdd_product*>(s);
+    const state_product* s2 = dynamic_cast<const state_product*>(s);
     assert(s2);
     if (t == this)
       return s2->clone();
