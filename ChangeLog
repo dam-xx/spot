@@ -1,5 +1,10 @@
 2003-04-17  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltlvisit/clone.hh, src/ltlvisit/clone.cc: New files.
+	* src/ltlvisit/Makefile.am (libltlvisit_a_SOURCES): Add them.
+	* src/ltlvisit/lunabbrev.hh, src/ltlvisit/lunabbrev.cc: Inherit
+	from clone_visitor and remove all useless methods (now inherited).
+
 	* src/ltlvisit/nenoform.hh, src/ltlvisit/nenoform.cc: New files.
 	* src/ltlvisit/Makefile.am (libltlvisit_a_SOURCES): Add them.
 	* src/ltltest/equals.cc (main) [NENOFORM]: Call negative_normal_form.

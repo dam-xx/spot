@@ -13,30 +13,6 @@ namespace spot
     {
     }
 
-    formula*
-    unabbreviate_logic_visitor::result() const
-    {
-      return result_;
-    }
-    
-    void 
-    unabbreviate_logic_visitor::visit(const atomic_prop* ap)
-    {
-      result_ = new atomic_prop(ap->name());
-    }
-
-    void 
-    unabbreviate_logic_visitor::visit(const constant* c)
-    {
-      result_ = new constant(c->val());
-    }
-
-    void 
-    unabbreviate_logic_visitor::visit(const unop* uo)
-    {
-      result_ = new unop(uo->op(), recurse(uo->child()));
-    }
-    
     void 
     unabbreviate_logic_visitor::visit(const binop* bo)
     {
@@ -74,20 +50,9 @@ namespace spot
       /* Unreachable code. */
       assert(0);
     }
-    
-    void 
-    unabbreviate_logic_visitor::visit(const multop* mo)
-    {
-      multop* res = new multop(mo->op());
-      unsigned mos = mo->size();
-      for (unsigned i = 0; i < mos; ++i)
-	{
-	  res->add(recurse(mo->nth(i)));
-	}
-      result_ = res;
-    }
 
-    formula* unabbreviate_logic_visitor::recurse(const formula* f)
+    formula* 
+    unabbreviate_logic_visitor::recurse(const formula* f)
     {
       return unabbreviate_logic(f);
     }

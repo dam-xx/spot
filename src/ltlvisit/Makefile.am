@@ -3,6 +3,8 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
 lib_LIBRARIES = libltlvisit.a
 libltlvisit_a_SOURCES = \
+  clone.cc \
+  clone.hh \
   dotty.cc \
   dotty.hh \
   dump.cc \
