@@ -28,7 +28,7 @@ namespace spot
     fv_map::iterator sii = var_map.find(f);
     if (sii != var_map.end())
       {
-	num =  sii->second;
+	num = sii->second;
       }
     else
       {

@@ -24,7 +24,7 @@ namespace spot
       while (all_acc != bddfalse)
 	{
 	  bdd acc = bdd_satone(all_acc);
-	  all_acc &= !acc;
+	  all_acc -= acc;
 	  sm[acc] = count++;
 	}
     }
@@ -35,7 +35,7 @@ namespace spot
       while (b != bddfalse)
 	{
 	  bdd acc = bdd_satone(b);
-	  b &= !acc;
+	  b -= acc;
 	  os << sm[acc] << " ";
 	}
       return os;
@@ -65,7 +65,7 @@ namespace spot
     else
       {
 	bdd cube = bdd_satone(b);
-	b &= !cube;
+	b -= cube;
 	if (b != bddfalse)
 	  {
 	    return "| " + bdd_to_lbtt(b, d) + " " + bdd_to_lbtt(cube, d);

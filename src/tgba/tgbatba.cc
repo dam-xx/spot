@@ -156,14 +156,14 @@ namespace spot
     // Now build the "cycle" of accepting conditions.
 
     bdd last = bdd_satone(all);
-    all &= !last;
+    all -= last;
 
     acc_cycle_[bddtrue] = last;
 
     while (all != bddfalse)
       {
 	bdd next = bdd_satone(all);
-	all &= !next;
+	all -= next;
 	acc_cycle_[last] = next;
 	last = next;
       }

@@ -151,7 +151,7 @@ namespace spot
   void
   tgba_explicit::add_neg_condition(transition* t, ltl::formula* f)
   {
-    t->condition &= ! get_condition(f);
+    t->condition -= get_condition(f);
   }
 
   void

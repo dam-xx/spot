@@ -66,11 +66,11 @@ namespace spot
     do
       {
 	// FIXME: Iterating on the successors this way (calling
-	// bdd_satone{,set} and NANDing out the result from a
+	// bdd_satone{,set} and NANDing out (-=) the result from a
 	// set) requires several descent of the BDD.  Maybe it would be
 	// faster to compute all satisfying formula in one operation.
 
-	succ_set_left_ &= !current_;
+	succ_set_left_ -= current_;
 	if (succ_set_left_ == bddfalse) // No more successors?
 	  return;
 
@@ -113,7 +113,7 @@ namespace spot
 	    // So, first, filter out all transitions like p, which
 	    // are also in other accepting sets.
 	    bdd fout = bdd_relprod(as, !current_acc_, data_.acc_set);
-	    bdd as_fout = as & !fout;
+	    bdd as_fout = as - fout;
 	    // Then, pick the remaining term that are exactly in all
 	    // required accepting sets.
 	    bdd all = bddtrue;
@@ -121,7 +121,7 @@ namespace spot
 	    do
 	      {
 		bdd one_acc = bdd_satone(acc);
-		acc &= !one_acc;
+		acc -= one_acc;
 		all &= bdd_relprod(as_fout, one_acc, data_.acc_set);
 	      }
 	    while (acc != bddfalse);

@@ -1,5 +1,9 @@
 2003-08-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/succiterconcrete.cc, src/tgba/tgbaexplicit.cc,
+	src/tgba/tgbatba.cc, src/tgbaalgos/lbtt.cc: Use `-' instead of `& !'
+	between two BDDs.  That's one less call to BuDDy.
+
 	* src/tgbatest/tgbaread.test, src/tgbatest/explicit.test:
 	Adjust expected output after 2003-08-07's change.
 
