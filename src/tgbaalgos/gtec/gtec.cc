@@ -229,6 +229,9 @@ namespace spot
 		todo.pop();
 		dec_depth();
 	      }
+	    // Use this state to start the computation of an accepting
+	    // cycle.
+	    ecs_->cycle_seed = spi.first;
             set_states(ecs_->states());
 	    return new couvreur99_check_result(ecs_);
 	  }
@@ -288,7 +291,8 @@ namespace spot
 	succ_queue::iterator q = queue.begin();
 	while (q != queue.end())
 	  {
-	    int* i = find_state(q->s);
+	    numbered_state_heap::state_index_p sip = ecs_->h->find(q->s);
+	    int* i = sip.second;
 	    if (!i)
 	      {
 		// Skip unknown states.
@@ -333,10 +337,15 @@ namespace spot
 		// merged SCC.
 		ecs_->root.top().condition |= acc;
 
+		// Have we found all acceptance conditions?
 		if (ecs_->root.top().condition
 		    == ecs_->aut->all_acceptance_conditions())
 		  {
-		    /// q->s has already been freed by find_state().
+		    // Use this state to start the computation of an accepting
+		    // cycle.
+		    ecs_->cycle_seed = sip.first;
+
+		    /// q->s has already been freed by ecs_->h->find.
 		    queue.erase(q);
 		    // We have found an accepting SCC.  Clean up TODO.
 		    // We must delete all states of apparing in TODO

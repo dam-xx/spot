@@ -24,10 +24,56 @@
 
 namespace spot
 {
+  namespace
+  {
+    typedef Sgi::hash_set<const state*,
+			  state_ptr_hash, state_ptr_equal> state_set;
+    class shortest_path: public bfs_steps
+    {
+    public:
+      shortest_path(const state_set* t, const couvreur99_check_status* ecs)
+        : bfs_steps(ecs->aut), target(t), ecs(ecs)
+      {
+      }
+
+      const state*
+      search(const state* start, tgba_run::steps& l)
+      {
+	return this->bfs_steps::search(filter(start), l);
+      }
+
+      const state*
+      filter(const state* s)
+      {
+	numbered_state_heap::state_index_p sip = ecs->h->find(s);
+	// Ignore unknown states ...
+	if (!sip.first)
+	  {
+	    delete s;
+	    return 0;
+	  }
+	// ... as well as dead states.
+	if (*sip.second == -1)
+	  return 0;
+	return sip.first;
+      }
+
+      bool
+      match(tgba_run::step&, const state* dest)
+      {
+        return target->find(dest) != target->end();
+      }
+
+    private:
+      state_set seen;
+      const state_set* target;
+      const couvreur99_check_status* ecs;
+    };
+  }
+
   couvreur99_check_result::couvreur99_check_result
-  (const couvreur99_check_status* ecs,
-   const explicit_connected_component_factory* eccf)
-    : emptiness_check_result(ecs->aut), ecs_(ecs), eccf_(eccf)
+  (const couvreur99_check_status* ecs)
+    : emptiness_check_result(ecs->aut), ecs_(ecs)
   {
   }
 
@@ -38,153 +84,93 @@ namespace spot
 
     assert(!ecs_->root.empty());
 
-    scc_stack::stack_type root = ecs_->root.s;
-    int comp_size = root.size();
-    // Transform the stack of connected component into an array.
-    explicit_connected_component** scc =
-      new explicit_connected_component*[comp_size];
-    for (int j = comp_size - 1; 0 <= j; --j)
+    // Compute an accepting cycle.
+    accepting_cycle();
+
+    // Compute the prefix: it's the shortest path from the initial
+    // state of the automata to any state of the cycle.
+
+    // Register all states from the cycle as target of the BFS.
+    state_set ss;
+    for (tgba_run::steps::const_iterator i = run_->cycle.begin();
+	 i != run_->cycle.end(); ++i)
+      ss.insert(i->s);
+    shortest_path shpath(&ss, ecs_);
+
+    const state* prefix_start = ecs_->aut->get_init_state();
+    // There are two cases: either the initial state is already on
+    // the cycle, or it is not.  If it is, we will have to rotate
+    // the cycle so it begins on this position.  Otherwise we will shift
+    // the cycle so it begins on the state that follows the prefix.
+    // cycle_entry_point is that state.
+    const state* cycle_entry_point;
+    state_set::const_iterator ps = ss.find(prefix_start);
+    if (ps != ss.end())
       {
-	scc[j] = eccf_->build();
-	scc[j]->index = root.top().index;
-	scc[j]->condition = root.top().condition;
-	root.pop();
+	// The initial state is on the cycle.
+	delete prefix_start;
+	cycle_entry_point = *ps;
       }
-    assert(root.empty());
-
-    // Build the set of states for all SCCs.
-    numbered_state_heap_const_iterator* i = ecs_->h->iterator();
-    for (i->first(); !i->done(); i->next())
+    else
       {
-	int index = i->get_index();
-	// Skip states from dead SCCs.
-	if (index < 0)
-	  continue;
-	assert(index != 0);
-
-	// Find the SCC this state belongs to.
-	int j;
-	for (j = 1; j < comp_size; ++j)
-	  if (index < scc[j]->index)
-	    break;
-	scc[j - 1]->insert(i->get_state());
-      }
-    delete i;
-
-    numbered_state_heap::state_index_p spi =
-      ecs_->h->index(ecs_->aut->get_init_state());
-    assert(spi.first);
-
-    // We build a path trough each SCC in the stack.  For the
-    // first SCC, the starting state is the initial state of the
-    // automaton.  The destination state is the closest state
-    // from the next SCC.  This destination state becomes the
-    // starting state when building a path through the next SCC.
-    const state* start = spi.first;
-    for (int k = 0; k < comp_size - 1; ++k)
-      {
-
-	struct scc_bfs: bfs_steps
-	{
-	  explicit_connected_component** scc;
-	  int k;
-	  bool in_next;
-	  scc_bfs(const tgba* a, explicit_connected_component** scc, int k)
-	    : bfs_steps(a), scc(scc), k(k)
-	  {
-	  }
-
-	  virtual const state*
-	  filter(const state* s)
-	  {
-	    const state* h_s = scc[k]->has_state(s);
-	    if (!h_s)
-	      {
-		h_s = scc[k+1]->has_state(s);
-		in_next = true;
-		if (!h_s)
-		  delete s;
-	      }
-	    else
-	      {
-		in_next = false;
-	      }
-	    return h_s;
-	  }
-
-	  virtual bool
-	  match(tgba_run::step&, const state*)
-	  {
-	    return in_next;
-	  }
-
-
-	} b(ecs_->aut, scc, k);
-
-	start = b.search(start, run_->prefix);
+	// This initial state is outside the cycle.  Compute the prefix.
+        cycle_entry_point = shpath.search(prefix_start, run_->prefix);
       }
 
-    accepting_cycle(scc[comp_size - 1], start,
-		    scc[comp_size - 1]->condition);
+    // Locate cycle_entry_point on the cycle.
+    tgba_run::steps::iterator cycle_ep_it;
+    for (cycle_ep_it = run_->cycle.begin();
+	 cycle_ep_it != run_->cycle.end()
+	   && cycle_entry_point->compare(cycle_ep_it->s); ++cycle_ep_it)
+      continue;
+    assert(cycle_ep_it != run_->cycle.end());
 
-    for (int j = comp_size - 1; 0 <= j; --j)
-      delete scc[j];
-    delete[] scc;
+    // Now shift the cycle so it starts on cycle_entry_point.
+    run_->cycle.splice(run_->cycle.end(), run_->cycle,
+		       run_->cycle.begin(), cycle_ep_it);
+    run_->cycle.erase(run_->cycle.begin(), cycle_ep_it);
 
     return run_;
   }
 
-  namespace
-  {
-    struct triplet
-    {
-      const state* s;		// Current state.
-      tgba_succ_iterator* iter;	// Iterator to successor of the current state.
-      bdd acc;			// All acceptance conditions traversed by
-				// the path so far.
-
-      triplet (const state* s, tgba_succ_iterator* iter, bdd acc)
-	: s(s), iter(iter), acc(acc)
-      {
-      }
-    };
-
-  }
-
   void
-  couvreur99_check_result::accepting_cycle(const explicit_connected_component*
-					   scc,
-					   const state* start, bdd
-					   acc_to_traverse)
+  couvreur99_check_result::accepting_cycle()
   {
+    bdd acc_to_traverse = ecs_->aut->all_acceptance_conditions();
     // Compute an accepting cycle using successive BFS that are
     // restarted from the point reached after we have discovered a
     // transition with a new acceptance conditions.
     //
     // This idea is taken from Product<T>::findWitness in LBTT 1.1.2.
-    const state* substart = start;
+    const state* substart = ecs_->cycle_seed;
     do
       {
 	struct scc_bfs: bfs_steps
 	{
-	  const explicit_connected_component* scc;
-	  bool in_next;
+	  const couvreur99_check_status* ecs;
 	  bdd& acc_to_traverse;
-	  const state* start;
-	  scc_bfs(const tgba* a, const explicit_connected_component* scc,
-		  bdd& acc_to_traverse, const state* start)
-	    : bfs_steps(a), scc(scc), acc_to_traverse(acc_to_traverse),
-	      start(start)
+	  int scc_root;
+	  scc_bfs(const couvreur99_check_status* ecs,
+		  bdd& acc_to_traverse)
+	    : bfs_steps(ecs->aut), ecs(ecs), acc_to_traverse(acc_to_traverse),
+	      scc_root(ecs->root.s.top().index)
 	  {
 	  }
 
 	  virtual const state*
 	  filter(const state* s)
 	  {
-	    const state* h_s = scc->has_state(s);
-	    if (!h_s)
-	      delete s;
-	    return h_s;
+	    numbered_state_heap::state_index_p sip = ecs->h->find(s);
+	    // Ignore unknown states.
+	    if (!sip.first)
+	      {
+		delete s;
+		return 0;
+	      }
+	    // Stay in the final SCC.
+	    if (*sip.second < scc_root)
+	      return 0;
+	    return sip.first;
 	  }
 
 	  virtual bool
@@ -193,7 +179,7 @@ namespace spot
 	    bdd less_acc = acc_to_traverse - st.acc;
 	    if (less_acc != acc_to_traverse
 		|| (acc_to_traverse == bddfalse
-		    && s == start))
+		    && s == ecs->cycle_seed))
 	      {
 		acc_to_traverse = less_acc;
 		return true;
@@ -201,11 +187,11 @@ namespace spot
 	    return false;
 	  }
 
-	} b(ecs_->aut, scc, acc_to_traverse, start);
+	} b(ecs_, acc_to_traverse);
 
 	substart = b.search(substart, run_->cycle);
       }
-    while (acc_to_traverse != bddfalse || substart != start);
+    while (acc_to_traverse != bddfalse || substart != ecs_->cycle_seed);
   }
 
   void

@@ -44,6 +44,7 @@ namespace spot
     const tgba* aut;
     scc_stack root;
     numbered_state_heap* h;	///< Heap of visited states.
+    const state* cycle_seed;
 
     /// Output statistics about this object.
     void print_stats(std::ostream& os) const;

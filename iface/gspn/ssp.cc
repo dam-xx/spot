@@ -1003,6 +1003,10 @@ namespace spot
     return new couvreur99_check_shy_ssp(ssp_automata);
   }
 
+#if 0
+  // I rewrote couvreur99_check_result today, and it no longer use
+  // connected_component_ssp_factory.  So this cannot work anymore.
+  // -- adl 2004-12-10.
   couvreur99_check_result*
   counter_example_ssp(const couvreur99_check_status* status)
   {
@@ -1010,4 +1014,5 @@ namespace spot
       couvreur99_check_result(status,
 			      connected_component_ssp_factory::instance());
   }
+#endif
 }

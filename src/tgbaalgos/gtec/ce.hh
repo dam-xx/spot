@@ -23,7 +23,6 @@
 # define SPOT_TGBAALGOS_GTEC_CE_HH
 
 #include "status.hh"
-#include "explscc.hh"
 #include "tgbaalgos/emptiness.hh"
 
 namespace spot
@@ -32,11 +31,7 @@ namespace spot
   class couvreur99_check_result: public emptiness_check_result
   {
   public:
-    couvreur99_check_result(const couvreur99_check_status* ecs,
-			    const explicit_connected_component_factory*
-			    eccf =
-			    connected_component_hash_set_factory::instance());
-
+    couvreur99_check_result(const couvreur99_check_status* ecs);
 
     virtual tgba_run* accepting_run();
 
@@ -45,12 +40,10 @@ namespace spot
   protected:
     /// Called by accepting_run() to find a cycle which traverses all
     /// acceptance conditions in the accepted SCC.
-    void accepting_cycle(const explicit_connected_component* scc,
-			 const state* start, bdd acc_to_traverse);
+    void accepting_cycle();
 
   private:
     const couvreur99_check_status* ecs_;
-    const explicit_connected_component_factory* eccf_;
     tgba_run* run_;
   };
 }

@@ -263,7 +263,11 @@ main(int argc, char **argv)
 			ce = new spot::couvreur99_check_result(ecs);
 			break;
 		      default:
-			ce = spot::counter_example_ssp(ecs);
+			// ce = spot::counter_example_ssp(ecs);
+			std::cerr
+			  << "counter_example_ssp() is no longer supported"
+			  << std::endl;
+			exit(1);
 		      }
 #endif
 		    spot::tgba_run* run = ce->accepting_run();

@@ -1,5 +1,18 @@
 2004-12-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/gtec/status.hh
+	(couvreur99_check_status::cycle_seed): New attribute.
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check::check,
+	couvreur99_check_shy::check): Fill cycle_seed.
+	* src/tgbaalgos/gtec/ce.hh, src/tgbaalgos/gtec/ce.cc:
+	(couvreur99_check_result::accepting_run,
+	couvreur99_check_result::accepting_cycle): Revamp to compute a
+	cycle from the cycle_start, and then the shortest prefix to this
+	cycle.
+
+	* iface/gspn/ltlgspn.cc, iface/gspn/ssp.hh, iface/gspn/ssp.cc: Disable
+	the functions that were using the interface I have just broken.
+
 	* src/tgbaalgos/gtec/nsheap.hh (numbered_state_heap::find): Clarify
 	comment.
 
