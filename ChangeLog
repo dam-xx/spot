@@ -1,3 +1,7 @@
+2003-06-25  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgbatest/ltl2tgba.cc: Support -v.
+
 2003-06-24  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgbatest/ltl2tgba.cc (syntax): Fix usage message.

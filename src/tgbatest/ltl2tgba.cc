@@ -21,7 +21,9 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -r   display the relation BDD, not the reachability graph"
 	    << std::endl
-	    << "  -R   same as -r, but as a set" << std::endl;
+	    << "  -R   same as -r, but as a set" << std::endl
+	    << "  -v   display the BDD variables used by the automaton" 
+	    << std::endl;
   exit(2);
 }
 
@@ -66,6 +68,10 @@ main(int argc, char** argv)
 	{
 	  output = 3;
 	}
+      else if (!strcmp(argv[formula_index], "-v"))
+	{
+	  output = 5;
+	}
       else
 	{
 	  break;
@@ -107,6 +113,9 @@ main(int argc, char** argv)
 	case 4:
 	  spot::bdd_print_set(std::cout, a.get_dict(),
 			      a.get_core_data().accepting_conditions);
+	  break;
+	case 5:
+	  a.get_dict().dump(std::cout);
 	  break;
 	default:
 	  assert(!"unknown output option");
