@@ -23,16 +23,16 @@
 #include <config.h>
 #include <utility>
 #include <vector>
+#include "EdgeContainer.h"
+#include "Graph.h"
 #include "LbttAlloc.h"
 #include "BuchiAutomaton.h"
 #include "Configuration.h"
-#include "ProductAutomaton.h"
 #include "StateSpace.h"
 
 using namespace std;
 using Graph::BuchiAutomaton;
 using Graph::StateSpace;
-using Graph::ProductAutomaton;
 
 /******************************************************************************
  *
@@ -107,7 +107,7 @@ struct AutomatonStats
                                                      * Büchi automaton.
 						     */
 
-  ProductAutomaton::size_type                       /* Number of stats in a */
+  ::Graph::Graph<GraphEdgeContainer>::size_type     /* Number of stats in a */
     number_of_product_states;                       /* product automaton.   */
 
   unsigned long int number_of_product_transitions;  /* Number of transitions in
@@ -270,29 +270,21 @@ struct TestStatistics
                                                      * checks performed.
 						     */
 
-  unsigned long int                                 /* Total number of   */
-    total_number_of_buchi_states[2];                /* states in all the
-                                                     * generated Büchi
-                                                     * automata.
+  BIGUINT total_number_of_buchi_states[2];          /* Total number of states
+                                                     * in all the generated
+                                                     * Büchi automata.
 						     */
 
-  unsigned long int                                 /* Total number of     */
-    total_number_of_buchi_transitions[2];           /* transitions in all
+  BIGUINT total_number_of_buchi_transitions[2];     /* Total number of
+                                                     * transitions in all
                                                      * the generated Büchi
                                                      * automata.
 						     */
 
-  unsigned long int                                 /* Total number of sets */
-    total_number_of_acceptance_sets[2];             /* of accepting states
-						     * in all the generated
-						     * Büchi automata.
-						     */
-
-  unsigned long int                                 /* Total number of      */
-    total_number_of_msccs[2];                       /* maximal strongly
-						     * connected components
-                                                     * in the generated
-                                                     * Büchi automata.
+  BIGUINT total_number_of_acceptance_sets[2];       /* Total number of sets of
+                                                     * accepting states in all
+						     * the generated Büchi
+						     * automata.
 						     */
 
   double total_buchi_generation_time[2];            /* Total time used when
@@ -300,14 +292,13 @@ struct TestStatistics
                                                      * automata.
 						     */
 
-  unsigned long int                                 /* Total number of   */
-    total_number_of_product_states[2];              /* states in all the 
-                                                     * generated product
-                                                     * automata.
+  BIGUINT total_number_of_product_states[2];        /* Total number of states
+                                                     * in all the generated
+                                                     * product automata.
 						     */
 
-  unsigned long int                                 /* Total number of      */
-    total_number_of_product_transitions[2];         /* transitions in all the
+  BIGUINT total_number_of_product_transitions[2];   /* Total number of
+                                                     * transitions in all the
                                                      * generated product
                                                      * automata.
 						     */
@@ -556,7 +547,6 @@ inline TestStatistics::TestStatistics
     total_number_of_buchi_states[i] = 0;
     total_number_of_buchi_transitions[i] = 0;
     total_number_of_acceptance_sets[i] = 0;
-    total_number_of_msccs[i] = 0;
     total_number_of_product_states[i] = 0;
     total_number_of_product_transitions[i] = 0;
     total_buchi_generation_time[i] = 0.0;

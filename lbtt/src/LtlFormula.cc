@@ -24,9 +24,8 @@
 namespace Ltl
 {
 
-map<LtlFormula*, unsigned long int,                 /* Shared storage for */
-    LtlFormula::ptr_less,                           /* LTL formulae.      */
-    ALLOC(unsigned long int) >
+set<LtlFormula*, LtlFormula::ptr_less,              /* Shared storage for */
+    ALLOC(LtlFormula*) >                            /* LTL formulae.      */
   LtlFormula::formula_storage;
 
 unsigned long int                                   /* Upper limit for the */
@@ -37,8 +36,6 @@ unsigned long int                                   /* Upper limit for the */
 						     * formula in a given
 						     * truth assignment).
 						     */
-
-
 
 /******************************************************************************
  *
@@ -873,193 +870,6 @@ Bitset LtlFormula::findPropositionalModel(long int max_atom) const
   }
 
   return model;
-}
-
-/* ========================================================================= */
-LtlFormula* LtlFormula::read(Exceptional_istream& stream)
-/* ----------------------------------------------------------------------------
- *
- * Description:   Recursively constructs an LtlFormula by parsing input from an
- *                exception-aware input stream.
- *
- * Argument:      stream  --  A reference to an exception-aware input stream.
- *
- * Returns:       The constructed LtlFormula.
- *
- * ------------------------------------------------------------------------- */
-{
-  string token;
-  LtlFormula* formula;
-
-  try
-  {
-    stream >> token;
-  }
-  catch (const IOException&)
-  {
-    if (static_cast<istream&>(stream).eof())
-      throw ParseErrorException("error parsing LTL formula (unexpected end of "
-				"input)");
-    else
-      throw ParseErrorException("error parsing LTL formula (I/O error)");
-  }
-
-  if (token[0] == 'p')
-  {
-    if (token.length() == 1)
-      throw ParseErrorException("error parsing LTL formula (unrecognized "
-				"token: `" + token + "')");
-
-    long int id;
-    char* endptr;
-
-    id = strtol(token.c_str() + 1, &endptr, 10);
-
-    if (*endptr != '\0' || id < 0 || id == LONG_MIN || id == LONG_MAX)
-      throw ParseErrorException("error parsing LTL formula (unrecognized "
-				"token: `" + token + "')");
-
-    formula = &Atom::construct(id);
-  }
-  else
-  {
-    if (token.length() > 1)
-      throw ParseErrorException("error parsing LTL formula (unrecognized "
-				"token: `" + token + "')");
-
-    switch (token[0])
-    {
-      case LTL_TRUE :
-	formula = &True::construct();
-	break;
-
-      case LTL_FALSE :
-	formula = &False::construct();
-	break;
-
-      case LTL_NEGATION :
-      case LTL_NEXT :
-      case LTL_FINALLY :
-      case LTL_GLOBALLY :
-	{
-	  LtlFormula* g = read(stream);
-
-	  try
-	  {
-	    switch (token[0])
-	    {
-	      case LTL_NEGATION :
-		formula = &Not::construct(g);
-		break;
-
-	      case LTL_NEXT :
-		formula = &Next::construct(g);
-		break;
-
-	      case LTL_FINALLY :
-		formula = &Finally::construct(g);
-		break;
-
-	      default : /* LTL_GLOBALLY */
-		formula = &Globally::construct(g);
-		break;
-	    }
-	  }
-	  catch (...)
-	  {
-	    LtlFormula::destruct(g);
-	    throw;
-	  }
-
-	  break;
-	}
-
-      case LTL_CONJUNCTION :
-      case LTL_DISJUNCTION :
-      case LTL_IMPLICATION :
-      case LTL_EQUIVALENCE :
-      case LTL_XOR :
-      case LTL_UNTIL :
-      case LTL_V :
-      case LTL_WEAK_UNTIL :
-      case LTL_STRONG_RELEASE :
-      case LTL_BEFORE :
-	{
-	  LtlFormula* g = read(stream);
-	  LtlFormula* h;
-
-	  try
-	  {
-	    h = read(stream);
-	  }
-	  catch (...)
-	  {
-	    LtlFormula::destruct(g);
-	    throw;
-	  }
-
-	  try
-	  {
-	    switch (token[0])
-	    {
-	      case LTL_CONJUNCTION :
-		formula = &And::construct(g, h);
-		break;
-
-	      case LTL_DISJUNCTION :
-		formula = &Or::construct(g, h);
-		break;
-
-	      case LTL_IMPLICATION :
-		formula = &Imply::construct(g, h);
-		break;
-
-	      case LTL_EQUIVALENCE :
-		formula = &Equiv::construct(g, h);
-		break;
-
-	      case LTL_XOR :
-		formula = &Xor::construct(g, h);
-		break;
-		
-	      case LTL_UNTIL :
-		formula = &Until::construct(g, h);
-		break;
-
-	      case LTL_V :
-		formula = &V::construct(g, h);
-		break;
-
-	      case LTL_WEAK_UNTIL :
-		formula = &WeakUntil::construct(g, h);
-		break;
-
-	      case LTL_STRONG_RELEASE :
-		formula = &StrongRelease::construct(g, h);
-		break;
-
-	      default : /* LTL_BEFORE */
-		formula = &Before::construct(g, h);
-		break;
-	    }
-	  }
-	  catch (...)
-	  {
-	    LtlFormula::destruct(g);
-	    LtlFormula::destruct(h);
-	    throw;
-	  }
-
-	  break;
-	}
-
-      default :
-	throw ParseErrorException("error parsing LTL formula (unrecognized "
-				  "token: `" + token + "')");
-    }
-  }
-
-  return formula;
 }
 
 /* ========================================================================= */

@@ -19,11 +19,6 @@
 
 %{
 #include <config.h>
-#include <cmath>
-#include <climits>
-#include <cstdlib>
-#include <cstring>
-#include <string>
 #include "Configuration.h"
 #include "Config-parse.h"
 
@@ -34,225 +29,102 @@ extern int config_file_line_number;
 %option case-insensitive
 %option never-interactive
 %option noyywrap
+%option nounput
+
+%x ATTR EQ VAL
+
+SQSTR [^\'\n]*
+DQSTR ([^\"\\\n]|\\.)*
+UQC   [^\'\"\\ \t\n]
+UQSTR ({UQC}+|\\.)({UQC}*|\\.)*
+OKVAL \'{SQSTR}\'|\"{DQSTR}\"|{UQSTR}
 
 %%
 
-[ \t]*                      { /* Skip whitespace. */ }
-"#"[^\n]*                   { /* Skip comments. */ }
+<*>[ \t]*                   { /* Skip whitespace everywhere. */ }
+<*>"#".*$                   { /* Skip comments everywhere. */ }
 
-"\n"                        { /* Skip newlines, but update the line number. */
+<INITIAL,ATTR>"\n"          { /* Skip newlines, but update the line number. */
                                config_file_line_number++;
                             }
 
-"{"                         { return CFG_LBRACE; }
-"}"                         { return CFG_RBRACE; }
-"="                         { return CFG_EQUALS; }
+"{"                         { BEGIN(ATTR); return CFG_LBRACE; }
 
-algorithm                   { return CFG_ALGORITHM; }
-enabled                     { return CFG_ENABLED; }
-name                        { return CFG_NAME; }
-parameters                  { return CFG_PARAMETERS; }
-path                        { return CFG_PROGRAMPATH; }
-
+algorithm|implementation|translator { return CFG_ALGORITHM; }
 globaloptions               { return CFG_GLOBALOPTIONS; }
-comparisoncheck             { return CFG_COMPARISONTEST; }
-comparisontest              { return CFG_COMPARISONTEST; }
-consistencycheck            { return CFG_CONSISTENCYTEST; }
-consistencytest             { return CFG_CONSISTENCYTEST; }
-interactive                 { return CFG_INTERACTIVE; }
-intersectioncheck           { return CFG_INTERSECTIONTEST; }
-intersectiontest            { return CFG_INTERSECTIONTEST; }
-modelcheck                  { return CFG_MODELCHECK; }
-rounds                      { return CFG_ROUNDS; }
-verbosity                   { return CFG_VERBOSITY; }
-
 statespaceoptions           { return CFG_STATESPACEOPTIONS; }
-edgeprobability             { return CFG_EDGEPROBABILITY; }
-propositions                { return CFG_PROPOSITIONS; }
-size                        { return CFG_SIZE; }
-truthprobability            { return CFG_TRUTHPROBABILITY; }
-changeinterval              { return CFG_CHANGEINTERVAL; }
-randomseed                  { return CFG_RANDOMSEED; }
-
 formulaoptions              { return CFG_FORMULAOPTIONS; }
-abbreviatedoperators        { return CFG_ABBREVIATEDOPERATORS; }
-andpriority                 { return CFG_ANDPRIORITY; }
-beforepriority              { return CFG_BEFOREPRIORITY; }
-defaultoperatorpriority     { return CFG_DEFAULTOPERATORPRIORITY; }
-equivalencepriority         { return CFG_EQUIVALENCEPRIORITY; }
-falsepriority               { return CFG_FALSEPRIORITY; }
-finallypriority             { return CFG_FINALLYPRIORITY; }
-generatemode                { return CFG_GENERATEMODE; }
-globallypriority            { return CFG_GLOBALLYPRIORITY; }
-implicationpriority         { return CFG_IMPLICATIONPRIORITY; }
-nextpriority                { return CFG_NEXTPRIORITY; }
-notpriority                 { return CFG_NOTPRIORITY; }
-orpriority                  { return CFG_ORPRIORITY; }
-outputmode                  { return CFG_OUTPUTMODE; }
-propositionpriority         { return CFG_PROPOSITIONPRIORITY; }
-releasepriority             { return CFG_RELEASEPRIORITY; }
-strongreleasepriority       { return CFG_STRONGRELEASEPRIORITY; }
-truepriority                { return CFG_TRUEPRIORITY; }
-untilpriority               { return CFG_UNTILPRIORITY; }
-weakuntilpriority           { return CFG_WEAKUNTILPRIORITY; }
-xorpriority                 { return CFG_XORPRIORITY; }
 
-true|yes                    {
-                              yylval.truth_value = true;
-                              return CFG_TRUTH_VALUE;
+[^ \t\n]+                   { return CFG_UNKNOWN; }
+
+<ATTR>enabled               { BEGIN(EQ); return CFG_ENABLED; }
+<ATTR>name                  { BEGIN(EQ); return CFG_NAME; }
+<ATTR>parameters            { BEGIN(EQ); return CFG_PARAMETERS; }
+<ATTR>path                  { BEGIN(EQ); return CFG_PROGRAMPATH; }
+
+<ATTR>comparisoncheck       { BEGIN(EQ); return CFG_COMPARISONTEST; }
+<ATTR>comparisontest        { BEGIN(EQ); return CFG_COMPARISONTEST; }
+<ATTR>consistencycheck      { BEGIN(EQ); return CFG_CONSISTENCYTEST; }
+<ATTR>consistencytest       { BEGIN(EQ); return CFG_CONSISTENCYTEST; }
+<ATTR>interactive           { BEGIN(EQ); return CFG_INTERACTIVE; }
+<ATTR>intersectioncheck     { BEGIN(EQ); return CFG_INTERSECTIONTEST; }
+<ATTR>intersectiontest      { BEGIN(EQ); return CFG_INTERSECTIONTEST; }
+<ATTR>modelcheck            { BEGIN(EQ); return CFG_MODELCHECK; }
+<ATTR>rounds                { BEGIN(EQ); return CFG_ROUNDS; }
+<ATTR>translatortimeout     { BEGIN(EQ); return CFG_TRANSLATORTIMEOUT; }
+<ATTR>verbosity             { BEGIN(EQ); return CFG_VERBOSITY; }
+
+<ATTR>edgeprobability       { BEGIN(EQ); return CFG_EDGEPROBABILITY; }
+<ATTR>propositions          { BEGIN(EQ); return CFG_PROPOSITIONS; }
+<ATTR>size                  { BEGIN(EQ); return CFG_SIZE; }
+<ATTR>truthprobability      { BEGIN(EQ); return CFG_TRUTHPROBABILITY; }
+<ATTR>changeinterval        { BEGIN(EQ); return CFG_CHANGEINTERVAL; }
+<ATTR>randomseed            { BEGIN(EQ); return CFG_RANDOMSEED; }
+
+<ATTR>abbreviatedoperators  { BEGIN(EQ); return CFG_ABBREVIATEDOPERATORS; }
+<ATTR>andpriority           { BEGIN(EQ); return CFG_ANDPRIORITY; }
+<ATTR>beforepriority        { BEGIN(EQ); return CFG_BEFOREPRIORITY; }
+<ATTR>defaultoperatorpriority {
+                              BEGIN(EQ); return CFG_DEFAULTOPERATORPRIORITY;
+                            }
+<ATTR>equivalencepriority   { BEGIN(EQ); return CFG_EQUIVALENCEPRIORITY; }
+<ATTR>falsepriority         { BEGIN(EQ); return CFG_FALSEPRIORITY; }
+<ATTR>finallypriority       { BEGIN(EQ); return CFG_FINALLYPRIORITY; }
+<ATTR>generatemode          { BEGIN(EQ); return CFG_GENERATEMODE; }
+<ATTR>globallypriority      { BEGIN(EQ); return CFG_GLOBALLYPRIORITY; }
+<ATTR>implicationpriority   { BEGIN(EQ); return CFG_IMPLICATIONPRIORITY; }
+<ATTR>nextpriority          { BEGIN(EQ); return CFG_NEXTPRIORITY; }
+<ATTR>notpriority           { BEGIN(EQ); return CFG_NOTPRIORITY; }
+<ATTR>orpriority            { BEGIN(EQ); return CFG_ORPRIORITY; }
+<ATTR>outputmode            { BEGIN(EQ); return CFG_OUTPUTMODE; }
+<ATTR>propositionpriority   { BEGIN(EQ); return CFG_PROPOSITIONPRIORITY; }
+<ATTR>releasepriority       { BEGIN(EQ); return CFG_RELEASEPRIORITY; }
+<ATTR>strongreleasepriority { BEGIN(EQ); return CFG_STRONGRELEASEPRIORITY; }
+<ATTR>truepriority          { BEGIN(EQ); return CFG_TRUEPRIORITY; }
+<ATTR>untilpriority         { BEGIN(EQ); return CFG_UNTILPRIORITY; }
+<ATTR>weakuntilpriority     { BEGIN(EQ); return CFG_WEAKUNTILPRIORITY; }
+<ATTR>xorpriority           { BEGIN(EQ); return CFG_XORPRIORITY; }
+
+<ATTR>"}"                   { BEGIN(INITIAL); return CFG_RBRACE; }
+
+<ATTR>"="?[^= \t\n]*        { return CFG_UNKNOWN; }
+
+<EQ>"="                     { BEGIN(VAL); return CFG_EQUALS; }
+
+<EQ>.                       { return CFG_UNKNOWN; }
+
+<VAL>\\|{OKVAL}+(\\)?       {
+                              yylval.value = yytext;
+                              BEGIN(ATTR);
+                              return CFG_VALUE;
                             }
 
-false|no                    {
-                              yylval.truth_value = false;
-                              return CFG_TRUTH_VALUE;
+<VAL>{OKVAL}*(\'{SQSTR}|\"{DQSTR})(\\)? {
+                              throw Configuration::ConfigurationException
+                                      (config_file_line_number,
+                                       "unmatched quotes");
                             }
 
-always                      {
-                              yylval.interactivity_value =
-                                Configuration::ALWAYS;
-                              return CFG_INTERACTIVITY_VALUE;
-                            }
-
-never                       {
-                              yylval.interactivity_value =
-                                Configuration::NEVER;
-                              return CFG_INTERACTIVITY_VALUE;
-                            }
-
-onerror                     {
-                              yylval.interactivity_value =
-                                Configuration::ONERROR;
-                              return CFG_INTERACTIVITY_VALUE;
-                            }
-
-normal                      {
-			      yylval.formula_mode_value = 
-				Configuration::NORMAL;
-			      return CFG_FORMULA_MODE_VALUE;
-                            }
-
-nnf                         {
-                              yylval.formula_mode_value = Configuration::NNF;
-			      return CFG_FORMULA_MODE_VALUE;
-                            }
-
-local                       {
-                              yylval.product_type_value = Configuration::LOCAL;
-			      return CFG_PRODUCT_TYPE_VALUE;
-                            }
-
-global                      {
-                              yylval.product_type_value =
-	                        Configuration::GLOBAL;
-			      return CFG_PRODUCT_TYPE_VALUE;
-                            }
-
-randomgraph                 {
-                              yylval.statespace_mode_value
-				= Configuration::RANDOMGRAPH;
-			      return CFG_STATESPACE_MODE_VALUE;
-                            }
-
-randomconnectedgraph        {
-                              yylval.statespace_mode_value
-				= Configuration::RANDOMCONNECTEDGRAPH;
-			      return CFG_STATESPACE_MODE_VALUE;
-                            }
-
-randompath                  {
-                              yylval.statespace_mode_value
-				= Configuration::RANDOMPATH;
-			      return CFG_STATESPACE_MODE_VALUE;
-                            }
-
-enumeratedpath              {
-                              yylval.statespace_mode_value
-				= Configuration::ENUMERATEDPATH;
-			      return CFG_STATESPACE_MODE_VALUE;
-                            }
-
-
-"-"?[0-9]+"...""-"?[0-9]+   {
-                              char* dot_ptr;
-                              yylval.integer_interval.min
-				= strtol(yytext, &dot_ptr, 10);
-			      
-			      if (yylval.integer_interval.min == LONG_MIN
-				  || yylval.integer_interval.min == LONG_MAX)
-                                throw Configuration::ConfigurationException
-                                  (config_file_line_number,
-				   "integer out of range");
-
-			      dot_ptr += 3;
-			      yylval.integer_interval.max
-				= strtol(dot_ptr, 0, 10);
-
-			      if (yylval.integer_interval.max == LONG_MIN
-				  || yylval.integer_interval.max == LONG_MAX)
-                                throw Configuration::ConfigurationException
-                                  (config_file_line_number,
-				   "integer out of range");
-
-			      return CFG_INTEGER_INTERVAL;
-                            }
-
-"-"?[0-9]+                  {
-                              yylval.integer = strtol(yytext, 0, 10);
-                              if (yylval.integer == LONG_MIN
-                                  || yylval.integer == LONG_MAX)
-                                throw Configuration::ConfigurationException
-                                  (config_file_line_number,
-				   "integer out of range");
-                              return CFG_INTEGER;
-                            }
-
-"-"?[0-9]*"."[0-9]+         {
-                              yylval.real = strtod(yytext, 0);
-
-                              if (yylval.real == HUGE_VAL
-				  || yylval.real == -HUGE_VAL)
-                                throw Configuration::ConfigurationException
-                                  (config_file_line_number,
-				   "real number out of range");
-                              return CFG_REAL;
-                            }
-
-\"([^\n\"\\]*(\\[^\n])?)*\" {
-                              unsigned long int len = strlen(yytext);
-                              bool escape = false;
-                              yylval.str = new string;
-                              for (unsigned long int i = 1; i < len - 1; i++)
-			      {
-                                if (!escape && yytext[i] == '\\')
-                                  escape = true;
-                                else
-				{
-                                  escape = false;
-                                  (*yylval.str) += yytext[i];
-                                }
-                              }
-                              return CFG_STRING_CONSTANT;
-                            }
-
-.                           {
-                              return CFG_UNKNOWN;
-                            }
-
+<EQ,VAL>"\n"                { return CFG_UNKNOWN; }
 
 %%
-
-/* ========================================================================= */
-int getCharacter()
-/* ----------------------------------------------------------------------------
- *
- * Description:   Reads the next character from the lexer input stream.
- *
- * Arguments:     None.
- *
- * Returns:       The next character in the lexer input stream or EOF if there
- *                are no more characters to read.
- *
- * ------------------------------------------------------------------------- */
-{
-  return yyinput();
-}

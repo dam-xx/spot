@@ -18,28 +18,50 @@
  */
 
 #include <config.h>
+#include <cerrno>
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif /* HAVE_SYS_STAT_H */
+#ifdef HAVE_SYS_TIMES_H
 #include <sys/times.h>
+#endif /* HAVE_SYS_TIMES_H */
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+#ifdef HAVE_SYS_WAIT_H
+#include <sys/wait.h>
+#endif /* HAVE_SYS_WAIT_H */
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif /* HAVE_FCNTL_H */
 #include "BitArray.h"
 #include "BuchiAutomaton.h"
+#include "BuchiProduct.h"
 #include "DispUtil.h"
+#include "Product.h"
+#include "IntervalList.h"
 #include "LtlFormula.h"
 #include "PathEvaluator.h"
-#include "ProductAutomaton.h"
 #include "Random.h"
-#include "SccIterator.h"
+#include "SccCollection.h"
 #include "SharedTestData.h"
 #include "PathIterator.h"
 #include "StateSpace.h"
+#include "StateSpaceProduct.h"
 #include "StatDisplay.h"
 #include "StringUtil.h"
+#include "TempFsysName.h"
 #include "TestOperations.h"
 #include "TestRoundInfo.h"
-#include "TestStatistics.h"
+
+
 
 /******************************************************************************
  *
@@ -54,6 +76,19 @@ using namespace ::SharedTestData;
 using namespace ::StatDisplay;
 using namespace ::StringUtil;
 using namespace ::DispUtil;
+
+/******************************************************************************
+ *
+ * Timeout handler.
+ *
+ *****************************************************************************/
+
+bool timeout = false;
+
+void timeoutHandler(int)
+{
+  timeout = true;
+}
 
 /* ========================================================================= */
 void openFile
@@ -129,13 +164,19 @@ void openFile
 }
 
 /* ========================================================================= */
-void removeFile(const char* filename, int indent)
+void openFile(const char* filename, int& fd, int flags, int indent)
 /* ----------------------------------------------------------------------------
  *
- * Description:   Removes a file.
+ * Description:   Function for opening a file for input/output using file
+ *                descriptors.
  *
  * Arguments:     filename  --  A pointer to a constant C-style string with
- *                              the name of the file to be removed.
+ *                              the name of the file to be opened.
+ *                fd        --  A reference to an int that should be associated
+ *                              with the file descriptor of the file.  This
+ *                              variable will have the value -1 if the
+ *                              operation fails.
+ *                flags     --  An integer specifying the open mode.
  *                indent    --  Number of spaces to leave to the left of
  *                              messages given to the user.
  *
@@ -143,10 +184,52 @@ void removeFile(const char* filename, int indent)
  *
  * ------------------------------------------------------------------------- */
 {
-  printText(string("<removing `") + filename + "'>", 5, indent);
+  printText(string("<") + (flags & O_CREAT ? "creat" : "open") + "ing `"
+	    + filename + "'>",
+	    5,
+	    indent);
 
-  if (remove(filename) == 0)
+  if (flags & O_CREAT)
+    fd = open(filename, flags, S_IRUSR | S_IWUSR);
+  else
+    fd = open(filename, flags);
+
+  if (fd == -1)
+  {
+    printText(" error\n", 5);
+
+    if (flags & O_CREAT)
+      throw FileCreationException(string("`") + filename + "'");
+    else
+      throw FileOpenException(string("`") + filename + "'");
+  }
+  else
     printText(" ok\n", 5);
+}
+
+/* ========================================================================= */
+void truncateFile(const char* filename, int indent)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Truncates a file.
+ *
+ * Arguments:     filename  --  A pointer to a constant C-style string with
+ *                              the name of the file to be truncated.
+ *                indent    --  Number of spaces to leave to the left of
+ *                              messages given to the user.
+ *
+ * Returns:       Nothing.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  printText(string("<truncating `") + filename + "'>", 5, indent);
+
+  int fd =  open(filename, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+  if (fd != -1)
+  {
+    close(fd);
+    printText(" ok\n", 5);
+  }
   else
     printText(" error\n", 5);
 }
@@ -617,9 +700,9 @@ void verifyFormulaOnPath()
   if (printText("Model checking formula using internal algorithm\n", 2, 4))
     printText("<model checking>", 4, 6);
 
-  test_results[round_info.number_of_translators].automaton_stats[0].
+  test_results[round_info.number_of_translators - 1].automaton_stats[0].
     emptiness_check_result.clear();
-  test_results[round_info.number_of_translators].automaton_stats[1].
+  test_results[round_info.number_of_translators - 1].automaton_stats[1].
     emptiness_check_result.clear();
 
   try
@@ -637,17 +720,18 @@ void verifyFormulaOnPath()
 	 s++)
     {
       if (path_evaluator.getResult(s))
-	test_results[round_info.number_of_translators].automaton_stats[0].
+	test_results[round_info.number_of_translators - 1].automaton_stats[0].
 	  emptiness_check_result.setBit(s);
       else
-	test_results[round_info.number_of_translators].automaton_stats[1].
+	test_results[round_info.number_of_translators - 1].automaton_stats[1].
 	  emptiness_check_result.setBit(s);
     }
   }
   catch (const UserBreakException&)
   {
-    if (!printText(" user break\n\n", 4))
-      printText("[User break]\n\n", 2, 6);
+    if (!printText(" aborted (user break)", 4))
+      printText("[User break]", 2, 6);
+    printText("\n\n", 2);
 
     if (round_info.transcript_file.is_open())
       writeToTranscript("User break while model checking formulas. No tests "
@@ -657,8 +741,9 @@ void verifyFormulaOnPath()
   }
   catch (const bad_alloc&)
   {
-    if (!printText(" out of memory\n\n", 4))
-      printText("[Out of memory]\n\n", 2, 6);
+    if (!printText(" aborted (out of memory)", 4))
+      printText("[Out of memory]", 2, 6);
+    printText("\n\n", 2);
 
     if (round_info.transcript_file.is_open())
       writeToTranscript("Out of memory while model checking formulas. No "
@@ -671,9 +756,9 @@ void verifyFormulaOnPath()
   printText(" ok\n", 4);
   printText("\n", 2);
 
-  test_results[round_info.number_of_translators].automaton_stats[0].
+  test_results[round_info.number_of_translators - 1].automaton_stats[0].
     emptiness_check_performed = true;
-  test_results[round_info.number_of_translators].automaton_stats[1].
+  test_results[round_info.number_of_translators - 1].automaton_stats[1].
     emptiness_check_performed = true;
 }
 
@@ -699,16 +784,17 @@ void writeFormulaeToFiles()
 
     if (!round_info.formula_in_file[f])
     {
-      printText(string("<writing ") + (f == 0 ? "posi" : "nega")
-		+ "tive formula to `" + round_info.formula_file_name[f]
-		+ "'>\n",
-		5,
-		6);
-
       try
       {
-	openFile(round_info.formula_file_name[f], formula_file,
+	openFile(round_info.formula_file_name[f]->get(), formula_file,
 		 ios::out | ios::trunc, 6);
+
+	printText(string("<writing ") + (f == 0 ? "posi" : "nega")
+		  + "tive formula to `"
+		  + round_info.formula_file_name[f]->get()
+		  + "'>\n",
+		  5,
+		  6);
 
 	round_info.formulae[configuration.formula_options.
 			      output_mode == Configuration::NNF
@@ -763,11 +849,10 @@ void generateBuchiAutomaton
     = test_results[algorithm_id].automaton_stats[f];
 
   if (automaton_stats.buchiAutomatonComputed())
-    printText("Büchi automaton (cached):\n", 2, 8);
+    printText("Büchi automaton (cached):\n", 3, 8);
   else
   {
-    if (!printText("Büchi automaton:\n", 3, 8))
-      printText("Computing Büchi automaton\n", 2, 8);
+    printText("Büchi automaton:\n", 3, 8);
 
     const Configuration::AlgorithmInformation& algorithm
       = configuration.algorithms[algorithm_id];
@@ -778,104 +863,304 @@ void generateBuchiAutomaton
 
     struct tms timing_information_begin, timing_information_end;
 
+    string failure_reason;
+    int stdout_capture_fileno = -1, stderr_capture_fileno = -1;
     int exitcode;
-    string command_line;
+
+    sigset_t sigint_mask;
+    sigemptyset(&sigint_mask);
+    sigaddset(&sigint_mask, SIGINT);
+
+    struct sigaction timeout_sa;
+    timeout_sa.sa_handler = timeoutHandler;
+    sigemptyset(&timeout_sa.sa_mask);
+    timeout_sa.sa_flags = 0;
+
+    pid_t pid = 0;
+
+    truncateFile(round_info.automaton_file_name->get(), 10);
+    truncateFile(round_info.cout_capture_file->get(), 10);
+    truncateFile(round_info.cerr_capture_file->get(), 10);
 
     try
     {
-      /*
-       *  Generate the command line to be used for executing the program that
-       *  is supposed to generate the automaton from a formula. The name of the
-       *  executable and any extra command line parameters are obtained from
-       *  the program configuration data structures. The command line will be
-       *  of the form
-       *    [path to executable] [additional parameters] [input file]
-       *                         [output file] 1>[stdout capture file]
-       *                         2>[stderr capture file],
-       *  so the program used for generating the automaton is assumed to follow
-       *  this format for passing the necessary input and output filenames.
-       *  Note: This kind of output redirection requires that the call to
-       *        `system' invokes a POSIX compatible shell!
-       *
-       *  The output of stdout and stderr will be redirected to two temporary
-       *  files.
-       */
-
-      command_line = *(algorithm.path_to_program) + ' ';
-
-      if (algorithm.extra_parameters != 0)
-	command_line += *(algorithm.extra_parameters) + ' ';
-
-      command_line += string(round_info.formula_file_name[f])
-                      + ' ' + round_info.automaton_file_name
-                      + " 1>" + round_info.cout_capture_file
-                      + " 2>" + round_info.cerr_capture_file;
-
-      if (!printText("<executing `" + command_line + "'>", 5, 10))
-	printText("<computing Büchi automaton>", 4, 10);
-
-      /*
-       *  Execute the translator and record its running time (user time) into
-       *  `automaton_stats.buchi_generation_time'. (The variable will have a
-       *  negative value if the time could not be determined.)
-       */
-
       automaton_stats.buchi_generation_time = -1.0;
 
-      times(&timing_information_begin);
-
-      exitcode = system(command_line.c_str());
-
-      times(&timing_information_end);
-
-      if (timing_information_begin.tms_utime != static_cast<clock_t>(-1)
-	  && timing_information_begin.tms_cutime != static_cast<clock_t>(-1)
-	  && timing_information_end.tms_utime != static_cast<clock_t>(-1)
-	  && timing_information_end.tms_cutime != static_cast<clock_t>(-1))
-	automaton_stats.buchi_generation_time 
-	  = static_cast<double>(timing_information_end.tms_utime
-			        + timing_information_end.tms_cutime
-			        - timing_information_begin.tms_utime
-			        - timing_information_begin.tms_cutime)
-	    / sysconf(_SC_CLK_TCK);
-
       /*
-       *  Nonzero exit codes from the external program are interpreted as
-       *  errors. In this case, throw an exception indicating that the program
-       *  execution failed.
+       *  Redirect standard output and standard error to files.
        */
 
-      if (exitcode != 0)
+      try
       {
+	openFile(round_info.cout_capture_file->get(), stdout_capture_fileno,
+		 O_CREAT | O_WRONLY | O_TRUNC, 10);
+
+	openFile(round_info.cerr_capture_file->get(), stderr_capture_fileno,
+		 O_CREAT | O_WRONLY | O_TRUNC, 10);
+      }
+      catch (const FileCreationException&)
+      {
+	if (stdout_capture_fileno != -1)
+	{
+	  close(stdout_capture_fileno);
+	  stdout_capture_fileno = -1;
+	}
+	printText(string(9, ' '), 4);
+	throw Exception(string("redirection of standard ")
+			+ (stdout_capture_fileno == -1 ? "output" : "error")
+			+ " failed ("
+                        + string(strerror(errno)) + ")");
+      }
+
+      /* Execute the external program. */
+
+      if (!printText("<executing translator>", 5, 10))
+	printText("<computing Büchi automaton>", 4, 10);
+
+      int error_number;
+      int error_pipe[2]; /* used for communicating errors in exec() */
+
+      double elapsed_time = -1.0;
+
+      if (pipe(error_pipe) == -1)
+	error_number = errno;
+      else
+      {
+	algorithm.parameters[algorithm.num_parameters + 1]
+	  = const_cast<char*>(round_info.formula_file_name[f]->get());
+	algorithm.parameters[algorithm.num_parameters + 2]
+	  = const_cast<char*>(round_info.automaton_file_name->get());
+
+	times(&timing_information_begin);
+	pid = fork();
+	switch (pid)
+	{
+	  case 0 : /* child */
+	    close(error_pipe[0]);
+
+	    if (dup2(stdout_capture_fileno, STDOUT_FILENO) != -1
+		&& dup2(stderr_capture_fileno, STDERR_FILENO) != -1)
+	      execvp(algorithm.parameters[0], algorithm.parameters);
+
+	    /* dup2 or exec failed: write the value of errno to error_pipe */
+
+	    write(error_pipe[1], static_cast<const void*>(&errno),
+		  sizeof(int));
+	    close(error_pipe[1]);
+	    exit(0);
+
+	  case -1 : /* fork failed */
+	    pid = 0;
+	    error_number = errno;
+	    close(error_pipe[0]);
+	    close(error_pipe[1]);
+	    break;
+
+	  default : /* parent */
+	    /* Block SIGINT signals while the child process is running. */
+
+	    if (configuration.global_options.handle_breaks)
+	      sigprocmask(SIG_BLOCK, &sigint_mask, static_cast<sigset_t*>(0));
+
+	    /* Install handler for timeouts if necessary. */
+
+	    if (configuration.global_options.translator_timeout > 0)
+	    {
+	      sigaction(SIGALRM, &timeout_sa,
+			static_cast<struct sigaction*>(0));
+	      timeout = false;
+	      alarm(configuration.global_options.translator_timeout);
+	    }
+
+	    close(error_pipe[1]);
+
+	    if (waitpid(pid, &exitcode, 0) == -1) /* waitpid failed */
+	    {
+	      error_number = errno;
+	      if (error_number == EINTR /* failure due to timeout */
+		  && configuration.global_options.translator_timeout > 0
+		  && timeout)
+	      {
+		/*
+		 *  Try to terminate the child process three times with SIGTERM
+		 *  (sleeping for one second between the tries). If the child
+		 *  fails to respond, try to terminate the child one more time
+		 *  with SIGKILL.
+		 */
+
+		int sig = SIGTERM;
+		unsigned int delay = 1;
+		for (int attempts_to_terminate = 0; attempts_to_terminate < 4;
+		     ++attempts_to_terminate)
+		{
+		  kill(pid, sig);
+		  sleep(delay);
+		  if (waitpid(pid, &exitcode, WNOHANG) != 0)
+		  {
+		    times(&timing_information_end);
+		    pid = 0;
+		    break;
+		  }
+		  if (attempts_to_terminate == 2)
+		  {
+		    sig = SIGKILL;
+		    delay = 5;
+		  }
+		}
+	      }
+	      else
+		pid = 0;
+	    }
+	    else /* child exited successfully */
+	    {
+	      times(&timing_information_end);
+	      pid = 0;
+
+	      /*  
+	       *  If there is something to be read from error_pipe, then there
+	       *  was an error in replacing the child process with the external
+	       *  program (and the pipe contains the value of errno in this
+	       *  case).
+	       */
+
+	      if (read(error_pipe[0], static_cast<void*>(&error_number),
+		       sizeof(int)) == 0)
+		error_number = 0;
+	    }
+
+	    close(error_pipe[0]);
+
+	    /* Restore signal handlers and remove any pending alarms. */
+
+	    if (configuration.global_options.translator_timeout > 0)
+	    {
+	      timeout_sa.sa_handler = SIG_DFL;
+	      sigaction(SIGALRM, &timeout_sa,
+			static_cast<struct sigaction*>(0));
+	      alarm(0);
+	    }
+
+	    if (configuration.global_options.handle_breaks)
+	      sigprocmask(SIG_UNBLOCK, &sigint_mask,
+			  static_cast<sigset_t*>(0));
+
+	    if (pid == 0
+		&& timing_information_begin.tms_utime
+		     != static_cast<clock_t>(-1)
+		&& timing_information_begin.tms_cutime
+		     != static_cast<clock_t>(-1)
+		&& timing_information_end.tms_utime != static_cast<clock_t>(-1)
+		&& timing_information_end.tms_cutime
+		     != static_cast<clock_t>(-1))
+	      elapsed_time = static_cast<double>
+		               (timing_information_end.tms_utime
+				+ timing_information_end.tms_cutime
+				- timing_information_begin.tms_utime
+				- timing_information_begin.tms_cutime)
+		             / sysconf(_SC_CLK_TCK);
+
+	    break;
+	}
+      }
+
+      close(stdout_capture_fileno);
+      close(stderr_capture_fileno);
+
+      /*
+       *  If pid != 0 at this point, then a timeout occurred, but lbtt was
+       *  unable to terminate the child process. The exception handler will
+       *  in this case throw an unexpected exception (see below) so that lbtt
+       *  will terminate (for example, it is not safe to use the temporary
+       *  file names any longer if the (still running) child process happens to
+       *  write to them).
+       */
+
+      if (pid != 0)
+      {
+	stdout_capture_fileno = stderr_capture_fileno = -1;
+	throw Exception("could not terminate child process");
+      }
+
+      if (error_number != 0) /* pipe, fork, dup2, execvp or waitpid failed */
+      {
+	stdout_capture_fileno = stderr_capture_fileno = -1;
 	ExecFailedException e;
-	e.changeMessage("Execution of `" + *(algorithm.path_to_program)
-			+ "' failed"
-			+ (automaton_stats.buchi_generation_time >= 0.0
-			   ? " ("
-			     + toString(automaton_stats.buchi_generation_time,
-					2)
-			     + " seconds elapsed)"
-			   : string(""))
-		        + " with exit status " + toString(exitcode));
+
+	if (configuration.global_options.translator_timeout > 0 && timeout)
+	  e.changeMessage("Timeout after " + toString(elapsed_time, 2)
+			  + " seconds (user time).");
+	else
+	  e.changeMessage("Execution of `" + string(algorithm.parameters[0])
+			  + "' failed (" + string(strerror(error_number))
+			  + ")");
 	throw e;
       }
 
-      printText(" ok\n", 5);
+      automaton_stats.buchi_generation_time = elapsed_time;
+
+      /*
+       *  Nonzero exit codes from the external program are interpreted as
+       *  errors. The same holds if the program was aborted by a signal. In
+       *  these cases, throw an exception indicating that the program
+       *  execution failed.
+       */
+
+      if (WIFSIGNALED(exitcode)
+	  || (WIFEXITED(exitcode) && WEXITSTATUS(exitcode) != 0))
+      {
+	ExecFailedException e;
+	failure_reason = "`" + string(algorithm.parameters[0]) + "' ";
+
+	if (WIFSIGNALED(exitcode))
+	{
+          failure_reason += "aborted by signal "
+	                    + toString(WTERMSIG(exitcode))
+#ifdef HAVE_STRSIGNAL
+			    + " (" + strsignal(WTERMSIG(exitcode)) + ")"
+#endif /* HAVE_STRSIGNAL */
+			    ;
+	  if (WTERMSIG(exitcode) == SIGINT || WTERMSIG(exitcode) == SIGQUIT)
+	    raise(WTERMSIG(exitcode));
+	}
+	else
+	  failure_reason += "exited with exit status "
+	                    + toString(WEXITSTATUS(exitcode));
+
+	e.changeMessage(failure_reason
+			+ (automaton_stats.buchi_generation_time >= 0.0
+			   ? " after "
+			     + toString(automaton_stats.buchi_generation_time,
+					2)
+			     + " seconds"
+			   : string("")));
+
+	throw e;
+      }
+
+      printText(" ok\n", 4);
 
       /*
        *  Read the automaton description into memory from the result file.
        */
 
       ifstream automaton_file;
-      openFile(round_info.automaton_file_name, automaton_file, ios::in, 10);
+      openFile(round_info.automaton_file_name->get(), automaton_file, ios::in,
+	       10);
 
-      printText("<reading automaton description>", 5, 10);
+      printText("<reading automaton description>", 4, 10);
 
-      automaton_file >> *buchi_automaton;
-
-      printText(" ok\n", 4);
+      try
+      {
+	automaton_file >> *buchi_automaton;
+      }
+      catch (const bad_alloc&)
+      {
+	throw Exception("out of memory");
+      }
 
       automaton_file.close();
+
+      printText(" ok\n", 4);
 
       automaton_stats.buchi_automaton = buchi_automaton;
     }
@@ -883,24 +1168,35 @@ void generateBuchiAutomaton
     {
       delete buchi_automaton;
 
-      printText(" error\n", 4);
-      printText("Error", 2, 10);
+      if (user_break)
+      {
+	if (!printText(" aborted (user break)", 4))
+	  printText("[User break]", 1,
+		    configuration.global_options.verbosity <= 2 ? 0 : 10);
+	printText("\n\n", 1);
+       
+	if (round_info.transcript_file.is_open())
+	  writeToTranscript("User break while generating Büchi automaton ("
+			    + configuration.algorithmString(algorithm_id)
+			    + ", "
+			    + (f == 0 ? "posi" : "nega") + "tive formula)\n");
+
+	throw UserBreakException();
+      }
 
       if (round_info.transcript_file.is_open())
-      {
 	writeToTranscript("Büchi automaton generation failed ("
                           + configuration.algorithmString(algorithm_id)
 	                  + ", "
 		  	  + (f == 0 ? "posi" : "nega")
-			  + "tive formula)");
-
-	if (automaton_stats.buchi_generation_time >= 0.0)
-	  round_info.transcript_file << string(8, ' ') + "Elapsed time: "
-				        + toString(automaton_stats.
-						     buchi_generation_time,
-						   2)
-				        + " seconds (user time)\n";
-      }
+			  + "tive formula)"
+	                  + (automaton_stats.buchi_generation_time >= 0.0
+			     ? "\n" + string(8, ' ') + "Elapsed time: "
+			       + toString(automaton_stats.
+					    buchi_generation_time,
+					  2)
+			       + " seconds (user time)"
+			     : string("")));
 
       try
       {
@@ -908,94 +1204,103 @@ void generateBuchiAutomaton
       }
       catch (const ExecFailedException& e)
       {
-	printText(string(": ") + e.what(), 2);
+	if (configuration.global_options.translator_timeout > 0 && timeout)
+	{
+	  if (!printText(" aborted (timeout)", 4))
+	    printText("[Timeout]", 1,
+		      configuration.global_options.verbosity <= 2 ? 0 : 10);
+	}
+	else
+	{
+	  if (!printText(string(" error: ") + e.what(), 4))
+	    printText("[Failed to execute translator]", 1,
+		      configuration.global_options.verbosity <= 2 ? 0 : 10);
+	}
+	printText("\n", 3);
 	if (round_info.transcript_file.is_open())
-	  round_info.transcript_file << string(8, ' ')
-                                        + "Program execution failed with exit "
-	                                  "status "
-                                        + toString(exitcode);
+	  round_info.transcript_file << string(8, ' ') + e.what() + "\n";
       }
       catch (const BuchiAutomaton::AutomatonParseException& e)
       {
-	printText(string(" parsing input: ") + e.what(), 2);
+	if (!printText(string(" error parsing input: ") + e.what(), 4))
+	  printText("[Error parsing automaton]", 1,
+		    configuration.global_options.verbosity <= 2 ? 0 : 10);
+	printText("\n", 3);
 	if (round_info.transcript_file.is_open())
 	  round_info.transcript_file << string(8, ' ')
 	                                + "Error reading automaton: "
-	                                + e.what();
+	                                + e.what()
+                                        + "\n";
       }
       catch (const Exception& e)
       {
-	printText(string(": ") + e.what(), 2);
+	if (!printText(string(" lbtt internal error: ") + e.what(), 4))
+	  printText("[lbtt internal error]", 1,
+		    configuration.global_options.verbosity <= 2 ? 0 : 10);
+	printText("\n", 3);
 	if (round_info.transcript_file.is_open())
 	  round_info.transcript_file << string(8, ' ')
                                         + "lbtt internal error: "
-	                                + e.what();
-      }
-      catch (const bad_alloc&)
-      {
-	printText(": out of memory", 2);
-	if (round_info.transcript_file.is_open())
-	  round_info.transcript_file << string(8, ' ')
-	                                + "Out of memory while reading "
-	                                  "automaton";
-      }
-
-      printText("\n", 2);
-
-      if (round_info.transcript_file.is_open())
-	round_info.transcript_file << '\n';
-
-      removeFile(round_info.automaton_file_name, 10);
-
-      try
-      {
-	const char* msg = "Contents of stdout";
-
-	if (configuration.global_options.verbosity >= 3)
-	  printFileContents(cout, msg, round_info.cout_capture_file, 10, "> ");
-	if (round_info.transcript_file.is_open())
-	  printFileContents(round_info.transcript_file, msg,
-			    round_info.cout_capture_file, 8, "> ");
-      }
-      catch (const IOException&)
-      {
+	                                + e.what()
+	                                + "\n";
       }
 
       try
       {
-	const char* msg = "Contents of stderr:";
+	if (stdout_capture_fileno != -1)
+        {
+	  const char* msg = "Contents of stdout";
 
-	if (configuration.global_options.verbosity >= 3)
-	  printFileContents(cout, msg, round_info.cerr_capture_file, 10, "> ");
-	if (round_info.transcript_file.is_open())
-	  printFileContents(round_info.transcript_file, msg,
-			    round_info.cerr_capture_file, 8, "> ");
+	  if (configuration.global_options.verbosity >= 3)
+	    printFileContents(cout, msg, round_info.cout_capture_file->get(),
+			      10, "> ");
+	  if (round_info.transcript_file.is_open())
+	    printFileContents(round_info.transcript_file, msg,
+			      round_info.cout_capture_file->get(), 10, "> ");
+	}
+
+	if (stderr_capture_fileno != -1)
+        {
+	  const char* msg = "Contents of stderr:";
+
+	  if (configuration.global_options.verbosity >= 3)
+	    printFileContents(cout, msg, round_info.cerr_capture_file->get(),
+			      10, "> ");
+	  if (round_info.transcript_file.is_open())
+	    printFileContents(round_info.transcript_file, msg,
+			      round_info.cerr_capture_file->get(), 10, "> ");
+	}
       }
       catch (const IOException&)
       {
       }
 
       if (round_info.transcript_file.is_open())
+      {
 	round_info.transcript_file << '\n';
+	round_info.transcript_file.flush();
+      }
 
-      removeFile(round_info.cout_capture_file, 10);
-      removeFile(round_info.cerr_capture_file, 10);
+      if (pid != 0) /* fatal error, lbtt should be terminated */
+	throw Exception
+	        ("fatal internal error while generating Büchi automaton");
 
       throw BuchiAutomatonGenerationException();
     }
 
-    removeFile(round_info.automaton_file_name, 10);
-
     if (configuration.global_options.verbosity >= 3)
     {
-      printFileContents(cout, "Contents of stdout:",
-			round_info.cout_capture_file, 10, "> ");
-      printFileContents(cout, "Contents of stderr:",
-			round_info.cerr_capture_file, 10, "> ");
+      try
+      {
+	printFileContents(cout, "Contents of stdout:",
+			  round_info.cout_capture_file->get(), 10, "> ");
+	printFileContents(cout, "Contents of stderr:",
+			  round_info.cerr_capture_file->get(), 10, "> ");
+      }
+      catch (const IOException&)
+      {
+      }
     }
-
-    removeFile(round_info.cout_capture_file, 10);
-    removeFile(round_info.cerr_capture_file, 10);
 
     printText("<computing statistics>", 4, 10);
 
@@ -1028,141 +1333,8 @@ void generateBuchiAutomaton
     printText(" ok\n", 4);
   }
 
-  if (configuration.global_options.verbosity >= 3)
+  if (configuration.global_options.verbosity >= 1)
     printBuchiAutomatonStats(cout, 10, algorithm_id, f);
-}
-
-/* ========================================================================= */
-void generateProductAutomaton
-  (int f,
-   vector<Configuration::AlgorithmInformation,
-          ALLOC(Configuration::AlgorithmInformation) >::size_type algorithm_id)
-/* ----------------------------------------------------------------------------
- *
- * Description:   Computes the product of a Büchi automaton with a state
- *                space.
- *
- * Arguments:     f             --  Indicates the Büchi automaton with which
- *                                  the product should be computed. 0
- *                                  corresponds to the automaton obtained from
- *                                  the positive, 1 corresponds to the one
- *                                  obtained from the negated formula.
- *                algorithm_id  --  Identifier of the LTL-to-Büchi translator
- *                                  used for generating the Büchi automata.
- *
- * Returns:       Nothing. The result is stored in
- *                'round_info.product_automaton'.
- *
- * ------------------------------------------------------------------------- */
-{
-  using ::Graph::ProductAutomaton;
-
-  AutomatonStats& automaton_stats
-    = test_results[algorithm_id].automaton_stats[f];
-
-  if (automaton_stats.emptiness_check_performed)
-    return;
-
-  if (printText("Product automaton:\n", 3, 8))
-    printText("<computing product automaton>", 4, 10);
-  else
-    printText("Computing product automaton\n", 2, 8);
-
-  final_statistics[algorithm_id].product_automaton_count[f]++;
-
-  ProductAutomaton* product_automaton = 0;
-
-  /*
-   *  Initialize the product automaton. The variable
-   *  `configuration.global_options.product_mode' is used to determine whether
-   *  the product is to be computed with respect to all the states of the
-   *  state space or only the initial state of the state space.
-   */
-
-  try
-  {
-    product_automaton = new ProductAutomaton();
-    product_automaton->computeProduct
-      (*automaton_stats.buchi_automaton, *round_info.statespace,
-       configuration.global_options.product_mode == Configuration::GLOBAL);
-  }
-  catch (const ProductAutomaton::ProductSizeException&)
-  {
-    if (!printText(" error (product may be too large)\n\n", 4))
-      printText("[Product may be too large]\n\n", 2, 10);
-
-    if (round_info.transcript_file.is_open())
-      writeToTranscript("Product automaton generation aborted ("
-			+ configuration.algorithmString(algorithm_id)
-	                + ", "
-			+ (f == 0 ? "posi" : "nega") + "tive formula)"
-			+ ". Product may be too large.\n");
-
-    delete product_automaton;
-
-    throw ProductAutomatonGenerationException();
-  }
-  catch (const UserBreakException&)
-  {
-    if (!printText(" user break\n\n", 4))
-      printText("[User break]\n\n", 2, 10);
-       
-    if (round_info.transcript_file.is_open())
-      writeToTranscript("User break while generating product automaton ("
-			+ configuration.algorithmString(algorithm_id)
-			+ ", "
-			+ (f == 0 ? "posi" : "nega") + "tive formula)\n");
-
-    delete product_automaton;
-
-    throw;
-  }
-  catch (const bad_alloc&)
-  {
-    if (product_automaton != 0)
-      delete product_automaton;
-
-    if (!printText(" out of memory\n", 4))
-      printText("[Out of memory]\n", 2, 10);
-
-    if (round_info.transcript_file.is_open())
-      writeToTranscript("Out of memory while generating product "
-			"automaton ("
-			+ configuration.algorithmString(algorithm_id)
-			+ ", "
-			+ (f == 0 ? "posi" : "nega") + "tive formula)\n");
-
-    throw ProductAutomatonGenerationException();
-  }
-
-  round_info.product_automaton = product_automaton;
-
-  /*
-   *  Determine the number of states and transitions in the product.
-   */
-
-  if (printText(" ok\n", 4))
-    printText("<computing statistics>", 4, 10);
-
-  pair<ProductAutomaton::size_type, unsigned long int> product_stats =
-    product_automaton->stats();
-
-  automaton_stats.number_of_product_states = product_stats.first;
-  automaton_stats.number_of_product_transitions = product_stats.second;
-
-  /*
-   *  Update product automaton statistics for the given algorithm.
-   */
-
-  final_statistics[algorithm_id].total_number_of_product_states[f]
-    += automaton_stats.number_of_product_states;
-  final_statistics[algorithm_id].total_number_of_product_transitions[f]
-    += automaton_stats.number_of_product_transitions;
-
-  printText(" ok\n", 4);
-
-  if (configuration.global_options.verbosity >= 3)
-    printProductAutomatonStats(cout, 10, algorithm_id, f);
 }
 
 /* ========================================================================= */
@@ -1194,30 +1366,71 @@ void performEmptinessCheck
   AutomatonStats& automaton_stats
     = test_results[algorithm_id].automaton_stats[f];
 
-  if (automaton_stats.emptiness_check_performed)
-    printText("Accepting cycles (cached):\n", 2, 8);
-  else
+  const bool result_cached = automaton_stats.emptiness_check_performed;
+
+  printText("Product automaton"
+	    + string(result_cached ? " (cached)" : "")
+	    + ":\n",
+	    3,
+	    8);
+
+  if (!result_cached)
   {
-    if (printText("Accepting cycles:\n", 3, 8))
-      printText("<checking product automaton for emptiness>", 4, 10);
-    else
-      printText("Searching for accepting cycles\n", 2, 8);
+    printText("<checking product automaton for emptiness>", 4, 10);
+
+    final_statistics[algorithm_id].product_automaton_count[f]++;
+
+    using ::Graph::StateSpaceProduct;
+    using ::Graph::Product;
 
     try
     {
-      round_info.product_automaton->emptinessCheck
-	(automaton_stats.emptiness_check_result);
-								 
+      Product<StateSpaceProduct>
+	product(*automaton_stats.buchi_automaton, *round_info.statespace);
+
+      const pair<Product<StateSpaceProduct>::size_type, unsigned long int>
+	product_stats =  product.globalEmptinessCheck
+	                   (automaton_stats.buchi_automaton->initialState(),
+			    automaton_stats.emptiness_check_result,
+			    round_info.real_emptiness_check_size);	 
+
+      printText(" ok\n", 4);
+    
+      automaton_stats.number_of_product_states = product_stats.first;
+      automaton_stats.number_of_product_transitions = product_stats.second;
+
+      final_statistics[algorithm_id].total_number_of_product_states[f]
+	+= automaton_stats.number_of_product_states;
+      final_statistics[algorithm_id].total_number_of_product_transitions[f]
+	+= automaton_stats.number_of_product_transitions;
       automaton_stats.emptiness_check_performed = true;
+    }
+    catch (const Product<StateSpaceProduct>::SizeException&)
+    {
+      if (!printText(" aborted (product may be too large)", 4))
+	printText("[Product may be too large]", 1,
+		  configuration.global_options.verbosity <= 2 ? 0 : 10);
+      printText("\n", 3);
+
+      if (round_info.transcript_file.is_open())
+	writeToTranscript("Product automaton generation aborted ("
+			  + configuration.algorithmString(algorithm_id)
+			  + ", "
+			  + (f == 0 ? "posi" : "nega") + "tive formula)"
+			  + ". Product may be too large.\n");
+
+      throw ProductAutomatonGenerationException();
     }
     catch (const UserBreakException&)
     {
-      if (!printText(" user break\n\n", 4))
-	printText("[User break]\n\n", 2, 10);
-
+      if (!printText(" aborted (user break)", 4))
+	printText("[User break]", 1,
+		  configuration.global_options.verbosity <= 2 ? 0 : 10);
+      printText("\n\n", 1);
+       
       if (round_info.transcript_file.is_open())
-	writeToTranscript("User break while searching for accepting cycles ("
-		  	  + configuration.algorithmString(algorithm_id)
+	writeToTranscript("User break while generating product automaton ("
+			  + configuration.algorithmString(algorithm_id)
 			  + ", "
 			  + (f == 0 ? "posi" : "nega") + "tive formula)\n");
 
@@ -1225,24 +1438,32 @@ void performEmptinessCheck
     }
     catch (const bad_alloc&)
     {
-      if (!printText(" out of memory\n", 4))
-	printText("[Out of memory]\n", 2, 10);
+      if (!printText(" aborted (out of memory)", 4))
+	printText("[Out of memory]", 1,
+		configuration.global_options.verbosity <= 2 ? 0 : 10);
+      printText("\n", 3);
 
       if (round_info.transcript_file.is_open())
-	writeToTranscript("Out of memory while searching for accepting cycles "
-			  "("
+	writeToTranscript("Out of memory while generating product "
+			  "automaton ("
 			  + configuration.algorithmString(algorithm_id)
 			  + ", "
 			  + (f == 0 ? "posi" : "nega") + "tive formula)\n");
 
-      throw EmptinessCheckFailedException();
+      throw ProductAutomatonGenerationException();
     }
-
-    printText(" ok\n", 4);
   }
 
-  if (configuration.global_options.verbosity >= 3)
+  if (configuration.global_options.verbosity >= 1)
+    printProductAutomatonStats(cout, 10, algorithm_id, f);
+
+  printText("Accepting cycles" + string(result_cached ? " (cached)" : "")
+	    + ":\n",
+	    3,
+	    8);
+  if (configuration.global_options.verbosity >= 1)
     printAcceptanceCycleStats(cout, 10, algorithm_id, f);
+
 }
 
 /* ========================================================================= */
@@ -1277,8 +1498,6 @@ void performConsistencyCheck
 
     if (printText("Result consistency check:\n", 3, 6))
       printText("<comparing results>", 4, 8);
-    else
-      printText("Checking consistency of the model checking results\n", 2, 6);
 
     /*
      *  The consistency check will succeed if `result' is still true at the end
@@ -1319,7 +1538,7 @@ void performConsistencyCheck
 
   printText((result ? " ok\n" : " failed\n"), 4);
   
-  if (configuration.global_options.verbosity >= 3)
+  if (configuration.global_options.verbosity >= 2)
     printConsistencyCheckStats(cout, 8, algorithm_id);
 }      
 
@@ -1340,7 +1559,7 @@ void compareResults()
   if (printText("Model checking result cross-comparison:\n", 3, 4))
     printText("<comparing results>", 4, 6);
   else
-    printText("Comparing model checking results\n", 2, 4);
+    printText("Comparing model checking results", 2, 4);
 
   bool result = true;
   AutomatonStats* alg_1_stats;
@@ -1408,6 +1627,9 @@ void compareResults()
     }
   }
 
+  IntervalList algorithms;
+  algorithms.merge(0, round_info.number_of_translators - 1);
+
   if (!result)
   {
     round_info.error = true;
@@ -1416,13 +1638,20 @@ void compareResults()
     {
       writeToTranscript("Model checking result cross-comparison check failed");
       printCrossComparisonStats(round_info.transcript_file, 8,
-				configuration.algorithms.size());
+				algorithms);
     }
   }
 
   printText((result ? " ok\n" : " failed\n"), 4);
-  if (configuration.global_options.verbosity >= 3)
-    printCrossComparisonStats(cout, 6, test_results.size());
+  if (configuration.global_options.verbosity == 2)
+  {
+    if (!result)
+      round_info.cout << " [failed]";
+    round_info.cout << '\n';
+    round_info.cout.flush();
+  }
+  else if (configuration.global_options.verbosity >= 3)
+    printCrossComparisonStats(cout, 6, algorithms);
 }
 
 /* ========================================================================= */
@@ -1438,15 +1667,14 @@ void performBuchiIntersectionCheck()
  *
  * ------------------------------------------------------------------------- */
 {
-  using ::Graph::SccIterator;
-
   if (printText("Büchi automata intersection emptiness check:\n", 3, 4))
     printText("<checking Büchi automata intersections for emptiness>\n", 4, 6);
   else
-    printText("Checking Büchi automata intersections for emptiness\n", 2, 4);
+    printText("Checking Büchi automata intersections for emptiness", 2, 4);
 
   bool result = true;
-  BuchiAutomaton* automaton_intersection;
+
+  ::Graph::BuchiProduct::clearSatisfiabilityCache();
 
   for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
 	 alg_1 = 0;
@@ -1458,6 +1686,10 @@ void performBuchiIntersectionCheck()
 	 alg_2 < round_info.number_of_translators;
 	 ++alg_2)
     {
+      if (configuration.isInternalAlgorithm(alg_1)
+	  || configuration.isInternalAlgorithm(alg_2))
+	continue;
+
       try
       {
 	if (test_results[alg_1].automaton_stats[0].
@@ -1477,12 +1709,9 @@ void performBuchiIntersectionCheck()
 	      && test_results[alg_2].automaton_stats[1].
 	           buchiAutomatonComputed())
 	  {
-	    automaton_intersection = 0;
-
-	    automaton_intersection
-	      = BuchiAutomaton::intersect
-	          (*(test_results[alg_1].automaton_stats[0].buchi_automaton),
-		   *(test_results[alg_2].automaton_stats[1].buchi_automaton));
+	    using ::Graph::BuchiAutomaton;
+	    using ::Graph::BuchiProduct;
+	    using ::Graph::Product;
 
 	    /*
 	     *  Scan the nontrivial maximal strongly connected components of
@@ -1492,85 +1721,15 @@ void performBuchiIntersectionCheck()
 	     *  fails.
 	     */
 
-	    for (SccIterator<GraphEdgeContainer> scc(*automaton_intersection);
-		 !scc.atEnd(); ++scc)
-	    {
-	      /*
-	       *  MSCC nontriviality check (an MSCC is nontrivial iff it has at
-	       *  least two states or if it consists of a single state
-	       *  connected to itself).
-	       */
+	    const BuchiAutomaton& a1
+	      = *(test_results[alg_1].automaton_stats[0].buchi_automaton);
+	    const BuchiAutomaton& a2
+	      = *(test_results[alg_2].automaton_stats[1].buchi_automaton);
 
-	      if (scc->size() > 1
-		  || (scc->size() == 1
-		      && automaton_intersection->connected(*(scc->begin()),
-							   *(scc->begin()))))
-	      {
-		const unsigned long int number_of_acceptance_sets
-		  = automaton_intersection->numberOfAcceptanceSets();
-		BitArray acceptance_sets(number_of_acceptance_sets);
-		acceptance_sets.clear(number_of_acceptance_sets);
+	    Product<BuchiProduct> product(a1, a2);
 
-		unsigned long int accept_set;
-		unsigned long int acceptance_set_counter = 0;
-
-		for (set<GraphEdgeContainer::size_type,
-	                 less<GraphEdgeContainer::size_type>,
-	                 ALLOC(GraphEdgeContainer::size_type) >::const_iterator
-		       state = scc->begin();
-		     state != scc->end()
-		       && acceptance_set_counter < number_of_acceptance_sets;
-		     ++state)
-	        {
-		  accept_set = acceptance_set_counter;
-		  while (accept_set < number_of_acceptance_sets)
-		  {
-		    if ((*automaton_intersection)[*state].acceptanceSets().
-		          test(accept_set))
-		    {
-		      acceptance_sets.setBit(accept_set);
-		      if (accept_set == acceptance_set_counter)
-		      {
-			do
-			  acceptance_set_counter++;
-			while (acceptance_set_counter
-			         < number_of_acceptance_sets
-			       && acceptance_sets[acceptance_set_counter]);
-			accept_set = acceptance_set_counter;
-			continue;
-		      }
-		    }
-		    accept_set++;
-		  }
-		}
-
-		if (acceptance_set_counter == number_of_acceptance_sets)
-	        {
-		  test_results[alg_1].automaton_stats[0].
-		    buchi_intersection_check_stats[alg_2] = 0;
-		  test_results[alg_2].automaton_stats[1].
-		    buchi_intersection_check_stats[alg_1] = 0;
-
-		  final_statistics[alg_1].
-		    buchi_intersection_check_failures[alg_2]++;
-		  if (alg_1 != alg_2)
-		    final_statistics[alg_2].
-		      buchi_intersection_check_failures[alg_1]++;
-
-		  result = false;
-
-		  printText(": failed\n", 4);
-
-		  break;
-		}
-	      }
-	    }
-
-	    delete automaton_intersection;
-	    automaton_intersection = 0;
-
-	    if (test_results[alg_1].automaton_stats[0].
-	          buchi_intersection_check_stats[alg_2] == -1)
+	    if (!product.localEmptinessCheck(a1.initialState(),
+					     a2.initialState()))
 	    {
 	      test_results[alg_1].automaton_stats[0].
 		buchi_intersection_check_stats[alg_2] = 1;
@@ -1578,6 +1737,23 @@ void performBuchiIntersectionCheck()
 		buchi_intersection_check_stats[alg_1] = 1;
 
 	      printText(": ok\n", 4);
+	    }
+	    else
+	    {
+	      test_results[alg_1].automaton_stats[0].
+		buchi_intersection_check_stats[alg_2] = 0;
+	      test_results[alg_2].automaton_stats[1].
+		buchi_intersection_check_stats[alg_1] = 0;
+
+	      final_statistics[alg_1]
+		.buchi_intersection_check_failures[alg_2]++;
+	      if (alg_1 != alg_2)
+		final_statistics[alg_2]
+		  .buchi_intersection_check_failures[alg_1]++;
+
+	      result = false;
+
+	      printText(": failed\n", 4);
 	    }
 
 	    final_statistics[alg_1].
@@ -1595,8 +1771,9 @@ void performBuchiIntersectionCheck()
       }
       catch (const UserBreakException&)
       {
-	if (!printText(" user break\n\n", 4))
-	  printText("[User break]\n\n", 2, 6);
+	if (!printText(": aborted (user break)", 4))
+	  printText(" [User break]", 2, 6);
+	printText("\n\n", 2);
 
 	if (round_info.transcript_file.is_open())
 	  writeToTranscript("User break during Büchi automata intersection "
@@ -1607,30 +1784,19 @@ void performBuchiIntersectionCheck()
 	                                + configuration.algorithmString(alg_2)
 	                                + "\n\n";
 
-	if (automaton_intersection != 0)
-	{
-	  delete automaton_intersection;
-	  automaton_intersection = 0;
-	}
-
 	throw;
       }
       catch (const bad_alloc&)
       {
-	if (automaton_intersection != 0)
-	{
-	  delete automaton_intersection;
-	  automaton_intersection = 0;
-	}
-
-	if (!printText(" out of memory\n", 4))
-	  printText("[Out of memory: (+)  "
+	if (!printText(": aborted (out of memory)", 4))
+	  printText(" [Out of memory: (+)  "
 		    + configuration.algorithmString(alg_1)
 		    + ", (-)  "
 		    + configuration.algorithmString(alg_2)
-		    + "]\n",
+		    + "]",
 		    2,
 		    6);
+	printText("\n", 2);
 
 	if (round_info.transcript_file.is_open())
 	  writeToTranscript("Out of memory during Büchi automata "
@@ -1644,6 +1810,9 @@ void performBuchiIntersectionCheck()
     }
   }
 
+  IntervalList algorithms;
+  algorithms.merge(0, round_info.number_of_translators - 1);
+
   if (!result)
   {
     round_info.error = true;
@@ -1652,13 +1821,44 @@ void performBuchiIntersectionCheck()
     {
       writeToTranscript("Büchi automata intersection emptiness check failed");
       printBuchiIntersectionCheckStats
-	(round_info.transcript_file, 8, round_info.number_of_translators);
+	(round_info.transcript_file, 8, algorithms);
+      round_info.transcript_file << '\n';
     }
+
+    if (configuration.global_options.verbosity == 2)
+      round_info.cout << " [failed]";
   }
 
-  if (configuration.global_options.verbosity >= 3)
-    printBuchiIntersectionCheckStats
-      (cout, 6, round_info.number_of_translators);
+  if (configuration.global_options.verbosity == 2)
+  {
+    round_info.cout << '\n';
+    round_info.cout.flush();
+  }
+  else if (configuration.global_options.verbosity >= 3)
+  {
+    printBuchiIntersectionCheckStats(cout, 6, algorithms);
+    round_info.cout << '\n';
+    round_info.cout.flush();
+  }
 }
+
+}
+
+
+
+/******************************************************************************
+ *
+ * Definitions for static members for specializations of the Product template.
+ *
+ *****************************************************************************/
+
+namespace Graph
+{
+
+template <>
+Product<BuchiProduct>* Product<BuchiProduct>::product = 0;
+
+template <>
+Product<StateSpaceProduct>* Product<StateSpaceProduct>::product = 0;
 
 }

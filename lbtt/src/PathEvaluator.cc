@@ -61,26 +61,25 @@ void PathEvaluator::reset()
 
 /* ========================================================================= */
 bool PathEvaluator::evaluate
-  (const LtlFormula& formula, const StateSpace& statespace,
-   const vector<StateSpace::size_type, ALLOC(StateSpace::size_type) >&
-     states_on_path,
-   StateSpace::size_type loop_state)
+  (const LtlFormula& formula, const StateSpace::Path& prefix,
+   const StateSpace::Path& cycle, const StateSpace& statespace)
 /* ----------------------------------------------------------------------------
  *
- * Description:   Evaluates an LTL formula in a state space in which the states
- *                are connected into a non-branching sequence that ends in a
- *                loop.
+ * Description:   Evaluates an LTL formula in a path formed from a prefix and
+ *                an infinitely repeating cycle of states in a state space.
  *
- * Arguments:     formula         --  Formula to be evaluated.
- *                statespace      --  State space from which the path is
- *                                    extracted.
- *                states_on_path  --  Mapping between states in the path and
- *                                    the states in `statespace' such that
- *                                    `statespace[states_on_path[i]]'
- *                                    corresponds to the ith state of the path.
- *                loop_state      --  Number of the state in the path to which
- *                                    the ``last'' state of the path is
- *                                    connected.
+ * Arguments:     formula     --  Formula to be evaluated.
+ *                prefix      --  A StateSpace::Path object corresponding to
+ *                                the prefix of the path.  Only the state
+ *                                identifiers in the path elements are used;
+ *                                the function will not require `prefix' to
+ *                                actually represent a path in `statespace'.
+ *                cycle       --  A StateSpace::Path object corresponding to
+ *                                the infinitely repeating cycle.  Only the
+ *                                state identifiers in the path elements are
+ *                                relevant.
+ *                statespace  --  State space to which the state identifiers in
+ *                                `path' and `cycle' refer.
  *
  * Returns:       `true' if and only if the LTL formula holds in the path.
  *
@@ -88,13 +87,21 @@ bool PathEvaluator::evaluate
 {
   reset();
 
-  if (states_on_path.empty() || loop_state >= states_on_path.size())
+  if (cycle.empty())
     return false;
 
   current_formula = &formula;
   current_path = &statespace;
-  current_loop_state = loop_state;
-  path_states = states_on_path;
+  current_loop_state = prefix.size();
+  path_states.reserve(prefix.size() + cycle.size());
+  for (StateSpace::Path::const_iterator state = prefix.begin();
+       state != prefix.end();
+       ++state)
+    path_states.push_back(state->node());
+  for (StateSpace::Path::const_iterator state = cycle.begin();
+       state != cycle.end();
+       ++state)
+    path_states.push_back(state->node());
 
   return eval();
 }

@@ -23,7 +23,7 @@
 #include <config.h>
 #include <deque>
 #include <iostream>
-#include <map>
+#include <set>
 #include <stack>
 #include <string>
 #include "LbttAlloc.h"
@@ -188,13 +188,6 @@ public:
 						     * input stream.
 						     */
 
-  static LtlFormula* read                           /* Constructs an         */
-    (Exceptional_istream& stream);                  /* LtlFormula by parsing
-						     * input from an
-						     * exception-aware input
-						     * stream.
-						     */
-
   void print                                        /* Writes the formula to */
     (ostream& stream = cout,                        /* an output stream.     */
      OutputMode mode = LTL_INFIX) const;
@@ -250,6 +243,10 @@ protected:
     unsigned int is_constant      : 1;              /* operators and atomic  */
   } info_flags;                                     /* propositions.         */
 
+  unsigned long int refcount;                       /* Number of references to
+						     * `this' LtlFormula.
+						     */
+
   static LtlFormula&                                /* Updates the shared   */
     insertToStorage(LtlFormula* f);                 /* formula storage with
 						     * a new formula.
@@ -288,8 +285,8 @@ private:
                                                      * formula.
 						     */
 
-  static map<LtlFormula*, unsigned long int,        /* Shared storage for */
-             ptr_less, ALLOC(unsigned long int) >   /* LTL formulae.      */
+  static set<LtlFormula*, ptr_less,                 /* Shared storage for */
+             ALLOC(LtlFormula*) >                   /* LTL formulae.      */
     formula_storage;
 
   static unsigned long int                          /* Upper limit for the */
@@ -327,6 +324,16 @@ private:
   template<class Operator>
   friend class BinaryFormula;
 };
+
+
+
+/******************************************************************************
+ *
+ * Interface to the formula parser.
+ *
+ *****************************************************************************/
+
+extern LtlFormula* parseFormula(istream& stream);
 
 
 
@@ -474,7 +481,7 @@ private:
                                                      * to satisfy the
                                                      * LtlFormula member
                                                      * function interface.
-                                                     */
+						     */
 };
 
 
@@ -1076,7 +1083,7 @@ typedef BinaryFormula<LtlBefore> Before;
  *****************************************************************************/
 
 /* ========================================================================= */
-inline LtlFormula::LtlFormula()
+inline LtlFormula::LtlFormula() : refcount(1)
 /* ----------------------------------------------------------------------------
  *
  * Description:    Constructor for class LtlFormula. Initializes the attributes
@@ -1088,8 +1095,6 @@ inline LtlFormula::LtlFormula()
  *
  * --------------------------------------------------------------------------*/
 {
-  info_flags.is_propositional = 0;
-  info_flags.is_constant = 0;
 }
 
 /* ========================================================================= */
@@ -1122,14 +1127,9 @@ inline void LtlFormula::destruct(LtlFormula* f)
  *
  * ------------------------------------------------------------------------- */
 {
-  map<LtlFormula*, unsigned long int, LtlFormula::ptr_less,
-      ALLOC(unsigned long int) >::iterator
-    deleter;
-
-  deleter = formula_storage.find(f);
-  if (--deleter->second == 0)
+  if (--f->refcount == 0)
   {
-    formula_storage.erase(deleter);
+    formula_storage.erase(f);
     delete f;
   }
 }
@@ -1147,7 +1147,7 @@ inline LtlFormula* LtlFormula::clone()
  *
  * ------------------------------------------------------------------------- */
 {
-  formula_storage.find(this)->second++;
+  ++refcount;
   return this;
 }
 
@@ -1241,8 +1241,7 @@ inline LtlFormula* LtlFormula::read(istream& stream)
  *
  * ------------------------------------------------------------------------- */
 {
-  Exceptional_istream estream(&stream, ios::badbit | ios::failbit);
-  return read(estream);
+  return parseFormula(stream);
 }
 
 /* ========================================================================= */
@@ -1303,8 +1302,6 @@ inline Exceptional_ostream& operator<<
   return stream;
 }
 
-  
-
 /* ========================================================================= */
 inline LtlFormula& LtlFormula::insertToStorage(LtlFormula* f)
 /* ----------------------------------------------------------------------------
@@ -1317,19 +1314,16 @@ inline LtlFormula& LtlFormula::insertToStorage(LtlFormula* f)
  *
  * ------------------------------------------------------------------------- */
 {
-  map<LtlFormula*, unsigned long int, LtlFormula::ptr_less,
-      ALLOC(unsigned long int) >::iterator
-    inserter;
-
-  inserter = formula_storage.find(f);
+  set<LtlFormula*, ptr_less, ALLOC(LtlFormula*) >::iterator inserter
+    = formula_storage.find(f);
   if (inserter != formula_storage.end())
   {
     delete f;
-    inserter->second++;
-    return *(inserter->first);
+    ++(*inserter)->refcount;
+    return **inserter;
   }
 
-  formula_storage.insert(make_pair(f, 1));
+  formula_storage.insert(f);
   return *f;
 }
 
@@ -1571,8 +1565,7 @@ inline Atom& Atom::construct(long int a)
 }
 
 /* ========================================================================= */
-inline Atom::Atom(long int a) :
-  LtlFormula(), atom(a)
+inline Atom::Atom(long int a) : atom(a)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Constructor for class Atom. Creates a new propositional atom.
@@ -1886,8 +1879,7 @@ inline UnaryFormula<Operator>& UnaryFormula<Operator>::construct(LtlFormula& f)
 
 /* ========================================================================= */
 template<class Operator>
-inline UnaryFormula<Operator>::UnaryFormula(LtlFormula* f) :
-  LtlFormula(), subformula(f)
+inline UnaryFormula<Operator>::UnaryFormula(LtlFormula* f) : subformula(f)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Constructs an LTL formula with a unary operator.
@@ -2189,7 +2181,7 @@ BinaryFormula<Operator>::construct(LtlFormula& f1, LtlFormula* f2)
 /* ========================================================================= */
 template<class Operator>
 inline BinaryFormula<Operator>::BinaryFormula(LtlFormula* f1, LtlFormula* f2) :
-  LtlFormula(), subformula1(f1), subformula2(f2)
+  subformula1(f1), subformula2(f2)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Constructs a binary LTL formula.

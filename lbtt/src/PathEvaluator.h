@@ -54,11 +54,11 @@ public:
 
   bool evaluate                                     /* Tests whether an      */
     (const LtlFormula& formula,                     /* LtlFormula holds in a */
-     const StateSpace& statespace,                  /* state space.          */
-     const vector<StateSpace::size_type,          
-                  ALLOC(StateSpace::size_type) >&
-       states_on_path,
-     StateSpace::size_type loop_state);
+     const StateSpace::Path& prefix,                /* path described by a   */
+     const StateSpace::Path& cycle,                 /* prefix and a cycle of */
+     const StateSpace& statespace);                 /* states from a state
+						     * space.
+						     */
 
   bool evaluate                                     /* Same as above. */
     (const LtlFormula& formula,

@@ -23,13 +23,17 @@
 #include <config.h>
 #include <deque>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 #include <utility>
 #include "LbttAlloc.h"
 #include "BuchiAutomaton.h"
 #include "Configuration.h"
-#include "ProductAutomaton.h"
+#include "EdgeContainer.h"
+#include "Graph.h"
+#include "IntervalList.h"
+#include "Product.h"
 #include "StateSpace.h"
 
 using namespace std;
@@ -45,38 +49,26 @@ extern Configuration configuration;
 namespace UserCommands
 {
 
-void computeProductAutomaton                        /* Computes a product */
-  (ProductAutomaton*& product_automaton,            /* automaton.         */
-   const BuchiAutomaton& buchi_automaton,
-   pair<unsigned long int, bool>& last_automaton,
-   const pair<unsigned long int, bool>&
-     new_automaton);
+unsigned long int parseAlgorithmId                  /* Parses an      */
+  (const string& id);                               /* implementation
+						     * identifier.
+						     */
+
+void parseAlgorithmId                               /* Parses a list of */
+  (const string& ids, IntervalList& algorithms);    /* implementation
+						     * identifiers.
+						     */
 
 void printAlgorithmList                             /* Displays a list of */
   (ostream& stream, int indent);                    /* algorithms used in
                                                      * the tests.    
 						     */
 
-void synchronizePrefixAndCycle                      /* Synchronizes a prefix */
-  (deque<Graph::Graph<GraphEdgeContainer>           /* with a cycle in a     */
-           ::size_type,                             /* sequence of graph     */
-         ALLOC(Graph::Graph<GraphEdgeContainer>     /* state identifiers.    */
-                 ::size_type) >&
-     prefix,
-   deque<Graph::Graph<GraphEdgeContainer>
-           ::size_type,
-         ALLOC(Graph::Graph<GraphEdgeContainer>
-	         ::size_type) >&
-     cycle);
-
 void printCrossComparisonAnalysisResults            /* Analyzes a            */
   (ostream& stream, int indent,                     /* contradiction between */
    bool formula_type,                               /* test results of two   */
    const vector<string, ALLOC(string) >&            /* implementations.      */
-     input_tokens,
-   ProductAutomaton*& product_automaton,
-   pair<unsigned long int, bool>&
-     last_product_automaton);
+     input_tokens);
 
 void printConsistencyAnalysisResults                /* Analyzes a            */
   (ostream& stream, int indent,                     /* contradicition in the */
@@ -87,19 +79,15 @@ void printConsistencyAnalysisResults                /* Analyzes a            */
 
 void printAutomatonAnalysisResults                  /* Analyzes a           */
   (ostream& stream, int indent,                     /* contradiction in the */
-   unsigned long int algorithm1,                    /* Büchi automata       */
-   unsigned long int algorithm2);                   /* intersection
+   const vector<string, ALLOC(string) >&            /* Büchi automata       */
+     input_tokens);                                 /* intersection
                                                      * emptiness check.
 						     */
 
 void printPath                                      /* Displays information */
   (ostream& stream, int indent,                     /* about a single       */
-   const deque<StateSpace::size_type,               /* system execution.    */
-               ALLOC(StateSpace::size_type) >&
-     prefix,
-   const deque<StateSpace::size_type,
-               ALLOC(StateSpace::size_type) >&
-     cycle,
+   const StateSpace::Path& prefix,                  /* system execution.    */
+   const StateSpace::Path& cycle,
    const StateSpace& path);
 
 void printAcceptingCycle                            /* Displays information */
@@ -108,13 +96,12 @@ void printAcceptingCycle                            /* Displays information */
           ALLOC(Configuration::AlgorithmInformation) >
      ::size_type
      algorithm_id,
-   const deque<StateSpace::size_type,
-               ALLOC(StateSpace::size_type) >&
-     prefix,
-   const deque<StateSpace::size_type,
-               ALLOC(StateSpace::size_type) >&
-     cycle,
-   const BuchiAutomaton& automaton);
+   const BuchiAutomaton::Path& aut_prefix,
+   const BuchiAutomaton::Path& aut_cycle,
+   const BuchiAutomaton& automaton,
+   const StateSpace::Path& path_prefix,
+   const StateSpace::Path& path_cycle,
+   const StateSpace& statespace);
 
 void printBuchiAutomaton                            /* Displays information */
   (ostream& stream, int indent,                     /* about a Büchi        */
@@ -129,7 +116,9 @@ void evaluateFormula                                /* Displays information */
 
 void printFormula                                   /* Displays a formula */
   (ostream& stream, int indent,                     /* used for testing.  */
-   bool formula_type);
+   bool formula_type,
+   const vector<string, ALLOC(string) >&
+     input_tokens);
 
 void printCommandHelp                               /* Displays help about */
   (ostream& stream, int indent,                     /* user commands.      */

@@ -58,6 +58,16 @@ void printTextBlock                                 /* Writes an indented */
 						     * a stream.
 						     */
 
+ bool printText                                     /* "Verbosity-aware"     */
+   (const char* text,                               /* functions for writing */
+    const int verbosity_threshold,                  /* text to standard      */
+    const int indent);                              /* output.               */
+
+ bool printText
+   (const string& text,
+    const int verbosity_threshold,
+    const int indent);
+
 
 
 /******************************************************************************
@@ -78,16 +88,6 @@ struct StreamFormatting
 						   * e.g. the justification
 						   * of output.
 						   */
-
-  bool printText                                  /* "Verbosity-aware"     */
-    (const char* text,                            /* functions for writing */
-     const int verbosity_threshold,               /* text to standard      */
-     const int indent);                           /* output.               */
-
-  bool printText
-    (const string& text,
-     const int verbosity_threshold,
-     const int indent);
 };
 
 

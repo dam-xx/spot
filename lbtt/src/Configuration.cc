@@ -18,10 +18,11 @@
  */
 
 #include <config.h>
-#include <cstdio>
+#include <climits>
 #include <cstdlib>
 #include <cstring>
 #include "Configuration.h"
+#include "IntervalList.h"
 #ifdef HAVE_GETOPT_LONG
 #include <getopt.h>
 #define OPTIONSTRUCT struct option
@@ -36,65 +37,28 @@
 
 /******************************************************************************
  *
- * Declarations for functions and variables provided by the parser.
- *
- *****************************************************************************/
-
-#include "Config-parse.h"                           /* Include declarations for
-						     * the tokens that may be
-						     * present in the
-						     * configuration file.
-						     */
-
-extern int parseConfiguration                       /* Parser interface. */
-  (FILE*, Configuration&);
-
-extern void checkIntegerRange                       /* Range checking */
-  (long int,                                        /* functions.     */
-   const struct Configuration::IntegerRange&,
-   bool);
-
-extern void checkProbability(double, bool);
-
-
-
-/******************************************************************************
- *
  * Definitions for ranges of certain integer-valued configuration options.
  *
  *****************************************************************************/
+ 
+const struct Configuration::IntegerRange Configuration::DEFAULT_RANGE
+  = {0, ULONG_MAX, "value out of range"};
 
 const struct Configuration::IntegerRange Configuration::VERBOSITY_RANGE
   = {0, 5, "verbosity must be between 0 and 5 (inclusive)"};
-
+ 
 const struct Configuration::IntegerRange Configuration::ROUND_COUNT_RANGE
-  = {1, LONG_MAX, "number of rounds must be positive"};
+  = {1, ULONG_MAX, "number of rounds must be positive"};
 
-const struct Configuration::IntegerRange Configuration::GENERATION_RANGE
-  = {0, LONG_MAX, "length of interval must be nonnegative"};
+const struct Configuration::IntegerRange Configuration::RANDOM_SEED_RANGE
+  = {0, UINT_MAX, "random seed out of range"};
+ 
+const struct Configuration::IntegerRange Configuration::ATOMIC_PRIORITY_RANGE
+  = {0, INT_MAX / 3, "priority out of range"};
 
-const struct Configuration::IntegerRange Configuration::PRIORITY_RANGE
-  = {0, INT_MAX / 14, "priority value out of range"};
-
-const struct Configuration::IntegerRange
-  Configuration::PROPOSITION_COUNT_RANGE
-    = {0, LONG_MAX, "number of propositions must be nonnegative"};
-
-const struct Configuration::IntegerRange Configuration::FORMULA_SIZE_RANGE
-  = {1, LONG_MAX, "formula size must be always positive"};
-
-const struct Configuration::IntegerRange
-  Configuration::FORMULA_MAX_SIZE_RANGE
-    = {1, LONG_MAX, "minimum formula size exceeds the maximum formula size"};
-
-const struct Configuration::IntegerRange Configuration::STATESPACE_SIZE_RANGE
-  = {1, LONG_MAX, "state space size must be always positive"};
-
-const struct Configuration::IntegerRange
-  Configuration::STATESPACE_MAX_SIZE_RANGE
-    = {1, LONG_MAX, "minimum state space size exceeds the maximum state space "
-	            "size"};
-
+const struct Configuration::IntegerRange Configuration::OPERATOR_PRIORITY_RANGE
+  = {0, INT_MAX / 14, "priority out of range"};
+ 
 
 
 /******************************************************************************
@@ -136,9 +100,9 @@ Configuration::~Configuration()
 	 ::const_iterator it = algorithms.begin();
        it != algorithms.end(); ++it)
   {
-    delete it->name;
-    delete it->path_to_program;
-    delete it->extra_parameters;
+    for (vector<string>::size_type p = 0; p <= it->num_parameters; ++p)
+      delete[] it->parameters[p];
+    delete[] it->parameters;
   }
 }
 
@@ -160,17 +124,15 @@ void Configuration::read(int argc, char* argv[])
 
   reset();
 
-  /*
-   *  Command line option declarations.
-   */
+  /* Command line option declarations. */
 
   static OPTIONSTRUCT command_line_options[] =
   {
-    {"comparisontest",        no_argument,       0, OPT_COMPARISONTEST},
-    {"comparisoncheck",       no_argument,       0, OPT_COMPARISONTEST},
+    {"comparisontest",        optional_argument, 0, OPT_COMPARISONTEST},
+    {"comparisoncheck",       optional_argument, 0, OPT_COMPARISONTEST},
     {"configfile",            required_argument, 0, OPT_CONFIGFILE},
-    {"consistencytest",       no_argument,       0, OPT_CONSISTENCYTEST},
-    {"consistencycheck",      no_argument,       0, OPT_CONSISTENCYTEST},
+    {"consistencytest",       optional_argument, 0, OPT_CONSISTENCYTEST},
+    {"consistencycheck",      optional_argument, 0, OPT_CONSISTENCYTEST},
     {"disable",               required_argument, 0, OPT_DISABLE},
     {"enable",                required_argument, 0, OPT_ENABLE},
     {"formulachangeinterval", required_argument, 0, OPT_FORMULACHANGEINTERVAL},
@@ -178,21 +140,19 @@ void Configuration::read(int argc, char* argv[])
     {"formularandomseed",     required_argument, 0, OPT_FORMULARANDOMSEED},
     {"globalmodelcheck",      no_argument,       0, OPT_GLOBALPRODUCT},
     {"help",                  no_argument,       0, OPT_HELP},
-    {"interactive",           required_argument, 0, OPT_INTERACTIVE},
-    {"intersectiontest",      no_argument,       0, OPT_INTERSECTIONTEST},
-    {"intersectioncheck",     no_argument,       0, OPT_INTERSECTIONTEST},
+    {"interactive",           optional_argument, 0, OPT_INTERACTIVE},
+    {"intersectiontest",      optional_argument, 0, OPT_INTERSECTIONTEST},
+    {"intersectioncheck",     optional_argument, 0, OPT_INTERSECTIONTEST},
     {"localmodelcheck",       no_argument,       0, OPT_LOCALPRODUCT},
     {"logfile",               required_argument, 0, OPT_LOGFILE},
     {"modelcheck",            required_argument, 0, OPT_MODELCHECK},
-    {"nocomparisontest",      no_argument,       0, OPT_NOCOMPARISONTEST},
-    {"nocomparisoncheck",     no_argument,       0, OPT_NOCOMPARISONTEST},
-    {"noconsistencytest",     no_argument,       0, OPT_NOCONSISTENCYTEST},
-    {"noconsistencycheck",    no_argument,       0, OPT_NOCONSISTENCYTEST},
-    {"nointersectiontest",    no_argument,       0, OPT_NOINTERSECTIONTEST},
-    {"nointersectioncheck",   no_argument,       0, OPT_NOINTERSECTIONTEST},
-    {"nopause",               no_argument,       0, OPT_NOPAUSE},
-    {"pause",                 no_argument,       0, OPT_PAUSE},
-    {"pauseonerror",          no_argument,       0, OPT_PAUSEONERROR},
+    {"nocomparisontest",      no_argument,       0, OPT_COMPARISONTEST},
+    {"nocomparisoncheck",     no_argument,       0, OPT_COMPARISONTEST},
+    {"noconsistencytest",     no_argument,       0, OPT_CONSISTENCYTEST},
+    {"noconsistencycheck",    no_argument,       0, OPT_CONSISTENCYTEST},
+    {"nointersectiontest",    no_argument,       0, OPT_INTERSECTIONTEST},
+    {"nointersectioncheck",   no_argument,       0, OPT_INTERSECTIONTEST},
+    {"pause",                 optional_argument, 0, OPT_INTERACTIVE},
     {"profile",               no_argument,       0, OPT_PROFILE},
     {"quiet",                 no_argument,       0, OPT_QUIET},
     {"rounds",                required_argument, 0, OPT_ROUNDS},
@@ -203,10 +163,11 @@ void Configuration::read(int argc, char* argv[])
     {"statespacechangeinterval", required_argument, 0,
      OPT_STATESPACECHANGEINTERVAL},
     {"statespacerandomseed",  required_argument, 0, OPT_STATESPACERANDOMSEED},
+    {"translatortimeout",     required_argument, 0 ,OPT_TRANSLATORTIMEOUT},
     {"verbosity",             required_argument, 0, OPT_VERBOSITY},
     {"version",               no_argument,       0, OPT_VERSION},
 
-    {"abbreviatedoperators",  no_argument,       0, OPT_ABBREVIATEDOPERATORS},
+    {"abbreviatedoperators",  optional_argument, 0, OPT_ABBREVIATEDOPERATORS},
     {"andpriority",           required_argument, 0, OPT_ANDPRIORITY},
     {"beforepriority",        required_argument, 0, OPT_BEFOREPRIORITY},
     {"defaultoperatorpriority", required_argument, 0,
@@ -222,7 +183,7 @@ void Configuration::read(int argc, char* argv[])
     {"globallypriority",      required_argument, 0, OPT_GLOBALLYPRIORITY},
     {"implicationpriority",   required_argument, 0, OPT_IMPLICATIONPRIORITY},
     {"nextpriority",          required_argument, 0, OPT_NEXTPRIORITY},
-    {"noabbreviatedoperators", no_argument, 0, OPT_NOABBREVIATEDOPERATORS},
+    {"noabbreviatedoperators", no_argument,      0, OPT_ABBREVIATEDOPERATORS},
     {"nogeneratennf",         no_argument,       0, OPT_NOGENERATENNF},
     {"nooutputnnf",           no_argument,       0, OPT_NOOUTPUTNNF},
     {"notpriority",           required_argument, 0, OPT_NOTPRIORITY},
@@ -251,185 +212,52 @@ void Configuration::read(int argc, char* argv[])
     {0,                       0,                 0, 0}
   };
 
-  opterr = 1;
+  opterr = 1; /* enable error messages from getopt_long */
+
+  const char* false_value = "false", *true_value = "true",
+              *always_value = "always";
 
   int opttype;
   int option_index;
-  bool error = false, print_config = false,
-       print_operator_distribution = false;
+  bool print_config = false, print_operator_distribution = false;
+  config_file_line_number = -1;
 
-  string enabled_or_disabled_algorithms[2];
-
-  locked_options.clear();
+  typedef pair<const OPTIONSTRUCT*, const char*> Parameter;
+  vector<Parameter, ALLOC(Parameter) > parameters;
 
   /*
-   *  Read the command line parameters.
+   *  Preprocess the command line parameters.  At this point only those special
+   *  options that do not override settings in the configuration file are
+   *  processed completely; all other options are stored in the vector
+   *  `parameters' to be handled only after reading the configuration file.
+   *  The arguments of all parameters taking optional parameters are
+   *  adjusted here.
    */
 
   do
   {
     option_index = 0;
-    opttype = getopt_long(argc, argv, "h", command_line_options,
+    opttype = getopt_long(argc, argv, "hV", command_line_options,
 			  &option_index);
 
     switch (opttype)
     {
-      case OPT_COMPARISONTEST :
-      case OPT_NOCOMPARISONTEST :
-	global_options.do_comp_test = (opttype == OPT_COMPARISONTEST);
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS,
-					CFG_COMPARISONTEST));
-	break;
-
       case OPT_CONFIGFILE :
 	global_options.cfg_filename = optarg;
-	break;
-
-      case OPT_CONSISTENCYTEST :
-      case OPT_NOCONSISTENCYTEST :
-	global_options.do_cons_test = (opttype == OPT_CONSISTENCYTEST);
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS,
-					CFG_CONSISTENCYTEST));
-	break;
-
-      case OPT_DISABLE :
-      case OPT_ENABLE :
-	{
-	  int i = (opttype == OPT_DISABLE ? 1 : 0);
-
-	  if (!enabled_or_disabled_algorithms[i].empty())
-	    enabled_or_disabled_algorithms[i] += ',';
-	  enabled_or_disabled_algorithms[i] += optarg;
-	}
-	break;
-
-      case OPT_FORMULACHANGEINTERVAL :
-      case OPT_STATESPACECHANGEINTERVAL :
-	{
-	  long int interval_length
-	    = parseCommandLineInteger
-	        (command_line_options[option_index].name, optarg);
-	  checkIntegerRange(interval_length, GENERATION_RANGE, false);
-
-	  if (opttype == OPT_FORMULACHANGEINTERVAL)
-	  {
-	    global_options.formula_change_interval = interval_length;
-	    locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					    CFG_CHANGEINTERVAL));
-	  }
-	  else
-	  {
-	    global_options.statespace_change_interval = interval_length;
-	    locked_options.insert(make_pair(CFG_STATESPACEOPTIONS,
-					    CFG_CHANGEINTERVAL));
-	  }
-	}
-
 	break;
 
       case OPT_FORMULAFILE :
 	global_options.formula_input_filename = optarg;
 	break;
 
-      case OPT_FORMULARANDOMSEED :
-	global_options.formula_random_seed
-	  = parseCommandLineInteger
-	      (command_line_options[option_index].name, optarg);
-	locked_options.insert(make_pair(CFG_FORMULAOPTIONS, CFG_RANDOMSEED));
-	break;
-
-      case OPT_GLOBALPRODUCT :
-	global_options.product_mode = GLOBAL;
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS, CFG_MODELCHECK));
-	break;
-
       case OPT_HELP :
 	showCommandLineHelp(argv[0]);
 	exit(0);
-
-      case OPT_INTERACTIVE :
-	if (strcmp(optarg, "always") == 0)
-	  global_options.interactive = ALWAYS;
-	else if (strcmp(optarg, "onerror") == 0)
-	  global_options.interactive = ONERROR;
-	else if (strcmp(optarg, "never") == 0)
-	  global_options.interactive = NEVER;
-	else
-	  error = true;
-
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS, CFG_INTERACTIVE));
-	break;
-
-      case OPT_INTERSECTIONTEST :
-      case OPT_NOINTERSECTIONTEST :
-	global_options.do_intr_test = (opttype == OPT_INTERSECTIONTEST);
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS,
-					CFG_INTERSECTIONTEST));
-	break;
-
-      case OPT_LOCALPRODUCT :
-	global_options.product_mode = LOCAL;
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS, CFG_MODELCHECK));
-	break;
 
       case OPT_LOGFILE :
 	global_options.transcript_filename = optarg;
 	break;
 
-      case OPT_MODELCHECK :
-	if (strcmp(optarg, "global") == 0)
-	  global_options.product_mode = GLOBAL;
-	else if (strcmp(optarg, "local") == 0)
-	  global_options.product_mode = LOCAL;
-	else
-	  error = true;
-
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS, CFG_MODELCHECK));
-	break;
-
-      case OPT_PAUSE :
-      case OPT_NOPAUSE :
-	global_options.interactive = (opttype == OPT_PAUSE ? ALWAYS : NEVER);
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS, CFG_INTERACTIVE));
-	break;
-
-      case OPT_PAUSEONERROR :
-	global_options.interactive = ONERROR;
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS, CFG_INTERACTIVE));
-	break;
-
-      case OPT_PROFILE :
-	global_options.do_comp_test
-	  = global_options.do_cons_test
-	  = global_options.do_intr_test
-	  = false;
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS,
-					CFG_COMPARISONTEST));
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS,
-					CFG_CONSISTENCYTEST));
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS,
-					CFG_INTERSECTIONTEST));
-	break;
-
-      case OPT_QUIET :
-	global_options.verbosity = 0;
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS, CFG_VERBOSITY));
-	global_options.interactive = NEVER;
-	locked_options.insert(make_pair(CFG_GLOBALOPTIONS, CFG_INTERACTIVE));
-	break;
-
-      case OPT_ROUNDS :
-	{
-	  long int number_of_rounds
-	    = parseCommandLineInteger
-	        (command_line_options[option_index].name, optarg);
-	  checkIntegerRange(number_of_rounds, ROUND_COUNT_RANGE, false);
-	  global_options.number_of_rounds = number_of_rounds;
-	  locked_options.insert(make_pair(CFG_GLOBALOPTIONS, CFG_ROUNDS));
-	}
-
-	break;
-	  
       case OPT_SHOWCONFIG :
 	print_config = true;
 	break;
@@ -439,421 +267,69 @@ void Configuration::read(int argc, char* argv[])
 	break;
 
       case OPT_SKIP :
-	{
-	  long int rounds_to_skip
-	    = parseCommandLineInteger
-	        (command_line_options[option_index].name, optarg);
-	  checkIntegerRange(rounds_to_skip, ROUND_COUNT_RANGE, false);
-	  global_options.init_skip = rounds_to_skip;
-	}
-
-	break;
-
-      case OPT_STATESPACERANDOMSEED :
-	global_options.statespace_random_seed
-	  = parseCommandLineInteger
-	      (command_line_options[option_index].name, optarg);
-	locked_options.insert(make_pair(CFG_STATESPACEOPTIONS,
-					CFG_RANDOMSEED));
-	break;
-
-      case OPT_VERBOSITY :
-	{
-	  long int verbosity
-	    = parseCommandLineInteger
-	        (command_line_options[option_index].name, optarg);
-	  checkIntegerRange(verbosity, VERBOSITY_RANGE, false);
-	  global_options.verbosity = verbosity;
-	  locked_options.insert(make_pair(CFG_GLOBALOPTIONS, CFG_VERBOSITY));
-	}
-
+	readInteger(global_options.init_skip, optarg);
 	break;
 
       case OPT_VERSION :
 	cout << "lbtt " PACKAGE_VERSION "\n"
 	        "lbtt is free software; you may change and "
-                "redistribute it under the terms of\n"
+	        "redistribute it under the terms of\n"
                 "the GNU General Public License. lbtt comes with "
                 "NO WARRANTY. See the file\n"
 	        "COPYING for details.\n";
 	exit(0);
 	break;
 
-      case OPT_ABBREVIATEDOPERATORS :
-      case OPT_NOABBREVIATEDOPERATORS :
-        formula_options.allow_abbreviated_operators
-	  = (opttype == OPT_ABBREVIATEDOPERATORS);
-	locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					CFG_ABBREVIATEDOPERATORS));
-	break;
-
-      case OPT_ANDPRIORITY :
-      case OPT_BEFOREPRIORITY :
-      case OPT_DEFAULTOPERATORPRIORITY :
-      case OPT_EQUIVALENCEPRIORITY :
-      case OPT_FALSEPRIORITY :
-      case OPT_FINALLYPRIORITY :
-      case OPT_GLOBALLYPRIORITY :
-      case OPT_IMPLICATIONPRIORITY :
-      case OPT_NEXTPRIORITY :
-      case OPT_NOTPRIORITY :
-      case OPT_ORPRIORITY :
-      case OPT_PROPOSITIONPRIORITY :
-      case OPT_RELEASEPRIORITY :
-      case OPT_STRONGRELEASEPRIORITY :
-      case OPT_TRUEPRIORITY :
-      case OPT_UNTILPRIORITY :
-      case OPT_WEAKUNTILPRIORITY :
-      case OPT_XORPRIORITY :
-	{
-	  long int priority
-	    = parseCommandLineInteger
-	        (command_line_options[option_index].name, optarg);
-
-	  checkIntegerRange(priority, PRIORITY_RANGE, false);
-
-	  int symbol = -1;
-
-	  switch (opttype)
-	  {
-	    case OPT_ANDPRIORITY :
-	      symbol = ::Ltl::LTL_CONJUNCTION;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_ANDPRIORITY));
-	      break;
-
-	    case OPT_BEFOREPRIORITY :
-	      symbol = ::Ltl::LTL_BEFORE;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_BEFOREPRIORITY));
-	      break;
-
-	    case OPT_DEFAULTOPERATORPRIORITY :
-	      formula_options.default_operator_priority = priority;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_DEFAULTOPERATORPRIORITY));
-	      break;
-
-	    case OPT_EQUIVALENCEPRIORITY :
-	      symbol = ::Ltl::LTL_EQUIVALENCE;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_EQUIVALENCEPRIORITY));
-	      break;
-
-	    case OPT_FALSEPRIORITY :
-	      symbol = ::Ltl::LTL_FALSE;
-              locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_FALSEPRIORITY));
-	      break;
-
-	    case OPT_FINALLYPRIORITY :
-	      symbol = ::Ltl::LTL_FINALLY;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_FINALLYPRIORITY));
-	      break;
-
-	    case OPT_GLOBALLYPRIORITY :
-	      symbol = ::Ltl::LTL_GLOBALLY;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_GLOBALLYPRIORITY));
-	      break;
-
-	    case OPT_IMPLICATIONPRIORITY :
-	      symbol = ::Ltl::LTL_IMPLICATION;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_IMPLICATIONPRIORITY));
-	      break;
-
-	    case OPT_NEXTPRIORITY :
-	      symbol = ::Ltl::LTL_NEXT;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_NEXTPRIORITY));
-	      break;
-
-	    case OPT_NOTPRIORITY :
-	      symbol = ::Ltl::LTL_NEGATION;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_NOTPRIORITY));
-	      break;
-
-	    case OPT_ORPRIORITY :
-	      symbol = ::Ltl::LTL_DISJUNCTION;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_ORPRIORITY));
-	      break;
-
-	    case OPT_PROPOSITIONPRIORITY :
-	      symbol = ::Ltl::LTL_ATOM;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_PROPOSITIONPRIORITY));
-	      break;
-
-	    case OPT_RELEASEPRIORITY :
-	      symbol = ::Ltl::LTL_V;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS, 
-					      CFG_RELEASEPRIORITY));
-	      break;
-
-	    case OPT_STRONGRELEASEPRIORITY :
-	      symbol = ::Ltl::LTL_STRONG_RELEASE;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_STRONGRELEASEPRIORITY));
-	      break;
-
-	    case OPT_TRUEPRIORITY :
-	      symbol = ::Ltl::LTL_TRUE;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_TRUEPRIORITY));
-	      break;
-
-	    case OPT_UNTILPRIORITY :
-	      symbol = ::Ltl::LTL_UNTIL;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_UNTILPRIORITY));
-	      break;
-
-	    case OPT_WEAKUNTILPRIORITY :
-	      symbol = ::Ltl::LTL_WEAK_UNTIL;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_WEAKUNTILPRIORITY));
-	      break;
-
-	    case OPT_XORPRIORITY :
-	      symbol = ::Ltl::LTL_XOR;
-	      locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					      CFG_XORPRIORITY));
-
-	    default :
-	      break;
-	  }
-
-	  if (symbol != -1)
-	    formula_options.symbol_priority[symbol] = priority;
-	}
-
-	break;
-
-      case OPT_FORMULAGENERATEMODE :
-	if (strcmp(optarg, "nnf") == 0)
-	  formula_options.generate_mode = NNF;
-	else if (strcmp(optarg, "normal") == 0)
-	  formula_options.generate_mode = NORMAL;
-	else
-	  error = true;
-
-	locked_options.insert(make_pair(CFG_FORMULAOPTIONS, CFG_GENERATEMODE));
-	break;
-
-      case OPT_FORMULAOUTPUTMODE :
-	if (strcmp(optarg, "nnf") == 0)
-	  formula_options.output_mode = NNF;
-	else if (strcmp(optarg, "normal") == 0)
-	  formula_options.output_mode = NORMAL;
-	else
-	  error = true;
-
-	locked_options.insert(make_pair(CFG_FORMULAOPTIONS, CFG_OUTPUTMODE));
-	break;
-	
-      case OPT_FORMULAPROPOSITIONS :
-      case OPT_STATESPACEPROPOSITIONS :
-	{
-	  long int num_propositions
-	    = parseCommandLineInteger
-	        (command_line_options[option_index].name, optarg);
-
-	  checkIntegerRange(num_propositions, PROPOSITION_COUNT_RANGE, false);
-
-	  if (opttype == OPT_STATESPACEPROPOSITIONS)
-	  {
-	    locked_options.insert(make_pair(CFG_STATESPACEOPTIONS,
-					    CFG_PROPOSITIONS));
-	    statespace_generator.atoms_per_state = num_propositions;
-	  }
-	  else
-	  {
-	    locked_options.insert(make_pair(CFG_FORMULAOPTIONS,
-					    CFG_PROPOSITIONS));
-	    formula_options.formula_generator.number_of_available_variables
-	      = num_propositions;
-	  }
-	}
-
-	break;
-
-      case OPT_FORMULASIZE :
-      case OPT_STATESPACESIZE :
-	{
-	  IntegerRange min_size_range, max_size_range;
-
-	  if (opttype == OPT_FORMULASIZE)
-	  {
-	    min_size_range = FORMULA_SIZE_RANGE;
-	    max_size_range = FORMULA_MAX_SIZE_RANGE;
-	    locked_options.insert(make_pair(CFG_FORMULAOPTIONS, CFG_SIZE));
-	  }
-	  else
-	  {
-	    min_size_range = STATESPACE_SIZE_RANGE;
-	    max_size_range = STATESPACE_MAX_SIZE_RANGE;
-	    locked_options.insert(make_pair(CFG_STATESPACEOPTIONS, CFG_SIZE));
-	  }
-
-	  string value(optarg);
-	  string::size_type index = value.find("...");
-
-	  if (index == string::npos)
-	  {
-	    long int size
-	      = parseCommandLineInteger
-	          (command_line_options[option_index].name, value);
-
-	    checkIntegerRange(size, min_size_range, false);
-
-	    if (opttype == OPT_FORMULASIZE)
-	      formula_options.formula_generator.size
-		= formula_options.formula_generator.max_size
-		= size;
-	    else
-	      statespace_generator.min_size
-		= statespace_generator.max_size
-		= size;
-	  }
-	  else
-	  {
-	    string option_name(command_line_options[option_index].name);
-
-	    long int min = parseCommandLineInteger(option_name + " (min)",
-						   value.substr(0, index));
-	    long int max = parseCommandLineInteger(option_name + " (max)",
-						   value.substr(index + 3));
-
-	    checkIntegerRange(min, min_size_range, false);
-	    max_size_range.min = min;
-	    checkIntegerRange(max, max_size_range, false);
-
-	    if (opttype == OPT_FORMULASIZE)
-	    {
-	      formula_options.formula_generator.size = min;
-	      formula_options.formula_generator.max_size = max;
-	    }
-	    else
-	    {
-	      statespace_generator.min_size = min;
-	      statespace_generator.max_size = max;
-	    }
-	  }
-	}
-
-	break;
-
-      case OPT_GENERATENNF :
-      case OPT_NOGENERATENNF :
-	formula_options.generate_mode
-	  = (opttype == OPT_GENERATENNF ? NNF : NORMAL);
-	locked_options.insert(make_pair(CFG_FORMULAOPTIONS, CFG_GENERATEMODE));
-	break;
-
-      case OPT_OUTPUTNNF :
-      case OPT_NOOUTPUTNNF :
-	formula_options.output_mode
-	  = (opttype == OPT_OUTPUTNNF ? NNF : NORMAL);
-	locked_options.insert(make_pair(CFG_FORMULAOPTIONS, CFG_OUTPUTMODE));
-	break;
-
-      case OPT_EDGEPROBABILITY :
-      case OPT_TRUTHPROBABILITY :
-	{
-	  char* endptr;
-	  double probability = strtod(optarg, &endptr);
-
-	  if (*endptr != '\0')
-	    probability = -1.0;
-
-	  checkProbability(probability, false);
-
-	  if (opttype == OPT_EDGEPROBABILITY)
-	  {
-	    statespace_generator.edge_probability = probability;
-	    locked_options.insert(make_pair(CFG_STATESPACEOPTIONS,
-					    CFG_EDGEPROBABILITY));
-	  }
-	  else
-	  {
-	    statespace_generator.truth_probability = probability;
-	    locked_options.insert(make_pair(CFG_STATESPACEOPTIONS,
-					    CFG_TRUTHPROBABILITY));
-	  }
-	}
-
-	break;
-
-      case OPT_ENUMERATEDPATH :
-	global_options.statespace_generation_mode = ENUMERATEDPATH;
-	locked_options.insert(make_pair(CFG_STATESPACEOPTIONS,
-					CFG_GENERATEMODE));
-	break;
-	
-      case OPT_RANDOMCONNECTEDGRAPH :
-	global_options.statespace_generation_mode = RANDOMCONNECTEDGRAPH;
-	locked_options.insert(make_pair(CFG_STATESPACEOPTIONS,
-					CFG_GENERATEMODE));
-	break;
-
-      case OPT_RANDOMGRAPH :
-	global_options.statespace_generation_mode = RANDOMGRAPH;
-	locked_options.insert(make_pair(CFG_STATESPACEOPTIONS,
-					CFG_GENERATEMODE));
-	break;
-
-      case OPT_RANDOMPATH :
-	global_options.statespace_generation_mode = RANDOMPATH;
-	locked_options.insert(make_pair(CFG_STATESPACEOPTIONS,
-					CFG_GENERATEMODE));
-	break;
-
-      case OPT_STATESPACEGENERATEMODE :
-	if (strcmp(optarg, "randomconnectedgraph") == 0)
-	  global_options.statespace_generation_mode = RANDOMCONNECTEDGRAPH;
-	else if (strcmp(optarg, "randomgraph") == 0)
-	  global_options.statespace_generation_mode = RANDOMGRAPH;
-	else if (strcmp(optarg, "randompath") == 0)
-	  global_options.statespace_generation_mode = RANDOMPATH;
-	else if (strcmp(optarg, "enumeratedpath") == 0)
-	  global_options.statespace_generation_mode = ENUMERATEDPATH;
-	else
-	  error = true;
-
-	locked_options.insert(make_pair(CFG_STATESPACEOPTIONS,
-					CFG_GENERATEMODE));
-	break;
-
       case '?' :
       case ':' :
-	exit(-1);
-    }
+	exit(2);
 
-    if (error)
-      throw ConfigurationException
-	("", string("unrecognized argument (`") + optarg
-             + "') for option `--"
-             + command_line_options[option_index].name + "'");
+      case -1 :
+	break;
+
+      case OPT_CONSISTENCYTEST :
+      case OPT_COMPARISONTEST :
+      case OPT_INTERSECTIONTEST :
+      case OPT_ABBREVIATEDOPERATORS :
+	{
+	  const char* val;
+	  if (command_line_options[option_index].name[0] == 'n')
+	    val = false_value;
+	  else if (optarg == 0)
+	    val = true_value;
+	  else
+	    val = optarg;
+	  parameters.push_back(make_pair(&command_line_options[option_index],
+					 val));
+	  break;
+	}
+
+      case OPT_INTERACTIVE :
+	{
+	  const char* val;
+	  if (optarg == 0)
+	    val = always_value;
+	  else
+	    val = optarg;
+	  parameters.push_back(make_pair(&command_line_options[option_index],
+					 val));
+	  break;
+	}
+
+      default :
+	parameters.push_back(make_pair(&command_line_options[option_index],
+				       optarg));
+	break;
+    }
   }
   while (opttype != -1);
 
-  if (optind != argc)
-    throw ConfigurationException
-      ("", string("unrecognized command line option `")
-           + argv[optind] + "'");
-
-  /*
-   *  Read the configuration file.
-   */
+  /* Read the configuration file. */
 
   FILE* configuration_file = fopen(global_options.cfg_filename.c_str(), "r");
   if (configuration_file == NULL)
     throw ConfigurationException
-            ("", "error opening configuration file `"
+            (-1, "error opening configuration file `"
 	         + global_options.cfg_filename + "'");
 
   try
@@ -867,53 +343,370 @@ void Configuration::read(int argc, char* argv[])
     throw;
   }
 
+  config_file_line_number = -1; /* Suppress configuration file line number in
+				 * any future error messages */
+
   /*
-   *  Use the information gathered from command line options to enable or
-   *  disable some of the implementations.
+   *  Process the command line parameters that override settings made in the
+   *  configuration file.
    */
 
-  set<unsigned long int, less<unsigned long int>, ALLOC(unsigned long int) >
-    algorithm_id_set;
+  vector<Parameter, ALLOC(Parameter) >::const_iterator parameter;
 
-  for (int i = 0; i < 2; i++)
+  try
   {
-    if (enabled_or_disabled_algorithms[i].empty())
-      continue;
-
-    try
+    for (parameter = parameters.begin(); parameter != parameters.end();
+	 ++parameter)
     {
-      parseInterval(enabled_or_disabled_algorithms[i], algorithm_id_set, 0,
-		    algorithms.size() - 1);
+      switch (parameter->first->val)
+      {
+	/* Remaining special options (excluding "--enable" and "--disable"). */
 
-      if (algorithm_id_set.empty())
-	throw Exception();
+        case OPT_ENABLE : case OPT_DISABLE :  /* These options can be    */
+	  break;                              /* processed only after
+					       * determining whether the
+					       * internal model checking
+					       * algorithm might be
+					       * included in the tests.
+					       */
+
+        case OPT_PROFILE :
+	  global_options.do_comp_test
+	    = global_options.do_cons_test
+	    = global_options.do_intr_test
+	    = false;
+	  break;
+
+        case OPT_QUIET :
+	  global_options.verbosity = 0;
+	  global_options.interactive = NEVER;
+	  break;
+
+	/* 
+	 *  Options corresponding to the GlobalOptions section in the
+	 *  configuration file.
+	 */
+
+        case OPT_COMPARISONTEST :
+	  readTruthValue(global_options.do_comp_test, parameter->second);
+	  break;
+
+        case OPT_CONSISTENCYTEST :
+	  readTruthValue(global_options.do_cons_test, parameter->second);
+	  break;
+
+        case OPT_GLOBALPRODUCT :
+	  readProductType("global");
+	  break;
+
+        case OPT_INTERACTIVE :
+	  readInteractivity(parameter->second);
+	  break;
+
+        case OPT_INTERSECTIONTEST :
+	  readTruthValue(global_options.do_intr_test, parameter->second);
+	  break;
+
+        case OPT_LOCALPRODUCT :
+	  readProductType("local");
+	  break;
+
+        case OPT_MODELCHECK :
+	  readProductType(parameter->second);
+	  break;
+
+        case OPT_ROUNDS :
+	  readInteger(global_options.number_of_rounds, parameter->second,
+		      ROUND_COUNT_RANGE);
+	  break;
+
+        case OPT_TRANSLATORTIMEOUT :
+	  readTranslatorTimeout(parameter->second);
+	  break;
+
+        case OPT_VERBOSITY :
+	  readInteger(global_options.verbosity, parameter->second,
+		      VERBOSITY_RANGE);
+	  break;
+
+	/* 
+	 *  Options corresponding to the StatespaceOptions section in the
+	 *  configuration file.
+	 */
+
+        case OPT_EDGEPROBABILITY :
+	  readProbability(statespace_generator.edge_probability,
+			  parameter->second);
+	  break;
+
+        case OPT_ENUMERATEDPATH :
+	  readStateSpaceMode("enumeratedpath");
+	  break;
+	
+        case OPT_RANDOMCONNECTEDGRAPH :
+	  readStateSpaceMode("randomconnectedgraph");
+	  break;
+
+        case OPT_RANDOMGRAPH :
+	  readStateSpaceMode("randomgraph");
+	  break;
+
+        case OPT_RANDOMPATH :
+	  readStateSpaceMode("randompath");
+	  break;
+
+        case OPT_STATESPACECHANGEINTERVAL :
+	  readInteger(global_options.statespace_change_interval,
+		      parameter->second);
+	  break;
+
+        case OPT_STATESPACEGENERATEMODE :
+	  readStateSpaceMode(parameter->second);
+	  break;
+
+        case OPT_STATESPACEPROPOSITIONS :
+	  readInteger(statespace_generator.atoms_per_state, parameter->second);
+	  break;
+
+        case OPT_STATESPACERANDOMSEED :
+	  readInteger(global_options.statespace_random_seed,
+		      parameter->second, RANDOM_SEED_RANGE);
+	  break;
+
+        case OPT_STATESPACESIZE :
+	  readSize(parameter->first->val, parameter->second);
+	  break;
+
+        case OPT_TRUTHPROBABILITY :
+	  readProbability(statespace_generator.truth_probability,
+			  parameter->second);
+	  break;
+
+	/* 
+	 *  Options corresponding to the FormulaOptions section in the
+	 *  configuration file.
+	 */
+
+        case OPT_ABBREVIATEDOPERATORS :
+	  readTruthValue(formula_options.allow_abbreviated_operators,
+			 parameter->second);
+	  break;
+
+        case OPT_ANDPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_CONJUNCTION],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_BEFOREPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_BEFORE],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_DEFAULTOPERATORPRIORITY :
+	  readInteger(formula_options.default_operator_priority,
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_EQUIVALENCEPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_EQUIVALENCE],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_FALSEPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_FALSE],
+		      parameter->second, ATOMIC_PRIORITY_RANGE);
+	  break;
+
+        case OPT_FINALLYPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_FINALLY],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_FORMULACHANGEINTERVAL :
+	  readInteger(global_options.formula_change_interval,
+		      parameter->second);
+	  break;
+
+        case OPT_FORMULAGENERATEMODE :
+	  readFormulaMode(formula_options.generate_mode, parameter->second);
+	  break;
+
+        case OPT_FORMULAOUTPUTMODE :
+	  readFormulaMode(formula_options.output_mode, parameter->second);
+	  break;
+
+        case OPT_FORMULAPROPOSITIONS :
+	  readInteger(formula_options.formula_generator.
+		        number_of_available_variables,
+		      parameter->second);
+	  break;
+
+        case OPT_FORMULARANDOMSEED :
+	  readInteger(global_options.formula_random_seed, parameter->second,
+		      RANDOM_SEED_RANGE);
+	  break;
+
+        case OPT_FORMULASIZE :
+	  readSize(parameter->first->val, parameter->second);
+	  break;
+
+        case OPT_GENERATENNF :
+	  readFormulaMode(formula_options.generate_mode, "nnf");
+	  break;
+
+        case OPT_GLOBALLYPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_GLOBALLY],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_IMPLICATIONPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_IMPLICATION],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_NEXTPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_NEXT],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_NOGENERATENNF :
+	  readFormulaMode(formula_options.generate_mode, "normal");
+	  break;
+
+        case OPT_NOOUTPUTNNF :
+	  readFormulaMode(formula_options.output_mode, "normal");
+	  break;
+
+        case OPT_NOTPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_NEGATION],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_ORPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_DISJUNCTION],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_OUTPUTNNF :
+	  readFormulaMode(formula_options.output_mode, "nnf");
+	  break;
+
+        case OPT_PROPOSITIONPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_ATOM],
+		      parameter->second, ATOMIC_PRIORITY_RANGE);
+	  break;
+
+        case OPT_RELEASEPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_V],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_STRONGRELEASEPRIORITY :
+	  readInteger(formula_options.symbol_priority
+		        [::Ltl::LTL_STRONG_RELEASE],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_TRUEPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_TRUE],
+		      parameter->second, ATOMIC_PRIORITY_RANGE);
+	  break;
+
+        case OPT_UNTILPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_UNTIL],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_WEAKUNTILPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_WEAK_UNTIL],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+
+        case OPT_XORPRIORITY :
+	  readInteger(formula_options.symbol_priority[::Ltl::LTL_XOR],
+		      parameter->second, OPERATOR_PRIORITY_RANGE);
+	  break;
+      }
     }
-    catch (const Exception&)
+
+    /*
+     *  If using paths as state spaces, include the internal model checking
+     *  algorithm in the set of algorithms.
+     */
+
+    if (global_options.statespace_generation_mode & Configuration::PATH)
     {
-      throw ConfigurationException("",
-				   string("invalid argument (`")
-				   + enabled_or_disabled_algorithms[i]
-				   + "') for option `--"
-				   + (i == 0 ? "en" : "dis")
-				   + "able'");
+      AlgorithmInformation lbtt_info = {"lbtt", new char*[1], 0, true};
+      lbtt_info.parameters[0] = new char[1];
+
+      algorithm_names["lbtt"] = algorithms.size();
+      algorithms.push_back(lbtt_info);
     }
 
-    for (set<unsigned long int, less<unsigned long int>,
-             ALLOC(unsigned long int) >::const_iterator
-	   id = algorithm_id_set.begin();
-	 id != algorithm_id_set.end();
-	 ++id)
+    /* Process "--enable" and "--disable" options. */
+
+    for (parameter = parameters.begin(); parameter != parameters.end();
+	 ++parameter)
     {
-      if (*id >= algorithms.size())
-	throw ConfigurationException
-	  ("",
-	   string("invalid implementation identifier (") + toString(*id)
-	   + ") in the argument for `--"
-	   + (i == 0 ? "en" : "dis")
-	   + "able'");
+      switch (parameter->first->val)
+      {
+        case OPT_DISABLE :
+        case OPT_ENABLE :
+	  try
+	  {
+	    IntervalList algorithm_ids;
+	    vector<string, ALLOC(string) > nonnumeric_algorithm_ids;
+	    string id_string
+	      = substituteInQuotedString(parameter->second, ",", "\n",
+					 INSIDE_QUOTES);
 
-      algorithms[*id].enabled = (i == 0);
+	    parseIntervalList(id_string, algorithm_ids, 0,
+			      algorithms.size() - 1,
+			      &nonnumeric_algorithm_ids);
+
+	    for (vector<string, ALLOC(string) >::iterator
+		   id = nonnumeric_algorithm_ids.begin();
+		 id != nonnumeric_algorithm_ids.end();
+		 ++id)
+	    {
+	      *id = unquoteString(substituteInQuotedString(*id, "\n", ","));
+	      map<string, unsigned long int, less<string>,
+	          ALLOC(unsigned long int) >::const_iterator id_finder
+		= algorithm_names.find(*id);
+	      if (id_finder == algorithm_names.end())
+		throw ConfigurationException
+		        (-1,
+			 string("unknown implementation identifier (`")
+			 + *id
+			 + "')");
+	      algorithm_ids.merge(id_finder->second);
+	    }
+
+	    for (IntervalList::const_iterator id = algorithm_ids.begin();
+		 id != algorithm_ids.end();
+		 ++id)
+	      algorithms[*id].enabled = (parameter->first->val == OPT_ENABLE);
+	  }
+	  catch (const IntervalRangeException& e)
+          {
+	    throw ConfigurationException
+	            (-1,
+		     string("invalid implementation identifier (")
+		     + toString(e.getNumber())
+		     + ")");
+	  }
+
+	  break;
+
+        default :
+	  break;
+      }
     }
+  }
+  catch (ConfigurationException& e)
+  {
+    e.changeMessage(string("[--") + parameter->first->name + "]: " + e.what());
+    throw e;
   }
 
   /*
@@ -929,8 +722,7 @@ void Configuration::read(int argc, char* argv[])
 
   if (global_options.number_of_rounds <= global_options.init_skip)
     throw ConfigurationException
-            ("", "the argument for `--skip' must be less than the total "
-	         "number of test rounds");
+            (-1, "[--skip]: number of rounds is less than skip count");
 
   /*
    *  Check that there is at least one algorithm available for use.
@@ -938,7 +730,7 @@ void Configuration::read(int argc, char* argv[])
 
   if (algorithms.empty())
     throw ConfigurationException
-            ("", "no implementations defined in the configuration file");
+            (-1, "no implementations defined in the configuration file");
 
   /*
    *  The case where the number of available variables for propositional
@@ -957,8 +749,8 @@ void Configuration::read(int argc, char* argv[])
   if (formula_options.symbol_priority[::Ltl::LTL_ATOM] == 0
       && formula_options.symbol_priority[::Ltl::LTL_TRUE] == 0
       && formula_options.symbol_priority[::Ltl::LTL_FALSE] == 0)
-    throw ConfigurationException("", "at least one atomic symbol must have "
-                                     "nonzero priority");
+    throw ConfigurationException(-1, "at least one atomic symbol should have "
+                                     "a nonzero priority");
 
   /*
    *  If the operators ->, <->, xor, <>, [], W and M are disallowed, set their
@@ -1000,7 +792,7 @@ void Configuration::read(int argc, char* argv[])
   }
 
   if (!unary_operator_allowed)
-    throw ConfigurationException("", "at least one unary operator must have "
+    throw ConfigurationException(-1, "at least one unary operator should have "
                                      "a nonzero priority");
 
   /*
@@ -1175,6 +967,10 @@ void Configuration::print(ostream& stream, int indent) const
     estream << "Testing will be interrupted in case of an error.\n";
   else
     estream << "Running in batch mode.\n";
+  estream << string(indent + 2, ' ')
+             + "Signalling a break will "
+             + (global_options.handle_breaks ? "interrupt" : "abort")
+             + " testing.\n";
 
   estream << string(indent + 2, ' ')
              + "Using "
@@ -1205,6 +1001,43 @@ void Configuration::print(ostream& stream, int indent) const
 
     algorithm_number++;
   }
+
+  estream << '\n' + string(indent + 2, ' ');
+  if (global_options.translator_timeout > 0)
+  {
+    estream << "Timeout for translators is set to "
+               + toString(global_options.translator_timeout)
+               + " seconds";
+    if (global_options.translator_timeout >= 60)
+    {
+      bool first_printed = false;
+      estream << " (";
+      if (global_options.translator_timeout >= 3600)
+      {
+	first_printed = true;
+	estream << toString(global_options.translator_timeout / 3600) + " h";
+      }
+      if (global_options.translator_timeout % 3600 > 60)
+      {
+	if (first_printed)
+	  estream << ' ';
+	else
+	  first_printed = true;
+	estream << toString((global_options.translator_timeout % 3600) / 60)
+	           + " min";
+      }
+      if (global_options.translator_timeout % 60 != 0)
+      {
+	if (first_printed)
+	  estream << ' ';
+	estream << toString(global_options.translator_timeout % 60) + " s";
+      }
+      estream << ')';
+    }
+    estream << ".\n";
+  }
+  else
+    estream << "Translators are allowed to run until their termination.\n";
 
   estream << '\n' + string(indent + 2, ' ');
 
@@ -1521,10 +1354,8 @@ string Configuration::algorithmString
  *
  * ------------------------------------------------------------------------- */
 {
-  using namespace ::StringUtil;
-
-  return toString(algorithm_id) + ": `" + *(algorithms[algorithm_id].name)
-         + '\'';
+  using ::StringUtil::toString;
+  return toString(algorithm_id) + ": `" + algorithms[algorithm_id].name + '\'';
 }
 
 /* ========================================================================= */
@@ -1541,11 +1372,13 @@ void Configuration::showCommandLineHelp(const char* program_name)
 {
   cout << string("Usage: ") + program_name
           + " [OPTION]...\n\nGeneral options:\n"
-            "  --[no]comparisontest        Enable or disable the model "
+            "  --comparisontest[=VALUE], --nocomparisontest\n"
+            "                              Enable or disable the model "
                                            "checking result\n"
             "                              cross-comparison test\n"
             "  --configfile=FILE           Read configuration from FILE\n"
-            "  --[no]consistencytest       Enable or disable the model "
+            "  --consistencytest[=VALUE], --noconsistencytest\n"
+            "                              Enable or disable the model "
                                            "checking result\n"
             "                              consistency test\n"
             "  --disable=IMPLEMENTATION-ID[,IMPLEMENTATION-ID...]\n"
@@ -1560,10 +1393,12 @@ void Configuration::showCommandLineHelp(const char* program_name)
             "                              (equivalent to "
                                            "`--modelcheck=global')\n"
             "  -h, --help                  Show this help and exit\n"
-            "  --interactive=MODE          Set the interactivity mode "
+            "  --interactive[=MODE[,MODE]], --pause[=MODE[,MODE]]\n"
+            "                              Set the interactivity mode "
                                            "(`always', `onerror', \n"
-            "                              `never')\n"
-            "  --[no]intersectiontest      Enable or disable the Büchi "
+            "                              `never', `onbreak')\n"
+            "  --intersectiontest[=VALUE], --nointersectiontest\n"
+            "                              Enable or disable the Büchi "
                                            "automata\n"
             "                              intersection emptiness test\n"
             "  --localmodelcheck           Use local model checking in tests"
@@ -1573,21 +1408,10 @@ void Configuration::showCommandLineHelp(const char* program_name)
             "  --logfile=FILE              Write error log to FILE\n"
             "  --modelcheck=MODE           Set model checking mode "
                                            "(`global' or `local')\n"
-            "  --nopause                   Do not pause between test rounds "
-                                           "(equivalent to\n"
-            "                              `--interactive=never')\n"
-            "  --pause                     Pause unconditionally after every "
-                                           "test round\n"
-            "                              (equivalent to "
-                                           "`--interactive=always')\n"
-            "  --pauseonerror              Pause between test rounds only in "
-                                           "case of an\n"
-            "                              error (equivalent to "
-                                           "`--interactive=onerror')\n"
             "  --profile                   Disable all automata correctness "
                                            "tests\n"
             "  --quiet, --silent           Run all tests silently without "
-                                           "interruption\n"
+                                           "pausing\n"
             "  --rounds=NUMBER-OF-ROUNDS   Set number of test rounds (1-)\n"
             "  --showconfig                Display current configuration and "
                                            "exit\n"
@@ -1597,13 +1421,15 @@ void Configuration::showCommandLineHelp(const char* program_name)
             "  --skip=NUMBER-OF-ROUNDS     Set number of test rounds to skip "
                                            "before\n"
             "                              starting tests\n"
+            "  --translatortimeout=TIME    Set timeout for translators\n"
             "  --verbosity=INTEGER         Set the verbosity of output (0-5)\n"
-            "  --version                   Display program version and exit"
+            "  -V,--version                Display program version and exit"
                                            "\n\n"
             "LTL formula generation options:\n"
-            "  --[no]abbreviatedoperators  Allow or disallow operators ->, "
-                                           "<->, xor, <>,\n"
-            "                              [], u, w in the generated "
+            "  --abbreviatedoperators[=VALUE], --noabbreviatedoperators\n"
+            "                              Allow or disallow operators ->, "
+                                           "<->, xor, <>, [],\n"
+            "                              W, M, and B in the generated "
                                            "formulas\n"
             "  --andpriority=INTEGER       Set priority for the /\\ operator\n"
             "  --beforepriority=INTEGER    Set priority for the Before "
@@ -1735,6 +1561,7 @@ void Configuration::reset()
 {
   global_options.verbosity = 3;
   global_options.interactive = ALWAYS;
+  global_options.handle_breaks = false;
   global_options.number_of_rounds = 10;
   global_options.init_skip = 0;
   global_options.statespace_change_interval = 1;
@@ -1749,6 +1576,7 @@ void Configuration::reset()
   global_options.do_intr_test = true;
   global_options.statespace_random_seed = 1;
   global_options.formula_random_seed = 1;
+  global_options.translator_timeout = 0;
 
   formula_options.default_operator_priority = 0;
   formula_options.symbol_priority.clear();
@@ -1779,40 +1607,418 @@ void Configuration::reset()
   formula_options.formula_generator.reset();
 
   statespace_generator.reset();
-
-  locked_options.clear();
 }
 
 /* ========================================================================= */
-long int Configuration::parseCommandLineInteger
-  (const string& option, const string& value) const
+void Configuration::registerAlgorithm
+  (const string& name, const string& path, const string& parameters,
+   bool enabled, const int block_begin_line)
 /* ----------------------------------------------------------------------------
  *
- * Description:   Converts an integer (given as a string) into a long int. Used
- *                when processing command line parameters.
+ * Description:   Adds a new implementation to the configuration.
  *
- * Arguments:     option  --  A reference to a constant string giving a name of
- *                            a command line option.
- *                value   --  A reference to a string which is supposed to
- *                            contain an integer.
+ * Arguments:     name              --  Name of the implementation.  If empty,
+ *                                      the implementation will be given the
+ *                                      name `Algorithm n', where n is the
+ *                                      number of previously registered
+ *                                      algorithms.  The name "lbtt" is
+ *                                      reserved and cannot be used as a name
+ *                                      for an implementation.  In addition,
+ *                                      `name' should be unique among the set
+ *                                      of the names of previously registered
+ *                                      implementations.
+ *                path              --  Path to the executable file used for
+ *                                      invoking the implementation.  This
+ *                                      string should not be empty.
+ *                parameters        --  Parameters for the implementation.
+ *                                      Parameters containing white space
+ *                                      should be quoted.
+ *                enabled           --  Whether the implementation is initially
+ *                                      enabled.
+ *                block_begin_line  --  Number of the first line of the most
+ *                                      recently encountered Algorithm block in
+ *                                      the configuration file.
  *
- * Returns:       The value of the integer.
+ * Returns:       Nothing.  The function throws a ConfigurationException if
+ *                `name' or `path' fails to satisfy one of the above
+ *                requirements.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  using namespace ::StringUtil;
+  string error;
+
+  AlgorithmInformation algorithm_information;
+
+  if (!name.empty())
+    algorithm_information.name = name;
+  else
+    algorithm_information.name = "Algorithm " + toString(algorithms.size());
+
+  if (algorithm_information.name == "lbtt")
+    error = "`lbtt' is a reserved name for an implementation";
+  else if (algorithm_names.find(algorithm_information.name)
+	     != algorithm_names.end())
+    error = "multiple definitions for implementation `"
+            + algorithm_information.name + "'";
+  else if (path.empty())
+    error = "missing path to executable for implementation `"
+            + algorithm_information.name + "'";
+
+  if (!error.empty())
+    throw ConfigurationException
+            (toString(block_begin_line)
+	     + (config_file_line_number > block_begin_line
+		? "-" + toString(config_file_line_number)
+		: string("")),
+	     error);
+
+  vector<string, ALLOC(string) > params;
+  sliceString(unquoteString(substituteInQuotedString(parameters, " \t", "\n\n",
+						     OUTSIDE_QUOTES)),
+	      "\n",
+	      params);
+
+  /*
+   *  Initialize the parameter array for the implementation.  This array is
+   *  arranged into a standard argv-style array of C-style strings (ready to be
+   *  used as a parameter for one of the exec functions) and has the following
+   *  structure:
+   *    Index                      Description
+   *    0                      --  Path to the executable for invoking the
+   *                               implementation (obtained from `path').
+   *    1...params.size()      --  Optional parameters (obtained from the
+   *                               `params' vector).
+   *    params.size() + 1,     --  Reserved for storing the input and output
+   *    params.size() + 2          file names given as the last two parameters
+   *                               for the implementation.
+   *    params.size() + 3      --  A 0 pointer terminating the parameter list.
+   */
+
+  algorithm_information.parameters = new char*[params.size() + 4];
+  algorithm_information.num_parameters = params.size();
+
+  algorithm_information.parameters[0] = new char[path.size() + 1];
+  memcpy(static_cast<void*>(algorithm_information.parameters[0]),
+	 static_cast<const void*>(path.c_str()), path.size() + 1);
+
+  for (vector<string, ALLOC(string) >::size_type p = 0;
+       p < algorithm_information.num_parameters;
+       ++p)
+  {
+    algorithm_information.parameters[p + 1] = new char[params[p].size() + 1];
+    memcpy(static_cast<void*>(algorithm_information.parameters[p + 1]),
+	   static_cast<const void*>(params[p].c_str()), params[p].size() + 1);
+  }
+
+  algorithm_information.parameters
+    [algorithm_information.num_parameters + 3] = 0;
+
+  algorithm_information.enabled = enabled;
+
+  algorithm_names[algorithm_information.name] = algorithms.size();
+  algorithms.push_back(algorithm_information);
+}
+
+/* ========================================================================= */
+void Configuration::readProbability(double& target, const string& value)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Reads a probability and stores it into `target'.
+ *
+ * Arguments:     target  --  A reference to a double for storing the result.
+ *                value   --  The probability as a string.
+ *
+ * Returns:       Nothing; the result is stored into `target'.  The function
+ *                throws a ConfigurationException if `value' is not a valid
+ *                probability (a number between 0.0 and 1.0).
  *
  * ------------------------------------------------------------------------- */
 {
   char* endptr;
-  long int val = strtol(value.c_str(), &endptr, 10);
+  string error;
 
-  if (*endptr != '\0' || value.empty())
+  target = strtod(value.c_str(), &endptr);
+  if (*endptr != '\0')
+    error = "`" + value + "' is not a valid real number";
+  else if (target < 0.0 || target > 1.0)
+    error = "probability must be between 0.0 and 1.0 (inclusive)";
+
+  if (!error.empty())
+    throw ConfigurationException(config_file_line_number, error);
+}
+
+/* ========================================================================= */
+void Configuration::readSize(int valtype, const string& value)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Initializes formula or state space size ranges from `value'.
+ *
+ * Arguments:     valtype  --  If == OPT_STATESPACESIZE, store the result in
+ *                             `this->statespace_generator.min_size' and
+ *                             `this->statespace_generator.max_size'; otherwise
+ *                             store the result in
+ *                             `this->formula_options.formula_generator.size'
+ *                             and
+ *                             `this->formula_options.formula_generator.
+ *                                      max_size'.
+ *                value    --  Size range as a string (a single integer or a
+ *                             closed integer interval).
+ *
+ * Returns:       Nothing; the result is stored into the Configuration object.
+ *                The function throws a ConfigurationException if `value' is
+ *                not a valid positive integer or a closed nonempty integer
+ *                interval.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  string error;
+  unsigned long int min, max;
+
+  try
+  {
+    int interval_type = ::StringUtil::parseInterval(value, min, max);
+    if (!(interval_type & ::StringUtil::LEFT_BOUNDED) ||
+	!(interval_type & ::StringUtil::RIGHT_BOUNDED))
+      throw Exception();
+
+    if (min < 1)
+    {
+      if (valtype == OPT_STATESPACESIZE)
+	error = "state space size must be positive";
+      else
+	error = "formula size must be positive";
+    }
+    else if (min > max)
+    {
+      if (valtype == OPT_STATESPACESIZE)
+	error = "minimum state space size exceeds maximum state space size";
+      else
+	error = "minimum formula size exceeds maximum formula size";
+    }
+  }
+  catch (const Exception&)
+  {
+    error = "`" + value + "' is neither a valid positive integer nor a closed "
+            "integer interval";
+  }
+
+  if (!error.empty())
+    throw ConfigurationException(config_file_line_number, error);
+
+  if (valtype == OPT_STATESPACESIZE)
+  {
+    statespace_generator.min_size = min;
+    statespace_generator.max_size = max;
+  }
+  else
+  {
+    formula_options.formula_generator.size = min;
+    formula_options.formula_generator.max_size = max;
+  }
+}
+
+/* ========================================================================= */
+void Configuration::readTruthValue(bool& target, const string& value)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Interprets a symbolic truth value and stores it into
+ *                `target'.
+ *
+ * Arguments:     target  --  A reference to a Boolean variable whose value
+ *                            should be set according to the given value.
+ *                value   --  The symbolic truth value.
+ *
+ * Returns:       Nothing; the interpreted value is stored in `target'.  If
+ *                `value' is not a valid truth value, the function throws a
+ *                ConfigurationException.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  const string value_in_lower_case = ::StringUtil::toLowerCase(value);
+
+  if (value_in_lower_case == "yes" || value_in_lower_case == "true")
+    target = true;
+  else if (value_in_lower_case == "no" || value_in_lower_case == "false")
+    target = false;
+  else
     throw ConfigurationException
-            ("", "the argument for `--" + option + "' must be a nonnegative "
-	         "integer");
+            (config_file_line_number,
+	     "`" + value + "' is not a valid truth value");
+}
 
-  if (val == LONG_MIN || val == LONG_MAX)
+/* ========================================================================= */
+void Configuration::readInteractivity(const string& value)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Interprets a symbolic list of interactivity modes and updates
+ *                `this->global_options.interactive' and
+ *                `this->global_options.handle_breaks' accordingly.
+ *
+ * Argument:      value  --  The symbolic mode (a comma-separated list of
+ *                           "always", "onerror", "never" or "onbreak"; the
+ *                           case is not relevant).
+ *
+ * Returns:       Nothing; the result is stored in
+ *                `this->global_options.interactive' and/or
+ *                `this->global_options.handle_breaks'.  The function throws a
+ *                ConfigurationException is `value' is not a valid
+ *                interactivity mode.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  /*
+   *  Reset the interactivity mode to NEVER and disable break handling to allow
+   *  the interactivity specification to be interpreted correctly.
+   */
+
+  global_options.interactive = NEVER;
+  global_options.handle_breaks = false;
+
+  vector<string, ALLOC(string) > modes;
+  ::StringUtil::sliceString(value, ",", modes);
+  for (vector<string, ALLOC(string) >::const_iterator mode = modes.begin();
+       mode != modes.end();
+       ++mode)
+  {
+    string mode_in_lower_case = ::StringUtil::toLowerCase(*mode);
+
+    if (mode_in_lower_case == "always")
+      global_options.interactive = ALWAYS;
+    else if (mode_in_lower_case == "onerror")
+      global_options.interactive = ONERROR;
+    else if (mode_in_lower_case == "never")
+      global_options.interactive = NEVER;
+    else if (mode_in_lower_case == "onbreak")
+      global_options.handle_breaks = true;
+    else
+      throw ConfigurationException
+	     (config_file_line_number,
+	      "`" + *mode + "' is not a valid interactivity mode");
+  }
+}
+
+/* ========================================================================= */
+void Configuration::readProductType(const string& value)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Interprets a symbolic model checking mode and updates
+ *                `this->global_options.product_mode' accordingly.
+ *
+ * Argument:      value  --  The symbolic mode (one of "local" or "global"; the
+ *                           case of characters is not relevant).
+ *
+ * Returns:       Nothing; the result is stored in
+ *                `this->global_options.product_mode'.  The function throws a
+ *                ConfigurationException is `value' is not a valid model
+ *                checking mode.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  const string value_in_lower_case = ::StringUtil::toLowerCase(value);
+
+  if (value_in_lower_case == "global")
+    global_options.product_mode = GLOBAL;
+  else if (value_in_lower_case == "local")
+    global_options.product_mode = LOCAL;
+  else
     throw ConfigurationException
-            ("", "the argument for `--" + option + "' is out of range");
+	    (config_file_line_number,
+	     "`" + value + "' is not a valid model checking mode");
+}
 
-  return val;
+/* ========================================================================= */
+void Configuration::readFormulaMode(FormulaMode& target, const string& mode)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Interprets a symbolic formula mode and updates `target'
+ *                accordingly.
+ *
+ * Argument:      mode  --  Symbolic formula mode (one of "normal" or "nnf";
+ *                          the case of characters is not relevant).
+ *
+ * Returns:       Nothing; the result is stored into `target'.  The function
+ *                throws a ConfigurationException if `mode' is not a valid mode
+ *                string.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  const string mode_in_lower_case = ::StringUtil::toLowerCase(mode);
+
+  if (mode_in_lower_case == "nnf")
+    target = NNF;
+  else if (mode_in_lower_case == "normal")
+    target = NORMAL;
+  else
+    throw ConfigurationException
+	    (config_file_line_number,
+	     "`" + mode + "' is not a valid formula mode");
+}
+
+/* ========================================================================= */
+void Configuration::readStateSpaceMode(const string& mode)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Interprets a symbolic state space generation mode and updates
+ *                `global_options.statespace_generation_mode' accordingly.
+ *
+ * Argument:      mode  --  Symbolic state space generation mode (one of
+ *                          "randomconnectedgraph", "randomgraph", "randompath"
+ *                          and "enumeratedpath"; the case of characters is
+ *                          not relevant).
+ *
+ * Returns:       Nothing; the result is stored into
+ *                `global_options.statespace_generation_mode'.  The function
+ *                throws a ConfigurationException if `mode' is not one of the
+ *                above keywords.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  const string mode_in_lower_case = ::StringUtil::toLowerCase(mode);
+
+  if (mode_in_lower_case == "randomconnectedgraph")
+    global_options.statespace_generation_mode = RANDOMCONNECTEDGRAPH;
+  else if (mode_in_lower_case == "randomgraph")
+    global_options.statespace_generation_mode = RANDOMGRAPH;
+  else if (mode_in_lower_case == "randompath")
+    global_options.statespace_generation_mode = RANDOMPATH;
+  else if (mode_in_lower_case == "enumeratedpath")
+    global_options.statespace_generation_mode = ENUMERATEDPATH;
+  else
+    throw ConfigurationException
+	    (config_file_line_number,
+	     "`" + mode + "' is not a valid state space generation mode");
+}
+
+/* ========================================================================= */
+void Configuration::readTranslatorTimeout(const string& value)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Reads a time specification from a string into
+ *                `this->global_options.translator_timeout'.
+ *
+ * Argument:      value  --  A time specification in the format expected by
+ *                           ::StringUtil::parseTime.
+ *
+ * Returns:       Nothing; the result is stored into
+ *                `this->global_options.translator_timeout'.  The function
+ *                throws a ConfigurationException if `value' is not a valid
+ *                time specification.
+ *
+ * ------------------------------------------------------------------------- */
+{ 
+  unsigned long int hours, minutes, seconds;
+  try
+  {
+    ::StringUtil::parseTime(value, hours, minutes, seconds);
+  }
+  catch (const Exception&)
+  {
+    throw ConfigurationException
+            (config_file_line_number,
+	     "`" + value + "' is not a valid time specification");
+  }
+  global_options.translator_timeout = (hours * 60 + minutes) * 60 + seconds;
 }
 
 /* ========================================================================= */

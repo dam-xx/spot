@@ -186,6 +186,10 @@ public:
                                                      * graph nodes.
 						     */
 
+  class PathElement;                                /* A class for representing
+						     * (node, edge) pairs
+						     */
+
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 protected:
@@ -204,6 +208,14 @@ public:
                                                      * the vector containing
                                                      * the graph nodes.
                                                      */
+
+  typedef EdgeContainer EdgeContainerType;          /* Type definition for
+						     * containers of graph
+						     * edges.
+						     */
+
+  typedef deque<PathElement, ALLOC(PathElement) >   /* Type definition for */
+    Path;                                           /* paths in a graph.   */
 
   typedef pair<size_type, size_type> StateIdPair;   /* Type definition for a
 						     * pair of state
@@ -323,8 +335,8 @@ public:
 
   /* default assignment operator */
   
-  Graph<EdgeContainer>::size_type targetNode()      /* Returns the index of */
-    const;                                          /* the target node of
+  size_type targetNode() const;                     /* Returns the index of */
+                                                    /* the target node of
                                                      * the directed edge.
                                                      */
 
@@ -353,7 +365,7 @@ protected:
                                                      */
                                                      
 private:
-  Graph<EdgeContainer>::size_type target_node;      /* Identifier of the edge's
+  size_type target_node;                            /* Identifier of the edge's
                                                      * target node.
                                                      */
 };
@@ -400,6 +412,62 @@ protected:
   EdgeContainer outgoing_edges;                     /* Container of edges
 						     * beginning at the node.
                                                      */
+};
+
+
+
+/******************************************************************************
+ *
+ * A template class for representing (node identifier, edge) pairs in a graph.
+ *
+ *****************************************************************************/
+
+template <class EdgeContainer>
+class Graph<EdgeContainer>::PathElement
+{
+public:
+  explicit PathElement                              /* Constructors. */
+    (const typename Graph<EdgeContainer>::size_type
+       n,
+     const typename Graph<EdgeContainer>::Edge*
+       e = 0);
+
+  PathElement
+    (const typename Graph<EdgeContainer>::size_type
+       n,
+     const typename Graph<EdgeContainer>::Edge& e);
+
+  /* default copy constructor */
+
+  ~PathElement();                                   /* Destructor. */
+
+  /* default assignment operator */
+
+  size_type node() const;                           /* Returns the identifier
+						     * of the node associated
+						     * with the path element.
+						     */
+
+  bool hasEdge() const;                             /* Tells whether there is
+						     * an edge associated with
+						     * the path element.
+						     */
+
+  const Edge& edge() const;                         /* Returns the edge
+						     * associated with the
+						     * path element.
+						     */
+
+private:
+  typename Graph<EdgeContainer>::size_type node_id; /* Identifier of the node
+						     * associated with the path
+						     * element.
+						     */
+
+  const typename Graph<EdgeContainer>::Edge*        /* Pointer to the edge */
+    edge_pointer;                                   /* associated with the
+						     * path element.
+						     */
 };
 
 
@@ -924,7 +992,7 @@ Graph<EdgeContainer>::stats() const
  *
  * ------------------------------------------------------------------------- */
 {
-  pair<Graph<EdgeContainer>::size_type, unsigned long int> result;
+  pair<size_type, unsigned long int> result;
 
   result.first = nodes.size();
   result.second = 0;
@@ -1464,6 +1532,128 @@ void Graph<EdgeContainer>::Node::print
   }
 
   estream.flush();
+}
+
+
+
+/******************************************************************************
+ *
+ * Inline function definitions for template class
+ * Graph<EdgeContainer>::PathElement.
+ *
+ *****************************************************************************/
+
+/* ========================================================================= */
+template <class EdgeContainer>
+inline Graph<EdgeContainer>::PathElement::PathElement
+  (const typename Graph<EdgeContainer>::size_type n,
+   const typename Graph<EdgeContainer>::Edge* e) :
+  node_id(n), edge_pointer(e)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Constructor for class Graph<EdgeContainer>::PathElement.
+ *                Creates a (node identifier, edge) pair from a node identifier
+ *                and a pointer to an edge.
+ *
+ * Arguments:     n  --  Numeric identifier of a graph node.
+ *                e  --  A constant pointer to a graph edge.
+ *
+ * Returns:       Nothing.
+ *
+ * ------------------------------------------------------------------------- */
+{
+}
+
+/* ========================================================================= */
+template <class EdgeContainer>
+inline Graph<EdgeContainer>::PathElement::PathElement
+  (const typename Graph<EdgeContainer>::size_type n,
+   const typename Graph<EdgeContainer>::Edge& e) :
+  node_id(n), edge_pointer(&e)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Constructor for class Graph<EdgeContainer>::PathElement.
+ *                Creates a (node identifier, edge) pair from a node identifier
+ *                and an edge.
+ *
+ * Arguments:     n  --  Numeric identifier of a graph node.
+ *                e  --  A constant reference to a graph edge.
+ *
+ * Returns:       Nothing.
+ *
+ * ------------------------------------------------------------------------- */
+{
+}
+
+/* ========================================================================= */
+template <class EdgeContainer>
+inline Graph<EdgeContainer>::PathElement::~PathElement()
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Destructor for class Graph<EdgeContainer>::PathElement.
+ *
+ * Arguments:     None.
+ *
+ * Returns:       Nothing.
+ *
+ * ------------------------------------------------------------------------- */
+{
+}
+
+/* ========================================================================= */
+template <class EdgeContainer>
+inline typename Graph<EdgeContainer>::size_type
+Graph<EdgeContainer>::PathElement::node() const
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Returns the identifier of the node associated with a
+ *                Graph<EdgeContainer>::PathElement object.
+ *
+ * Arguments:     None.
+ *
+ * Returns:       Identifier of the node associated with the object.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  return node_id;
+}
+
+/* ========================================================================= */
+template <class EdgeContainer>
+inline bool Graph<EdgeContainer>::PathElement::hasEdge() const
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Tells whether there is an edge associated with a
+ *                Graph<EdgeContainer>::PathElement object.
+ *
+ * Arguments:     None.
+ *
+ * Returns:       true iff there is an edge associated with the object.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  return (edge != 0);
+}
+
+/* ========================================================================= */
+template <class EdgeContainer>
+inline const typename Graph<EdgeContainer>::Edge&
+Graph<EdgeContainer>::PathElement::edge() const
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Returns the edge associated with a
+ *                Graph<EdgeContainer>::PathElement object.  The function
+ *                assumes that there is such an edge; it is an error to call
+ *                this function for a PathElement object `element' for which
+ *                `element.hasEdge() == false'.
+ *
+ * Arguments:     None.
+ *
+ * Returns:       The edge associated with the object.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  return *edge_pointer;
 }
 
 

@@ -64,7 +64,7 @@ under the above conditions for modified versions.
 @title @command{lbtt}
 
 @subtitle LTL-to-B@"uchi Translator Testbench
-@subtitle @today, @command{lbtt} Versions 1.0.x
+@subtitle @today, @command{lbtt} Versions 1.1.x
 @author Heikki Tauriainen <@email{heikki.tauriainen@@hut.fi}>
 @page
 @vskip 0pt plus 1filll
@@ -103,8 +103,8 @@ under the above conditions for modified versions.
 for translating propositional linear temporal logic formulas into
 B@"uchi automata.
 
-This is edition 1.0.2 of the @command{lbtt} documentation. This edition
-applies to @command{lbtt} versions 1.0.x.
+This is edition 1.1.0 of the @command{lbtt} documentation. This edition
+applies to @command{lbtt} versions 1.1.x.
 
 @command{lbtt} is free software, you may change and redistribute it
 under the terms of the GNU General Public License.  @command{lbtt}
@@ -148,7 +148,7 @@ comes with NO WARRANTY. See @ref{Copying} for details.
 @chapter Overview
 
 @cindex model checking
-@command{lbtt} is a tool for automatic testing of programs which translate
+@command{lbtt} is a tool for testing programs that translate
 formulas expressed in propositional linear temporal logic (@dfn{LTL}) into
 B@"uchi automata. These finite-state automata over infinite words are
 used e.g.@: in automata-theoretic model checking
@@ -163,7 +163,7 @@ where they can help in detecting errors in the specifications of finite-state
 hardware or software systems. Usually the model checking procedure involves
 first composing an
 automaton with a formal model of a given system, and the result of the
-composition reveals whether any execution path of the system violates
+composition reveals whether any computation path of the system violates
 some property that the automaton represents.
 (For an introduction to model checking techniques in general, see,
 for example,
@@ -174,12 +174,14 @@ for example,
 [CGP99].)
 @end iftex
 
-The property to be model checked is often specified as an
+The property to be model checked can be specified as an
 LTL formula, and the B@"uchi automaton used for model checking is obtained
-automatically from the formula with a translation algorithm. (Detailed
-descriptions and optimization techniques for such algorithms can be found, for
-example, in
+automatically from the formula with a translation algorithm.
+(For descriptions and optimization techniques for such algorithms, see the
+references, for example,
 @ifnottex
+@ref{[VW86]},
+@ref{[Isl94]},
 @ref{[GPVW95]},
 @ref{[Cou99]}
 @ref{[DGV99]},
@@ -187,20 +189,33 @@ example, in
 @ref{[SB00]},
 @ref{[EH00]},
 @ref{[EWS01]},
-@ref{[GO01]}.)
+@ref{[GO01]},
+@ref{[Gei01]},
+@ref{[Sch01]},
+@ref{[Wol01]},
+@ref{[Ete02]},
+@ref{[GL02]},
+@ref{[GSB02]},
+@ref{[Thi02]},
+@ref{[Fri03]},
+@ref{[GO03]},
+@ref{[Lat03]},
+@ref{[ST03]}.)
 @end ifnottex
 @iftex
-[GPVW95, Cou99, DGV99, Ete99, SB00, EH00, EWS01, GO01].)
+[VW86, Isl94, GPVW95, Cou99, DGV99, Ete99, SB00, EH00, EWS01, GO01,
+Gei01, Sch01, Wol01, Ete02, GL02, GSB02, Thi02, Fri03, GO03, Lat03, ST03].)
 @end iftex
-In practice, the implementation correctness of such a translation algorithm
-is crucial to the soundness of the model checking procedure.
+In practice, ensuring the correctness of the implementation of such a
+translation algorithm is crucial to guarantee the soundness of the
+implementation of a model checking procedure.
 
-The goal of @command{lbtt} is to assist in the correct implementation of
-LTL-to-B@"uchi translation algorithms by providing an automated
+The goal of @command{lbtt} is to assist implementing LTL-to-B@"uchi
+translation algorithms correctly by providing an automated
 testing environment for LTL-to-B@"uchi translators. Testing consists of running
 LTL-to-B@"uchi translators on randomly generated (or user-specified) LTL
 formulas as input and then performing simple consistency checks on the
-resulting automata to test whether the translators seem to operate correctly
+resulting automata to test whether the translators seem to function correctly
 in practice. (See
 @ifnottex
 @ref{[TH02]}
@@ -208,9 +223,9 @@ in practice. (See
 @iftex
 [TH02]
 @end iftex
-for more information on the theory behind the testing methods.) If the tests
-suggest an implementation
-error in a translator, @command{lbtt} can generate sample data which causes
+for more information on the theory behind the testing methods.) If the test
+results suggest that there is an error in an implementation,
+@command{lbtt} can generate sample data which causes
 a test failure and which may also be useful for debugging the
 implementation.
 
@@ -218,12 +233,12 @@ Additionally, the testing environment can be used for very basic profiling of
 different LTL-to-B@"uchi translators to evaluate their performance.
 
 @noindent
-@emph{
-Note: although @command{lbtt} might be able to detect implementation errors
-in an LTL-to-B@"uchi translator, it is only a testing tool and is therefore
-incapable of formally proving any translation algorithm implementation to be
-correct. Therefore, the test results should never be used as the sole basis
-for any formal conclusions about the correctness of an implementation.
+@emph{Note: although @command{lbtt} might be able to detect inconsistent
+behavior in an LTL-to-B@"uchi translator, it is only a testing tool and is
+therefore incapable of formally proving any translation algorithm
+implementation to be correct. Therefore, the test results should never be used
+as the sole basis for any formal conclusions about the correctness of an
+implementation.
 }
 
 
@@ -289,12 +304,12 @@ read LTL formulas from a file
 
 @cindex state space
 Additionally, some of the tests make use of randomly generated
-``state spaces'', which are basically directed labelled graphs with labels on
+``state spaces'', which are basically directed labeled graphs with labels on
 nodes with the additional requirement of having at least one arc leaving
 each node. The label of each node is a subset of a finite collection of atomic
 propositions
 @cindex atomic proposition
-(representing a set of conditions which may or may not hold in a
+(an uninterpreted set of assertions which may or may not hold in a
 state), which occur also in the LTL formulas used in the tests.
 
 The following sections describe how @command{lbtt} generates input for the
@@ -589,9 +604,9 @@ number of @emph{different} atomic propositions.)
 @cindex operators, priorities for
 Priorities for the Boolean constants and atomic propositions. The priority of
 a symbol determines the relative likelihood of its occurrence in a generated
-formula. The higher the priority of a symbol, the more likely it will occur
-(with respect to the other symbols) in a generated formula; a zero priority
-will exclude the symbol altogether.
+formula. The higher the priority of a symbol, the more likely it is that the
+symbol will occur (with respect to the other symbols) in a generated formula; a
+zero priority will exclude the symbol altogether.
 
 @item
 Priorities for the logical and temporal operators.
@@ -602,7 +617,8 @@ Priorities for the logical and temporal operators.
 Note that the priorities for atomic symbols (Boolean constants and atomic
 propositions) and the priorities of the logical and temporal operators are
 independent, i.e., changing the priority of an atomic symbol does not affect
-the occurrence likelihood of any logical or temporal operator and vice versa.
+the likelihood of the occurrence of any logical or temporal operator and vice
+versa.
 
 @ifnottex
 For further details, see @ref{The formula generation algorithm} for a
@@ -878,6 +894,16 @@ distribution for a given combination of operator priorities; see the
 (@pxref{--showoperatordistribution,,@samp{--showoperatordistribution} command line option})
 for more information.
 
+See also the web page@*
+@ifinfo
+@url{http://www.tcs.hut.fi/Software/lbtt/formulaoptions.php}
+@end ifinfo
+@ifnotinfo
+<@uref{http://www.tcs.hut.fi/Software/lbtt/formulaoptions.php>}
+@end ifnotinfo
+for an interface to a small database for adjusting the operator priorities
+towards certain simple distributions.
+
 
 
 @node Random state spaces, , Random LTL formulas, Random input generation
@@ -891,7 +917,7 @@ model checking result cross comparison test
 (@pxref{Model checking result cross-comparison test}) and the
 model checking result consistency check
 (@pxref{Model checking result consistency check}).
-The state spaces are directed labelled graphs, each node of which is labelled
+The state spaces are directed labeled graphs, each node of which is labeled
 with a randomly chosen set of atomic propositions (the propositions that
 hold in the state corresponding to the graph node). In addition, each state of
 the state space always has at least one successor.
@@ -1009,11 +1035,11 @@ $|\it{AP}|$.
 @math{|AP|}.
 @end ifnottex
 
-In practice, you should always start testing using only very small state spaces
+In practice, testing should be started using only very small state spaces
 (say, with only 10--50 states and a small density) regardless of the particular
 algorithm chosen for generating the state spaces. The size of the state spaces
-can then be increased if @command{lbtt}'s memory consumption stays within
-acceptable limits.
+can then be increased if @command{lbtt}'s memory consumption and the time spent
+running the tests stay within acceptable limits.
 
 
 
@@ -1242,7 +1268,7 @@ section.
 @cindex B@"uchi automata intersection emptiness check
 @cindex tests, B@"uchi automata intersection emptiness check
 
-The semantics of LTL guarantee that no model of an LTL formula
+The semantics of LTL guarantees that no model of an LTL formula
 can be the model of the negation of the same formula. In terms of
 B@"uchi automata, this implies that the languages accepted by automata
 constructed from two complementary LTL formulas should be disjoint.
@@ -1271,7 +1297,7 @@ to be tested and defines additional testing parameters.
 if the configuration file cannot be processed successfully, @command{lbtt}
 exits with an error message.
 
-After reading the configuration file @command{lbtt} starts tests on the
+After reading the configuration file, @command{lbtt} starts tests on the
 LTL-to-B@"uchi translators listed in the configuration file (for
 details about the testing procedure, see @ref{Test methods}). The program
 exits after a predetermined number of test rounds.
@@ -1331,10 +1357,10 @@ format of the configuration file is
 @noindent
 Section and option names are case-insensitive. Values can be numbers,
 strings or truth values (@samp{yes} and @samp{no}, or equivalently,
-@samp{true} and @samp{false}). String values are case-sensitive and must be
-always enclosed in quotes (@samp{"}).
-The backslash (@samp{\}) is treated as an escape character (to be used
-e.g.@: if the string itself contains quotes; use @samp{\\} to get a backslash).
+@samp{true} and @samp{false}). String values are case-sensitive and are subject
+to common quoting and escaping rules (i.e., string values containing white
+space should be enclosed in quotes, or the white space characters should be
+escaped with @samp{\}).
 
 @cindex comments in configuration file
 @cindex configuration file, comments
@@ -1346,14 +1372,14 @@ configuration file.
 @cindex configuration file, minimal requirements
 @cindex minimal requirements for configuration files
 
-The configuration file must contain at least one @samp{Algorithm}
+The configuration file must contain at least one @samp{Translator}
 section specifying an LTL-to-B@"uchi translator. The other sections
 are optional and can be used to override the default testing parameters.
 
 @menu
-* Algorithm section::             Each LTL-to-B@"uchi translator to be
+* Translator section::            Each LTL-to-B@"uchi translator to be
                                     tested requires a separate
-                                    @samp{Algorithm} section in the
+                                    @samp{Translator} section in the
                                     configuration file.
 * GlobalOptions section::         Options for changing the general
                                     behavior of @command{lbtt}.
@@ -1365,16 +1391,24 @@ are optional and can be used to override the default testing parameters.
 @end menu
 
 
-@node Algorithm section, GlobalOptions section, Configuration file, Configuration file
-@subsection The @samp{Algorithm} section
+@node Translator section, GlobalOptions section, Configuration file, Configuration file
+@subsection The @samp{Translator} section
 
 @cindex configuration file, @samp{Algorithm} section
+@cindex configuration file, @samp{Implementation} section
+@cindex configuration file, @samp{Translator} section
 @cindex @samp{Algorithm} section (configuration file)
+@cindex @samp{Implementation} section (configuration file)
+@cindex @samp{Translator} section (configuration file)
 @cindex configuration file, minimal requirements
 
 Each LTL-to-B@"uchi translator to be tested requires a separate
-@samp{Algorithm} section in the configuration file; there must be at least
-one such section in the file. The translators are assumed to be accessible
+@samp{Translator}
+section@footnote{The @samp{Algorithm} and @samp{Implementation} keywords are
+recognized as aliases of the @samp{Translator} keyword.} in the configuration
+file; there must be at least one such section in the file.
+
+The translators are assumed to be accessible
 through external executable files. Therefore, this section must at a minimum
 specify the full file name of the executable to run in order to invoke
 the translator; see @ref{Translator interface}, for information about the
@@ -1384,10 +1418,11 @@ LTL-to-B@"uchi translators.
 @cindex LTL-to-B@"uchi translators, identifiers
 @cindex identifiers for LTL-to-B@"uchi translators
 Translators specified in the configuration file are given unique
-integer identifiers in the order they are listed in the configuration file,
-starting from zero. These numbers must be used when referring to the
+integer identifiers in the order they are listed in the file,
+starting from zero. These numbers can be used when referring to the
 different translators when using @command{lbtt}'s internal commands
-(@pxref{Analyzing test results}).
+(@pxref{Analyzing test results}). Alternatively, the translators can be
+referred to using the names specified in the configuration file.
 
 The following options (in alphabetical order) are available within this
 section:
@@ -1398,29 +1433,35 @@ section:
 @cindex LTL-to-B@"uchi translators, enabling
 @cindex disabling LTL-to-B@"uchi translators
 @cindex LTL-to-B@"uchi translators, disabling
-@findex Enabled @r{[}Algorithm@r{]}
+@findex Enabled @r{[}Translator@r{]}
 This option determines whether the translator should be initially included in
 or excluded from the tests. The default value is @samp{Yes}. The translator
 can be enabled or disabled during testing with @command{lbtt}'s
 internal commands (@pxref{Test control commands}).
 
 @item Name = @var{STRING}
-@findex Name @r{[}Algorithm@r{]}
-This option can be used to specify a textual identifier for the LTL-to-B@"uchi
-translator. This identifier will then be used when displaying various messages
-concerning the implementation. (If no name has been explicitly given for the
-translator, @command{lbtt} assigns the translator a name of the form
-@samp{Algorithm @var{n}}, where @var{n} is the running integer identifier for
-the translators.)
+@findex Name @r{[}Translator@r{]}
+This option can be used to specify a unique textual identifier for the
+LTL-to-B@"uchi translator. @command{lbtt} will use this identifier when
+displaying various messages concerning the implementation; the identifier can
+also be used to refer to the implementation when working with @command{lbtt}'s
+internal commands (@pxref{Analyzing test results}). (If no name has been
+explicitly given for the translator, @command{lbtt} assigns the translator a
+name of the
+form @samp{Algorithm @var{n}}, where @var{n} is the running integer identifier
+for the translators.)
+
+The identifier @samp{lbtt} is reserved for @command{lbtt}'s internal model
+checking algorithm (@pxref{Model checking result cross-comparison test}).
 
 @item Parameters = @var{STRING}
-@findex Parameters @r{[}Algorithm@r{]}
+@findex Parameters @r{[}Translator@r{]}
 This option can be used to specify any additional parameters that should
-be passed to the translator executable whenever running it. (The default
-value of this option is the empty string.)
+be passed to the translator executable whenever running it. (The parameter
+string defaults to the empty string if the option is not used.)
 
 @item Path = @var{STRING}
-@findex Path @r{[}Algorithm@r{]}
+@findex Path @r{[}Translator@r{]}
 This option must be given a value for each translator specified in the
 configuration file. The value should be the complete file name of the program
 which is used to run the translator.
@@ -1429,7 +1470,7 @@ which is used to run the translator.
 
 
 
-@node GlobalOptions section, FormulaOptions section, Algorithm section, Configuration file
+@node GlobalOptions section, FormulaOptions section, Translator section, Configuration file
 @subsection The @samp{GlobalOptions} section
 
 @cindex configuration file, @samp{GlobalOption} section
@@ -1460,16 +1501,32 @@ This option can be used to enable or disable the model checking result
 consistency check (@pxref{Model checking result consistency check}). The test
 is enabled by default.
 
-@item @anchor{Interactivity modes}Interactive = Always @r{|} OnError @r{|} Never
+@item @anchor{Interactivity modes}Interactive = @var{MODE-LIST}
 @cindex interactivity modes
 @findex Interactive @r{[}GlobalOptions@r{]}
-The interactivity mode determines whether @command{lbtt} should pause to wait
-for user input between test rounds. A value of @samp{Always} causes
-@command{lbtt} to pause unconditionally after each test round, @samp{OnError}
-will interrupt testing only after failed test rounds, and @samp{Never} will
-simply run all tests without interruption.
+This option determines when @command{lbtt} should pause to wait for user input
+between test rounds. The @var{MODE-LIST} is a comma-separated list of the
+following modes (with no spaces in between the modes):
+@table @samp
+@item Always
+Pause unconditionally after each test round.
 
-The default value for this option is @samp{Always}.
+@item OnError
+Pause testing only after failed test rounds.
+
+@item Never
+Run all tests without interruption.
+
+@item OnBreak
+Pause testing when requested by the user (for example, after receiving a break
+signal from the keyboard). If this mode is not specified, @samp{lbtt} will
+respond to break signals by aborting.
+@end table
+
+(Since the first three interactivity modes are mutually exclusive, it does not
+make sense to combine these modes with each other.) The default mode list
+consists of the value @samp{Always}, that is, testing is paused after
+every test round, and signalling a break will abort testing.
 
 @item IntersectionCheck = @var{TRUTH-VALUE}
 @itemx IntersectionTest = @var{TRUTH-VALUE}
@@ -1500,6 +1557,18 @@ model checking tests is enabled.)
 @findex Rounds @r{[}GlobalOptions@r{]}
 The @samp{Rounds} option can be used to specify the number of test rounds to
 run; the default value is 10.
+
+@item @anchor{Timeouts}TranslatorTimeout = @var{TIME-SPECIFICATION}
+@findex TranslatorTimeout @r{[}GlobalOptions@r{]}
+@cindex timeouts for translators
+This option can be used to specify a time limit (in wall-clock time) after
+which the execution of a translator is aborted if it fails to produce a
+result within the given limit. A timeout is considered a test failure. The time
+specification is of the form
+@samp{@r{[}@var{hours}@r{]}h@r{[}@var{minutes}@r{]}min@r{[}@var{seconds}@r{]}s}
+where @var{hours}, @var{minutes} and @var{seconds} specify the time limit in
+the obvious way (time units having value 0 can be omitted). For example,
+a limit of @samp{1h30min} sets the limit at one hour and thirty minutes.
 
 @item Verbosity = @var{INTEGER}
 @findex Verbosity @r{[}GlobalOptions@r{]}
@@ -1680,8 +1749,7 @@ The following table illustrates the effects of the
   ! <> p0            @r{No}       Nor@r{:} ! <> p0
                               NNF@r{:} (false V ! p0)
 
-  @r{* only if} AbbreviatedOperators=Yes
-}
+  @r{* only if} AbbreviatedOperators=Yes}
 @end smallformat
 
 @item PropositionPriority = @var{INTEGER}
@@ -1727,11 +1795,13 @@ but with state spaces of different size.)
 Priority of the temporal ``(weak) release'' operator (@samp{V}).
 
 @item Size = @var{INTEGER}
+@itemx Size = @var{MINIMUM-SIZE}-@var{MAXIMUM-SIZE}
 @itemx Size = @var{MINIMUM-SIZE}...@var{MAXIMUM-SIZE}
 @findex Size @r{[}FormulaOptions@r{]}
 This option defines how many nodes are allowed in the parse tree of each
 randomly generated LTL formula. If the size is given as an interval (by
-separating the bounds with three dots with no white space in between),
+separating the bounds with @samp{-} or @samp{...} with no white space in
+between),
 @command{lbtt} chooses the size of each formula randomly in the interval
 using a uniform random distribution. The default size is 5.
 
@@ -1868,6 +1938,7 @@ used to initialize the random number generator for the random LTL formula
 generation algorithm.
 
 @item Size = @var{INTEGER}
+@itemx Size = @var{MINIMUM-SIZE}-@var{MAXIMUM-SIZE}
 @itemx Size = @var{MINIMUM-SIZE}...@var{MAXIMUM-SIZE}
 @findex Size @r{[}StateSpaceOptions@r{]}
 This option sets the number of states in the generated state spaces. If the
@@ -1906,20 +1977,20 @@ imaginary LTL-to-B@"uchi translators.
 @smallexample
 # Sample configuration file for lbtt
 
-Algorithm
+Translator
 @{
-  Name = "Translator 1"
-  Path = "~/lbtt/bin/t-1"           # location of the translator
+  Name = Translator\ 1
+  Path = /home/lbtt-user/bin/t-1    # location of the translator
                                     # executable
   Enabled = Yes
 @}
 
-Algorithm
+Translator
 @{
   Name = "Translator 2"
-  Path = "~/lbtt/bin/t-2"
+  Path = /home/lbtt-user/bin/t-2
   Parameters = "-x -y 3 -v 0"       # parameters to be passed to the
-                                    # `~/lbtt/bin/t-2' executable
+                                    # executable
   Enabled = Yes
 @}
 
@@ -1927,9 +1998,10 @@ GlobalOptions
 @{
   Rounds = 100                      # 100 test rounds
 
-  Interactive = OnError             # pause only in case of an error
+  Interactive = OnError,OnBreak     # pause testing in case of an error
+                                    # or when receiving a break signal
 
-  Verbosity = 1                     # suppress most of the output
+  Verbosity = 1                     # show only numeric statistics
 
   ComparisonTest = Yes              # enable all tests except the
   ConsistencyTest = Yes             # B@"uchi automata intersection
@@ -1938,24 +2010,29 @@ GlobalOptions
   ModelCheck = Local                # perform the tests only in a
                                     # single state of each state
                                     # space
+
+  TranslatorTimeout = 30s           # abort the execution of a
+                                    # translator if it fails to give
+                                    # a result in 30 seconds
 @}
 
 FormulaOptions
 @{
   AbbreviatedOperators = Yes        # formula generation mode
   GenerateMode = Normal
-  OutputMode = Normal
+  OutputMode = NNF                  # rewrite formulas in negation
+                                    # normal form before passing
+                                    # them to the translators
 
-  ChangeInterval = 1                # new formula after each test
-                                    # round
+  ChangeInterval = 1                # new formula after each round
 
   RandomSeed = 4632912              # random seed
 
-  Size = 5...15                     # 5 to 15 nodes in the parse
+  Size = 5-15                       # 5 to 15 nodes in the parse
                                     # tree of each formula
 
-  Propositions = 3                  # max. 3 different propositions
-                                    # in each LTL formula
+  Propositions = 3                  # allow at most three different
+                                    # propositions in each LTL formula
 
   PropositionPriority = 50          # priorities for propositional
   TruePriority = 1                  # symbols
@@ -1964,10 +2041,12 @@ FormulaOptions
   AndPriority = 10                  # priorities for some logical
   OrPriority = 10                   # operators
   NotPriority = 10
+  EquivalencePriority = 5
 
   NextPriority = 5                  # priorities for some temporal
   UntilPriority = 5                 # operators
   ReleasePriority = 5
+  FinallyPriority = 2
 
   DefaultOperatorPriority = 0       # disable all the remaining
                                     # operators
@@ -1986,8 +2065,8 @@ StatespaceOptions
 
   Size = 50                         # 50 states in each state space
 
-  Propositions = 3                  # 3 propositions in each state
-                                    # of each state space
+  Propositions = 3                  # three propositions in each
+                                    # state of each state space
 
   EdgeProbability = 0.1             # approximate probability of
                                     # having a transition between
@@ -1997,7 +2076,6 @@ StatespaceOptions
                                     # atomic proposition is true in
                                     # a state
 @}
-
 @end smallexample
 
 
@@ -2046,14 +2124,29 @@ file @samp{config} in the current working directory.
 @cindex LTL formula, reading from a file
 @cindex file formats, formula input file for @command{lbtt}
 This option instructs @command{lbtt} to read the LTL formulas used in the tests
-from a file instead of generating them randomly. The file should contain
-LTL formulas separated from each other with white space. Currently the
-only supported format for the formulas is the same prefix notation that
-@command{lbtt} uses for its output files (@pxref{Format for LTL formulas},
-for details).
+from a file instead of generating them randomly. The file should contain a
+list of formulas, each on its own line in the file. The formulas can be
+specified either in @command{lbtt}'s own prefix notation
+(@pxref{Format for LTL formulas}; also the infix notation used in output
+messages is supported) or in a variety of formats found in
+some LTL-to-B@"uchi translator implementations (Spin, LTL2BA, LTL2AUT,
+Temporal Massage Parlor, Wring, Spot, LBT), however with the restriction that
+all atomic propositions should have names of the form
+@samp{p@var{N}} for some nonnegative integer @var{N}.
 
-If this option is used, all LTL formula generation parameters in the command
-line or in the configuration file are ignored.
+@cindex operators, precedence in input files
+(When using one of the alternative
+formats, it is recommended to use parentheses to avoid possible ambiguities in
+the precedence and associativity of the various operators; in @command{lbtt},
+the unary operators have the highest precedence, @samp{/\} has higher
+precedence than @samp{\/}, which in turn has higher precedence than any of
+@samp{->}, @samp{<->} or @samp{xor}, and the binary temporal operators have
+the lowest precedence. All binary logical operators are left-associative;
+all binary temporal operators are nonassociative.)
+
+If this option is used, all command line or configuration file parameters
+affecting the generation of random LTL formulas (excluding their mode of
+output) are ignored.
 
 @item --h
 @itemx --help
@@ -2074,7 +2167,8 @@ encountered during testing. By default no log will be created.
 @cindex enabling and disabling tests
 @cindex tests, profiling LTL-to-B@"uchi translators
 This option can be used as a shorthand for disabling all B@"uchi automata
-correctness tests. The test report generated at the end of testing then shows
+correctness tests. 
+The test report generated at the end of testing then shows
 only the running times of each tested LTL-to-B@"uchi translator and the sizes
 of the generated automata.
 
@@ -2084,8 +2178,7 @@ of the generated automata.
 @vindex --silent
 @cindex suppressing output
 These options suppress any messages that are normally displayed during
-testing. These options also imply the @samp{--nopause} option, i.e., all
-tests will be run without interruption. Use the @samp{--logfile} option (see
+testing. Use the @samp{--logfile} option (see
 above) with these options to save a test failure report into a log file.
 
 @item @anchor{--showconfig}--showconfig
@@ -2114,7 +2207,9 @@ configuration information when the program starts.
 This option can be used to skip the first @var{NUMBER-OF-ROUNDS} test rounds,
 i.e., begin testing from round @var{NUMBER-OF-ROUNDS}+1.
 
-@item --version
+@item -V
+@itemx --version
+@vindex -V
 @vindex --version
 This option displays the version of the @command{lbtt} executable.
 
@@ -2130,7 +2225,7 @@ values specified in the @samp{GlobalOptions} section of the configuration
 file.
 
 @table @samp
-@item --comparisontest
+@item --comparisontest@r{[}=yes | no@r{]}
 @itemx --nocomparisontest
 @cindex tests, enabling and disabling
 @cindex enabling and disabling tests
@@ -2139,7 +2234,7 @@ file.
 These options enable or disable the model checking result cross-comparison
 test (@pxref{Model checking result cross-comparison test}).
 
-@item --consistencytest
+@item --consistencytest@r{[}=yes | no@r{]}
 @itemx --noconsistencytest
 @cindex tests, enabling and disabling
 @cindex enabling and disabling tests
@@ -2153,10 +2248,10 @@ These options enable or disable the model checking result consistency check
 @cindex LTL-to-B@"uchi translators, disabling
 @vindex --disable
 This option can be used to exclude some implementations from the tests by
-specifying a comma-separated list of integers (the implementation identifiers).
-The implementations are numbered in the order in which they appear in the
-configuration file, starting from zero. (The @samp{--showconfig}
-option, see @ref{Special options}, can be used to obtain a list of the
+specifying a comma-separated list of implementation names or their numeric
+identifiers. (The implementations are numbered in the order in which they
+appear in the configuration file, starting from zero. Use the
+@samp{--showconfig} option, see @ref{Special options}, to obtain a list of the
 implementations specified in the configuration file, together with their
 identifiers.)
 
@@ -2177,14 +2272,19 @@ checking result cross-comparison test and the model checking result
 consistency check. Using a global check increases the number of possible
 tests.
 
-@item --interactive=always | onerror | never
+@item --interactive@r{[}=@var{MODE-LIST}@r{]}
+@itemx --pause@r{[}=@var{MODE-LIST}@r{]}
 @vindex --interactive
 @cindex interactivity modes
-This option can be used to override whether @command{lbtt} should pause
-between test rounds to wait for user input.
+These options can be used to override whether @command{lbtt} should pause
+between test rounds to wait for user input. The optional @var{MODE-LIST} is a
+comma-separated list of interactivity modes (@samp{Always}, @samp{OnError},
+@samp{Never}, @samp{OnBreak}) with no spaces in between
+(@pxref{Interactivity modes}, for the mode descriptions). If omitted, the
+mode list defaults to @samp{Always}.
 
-@item --intersectiontest
-@item --nointersectiontest
+@item --intersectiontest@r{[}=yes | no@r{]}
+@itemx --nointersectiontest
 @cindex tests, enabling and disabling
 @cindex enabling and disabling tests
 @vindex --intersectiontest
@@ -2208,28 +2308,18 @@ check.
 @cindex global model checking
 This option can be used to select the model checking mode.
 
-@item --nopause
-@vindex --nopause
-@cindex interactivity modes
-This option forces @command{lbtt} to run all tests without interruption.
-
-@item --pause
+@item --pause@r{[}=@var{MODE-LIST}@r{]}
 @vindex --pause
-@cindex interactivity modes
-This option forces @command{lbtt} to pause between each test round to
-wait for user commands.
-
-@item --pauseonerror
-@vindex --pauseonerror
-@cindex interactivity modes
-Using this option will cause testing to be paused each time an error occurs
-during testing,
-giving the user an opportunity to analyze the error situation using
-@command{lbtt}'s internal commands before proceeding to the next test round.
+See @samp{--interactive}.
 
 @item --rounds=@var{NUMBER-OF-ROUNDS}
 @vindex --rounds
 This option can be used to override the number of test rounds to run.
+
+@item --translatortimeout=@var{TIME-SPECIFICATION}
+@vindex --translatortimeout
+This option can be used to override the running time limit (in wall-clock
+time) for translators (@pxref{Timeouts}, for more information).
 
 @item --verbosity=@var{INTEGER}
 @vindex --verbosity
@@ -2259,7 +2349,7 @@ configuration file.
 @cindex operators, priorities for
 
 @table @samp
-@item --abbreviatedoperators
+@item --abbreviatedoperators@r{[}=yes | no@r{]}
 @itemx --noabbreviatedoperators
 @vindex --abbreviatedoperators
 @vindex --noabbreviatedoperators
@@ -2338,6 +2428,7 @@ This option gives a seed value for generating random numbers used by the
 random LTL formula generation algorithm.
 
 @item --formulasize=@var{INTEGER}
+@itemx --formulasize=@var{MINIMUM-SIZE}-@var{MAXIMUM-SIZE}
 @itemx --formulasize=@var{MINIMUM-SIZE}...@var{MAXIMUM-SIZE}
 @vindex --formulasize
 This option sets the size of the random LTL formulas generated for the tests.
@@ -2510,6 +2601,7 @@ This option gives a seed value for generating random numbers required by the
 random state space generation algorithm.
 
 @item --statespacesize=@var{INTEGER}
+@itemx --statespacesize=@var{MINIMUM-SIZE}-@var{MAXIMUM-SIZE}
 @itemx --statespacesize=@var{MINIMUM-SIZE}...@var{MAXIMUM-SIZE}
 @vindex --statespacesize
 This option can be used to change the size of the generated state spaces.
@@ -2528,11 +2620,12 @@ spaces.)
 @node Interpreting the output, Analyzing test results, Invocation, Top
 @chapter Interpreting the output
 
-This chapter briefly intoduces the most typical messages that
-@command{lbtt} outputs during testing when running in its default output
-verbosity mode (3). In lower verbosity modes some (or all) of these
-messages will be suppressed; higher verbosity modes show information about
-@command{lbtt}'s internal behavior.
+This chapter briefly introduces the most typical messages that
+@command{lbtt} outputs during testing. Most of the examples in this section
+illustrate the output when @command{lbtt} is running in its default output
+verbosity mode (3). In lower verbosity modes some (or in verbosity mode 0, all)
+of these messages will be suppressed; in higher verbosity modes, some
+additional information about @command{lbtt}'s internal behavior is shown.
 
 @menu
 * Configuration information::   The current configuration is shown
@@ -2548,7 +2641,8 @@ messages will be suppressed; higher verbosity modes show information about
 
 @cindex configuration information
 
-Before starting tests, @command{lbtt} shows a short summary of the current
+Before starting tests, @command{lbtt} outputs (in verbosity modes 2 and above)
+a summary of the current
 program configuration as obtained by reading the program configuration file
 and interpreting the command line parameters. The same summary can be
 obtained without running any tests by using the
@@ -2590,6 +2684,7 @@ Program configuration:
 
   1000 test rounds.
   Testing will be interrupted in case of an error.
+  Signalling a break will interrupt testing.
   Using global model checking for tests.
   Writing error log to `error.log'.
 
@@ -2597,13 +2692,15 @@ Program configuration:
     0: `Implementation 0'
     1: `Implementation 1'
 
+  Timeout for translators is set to 30 seconds.
+
   Enabled tests:
     Model checking result cross-comparison test
     Model checking result consistency check
     B@"uchi automata intersection emptiness check
 
   Random state spaces:
-    Random connected graphs (50 states, 5 atomic propositions)
+    Random graphs (50 states, 5 atomic propositions)
     New state space will be generated after every 5th round.
     Random seed: 98
     Random edge probability: 0.10
@@ -2617,14 +2714,38 @@ Program configuration:
       false (5); propositions (90); true (5)
     Operators used for random LTL formula generation:
       operator  !        /\       U        V        X        \/
-      priority  10       20       20       20       10       20
+      priority  10       10       20       20       10       20
+
 @end smallexample
 
 @node Test round messages, Test statistics, Configuration information, Interpreting the output
 @section Test round messages
 
+In verbosity modes 1 and 2, @command{lbtt} reports numeric statistics on the
+generated automata in tabular form. Each row of this table contains the
+following information (in this order):
+@itemize
+@item
+number of the current test round (verbosity mode 1 only);
+@item
+numeric identifier of an implementation;
+@item
+formula identifier (@samp{+} or @samp{-});
+@item
+time consumed when generating an automaton from the formula using the
+implementation;
+@item
+number of states, transitions and acceptance conditions in the automaton;
+@item
+number of states and transitions in the product automaton
+@item
+number of accepting cycles in the state space (see below), and
+@item
+result of the consistency check (verbosity mode 2 only).
+@end itemize
+
 The following example shows a fragment of the output that @command{lbtt} might
-produce during a test round:
+produce during a test round when running in the default verbosity mode 3.
 
 @cindex tests, output example
 
@@ -2681,15 +2802,15 @@ configuration; if the state space size is allowed to vary in an interval,
 space.)
 
 @item
-@cindex operators, precedence
-Information about a random LTL formula and its negation. Note that in the
-printed output, it is assumed (to remove some parentheses) that all unary
-formula operators have strictly higher precedence than binary operators.
+@cindex operators, precedence in output messages
+Information about a random LTL formula and its negation. To simplify the
+notation, it is assumed that all unary formula operators have higher
+precedence than binary operators.
 
 @item
 Information about the B@"uchi automaton that `Implementation 0' generated
 from the positive LTL formula (number of states, transitions and acceptance
-conditions).
+conditions, and the amount of user time elapsed in generating the automaton).
 
 @item
 Information about the synchronous product of the state space and the
@@ -2703,11 +2824,6 @@ space contains no states with an infinite path beginning from the state such
 that the B@"uchi automaton accepts the temporal interpretation of the path
 (the infinite sequence of state labels on the path).
 
-(If the implementation used for translating the positive formula
-@samp{((p1 <-> p0) U (p0 \/ ! p3))} into a B@"uchi automaton is known to be
-correct, the result would then also indicate that no infinite path in the state
-space satisfies the formula.)
-
 @item
 The model checking process is repeated using the negated formula as
 input for the LTL-to-B@"uchi translator `Implementation 0'.
@@ -2715,7 +2831,7 @@ input for the LTL-to-B@"uchi translator `Implementation 0'.
 @item
 @command{lbtt} performs the model checking result consistency check
 (@pxref{Model checking result consistency check}) using the model checking
-results computed for the positive and the negative formula. In this case,
+results computed for the positive and the negative formula. In this example,
 the result consistency check fails in 75 states of the state space. This
 implies that `Implementation 0' failed to translate one (or both)
 of the formulas into a B@"uchi automaton correctly.
@@ -2729,7 +2845,7 @@ the B@"uchi automata intersection emptiness test
 (@pxref{Automata intersection emptiness check}).
 
 The model checking result cross-comparison test might result in the following
-output:
+output (shown in verbosity modes greater than 1):
 
 @smallformat
 @t{    Model checking result cross-comparison:}
@@ -2754,8 +2870,7 @@ the test is @samp{N/A}.
 @cindex tests, against internal model checking algorithm
 If using enumerated or randomly generated paths as state spaces, the model
 checking results are also compared against those given by
-@command{lbtt}'s internal model checking algorithm. In the output, the
-internal implementation has the name @samp{lbtt} and no numeric identifier.
+@command{lbtt}'s internal model checking algorithm.
 
 A similar convention is used to report failures in the B@"uchi automata
 intersection emptiness check. However, because this test is always performed
@@ -2789,7 +2904,7 @@ format specified above.
 @cindex tests, statistics
 
 At the end of testing, @command{lbtt} outputs some simple statistics computed
-over all tests. If using an error log file
+over all tests in verbosity modes 2 and above. If using an error log file
 (@pxref{--logfile,,@samp{--logfile} command line option}), the statistics
 will be stored also in the log file. These statistics can be also accessed
 during interactive testing by using the internal command @samp{statistics}
@@ -2858,8 +2973,8 @@ Number of failures in the B@"uchi automata intersection emptiness check
 implementations.
 @end itemize
 
-Note that the pairwise inconsistency results form a symmetric matrix (although
-@command{lbtt} might display the matrix in several parts), which means that
+Note that the pairwise inconsistency results form a symmetric matrix (possibly
+shown in several parts), which means that
 the same information is repeated on both sides of the matrix diagonal.
 
 @end itemize
@@ -2879,8 +2994,8 @@ analyze test results.
 
 To use the internal commands, @command{lbtt} must be started in one of its
 interactive modes (@pxref{Interactivity modes}). Depending on the mode,
-@command{lbtt} may occasionally pause (either after each test round or only in
-case a test failure is detected) between test rounds to wait for user input by
+@command{lbtt} may occasionally pause (for example, after each test round, or
+when a test failure is detected) between test rounds to wait for user input by
 showing a prompt of the form
 
 @smallexample
@@ -2919,7 +3034,7 @@ command unambiguously (for example, @samp{h} could be used in place of the
 @samp{help} command).
 
 @cindex commands, entering lists of numbers
-Some of the commands accept or require lists of implementation or state
+Some of the commands expect lists of implementation or state
 identifiers as parameters. The lists can be specified as comma-separated
 numbers (for example, @samp{8}) or intervals (for example, @samp{3-11})
 with no white space between the commas and the numbers or intervals that
@@ -2931,6 +3046,11 @@ or equal to 5, together with information about state 8, states 14 to 18
 (inclusive) and all states with an identifier greater than or equal to 22. The
 @samp{*} symbol can be used as a shorthand for all identifiers in the
 available range.
+
+@command{lbtt} also recognizes the symbolic names of implementations (defined
+in the configuration file) in implementation identifier lists. The names can be
+used in place of the numeric identifiers. Quotes or the escape character
+(@samp{\}) should be used to handle white space in identifiers.
 
 @cindex LTL formula, identifiers in commands
 @cindex commands, LTL formula identifiers
@@ -2949,13 +3069,12 @@ respectively.
 
 @cindex commands, invoking external programs
 @cindex commands, writing output to a pipe
-Optionally, the output can be written to a pipe (to be processed by an external
-program) instead of a file. This is done by ending the command line with
-@samp{| @var{command}}, where @var{command} is the command line for the
-external program intended to process the output produced by @command{lbtt}.
+Optionally, the output can be handed over to an external program by ending the
+command line with @samp{| @var{command}}, where @var{command} is the command
+line used for invoking the external program.
 For example, the output of the (@command{lbtt}'s internal) command can be piped
 to a pager application if the entire output does not fit on the screen by
-itself. Using the pipe construct @emph{without} specifying any internal command
+itself. Using the pipe construct without specifying any internal command
 will simply invoke the external program.
 
 
@@ -2971,9 +3090,9 @@ general conventions for using the commands. The @samp{help} command can be
 optionally given a command name as a parameter to access command-specific
 help.
 
-In command-specific help, arguments in angle brackets (@samp{<}, @samp{>})
+In command-specific help, arguments in angle brackets (@r{<}, @r{>})
 denote obligatory command parameters, while arguments in square brackets
-(@samp{[}, @samp{]}) are optional. A vertical bar (@samp{|}) denotes
+(@r{[}, @r{]}) are optional. A vertical bar (@r{|}) denotes
 selection between several alternatives. Arguments in double quotes should
 be entered literally (without the quotes themselves).
 
@@ -2992,18 +3111,18 @@ verbosity of @command{lbtt}'s output messages.
 @item continue @r{[}@var{number-of-rounds}@r{]}
 @kindex continue
 Continue testing. If no argument is given, testing will be interrupted again
-when the current interactivity mode requires it
+when mandated by the current interactivity mode
 (@pxref{Interactivity modes}). The optional argument @var{number-of-rounds}
 can be used to specify a number of rounds to run; testing is then interrupted
 again after the given number of test rounds (or in case of a new
-test failure if this is required by the current interactivity mode).
+test failure if mandated by the current interactivity mode).
 
 @item disable @r{[}@var{implementation-id-list}@r{]}
 @kindex disable
 @cindex disabling LTL-to-B@"uchi translators
 @cindex LTL-to-B@"uchi translators, disabling
-Disable testing of a list of implementations or all implementations if
-no list of implementations is specified. @command{lbtt} will not include these
+Disable testing of a list of implementations (all implementations if
+no list of implementations is specified). @command{lbtt} will not include these
 implementations in the tests in subsequent test rounds. (See
 @ref{Command conventions}, for the syntax used for the list of
 implementations.)
@@ -3052,20 +3171,22 @@ current test round.
 
 @table @samp
 @item algorithms
+@itemx implementations
+@itemx translators
 @kindex algorithms
+@kindex implementations
+@kindex translators
 Show a list of implementations declared in the program configuration file and
-whether they are currently enabled for testing. The list also shows the
-numeric identifiers of the implementations. These identifiers
-should be used with commands that accept or require implementation identifier
-lists as arguments.
+tell whether they are currently enabled for testing. The list also shows the
+numeric identifiers of the implementations.
 
-@item buchi @r{[}+ @r{|} -@r{]} @var{implementation-id} @r{[}@var{state-id-list} | dot@r{]}
+@item buchi @r{[``}+@r{''} @r{|} @r{``}-@r{'']} @r{<}@var{implementation-id}@r{>} @r{[}@var{state-id-list} | @r{``}dot@r{'']}
 @kindex buchi
 Display information about the structure of the B@"uchi automaton generated by
 the implementation @var{implementation-id} from the positive (@samp{+}) or
 negative (@samp{-}) LTL formula used in the current test round. The
 implementation identifier may be optionally followed by a list of state
-identifiers to display only certain states of the automaton (see
+identifiers to display specific states of the automaton (see
 @ref{Command conventions}, for details on how the list should be formatted),
 or the keyword @samp{dot} to display the automaton in a format that can be
 given as input for the @samp{dot} tool of the
@@ -3079,7 +3200,7 @@ GraphViz graph visualization package
 @end iftex
 to obtain a graphical representation of the automaton.
 
-@item evaluate @r{[}+ @r{|} -@r{]} @r{[}@var{implementation-id-list}@r{]} @r{[}@var{state-id-list}@r{]}
+@item evaluate @r{[``}+@r{''} @r{|} @r{``}-@r{'']} @r{[}@var{implementation-id-list}@r{]} @r{[}@var{state-id-list}@r{]}
 @kindex evaluate
 Display the model checking results for the positive (@samp{+}) or the negative
 (@samp{-}) formula computed using a given set of implementations for
@@ -3097,22 +3218,25 @@ as input for the @samp{resultanalysis} command
 (@pxref{Failure analysis commands}).
 
 Note 1: Observe that the model checking results shown do not follow the
-``traditional'' semantics of LTL, by which a formula is usually considered to
+``universal'' semantics of LTL (common in model checking), by which a formula
+is usually considered to
 hold in a set of infinite paths beginning from a state only if @emph{all}
 paths in the set are accepted by the B@"uchi automaton constructed from the
-formula to be model checked. Instead, @command{lbtt} will mark the result as
-true if even @emph{one} of these paths is accepted by the automaton.
+formula to be model checked. Instead, @command{lbtt} will mark the result
+true if @emph{any} of these paths is accepted by the automaton.
 
 Note 2: If using random or enumerated paths as state spaces, @command{lbtt}
-accepts also the symbol @samp{p} in the implementation identifier list. This
-symbol can be used for accessing the model checking results computed using
-@command{lbtt}'s internal ``path'' model checking algorithm.
+accepts also the identifier @samp{lbtt} in the implementation identifier list.
+This identifier can be used for accessing the model checking results computed
+using @command{lbtt}'s internal model checking algorithm for paths.
 
-@item formula @r{[}+ @r{|} -@r{]}
+@item formula @r{[``}+@r{''} @r{|} @r{``}-@r{'']} @r{[``}normal@r{''} @r{|} @r{``}nnf@r{'']}
 @kindex formula
 @cindex LTL formula, displaying with user command
 Display the positive (@samp{+}) or the negative (@samp{-}) LTL formula used
-for tests in the current test round.
+for tests in the current test round either in the form in which it was
+generated (@samp{normal} -- the default) or in negation normal form
+(@samp{nnf}).
 
 @item inconsistencies @r{[}@var{implementation-id-list}@r{]}
 @kindex inconsistencies
@@ -3125,14 +3249,14 @@ The state identifiers can then be used as input for the
 
 @item results @r{[}@var{implementation-id-list}@r{]}
 @kindex results
-Display test results for each implementation in the list (or all
-implementations if the list is omitted) in a format very similar to test
-messages shown when running @command{lbtt} in its default verbosity mode 3.
+Display test results (in the current test round) for each implementation in the
+list (or all
+implementations if the list is omitted).
 For more information about the output, see @ref{Test round messages}; see
 @ref{Command conventions}, for information on how to specify the
 implementations.
 
-@item statespace @r{[}@var{state-id-list} @r{|} dot@r{]}
+@item statespace @r{[}@var{state-id-list} @r{|} @r{``}dot@r{'']}
 @kindex statespace
 @cindex state space, displaying with an user command
 Display information about the structure of the state space used for model
@@ -3149,7 +3273,7 @@ the GraphViz graph visualization package
 @iftex
 [GViz]
 @end iftex
-to obtain a graphical representation of the state space.
+that can be used to obtain a graphical representation of the state space.
 
 @item @anchor{statistics}statistics
 @kindex statistics
@@ -3173,7 +3297,7 @@ automata correctness tests. The second part describes the conventions that
 @subsection Alphabetical list of failure analysis commands
 
 @table @samp
-@item buchianalysis @var{implementation-id} @var{implementation-id}
+@item buchianalysis @r{<}@var{implementation-id}@r{>} @r{<}@var{implementation-id}@r{>}
 @kindex buchianalysis
 @cindex B@"uchi automata intersection emptiness check, failure analysis
 @cindex tests, failure analysis
@@ -3194,9 +3318,9 @@ be equal if one of the tested implementations failed the check against itself.)
 A failure in the B@"uchi automata intersection emptiness check implies that
 there exists an input sequence over subsets of atomic propositions that is
 accepted by both automata included in the analysis. @command{lbtt} examines the
-intersection of the automata to find a witness of such an input, model
-checks the positive formula in the witness, and tells which one of the automata
-is likely to be incorrect according to the following rules:
+intersection of the automata to find a witness of such an input, checks whether
+this witness is a model of the positive formula, and tells which one of the
+automata is likely to be incorrect according to the following rules:
 
 @itemize @bullet
 @item
@@ -3208,7 +3332,7 @@ If the witness is not a model for the positive formula, then the automaton
 constructed from the positive formula probably accepts the witness incorrectly.
 @end itemize
 
-@item consistencyanalysis @var{implementation-id} @r{[}@var{state-id}@r{]}
+@item consistencyanalysis @r{<}@var{implementation-id}@r{>} @r{[}@var{state-id}@r{]}
 @kindex consistencyanalysis
 @cindex model checking result consistency check, failure analysis
 @cindex tests, failure analysis
@@ -3218,10 +3342,10 @@ Analyze a failure in the model checking result consistency check
 (@pxref{Model checking result consistency check}). The
 @var{implementation-id} parameter chooses the implementation to analyze.
 In addition, the optional @var{state-id} parameter can be used to specify a
-state space state in which to perform the analysis (use the
+state (in the state space) in which to perform the analysis (use the
 @samp{inconsistencies} command, @ref{Data display commands}, to see a list
-of all state space states in which the check failed). If the state identifier
-is not present, @command{lbtt} will try to find a state where
+of all states in which the check failed). If the state identifier
+is omitted, @command{lbtt} will try to find a state where
 the check failed.
 
 @cindex witness
@@ -3229,11 +3353,11 @@ A failure in the model checking result consistency check implies the existence
 of a witness (i.e., a path in the state space used for the tests in the
 current test round) whose temporal interpretation is not accepted by either of
 two automata constructed from two complementary LTL formulas. In the analysis,
-@command{lbtt} finds such a witness, model checks the positive formula in the
-witness separately, and tells which one of the automata seems to reject the
-witness incorrectly.
+@command{lbtt} finds such a witness, checks separately whether it is a model of
+the positive formula, and then tells which one of the automata seems to reject
+the witness incorrectly.
 
-@item resultanalysis @r{[}+ @r{|} -@r{]} @var{implementation-id} @var{implementation-id} @r{[}@var{state-id}@r{]}
+@item resultanalysis @r{[``}+@r{''} @r{|} @r{``}-@r{'']} @r{<}@var{implementation-id}@r{>} @r{<}@var{implementation-id}@r{>} @r{[}@var{state-id}@r{]}
 @kindex resultanalysis
 @cindex model checking result cross-comparison test, failure analysis
 @cindex tests, failure analysis
@@ -3243,8 +3367,9 @@ Analyze a failure in the model checking result cross-comparison test
 (@pxref{Model checking result cross-comparison test}) between two
 implementations on either the positive (@samp{+}) or the negative
 (@samp{-}) LTL formula used in the current test round. The implementation
-identifiers can be optionally followed by a state space state identifier
-to specify a state in which the analysis should be performed. (Suitable
+identifiers can be optionally followed by an identifier of a state in the
+state space to specify a state in which the analysis should be performed.
+(Suitable
 state identifiers can be found by looking for inconsistencies in the model
 checking results accessible with the @samp{evaluate} command,
 @ref{Data display commands}; by omitting the state identifier,
@@ -3252,9 +3377,9 @@ checking results accessible with the @samp{evaluate} command,
 checking result comparison failed between the implementations.)
 
 If using randomly generated or enumerated paths as state spaces, @command{lbtt}
-also accepts the symbol @samp{p} in place of either of the implementation
-identifiers. This instructs @command{lbtt} to perform the analysis against
-@command{lbtt}'s internal model checking algorithm.
+also accepts the identifier @samp{lbtt} in place of either of the
+implementation identifiers. This instructs @command{lbtt} to perform the
+analysis against @command{lbtt}'s internal model checking algorithm.
 
 @cindex witness
 A failure in the model checking result cross-comparison test suggests that
@@ -3275,25 +3400,32 @@ All of the above analysis commands use @command{lbtt}'s internal model
 checking algorithm to determine which one of the two automata involved in
 each test is incorrect by checking whether an LTL formula holds in a witness
 path extracted from the state space used in the current test round or from the
-intersection of two B@"uchi automata. The witness path is a linear sequence of
-states that ends in a loop, and is represented in two parts as an initial
+intersection of two B@"uchi automata. The witness path is a sequence of
+consecutive states that ends in a loop, and is represented in two parts as an
+initial
 ``prefix'' (which may be empty) and a ``cycle'' that is considered to repeat
-itself indefinitely. The witness might look as follows:
+itself indefinitely. The witness might, for example, look as follows:
 
 @smallexample
     Execution M:
-      prefix:      < s0  @{p0, p4@},
-                     s2  @{p1, p2, p3, p4@} >
-      cycle:       < s34  @{p0, p1, p2, p3, p4@},
-                     s42  @{p4@},
-                     s44  @{p1, p4@} >
+      prefix:
+        s3 @{p0,p2,p4@} --> s4
+      cycle:
+        s4 @{p1,p3@} --> s5
+        s5 @{p3@} --> s6
+        s6 @{p1,p2,p3@} --> s7
+        s7 @{p3,p4@} --> s8
+        s8 @{p1@} --> s9
+        s9 @{@} --> s2
+        s2 @{@} --> s3
+        s3 @{p0,p2,p4@} --> s4
 @end smallexample
 
 @noindent
 In this case, the witness (or ``execution'' as displayed in the output)
-@math{M} consists of a prefix of two states followed by a cycle of three
-states. Each state is associated with a set of atomic propositions that hold
-in the state.
+@math{M} consists of a single-state prefix followed by a cycle of eight
+states. The atomic propositions that hold in each state are also shown in
+the output.
 
 (The witness can be considered a small state space
 @iftex
@@ -3307,30 +3439,34 @@ $M = \langle S, \rho, {\cal L} \rangle$
 following the definition in @ref{State spaces}; in the example above,
 @iftex
 @tex
-$S = \{s_0, s_2, s_{34}, s_{42}, s_{44}\}$,
+$S = \{s_2, s_3, s_4, s_5, s_6, s_7, s_8, s_9\}$,
 @end tex
 @end iftex
 @ifnottex
-@math{S = @{s0, s2, s34, s42, s44@}},
+@math{S = @{s2, s3, s4, s5, s6, s7, s8, s9@}},
 @end ifnottex
 @iftex
 @tex
-$\rho = \{(s_0, s_2), (s_2, s_{34}), (s_{34}, s_{42}), (s_{42}, s_{44}),
-          (s_{44}, s_{34})\}$,
+$\rho = \{(s_2, s_3), (s_3, s_4), (s_4, s_5), (s_5, s_6), (s_6, s_7),
+          (s_7, s_8), (s_8, s_9), (s_9, s_2)\}$,
 @end tex
 @end iftex
 @ifnottex
-@math{R = @{(s0, s2), (s2, s34), (s34, s42), (s42, s44), (s44, s34)@}},
+@math{R = @{(s2, s3), (s3, s4), (s4, s5), (s5, s6), (s6, s7), (s7, s8), (s8, s9), (s9, s2)@}},
 @end ifnottex
 @iftex
 @tex
-${\cal L}(s_0) = \{p_0, p_4\}, {\cal L}(s_2) = \{p_1, p_2, p_3, p_4\},
- {\cal L}(s_{34}) = \{p_0, p_1, p_2, p_3, p_4\}, {\cal L}(s_{42}) = \{p_4\},$
- and ${\cal L}(s_{44}) = \{p_1, p_4\}$.)
+${\cal L}(s_2) = {\cal L}(s_9) = \emptyset$,
+${\cal L}(s_3) = \{p_0, p_2, p_4\}$,
+${\cal L}(s_4) = \{p_1, p_3\}$,
+${\cal L}(s_5) = \{p_3\}$,
+${\cal L}(s_6) = \{p_1, p_2, p_3\}$,
+${\cal L}(s_7) = \{p_3, p_4\}$, and
+${\cal L}(s_8) = \{p_1\}$.)
 @end tex
 @end iftex
 @ifnottex
-@math{L(s0) = @{p0, p4@}, L(s2) = @{p1, p2, p3, p4@}, L(s34) = @{p0, p1, p2, p3, p4@}, L(s42) = @{p4@},} and @math{L(s44) = @{p1, p4@}}.)
+@math{L(s2) = L(s_9) = @{@}, L(s3) = @{p0, p2, p4@}, L(s4) = @{p1, p3@}, L(s5) = @{p3@}, L(s6) = @{p1, p2, p3@}, L(s7) = @{p3, p4@},} and @math{L(s8) = @{p1@}}.)
 @end ifnottex
 
 
@@ -3351,21 +3487,14 @@ LTL and might look as follows:
 
 @smallexample
     Analysis of the formula in the execution:
-      M,<s0, ...> |== ((p1 U p4) <-> (! p1 -> [] p4)) :
-      +-> M,<s0, ...> |== (p1 U p4) :
-      |   +-> M,<s0, ...> |== p4
-      +-> M,<s0, ...> |== (! p1 -> [] p4) :
-          +-> M,<s0, ...> |== [] p4 :
-              +-> M,<s0, ...> |== p4
-              +-> s0 --> s2
-              +-> M,<s2, ...> |== p4
-              +-> s2 --> s34
-              +-> M,<s34, ...> |== p4
-              +-> s34 --> s42
-              +-> M,<s42, ...> |== p4
-              +-> s42 --> s44
-              +-> M,<s44, ...> |== p4
-              +-> s44 --> s34
+      M,<s3, ...> |/= ((X p0 U ! p4) <-> p0) :
+      +-> M,<s3, ...> |/= (X p0 U ! p4) :
+      |   +-> M,<s3, ...> |/= X p0 :
+      |   |   +-> s3 --> s4
+      |   |   +-> M,<s4, ...> |/= p0
+      |   +-> M,<s3, ...> |/= ! p4 :
+      |       +-> M,<s3, ...> |== p4
+      +-> M,<s3, ...> |== p0
 @end smallexample
 
 @noindent
@@ -3377,57 +3506,81 @@ subsequence beginning at state @samp{s} of the witness, and the relational
 symbol @samp{|/=} denotes the opposite. The children of each proof tree node
 give justification for the claim in their parent node; the children might be
 further expanded if the claims in them do not directly follow from the
-definition of @math{M}. In the presence of temporal operators, the proofs may
+definition of
+@iftex
+@tex
+${\cal L}$.
+@end tex
+@end iftex
+@ifnottex
+@math{L}.
+@end ifnottex
+In the presence of temporal operators, the proofs may
 need to be based also on the structural properties of @math{M}. These are
 shown as statements of the form @samp{sn --> sm} to indicate that @math{M}
 contains a transition from the state @samp{sn} to the state @samp{sm} (and,
-since the states in @math{M} are connected into a linear sequence, that this
-is the @emph{only} transition originating from @samp{sn}).
+since the states in @math{M} are connected into a non-branching sequence, that
+this is the @emph{only} transition originating from @samp{sn}).
 
 In the above example, @command{lbtt} claims that the formula
-@samp{((p1 U p4) <-> (! p1 -> [] p4))} holds in the witness presented earlier
+@samp{((X p0 U ! p4) <-> p0)} does not hold in the witness presented earlier
 in this section, and that this follows (by the semantics of logical
-equivalence) from the claims that the subformulas @samp{(p1 U p4)} and
-@samp{(! p1 -> [] p4)} both hold in the same witness.
-@samp{(p1 U p4)} holds in the witness because of the fact that
+equivalence) from the claims that the subformula @samp{(X p0 U ! p4)} does not
+hold, but the subformula @samp{p0} holds in this witness.
+@samp{(X p0 U ! p4)} does not hold in the witness, because neither
+@samp{X p0} nor @samp{! p4} holds in the first state of the witness
 @iftex
 @tex
-$p_4 \in {\cal L}(s_0)$,
+($p_4 \in {\cal L}(s_3)$, and $p_0 \notin {\cal L}(s_4)$, where $s_4$ is the
+only successor of $s_3$).
 @end tex
 @end iftex
 @ifnottex
-@math{p4} is included in @math{L(s0)},
+(@math{p4} is included in @math{L(s3)}, and @math{p0} is not included in
+@math{L(s4)}, where @math{s4} is the only successor of @math{s3}).
 @end ifnottex
-and the truth of the implication @samp{(! p1 -> [] p4)} is justified by the
-property that
+On the other hand,
+@samp{p0} holds in the witness because of the fact that
 @iftex
 @tex
-$p_4$
+$p_0 \in {\cal L}(s_3)$.
 @end tex
 @end iftex
 @ifnottex
-@math{p4}
+@math{p0} is included in @math{L(s3)}.
 @end ifnottex
-holds in all states of the (only) infinite sequence beginning at the state
-@iftex
-@tex
-$s_0$,
-@end tex
-@end iftex
-@ifnottex
-s0,
-@end ifnottex
-which can be seen from the proof.
 
 
 
 @node Interfacing with lbtt, References, Analyzing test results, Top
-@chapter Interfacing LTL-to-B@"uchi translators with @command{lbtt}
+@chapter Interfacing with @command{lbtt}
 
 @cindex LTL-to-B@"uchi translators, interfacing with
 @cindex interfacing LTL-to-B@"uchi translators with @command{lbtt}
 
-This chapter gives the details on how to use @command{lbtt} for
+The output generated by @command{lbtt} consists of textual messages
+and an optional error log file (@pxref{--logfile,,@samp{--logfile} command line
+option}). The format of the output messages is determined by the verbosity
+mode;
+for more information, see @ref{Interpreting the output}. In addition,
+@command{lbtt} returns one of the following three values as its exit
+status upon normal termination:
+@itemize
+@item 0:
+@command{lbtt} exited successfully; no errors were detected during testing.
+
+@item 1:
+@command{lbtt} exited successfully; errors were detected during testing.
+
+@item 2:
+An error was found when reading the program configuration or when processing
+the command line options.
+
+@item 3:
+@command{lbtt} exited due to an unrecoverable internal error.
+@end itemize
+
+The rest of this chapter gives the details on how to use @command{lbtt} for
 testing LTL-to-B@"uchi translation algorithm implementations that are not
 supported by the basic distribution. (See
 @ref{The lbtt-translate utility}
@@ -3446,8 +3599,9 @@ LTL-to-B@"uchi translator implementations to @command{lbtt}.)
 @end menu
 
 
-@node Translator interface, Format for LTL formulas, Interfacing with lbtt, Interfacing with lbtt
-@section Translator interface requirements
+
+@node Translator interface, Format for LTL formulas, , Interfacing with lbtt
+@section Requirements for translator executables
 
 @cindex LTL-to-B@"uchi translators, interface requirements
 @command{lbtt} assumes each tested LTL-to-B@"uchi translator to be
@@ -3478,18 +3632,19 @@ for a description on how these files should be formatted.
 
 The translator executable should always create an output file and then return
 with a zero exit status in case no errors occur during the translation.
-@command{lbtt} interprets a missing output file or any non-zero exit status as
+@command{lbtt} interprets a missing output file or a nonzero exit status as
 an error and will not in this case try to run any tests, even if
 an automaton were successfully saved in an output file.
 
-To start testing the translator, add a new @samp{Algorithm} section for it into
+To start testing the translator, add a new @samp{Translator} section for it
+into
 @command{lbtt}'s configuration file (@pxref{Configuration file}), for example
 
 @smallexample
-Algorithm
+Translator
 @{
   Name = "LTL-to-B@"uchi translator"
-  Path = "~/bin/ltl-to-buchi-translator"
+  Path = /home/lbtt-user/bin/ltl-to-buchi-translator
   Parameters = "-x -y -z"
   Enabled = Yes
 @}
@@ -3591,38 +3746,86 @@ line options (@pxref{Command line options}) to prevent
 @command{lbtt} expects the B@"uchi automata generated by each LTL-to-B@"uchi
 translator implementation to be in the format specified below. The format
 encodes a generalized B@"uchi automaton (a B@"uchi automaton with zero or
-more acceptance conditions) with a single initial state and labels on
-transitions. For the full formal definition and some general guidelines on how
-to convert your automata to support the definition, see @ref{Definitions}.
+more acceptance conditions) with a single initial state and labels (guards) on
+transitions. For the full formal definition and examples on how
+to reduce other definitions into the one used by @command{lbtt}, see
+@ref{Definitions}.
 
 The output file generated by the translator should contain an @var{automaton}
-described using the following grammar:
+described using the following grammar
+(as before, quoted characters denote the characters themselves, @var{sp}
+denotes any nonempty string of white space, lines containing a // are
+comments that are not part of the grammar, and @samp{\n} corresponds to the
+newline character).
 
 @smallexample
-@var{automaton}  @r{::=}  @var{num-states} @var{sp} @var{num-conds} @var{states}
+@var{automaton}  @r{::=}  @var{num-states} @var{sp} @var{cond-specifier} @var{state-list}
 
 @var{num-states}  @r{::=}  @r{[}0@r{---}9@r{]+}
 
-@var{num-conds}  @r{::=}  @r{[}0@r{---}9@r{]+}
+@var{cond-specifier}  @r{::=}  @r{[}0@r{---}9@r{]+}@r{[}st@r{]}*
 
-@var{states}  @r{::=}  @var{states} @var{sp} @var{state}
-          @r{|}  @r{// empty}
+@var{state-list}  @r{::=}  @var{state-list} @var{sp} @var{state}
+              @r{|}  @r{// empty}
+@end smallexample
 
-@var{state}  @r{::=}  @var{state-id} @var{sp} @var{initial?} @var{conds} @var{sp} `-1' @var{transitions} @var{sp} `-1'
+@noindent
+The automaton description begins with a nonnegative number that gives the
+number of states in the automaton. If the number of
+states is 0, the automaton will not accept any input. If the number is
+positive, it should be followed by a @var{cond-specifier} that determines the
+number
+and placement of acceptance conditions in the automaton. If the number of
+acceptance conditions is 0, the automaton accepts an input word if and only if
+it has a run on that word according to the definition given in the
+Appendix (@pxref{Definitions}).
+
+The placement of acceptance conditions is specified by concatenating a
+string formed from the symbols @samp{s} and @samp{t} to the number of
+acceptance conditions (with no white space in between). The interpretation of
+this string is as follows:
+@itemize
+@item
+If the string is empty or does not include the symbol @samp{t}, the acceptance
+conditions of the automaton are placed exclusively on its states. (This
+alternative corresponds to the definition supported by @command{lbtt} 1.0.x.)
+
+@item
+If the string is nonempty but does not include the symbol @samp{s}, the
+automaton has acceptance conditions exclusively on its transitions.
+
+@item
+Otherwise, the automaton has acceptance conditions on both states and
+transitions.
+@end itemize
+
+The @var{cond-specifier} is followed by a list of the descriptions of states in
+the automaton. The format of this list is affected by the choice of the
+placement of the acceptance conditions.
+More precisely, the choice affects the interpretation of the
+@var{cond-list} nonterminal symbol in the following fragment of the grammar: we
+indicate this by prefixing the nonterminal with either ``<s>'' or
+``<t>'' to denote that the list (together with its terminating @samp{-1})
+should be
+omitted in automata that do not associate acceptance conditions with states or
+transitions, respectively.
+
+@smallexample
+@var{state}  @r{::=}  @var{state-id} @var{sp} @var{initial?} @r{<s>}@var{cond-list} @var{transition-list}
 
 @var{state-id}  @r{::=}  @r{[}0@r{---}9@r{]+}
 
 @var{initial?}  @r{::=}  `0'  @r{|}  `1'
 
-@var{conds}  @r{::=}  @var{conds} @var{sp} @var{acceptance-set-id}
-         @r{|}  @r{// empty}
+@var{cond-list}  @r{::=}  @var{sp} @var{acceptance-condition-id} @var{cond-list}
+             @r{|}  @var{sp} `-1'
 
-@var{acceptance-set-id}  @r{::=}  @r{[}0@r{---}9@r{]+}
+@var{acceptance-condition-id}  @r{::=}  @r{[}0@r{---}9@r{]+}
 
-@var{transitions}  @r{::=}  @var{transitions} @var{sp} @var{transition}
-               @r{|}  @r{// empty}
+@var{transition-list}  @r{::=}  @var{sp} @var{transition} @var{transition-list}
+                   @r{|}  @var{sp} `-1'
 
-@var{transition}  @r{::=}  @var{state-id} @var{sp} @var{guard-formula}
+@var{transition}  @r{::=}  @var{state-id} @r{<t>}@var{cond-list} @var{sp} @var{guard-formula} `\n'
 
 @var{guard-formula}  @r{::=}  `t'
                                              @r{// ``true''}
@@ -3644,39 +3847,25 @@ described using the following grammar:
                                              @r{// exclusive or}
 @end smallexample
 @noindent
-(The quoted characters denote the characters themselves; @var{sp} denotes any
-non-empty string of white space. Lines containing a // are comments and are not
-part of the grammar.)
 
-The automaton description begins with two nonnegative numbers, the first one
-of which gives the number of states in the automaton, and the second one
-tells the number of acceptance conditions in the automaton. If the number of
-states is 0, the automaton will not accept any input. If the number of
-acceptance conditions is 0, the automaton accepts an input word if and only if
-it has a run on that word according to the definition given in the
-Appendix (@pxref{Definitions}).
+The description of each state begins with a numeric state identifier, which can
+be any nonnegative integer. The state identifier should be followed by a number
+telling whether the state is initial (@samp{1} if yes). The automaton should
+have exactly one initial state. If the automaton has acceptance conditions
+associated with its states, this number should then be followed by a list of
+acceptance condition identifiers separated by white space. This list should be
+terminated with @samp{-1}.
 
-If the number of states is greater than zero, the acceptance condition count
-should be followed by a list of states. The description of each state begins
-with a numeric state identifier, which can be any nonnegative integer. The
-state identifier should be followed by a number telling whether the state is
-initial (@samp{1} if yes). The automaton should have exactly one initial state.
-This number is then followed by a list of the identifiers of the acceptance
-conditions to which the state belongs. This list should be terminated with
-@samp{-1}.
-
-The state and acceptance condition identifiers need not be successive, and the
-states or acceptance conditions can be listed in any order. The only
-restrictions are that the identifiers of different states and acceptance
-conditions should be unique and that the total number of different identifiers
-should equal @var{num-states} or @var{num-conds},
-respectively. (The same identifiers can be shared between states and acceptance
-conditions, however.)
-
-Finally, the acceptance condition list of each state should be followed by a
-list of transitions (terminated again by @samp{-1}). Each transition consists
-of a state identifier (the target state of the transition) and a propositional
-formula that encodes the symbols of the alphabet
+The state description should be followed by the list of transitions starting
+from the state (terminated again by @samp{-1}). Each transition consists of a
+state identifier (the target state of the transition), a list of acceptance
+condition identifiers (if the automaton has acceptance conditions on
+transitions), and a propositional formula @footnote{Although not described
+formally in the grammar, the guard formulas can be specified in any
+of the formats @command{lbtt} supports in its formula input files
+(@pxref{--formulafile,,@samp{--formulafile} command line option}). Note that
+the formula always needs to be terminated with a newline, though.} that encodes
+the symbols of the alphabet
 @iftex
 @tex
 $2^{AP}$
@@ -3686,17 +3875,32 @@ $2^{AP}$
 @math{2^AP}
 @end ifnottex
 (where @var{AP} is a finite set of atomic propositions) on which the
-automaton is allowed to take the transition.
+automaton is allowed to take the transition. The propositional formula should
+be terminated with a newline.
+
+The state and acceptance condition identifiers need not be successive, and the
+states or acceptance conditions can be listed in any order. The only
+restrictions are that the identifiers of different states and acceptance
+conditions should be unique and that the total number of different identifiers
+should equal @var{num-states} or @var{num-conds},
+respectively. (The same identifiers can be shared between states and acceptance
+conditions, however.)
+
 
 Note that the output file should always contain a valid automaton description
 if the LTL-to-B@"uchi translation was successful, even in the case that the
 resulting automaton is empty (@command{lbtt} interprets a missing automaton
 description file as an error).
 
-The following example illustrates the file format.
+The following examples illustrate the file format. The first example
+gives the description of an automaton with acceptance conditions on
+states. Note that in this case the @samp{s} is optional for describing the
+placement of acceptance conditions; therefore, the automaton files used with
+@command{lbtt} 1.0.x are upwards compatible with newer versions of the tool
+(provided that each guard of a transition is terminated by a newline).
 
 @smallexample
-6 2          @r{// an automaton with six states and two acceptance conditions}
+6 2s         @r{// an automaton with six states and two acc.@ conditions on states}
 0 1 -1       @r{// state 0: initial state, no acceptance conditions}
 2 p1         @r{//     transition to state 2, guard} @samp{p1}
 5 p2         @r{//     transition to state 5, guard} @samp{p2}
@@ -3731,7 +3935,37 @@ The following example illustrates the file format.
 -1           @r{// end of state 12}
 @end smallexample
 
+@noindent
+The following example illustrates an automaton in which acceptance conditions
+are placed on transitions.
 
+@smallexample
+4 3t         @r{// four states, three acceptance conditions on transitions}
+5 0          @r{// state 5: non-initial state}
+84 0 -1 p1   @r{//     transition to state 84, condition 0, guard} @samp{p1}
+27 0 -1 & p1 ! p2 @r{// tr. to state 27, condition 0, guard} @samp{p1 /\ ! p2}
+5 -1 t       @r{//     transition to state 5, no conditions, guard} @samp{true}
+-1           @r{// end of state 5}
+84 1         @r{// state 84: initial state}
+5 1 -1 t     @r{//     transition to state 5, condition 1, guard} @samp{true}
+27 0 -1 p1   @r{//     transition to state 27, condition 0, guard} @samp{p1}
+-1           @r{// end of state 84}
+49 0         @r{// state 49: non-initial state}
+5 -1 t       @r{//     transition to state 5, no conditions, guard} @samp{true}
+49 1 4 -1 & p1 ! p2 @r{// tr.@ to state 49, conds.@ 1 and 4, guard} @samp{p1 /\ ! p2}
+84 -1 p1     @r{//     transition to state 84, no conditions, guard} @samp{p1}
+-1           @r{// end of state 49}
+27 0         @r{// state 27: non-initial state}
+49 -1 & p1 p3 @r{//    transition to state 49, no conds., guard} @samp{p1 /\ p3}
+-1           @r{// end of state 27}
+@end smallexample
+
+@noindent
+Automata with acceptance conditions on both states and transitions can be
+specified using a combination of the above two formats, that is, by using
+@samp{st} as the acceptance condition placement specifier and including a list
+of acceptance conditions both after the value determining the initialness of a
+state, and after the identifier of the target state of each transition.
 
 @node The lbtt-translate utility, , Format for automata, Interfacing with lbtt
 @section The @command{lbtt-translate} utility
@@ -3746,7 +3980,7 @@ translator algorithm implementations:
 @itemize @bullet
 @item
 @cindex @command{lbt}
-@command{lbt} --- a free LTL-to-B@"uchi translation algorithm implementation
+@command{lbt} --- an LTL-to-B@"uchi translation algorithm implementation
 based on the algorithm described in
 @ifnottex
 @ref{[GPVW95]}.
@@ -3791,26 +4025,25 @@ See
 <@uref{http://spinroot.com/spin/whatispin.html}>
 @end ifnotinfo
 for more information.
-
 @end itemize
 
 To use @command{lbtt} for testing the LTL-to-B@"uchi translators included in
 these tools, you should first install the tool normally by following its
-installation instructions. Then add the following @samp{Algorithm} section in
+installation instructions. Then add the following @samp{Translator} section in
 @command{lbtt}'s configuration file:
 
 @smallexample
-Algorithm
+Translator
 @{
   Name = "@r{[@var{name for the implementation}]}"
-  Path = "@r{[@var{path-to-@command{lbtt-translate}}]}"
+  Path = "@r{[@var{path to @command{lbtt-translate}}]}"
   Parameters = "@r{[@var{implementation selector}]} @r{[@var{path to executable}]}"
   Enabled = Yes
 @}
 @end smallexample
 
 @noindent
-where [@var{path-to-@command{lbtt-translate}}] contains the complete path and
+where [@var{path to @command{lbtt-translate}}] contains the complete path and
 file name of the @command{lbtt-translate} tool executable,
 [@var{implementation selector}] is either of the options @samp{--lbt} or
 @samp{--spin}, and [@var{path to executable}] is the full path
@@ -3822,7 +4055,9 @@ LTL formula operators available for generating random LTL formulas with
 @command{lbtt}. See the documentation of each translator for information
 about which operators are supported, and then change the parameters in
 @command{lbtt}'s configuration file accordingly to disable the unsupported
-operators.
+operators (or instruct @command{lbtt} to read the formulas from an external
+file by invoking @command{lbtt} with the
+@ref{--formulafile,,@samp{--formulafile} command line option}).
 
 The @command{lbtt-translate} utility can also be invoked directly from the
 shell to translate an LTL formula into a B@"uchi automaton using either of the
@@ -3840,7 +4075,7 @@ E.@: Clarke Jr., O.@: Grumberg and D.@: Peled. Model checking. The MIT Press,
 1999.
 
 @item @anchor{[Cou99]} [Cou99]
-J.-M. Couvreur. On-the-fly verification of linear temporal logic. In
+J.-M.@: Couvreur. On-the-fly verification of linear temporal logic. In
 @i{Proceedings of the World Congress on Formal Methods in the Development of
 Computing Systems (FM'99), volume I}, volume 1708 of
 @i{Lecture Notes in Computer Science}, pages 253---271. Springer-Verlag, 1999.
@@ -3855,33 +4090,70 @@ of @i{Lecture Notes in Computer Science}, pages 249---260. Springer-Verlag,
 @item @anchor{[EH00]} [EH00]
 K.@: Etessami and G.@: Holzmann. Optimizing B@"uchi automata. In
 @i{Proceedings of the 11th International Conference on Concurrency Theory
-(CONCUR'2000)}, volume 1877 of @i{Lecture Notes in Computer Science},
+(CONCUR 2000)}, volume 1877 of @i{Lecture Notes in Computer Science},
 pages 153---167. Springer-Verlag, 2000.
 
 @item @anchor{[Ete99]} [Ete99]
 K.@: Etessami. Stutter-invariant languages, omega-automata, and temporal
-logic. In @i{Proceedings of the 11th Conference on Computer Aided Verification
-(CAV'99)}, volume 1633 of @i{Lecture Notes in Computer Science}, pages
-236---248. Springer-Verlag, 1999.
+logic. In @i{Proceedings of the 11th International Conference on Computer Aided
+Verification (CAV'99)}, volume 1633 of @i{Lecture Notes in Computer Science},
+pages 236---248. Springer-Verlag, 1999.
+
+@item @anchor{[Ete02]} [Ete02]
+K.@: Etessami. A hierarchy of polynomial-time computable simulations for
+automata. In @i{Proceedings of the 13th International Conference on
+Concurrency Theory (CONCUR 2002)}, volume 2421 of
+@i{Lecture Notes in Computer Science}, pages 131---144. Springer-Verlag, 2002.
 
 @item @anchor{[EWS01]} [EWS01]
 K.@: Etessami, Th.@: Wilke and R.@: Schuller. Fair simulation relations,
 parity games, and state space reduction for B@"uchi automata. In
 @i{Proceedings of the 28th International Colloquium on Automata, Languages and
-Programming (ICALP'2001)}, volume 2076 of
+Programming (ICALP 2001)}, volume 2076 of
 @i{Lecture Notes in Computer Science}, pages 694---707. Springer-Verlag, 2001.
+
+@item @anchor{[Fri03]} [Fri03]
+C.@: Fritz. Constructing B@"uchi automata from linear temporal logic using
+simulation relations for alternating B@"uchi automata. In
+@i{Proceedings of the 8th International Conference on Implementation and
+Application of Automata (CIAA 2003)}, volume 2759 of
+@i{Lecture Notes in Computer Science}, pages 35---48. Springer-Verlag, 2003.
 
 @item @anchor{[GO01]} [GO01]
 P.@: Gastin and D.@: Oddoux. Fast LTL to B@"uchi automata translation.
 In @i{Proceedings of the 13th International Conference on Computer
-Aided Verification (CAV'01)}, volume 2102 of @i{Lecture Notes in Computer
+Aided Verification (CAV 2001)}, volume 2102 of @i{Lecture Notes in Computer
 Science}, pages 53---65. Springer-Verlag, 2001.
+
+@item @anchor{[GO03]} [GO03]
+P.@: Gastin and D.@: Oddoux. LTL with past and two-way weak alternating
+automata. In @i{Proceedings of the 28th International Symposium on Mathematical
+Foundations of Computer Science (MFCS 2003)}, volume 2747 of
+@i{Lecture Notes in Computer Science}, pages 439---448. Springer-Verlag, 2003.
+
+@item @anchor{[Gei01]} [Gei01]
+M.@: C.@: W.@: Geilen. On the construction of monitors for temporal logic
+properties. @i{Electronic Notes for Theoretical Computer Science}, 55(2), 2001.
 
 @item @anchor{[GPVW95]} [GPVW95]
 R.@: Gerth, D.@: Peled, M.@: Y.@: Vardi and P.@: Wolper. Simple on-the-fly
 automatic verification of linear temporal logic. In
-@i{Proceedings of 15th Workshop Protocol Specification, Testing, and
-Verification (PSTV'95)}, pages 3---18. Chapman & Hall, 1995.
+@i{Proceedings of 15th IFIP WG6.1 International Symposium on Protocol
+Specification, Testing, and Verification (PSTV'95)}, pages 3---18.
+Chapman & Hall, 1995.
+
+@item @anchor{[GL02]} [GL02]
+D.@: Giannakopoulou and F.@: Lerda. From states to transitions: Improving
+translation of LTL formulae to B@"uchi automata. In
+@i{Proceedings of the 22nd IFIP WG6.1 International Conference on Formal
+Techniques for Networked and Distributed Systems (FORTE 2002)}, volume 2529 of
+@i{Lecture Notes in Computer Science}, pages 308---326. Springer-Verlag, 2002.
+
+@item @anchor{[GSB02]} [GSB02]
+S.@: Gurumurthy, F.@: Somenzi and R.@: Bloem. Fair simulation minimization.
+In @i{Proceedings of the 14th International Conference on Computer Aided
+Verification (CAV 2002)}, volume 2404 of @i{Lecture Notes in Computer Science},
+pages 610---624. Springer-Verlag, 2002.
 
 @item @anchor{[GViz]} [GViz]
 GraphViz - open source graph drawing software. See
@@ -3893,7 +4165,7 @@ GraphViz - open source graph drawing software. See
 @end ifnotinfo
 
 @item @anchor{[Hol97]} [Hol97]
-G. Holzmann. The model checker
+G.@: J.@: Holzmann. The model checker
 @ifnottex
 SPIN.
 @end ifnottex
@@ -3904,14 +4176,40 @@ SPIN.
 @end iftex
 @i{IEEE Transactions on Software Engineering}, 23(5):279---295, 1997.
 
+@item @anchor{[Isl94]} [Isl94]
+A.@: Isli. Mapping an LPTL formula into a B@"uchi alternating automaton
+accepting its models. In @i{Temporal Logic: Proceedings of the ICTL Workshop},
+pages 85---90. Research Report MPI-I-94-230, Max-Planck-Institut f@"ur
+Informatik, 1994.
+
+@item @anchor{[Lat03]} [Lat03]
+T.@: Latvala. Efficient model checking of safety properties. In
+@i{Proceedings of the 10th Spin Workshop on Model Checking of Software
+(SPIN 2003)}, volume 2648 of @i{Lecture Notes in Computer Science}, pages
+74---88. Springer-Verlag, 2003.
+
+@item @anchor{[Sch01]} [Sch01]
+K.@: Schneider. Improving automata generation for linear temporal logic by
+considering the automaton hierarchy. In @i{Proceedings of the 8th International
+Conference on Logic for Programming, Artificial Intelligence and Reasoning
+(LPAR 2001)}, volume 2250 of @i{Lecture Notes in Computer Science}, pages
+39---54. Springer-Verlag, 2001.
+
+@item @anchor{[ST03]} [ST03]
+R.@: Sebastiani and S.@: Tonetta. ``More deterministic'' vs.@: ``smaller''
+B@"uchi automata for efficient LTL model checking. In
+@i{Proceedings of the 12th Advanced Research Working Conference on Correct
+Hardware Design and Verification Methods (CHARME 2003)}, volume 2860 of
+@i{Lecture Notes in Computer Science}, pages 126---140. Springer-Verlag, 2003.
+
 @item @anchor{[SB00]} [SB00]
 F.@: Somenzi and R.@: Bloem. Efficient B@"uchi automata from LTL formulae.
 In @i{Proceedings of the 12th International Conference on Computer Aided
-Verification (CAV'00)}, volume 1855 of @i{Lecture Notes in Computer Science},
+Verification (CAV 2000)}, volume 1855 of @i{Lecture Notes in Computer Science},
 pages 247---263. Springer-Verlag, 2000.
 
 @item @anchor{[Tau00]} [Tau00]
-H. Tauriainen. Automated testing of B@"uchi automata translators
+H.@: Tauriainen. Automated testing of B@"uchi automata translators
 for linear temporal logic. Research report A66, Laboratory for Theoretical
 Computer Science, Helsinki University of Technology, Espoo, Finland,
 2000. Available on the WWW at
@@ -3926,10 +4224,14 @@ Computer Science, Helsinki University of Technology, Espoo, Finland,
 @end iftex
 
 @item @anchor{[TH02]} [TH02]
-H. Tauriainen and K. Heljanko. Testing LTL formula translation into B@"uchi
+H.@: Tauriainen and K.@: Heljanko. Testing LTL formula translation into B@"uchi
 automata.
 @i{International Journal on Software Tools for Technology Transfer (STTT)}
 4(1):57---70, 2002.
+
+@item @anchor{[Thi02]} [Thi02]
+X.@: Thirioux. Simple and efficient translation from LTL formulas to B"uchi
+automata. @i{Electronic Notes in Theoretical Computer Science}, 66(2), 2002.
 
 @item @anchor{[Var96]} [Var96]
 M.@: Y.@: Vardi. An automata-theoretic approach to linear temporal logic.
@@ -3939,9 +4241,16 @@ In @i{Logics for Concurrency: Structure versus Automata}, volume 1043 of
 
 @item @anchor{[VW86]} [VW86]
 M.@: Y.@: Vardi and P.@: Wolper. An automata-theoretic approach to
-automatic program verification. In @i{Proceedings of the 1st IEEE
+automatic program verification. In @i{Proceedings of the First IEEE
 Symposium on Logic in Computer Science (LICS'86)}, pages 332---344. IEEE
 Computer Society Press, 1986.
+
+@item @anchor{[Wol01]} [Wol01]
+P.@: Wolper. Constructing automata from temporal logic formulas: A tutorial.
+In @i{Lectures on Formal Methods and Performance Analysis: First EEF/Euro
+Summer School on Trends in Computer Science, Revised Lectures}, volume 2090
+of @i{Lecture Notes in Computer Science}, pages 261---277. Springer-Verlag,
+2001.
 
 @end table
 
@@ -4368,14 +4677,21 @@ conditions.
 
 @appendixsubsec Formal definition of generalized automata
 
-Formally, a generalized B@"uchi automaton can be represented as a tuple
+Formally, a generalized B@"uchi automaton can be represented as a
+tuple@footnote{This definition differs from those commonly found in
+the literature by specifying the acceptance conditions in terms of a separate
+set that is independent of the other components of the automaton, together with
+an
+explicit labeling function for the states. This is to allow the definition to
+correspond more accurately to the automata that can be described in
+input files.}
 @iftex
 @tex
-$\langle \Sigma, Q, \Delta, q^0, \cal{F}\rangle$,
+$\langle \Sigma, Q, \Delta, q_I, \cal{F}, \lambda\rangle$,
 @end tex
 @end iftex
 @ifnottex
-@math{<S, Q, R, q, F>},
+@math{<S, Q, R, q, F, L>},
 @end ifnottex
 where
 
@@ -4389,7 +4705,7 @@ $\Sigma$
 @ifnottex
 @math{S}
 @end ifnottex
-is the @emph{alphabet}
+is the finite @emph{alphabet}
 @iftex
 @tex
 ($\Sigma = 2^{AP}$ in this case),
@@ -4400,42 +4716,55 @@ is the @emph{alphabet}
 @end ifnottex
 
 @item
-@math{Q} is the set of @emph{states},
+@math{Q} is the finite set of @emph{states},
 
 @item
 @iftex
 @tex
-$\Delta \subseteq Q \times 2^\Sigma \times Q$
+$\Delta \subseteq Q \times 2^\Sigma \times 2^{\cal{F}} \times Q$
 @end tex
 @end iftex
 @ifnottex
-@math{R} (a subset of @math{Q x 2^S x Q})
+@math{R} (a subset of @math{Q x 2^S x 2^F x Q})
 @end ifnottex
-is the
-@emph{transition relation},
+is the set of @emph{transitions} (each of which consists of four components
+called the @emph{start state}, the @emph{guard}, the
+@emph{acceptance component}, and the @emph{target state}, respectively),
 
 @item
 @iftex
 @tex
-$q^0$
+$q_I$
 @end tex
 @end iftex
 @ifnottex
 @math{q}
 @end ifnottex
-is the @emph{initial state}, and
+is the @emph{initial state},
 
 @item
 @iftex
 @tex
-${\cal F} \subseteq 2^Q$
+${\cal F} = \{f_1,f_2,\ldots,f_n\}$ (for some finite $n$)
 @end tex
 @end iftex
 @ifnottex
-@math{F}, a collection of subsets of @math{Q},
+@math{F = @{f1, f2, ..., fn@} (for some finite @math{n})}
 @end ifnottex
-is the set of @emph{acceptance conditions}. (A ``nongeneralized''
-B@"uchi automaton has exactly one acceptance condition.)
+is the set of @emph{acceptance conditions} (a ``nongeneralized''
+B@"uchi automaton has exactly one acceptance condition), and
+
+@item
+@iftex
+@tex
+$\lambda: Q \rightarrow 2^{\cal F}$
+@end tex
+@end iftex
+@ifnottex
+@math{L: Q -> 2^F}
+@end ifnottex
+is a @emph{labeling function} that associates each state of the automaton
+with a set of acceptance conditions.
 
 @end itemize
 
@@ -4457,19 +4786,22 @@ $2^{AP}$
 @ifnottex
 @math{2^AP}
 @end ifnottex
-is an infinite sequence of states
+is an infinite sequence of pairs of states and transitions
 @iftex
 @tex
-$\langle q_0, q_1, q_2, \ldots \rangle \in Q^\omega$
+$\langle (q_0, t_0), (q_1, t_1), (q_2, t_2), \ldots \rangle \in
+(Q\times\Delta)^\omega$
 @end tex
 @end iftex
 @ifnottex
-@math{<q(0), q(1), q(2), ...>}  (where each @math{q(i)} is a state in @math{Q})
+@math{<(q(0),t(0)), (q(1),t(1)), (q(2),t(2)) ...>}
+(where each @math{q(i)} is a state in @math{Q} and each @math{t(i)} is a
+transition in @math{R})
 @end ifnottex
 such that
 @iftex
 @tex
-$q_0 = q^0$
+$q_0 = q_I$
 @end tex
 @end iftex
 @ifnottex
@@ -4484,25 +4816,24 @@ $i \geq 0$,
 @ifnottex
 @math{i >= 0},
 @end ifnottex
-there is a triple
 @iftex
 @tex
-$\langle q_i, X, q_{i+1}\rangle \in \Delta$
+$t_i = \langle q_i, X_i, Y_i, q_{i+1}\rangle \in \Delta$
 @end tex
 @end iftex
 @ifnottex
-@math{<q(i), X, q(i+1)>} in @math{R}
+@math{t(i) = <q(i), X(i), Y(i), q(i+1)>} in @math{R}
 @end ifnottex
 such that
 @iftex
 @tex
-$x_i \in X$.
+$x_i \in X_i$.
 @end tex
 @end iftex
 @ifnottex
-@math{x(i)} belongs to @math{X}.
+@math{x(i)} belongs to @math{X(i)}.
 @end ifnottex
-Because
+(Because the relation
 @iftex
 @tex
 $\Delta$
@@ -4514,11 +4845,11 @@ $\Delta$
 is not necessarily a function from
 @iftex
 @tex
-$Q \times 2^\Sigma$
+$Q \times 2^\Sigma \times 2^{\cal{F}}$
 @end tex
 @end iftex
 @ifnottex
-@math{Q x 2^S}
+@math{Q x 2^S x 2^F}
 @end ifnottex
 to
 @iftex
@@ -4529,38 +4860,63 @@ $Q$,
 @ifnottex
 @math{Q},
 @end ifnottex
-the automaton may have many runs on the same input.
+the automaton may have many runs on the same input.)
 
 A run
 @iftex
 @tex
-$\langle q_0, q_1, q_2, \ldots\rangle$
+$\langle (q_0,t_0), (q_1,t_1), (q_2,t_2), \ldots\rangle$
 @end tex
 @end iftex
 @ifnottex
-@math{<q(0), q(1), q(2), ...>}
+@math{<(q(0),t(0)), (q(1),t(1)), (q(2),t(2)), ...>}
 @end ifnottex
-is @emph{accepting} if and only if additionally
-for each acceptance condition
+(where
 @iftex
 @tex
-$F_j \in {@cal F}$,
+$t_i = \langle q_i,X_i,Y_i,q_{i+1}\rangle\in\Delta$ for all $i$)
 @end tex
 @end iftex
 @ifnottex
-@math{C(j)} in @math{F},
+@math{t(i) = < q(i), X(i), Y(i), q(i+1) >} for all @math{i})
 @end ifnottex
-there is a state
+is @emph{accepting} if and only if additionally, for each acceptance condition
 @iftex
 @tex
-$q_j \in F_j$
+$f \in {@cal F}$,
 @end tex
 @end iftex
 @ifnottex
-@math{q(j)} in @math{C(j)}
+@math{f} in @math{F},
 @end ifnottex
-that occurs infinitely often in the run. The automaton @emph{accepts} an
-infinite sequence
+@iftex
+@tex
+$f \in \lambda(q_i)$
+@end tex
+@end iftex
+@ifnottex
+@math{f} is in @math{L(q(i))}
+@end ifnottex
+or
+@iftex
+@tex
+$f \in Y_i$
+@end tex
+@end iftex
+@ifnottex
+@math{f} is in @math{Y(i)}
+@end ifnottex
+for infinitely many
+@iftex
+@tex
+$i$.
+@end tex
+@end iftex
+@ifnottex
+@math{i}.
+@end ifnottex
+
+The automaton @emph{accepts} an infinite sequence
 @iftex
 @tex
 $\langle x_0, x_1, x_2, \ldots\rangle \in 2^{AP}$
@@ -4573,9 +4929,7 @@ if and only if the automaton has at least one accepting run on this sequence.
 
 @appendixsubsec Transition label encoding
 
-In practice, a transition label of a B@"uchi automaton can be expressed as a
-propositional formula, since these formulas readily encode sets of subsets of
-the alphabet
+When working with automata on words over the alphabet
 @iftex
 @tex
 $2^{AP}$,
@@ -4584,8 +4938,9 @@ $2^{AP}$,
 @ifnottex
 @math{2^AP},
 @end ifnottex
-namely, the models of the formula. A transition can then be seen as a rule
-``if in state
+the guards of transitions can be expressed as propositional formulas by
+identifying a set of symbols from this alphabet with the set of models of a
+propositional formula. A transition can then be seen as a rule ``if in state
 @iftex
 @tex
 $q_i$
@@ -4626,32 +4981,74 @@ Many LTL-to-B@"uchi translation algorithms presented in the literature
 @iftex
 [GPVW95])
 @end iftex
-use a slightly different definition for generalized B@"uchi automata,
-which permits a B@"uchi automaton to have several initial states and
-places the labels on states instead of transitions. However, these B@"uchi
-automata can be easily converted into an equivalent B@"uchi automaton in the
-above format with the following steps (we assume here that
-each state of the automaton is labelled with a set of LTL formulas that
-should hold in that state):
+are based on a slightly different definition for generalized B@"uchi automata,
+where the automata can have several initial states, acceptance is determined
+using a family of sets of states, and the guards of transitions are replaced
+with an additional state labeling that associates a set of LTL
+formulas with each state. These automata can easily be described using the
+above definition through the following steps:
 
 @enumerate
 @item
-Add a new state (with an empty label) into the automaton and add transitions
-from it to each initial state of the original automaton. Make the new state
-the (only) initial state of the automaton.
+Add a new state (associated with an empty set of LTL formulas) into the
+automaton and add transitions from it to each initial state of the original
+automaton. Make the new state the (only) initial state of the automaton.
 
 @item
 For each state of the (modified) automaton, construct a conjunction of all
-propositional
-constraints (i.e., all formulas with no temporal operators) in the label of
-the state and copy the conjunction onto each transition coming into the
-state. Then remove all labels from the states.
-@end enumerate
+propositional constraints (all formulas with no temporal operators)
+associated with the state and make the conjunction the guard of each transition
+coming into the state (the acceptance component of each transition remains
+empty). Then remove the association between states and sets of formulas.
 
-Conversions from other definitions can be handled in a similar way. In
-some cases (e.g., if the acceptance conditions are subsets of transitions
-instead of subsets of states), the conversion may also require making copies
-of some states and then adjusting the transition labels appropriately.
+@item
+If
+@iftex
+@tex
+$Q_1,Q_2,\ldots,Q_k \in 2^Q$
+@end tex
+@end iftex
+@ifnottex
+@math{Q1, Q2, ..., Qk} (subsets of @math{Q})
+@end ifnottex
+are the sets of states determining acceptance in the original automaton,
+let
+@iftex
+@tex
+$f_i = Q_i$
+@end tex
+@end iftex
+@ifnottex
+@math{fi = Qi}
+@end ifnottex
+for all
+@iftex
+@tex
+$1 \leq i \leq k$,
+@end tex
+@end iftex
+@ifnottex
+@math{1 <= 1 <= k},
+@end ifnottex
+and let
+@iftex
+@tex
+$\lambda(q) = \{f_i\mid q \in f_i\}$
+@end tex
+@end iftex
+@ifnottex
+@math{L(q) = @{fi | q is a member of fi@}}
+@end ifnottex
+for all states
+@iftex
+@tex
+$q$.
+@end tex
+@end iftex
+@ifnottex
+@math{q}.
+@end ifnottex
+@end enumerate
 
 
 
@@ -4664,7 +5061,7 @@ model checking result cross-comparison test
 (@pxref{Model checking result cross-comparison test}) and
 the model checking result consistency check
 (@pxref{Model checking result consistency check}). Formally,
-the state spaces are Kripke structures with a total transition
+the state spaces are (finite) Kripke structures with a total transition
 relation, i.e., directed graphs with a set of atomic propositions
 attached to each state, with each state having at least one
 immediate successor (which may be the state itself). The precise
@@ -4685,7 +5082,7 @@ where
 @itemize @bullet
 
 @item
-@math{S} is the set of @emph{states},
+@math{S} is the finite set of @emph{states},
 
 @item
 @iftex
@@ -4705,7 +5102,7 @@ ${\cal L}: S \rightarrow 2^{AP}$
 @end tex
 @end iftex
 @ifnottex
-@math{L} (a function from @math{S} to @math{2^AP})
+@math{L: S -> 2^AP}
 @end ifnottex
 is the @emph{labeling function} which maps each state to a set of atomic
 propositions that hold in the state.

@@ -21,6 +21,7 @@
 #define FORMULARANDOMIZER_H
 
 #include <config.h>
+#include <map>
 #include <vector>
 #include <utility>
 #include "LbttAlloc.h"

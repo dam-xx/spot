@@ -29,6 +29,7 @@
 #include "Configuration.h"
 #include "Exception.h"
 #include "StateSpace.h"
+#include "TestStatistics.h"
 
 using namespace std;
 
@@ -53,7 +54,11 @@ void openFile                                       /* Opens a file for */
   (const char* filename, ofstream& stream,          /* writing.         */
    ios::openmode mode, int indent = 0);
 
-void removeFile                                     /* Removes a file. */
+void openFile                                       /* Opens a file for   */
+  (const char* filename, int& fd, int flags,        /* input/output using */
+   int indent = 0);                                 /* file descriptors.  */
+
+void truncateFile                                   /* Truncates a file. */
   (const char* filename, int indent = 0);
 
 void printFileContents                              /* Displays the contents */
@@ -96,13 +101,6 @@ void generateBuchiAutomaton                         /* Generates a Büchi     */
      algorithm_id);                                 /* translation algorithm
                   				     * for the conversion.
 						     */
-
-void generateProductAutomaton                       /* Computes the         */
-  (int f,                                           /* synchronous product  */
-   vector<Configuration::AlgorithmInformation,      /* of a Büchi automaton */
-     ALLOC(Configuration::AlgorithmInformation) >   /* and a state space.   */
-     ::size_type
-     algorithm_id);
 
 void performEmptinessCheck                          /* Performs an emptiness */
   (int f,                                           /* check on a product    */

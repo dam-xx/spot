@@ -21,12 +21,10 @@
 #define FORMULAWRITER_H
 
 #include "Exception.h"
+#include "LtlFormula.h"
 
 namespace Ltl
 {
-
-class LtlFormula;
-class Atom;
 
 /******************************************************************************
  *

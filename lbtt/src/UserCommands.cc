@@ -18,11 +18,14 @@
  */
 
 #include <config.h>
+#include "BuchiProduct.h"
 #include "DispUtil.h"
 #include "Exception.h"
 #include "PathEvaluator.h"
+#include "Product.h"
 #include "SharedTestData.h"
 #include "StatDisplay.h"
+#include "StateSpaceProduct.h"
 #include "StringUtil.h"
 #include "TestRoundInfo.h"
 #include "TestStatistics.h"
@@ -45,84 +48,98 @@ using namespace ::StringUtil;
 using namespace ::UserCommandInterface;
 
 /* ========================================================================= */
-void computeProductAutomaton
-  (ProductAutomaton*& product_automaton,
-   const BuchiAutomaton& buchi_automaton,
-   pair<unsigned long int, bool>& last_automaton,
-   const pair<unsigned long int, bool>& new_automaton)
+unsigned long int parseAlgorithmId(const string& id)
 /* ----------------------------------------------------------------------------
  *
- * Description:   Computes a product automaton.
+ * Description:   Parses an algorithm identifier (either a symbolic or a
+ *                numeric one).
  *
- * Arguments:     product_automaton  --  A reference to a pointer giving the
- *                                       storage location of the generated
- *                                       automaton.
- *                buchi_automaton    --  The Büchi automaton to be used for
- *                                       computing the product automaton.
- *                last_automaton     --  A pair telling the algorithm and the
- *                                       formula last used for computing an
- *                                       automaton (for testing whether the
- *                                       result is already available).
- *                new_automaton      --  A pair telling the algorithm and the
- *                                       formula which are to be used for
- *                                       computing the automaton.
+ * Argument:      id  --  String containing the identifier.
  *
- * Returns:       Nothing.
+ * Returns:       The numeric identifier of the algorithm. Throws a
+ *                CommandErrorException if the identifier is not recognizable
+ *                as a proper algorithm identifier.
  *
  * ------------------------------------------------------------------------- */
 {
-  if (product_automaton == 0 || last_automaton != new_automaton)
+  unsigned long int result;
+  string unquoted_id = unquoteString(id);
+
+  try
   {
-    if (product_automaton != 0)
+    result = parseNumber(unquoted_id);
+    verifyNumber(result, round_info.number_of_translators,
+		 "Implementation identifier out of range");
+  }
+  catch (const NotANumberException&)
+  {
+    map<string, unsigned long int, less<string>, ALLOC(unsigned long int) >
+      ::const_iterator id_finder
+      = configuration.algorithm_names.find(unquoted_id);
+    if (id_finder == configuration.algorithm_names.end())
+      throw CommandErrorException
+	      ("Unknown implementation identifier (`" + unquoted_id + "').");
+    result = id_finder->second;
+  }
+
+  return result;
+}
+
+/* ========================================================================= */
+void parseAlgorithmIdList(const string& ids, IntervalList& algorithms)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Parses a list of algorithm identifiers specified either as
+ *                comma-separated intervals or algorithm identifiers.
+ *
+ * Arguments:     ids         --  A constant reference to a string containing
+ *                                the list of algorithm identifiers.
+ *                algorithms  --  A reference to an IntervalList for storing
+ *                                the numeric identifiers of the algorithms.
+ *
+ * Returns:       Nothing. Throws a CommandErrorException if the identifier
+ *                list includes a string not recognizable as an algorithm
+ *                identifier.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  /*
+   *  Make a copy of `ids' in which each comma (',') within double quotes is
+   *  substituted with a newline. This is necessary to handle symbolic
+   *  algorithm identifiers with commas correctly.
+   */
+
+  string id_string = substituteInQuotedString(ids, ",", "\n", INSIDE_QUOTES);
+
+  try
+  {
+    vector<string, ALLOC(string) > nonnumeric_algorithm_ids;
+
+    parseIntervalList(id_string, algorithms, 0,
+		      round_info.number_of_translators - 1,
+		      &nonnumeric_algorithm_ids);
+
+    for (vector<string, ALLOC(string) >::iterator
+	   id = nonnumeric_algorithm_ids.begin();
+	 id != nonnumeric_algorithm_ids.end();
+	 ++id)
     {
-      printText("<deallocating memory>", 4, 2);
-
-      delete product_automaton;
-      product_automaton = 0;
-
-      printText(" ok\n", 4);
+      *id = unquoteString(substituteInQuotedString(*id, "\n", ","));
+      map<string, unsigned long int, less<string>, ALLOC(unsigned long int) >
+	::const_iterator
+	id_finder = configuration.algorithm_names.find(*id);
+      if (id_finder == configuration.algorithm_names.end())
+	throw CommandErrorException
+	        ("Unknown implementation identifier (`" + *id + "').");
+      algorithms.merge(id_finder->second);
     }
-
-    printText("<computing product automaton>", 0, 2);
-
-    try
-    {
-      product_automaton = new ProductAutomaton();
-      product_automaton->computeProduct
-	(buchi_automaton, *(round_info.statespace),
-	 configuration.global_options.product_mode == Configuration::GLOBAL);
-    }
-    catch (...)
-    {
-      if (product_automaton != 0)
-      {
-	delete product_automaton;
-	product_automaton = 0;
-      }
-
-      printText(" error\n", 0);
-
-      try
-      {
-	throw;
-      }
-      catch (const ::Graph::ProductAutomaton::ProductSizeException&)
-      {
-	throw CommandErrorException("Product may be too large");
-      }
-      catch (const UserBreakException&)
-      {
-	throw CommandErrorException("User break");
-      }
-      catch (const bad_alloc&)
-      {
-	throw CommandErrorException("Out of memory");
-      }
-    }
-
-    printText(" ok\n", 0);
-
-    last_automaton = new_automaton;
+  }
+  catch (const IntervalRangeException& e)
+  {
+    throw CommandErrorException
+      (string("Implementation identifier out of range (")
+       + toString(e.getNumber())
+       + ").");
   }
 }
 
@@ -158,64 +175,13 @@ void printAlgorithmList(ostream& stream, int indent)
                + "abled)\n";
   }
 
-  estream << '\n';
   estream.flush();
-}
-
-/* ========================================================================= */
-void synchronizePrefixAndCycle
-  (deque<Graph::Graph<GraphEdgeContainer>::size_type,
-         ALLOC(Graph::Graph<GraphEdgeContainer>::size_type) >& prefix,
-   deque<Graph::Graph<GraphEdgeContainer>::size_type,
-         ALLOC(Graph::Graph<GraphEdgeContainer>::size_type) >& cycle)
-/* ----------------------------------------------------------------------------
- *
- * Description:   Function for `synchronizing' a sequence of states consisting
- *                of a prefix and a repeating cycle. This means removing from
- *                the end of the prefix the longest sequence of states that
- *                forms a postfix of the cycle. The states in the cycle will be
- *                `rotated' accordingly.
- *
- * Arguments:     prefix  --  A reference to a deque of state identifiers
- *                            forming the prefix of the state sequence.
- *                cycle   --  A reference to a deque of state identifiers
- *                            representing the states in the repeating cycle.
- *
- * Returns:       Nothing.
- *
- * ------------------------------------------------------------------------- */
-{
-  if (cycle.empty())
-    throw CommandErrorException("internal error");
-
-  while (!prefix.empty() && prefix.back() == cycle.back())
-  {
-    prefix.pop_back();
-    cycle.push_front(cycle.back());
-    cycle.pop_back();
-  }
-
-  Graph::Graph<GraphEdgeContainer>::size_type state_id = cycle.front();
-  deque<Graph::Graph<GraphEdgeContainer>::size_type,
-        ALLOC(Graph::Graph<GraphEdgeContainer>::size_type) >::const_iterator
-    s;
-
-  for (s = cycle.begin() + 1; s != cycle.end() && *s == state_id; ++s)
-    ;
-
-  if (s == cycle.end())
-  {
-    cycle.clear();
-    cycle.push_front(state_id);
-  }
 }
 
 /* ========================================================================= */
 void printCrossComparisonAnalysisResults
   (ostream& stream, int indent, bool formula_type,
-   const vector<string, ALLOC(string) >& input_tokens,
-   ProductAutomaton*& product_automaton,
-   pair<unsigned long int, bool>& last_product_automaton)
+   const vector<string, ALLOC(string) >& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `resultanalysis', i.e., analyzes
@@ -232,14 +198,6 @@ void printCrossComparisonAnalysisResults
  *                input_tokens            --  A reference to a vector
  *                                            containing the arguments of the
  *                                            command.
- *                product_automaton       --  A reference to a pointer telling
- *                                            the storage location of the
- *                                            generated product automaton.
- *                last_product_automaton  --  A pair telling the algorithm and
- *                                            the formula last used for
- *                                            computing a product automaton
- *                                            (for testing whether the result
- *                                            is already available).
  *
  * Returns:       Nothing.
  *
@@ -255,32 +213,35 @@ void printCrossComparisonAnalysisResults
 				"model checking result cross-comparison test "
 				"is enabled.");
 
-  if (input_tokens[1] == "p")
+  algorithm1 = parseAlgorithmId(input_tokens[1]);
+  algorithm2 = parseAlgorithmId(input_tokens[2]);
+
+  if (algorithm1 == algorithm2)
+    throw CommandErrorException("Implementation identifiers must be "
+				"different.");
+
+  /* 
+   *  Arrange the algorithm identifiers such that `algorithm1' never refers to
+   *  the internal model checking algorithm (swap `algorithm1' and `algorithm2'
+   *  if necessary).
+   */
+
+  if (configuration.isInternalAlgorithm(algorithm1))
   {
     path_compare = true;
-    algorithm1 = parseNumber(input_tokens[2]);
-    algorithm2 = round_info.number_of_translators;
+    algorithm1 ^= algorithm2;
+    algorithm2 ^= algorithm1;
+    algorithm1 ^= algorithm2;
   }
-  else
-  {
-    algorithm1 = parseNumber(input_tokens[1]);
-    if (input_tokens[2] == "p")
-    {
-      path_compare = true;
-      algorithm2 = round_info.number_of_translators;
-    }
-    else
-      algorithm2 = parseNumber(input_tokens[2]);
-  }
+
+  if (configuration.isInternalAlgorithm(algorithm2))
+    path_compare = true;
 
   if (path_compare
       && !(configuration.global_options.statespace_generation_mode
 	     & Configuration::PATH))
     throw CommandErrorException("This feature is available only when using "
 				"paths as state spaces.");
-
-  verifyNumber(algorithm1, round_info.number_of_translators,
-	       "No such implementation");
 
   int formula = (formula_type ? 0 : 1);
   int generator_formula = formula;
@@ -292,17 +253,6 @@ void printCrossComparisonAnalysisResults
   const AutomatonStats* stats2;
 
   stats1 = &test_results[algorithm1].automaton_stats[formula];
-
-  if (!path_compare)
-  {
-    verifyNumber(algorithm2, round_info.number_of_translators,
-		 "No such implementation");
-
-    if (algorithm1 == algorithm2)
-      throw CommandErrorException("Implementation identifiers must be "
-				  "different.");
-  }
-
   stats2 = &test_results[algorithm2].automaton_stats[formula];
 
   if (!stats1->crossComparisonPerformed(algorithm2))
@@ -312,7 +262,7 @@ void printCrossComparisonAnalysisResults
 		   "performed between "
                    + configuration.algorithmString(algorithm1)
 		   + " and " + configuration.algorithmString(algorithm2)
-                   + ".\n",
+                   + ".",
 		   78);
     return;
   }
@@ -324,7 +274,7 @@ void printCrossComparisonAnalysisResults
 		   "results given by "
                    + configuration.algorithmString(algorithm1)
 		   + " and "
-                   + configuration.algorithmString(algorithm2) + ".\n",
+                   + configuration.algorithmString(algorithm2) + ".",
 		   78);
     return;
   }
@@ -374,7 +324,8 @@ void printCrossComparisonAnalysisResults
 
     state = parseNumber(input_tokens[3]);
 
-    verifyNumber(state, round_info.statespace->size(), "No such state");
+    verifyNumber(state, round_info.statespace->size(),
+		 "State identifier out of range");
 
     if (state >= round_info.real_emptiness_check_size)
     {
@@ -386,7 +337,7 @@ void printCrossComparisonAnalysisResults
 		     + configuration.algorithmString(algorithm2)
 		     + " in state "
                      + toString(state)
-		     + " of the state space.\n",
+		     + " of the state space.",
 		     78);
       return;
     }
@@ -401,7 +352,7 @@ void printCrossComparisonAnalysisResults
                      + configuration.algorithmString(algorithm2)
                      + " in state "
                      + toString(state)
-                     + " of the state space.\n",
+                     + " of the state space.",
 		     78);
       return;
     }
@@ -420,40 +371,37 @@ void printCrossComparisonAnalysisResults
 					   ? algorithm2
 					   : algorithm1);
 
-  deque<StateSpace::size_type, ALLOC(StateSpace::size_type) > system_prefix;
-  deque<StateSpace::size_type, ALLOC(StateSpace::size_type) > system_cycle;
-  deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) >
-    automaton_prefix;
-  deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) >
-    automaton_cycle;
+  ::Graph::Product<Graph::StateSpaceProduct>::Witness witness;
 
   if (!path_compare || accepting_algorithm == algorithm1)
   {
     /*
-     *  Compute the synchronous product of the automaton and the state space.
-     */
-
-    computeProductAutomaton(product_automaton,
-			    *(test_results[accepting_algorithm].
-			       automaton_stats[formula].buchi_automaton),
-			    last_product_automaton,
-			    make_pair(accepting_algorithm, formula_type));
-
-    /*
      *  Search the product automaton for an accepting cycle.
      */
 
-    pair<deque<ProductAutomaton::StateIdPair,
-               ALLOC(ProductAutomaton::StateIdPair) >,
-         deque<ProductAutomaton::StateIdPair,
-               ALLOC(ProductAutomaton::StateIdPair) > >
-      execution;
+    const BuchiAutomaton& automaton
+      =  *test_results[accepting_algorithm].automaton_stats[formula]
+            .buchi_automaton;
+
+    ::Graph::Product<Graph::StateSpaceProduct> product
+	(automaton, *round_info.statespace);
 
     try
     {
       printText("<searching for a system execution producing contradictory "
 		"results>", 0, 2);
-      product_automaton->findAcceptingExecution(state, execution);
+
+      product.findWitness(automaton.initialState(), state, witness);
+
+      if (witness.cycle.first.empty())
+	throw Exception
+	  ("UserCommands::printCrossComparisonAnalysisResults(...): internal "
+	   "error [witness construction failed]");
+    }
+    catch (const UserBreakException&)
+    {
+      printText(" user break\n", 0);
+      throw;
     }
     catch (...)
     {
@@ -462,70 +410,26 @@ void printCrossComparisonAnalysisResults
     }
 
     printText(" ok\n\n", 0);
-
-    /*
-     *  Separate the parallel executions of the system and the automaton into
-     *  prefixes and cycles.
-     */
-
-    while (!execution.first.empty())
-    {
-      automaton_prefix.push_back(execution.first.front().first);
-      system_prefix.push_back(execution.first.front().second);
-      execution.first.pop_front();
-    }
-
-    while (!execution.second.empty())
-    {
-      automaton_cycle.push_back(execution.second.front().first);
-      system_cycle.push_back(execution.second.front().second);
-      execution.second.pop_front();
-    }
-
-    synchronizePrefixAndCycle(automaton_prefix, automaton_cycle);
-    synchronizePrefixAndCycle(system_prefix, system_cycle);
   }
   else
   {
-    StateSpace::size_type loop_state
+    const StateSpace::size_type loop_state
       = (*((*round_info.statespace)[round_info.statespace->size() - 1].
 	    edges().begin()))->targetNode();
+    const StateSpace::size_type loop_length
+      = round_info.statespace->size() - loop_state;
 
-    if (state < loop_state)
+    for ( ; state < loop_state; ++state)
+      witness.prefix.second.push_back(StateSpace::PathElement(state, 0));
+
+    state -= loop_state;
+    for (StateSpace::size_type s = 0; s < loop_length; ++s)
     {
-      for (StateSpace::size_type path_state = state; path_state < loop_state;
-	   path_state++)
-	system_prefix.push_back(path_state);
-
-      for (StateSpace::size_type path_state = loop_state;
-	   path_state < round_info.statespace->size();
-	   path_state++)
-	system_cycle.push_back(path_state);
-    }
-    else
-    {
-      for (StateSpace::size_type path_state = state;
-	   path_state < round_info.statespace->size();
-	   path_state++)
-	system_cycle.push_back(path_state);
-
-      for (StateSpace::size_type path_state = loop_state;
-	   path_state < state;
-	   path_state++)
-	system_cycle.push_back(path_state);
+      witness.cycle.second.push_back
+	(StateSpace::PathElement(state + loop_state, 0));
+      state = (state + 1) % loop_length;
     }
   }
-
-  state = system_prefix.size();
-
-  /*
-   *  Construct a path in the state space from the system prefix and the cycle.
-   */
-
-  vector<StateSpace::size_type, ALLOC(StateSpace::size_type) > path;
-
-  path.insert(path.end(), system_prefix.begin(), system_prefix.end());
-  path.insert(path.end(), system_cycle.begin(), system_cycle.end());
 
   /*
    *  Write information about the execution to the output stream. That is,
@@ -538,7 +442,7 @@ void printCrossComparisonAnalysisResults
 
   estream << string(indent + 2, ' ') + "Execution M:\n";
 
-  printPath(stream, indent + 4, system_prefix, system_cycle,
+  printPath(stream, indent + 4, witness.prefix.second, witness.cycle.second,
 	    *(round_info.statespace));
 
   estream << string(indent + 4, ' ')
@@ -557,8 +461,8 @@ void printCrossComparisonAnalysisResults
 
   Ltl::PathEvaluator path_evaluator;
   bool result = path_evaluator.evaluate
-    (*round_info.formulae[generator_formula], *(round_info.statespace), path,
-     state);
+    (*round_info.formulae[generator_formula], witness.prefix.second,
+     witness.cycle.second, *round_info.statespace);
 
   path_evaluator.print(stream, indent + 4);
 
@@ -573,14 +477,19 @@ void printCrossComparisonAnalysisResults
 		    : configuration.algorithmString(result
 						    ? rejecting_algorithm
 						    : accepting_algorithm))
-                 + ".\n",
+                 + ".",
 		 78);
 
   if (!result)
+  {
+    estream << '\n';
     printAcceptingCycle(stream, indent + 2, accepting_algorithm,
-			automaton_prefix, automaton_cycle,
+			witness.prefix.first, witness.cycle.first,
 			*(test_results[accepting_algorithm].
-			    automaton_stats[formula].buchi_automaton));
+			    automaton_stats[formula].buchi_automaton),
+			witness.prefix.second, witness.cycle.second,
+			*round_info.statespace);
+  }
 }
 
 /* ========================================================================= */
@@ -610,10 +519,7 @@ void printConsistencyAnalysisResults
 				"model checking result consistency check is "
 				"enabled.");
 
-  unsigned long int algorithm_id = parseNumber(input_tokens[1]);
-
-  verifyNumber(algorithm_id, round_info.number_of_translators,
-	       "No such implementation");
+  unsigned long int algorithm_id = parseAlgorithmId(input_tokens[1]);
 
   if (test_results[algorithm_id].consistency_check_result == -1)
   {
@@ -621,7 +527,7 @@ void printConsistencyAnalysisResults
 		   "Model checking result consistency check was not performed "
 		   "on implementation "
 		   + configuration.algorithmString(algorithm_id)
-		   + ".\n",
+		   + ".",
 		   78);
     return;
   }
@@ -631,7 +537,7 @@ void printConsistencyAnalysisResults
     printTextBlock(stream, indent,
 		   "Implementation "
 		   + configuration.algorithmString(algorithm_id)
-		   + " passed the model checking result consistency check.\n",
+		   + " passed the model checking result consistency check.",
 		   78);
     return;
   }
@@ -671,7 +577,8 @@ void printConsistencyAnalysisResults
      */
 
     state = parseNumber(input_tokens[2]);
-    verifyNumber(state, round_info.statespace->size(), "No such state");
+    verifyNumber(state, round_info.statespace->size(),
+		 "State identifier out of range");
 
     if (state >= round_info.real_emptiness_check_size)
     {
@@ -680,7 +587,7 @@ void printConsistencyAnalysisResults
 		     "performed on implementation "
 		     + configuration.algorithmString(algorithm_id)
 		     + " in state " + toString(state) + " of the state "
-		       "space.\n",
+		       "space.",
 		     78);
       return;
     }
@@ -694,14 +601,14 @@ void printConsistencyAnalysisResults
 		     "consistency check on implementation "
 		     + configuration.algorithmString(algorithm_id)
 		     + " in state " + toString(state) + " of the state "
-		       "space.\n",
+		       "space.",
 		     78);
       return;
     }
   }
 
   vector<StateSpace::size_type, ALLOC(StateSpace::size_type) > path;
-  deque<StateSpace::size_type, ALLOC(StateSpace::size_type) > prefix, cycle;
+  StateSpace::Path prefix, cycle;
   map<StateSpace::size_type, StateSpace::size_type,
       less<StateSpace::size_type>, ALLOC(StateSpace::size_type) >
     ordering;
@@ -728,10 +635,10 @@ void printConsistencyAnalysisResults
   loop_state = ordering[state];
 
   for (StateSpace::size_type s = 0; s < loop_state; s++)
-    prefix.push_back(path[s]);
+    prefix.push_back(StateSpace::PathElement(path[s], 0));
 
   for (StateSpace::size_type s = loop_state; s < path.size(); s++)
-    cycle.push_back(path[s]);
+    cycle.push_back(StateSpace::PathElement(path[s], 0));
 
   estream << string(indent + 2, ' ') + "Execution M:\n";
   printPath(stream, indent + 4, prefix, cycle, *(round_info.statespace));
@@ -741,8 +648,7 @@ void printConsistencyAnalysisResults
 
   Ltl::PathEvaluator path_evaluator;
   bool result = path_evaluator.evaluate
-    (*round_info.formulae[formula], *(round_info.statespace), path,
-     loop_state);
+    (*round_info.formulae[formula], prefix, cycle, *round_info.statespace);
 
   path_evaluator.print(stream, indent + 4);
 
@@ -751,14 +657,14 @@ void printConsistencyAnalysisResults
                  + "satisfied in the execution. It seems that the automaton "
 		   "constructed for the "
 		 + (result ? "posi" : "nega")
-                 + "tive formula rejects the execution incorrectly.\n",
+                 + "tive formula rejects the execution incorrectly.",
 		 78);
 }
  
 /* ========================================================================= */
 void printAutomatonAnalysisResults
-  (ostream& stream, int indent, unsigned long int algorithm1,
-   unsigned long int algorithm2)
+  (ostream& stream, int indent,
+   const vector<string, ALLOC(string) >& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `buchianalysis', i.e., analyzes
@@ -766,11 +672,11 @@ void printAutomatonAnalysisResults
  *                for two Büchi automata constructed for the formula and its
  *                negation.
  *
- * Arguments:     stream       --  A reference to an output stream.
- *                indent       --  Number of spaces to leave on the left of the
- *                                 output.
- *                algorithm1,  --  Identifiers of the algorithms for which the
- *                algorithm2       should be performed.
+ * Arguments:     stream        --  A reference to an output stream.
+ *                indent        --  Number of spaces to leave on the left of
+ *                                  the output.
+ *                input_tokens  --  A reference to a vector containing the
+ *                                  arguments of the command.
  *
  * Returns:       Nothing.
  *
@@ -783,10 +689,14 @@ void printAutomatonAnalysisResults
 				"Büchi automata intersection emptiness check "
 				"is enabled.");
 
-  verifyNumber(algorithm1, round_info.number_of_translators,
-	       "No such implementation");
-  verifyNumber(algorithm2, round_info.number_of_translators,
-	       "No such implementation");
+  unsigned long int algorithm1 = parseAlgorithmId(input_tokens[1]);
+  unsigned long int algorithm2 = parseAlgorithmId(input_tokens[2]);
+
+  if (configuration.isInternalAlgorithm(algorithm1)
+      || configuration.isInternalAlgorithm(algorithm2))
+    throw CommandErrorException
+            ("This feature is not available for lbtt's internal "
+	     "model checking algorithm.");
 
   int test_result
     = test_results[algorithm1].automaton_stats[0].
@@ -806,7 +716,7 @@ void printAutomatonAnalysisResults
 		      : " (positive formula) and "
 		        + configuration.algorithmString(algorithm2)
 		        + " (negative formula)")
-		   + ".\n",
+		   + ".",
 		   78);
 
     return;
@@ -838,318 +748,170 @@ void printAutomatonAnalysisResults
   estream << "\n\n";
   estream.flush();
 
-  /*
-   *  Compute the intersection of the two automata.
-   */
-  
-  BuchiAutomaton* a = 0;
+  ::Graph::Product<Graph::BuchiProduct>::Witness witness;
 
   try
   {
-    map<BuchiAutomaton::size_type, BuchiAutomaton::StateIdPair,
-        less<BuchiAutomaton::size_type>, ALLOC(BuchiAutomaton::StateIdPair) >
-      intersection_state_mapping;
+    printText("<searching for an accepting execution>", 0, 2);
 
-    try
-    {
-      printText("<computing the intersection of two automata>", 0, 2);
+    const BuchiAutomaton& automaton_1
+      = *(test_results[algorithm1].automaton_stats[0].buchi_automaton);
+    const BuchiAutomaton& automaton_2
+      = *(test_results[algorithm2].automaton_stats[1].buchi_automaton);
 
-      a = BuchiAutomaton::intersect
-	    (*(test_results[algorithm1].automaton_stats[0].buchi_automaton),
-	     *(test_results[algorithm2].automaton_stats[1].buchi_automaton),
-	     &intersection_state_mapping);
-    }
-    catch (...)
-    {
-      printText(" error\n", 0);
-      throw;
-    }
+    ::Graph::Product<Graph::BuchiProduct> product(automaton_1, automaton_2);
+    product.findWitness(automaton_1.initialState(), automaton_2.initialState(),
+			witness);
 
-    printText(" ok\n", 0);
-
-    /*
-     *  Search the intersection automaton for an accepting execution. This is
-     *  done `indirectly' as follows:
-     *
-     *      1.  Convert the intersection automaton into a StateSpace, i.e.,
-     *          construct a StateSpace which shares a similar transition
-     *          relation with the automaton.
-     *      2.  Construct a `dummy' single-state Büchi automaton which
-     *          accepts all inputs.
-     *      3.  Compute the synchronous product of the state space and the
-     *          automaton. The obtained product automaton again has the same
-     *          transition relation as the original intersection automaton
-     *          (state identifiers may have been permuted; however, the
-     *          product automaton contains information about the
-     *          correspondence between the state identifiers of the product 
-     *          automaton and the original intersection automaton).
-     *      4.  Switch the roles of the state space and the Büchi automaton in
-     *          the product to effectively transfer state acceptance
-     *          information to the product automaton from the automaton
-     *          intersection.
-     *      5.  Search an accepting cycle in the product automaton. This then
-     *          corresponds to an accepting execution of the intersection
-     *          automaton.
-     */
-    
-    StateSpace automaton_as_statespace
-      (configuration.formula_options.formula_generator.
-         number_of_available_variables,
-       a->size());
-
-    /*
-     *  1.
-     */
-
-    for (BuchiAutomaton::size_type state = 0; state < a->size(); state++)
-    {
-      for (GraphEdgeContainer::const_iterator transition
-	     = (*a)[state].edges().begin();
-	   transition != (*a)[state].edges().end();
-	   ++transition)
-	automaton_as_statespace.connect(state, (*transition)->targetNode());
-    }
-
-    /*
-     *  2.
-     */
-
-    BuchiAutomaton dummy_automaton(1, 0, 0);
-    dummy_automaton.connect(0, 0, &Ltl::True::construct());
-
-    /*
-     *  3.
-     */
-
-    ProductAutomaton p;
-    p.computeProduct(dummy_automaton, automaton_as_statespace, false);
-
-    /*
-     *  4.
-     */
-
-    p.buchi_automaton = a;
-    p.statespace_size = 1;
-
-    /*
-     *  5.
-     */
-
-    pair<deque<BuchiAutomaton::StateIdPair,
-               ALLOC(BuchiAutomaton::StateIdPair) >,
-         deque<BuchiAutomaton::StateIdPair,
-               ALLOC(BuchiAutomaton::StateIdPair) > >
-      execution;
-
-    try
-    {
-      printText("<searching for accepting execution in automata intersection>",
-		0, 2);
-
-      p.findAcceptingExecution(0, execution);
-    }
-    catch (...)
-    {
-      printText(" error\n", 0);
-      throw;
-    }
-
-    printText(" ok\n\n", 0);
-
-    /*
-     *  Extract the state identifiers belonging to the execution of the
-     *  intersection automaton from the result.
-     */
-
-    vector<StateSpace::size_type, ALLOC(StateSpace::size_type) > path;
-
-    for (deque<BuchiAutomaton::StateIdPair,
-	       ALLOC(BuchiAutomaton::StateIdPair) >::const_iterator
-	   state = execution.first.begin();
-	 state != execution.first.end();
-	 ++state)
-      path.push_back(state->first);
-
-    const vector<StateSpace::size_type, ALLOC(StateSpace::size_type) >
-      ::size_type loop_pos = path.size();
-
-    for (deque<BuchiAutomaton::StateIdPair,
-	       ALLOC(BuchiAutomaton::StateIdPair) >::const_iterator
-	   state = execution.second.begin();
-	 state != execution.second.end();
-	 ++state)
-      path.push_back(state->first);
-
-    /*
-     *  Construct an execution accepted by both of the automata. This is done
-     *  by giving suitable truth assignments for the atomic propositions in
-     *  'path.size()' states, where `path' corresponds to an accepting run of
-     *  the intersection automaton. (The state space representing the
-     *  intersection automaton is reused for this purpose, since it is not
-     *  needed any longer.) In addition, `prefix' and `cycle' (required for
-     *  displaying the execution) are built to refer to the reused states.
-     */
-
-    deque<StateSpace::size_type, ALLOC(StateSpace::size_type) > prefix, cycle;
-
-    /*
-     *  Ensure that the state space is large enough to contain the execution
-     *  (the execution may pass several times through a state in the
-     *  intersection automaton).
-     */
-
-    if (automaton_as_statespace.size() < path.size())
-      automaton_as_statespace.expand
-	(path.size() - automaton_as_statespace.size());
-
-    path.push_back(path[loop_pos]); /* use the first state of the cycle as a
-				     * temporary sentinel element
-				     */
-
-    for (vector<StateSpace::size_type, ALLOC(StateSpace::size_type) >
-	   ::size_type state = 0;
-	 state + 1 < path.size();
-	 ++state)
-    {
-      GraphEdgeContainer::const_iterator transition;
-
-      for (transition = (*a)[path[state]].edges().begin();
-	   (*transition)->targetNode() != path[state + 1];
-	   ++transition)
-	;
-
-      automaton_as_statespace[state].positiveAtoms()
-	= static_cast<BuchiAutomaton::BuchiTransition*>(*transition)
-            ->guard().findPropositionalModel
-	        (configuration.formula_options.formula_generator.
-		   number_of_available_variables);
-
-      (state < loop_pos ? prefix : cycle).push_back(state);
-    }
-
-    path.pop_back(); /* remove the sentinel element */
-
-    delete a;
-    a = 0;
-
-    /*
-     *  Display the input sequence accepted by both automata.
-     */
-
-    estream << string(indent + 2, ' ')
-               + "Execution M accepted by both automata:\n";
-
-    printPath(stream, indent + 4, prefix, cycle, automaton_as_statespace);
-
-    estream << '\n';
-
-    /*
-     *  For each of the original automata, display the accepting runs that
-     *  these automata have on the input sequence.
-     */
-
-    deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) >
-      aut_prefix;
-
-    deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) >
-      aut_cycle;
-
-    for (int i = 0; i < 2; i++)
-    {
-      aut_prefix.clear();
-      aut_cycle.clear();
-
-      deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) >*
-	new_execution_states = &aut_prefix;
-
-      for (vector<StateSpace::size_type, ALLOC(StateSpace::size_type) >
-	     ::size_type state_id = 0;
-	   state_id < path.size();
-	   ++state_id)
-      {
-	if (state_id == loop_pos)
-	  new_execution_states = &aut_cycle;
-	new_execution_states->push_back
-	  (i == 0
-	   ? intersection_state_mapping[path[state_id]].first
-	   : intersection_state_mapping[path[state_id]].second);
-      }
-
-      synchronizePrefixAndCycle(aut_prefix, aut_cycle);
-
-      printAcceptingCycle(stream, indent + 2,
-			  (i == 0 ? algorithm1 : algorithm2),
-			  aut_prefix, aut_cycle,
-			  *(test_results[(i == 0 ? algorithm1 : algorithm2)].
-			      automaton_stats[i].buchi_automaton));
-    }
-
-    /*
-     *  Normalize the state identifiers in `path' to refer to the states that
-     *  give the valuations for atomic propositions along the execution.
-     */
-
-    for (vector<StateSpace::size_type, ALLOC(StateSpace::size_type) >
-	   ::size_type state = 0;
-	 state < path.size();
-	 ++state)
-      path[state] = state;
-
-    /*
-     *  Display a proof or a refutation for the formula in the execution.
-     */
-
-    estream << string(indent + 2, ' ')
-	       + "Analysis of the positive formula in the execution M:\n";
-
-    Ltl::PathEvaluator path_evaluator;
-    bool result = path_evaluator.evaluate
-      (*round_info.formulae[formula], automaton_as_statespace, path, loop_pos);
-
-    path_evaluator.print(stream, indent + 4);
-
-    printTextBlock(stream, indent + 2,
-		   " \n The positive formula is "
-		   + string(result ? "" : "not ")
-		   + "satisfied in the execution. This suggests that the "
-                     "Büchi automaton constructed for the "
-		   + (result ? "nega" : "posi") + "tive formula "
-		   + (algorithm1 == algorithm2
-		      ? ""
-		      : "(the automaton constructed by implementation "
-			+ configuration.algorithmString(result ? algorithm2
-							       : algorithm1)
-		        + ") ")
-		   + "is incorrect.\n",
-		   78);
+    if (witness.cycle.first.empty())
+      throw Exception
+	("UserCommands::printAutomatonAnalysisResults(...): internal error "
+	 "[witness construction failed]");
+  }
+  catch (const UserBreakException&)
+  {
+    printText(" user break\n", 0);
+    throw;
   }
   catch (...)
   {
-    if (a != 0)
-      delete a;
+    printText(" error\n", 0);
+    throw;
   }
+
+  printText(" ok\n", 0);
+
+  const unsigned long int valuation_size
+    = configuration.formula_options.formula_generator
+        .number_of_available_variables;
+  const StateSpace::size_type path_length
+    = witness.prefix.first.size() + witness.cycle.first.size();
+  StateSpace path(valuation_size, path_length);
+
+  StateSpace::size_type state = 0;
+  StateSpace::Path::const_iterator p1, p2;
+  StateSpace::Path path_prefix, path_cycle;
+
+  for (int i = 0; i < 2; ++i)
+  {
+    const pair<StateSpace::Path, StateSpace::Path>* witness_segment;
+    StateSpace::Path* path_segment;
+
+    if (i == 0)
+    {
+      witness_segment = &witness.prefix;
+      path_segment = &path_prefix;
+    }
+    else
+    {
+      witness_segment = &witness.cycle;
+      path_segment = &path_cycle;
+    }
+
+    for (p1 = witness_segment->first.begin(), 
+	   p2 = witness_segment->second.begin();
+	 p1 != witness_segment->first.end();
+	 ++p1, ++p2, ++state)
+    {
+      ::Ltl::LtlFormula* f
+	= &::Ltl::And::construct
+	     (static_cast<const BuchiAutomaton::BuchiTransition&>(p1->edge())
+	        .guard(),
+	      static_cast<const BuchiAutomaton::BuchiTransition&>(p2->edge())
+	        .guard());
+
+      path[state].positiveAtoms().copy
+	(f->findPropositionalModel(valuation_size - 1), valuation_size);
+
+      path_segment->push_back(StateSpace::PathElement(state, 0));
+
+      ::Ltl::LtlFormula::destruct(f);
+    }
+  }
+
+  /*
+   *  Display the input sequence accepted by both automata.
+   */
+
+  estream << string(indent + 2, ' ')
+             + "Execution M accepted by both automata:\n";
+
+  printPath(stream, indent + 4, path_prefix, path_cycle, path);
+
+  estream << '\n';
+
+  /*
+   *  For each of the original automata, display the accepting runs that
+   *  these automata have on the input sequence.
+   */
+
+  for (int i = 0; i < 2; ++i)
+  {
+    const BuchiAutomaton::Path* prefix;
+    const BuchiAutomaton::Path* cycle;
+
+    if (i == 0)
+    {
+      prefix = &witness.prefix.first;
+      cycle = &witness.cycle.first;
+    }
+    else
+    {
+      prefix = &witness.prefix.second;
+      cycle = &witness.cycle.second;
+    }
+
+    printAcceptingCycle(stream, indent + 2, (i == 0 ? algorithm1 : algorithm2),
+			*prefix, *cycle,
+			*(test_results[i == 0 ? algorithm1 : algorithm2]
+			    .automaton_stats[i].buchi_automaton),
+			path_prefix, path_cycle, path);
+
+    estream << '\n';
+  }
+
+  /*
+   *  Display a proof or a refutation for the formula in the execution.
+   */
+
+  estream << string(indent + 2, ' ')
+	     + "Analysis of the positive formula in the execution M:\n";
+
+  Ltl::PathEvaluator path_evaluator;
+  bool result = path_evaluator.evaluate(*round_info.formulae[formula],
+					path_prefix, path_cycle, path);
+
+  path_evaluator.print(stream, indent + 4);
+
+  printTextBlock(stream, indent + 2,
+		 " \n The positive formula is " + string(result ? "" : "not ")
+		 + "satisfied in the execution. This suggests that the "
+                   "Büchi automaton constructed for the "
+		 + (result ? "nega" : "posi") + "tive formula "
+		 + (algorithm1 == algorithm2
+		    ? ""
+		    : "(the automaton constructed by implementation "
+		      + configuration.algorithmString(result ? algorithm2
+						             : algorithm1)
+		      + ") ")
+		 + "is incorrect.",
+		 78);
 }
 
 /* ========================================================================= */
 void printPath
-  (ostream& stream, int indent,
-   const deque<StateSpace::size_type, ALLOC(StateSpace::size_type) >& prefix,
-   const deque<StateSpace::size_type, ALLOC(StateSpace::size_type) >& cycle,
-   const StateSpace& path)
+  (ostream& stream, int indent, const StateSpace::Path& prefix,
+   const StateSpace::Path& cycle, const StateSpace& path)
 /* ----------------------------------------------------------------------------
  *
- * Description:   Writes information about a single execution path to a stream.
+ * Description:   Writes information about a path in a state space to a stream.
  *
  * Arguments:     stream  --  A reference to an output stream.
  *                indent  --  Number of spaces to leave to the left of output.
- *                prefix  --  A reference to a constant deque of state
- *                            identifiers forming the prefix of the execution.
- *                cycle   --  A reference to a constant deque of state
- *                            identifiers forming the infinitely repeating
- *                            cycle in the execution.
- *                path    --  A reference to the constant state space from
- *                            which the state identifiers in the deques are
- *                            taken.
+ *                prefix  --  The prefix of the path.
+ *                cycle   --  The cycle of the path.
+ *                path    --  The state space to which the state identifiers in
+ *                            the prefix and the cycle refer.
  *
  * Returns:       Nothing.
  *
@@ -1157,65 +919,59 @@ void printPath
 {
   Exceptional_ostream estream(&stream, ios::badbit | ios::failbit);
 
-  const deque<StateSpace::size_type, ALLOC(StateSpace::size_type) >*
-    execution_states;
+  const StateSpace::Path* path_segment;
 
-  for (int counter = 0; counter < 2; counter++)
+  for (int i = 0; i < 2; ++i)
   {
+    if (i == 0 && prefix.empty())
+      continue;
+
     estream << string(indent, ' ');
-
-    if (counter == 0)
+    if (i == 0)
     {
-      execution_states = &prefix;
-      estream << "prefix:";
+      path_segment = &prefix;
+      estream << "prefix";
     }
     else
     {
-      execution_states = &cycle;
-      estream << "cycle: ";
+      path_segment = &cycle;
+      estream << "cycle";
     }
+    estream << ":\n";
 
-    estream << string(6, ' ') + "< ";
+    bool first_printed;
 
-    if (!execution_states->empty())
+    for (StateSpace::Path::const_iterator path_element = path_segment->begin();
+	 path_element != path_segment->end();
+	 ++path_element)
     {
-      bool first_printed;
+      if (path_element != path_segment->begin())
+	estream << toString(path_element->node()) + "\n";
+      estream << string(indent + 2, ' ') + 's' + toString(path_element->node())
+                 + " {";
 
-      for (deque<StateSpace::size_type, ALLOC(StateSpace::size_type) >
-	     ::const_iterator execution_state = execution_states->begin();
-	   execution_state != execution_states->end();
-	   ++execution_state)
+      first_printed = false;
+      for (unsigned long int proposition = 0;
+	   proposition < path.numberOfPropositions();
+	   ++proposition)
       {
-	if (execution_state != execution_states->begin())
-	  estream << ",\n" + string(indent + 15, ' ');
-
-	estream << 's' + toString(*execution_state) + "  {";
-
-	first_printed = false;
-
-	for (unsigned long int proposition = 0;
-	     proposition < path.numberOfPropositions();
-	     proposition++)
+	if (path[path_element->node()].positiveAtoms().test(proposition))
 	{
-	  if (path[*execution_state].positiveAtoms().test(proposition))
-	  {
-	    if (first_printed)
-	      estream << ", ";
-	    else
-	      first_printed = true;
+	  if (first_printed)
+	    estream << ',';
+	  else
+	    first_printed = true;
 
-	    estream << 'p' + toString(proposition);
-	  }
+	  estream << 'p' + toString(proposition);
 	}
-
-	estream << '}';
       }
+
+      estream << "} --> s";
     }
-    else
-      estream << "empty";
-    
-    estream << " >\n";
+    estream << toString(cycle.begin()->node()) + "\n";
   }
+
+  estream.flush();
 }
 
 /* ========================================================================= */
@@ -1224,39 +980,40 @@ void printAcceptingCycle
    vector<Configuration::AlgorithmInformation,
           ALLOC(Configuration::AlgorithmInformation) >::size_type
      algorithm_id,		
-   const deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) >&
-     prefix,
-   const deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) >&
-     cycle,
-   const BuchiAutomaton& automaton)
+   const BuchiAutomaton::Path& aut_prefix,
+   const BuchiAutomaton::Path& aut_cycle,
+   const BuchiAutomaton& automaton, const StateSpace::Path& path_prefix,
+   const StateSpace::Path& path_cycle, const StateSpace& path)
 /* ----------------------------------------------------------------------------
  *
- * Description:   Writes information about a single automaton execution to a
- *                stream.
+ * Description:   Writes information about an execution of a Büchi automaton to
+ *                a stream.
  *
  * Arguments:     stream        --  A reference to an output stream.
  *                indent        --  Number of spaces to leave to the left of
  *                                  output.
  *                algorithm_id  --  Identifier for an algorithm.
- *                prefix        --  A reference to a constant deque of state
- *                                  identifiers forming the prefix of the
- *                                  execution.
- *                cycle         --  A reference to a constant deque of state
- *                                  identifiers forming the infinitely
- *                                  repeating cycle in the execution.
- *                automaton     --  A reference to a constant BuchiAutomaton
- *                                  from which the state identifiers in the
- *                                  deques are taken.
+ *                aut_prefix    --  The prefix of a path in a Büchi automaton.
+ *                aut_cycle     --  The cycle of a path in a Büchi automaton.
+ *                automaton     --  The Büchi automaton to which the state
+ *                                  identifiers in `aut_prefix' and `aut_cycle'
+ *                                  refer.
+ *                path_prefix   --  The prefix of a path in a state space.
+ *                                  (This path is interpreted as the input for
+ *                                  the Büchi automaton.)  It is assumed that
+ *                                  `path_prefix.size() == aut_prefix.size()'.
+ *                path_cycle    --  The cycle of a path in a state space.  It
+ *                                  is assumed that `path_cycle.size() ==
+ *                                  aut_cycle.size()'.
+ *                path          --  The state space to which the state
+ *                                  identifiers in `path_prefix' and
+ *                                  `path_cycle' refer.
  *
  * Returns:       Nothing.
  *
  * ------------------------------------------------------------------------- */
 {
   Exceptional_ostream estream(&stream, ios::badbit | ios::failbit);
-
-  const deque<BuchiAutomaton::size_type, ALLOC(BuchiAutomaton::size_type) >*
-    execution_states;
-  bool first_printed;
 
   printTextBlock(stream, indent,
 		 "On input M, the automaton constructed by implementation "
@@ -1267,76 +1024,97 @@ void printAcceptingCycle
                  + ") has the following accepting execution:",
 		 78);
 
-  for (int counter = 0; counter < 2; counter++)
-  {
-    estream << string(indent + 2, ' ');
+  const BuchiAutomaton::Path* aut_segment;
+  const StateSpace::Path* path_segment;
+  BuchiAutomaton::Path::const_iterator aut_state;
+  StateSpace::Path::const_iterator path_state;
 
-    if (counter == 0)
+  for (int i = 0; i < 2; ++i)
+  {
+    if (i == 0 && aut_prefix.empty())
+      continue;
+
+    estream << string(indent + 2, ' ');
+    if (i == 0)
     {
       estream << "prefix";
-      execution_states = &prefix;
+      aut_segment = &aut_prefix;
+      path_segment = &path_prefix;
     }
     else
     {
       estream << "cycle";
-      execution_states = &cycle;
+      aut_segment = &aut_cycle;
+      path_segment = &path_cycle;
     }
-
     estream << ":\n";
 
-    string execution_string = "<";
-
-    if (!execution_states->empty())
+    bool first_printed = false;
+    for (aut_state = aut_segment->begin(), path_state = path_segment->begin();
+	 aut_state != aut_segment->end();
+	 ++aut_state, ++path_state)
     {
-      first_printed = false;
-	  
-      for (deque<BuchiAutomaton::size_type,
-	         ALLOC(BuchiAutomaton::size_type) >::const_iterator
-	     execution_state = execution_states->begin();
-	   execution_state != execution_states->end();
-	   ++execution_state)
+      estream << string(indent + 4, ' ') + toString(aut_state->node()) + ' ';
+	
+      const BitArray* bits;
+      for (int j = 0; j < 2; ++j)
       {
-	if (first_printed)
-	  execution_string += ", ";
-	else
-	  first_printed = true;
-	execution_string += toString(*execution_state);
+	bits = (j == 0
+		? &automaton[aut_state->node()].acceptanceSets()
+		: &static_cast<const BuchiAutomaton::BuchiTransition&>
+                     (aut_state->edge()).acceptanceSets());
+	first_printed = false;
 
-	if (counter == 1)
-	{
-	  bool first_acceptance_set_printed = false;
-
-	  for (unsigned long int accept_set = 0;
-	       accept_set < automaton.numberOfAcceptanceSets();
-	       accept_set++)
+	for (unsigned long int accept_set = 0;
+	     accept_set < automaton.numberOfAcceptanceSets();
+	     ++accept_set)
+        {
+	  if (bits->test(accept_set))
 	  {
-	    if (automaton[*execution_state].acceptanceSets().test(accept_set))
+	    if (first_printed)
+	      estream << ',';
+	    else
 	    {
-	      if (first_acceptance_set_printed)
-		execution_string += ", ";
-	      else
-	      {
-		first_acceptance_set_printed = true;
-		execution_string += " [acceptance sets: {";
-	      }
-	      execution_string += toString(accept_set);
+	      first_printed = true;
+	      if (j == 1)
+		estream << "--";
+	      estream << '{';
 	    }
+	    estream << accept_set;
 	  }
+	}
 
-	  if (first_acceptance_set_printed)
-	    execution_string += "}]";
+	if (first_printed)
+	{
+	  estream << "}";
+	  if (j == 0)
+	    estream << ' ';
 	}
       }
+
+      estream << "--> " + toString(aut_state->edge().targetNode()) + "  [ {"; 
+      bits = &path[path_state->node()].positiveAtoms();
+      first_printed = false;
+      for (unsigned long int proposition = 0;
+	   proposition < path.numberOfPropositions();
+	   ++proposition)
+      {
+	if (bits->test(proposition))
+	{
+	  if (first_printed)
+	    estream << ',';
+	  else
+	    first_printed = true;
+	  estream << 'p' + toString(proposition);
+	}
+      }
+      estream << "} |== ";
+      static_cast<const BuchiAutomaton::BuchiTransition&>(aut_state->edge())
+	.guard().print(estream);
+      estream << " ]\n";
     }
-    else
-      execution_string += "empty";
-
-    execution_string += ">";
-
-    printTextBlock(stream, indent + 4, execution_string, 78);
   }
 
-  estream << '\n';
   estream.flush();
 }
  
@@ -1367,15 +1145,16 @@ void printBuchiAutomaton
 {
   Exceptional_ostream estream(&stream, ios::badbit | ios::failbit);
 
-  unsigned long int algorithm = parseNumber(input_tokens[1]);
-
-  verifyNumber(algorithm, round_info.number_of_translators,
-	       "No such implementation");
-
+  unsigned long int algorithm = parseAlgorithmId(input_tokens[1]);
   int formula
     = (configuration.formula_options.output_mode == Configuration::NNF
        ? 0 : 2)
       + (formula_type ? 0 : 1);
+
+  if (configuration.isInternalAlgorithm(algorithm))
+    throw CommandErrorException
+            ("This feature is not available for lbtt's internal "
+	     "model checking algorithm.");
 
   if (!test_results[algorithm].automaton_stats[formula_type ? 0 : 1].
          buchiAutomatonComputed())
@@ -1385,7 +1164,7 @@ void printBuchiAutomaton
 		   + configuration.algorithmString(algorithm)
 		   + " for the formula `"
 		   + toString(*round_info.formulae[formula])
-		   + "'.\n",
+		   + "'.",
 		   78);
     return;
   }
@@ -1415,22 +1194,27 @@ void printBuchiAutomaton
       estream << string(indent + 2, ' ') + "The automaton is empty.\n";
     else
     {
-      set<unsigned long int, less<unsigned long int>,
-                                  ALLOC(unsigned long int) > states;
+      IntervalList states;
 
       if (input_tokens.size() == 2)
 	input_tokens.push_back("*");
 
-      parseInterval(input_tokens[2], states, 0, automaton->size() - 1);
-
-      for (set<unsigned long int, less<unsigned long int>,
-               ALLOC(unsigned long int) >::const_iterator
-	     state = states.begin();
-	   state != states.end(); ++state)
+      try
       {
-	verifyNumber(*state, automaton->size(),
-		     "State identifier out of range");
+	parseIntervalList(input_tokens[2], states, 0, automaton->size() - 1);
+      }
+      catch (const IntervalRangeException& e)
+      {
+	throw CommandErrorException
+	  (string("State identifier out of range (")
+	   + toString(e.getNumber())
+	   + ").");
+      }
 
+      for (IntervalList::const_iterator state = states.begin();
+	   state != states.end();
+	   ++state)
+      {
 	estream << string(indent + 2, ' ') + "State " + toString(*state)
                    + (*state == automaton->initialState()
 		      ? " (initial state)" : "") + ":\n";
@@ -1442,7 +1226,6 @@ void printBuchiAutomaton
   else if (fmt == Graph::DOT)
     automaton->print(stream, indent, Graph::DOT);
 
-  estream << '\n';
   estream.flush();
 }
 
@@ -1472,13 +1255,10 @@ void evaluateFormula
 {
   Exceptional_ostream estream(&stream, ios::failbit | ios::badbit);
 
-  set<unsigned long int, less<unsigned long int>, ALLOC(unsigned long int) >
-    algorithms;
-  set<unsigned long int, less<unsigned long int>, ALLOC(unsigned long int) >
-    system_states;
+  IntervalList algorithms;
+  IntervalList system_states;
   string algorithm_name;
   int formula = (formula_type ? 0 : 1);
-  bool show_path_eval_results = false;
 
   if (!configuration.global_options.do_comp_test
       && !configuration.global_options.do_cons_test)
@@ -1488,55 +1268,16 @@ void evaluateFormula
   if (round_info.statespace == 0)
     throw CommandErrorException("No state space was generated in this test "
                                 "round.");
-  string algorithm_list;
+
+  /*
+   *  If no list of algorithms was given as an argument, show the results of
+   *  all algorithms.
+   */
 
   if (input_tokens.size() < 2)
-  {
-    /*
-     *  If no list of algorithms was given as an argument, show the results of
-     *  all algorithms.
-     */
-
-    algorithm_list = "*";
     input_tokens.push_back("*");
-    show_path_eval_results
-      = ((configuration.global_options.statespace_generation_mode
-	    & Configuration::PATH) != 0);
-  }
-  else
-  {
-    /*
-     *  Otherwise parse the list of algorithms. Test also whether the internal
-     *  model checking algorithm was included in the list.
-     */
 
-    vector<string, ALLOC(string) > algorithm_list_elements;
-    sliceString(input_tokens[1], ",", algorithm_list_elements);
-
-    for (vector<string, ALLOC(string) >::const_iterator alg
-	   = algorithm_list_elements.begin();
-	 alg != algorithm_list_elements.end();
-	 ++alg)
-    {
-      if (algorithm_list.length() > 0)
-	algorithm_list += ',';
-
-      if (*alg == "p")
-      {
-	if ((configuration.global_options.statespace_generation_mode
-	      & Configuration::PATH) == 0)
-	  throw CommandErrorException("This feature is available only when "
-				      "using paths as state spaces.");
-	else
-	  show_path_eval_results = true;
-      }
-      else
-	algorithm_list += *alg;
-    }
-  }
-
-  parseInterval(algorithm_list, algorithms, 0,
-		round_info.number_of_translators - 1);
+  parseAlgorithmIdList(input_tokens[1], algorithms);
 
   /*
    *  If no list of states was given, show information about all states.
@@ -1547,8 +1288,18 @@ void evaluateFormula
   if (input_tokens.size() < 3)
     input_tokens.push_back("*");
 
-  parseInterval(input_tokens[2], system_states, 0,
-		round_info.real_emptiness_check_size - 1);
+  try
+  {
+    parseIntervalList(input_tokens[2], system_states, 0,
+		      round_info.real_emptiness_check_size - 1);
+  }
+  catch (const IntervalRangeException& e)
+  {
+    throw CommandErrorException
+      (string("State identifier out of range (")
+       + toString(e.getNumber())
+       + ").");
+  }
 
   estream << string(indent, ' ') + "Acceptance information:\n"
              + string(indent + 2, ' ') + "CTL* formula: E ";
@@ -1560,35 +1311,26 @@ void evaluateFormula
 
   estream << '\n';
 
-  for (set<unsigned long int, less<unsigned long int>,
-           ALLOC(unsigned long int) >::const_iterator
-	 state = system_states.begin();
+  for (IntervalList::const_iterator state = system_states.begin();
        state != system_states.end();
        ++state)
   {
-    verifyNumber(*state, round_info.real_emptiness_check_size,
-		 "State identifier out of range");
-
     estream << string(indent + 2, ' ') + "State " + toString(*state) + ":\n";
 
-    for (set<unsigned long int, less<unsigned long int>,
-             ALLOC(unsigned long int) >::const_iterator
-	   algorithm = algorithms.begin();
-         algorithm != algorithms.end();
-         ++algorithm)
+    for (IntervalList::const_iterator algorithm = algorithms.begin();
+	 algorithm != algorithms.end();
+	 ++algorithm)
     {
-      verifyNumber(*algorithm, round_info.number_of_translators,
-		   "No such implementation");
-
-      algorithm_name = configuration.algorithms[*algorithm].name
-	                 ->substr(0, 20);
+      algorithm_name = configuration.algorithms[*algorithm].name.substr(0, 20);
       estream << string(indent + 4, ' ') + toString(*algorithm) + ": "
                  + algorithm_name + ':'
                  + string(21 - algorithm_name.length(), ' ');
 
       if (!test_results[*algorithm].automaton_stats[formula].
              emptiness_check_performed)
-        estream << "emptiness check not performed\n";
+        estream << (configuration.isInternalAlgorithm(*algorithm)
+		    ? "model checking result not available\n" 
+		    : "emptiness check not performed\n");
       else
         estream << (test_results[*algorithm].automaton_stats[formula].
                       emptiness_check_result[*state]
@@ -1596,28 +1338,15 @@ void evaluateFormula
                     : "false")
                 << '\n';
     }
-
-    if (show_path_eval_results)
-    {
-      estream << string(indent + 4, ' ') + "lbtt:                    ";
-      if (!test_results[round_info.number_of_translators].
-	    automaton_stats[formula].emptiness_check_performed)
-	estream << "no model checking result available\n";
-      else
-	estream << (test_results[round_info.number_of_translators].
-	              automaton_stats[formula].emptiness_check_result[*state]
-		    ? "true"
-		    : "false")
-	        << '\n';
-    }
   }
 
-  estream << '\n';
   estream.flush();
 }    
 
 /* ========================================================================= */
-void printFormula(ostream& stream, int indent, bool formula_type)
+void printFormula
+  (ostream& stream, int indent, bool formula_type,
+   const vector<string, ALLOC(string) >& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `formula', i.e., displays the
@@ -1630,6 +1359,9 @@ void printFormula(ostream& stream, int indent, bool formula_type)
  *                indent        --  Number of spaces to leave on the left of
  *                                  the output.
  *                formula_type  --  Identifies the formula to be displayed.
+ *                input_tokens  --  A reference to a vector of strings
+ *                                  containing the arguments of the user
+ *                                  command.
  *
  * Returns:       Nothing.
  *
@@ -1641,16 +1373,29 @@ void printFormula(ostream& stream, int indent, bool formula_type)
 
   Exceptional_ostream estream(&stream, ios::failbit | ios::badbit);
 
-  estream << string(indent, ' ') + "Formula:" + string(17, ' ');
-  round_info.formulae[formula_type ? 2 : 3]->print(estream);
-
-  if (configuration.formula_options.output_mode == Configuration::NNF)
+  if (input_tokens.size() <= 1 || input_tokens[1] == "normal")
   {
-    estream << '\n' + string(indent, ' ') + "In negation normal form: ";
-    round_info.formulae[formula_type ? 0 : 1]->print(estream);
+    estream << string(indent, ' ');
+    round_info.formulae[formula_type ? 2 : 3]->print(estream);
   }
+  else if (input_tokens[1] == "nnf")
+  {
+    estream << string(indent, ' ');
+    if (configuration.formula_options.output_mode != Configuration::NNF)
+    {
+      ::Ltl::LtlFormula* f
+	  = round_info.formulae[formula_type ? 2 : 3]->nnfClone();
+      f->print(estream);
+      ::Ltl::LtlFormula::destruct(f);
+    }
+    else
+      round_info.formulae[formula_type ? 0 : 1]->print(estream);
+  }
+  else
+    throw CommandErrorException
+	    ("`" + input_tokens[1] + "' is not a valid formula mode.");
 
-  estream << "\n\n";
+  estream << '\n';
   estream.flush();
 }
   
@@ -1679,16 +1424,19 @@ void printCommandHelp
   TokenType command = _NO_INPUT;
 
   if (input_tokens.size() > 1)
+  {
     command = parseCommand(input_tokens[1]);
-
-  if (command == UNKNOWN)
-    estream << string(indent, ' ') + "Unknown command (`" + input_tokens[1]
-               + "').\n\n";
+    if (command == UNKNOWN)
+      estream << string(indent, ' ') + "Unknown command (`" + input_tokens[1]
+                 + "').\n\n";
+  }
 
   switch (command)
   {
     case ALGORITHMS :
-      estream << string(indent, ' ') + "algorithms\n";
+      estream << string(indent, ' ') + "algorithms\n"
+	         + string(indent, ' ') + "implementations\n"
+	         + string(indent, ' ') + "translators\n";
 
       printTextBlock(stream, indent + 4,
                      "List all implementations currently available for "
@@ -1794,21 +1542,21 @@ void printCommandHelp
 		     "positive formula. Leaving the list of implementations "
 		     "or the list of states unspecified will display the "
 		     "results for all implementations or all system states, "
-		     "respectively. If using paths as state spaces, the "
-		     "special symbol \"p\" in the implementation list will "
-		     "show also the results obtained with the internal "
-		     "model checking algorithm.",
+		     "respectively.",
                      78);
       break;
 
     case FORMULA :
-      estream << string(indent, ' ') + "formula [\"+\"|\"-\"]\n";
+      estream << string(indent, ' ')
+                 + "formula [\"+\"|\"-\"] [\"normal\"|\"nnf\"]\n";
 
       printTextBlock(stream, indent + 4,
                      "Display the LTL formula used in this test round for "
                      "generating Büchi automata (\"+\" denotes the positive "
-                     "formula, \"-\" the negated formula). If no formula is "
-                     "specified, show the positive formula.",
+                     "formula, \"-\" the negated formula; \"normal\" and "
+                     "\"nnf\" select between the display mode). If no formula "
+                     "(display mode) is specified, show the positive formula "
+                     "(the formula as generated).",
                      78);
       break;
 
@@ -1852,14 +1600,9 @@ void printCommandHelp
                      "Analyze a contradiction in the model checking results "
                      "of two implementations on a formula (\"+\" denotes the "
                      "positive formula, \"-\" the negated formula). If no "
-                     "formula is specified, use the positive formula. When "
-                     "using paths as state spaces, one of implementation "
-                     "identifiers can be replaced by the symbol \"p\" to "
-                     "analyze the result given by some implementation against "
-		     "that given by the internal model checking algorithm. "
-		     "The optional argument `state' can be used to specify "
-		     "the state of the state space in which to do the "
-		     "analysis.",
+                     "formula is specified, use the positive formula. The "
+		     "optional argument `state' can be used to specify the "
+		     "state of the state space in which to do the analysis.",
                      78);
       break;
 
@@ -1933,6 +1676,7 @@ void printCommandHelp
                      "evaluate\n"
 		     "formula\n"
                      "help\n"
+                     "implementations\n"
                      "inconsistencies\n"
                      "quit\n"
                      "resultanalysis\n"
@@ -1940,6 +1684,7 @@ void printCommandHelp
                      "skip\n"
                      "statespace\n"
                      "statistics\n"
+                     "translators\n"
                      "verbosity\n",
                      78);
 
@@ -1964,7 +1709,6 @@ void printCommandHelp
       break;
   }
 
-  estream << '\n';
   estream.flush();
 }
 
@@ -1990,13 +1734,17 @@ void printInconsistencies
 {
   Exceptional_ostream estream(&stream, ios::failbit | ios::badbit);
 
-  set<unsigned long int, less<unsigned long int>, ALLOC(unsigned long int) >
-    number_set;
+  IntervalList algorithms;
 
   if (!configuration.global_options.do_cons_test)
     throw CommandErrorException("This command is available only when the "
 				"model checking result consistency check is "
 				"enabled.");
+
+  if (input_tokens.size() == 1)
+    input_tokens.push_back("*");
+
+  parseAlgorithmIdList(input_tokens[1], algorithms);
 
   estream << string(indent, ' ') + "Model checking result consistency check "
                                    "results for round "
@@ -2011,23 +1759,13 @@ void printInconsistencies
 				  : 2]
 	  << '\n';
 
-  if (input_tokens.size() == 1)
-    input_tokens.push_back("*");
-
-  parseInterval(input_tokens[1], number_set, 0,
-                round_info.number_of_translators - 1);
-
-  for (set<unsigned long int, less<unsigned long int>,
-           ALLOC(unsigned long int) >::const_iterator
-	 algorithm = number_set.begin();
-       algorithm != number_set.end(); ++algorithm)
+  for (IntervalList::const_iterator algorithm = algorithms.begin();
+       algorithm != algorithms.end();
+       ++algorithm)
   {
-    estream << '\n';
-
-    verifyNumber(*algorithm, round_info.number_of_translators,
-		 "No such implementation");
-
-    estream << string(indent, ' ') + configuration.algorithmString(*algorithm)
+    estream << '\n'
+               + string(indent, ' ')
+               + configuration.algorithmString(*algorithm)
                + '\n';
 
     if (test_results[*algorithm].consistency_check_result == -1)
@@ -2075,7 +1813,6 @@ void printInconsistencies
     }
   }
 
-  estream << '\n';
   estream.flush();
 }
 
@@ -2100,43 +1837,42 @@ void printTestResults
  * ------------------------------------------------------------------------- */
 {
   Exceptional_ostream estream(&stream, ios::failbit | ios::badbit);
-  set<unsigned long int, less<unsigned long int>, ALLOC(unsigned long int) >
-    number_set;
-
-  estream << string(indent, ' ') + "Test results for round "
-             + toString(round_info.current_round) << ":\n";
+  IntervalList algorithms;
 
   if (input_tokens.size() == 1)
     input_tokens.push_back("*");
 
-  parseInterval(input_tokens[1], number_set, 0,
-                round_info.number_of_translators - 1);
+  parseAlgorithmIdList(input_tokens[1], algorithms);
 
-  for (set<unsigned long int, less<unsigned long int>,
-           ALLOC(unsigned long int) >::const_iterator
-	 algorithm = number_set.begin();
-       algorithm != number_set.end(); ++algorithm)
-  {
-    verifyNumber(*algorithm, round_info.number_of_translators,
-		 "No such implementation");
+  estream << string(indent, ' ') + "Test results for round "
+             + toString(round_info.current_round) << ":\n\n";
 
+  if (configuration.global_options.verbosity <= 2)
+    printStatTableHeader(stream, indent);
+
+  for (IntervalList::const_iterator algorithm = algorithms.begin();
+       algorithm != algorithms.end();
+       ++algorithm)
     printAllStats(stream, indent, *algorithm);
 
-    if (configuration.global_options.do_comp_test)
-    {
-      estream << string(indent, ' ')
-                 + "Model checking result cross-comparison:\n";
-      printCrossComparisonStats(stream, indent + 2, *algorithm);
-    }
+  if (configuration.global_options.verbosity <= 2)
+    estream << '\n';
 
-    if (configuration.global_options.do_intr_test)
-    {
-      estream << string(indent, ' ')
-                 + "Büchi automata intersection emptiness check:\n";
-      printBuchiIntersectionCheckStats(stream, indent + 2, *algorithm);
-    }
-    estream.flush();
+  if (configuration.global_options.do_comp_test)
+  {
+    estream << string(indent, ' ')
+               + "Model checking result cross-comparison:\n";
+    printCrossComparisonStats(stream, indent + 2, algorithms);
   }
+
+  if (configuration.global_options.do_intr_test)
+  {
+    estream << string(indent, ' ')
+               + "Büchi automata intersection emptiness check:\n";
+    printBuchiIntersectionCheckStats(stream, indent + 2, algorithms);
+  }
+
+  estream.flush();
 }
 
 /* ========================================================================= */
@@ -2161,8 +1897,7 @@ void printStateSpace
  * ------------------------------------------------------------------------- */
 {
   Exceptional_ostream estream(&stream, ios::failbit | ios::badbit);
-  set<unsigned long int, less<unsigned long int>, ALLOC(unsigned long int) >
-    number_set;
+  IntervalList states;
 
   if (!configuration.global_options.do_comp_test
       && !configuration.global_options.do_cons_test)
@@ -2175,22 +1910,28 @@ void printStateSpace
 
   if (fmt == Graph::NORMAL)
   {
-    estream << string(indent, ' ') + "State space information:\n";
-
     if (input_tokens.size() == 1)
       input_tokens.push_back("*");
 
-    parseInterval(input_tokens[1], number_set, 0,
-		  round_info.statespace->size() - 1);
-
-    for (set<unsigned long int, less<unsigned long int>,
-             ALLOC(unsigned long int) >::const_iterator
-	   state = number_set.begin();
-         state != number_set.end(); ++state)
+    try
     {
-      verifyNumber(*state, round_info.statespace->size(),
-		   "State identifier out of range");
+      parseIntervalList(input_tokens[1], states, 0,
+			round_info.statespace->size() - 1);
+    }
+    catch (const IntervalRangeException& e)
+    {
+      throw CommandErrorException
+	(string("State identifier out of range (")
+	 + toString(e.getNumber())
+	 + ").");
+    }
 
+    estream << string(indent, ' ') + "State space information:\n";
+
+    for (IntervalList::const_iterator state = states.begin();
+	 state != states.end();
+	 ++state)
+    {
       estream << string(indent, ' ') + "State " + toString(*state)
 	         + (*state == round_info.statespace->initialState()
 		    ? " (initial state)"
@@ -2205,7 +1946,6 @@ void printStateSpace
   else if (fmt == Graph::DOT)
     round_info.statespace->print(stream, indent, Graph::DOT);
 
-  estream << '\n';
   estream.flush();
 }
 
@@ -2263,31 +2003,25 @@ void changeAlgorithmState
  *
  * ------------------------------------------------------------------------- */
 {
-  set<unsigned long int, less<unsigned long int>, ALLOC(unsigned long int) >
-    algorithms;
+  IntervalList algorithms;
 
   if (input_tokens.size() < 2)
     input_tokens.push_back("*");
 
-  parseInterval(input_tokens[1], algorithms, 0,
-                round_info.number_of_translators - 1);
+  parseAlgorithmIdList(input_tokens[1], algorithms);
 
-  for (set<unsigned long int, less<unsigned long int>,
-           ALLOC(unsigned long int) >::const_iterator
-	 alg = algorithms.begin();
-       alg != algorithms.end(); alg++)
+  for (IntervalList::const_iterator algorithm = algorithms.begin();
+       algorithm != algorithms.end();
+       ++algorithm)
   {
-    verifyNumber(*alg, round_info.number_of_translators,
-		 "No such implementation");
-
     printText(string(enable ? "En" : "Dis")
 	      + "abling implementation "
-	      + configuration.algorithmString(*alg)
+	      + configuration.algorithmString(*algorithm)
 	      + ".\n",
 	      0,
 	      2);
     
-    configuration.algorithms[*alg].enabled = enable;
+    configuration.algorithms[*algorithm].enabled = enable;
   }
 
   round_info.cout << '\n';

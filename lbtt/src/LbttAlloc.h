@@ -22,11 +22,7 @@
 
 #include <config.h>
 
-#ifdef HAVE_SINGLE_CLIENT_ALLOC
-#define ALLOC(typename) single_client_alloc
-#else
 #define ALLOC(typename) allocator<typename>
-#endif /* HAVE_SINGLE_CLIENT_ALLOC */
 
 #ifdef HAVE_OBSTACK_H
 

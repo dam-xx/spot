@@ -42,6 +42,11 @@ extern Configuration configuration;
 namespace StatDisplay
 {                                                    
 
+void printStatTableHeader                           /* Displays a table  */
+  (ostream& stream, int indent);                    /* header for test
+						     * statistics.
+						     */
+
 void printBuchiAutomatonStats                       /* Displays information */
   (ostream& stream,                                 /* about a Büchi        */
    int indent,                                      /* automaton.           */
@@ -74,17 +79,15 @@ void printConsistencyCheckStats                     /* Displays the result */
      algorithm);
 
 void printCrossComparisonStats                      /* Displays information */
-  (ostream& stream,                                 /* about the model      */
-   int indent,                                      /* checking result      */
-   vector<AlgorithmTestResults,                     /* cross-comparison     */
-          ALLOC(AlgorithmTestResults) >::size_type  /* check.               */
-     algorithm);
+  (ostream& stream, int indent,                     /* about the model      */
+   const IntervalList& algorithms);                 /* checking result      */
+                                                    /* cross-comparison     */
+                                                    /* check.               */
 
 void printBuchiIntersectionCheckStats               /* Displays the results  */
   (ostream& stream, int indent,                     /* of the Büchi automata */
-   vector<AlgorithmTestResults,                     /* intersection          */
-          ALLOC(AlgorithmTestResults) >::size_type  /* emptiness checks.     */
-     algorithm);
+   const IntervalList& algorithms);                 /* intersection          */
+                                                    /* emptiness checks.     */
  
 void printAllStats                                  /* A shorthand for       */
   (ostream& stream,                                 /* showing all the       */

@@ -36,23 +36,13 @@
 #include "Random.h"
 #include "SharedTestData.h"
 #include "StatDisplay.h"
+#include "TempFsysName.h"
 #include "TestOperations.h"
 #include "TestRoundInfo.h"
 #include "TestStatistics.h"
 #include "UserCommandReader.h"
 
 using namespace std;
-
-/******************************************************************************
- *
- * Handler for the SIGINT signal.
- *
- *****************************************************************************/
-
-RETSIGTYPE breakHandler(int)
-{
-  user_break = true;
-}
 
 
 
@@ -107,11 +97,118 @@ vector<TestStatistics, ALLOC(TestStatistics) >      /* Overall test        */
 
 /******************************************************************************
  *
+ * Functions for allocating and deallocating temporary file names.
+ *
+ *****************************************************************************/
+
+static void allocateTempFilenames()
+{
+  using SharedTestData::round_info;
+  round_info.formula_file_name[0] = new TempFsysName;
+  round_info.formula_file_name[0]->allocate("lbtt");
+  round_info.formula_file_name[1] = new TempFsysName;
+  round_info.formula_file_name[1]->allocate("lbtt");
+  round_info.automaton_file_name = new TempFsysName;
+  round_info.automaton_file_name->allocate("lbtt");
+  round_info.cout_capture_file = new TempFsysName;
+  round_info.cout_capture_file->allocate("lbtt");
+  round_info.cerr_capture_file = new TempFsysName;
+  round_info.cerr_capture_file->allocate("lbtt");
+}
+
+static void deallocateTempFilenames()
+{
+  using SharedTestData::round_info;
+  if (round_info.formula_file_name[0] != 0)
+  {
+    delete round_info.formula_file_name[0];
+    round_info.formula_file_name[0] = 0;
+  }
+  if (round_info.formula_file_name[1] != 0)
+  {
+    delete round_info.formula_file_name[1];
+    round_info.formula_file_name[1] = 0;
+  }
+  if (round_info.automaton_file_name != 0)
+  {
+    delete round_info.automaton_file_name;
+    round_info.automaton_file_name = 0;
+  }
+  if (round_info.cout_capture_file != 0)
+  {
+    delete round_info.cout_capture_file;
+    round_info.cout_capture_file = 0;
+  }
+  if (round_info.cerr_capture_file != 0)
+  {
+    delete round_info.cerr_capture_file;
+    round_info.cerr_capture_file = 0;
+  }
+}
+
+
+
+/******************************************************************************
+ *
+ * Handler for the SIGINT signal.
+ *
+ *****************************************************************************/
+
+static void breakHandler(int)
+{
+  user_break = true;
+}
+
+
+
+/******************************************************************************
+ *
+ * Default handler for signals that terminate the process.
+ *
+ *****************************************************************************/
+
+static void abortHandler(int signum)
+{
+  deallocateTempFilenames();
+  struct sigaction s;
+  s.sa_handler = SIG_DFL;
+  sigemptyset(&s.sa_mask);
+  s.sa_flags = 0;
+  sigaction(signum, &s, static_cast<struct sigaction*>(0));
+  raise(signum);
+}
+
+
+
+/******************************************************************************
+ *
+ * Function for installing signal handlers.
+ *
+ *****************************************************************************/
+
+static void installSignalHandler(int signum, void (*handler)(int))
+{
+  struct sigaction s;
+  sigaction(signum, static_cast<struct sigaction*>(0), &s);
+
+  if (s.sa_handler != SIG_IGN)
+  {
+    s.sa_handler = handler;
+    sigemptyset(&s.sa_mask);
+    s.sa_flags = 0;
+    sigaction(signum, &s, static_cast<struct sigaction*>(0));
+  }
+}
+
+
+
+/******************************************************************************
+ *
  * Test loop.
  *
  *****************************************************************************/
 
-void testLoop()
+bool testLoop()
 {
   using namespace DispUtil;
   using namespace SharedTestData;
@@ -135,13 +232,6 @@ void testLoop()
     = (global_options.interactive == Configuration::ALWAYS
        ? round_info.next_round_to_run
        : global_options.number_of_rounds + 1);
-
-  if (tmpnam(round_info.formula_file_name[0]) == 0
-      || tmpnam(round_info.formula_file_name[1]) == 0
-      || tmpnam(round_info.automaton_file_name) == 0
-      || tmpnam(round_info.cout_capture_file) == 0
-      || tmpnam(round_info.cerr_capture_file) == 0)
-    throw Exception("unable to allocate names for temporary files");
 
   /*
    *  If a name for the error log file was given in the configuration, create
@@ -222,19 +312,6 @@ void testLoop()
 #endif /* HAVE_RAND48 */
 
   /*
-   *  If using paths as state spaces, include the internal model checking
-   *  algorithm in the set of algorithms.
-   */
-
-  if (global_options.statespace_generation_mode & Configuration::PATH)
-  {
-    Configuration::AlgorithmInformation lbtt_info
-      = {new string("lbtt"), new string(), new string(), true};
-
-    configuration.algorithms.push_back(lbtt_info);
-  }
-
-  /*
    *  Intialize the vector for storing the test results for each
    *  implementation and the vector for collecting overall test statistics for
    *  each implementation.
@@ -271,21 +348,9 @@ void testLoop()
       = (round_info.current_round < round_info.next_round_to_run);
 	
     if (!round_info.skip)
-    {
-      if (!printText(string("Round ") + toString(round_info.current_round)
-		     + " of " + toString(global_options.number_of_rounds)
-		     + "\n\n",
-		     2))
-      {
-	if (global_options.verbosity == 1)
-	{
-	  if (round_info.current_round > 1)
-	    round_info.cout << ' ';
-	  round_info.cout << round_info.current_round;
-	  round_info.cout.flush();
-	}
-      }
-    }
+      printText(string("Round ") + toString(round_info.current_round)
+		+ " of " + toString(global_options.number_of_rounds) + "\n\n",
+		2);
 
     try
     {
@@ -399,7 +464,7 @@ void testLoop()
 
       if (user_break)
       {
-	printText("[User break]\n\n", 2, 4);
+	printText("[User break]\n\n", 1, 4);
 	throw UserBreakException();
       }
 
@@ -414,12 +479,17 @@ void testLoop()
 
 	if (global_options.statespace_generation_mode & Configuration::PATH
 	    && (global_options.do_cons_test || global_options.do_comp_test)
-	    && (!test_results[round_info.number_of_translators].
-		  automaton_stats[0].emptiness_check_performed))
+	    && (!test_results[round_info.number_of_translators - 1].
+		  automaton_stats[0].emptiness_check_performed)
+	    && configuration.algorithms[round_info.number_of_translators - 1].
+	         enabled)
 	  verifyFormulaOnPath();
 
 	if (!round_info.error)
         {
+	  if (global_options.verbosity == 2)
+	    ::StatDisplay::printStatTableHeader(round_info.cout, 4);
+
 	  unsigned long int num_enabled_implementations = 0;
 
 	  for (unsigned long int algorithm_id = 0;
@@ -431,81 +501,61 @@ void testLoop()
 
 	    num_enabled_implementations++;
 
+	    if (configuration.isInternalAlgorithm(algorithm_id))
+	      continue;
+
 	    printText(configuration.algorithmString(algorithm_id) + '\n',
-		      2, 4);
+		      3, 4);
 
 	    for (int counter = 0; counter < 2; counter++)
 	    {
 	      if (user_break)
 	      {
-		printText("[User break]\n\n", 2, 4);
+		printText("[User break]\n\n", 1, 4);
 		throw UserBreakException();
 	      }
 
-	      printText(string(counter == 1 ? "Negated" : "Positive")
-			+ " formula:\n",
-			2,
-			6);
+	      if (global_options.verbosity == 1
+		  || global_options.verbosity == 2)
+	      {
+		if (counter == 1)
+		  round_info.cout << '\n';
+		if (global_options.verbosity == 1)
+		  round_info.cout << round_info.current_round << ' ';
+		else
+		  round_info.cout << string(4, ' ');
+		changeStreamFormatting(cout, 2, 0, ios::right);
+		round_info.cout << algorithm_id << ' ';
+		restoreStreamFormatting(cout);
+		round_info.cout << (counter == 0 ? '+' : '-') << ' ';
+		round_info.cout.flush();
+	      }
+	      else
+		printText(string(counter == 1 ? "Negated" : "Positive")
+			  + " formula:\n",
+			  3,
+			  6);
 
 	      try
 	      {
-		try
-	        {
-		  round_info.product_automaton = 0;
+		/*
+		 *  Generate a Büchi automaton using the current algorithm.
+		 *  `counter' determines the formula which is to be
+		 *  translated into an automaton; 0 denotes the positive and
+		 *  1 the negated formula.
+		 */
 
+		generateBuchiAutomaton(counter, algorithm_id);
+
+		if (global_options.do_cons_test || global_options.do_comp_test)
+		{
 		  /*
-		   *  Generate a Büchi automaton using the current algorithm.
-		   *  `counter' determines the formula which is to be
-		   *  translated into an automaton; 0 denotes the positive and
-		   *  1 the negated formula.
+		   *  Find the system states from which an accepting
+		   *  execution cycle can be reached by checking the product
+		   *  automaton for emptiness.
 		   */
 
-		  generateBuchiAutomaton(counter, algorithm_id);
-
-		  if (global_options.do_cons_test
-		      || global_options.do_comp_test)
-		  {
-		    /*
-		     *  Compute the product of the Büchi automaton with the
-		     *  state space.
-		     */
-
-		    generateProductAutomaton(counter, algorithm_id);
-
-		    /*
-		     *  Find the system states from which an accepting
-		     *  execution cycle can be reached by checking the product
-		     *  automaton for emptiness.
-		     */
-
-		    performEmptinessCheck(counter, algorithm_id);
-		    
-		    /*
-		     *  If a product automaton was computed in this test round
-		     *  (it might have not if the emptiness checking result was
-		     *  already available), release the memory allocated for
-		     *  the product automaton.
-		     */
-
-		    if (round_info.product_automaton != 0)
-		    {
-		      printText("<deallocating memory>", 4, 8);
-
-		      delete round_info.product_automaton;
-		      round_info.product_automaton = 0;
-
-		      printText(" ok\n", 4);
-		    }
-		  }
-		}
-		catch (...)
-		{
-		  if (round_info.product_automaton != 0)
-		  {
-		    delete round_info.product_automaton;
-		    round_info.product_automaton = 0;
-		  }
-		  throw;
+		  performEmptinessCheck(counter, algorithm_id);
 		}
 	      }
 	      catch (const BuchiAutomatonGenerationException&)
@@ -541,7 +591,13 @@ void testLoop()
 		     emptiness_check_performed)
 	      performConsistencyCheck(algorithm_id);
 
-	    printText("\n", 2);
+	    printText("\n", 1);
+	  }
+
+	  if (global_options.verbosity == 2)
+	  {
+	    round_info.cout << '\n';
+	    round_info.cout.flush();
 	  }
 
 	  if (num_enabled_implementations > 0)
@@ -553,10 +609,7 @@ void testLoop()
 	       *  results obtained using the different algorithms.
 	       */
 
-	      if (num_enabled_implementations >= 2
-		  || (num_enabled_implementations == 1
-		      && global_options.statespace_generation_mode
-		           & Configuration::PATH))
+	      if (num_enabled_implementations >= 2)
 		compareResults();
 	    }
 
@@ -592,24 +645,16 @@ void testLoop()
      *  the testing should be paused to wait for user commands.
      */
 
+    if (round_info.error)
+      round_info.all_tests_successful = false;
+
     if (round_info.error
 	&& global_options.interactive == Configuration::ONERROR)
       round_info.next_round_to_stop = round_info.current_round;
 
     if (round_info.next_round_to_stop == round_info.current_round)
-    {
-      if (global_options.verbosity == 1)
-      {
-	round_info.cout << '\n';
-	round_info.cout.flush();
-      }
-
       ::UserCommandInterface::executeUserCommands();
-    }
   }
-
-  for (int i = 0; i < 2; i++)
-    removeFile(round_info.formula_file_name[i], 2);
 
   if (round_info.path_iterator != 0)
     delete round_info.path_iterator;
@@ -661,11 +706,13 @@ void testLoop()
     round_info.transcript_file.close();
   }
 
-  if (global_options.verbosity >= 1)
+  if (global_options.verbosity >= 2)
     printCollectiveStats(cout, 0);
 
   if (round_info.formula_input_file.is_open())
     round_info.formula_input_file.close();
+
+  return round_info.all_tests_successful;
 }
 
 
@@ -688,15 +735,27 @@ int main(int argc, char* argv[])
     if (!e.line_info.empty())
       cerr << ":" << configuration.global_options.cfg_filename << ":"
 	   << e.line_info;
-    cerr << ": " << e.what() << endl;
-    exit(-1);
+    cerr << ":" << e.what() << endl;
+    exit(2);
   }
 
   if (configuration.global_options.verbosity >= 3)
     configuration.print(cout);
 
   user_break = false;
-  signal(SIGINT, breakHandler);
+
+  installSignalHandler(SIGHUP, abortHandler);
+  installSignalHandler(SIGINT,
+		       configuration.global_options.handle_breaks
+		       ? breakHandler
+		       : abortHandler);
+  installSignalHandler(SIGQUIT, abortHandler);
+  installSignalHandler(SIGABRT, abortHandler);
+  installSignalHandler(SIGPIPE, abortHandler);
+  installSignalHandler(SIGALRM, abortHandler);
+  installSignalHandler(SIGTERM, abortHandler);
+  installSignalHandler(SIGUSR1, abortHandler);
+  installSignalHandler(SIGUSR2, abortHandler);
 
 #ifdef HAVE_OBSTACK_H
   obstack_alloc_failed_handler = &ObstackAllocator::failure;
@@ -708,18 +767,26 @@ int main(int argc, char* argv[])
 
   try 
   {
-    testLoop();
+    allocateTempFilenames();
+    if (!testLoop())
+    {
+      deallocateTempFilenames();
+      return 1;
+    }
   }
   catch (const Exception& e)
   {
-    cerr << argv[0] << ": " << e.what() << endl;
-    exit(-1);
+    deallocateTempFilenames();
+    cerr << endl << argv[0] << ": " << e.what() << endl;
+    exit(3);
   }
   catch (const bad_alloc&)
   {
-    cerr << argv[0] << ": out of memory" << endl;
-    exit(-1);
+    deallocateTempFilenames();
+    cerr << endl << argv[0] << ": out of memory" << endl;
+    exit(3);
   }
 
+  deallocateTempFilenames();
   return 0;
 }

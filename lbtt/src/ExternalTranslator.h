@@ -33,6 +33,7 @@
 #include "Exception.h"
 #include "LtlFormula.h"
 #include "translate.h"
+#include "TempFsysName.h"
 #include "TranslatorInterface.h"
 
 /******************************************************************************
@@ -98,13 +99,21 @@
  * from the names of the input/output files.  Each of these files should be
  * "registered" before calling the external program with the function
  *
- *    void registerTempFileObject
- *      (const string& filename, TempFileObject::Type t)
+ *    const char* registerTempFileObject
+ *      (const string& filename, const TempFsysName::NameType t,
+ *       const bool literal)
  *
- * where `filename' is the full name of the temporary file and `t' is a type
- * of the object (TempFileObject::FILE or TempFileObject::DIRECTORY).
+ * where `filename' is the prefix of a temporary file name, `t' is a type
+ * of the object (TempFsysName::FILE or TempFsysName::DIRECTORY), and
+ * `literal' specifies whether `filename' should be interpreted literally or
+ * not (if not, `filename' will be treated as a suggestion for the name
+ * of the temporary file).  If the name is to be interpreted literally,
+ * `filename' should contain the full path name of the temporary file to be
+ * created.  In all cases, the function returns the full path name of the
+ * temporary file or directory, or it throws an IOException (defined in
+ * Exception.h) if the creation fails.
  *
- * All files or directories registered using this function will then be
+ * All files or directories registered using this function will be
  * automatically deleted after the translation is finished or aborted.
  * The files or directories will be deleted in the reverse order of
  * registration, i.e., the most recently registered file/directory will be
@@ -115,55 +124,15 @@
 class ExternalTranslator : public TranslatorInterface
 {
 public:
-  /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-  class TempFileObject                              /* A class for storing */
-  {                                                 /* information about   */
-  public:                                           /* temporary files and
-						     * directories.
-						     */
-
-    enum Type {FILE, DIRECTORY};                    /* Types for a temporary
-						     * file object.
-						     */
-
-    TempFileObject                                  /* Constructor. */
-      (const string& filename = "", Type t = FILE);
-
-    ~TempFileObject();                              /* Destructor. */
-
-    const string& getName() const;                  /* Returns the filename
-						     * associated with the
-						     * object.
-						     */
-
-    Type getType() const;                           /* Returns the type of
-						     * the object.
-						     */
-
-  private:
-    string name;                                    /* Name of the file object.
-						     */
-
-    Type type;                                      /* Type of the file object.
-						     */
-
-    TempFileObject(const TempFileObject&);          /* Prevent copying and */
-    TempFileObject& operator=                       /* assignment of       */
-      (const TempFileObject&);                      /* TempFileObjects.    */
-  };
-
-  /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
   ExternalTranslator();                             /* Constructor. */
 
   ~ExternalTranslator();                            /* Destructor. */
 
-  TempFileObject& registerTempFileObject            /* Registers a temporary */
+  const char* registerTempFileObject                /* Registers a temporary */
     (const string& filename = "",                   /* file or directory     */
-     TempFileObject::Type                           /* such that it will be  */
-       t = TempFileObject::FILE);                   /* automatically deleted
-						     * when the translation
+     const TempFsysName::NameType                   /* such that it will be  */
+       t = TempFsysName::FILE,                      /* automatically deleted */
+     const bool literal = false);                   /* when the translation
 						     * is complete.
 						     */
 
@@ -205,17 +174,12 @@ private:
 						     * objects.
 						     */
 
-  stack<TempFileObject*,                            /* Stack for storing */
-        deque<TempFileObject*,                      /* temporary file    */
-              ALLOC(TempFileObject*) > >            /* information.      */
+  stack<TempFsysName*,                              /* Stack for storing */
+        deque<TempFsysName*,                        /* temporary file    */
+              ALLOC(TempFsysName*) > >              /* information.      */
     temporary_file_objects;
 
-  friend class KecWrapper;                          /* Friend declarations. */
-  friend class Ltl2AutWrapper;
-  friend class Ltl2BaWrapper;
-  friend class ProdWrapper;
-  friend class SpinWrapper;
-  friend class WringWrapper;
+  friend class SpinWrapper;                         /* Friend declarations. */
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -312,46 +276,6 @@ inline bool ExternalTranslator::execSuccess(int exitcode)
  * ------------------------------------------------------------------------- */
 {
   return (exitcode == 0);
-}
-
-
-
-/******************************************************************************
- *
- * Inline function definitions for class ExternalTranslator::TempFileObject.
- *
- *****************************************************************************/
-
-/* ========================================================================= */
-inline const string& ExternalTranslator::TempFileObject::getName() const
-/* ----------------------------------------------------------------------------
- *
- * Description:   Returns the name associated with the
- *                ExternalTranslator::TempFileObject.
- *
- * Arguments:     None.
- *
- * Returns:       The name associated with the object.
- *
- * ------------------------------------------------------------------------- */
-{
-  return name;
-}
-
-/* ========================================================================= */
-inline ExternalTranslator::TempFileObject::Type
-ExternalTranslator::TempFileObject::getType() const
-/* ----------------------------------------------------------------------------
- *
- * Description:   Returns the type of the ExternalTranslator::TempFileObject.
- *
- * Arguments:     None.
- *
- * Returns:       The type associated with the object.
- *
- * ------------------------------------------------------------------------- */
-{
-  return type;
 }
 
 

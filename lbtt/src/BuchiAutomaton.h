@@ -21,6 +21,7 @@
 #define BUCHIAUTOMATON_H
 
 #include <config.h>
+#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <string>
@@ -38,8 +39,7 @@ namespace Graph
 
 /******************************************************************************
  *
- * A class for representing Büchi automata with a single set of accepting
- * states.
+ * A class for representing generalized Büchi automata.
  *
  *****************************************************************************/
 
@@ -139,15 +139,19 @@ public:
   void connect                                      /* Connects two states   */
     (const size_type father,                        /* of the automaton with */
      const size_type child);                        /* an unguarded
-						     * transition.
+						     * transition with no
+						     * associated acceptance
+						     * sets.
 						     */
 
   void connect                                      /* Connects two states   */
     (const size_type father, const size_type child, /* of the automaton with */
-     ::Ltl::LtlFormula& guard);                     /* a transition guarded  */
-  void connect                                      /* by a propositional    */
-    (const size_type father, const size_type child, /* formula.              */
-     ::Ltl::LtlFormula* guard);
+     ::Ltl::LtlFormula& guard,                      /* a transition guarded  */
+     const BitArray& acc_sets);                     /* by a propositional    */
+  void connect                                      /* formula.              */
+    (const size_type father, const size_type child,
+     ::Ltl::LtlFormula* guard,
+     const BitArray& acc_sets);
 
   /* `disconnect' inherited from Graph<GraphEdgeContainer> */
 
@@ -167,12 +171,6 @@ public:
 						     * automaton.
 						     */
 
-  BuchiAutomaton* regularize() const;               /* Converts a generalized
-                                                     * automaton to an
-                                                     * automaton with one set
-						     * of accepting states.
-                                                     */
-
   void read(istream& input_stream);                 /* Reads the automaton
                                                      * from a stream.
                                                      */
@@ -181,16 +179,9 @@ public:
     (ostream& stream = cout,                        /* about the automaton */
      const int indent = 0,                          /* to a stream in      */
      const GraphOutputFormat fmt = NORMAL) const;   /* various formats
-						     * (determined by the
-						     * `fmt' argument).
+                                                     * (determined by the
+                                                     * `fmt' argument).
 						     */
-
-  static BuchiAutomaton* intersect                  /* Computes the        */
-    (const BuchiAutomaton& a1,                      /* intersection of two */
-     const BuchiAutomaton& a2,                      /* Büchi automata.     */
-     map<size_type, StateIdPair,
-         less<size_type>, ALLOC(StateIdPair) >*
-       intersection_state_mapping = 0);
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -227,13 +218,11 @@ class BuchiAutomaton::BuchiTransition : public Graph<GraphEdgeContainer>::Edge
 public:
   BuchiTransition                                   /* Constructor. */
     (const size_type target,
-     ::Ltl::LtlFormula* formula);
+     ::Ltl::LtlFormula* formula,
+     const BitArray& acc_sets,
+     unsigned long int num_acc_sets);
 
   ~BuchiTransition();                               /* Destructor. */
-
-private:
-
-public:
 
   /* `targetNode' inherited from Graph<GraphEdgeContainer>::Edge */
     
@@ -249,14 +238,24 @@ public:
                                                      * propositional formula
                                                      * guarding the transition.
                                                      */
+
+  BitArray& acceptanceSets();                       /* Returns the         */
+  const BitArray& acceptanceSets() const;           /* acceptance sets
+						     * associated with the
+						     * the transition.
+						     */
+
+  void print                                        /* Writes information   */
+    (ostream& stream,                               /* about the transition */
+     const int indent,                              /* (as a plain graph    */
+     const GraphOutputFormat fmt) const;            /* edge) to a stream.   */
     
   void print                                        /* Writes information   */
-    (ostream& stream = cout,                        /* about the transition */
-     const int indent = 0,                          /* to a stream in       */
-     const GraphOutputFormat fmt = NORMAL) const;   /* various formats
-						     * (determined by the
-						     * `fmt' argument).
-						     */
+    (ostream& stream,                               /* about the transition */
+     const int indent,                              /* to a stream in       */
+     const GraphOutputFormat fmt,                   /* various formats      */
+     const unsigned long int                        /* (determined by the   */
+       number_of_acceptance_sets) const;	    /* `fmt' argument).     */
 
 private:
   BuchiTransition(const BuchiTransition&);          /* Prevent copying and */
@@ -281,6 +280,11 @@ private:
                                                      * formula guarding the
                                                      * transition.
                                                      */
+
+  BitArray acceptance_sets;                         /* Acceptance sets
+						     * associated with the
+						     * transition.
+						     */
 };
 
 
@@ -372,7 +376,8 @@ inline void BuchiAutomaton::connect
  *
  * Description:   Connects two states of a BuchiAutomaton to each other with an
  *                unguarded transition (actually, a transition with a guard
- *                that is always true).
+ *                that is always true) with an empty set of acceptance
+ *                conditions.
  *
  * Arguments:     father  --  Source state identifier.
  *                child   --  Target state identifier.
@@ -381,50 +386,59 @@ inline void BuchiAutomaton::connect
  *
  * ------------------------------------------------------------------------- */
 {
-  connect(father, child, &(::Ltl::True::construct()));
+  BitArray acc_sets(number_of_acceptance_sets);
+  acc_sets.clear(number_of_acceptance_sets);
+  connect(father, child, &(::Ltl::True::construct()), acc_sets);
 }
 
 /* ========================================================================= */
 inline void BuchiAutomaton::connect
-  (const size_type father, const size_type child, ::Ltl::LtlFormula& guard)
+  (const size_type father, const size_type child, ::Ltl::LtlFormula& guard,
+   const BitArray& acc_sets)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Connects two states of a BuchiAutomaton to each other, using
  *                a LtlFormula (which is actually a propositional formula) to
  *                guard the transition between the states.
  *
- * Arguments:     father  --  Source state.
- *                child   --  Target state.
- *                guard   --  A reference to an LtlFormula (a propositional
- *                            formula) guarding the transition.
+ * Arguments:     father    --  Source state.
+ *                child     --  Target state.
+ *                guard     --  A reference to an LtlFormula (a propositional
+ *                              formula) guarding the transition.
+ *                acc_sets  --  A reference to a BitArray giving the
+ *                              acceptance sets associated with the transition.
  *
  * Returns:       Nothing.
  *
  * ------------------------------------------------------------------------- */
 {
-  connect(father, child, guard.clone());
+  connect(father, child, guard.clone(), acc_sets);
 }
 
 /* ========================================================================= */
 inline void BuchiAutomaton::connect
-  (const size_type father, const size_type child, ::Ltl::LtlFormula* guard)
+  (const size_type father, const size_type child, ::Ltl::LtlFormula* guard,
+   const BitArray& acc_sets)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Connects two states of a BuchiAutomaton to each other, using
  *                a LtlFormula (which is actually a propositional formula) to
  *                guard the transition between the states.
  *
- * Arguments:     father  --  Source state.
- *                child   --  Target state.
- *                guard   --  A pointer to an LtlFormula (a propositional
- *                            formula) guarding the transition. The transition
- *                            will "own" the guard formula.
+ * Arguments:     father    --  Source state.
+ *                child     --  Target state.
+ *                guard     --  A pointer to an LtlFormula (a propositional
+ *                              formula) guarding the transition. The
+ *                              transition will "own" the guard formula.
+ *                acc_sets  --  A reference to a BitArray giving the acceptance
+ *                              sets associated with the transition.
  *
  * Returns:       Nothing.
  *
  * ------------------------------------------------------------------------- */
 {
-  BuchiTransition* new_buchi_transition = new BuchiTransition(child, guard);
+  BuchiTransition* new_buchi_transition
+    = new BuchiTransition(child, guard, acc_sets, number_of_acceptance_sets);
 
   try
   {
@@ -512,39 +526,28 @@ inline istream& operator>>(istream& stream, BuchiAutomaton& automaton)
 
 /* ========================================================================= */
 inline BuchiAutomaton::BuchiTransition::BuchiTransition
-  (const size_type target, ::Ltl::LtlFormula* formula) :
-  Edge(target), guard_formula(formula)
+  (const size_type target, ::Ltl::LtlFormula* formula,
+   const BitArray& acc_sets, unsigned long int num_acc_sets) :
+  Edge(target), guard_formula(formula), acceptance_sets(num_acc_sets)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Constructor for class BuchiAutomaton::BuchiTransition.
  *                Initializes a new transition to a BuchiState, guarded by an
  *                LtlFormula (which is actually a propositional formula).
  *                
- * Arguments:     target   --  Identifier of the target state of the automaton.
- *                formula  --  A pointer to a propositional formula guarding
- *                             the transition.
+ * Arguments:     target    --  Identifier of the target state of the
+ *                              automaton.
+ *                formula   --  A pointer to a propositional formula guarding
+ *                              the transition.
+ *                acc_sets  --  A reference to a constant BitArray containing
+ *                              the acceptance sets associated with the
+ *                              transition.
  *
  * Returns:       Nothing.
  *
  * ------------------------------------------------------------------------- */
 {
-}
-
-/* ========================================================================= */
-inline BuchiAutomaton::BuchiTransition::BuchiTransition
-  (const BuchiTransition& transition) :
-  Edge(transition), guard_formula(transition.guard_formula->clone())
-/* ----------------------------------------------------------------------------
- *
- * Description:   Copy constructor for class BuchiAutomaton::BuchiTransition.
- *                Creates a copy of a BuchiTransition object.
- *
- * Arguments:     transition  --  BuchiTransition to be copied.
- *
- * Returns:       Nothing.
- *
- * ------------------------------------------------------------------------- */
-{
+  acceptance_sets.copy(acc_sets, num_acc_sets);
 }
 
 /* ========================================================================= */
@@ -686,6 +689,59 @@ inline ::Ltl::LtlFormula& BuchiAutomaton::BuchiTransition::guard() const
  * ------------------------------------------------------------------------- */
 {
   return *guard_formula;
+}
+
+/* ========================================================================= */
+inline BitArray& BuchiAutomaton::BuchiTransition::acceptanceSets()
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Returns the acceptance sets associated with a
+ *                BuchiTransition.
+ *
+ * Arguments:     None.
+ *
+ * Returns:       A reference to the BitArray storing the acceptance sets
+ *                associated with the transition.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  return acceptance_sets;
+}
+
+/* ========================================================================= */
+inline const BitArray& BuchiAutomaton::BuchiTransition::acceptanceSets() const
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Returns the acceptance sets associated with a
+ *                BuchiTransition.
+ *
+ * Arguments:     None.
+ *
+ * Returns:       A constant reference to the BitArray storing the acceptance
+ *                sets associated with the transition.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  return acceptance_sets;
+}
+
+/* ========================================================================= */
+inline void BuchiAutomaton::BuchiTransition::print
+  (ostream& stream, const int indent, const GraphOutputFormat fmt) const
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Writes information about a transition (as a plain graph edge
+ *                without any associated information) to a stream.
+ *
+ * Arguments:     stream  --  A reference to an output stream.
+ *                indent  --  Number of spaces to leave to the left of output.
+ *                fmt     --  Determines the output format of the transition.
+ *
+ * Returns:       Nothing.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  Graph<GraphEdgeContainer>::Edge::print(stream, indent, fmt);
 }
 
 

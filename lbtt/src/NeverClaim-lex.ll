@@ -30,6 +30,7 @@ extern int current_neverclaim_line_number;
 
 %option never-interactive
 %option noyywrap
+%option nounput
 
 %%
 
