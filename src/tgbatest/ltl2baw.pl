@@ -27,9 +27,9 @@
 # This script converts the intermediate generalized automata computed
 # by ltl2ba into a form usable by lbtt.  This is useful for statistics.
 #
-# It can also be used to simplify a formula using lbtt, and then hand
-# the simplified formula over to spot.  (At the time of writing, Spot
-# is not yet able to simplify formulae.)
+# It can also be used to simplify a formula using ltl2ba, and then hand
+# the simplified formula over to spot.  (This can be used to compare
+# Spot's formulae simplification and ltl2ba's.)
 #
 #   ltl2baw.pl --ltl2ba='options-A' options-B
 #     run `ltl2ba options-B', extract the optimized generalized automata,
@@ -39,17 +39,12 @@
 #       a form readable by lbtt.
 #
 #   ltl2baw.pl options-B
-#     this is a shorthand for `ltl2baw.pl --ltl2ba=-T options-B',
-#     i.e., this creates an lbtt automata whose size is the same as
-#     the size of the one produced by ltl2ba (module the initial
-#     state, see below), whose product with the system will have
-#     the same size, but without acceptance conditions.  I.e., the
-#     only use of this automata is making statistics.
+#     this is a shorthand for `ltl2baw.pl --ltl2ba=-t options-B',
 #       e.g., ltl2baw.pl -f 'a U b'
 #
 #   ltl2baw.pl --spot='options-A' options-B
-#     run `ltl2ba options-B', extract the optimized generalized automata,
-#     and pass this automata to `ltl2tgba options-A'.
+#     run `ltl2ba options-B', extract the simplified formula
+#     and pass this formula to `ltl2tgba options-A'.
 #       e.g., ltl2baw.pl ---spot=-f -f '(a U b) <-> true'
 #       will use the Couvreur/FM algorithm to translate the formula
 #       simplified by ltl2ba
@@ -93,7 +88,7 @@ elsif ($arg =~ '--spot=(.*)$')
   }
 else
   {
-    open(LTL2TGBA, "| ./ltl2tgba -T -X -");
+    open(LTL2TGBA, "| ./ltl2tgba -t -X -");
   }
 
 END {
