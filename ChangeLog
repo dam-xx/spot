@@ -1,3 +1,8 @@
+2004-01-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlvisit/tostring.cc: Fix output of F0, F1, G0, G1, X0, and X1.
+	* src/ltltest/tostring.test: Test these.
+
 2004-01-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgba/tgbaexplicit.cc (tgba_explicit::get_acceptance_condition):

@@ -96,10 +96,14 @@ namespace spot
       void
       visit(const unop* uo)
       {
+	// The parser treats F0, F1, G0, G1, X0, and X1 as atomic
+	// propositions.  So make sure we output F(0), G(1), etc.
+	bool need_parent = !! dynamic_cast<const constant*>(uo->child());
 	switch(uo->op())
 	  {
 	  case unop::Not:
 	    os_ << "!";
+	    need_parent = false;
 	    break;
 	  case unop::X:
 	    os_ << "X";
@@ -112,7 +116,11 @@ namespace spot
 	    break;
 	  }
 
+	if (need_parent)
+	  os_ << "(";
 	uo->child()->accept(*this);
+	if (need_parent)
+	  os_ << ")";
       }
 
       void
