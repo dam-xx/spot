@@ -126,9 +126,11 @@ if show_formula_gif:
     outfile = spot.ofstream(imgprefix + '-f.dot')
     spot.dotty(outfile, f)
     del outfile
-    os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-o',
+    os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
                imgprefix + '-f.gif', imgprefix + '-f.dot')
-    print '<img src="' + imgprefix + '-f.gif">'
+    os.spawnlp(os.P_WAIT, 'convert', 'convert',
+               imgprefix + '-f.gif', imgprefix + '-f.png')
+    print '<img src="' + imgprefix + '-f.png">'
 
 
 print '<H2>Automaton</H2>'
@@ -155,9 +157,11 @@ if show_automaton_gif:
     outfile = spot.ofstream(imgprefix + '-a.dot')
     spot.dotty_reachable(outfile, concrete)
     del outfile
-    os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-o',
+    os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
 	       imgprefix + '-a.gif', imgprefix + '-a.dot')
-    print '<img src="' + imgprefix + '-a.gif">'
+    os.spawnlp(os.P_WAIT, 'convert', 'convert',
+               imgprefix + '-a.gif', imgprefix + '-a.png')
+    print '<img src="' + imgprefix + '-a.png">'
 
 
 if show_degen_dot or show_degen_gif:
@@ -174,9 +178,11 @@ if show_degen_dot or show_degen_gif:
 	outfile = spot.ofstream(imgprefix + '-d.dot')
 	spot.dotty_reachable(outfile, degen)
 	del outfile
-	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-o',
+	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
 		   imgprefix + '-d.gif', imgprefix + '-d.dot')
-	print '<img src="' + imgprefix + '-d.gif">'
+        os.spawnlp(os.P_WAIT, 'convert', 'convert',
+                   imgprefix + '-d.gif', imgprefix + '-d.png')
+	print '<img src="' + imgprefix + '-d.png">'
 else:
     degen = 0
 
@@ -200,9 +206,11 @@ if show_relation_dot or show_relation_set or show_relation_gif:
 	spot.bdd_print_dot(outfile, concrete.get_dict(),
 			   concrete.get_core_data().relation)
 	del outfile
-	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-o',
+	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
 		   imgprefix + '-b.gif', imgprefix + '-b.dot')
-	print '<img src="' + imgprefix + '-b.gif">'
+        os.spawnlp(os.P_WAIT, 'convert', 'convert',
+                   imgprefix + '-b.gif', imgprefix + '-b.png')
+	print '<img src="' + imgprefix + '-b.png">'
 
 if show_acceptance_dot or show_acceptance_set or show_acceptance_gif:
     print '<H3>Acceptance relation</H3>'
@@ -217,9 +225,11 @@ if show_acceptance_dot or show_acceptance_set or show_acceptance_gif:
 	spot.bdd_print_dot(outfile, concrete.get_dict(),
 			   concrete.get_core_data().accepting_conditions)
 	del outfile
-	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-o',
+	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
 		   imgprefix + '-c.gif', imgprefix + '-c.dot')
-	print '<img src="' + imgprefix + '-c.gif">'
+        os.spawnlp(os.P_WAIT, 'convert', 'convert',
+                   imgprefix + '-c.gif', imgprefix + '-c.png')
+	print '<img src="' + imgprefix + '-c.png">'
 
 if show_lbtt:
     print '<H3>LBTT conversion</H3>'

@@ -37,5 +37,8 @@ You have to install the script yourself if you want to test it.
    will run the script when the HTTP server processes the
    request.
 
-   ltl2tgba purges old files (>10min) from this directory 
+   ltl2tgba purges old files (>10min) from this directory
    each time it runs.
+
+4) `dot' from the GraphViz package, and `convert' from
+   the ImageMagick package should be in the PATH.

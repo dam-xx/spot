@@ -1,3 +1,10 @@
+2003-08-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* wrap/python/cgi/ltl2tgba.in: Convert GIFs to PNGs.  Restrict
+	the size of dot's output to 1024x1024.
+	* src/tgbaalgos/dotty.cc (dotty_bfs::start): Do not preset
+	the size of the graph.  Set height=0 for the invisible state.
+
 2003-08-06  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* src/ltlparse/ltlparse.yy: Fix precedence OP_OR < OP_XOR < OP_AND.

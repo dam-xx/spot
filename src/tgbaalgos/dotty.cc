@@ -18,8 +18,7 @@ namespace spot
     start()
     {
       os_ << "digraph G {" << std::endl;
-      os_ << "  size=\"7.26,10.69\"" << std::endl;
-      os_ << "  0 [label=\"\", style=invis]" << std::endl;
+      os_ << "  0 [label=\"\", style=invis, height=0]" << std::endl;
       os_ << "  0 -> 1" << std::endl;
     }
 
