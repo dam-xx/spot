@@ -53,7 +53,7 @@ namespace spot
     /// Add a new constraint to the relation.
     void add_relation(bdd new_rel);
 
-    /// \Perfom final computations before the relation can be used.
+    /// \brief Perfom final computations before the relation can be used.
     ///
     /// This function should be called after all propositions, state,
     /// promise, and constraints have been declared, and before calling

@@ -94,7 +94,7 @@ namespace spot
     /// \brief Constructor.
     /// \param left The left automata in the product.
     /// \param right The right automata in the product.
-    /// Do not be fooled by these arguments: a product \emph is commutative.
+    /// Do not be fooled by these arguments: a product is commutative.
     tgba_product(const tgba& left, const tgba& right);
 
     virtual ~tgba_product();

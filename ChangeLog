@@ -1,5 +1,8 @@
 2003-06-25  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/bddprint.hh, src/tgba/tgbabddconcretefactory.hh,
+	src/tgba/tgbaproduct.hh: Fix Doxygen comments.
+
 	* src/tgba/succiterconcrete.hh (next_succ_set_): Rename as ...
 	(succ_set_left_): ... this.
 	(current_base_, current_base_left_): New variables.
@@ -10,7 +13,7 @@
 	(tgba_succ_iterator_concrete::current_accepting_conditions): Remove
 	atomic proposition with universal quantification.
 	* src/tgba/ltl2tgba.cc (ltl_to_tgba): Normalize the formula.
-	* src/tgba/tgbabddconcrete.cc (tgba_bdd_concrete::set_init_state): 
+	* src/tgba/tgbabddconcrete.cc (tgba_bdd_concrete::set_init_state):
 	Complete the initial state.
 	(tgba_bdd_concrete::succ_iter): Do not remove Now variable
 	from the BDD passed to the iterator.
