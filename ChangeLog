@@ -1,5 +1,7 @@
 2005-02-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* bench/emptchk/README: Document the file `algorithms'.
+
 	* src/tgbaalgos/tau03opt.cc (tau03_opt_search): Implement the
 	"condition heuristic".  Suggested by Heikki Tauriainen.
 	* src/tgbatest/randtgba.cc: Test it.

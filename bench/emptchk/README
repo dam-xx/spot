@@ -142,6 +142,9 @@ This directory contains:
     file `algorihms'.  You should have run `make' before attempting to
     run this script, so the state space are available.
 
+* algorithms
+
+    The list of emptiness-check algorithms run by the above tests.
 
 =======
  USAGE
@@ -168,8 +171,8 @@ This directory contains:
      Running ltl-random.sh took 4 hours on a 3GHz Intel Pentium 4,
      and ltl-human.sh took 9 hours.
 
-     You can speed up the pml-*.sh tests by removing some algorithms
-     from the `algorithms' file.
+     You can speed up all tests by removing some algorithms from the
+     `algorithms' file.
 
 ==========================
  INTERPRETING THE RESULTS
