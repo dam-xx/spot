@@ -1,3 +1,8 @@
+2004-11-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/ltl2tgba.cc (syntax): Fix old typos and reword
+	some help strings.
+
 2004-11-09  Poitrenaud Denis  <denis@src.lip6.fr>
 
 	* src/tgbaalgos/magic.cc: rewrite to externalize the heap and

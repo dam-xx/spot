@@ -67,6 +67,7 @@ syntax(char* prog)
 	    << std::endl
             << "  -F    read the formula from the file" << std::endl
 	    << "  -g    graph the accepting run on the automaton (requires -e)"
+	    << std::endl
             << "  -L    fair-loop approximation (implies -f)" << std::endl
 	    << "  -N    display the never clain for Spin "
 	    << "(implies -D)" << std::endl
@@ -81,24 +82,18 @@ syntax(char* prog)
 	    << "  -r4   reduce formula using all rules" << std::endl
 	    << "  -rd   display the reduce formula" << std::endl
 	    << "  -R    same as -r, but as a set" << std::endl
-	    << "  -R1q  use direct simulation to merge some state "
+	    << "  -R1q  merge states using direct simulation "
 	    << "(use -L for more reduction)"
 	    << std::endl
-	    << "  -R1t  use direct simulation to remove some transition "
+	    << "  -R1t  remove transitions using direct simulation "
 	    << "(use -L for more reduction)"
 	    << std::endl
-	    << "  -R2q  use delayed simulation to merge some state "
-	    << "(the automaton must be degeneralised)"
+	    << "  -R2q  merge states using delayed simulation" << std::endl
+	    << "  -R2t  remove transitions using delayed simulation"
 	    << std::endl
-	    << "  -R2t  use delayed simulation to remove some transition "
-	    << "(the automaton must be degeneralised)"
-	    << std::endl
-	    << "  -R3   use SCC to reduce the automata"
-	    << std::endl
-	    << "  -Rd   display the simulation relation"
-	    << std::endl
-	    << "  -RD   display the parity game (dot format)"
-	    << std::endl
+	    << "  -R3   use SCC to reduce the automata" << std::endl
+	    << "  -Rd   display the simulation relation" << std::endl
+	    << "  -RD   display the parity game (dot format)" << std::endl
 	    << "  -s    convert to explicit automata, and number states "
 	    << "in DFS order" << std::endl
 	    << "  -S    convert to explicit automata, and number states "
