@@ -13,3 +13,6 @@ set -e
 ./ltl2tgba 'a & b & c'
 ./ltl2tgba 'a | b | (c U (d & (g U (h ^ i))))'
 ./ltl2tgba 'Xa & (b U !a) & (b U !a)'
+./ltl2tgba 'Fa & Xb & GFc & Gd'
+./ltl2tgba 'Fa & Xa & GFc & Gc'
+./ltl2tgba 'Fc & X(a | Xb) & GF(a | Xb) & Gc'

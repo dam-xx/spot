@@ -60,21 +60,53 @@ namespace spot
       switch (node->op())
 	{
 	case unop::F:
+	  {
+	    /*
+		   Fx  <=> x | XFx
+	       In other words:
+		   now <=> x | next
+
+		`x | next', doesn't actually encode the fact that x
+		should be fulfilled at some point.  We use the
+		`promise' variable for this purpose.
+	    */
+	    int v = fact_.create_state(node);
+	    bdd now = fact_.ithvar(v);
+	    bdd next = fact_.ithvar(v + 1);
+	    bdd promise = fact_.ithvar(fact_.create_promise(node->child()));
+	    fact_.add_relation(bdd_apply(now, (recurse(node->child())
+					       | (promise & next)),
+					 bddop_biimp));
+	    res_ = now;
+	    return;
+	  }
 	case unop::G:
-	  // FIXME: We can normalize on the fly, here.
-	  assert(!"unexpected operator, normalize first");
+	  {
+	    // Gx  <=>  x && XGx
+	    int v = fact_.create_state(node);
+	    bdd now = fact_.ithvar(v);
+	    bdd next = fact_.ithvar(v + 1);
+	    fact_.add_relation(bdd_apply(now, recurse(node->child()) & next,
+					 bddop_biimp));
+	    res_ = now;
+	    return;
+	  }
 	case unop::Not:
-	  res_ = bdd_not(recurse(node->child()));
-	  return;
+	  {
+	    res_ = bdd_not(recurse(node->child()));
+	    return;
+	  }
 	case unop::X:
-	  // FIXME: Can be smarter on X(a U b) and X(a R b).
-	  int v = fact_.create_state(node->child());
-	  bdd now = fact_.ithvar(v);
-	  bdd next = fact_.ithvar(v + 1);
-	  fact_.add_relation(bdd_apply(now, recurse(node->child()),
-				       bddop_biimp));
-	  res_ = next;
-	  return;
+	  {
+	    // FIXME: Can be smarter on X(a U b) and X(a R b).
+	    int v = fact_.create_state(node->child());
+	    bdd now = fact_.ithvar(v);
+	    bdd next = fact_.ithvar(v + 1);
+	    fact_.add_relation(bdd_apply(now, recurse(node->child()),
+					 bddop_biimp));
+	    res_ = next;
+	    return;
+	  }
 	}
       /* Unreachable code.  */
       assert(0);
@@ -99,21 +131,20 @@ namespace spot
 	  return;
 	case binop::U:
 	  {
-	    int v = fact_.create_state(node);
-	    bdd now = fact_.ithvar(v);
-	    bdd next = fact_.ithvar(v + 1);
-
-	    bdd promise_f2 =
-	      fact_.ithvar(fact_.create_promise(node->second()));
 	    /*
 	       f1 U f2 <=> f2 | (f1 & X(f1 U f2))
 	       In other words:
 		   now <=> f2 | (f1 & next)
 
 		The rightmost conjunction, f1 & next, doesn't actually
-		encodes the fact that f2 should be fulfilled at some
+		encode the fact that f2 should be fulfilled at some
 		point.  We use the `promise_f2' variable for this purpose.
 	    */
+	    int v = fact_.create_state(node);
+	    bdd now = fact_.ithvar(v);
+	    bdd next = fact_.ithvar(v + 1);
+	    bdd promise_f2 =
+	      fact_.ithvar(fact_.create_promise(node->second()));
 	    fact_.add_relation(bdd_apply(now,
 					 f2 | (promise_f2 & f1 & next),
 					 bddop_biimp));
@@ -122,14 +153,14 @@ namespace spot
 	  }
 	case binop::R:
 	  {
-	    int v = fact_.create_state(node);
-	    bdd now = fact_.ithvar(v);
-	    bdd next = fact_.ithvar(v + 1);
 	    /*
 	       f1 R f2 <=> f2 & (f1 | X(f1 U f2))
 	       In other words:
 		   now <=> f2 & (f1 | next)
 	    */
+	    int v = fact_.create_state(node);
+	    bdd now = fact_.ithvar(v);
+	    bdd next = fact_.ithvar(v + 1);
 	    fact_.add_relation(bdd_apply(now, f2 & (f1 | next), bddop_biimp));
 	    res_ = now;
 	    return;
