@@ -396,9 +396,57 @@ namespace spot
 
   }
 
+  typedef std::map<bdd, bdd, bdd_less_than> prom_map;
+  typedef Sgi::hash_map<const formula*, prom_map, ptr_hash<formula> > dest_map;
+  typedef std::map<bdd, const formula*, bdd_less_than> succ_to_formula;
+
+  static void
+  fill_dests(translate_dict& d, bool symb_merge,
+	     std::set<const formula*>& formulae_seen,
+	     succ_to_formula& canonical_succ, ltl_trad_visitor& v,
+	     dest_map& dests, bdd label, formula* dest)
+  {
+    // If we already know a state with the same successors,
+    // use it in lieu of the current one.  (See the comments
+    // for canonical_succ.)  We need to do this only for new
+    // destinations.
+    if (symb_merge
+	&& formulae_seen.find(dest) == formulae_seen.end())
+      {
+	dest->accept(v);
+	bdd succbdd = v.result();
+	succ_to_formula::iterator cs =
+	  canonical_succ.find(succbdd);
+	if (cs != canonical_succ.end())
+	  {
+	    destroy(dest);
+	    dest = clone(cs->second);
+	  }
+	else
+	  {
+	    canonical_succ[succbdd] = clone(dest);
+	  }
+      }
+
+    bdd promises = bdd_existcomp(label, d.a_set);
+    bdd conds = bdd_existcomp(label, d.var_set);
+
+    dest_map::iterator i = dests.find(dest);
+    if (i == dests.end())
+      {
+	dests[dest][promises] = conds;
+      }
+    else
+      {
+	i->second[promises] |= conds;
+	destroy(dest);
+      }
+  }
+
+
   tgba_explicit*
   ltl_to_tgba_fm(const formula* f, bdd_dict* dict,
-		 bool exprop, bool symb_merge)
+		 bool exprop, bool symb_merge, bool branching_postponement)
   {
     // Normalize the formula.  We want all the negations on
     // the atomic propositions.  We also suppress logic
@@ -414,7 +462,6 @@ namespace spot
     // We do this because many formulae (such as `aR(bRc)' and
     // `aR(bRc).(bRc)') are equivalent, and are trivially identified
     // by looking at the set of successors.
-    typedef std::map<bdd, const formula*, bdd_less_than> succ_to_formula;
     succ_to_formula canonical_succ;
 
     translate_dict d(dict);
@@ -435,8 +482,8 @@ namespace spot
 
 	// Translate it into a BDD to simplify it.
 	// FIXME: Currently the same formula can be converted into a
-	// BDD twice.  Once in the symb_merge block below, and then
-	// once here.
+	// BDD twice.  Once in the symb_merge block in fill_dests,
+	// and then  once here.
 	f->accept(v);
 	bdd res = v.result();
 	succ_to_formula::iterator cs = canonical_succ.find(res);
@@ -474,10 +521,6 @@ namespace spot
 	//
 	// In `exprop' mode, considering all possible combinations of
 	// outgoing propositions generalizes the above trick.
-
-	typedef std::map<bdd, bdd, bdd_less_than> prom_map;
-	typedef Sgi::hash_map<const formula*, prom_map, ptr_hash<formula> >
-	  dest_map;
 	dest_map dests;
 
 	// Compute all outgoing arcs.
@@ -497,50 +540,43 @@ namespace spot
 	    bdd one_prop_set =
 	      exprop ? bdd_satoneset(all_props, var_set, bddtrue) : bddtrue;
 	    all_props -= one_prop_set;
+
+	    typedef std::map<bdd, formula*, bdd_less_than> succ_map;
+	    succ_map succs;
+
 	    minato_isop isop(res & one_prop_set);
 	    bdd cube;
 	    while ((cube = isop.next()) != bddfalse)
 	      {
-		const formula* dest =
+		bdd label = bdd_exist(cube, d.next_set);
+		formula* dest =
 		  d.conj_bdd_to_formula(bdd_existcomp(cube, d.next_set));
 
-		// If we already know a state with the same successors,
-		// use it in lieu of the current one.  (See the comments
-		// for canonical_succ.)  We need to do this only for new
-		// destinations.
-		if (symb_merge
-		    && formulae_seen.find(dest) == formulae_seen.end())
+		// If we are not postponing the branching, we can
+		// declare the outgoing transitions immediately.
+		// Otherwise, we merge transitions with identical
+		// label, and declare the outgoing transitions in a
+		// second loop.
+		if (!branching_postponement)
 		  {
-		    dest->accept(v);
-		    bdd succbdd = v.result();
-		    succ_to_formula::iterator cs =
-		      canonical_succ.find(succbdd);
-		    if (cs != canonical_succ.end())
-		      {
-			destroy(dest);
-			dest = clone(cs->second);
-		      }
-		    else
-		      {
-			canonical_succ[succbdd] = clone(dest);
-		      }
-		  }
-
-		bdd promises = bdd_existcomp(cube, d.a_set);
-		bdd conds =
-		  exprop ? one_prop_set : bdd_existcomp(cube, var_set);
-
-		dest_map::iterator i = dests.find(dest);
-		if (i == dests.end())
-		  {
-		    dests[dest][promises] = conds;
+		    fill_dests(d, symb_merge, formulae_seen, canonical_succ,
+			       v, dests, label, dest);
 		  }
 		else
 		  {
-		    i->second[promises] |= conds;
-		    destroy(dest);
+		    succ_map::iterator si = succs.find(label);
+		    if (si == succs.end())
+		      succs[label] = dest;
+		    else
+		      si->second = multop::instance(multop::Or,
+						    si->second, dest);
 		  }
 	      }
+	    if (branching_postponement)
+	      for (succ_map::const_iterator si = succs.begin();
+		   si != succs.end(); ++si)
+		fill_dests (d, symb_merge, formulae_seen, canonical_succ, v,
+			    dests, si->first, si->second);
 	  }
 
 	// Check for an arc going to 1 (True).  Register it first, that

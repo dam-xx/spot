@@ -72,6 +72,7 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -N   display the never clain for Spin "
 	    << "(implies -D)" << std::endl
+            << "  -p   branching postponement (implies -f)" << std::endl
 	    << "  -r   display the relation BDD, not the reachability graph"
 	    << std::endl
 	    << "  -R   same as -r, but as a set" << std::endl
@@ -111,6 +112,7 @@ main(int argc, char** argv)
   bool magic_many = false;
   bool expect_counter_example = false;
   bool from_file = false;
+  bool post_branching = false;
 
   for (;;)
     {
@@ -193,6 +195,11 @@ main(int argc, char** argv)
 	{
 	  degeneralize_opt = true;
 	  output = 8;
+	}
+      else if (!strcmp(argv[formula_index], "-p"))
+	{
+	  post_branching = true;
+	  fm_opt = true;
 	}
       else if (!strcmp(argv[formula_index], "-r"))
 	{
@@ -300,7 +307,8 @@ main(int argc, char** argv)
 	{
 	  if (fm_opt)
 	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt,
-					       fm_symb_merge_opt);
+					       fm_symb_merge_opt,
+					       post_branching);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 	}

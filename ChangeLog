@@ -1,3 +1,14 @@
+2004-05-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba_fm.hh (ltl_to_tgba_fm): Add argument
+	branching_postponement.
+	* src/tgbaalgos/ltl2tgba_fm.cc (fill_dests): New function, extracted
+	from ltl_to_tgba_fm().
+	(ltl_to_tgba_fm): Implement the branching_postponement optimization.
+	* src/tgbatest/ltl2tgba.cc: Add the -p option.
+	* src/tgbatest/spotlbtt.test: Exercise branching postponement.
+	* wrap/python/cgi/ltl2tgba.in: Make it an option.
+
 2004-05-04  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/ltl2tgba_fm.cc: Add a superfluous return to pacify

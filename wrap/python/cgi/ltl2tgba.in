@@ -211,6 +211,7 @@ options_trans_fm = [
     ('opt_exprop',          'optimize determinism',                        1),
     ('opt_symb_merge',
      'merge states with same symbolic successor representation',           1),
+    ('opt_branch_post',     'branching postponement',                      0),
     ]
 options_trans_lacim = [
     ('show_relation_set',
@@ -407,11 +408,16 @@ if opt_symb_merge:
     symb_merge = 1
 else:
     symb_merge = 0
+if opt_branch_post:
+    branching_postponement = 1
+else:
+    branching_postponement = 0
 
 if trans_lacim:
     automaton = spot.ltl_to_tgba_lacim(f, dict)
 elif trans_fm:
-    automaton = spot.ltl_to_tgba_fm(f, dict, exprop, symb_merge)
+    automaton = spot.ltl_to_tgba_fm(f, dict,
+                                    exprop, symb_merge, branching_postponement)
 
 print 'done.</p>'
 sys.stdout.flush()
