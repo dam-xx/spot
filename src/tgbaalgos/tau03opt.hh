@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_TGBAALGOS_TAU03_HH
-# define SPOT_TGBAALGOS_TAU03_HH
+#ifndef SPOT_TGBAALGOS_TAU03_OPT_HH
+# define SPOT_TGBAALGOS_TAU03_OPT_HH
 
 namespace spot
 {
@@ -45,11 +45,14 @@ namespace spot
   ///
   /// procedure dfs_blue (s)
   /// begin
-  ///   s.color = blue;
+  ///   s.color = cyan;
   ///   s.acc = emptyset;
   ///   for all t in post(s) do
+  ///     let (s, l, a, t) be the edge from s to t;
   ///     if t.color == white then
   ///       call dfs_blue(t);
+  ///     else if t.color == cyan && s.acc U a U t.acc == all_acc then
+  ///       report a cycle;
   ///     end if;
   ///   end for;
   ///   for all t in post(s) do
@@ -58,44 +61,31 @@ namespace spot
   ///       call dfs_red(t, a U s.acc);
   ///     end if;
   ///   end for;
-  ///   if s.acc == all_acc then
-  ///     report a cycle;
-  ///   end if;
+  ///   s.color = blue;
   /// end;
   ///
   /// procedure dfs_red(s, A)
   /// begin
   ///   s.acc = s.acc U A;
   ///   for all t in post(s) do
-  ///     if t.color != white and A not included in t.acc then
-  ///       call dfs_red(t, A);
+  ///     let (s, l, a, t) be the edge from s to t;
+  ///     if t.color != white then
+  ///       if t.color == cyan && A U t.acc == all_acc then
+  ///         report a cycle;
+  ///       else if A not included in t.acc then
+  ///         call dfs_red(t, A);
+  ///       end if;
   ///     end if;
   ///   end for;
   /// end;
   /// \endverbatim
   ///
-  /// This algorithm is the one presented in
+  /// This algorithm is an optimisation of the one implemented in
+  /// spot::explicit_tau03_search.
   ///
-  /// \verbatim
-  /// @techreport{HUT-TCS-A83,
-  ///    address = {Espoo, Finland},
-  ///    author = {Heikki Tauriainen},
-  ///    institution = {Helsinki University of Technology, Laboratory for
-  ///    Theoretical Computer Science},
-  ///    month = {December},
-  ///    number = {A83},
-  ///    pages = {132},
-  ///    title = {On Translating Linear Temporal Logic into Alternating and
-  ///    Nondeterministic Automata},
-  ///    type = {Research Report},
-  ///    year = {2003},
-  ///    url = {http://www.tcs.hut.fi/Publications/info/bibdb.HUT-TCS-A83.shtml}
-  /// }
-  /// \endverbatim
-  ///
-  emptiness_check* explicit_tau03_search(const tgba *a);
+  emptiness_check* explicit_tau03_opt_search(const tgba *a);
 
   /// @}
 }
 
-#endif // SPOT_TGBAALGOS_TAU03_HH
+#endif // SPOT_TGBAALGOS_TAU03_OPT_HH

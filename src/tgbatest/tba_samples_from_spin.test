@@ -33,6 +33,7 @@ expect_ce()
   ./ltl2tgba -X -ese05_search "$1"
   ./ltl2tgba -X -ebsh_se05_search "$1"
   ./ltl2tgba -X -etau03_search "$1"
+  ./ltl2tgba -X -etau03_opt_search "$1"
 }
 
 expect_no()
@@ -44,6 +45,7 @@ expect_no()
   ./ltl2tgba -X -Ese05_search "$1"
   ./ltl2tgba -X -Ebsh_se05_search "$1"
   ./ltl2tgba -X -Etau03_search "$1"
+  ./ltl2tgba -X -Etau03_opt_search "$1"
 }
 
 dir=$srcdir/tba_samples_from_spin

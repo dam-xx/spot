@@ -36,6 +36,7 @@
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/se05.hh"
 #include "tgbaalgos/tau03.hh"
+#include "tgbaalgos/tau03opt.hh"
 #include "tgbaalgos/replayrun.hh"
 
 void
@@ -211,6 +212,10 @@ main(int argc, char** argv)
 	    {
               ec_obj.push_back(spot::explicit_tau03_search(a));
               ec_name.push_back("explicit_tau03_search");
+              ec_safe.push_back(true);
+
+              ec_obj.push_back(spot::explicit_tau03_opt_search(a));
+              ec_name.push_back("explicit_tau03_opt_search");
               ec_safe.push_back(true);
             }
 

@@ -46,6 +46,7 @@ tgbaalgos_HEADERS = \
   se05.hh \
   stats.hh \
   tau03.hh \
+  tau03opt.hh \
   reductgba_sim.hh
 
 noinst_LTLIBRARIES = libtgbaalgos.la
@@ -69,6 +70,7 @@ libtgbaalgos_la_SOURCES = \
   se05.cc \
   stats.cc \
   tau03.cc \
+  tau03opt.cc \
   reductgba_sim.cc \
   reductgba_sim_del.cc
 

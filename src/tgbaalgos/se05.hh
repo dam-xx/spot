@@ -145,4 +145,4 @@ namespace spot
   /// @}
 }
 
-#endif // SPOT_TGBAALGOS_MAGIC_HH
+#endif // SPOT_TGBAALGOS_SE05_HH

@@ -20,6 +20,7 @@
 // 02111-1307, USA.
 
 /// FIXME: Add
+/// - the optimisation based on weights (a weight by accepting conditions),
 /// - the computation of a counter example if detected.
 /// - a bit-state hashing version.
 
@@ -37,28 +38,28 @@
 #include "tgba/tgba.hh"
 #include "emptiness.hh"
 #include "magic.hh"
-#include "tau03.hh"
+#include "tau03opt.hh"
 
 namespace spot
 {
   namespace
   {
-    enum color {WHITE, BLUE};
+    enum color {WHITE, CYAN, BLUE};
 
     /// \brief Emptiness checker on spot::tgba automata having at most one
     /// accepting condition (i.e. a TBA).
     template <typename heap>
-    class tau03_search : public emptiness_check
+    class tau03_opt_search : public emptiness_check
     {
     public:
       /// \brief Initialize the search algorithm on the automaton \a a
-      tau03_search(const tgba *a, size_t size)
-        : h(size), a(a), all_cond(a->all_acceptance_conditions())
+      tau03_opt_search(const tgba *a, size_t size)
+        : h(size), a(a), all_acc(a->all_acceptance_conditions())
       {
         assert(a->number_of_acceptance_conditions() > 0);
       }
 
-      virtual ~tau03_search()
+      virtual ~tau03_opt_search()
       {
         // Release all iterators on the stacks.
         while (!st_blue.empty())
@@ -81,16 +82,17 @@ namespace spot
       /// accepting path.
       virtual emptiness_check_result* check()
       {
-        if (!st_blue.empty())
+        if (!st_red.empty())
           {
+            assert(!st_blue.empty());
             return 0;
           }
-        assert(st_red.empty());
+        assert(st_blue.empty());
         nbn = nbt = 0;
         sts = mdp = 0;
         const state* s0 = a->get_init_state();
         ++nbn;
-        h.add_new_state(s0, BLUE);
+        h.add_new_state(s0, CYAN);
         push(st_blue, s0, bddfalse, bddfalse);
         if (dfs_blue())
           return new emptiness_check_result;
@@ -153,7 +155,7 @@ namespace spot
       const tgba* a;
 
       /// The unique accepting condition of the automaton \a a.
-      bdd all_cond;
+      bdd all_acc;
 
       bool dfs_blue()
       {
@@ -183,15 +185,32 @@ namespace spot
 #ifdef TRACE
                     std::cout << "  It is white, go down" << std::endl;
 #endif
-                    h.add_new_state(s_prime, BLUE);
+                    h.add_new_state(s_prime, CYAN);
                     push(st_blue, s_prime, label, acc);
                   }
-                else // Backtrack the edge (f.s, <label, acc>, s_prime)
+                else
                   {
+                    typename heap::color_ref c = h.get_color_ref(f.s);
+                    assert(!c.is_white());
+                    if (c_prime.get_color() == CYAN &&
+                      (c.get_acc() | acc | c_prime.get_acc()) == all_acc)
+                      {
 #ifdef TRACE
-                    std::cout << "  It is blue, pop it" << std::endl;
+                          std::cout << "  It is cyan and acceptance condition "
+                                    << "is reached, report cycle" << std::endl;
 #endif
-                    h.pop_notify(s_prime);
+                        c_prime.cumulate_acc(c.get_acc() | acc);
+                        push(st_red, s_prime, label, acc);
+                        return true;
+                      }
+                    else // Backtrack the edge (f.s, <label, acc>, s_prime)
+                      {
+#ifdef TRACE
+                          std::cout << "  It is cyan or blue, pop it"
+                                    << std::endl;
+#endif
+                          h.pop_notify(s_prime);
+                      }
                   }
               }
             else
@@ -225,26 +244,27 @@ namespace spot
 #ifdef TRACE
                         std::cout << "  ";
                         bdd_print_acc(std::cout, a->get_dict(), acu);
-                        std::cout << " is not included in ";
+                        std::cout << "  is not included in ";
                         bdd_print_acc(std::cout, a->get_dict(),
-                                                  c_prime.get_acc());
+                                                        c_prime.get_acc());
                         std::cout << std::endl;
                         std::cout << "  Start a red dfs from "
                                   << a->format_state(s_prime)
-                                  << " propagating: ";
+                                  << "  propagating: ";
                         bdd_print_acc(std::cout, a->get_dict(), acu);
                         std::cout << std::endl;
 #endif
                         c_prime.cumulate_acc(acu);
                         push(st_red, s_prime, label, acc);
-                        dfs_red(acu);
+                        if (dfs_red(acu))
+                          {
+                            delete i;
+                            return true;
+                          }
                      }
                   }
                 delete i;
-                if (c.get_acc() == all_cond)
-                  {
-                    return true;
-                  }
+                c.set_color(BLUE);
                 delete f.it;
                 --sts;
                 h.pop_notify(f.s);
@@ -254,7 +274,7 @@ namespace spot
         return false;
       }
 
-      void dfs_red(const bdd& acu)
+      bool dfs_red(const bdd& acu)
       {
         assert(!st_red.empty());
 
@@ -279,11 +299,23 @@ namespace spot
                 typename heap::color_ref c_prime = h.get_color_ref(s_prime);
                 if (!c_prime.is_white())
                   {
-                    if ((c_prime.get_acc() & acu) != acu)
+                    if (c_prime.get_color() == CYAN &&
+                        (c_prime.get_acc() | acu) == all_acc)
                       {
 #ifdef TRACE
-                        std::cout << "  It is blue and propagation "
-                                  << "is needed, go down" << std::endl;
+                        std::cout << "  It is cyan and acceptance condition "
+                                  << "is reached, report cycle" << std::endl;
+#endif
+                        c_prime.cumulate_acc(acu);
+                        push(st_red, s_prime, label, acc);
+                        return true;
+                      }
+                    else if ((c_prime.get_acc() & acu) != acu)
+                      {
+#ifdef TRACE
+                        std::cout << "  It is cyan or blue and propagation "
+                                  << "is needed, go down"
+                                  << std::endl;
 #endif
                         c_prime.cumulate_acc(acu);
                         push(st_red, s_prime, label, acc);
@@ -291,8 +323,8 @@ namespace spot
                     else
                       {
 #ifdef TRACE
-                        std::cout << "  It is blue and no propagation "
-                                  << "is needed, pop it" << std::endl;
+                        std::cout << "  It is cyan or blue and no propagation "
+                                  << "is needed , pop it" << std::endl;
 #endif
                         h.pop_notify(s_prime);
                       }
@@ -317,11 +349,12 @@ namespace spot
                 st_red.pop_front();
               }
           }
+        return false;
       }
 
     };
 
-    class explicit_tau03_search_heap
+    class explicit_tau03_opt_search_heap
     {
     public:
       class color_ref
@@ -358,11 +391,11 @@ namespace spot
         bdd* acc;
       };
 
-      explicit_tau03_search_heap(size_t)
+      explicit_tau03_opt_search_heap(size_t)
         {
         }
 
-      ~explicit_tau03_search_heap()
+      ~explicit_tau03_opt_search_heap()
         {
           hash_type::const_iterator s = h.begin();
           while (s != h.end())
@@ -406,9 +439,9 @@ namespace spot
 
   } // anonymous
 
-  emptiness_check* explicit_tau03_search(const tgba *a)
+  emptiness_check* explicit_tau03_opt_search(const tgba *a)
   {
-    return new tau03_search<explicit_tau03_search_heap>(a, 0);
+    return new tau03_opt_search<explicit_tau03_opt_search_heap>(a, 0);
   }
 
 }

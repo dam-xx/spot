@@ -38,6 +38,7 @@
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/se05.hh"
 #include "tgbaalgos/tau03.hh"
+#include "tgbaalgos/tau03opt.hh"
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/gtec/ce.hh"
 #include "tgbaparse/public.hh"
@@ -128,7 +129,8 @@ syntax(char* prog)
             << std::endl
 	    << "  bsh_se05_search_repeated[(heap size in MB - 10MB"
             << " by default)]" << std::endl
-	    << "  tau03_search" << std::endl;
+	    << "  tau03_search" << std::endl
+	    << "  tau03_opt_search" << std::endl;
   exit(2);
 }
 
@@ -147,8 +149,8 @@ main(int argc, char** argv)
   int output = 0;
   int formula_index = 0;
   std::string echeck_algo;
-  enum { None, Couvreur, Couvreur2, MagicSearch, Se05Search, Tau03Search }
-                                                                 echeck = None;
+  enum { None, Couvreur, Couvreur2, MagicSearch, Se05Search,
+              Tau03Search, Tau03OptSearch } echeck = None;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
   bool search_many = false;
   bool bit_state_hashing = false;
@@ -415,6 +417,10 @@ main(int argc, char** argv)
 	{
 	  echeck = Tau03Search;
 	}
+      else if (echeck_algo == "tau03_opt_search")
+	{
+	  echeck = Tau03OptSearch;
+	}
       else
 	{
 	  std::cerr << "unknown emptiness-check: " << echeck_algo << std::endl;
@@ -668,6 +674,18 @@ main(int argc, char** argv)
           else
             {
               ec = spot::explicit_tau03_search(a);
+            }
+
+	case Tau03OptSearch:
+          if (a->number_of_acceptance_conditions() == 0)
+            {
+              std::cout << "To apply tau03_opt_search, the automaton must "
+                        << "have at least on accepting condition. "
+                        << "Try with another algorithm." << std::endl;
+            }
+          else
+            {
+              ec = spot::explicit_tau03_opt_search(a);
             }
 	  break;
 	}
