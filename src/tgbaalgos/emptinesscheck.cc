@@ -29,30 +29,43 @@ namespace spot
   }
 
   void
-  emptiness_check::remove_component(const state* start_delete)
+  emptiness_check::remove_component(const state* from)
   {
+    // Remove from H all states which are reachable from state FROM.
+
+    // Stack of iterators towards states to remove.
     std::stack<tgba_succ_iterator*> to_remove;
-    h[start_delete] = -1;
-    tgba_succ_iterator* iter_delete = aut_->succ_iter(start_delete);
-    iter_delete->first();
-    to_remove.push(iter_delete);
-    while (!to_remove.empty())
+
+    // Remove FROM itself, and prepare to remove its successors.
+    // (FROM should be in H, otherwise it means all reachable
+    // states from FROM have already been removed and there is no
+    // point in calling remove_component.)
+    hash_type::iterator hi = h.find(from);
+    assert(hi->second != -1);
+    hi->second = -1;
+    tgba_succ_iterator* i = aut_->succ_iter(from);
+
+    for (;;)
       {
-	tgba_succ_iterator* succ_delete = to_remove.top();
-	to_remove.pop();
-	if (!succ_delete->done())
+	// Remove each destination of this iterator.
+	for (i->first(); !i->done(); i->next())
 	  {
-	    to_remove.push(succ_delete);
-	    state* curr_state = succ_delete->current_state();
-	    succ_delete->next();
-	    if (h[curr_state] != -1)
+	    state* s = i->current_state();
+	    hash_type::iterator hi = h.find(s);
+	    assert(hi != h.end());
+
+	    if (hi->second != -1)
 	      {
-		h[curr_state] = -1;
-		tgba_succ_iterator* succ_delete2 = aut_->succ_iter(curr_state);
-		succ_delete2->first();
-		to_remove.push(succ_delete2);
+		hi->second = -1;
+		to_remove.push(aut_->succ_iter(s));
 	      }
+	    delete s;
 	  }
+	delete i;
+	if (to_remove.empty())
+	  break;
+	i = to_remove.top();
+	to_remove.pop();
       }
   }
 
@@ -252,7 +265,6 @@ namespace spot
 	      {
 		pair_state_iter started_from = todo_trace.front();
 		todo_trace.pop_front();
-		started_from.second->first();
 
 		for (started_from.second->first();
 		     !started_from.second->done();
@@ -270,9 +282,13 @@ namespace spot
 			while (vec_component[k].index < i_2->second)
 			  {
 			    assert(i_2->second != 1);
-			    seq.push_front(path_map[curr_father]);
-			    curr_father = path_map[curr_father];
-			    assert(h.find(curr_father) != h.end());
+			    assert(path_map.find(curr_father)
+				   != path_map.end());
+			    const state* f = path_map[curr_father];
+			    seq.push_front(f);
+			    curr_father = f;
+			    i_2 = h.find(curr_father);
+			    assert(i_2 != h.end());
 			  }
 			vec_sequence[k] = seq;
 			seq.clear();

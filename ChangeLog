@@ -1,3 +1,8 @@
+2003-10-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::remove_component):
+	Rewrite.
+
 2003-10-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::check,
