@@ -182,7 +182,6 @@ namespace spot
     // Now shift the cycle so it starts on cycle_entry_point.
     res->cycle.splice(res->cycle.end(), res->cycle,
 		      res->cycle.begin(), cycle_ep_it);
-    res->cycle.erase(res->cycle.begin(), cycle_ep_it);
 
     return res;
   }

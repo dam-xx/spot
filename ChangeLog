@@ -1,5 +1,10 @@
 2004-12-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/reducerun.cc (reduce_run): Do not call erase() after
+	splice(), splice() already remove the elements.
+	* src/tgbaalgos/gtec/ce.cc (couvreur99_check_result::accepting_run):
+	Likewise.
+
 	* src/tgbatest/randtgba.cc: Add option -O, so we can profile each
 	emptiness-check on its own.
 

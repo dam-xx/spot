@@ -21,6 +21,7 @@
 
 #include "ce.hh"
 #include "tgbaalgos/bfssteps.hh"
+#include "misc/hash.hh"
 
 namespace spot
 {
@@ -128,7 +129,6 @@ namespace spot
     // Now shift the cycle so it starts on cycle_entry_point.
     run_->cycle.splice(run_->cycle.end(), run_->cycle,
 		       run_->cycle.begin(), cycle_ep_it);
-    run_->cycle.erase(run_->cycle.begin(), cycle_ep_it);
 
     return run_;
   }
