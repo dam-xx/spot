@@ -62,129 +62,127 @@ namespace spot
   typedef std::list<stack_item> stack_type;
 
   template <typename ndfs_search, typename heap>
-  class ndfs_result : public emptiness_check_result
+  class ndfs_result:
+    public emptiness_check_result,
+    public ars_statistics
   {
   public:
     ndfs_result(const ndfs_search& ms)
-    : emptiness_check_result(ms.automaton()), ms_(ms), h_(ms_.get_heap())
-      {
-      }
+      : emptiness_check_result(ms.automaton()), ms_(ms), h_(ms_.get_heap())
+    {
+    }
 
     virtual ~ndfs_result()
-      {
-      }
+    {
+    }
 
     virtual tgba_run* accepting_run()
-      {
-        const stack_type& stb = ms_.get_st_blue();
-        const stack_type& str = ms_.get_st_red();
+    {
+      const stack_type& stb = ms_.get_st_blue();
+      const stack_type& str = ms_.get_st_red();
 
-        assert(!stb.empty());
+      assert(!stb.empty());
 
-        bdd covered_acc = bddfalse;
-        accepting_transitions_list acc_trans;
+      bdd covered_acc = bddfalse;
+      accepting_transitions_list acc_trans;
 
-        const state* start;
+      const state* start;
 
-        if (str.empty())
-          start = stb.front().s->clone();
-        else
-          {
-            start = str.front().s->clone();
-            if (a_->number_of_acceptance_conditions() == 0)
-              {
-                // take arbitrarily the last transition on the red stack
-                stack_type::const_iterator i, j;
-                i = j = str.begin(); ++i;
-                if (i == str.end())
-                  i = stb.begin();
-                transition t = { i->s->clone(), j->label, j->acc,
-                                                              j->s->clone() };
-                assert(h_.has_been_visited(t.source));
-                assert(h_.has_been_visited(t.dest));
-                acc_trans.push_back(t);
-              }
-            else
-              {
-                // ignore the prefix
-                stack_type::const_reverse_iterator i, j;
+      start = stb.front().s->clone();
+      if (!str.empty())
+        {
+          if (a_->number_of_acceptance_conditions() == 0)
+            {
+              // take arbitrarily the last transition on the red stack
+              stack_type::const_iterator i, j;
+              i = j = str.begin(); ++i;
+              if (i == str.end())
+                i = stb.begin();
+              transition t = { i->s->clone(), j->label, j->acc,
+			       j->s->clone() };
+              assert(h_.has_been_visited(t.source));
+              assert(h_.has_been_visited(t.dest));
+              acc_trans.push_back(t);
+            }
+          else
+            {
+              // ignore the prefix
+              stack_type::const_reverse_iterator i, j;
 
-                i = j = stb.rbegin(); ++j;
-                for (; i->s->compare(start) != 0; ++i, ++j)
-                  {
-                  }
+              i = j = stb.rbegin(); ++j;
+              while (i->s->compare(start) != 0)
+		++i, ++j;
 
+              stack_type::const_reverse_iterator end = stb.rend();
+              for (; j != end; ++i, ++j)
+                {
+                  if ((covered_acc & j->acc) != j->acc)
+                    {
+                      transition t = { i->s->clone(), j->label, j->acc,
+				       j->s->clone() };
+                      assert(h_.has_been_visited(t.source));
+                      assert(h_.has_been_visited(t.dest));
+                      acc_trans.push_back(t);
+                      covered_acc |= j->acc;
+                    }
+                }
 
-                stack_type::const_reverse_iterator end = stb.rend();
-                for (; j != end; ++i, ++j)
-                  {
-                    if ((covered_acc & j->acc) != j->acc)
-                      {
-                        transition t = { i->s->clone(), j->label, j->acc,
-                                                                j->s->clone() };
-                        assert(h_.has_been_visited(t.source));
-                        assert(h_.has_been_visited(t.dest));
-                        acc_trans.push_back(t);
-                        covered_acc |= j->acc;
-                      }
-                  }
+              j = str.rbegin();
+              if ((covered_acc & j->acc) != j->acc)
+                {
+                  transition t = { i->s->clone(), j->label, j->acc,
+				   j->s->clone() };
+                  assert(h_.has_been_visited(t.source));
+                  assert(h_.has_been_visited(t.dest));
+                  acc_trans.push_back(t);
+                  covered_acc |= j->acc;
+                }
 
-                j = str.rbegin();
-                if ((covered_acc & j->acc) != j->acc)
-                  {
-                    transition t = { i->s->clone(), j->label, j->acc,
-                                                              j->s->clone() };
-                    assert(h_.has_been_visited(t.source));
-                    assert(h_.has_been_visited(t.dest));
-                    acc_trans.push_back(t);
-                    covered_acc |= j->acc;
-                  }
+              i = j; ++j;
+              end = str.rend();
+              for (; j != end; ++i, ++j)
+                {
+                  if ((covered_acc & j->acc) != j->acc)
+                    {
+                      transition t = { i->s->clone(), j->label, j->acc,
+				       j->s->clone() };
+                      assert(h_.has_been_visited(t.source));
+                      assert(h_.has_been_visited(t.dest));
+                      acc_trans.push_back(t);
+                      covered_acc |= j->acc;
+                    }
+                }
+            }
+        }
 
-                i = j; ++j;
-                end = str.rend();
-                for (; j != end; ++i, ++j)
-                  {
-                    if ((covered_acc & j->acc) != j->acc)
-                      {
-                        transition t = { i->s->clone(), j->label, j->acc,
-                                                                j->s->clone() };
-                        assert(h_.has_been_visited(t.source));
-                        assert(h_.has_been_visited(t.dest));
-                        acc_trans.push_back(t);
-                        covered_acc |= j->acc;
-                      }
-                  }
-              }
-          }
+      if (a_->all_acceptance_conditions() != covered_acc)
+        {
+          bool b = dfs(start, acc_trans, covered_acc);
+          assert(b);
+          (void) b;
+        }
 
-        if (a_->all_acceptance_conditions() != covered_acc)
-          {
-            bool b = dfs(start, acc_trans, covered_acc);
-            assert(b);
-            (void) b;
-          }
+      delete start;
 
-        delete start;
+      assert(!acc_trans.empty());
 
-        assert(!acc_trans.empty());
+      tgba_run* run = new tgba_run;
+      // construct run->cycle from acc_trans.
+      construct_cycle(run, acc_trans);
+      // construct run->prefix (a minimal path from the initial state to any
+      // state of run->cycle) and adjust the cycle to the state reached by the
+      // prefix.
+      construct_prefix(run);
 
-        tgba_run* run = new tgba_run;
-        // construct run->cycle from acc_trans.
-        construct_cycle(run, acc_trans);
-        // construct run->prefix (a minimal path from the initial state to any
-        // state of run->cycle) and adjust the cycle to the state reached by the
-        // prefix.
-        construct_prefix(run);
+      for (typename accepting_transitions_list::const_iterator i =
+	     acc_trans.begin(); i != acc_trans.end(); ++i)
+        {
+          delete i->source;
+          delete i->dest;
+        }
 
-        for (typename accepting_transitions_list::const_iterator i =
-	       acc_trans.begin(); i != acc_trans.end(); ++i)
-          {
-            delete i->source;
-            delete i->dest;
-          }
-
-        return run;
-      }
+      return run;
+    }
 
   private:
     const ndfs_search& ms_;
@@ -244,6 +242,7 @@ namespace spot
           if (!f.it->done())
             {
               const state *s_prime = f.it->current_state();
+	      inc_ars_states();
               ndfsr_trace << "  Visit the successor: "
                           << a_->format_state(s_prime) << std::endl;
               bdd label = f.it->current_condition();
@@ -340,9 +339,10 @@ namespace spot
     class test_path: public bfs_steps
     {
     public:
-      test_path(const tgba* a, const state* t,
+      test_path(ars_statistics* ars,
+		const tgba* a, const state* t,
 		const state_set& d, const heap& h)
-        : bfs_steps(a), target(t), dead(d), h(h)
+        : bfs_steps(a), ars(ars), target(t), dead(d), h(h)
       {
       }
 
@@ -368,6 +368,7 @@ namespace spot
 
       const state* filter(const state* s)
       {
+	ars->inc_ars_states();
         if (!h.has_been_visited(s)
 	    || seen.find(s) != seen.end()
 	    || dead.find(s) != dead.end())
@@ -396,6 +397,7 @@ namespace spot
       }
 
     private:
+      ars_statistics* ars;
       state_set seen;
       const state* target;
       const state_set& dead;
@@ -408,7 +410,7 @@ namespace spot
       if (start->compare(target) == 0)
 	return true;
 
-      test_path s(a_, target, dead, h_);
+      test_path s(this, a_, target, dead, h_);
       const state* res = s.search(start->clone(), path);
       if (res)
 	{
@@ -430,8 +432,9 @@ namespace spot
     class min_path: public bfs_steps
     {
     public:
-      min_path(const tgba* a, const m_source_trans& target, const heap& h)
-        : bfs_steps(a), target(target), h(h)
+      min_path(ars_statistics* ars,
+	       const tgba* a, const m_source_trans& target, const heap& h)
+        : bfs_steps(a), ars(ars), target(target), h(h)
       {
       }
 
@@ -457,6 +460,7 @@ namespace spot
 
       const state* filter(const state* s)
       {
+	ars->inc_ars_states();
         ndfsr_trace << "filter: " << a_->format_state(s);
         if (!h.has_been_visited(s) || seen.find(s) != seen.end())
           {
@@ -480,6 +484,7 @@ namespace spot
       }
 
     private:
+      ars_statistics* ars;
       state_set seen;
       const m_source_trans& target;
       const heap& h;
@@ -533,7 +538,7 @@ namespace spot
 	  typename m_source_trans::iterator i = target.find(current.dest);
 	  if (i == target.end())
 	    {
-	      min_path s(a_, target, h_);
+	      min_path s(this, a_, target, h_);
 	      const state* res = s.search(current.dest->clone(), run->cycle);
 	      // init current to the corresponding transition.
 	      assert(res);
@@ -563,7 +568,7 @@ namespace spot
 		      << a_->format_state(begin) << std::endl;
 	  transition tmp;
 	  target.insert(std::make_pair(begin, tmp));
-	  min_path s(a_, target, h_);
+	  min_path s(this, a_, target, h_);
 	  const state* res = s.search(current.dest->clone(), run->cycle);
 	  assert(res);
 	  assert(res->compare(begin) == 0);
@@ -598,7 +603,7 @@ namespace spot
       else
         {
           // This initial state is outside the cycle.  Compute the prefix.
-          min_path s(a_, target, h_);
+          min_path s(this, a_, target, h_);
           cycle_entry_point = s.search(prefix_start, run->prefix);
           assert(cycle_entry_point);
           cycle_entry_point = cycle_entry_point->clone();

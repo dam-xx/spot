@@ -28,6 +28,7 @@ namespace spot
   /// \addtogroup ec_misc
   /// @{
 
+  /// Emptiness-check statistics
   class ec_statistics
   {
   public :
@@ -87,17 +88,43 @@ namespace spot
     }
 
   private :
-    unsigned states_; /// number of disctint visited states
-    unsigned transitions_; /// number of visited transitions
-    unsigned depth_; /// maximal depth of the stack(s)
-    unsigned max_depth_; /// maximal depth of the stack(s)
+    unsigned states_;		/// number of disctint visited states
+    unsigned transitions_;	/// number of visited transitions
+    unsigned depth_;		/// maximal depth of the stack(s)
+    unsigned max_depth_;	/// maximal depth of the stack(s)
   };
 
   /// Accepting Cycle Search Space statistics
   class acss_statistics
   {
   public:
+    /// Number of states in the search space for the accepting cycle.
     virtual int acss_states() const = 0;
+  };
+
+  /// Accepting Run Search statistics.
+  class ars_statistics
+  {
+  public:
+    ars_statistics()
+      : states_(0)
+    {
+    }
+
+    void
+    inc_ars_states()
+    {
+      ++states_;
+    }
+
+    int
+    ars_states() const
+    {
+      return states_;
+    }
+
+  private:
+    unsigned states_;	/// number of states visited
   };
 
   /// @}

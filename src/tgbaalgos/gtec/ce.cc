@@ -32,8 +32,10 @@ namespace spot
     class shortest_path: public bfs_steps
     {
     public:
-      shortest_path(const state_set* t, const couvreur99_check_status* ecs)
-        : bfs_steps(ecs->aut), target(t), ecs(ecs)
+      shortest_path(const state_set* t,
+		    const couvreur99_check_status* ecs,
+		    couvreur99_check_result* r)
+        : bfs_steps(ecs->aut), target(t), ecs(ecs), r(r)
       {
       }
 
@@ -46,6 +48,7 @@ namespace spot
       const state*
       filter(const state* s)
       {
+	r->inc_ars_states();
 	numbered_state_heap::state_index_p sip = ecs->h->find(s);
 	// Ignore unknown states ...
 	if (!sip.first)
@@ -69,6 +72,7 @@ namespace spot
       state_set seen;
       const state_set* target;
       const couvreur99_check_status* ecs;
+      couvreur99_check_result* r;
     };
   }
 
@@ -109,7 +113,7 @@ namespace spot
     for (tgba_run::steps::const_iterator i = run_->cycle.begin();
 	 i != run_->cycle.end(); ++i)
       ss.insert(i->s);
-    shortest_path shpath(&ss, ecs_);
+    shortest_path shpath(&ss, ecs_, this);
 
     const state* prefix_start = ecs_->aut->get_init_state();
     // There are two cases: either the initial state is already on
@@ -161,11 +165,14 @@ namespace spot
 	struct scc_bfs: bfs_steps
 	{
 	  const couvreur99_check_status* ecs;
+	  couvreur99_check_result* r;
 	  bdd& acc_to_traverse;
 	  int scc_root;
+
 	  scc_bfs(const couvreur99_check_status* ecs,
-		  bdd& acc_to_traverse)
-	    : bfs_steps(ecs->aut), ecs(ecs), acc_to_traverse(acc_to_traverse),
+		  couvreur99_check_result* r, bdd& acc_to_traverse)
+	    : bfs_steps(ecs->aut), ecs(ecs), r(r),
+	      acc_to_traverse(acc_to_traverse),
 	      scc_root(ecs->root.s.top().index)
 	  {
 	  }
@@ -173,6 +180,7 @@ namespace spot
 	  virtual const state*
 	  filter(const state* s)
 	  {
+	    r->inc_ars_states();
 	    numbered_state_heap::state_index_p sip = ecs->h->find(s);
 	    // Ignore unknown states.
 	    if (!sip.first)
@@ -200,7 +208,7 @@ namespace spot
 	    return false;
 	  }
 
-	} b(ecs_, acc_to_traverse);
+	} b(ecs_, this, acc_to_traverse);
 
 	substart = b.search(substart, run_->cycle);
       }

@@ -31,7 +31,8 @@ namespace spot
   /// Compute a counter example from a spot::couvreur99_check_status
   class couvreur99_check_result:
     public emptiness_check_result,
-    public acss_statistics
+    public acss_statistics,
+    public ars_statistics
   {
   public:
     couvreur99_check_result(const couvreur99_check_status* ecs);

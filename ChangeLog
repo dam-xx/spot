@@ -1,5 +1,18 @@
 2005-01-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptiness_stats.hh (ars_statistics): New class.
+	* src/tgbaalgos/ndfs_result.hh (ndfs_result): Inherit from
+	ars_statistics.
+	(ndfs_result::dfs): Call inc_ars_states().
+	(ndfs_result::test_path, ndfs_result::min_path): Update ars_statistics.
+	* tgbaalgos/gtec/ce.hh (couvreur99_check_result): Inherit
+	from ars_statistics.
+	* tgbaalgos/gtec/ce.cc (shortest_path,
+	couvreur99_check_result::accepting_cycle::scc_bfs):
+	Update ars_statistics.
+	* src/tgbatest/randtgba.cc: Display statistics about accepting run
+	search.
+
 	* src/tgbaalgos/bfssteps.hh (bfs_steps::finalize): Document.
 
 	* src/tgbaalgos/emptiness_stats.hh (accs_statistics): New class.

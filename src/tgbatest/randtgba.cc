@@ -252,6 +252,36 @@ struct acss_stat
   }
 };
 
+struct ars_stat
+{
+  int min_states;
+  int max_states;
+  int tot_states;
+  int n;
+
+  ars_stat()
+    : n(0)
+  {
+  }
+
+  void
+  count(const spot::ars_statistics* acss)
+  {
+    int s = acss->ars_states();
+    if (n++)
+      {
+	min_states = std::min(min_states, s);
+	max_states = std::max(max_states, s);
+	tot_states += s;
+      }
+    else
+      {
+	min_states = max_states = tot_states = s;
+      }
+  }
+};
+
+
 struct ar_stat
 {
   int min_prefix;
@@ -299,6 +329,8 @@ ec_stats_type ec_stats;
 
 typedef std::map<std::string, acss_stat> acss_stats_type;
 acss_stats_type acss_stats;
+typedef std::map<std::string, ars_stat> ars_stats_type;
+ars_stats_type ars_stats;
 
 typedef std::map<std::string, ar_stat> ar_stats_type;
 ar_stats_type ar_stats;		// Statistics about accepting runs.
@@ -586,10 +618,21 @@ main(int argc, char** argv)
 		  if (opt_replay)
 		    {
 		      spot::tgba_run* run;
+
+		      const spot::ars_statistics* ars =
+			dynamic_cast<const spot::ars_statistics*>(res);
+
 		      tm_ar.start(algo);
 		      for (int count = opt_R;;)
 			{
 			  run = res->accepting_run();
+			  if (opt_z && ars)
+			    {
+			      // Count only the first run (the other way
+			      // would be to divide the stats by opt_R).
+			      ars_stats[algo].count(ars);
+			      ars = 0;
+			    }
 			  if (count-- <= 0 || !run)
 			    break;
 			  delete run;
@@ -770,6 +813,37 @@ main(int argc, char** argv)
 		<< std::endl;
       for (acss_stats_type::const_iterator i = acss_stats.begin();
 	   i != acss_stats.end(); ++i)
+	std::cout << std::setw(22) << i->first << " |"
+		  << std::setw(6) << i->second.min_states
+		  << " "
+		  << std::setw(8)
+		  << static_cast<float>(i->second.tot_states) / i->second.n
+		  << " "
+		  << std::setw(6) << i->second.max_states
+		  << " |"
+		  << std::setw(6) << i->second.tot_states
+		  << " |"
+		  << std::setw(4) << i->second.n
+		  << std::endl;
+      std::cout << std::setiosflags(old);
+    }
+  if (!ars_stats.empty())
+    {
+      std::cout << std::endl;
+      std::ios::fmtflags old = std::cout.flags();
+      std::cout << std::right << std::fixed << std::setprecision(1);
+
+      std::cout << "Statistics about accepting run computation:"
+		<< std::endl;
+      std::cout << std::setw(22) << ""
+		<< " |      (non unique) states      |"
+		<< std::endl << std::setw(22) << "algorithm"
+		<< " |   min   < mean  < max | total |  n"
+		<< std::endl
+		<< std::setw(61) << std::setfill('-') << "" << std::setfill(' ')
+		<< std::endl;
+      for (ars_stats_type::const_iterator i = ars_stats.begin();
+	   i != ars_stats.end(); ++i)
 	std::cout << std::setw(22) << i->first << " |"
 		  << std::setw(6) << i->second.min_states
 		  << " "
