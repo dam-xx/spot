@@ -108,4 +108,22 @@ namespace spot
     acc_set &= acc;
     negacc_set &= !acc;
   }
+
+  void 
+  tgba_bdd_core_data::translate(bddPair* rewrite)
+  {
+    relation = bdd_replace(relation, rewrite);
+    accepting_conditions = bdd_replace(accepting_conditions, rewrite);
+    now_set = bdd_replace(now_set, rewrite);
+    next_set = bdd_replace(next_set, rewrite);
+    nownext_set = bdd_replace(nownext_set, rewrite);
+    notnow_set = bdd_replace(notnow_set, rewrite);
+    notnext_set = bdd_replace(notnext_set, rewrite);
+    notvar_set = bdd_replace(notvar_set, rewrite);
+    var_set = bdd_replace(var_set, rewrite);
+    varandnext_set = bdd_replace(varandnext_set, rewrite);
+    acc_set = bdd_replace(acc_set, rewrite);
+    notacc_set = bdd_replace(notacc_set, rewrite);
+    negacc_set = bdd_replace(negacc_set, rewrite);
+  }
 }

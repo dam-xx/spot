@@ -1,5 +1,13 @@
 2003-07-02  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/tgbabddcoredata.hh (tgba_bdd_core_data::translate): New 
+	function. 
+	* src/tgba/tgbabddcoredata.cc (tgba_bdd_core_data::translate): 
+	Likewise.
+	* src/tgba/tgbabddtranslatefactory.cc 
+	(tgba_bdd_translate_factory::tgba_bdd_translate_factory): Use 
+	tgba_bdd_core_data::translate.
+
 	* src/tgba/tgbabddcoredata.hh (tgba_bdd_core_data::nownext_set):
 	New attribute.
 	* tgba/tgbabddcoredata.cc, tgba/tgbabddtranslatefactory.cc:

@@ -6,28 +6,11 @@ namespace spot
 {
   tgba_bdd_translate_factory::tgba_bdd_translate_factory
   (const tgba_bdd_concrete& from, const tgba_bdd_dict& to)
-    : dict_(to)
+    : data_(from.get_core_data()), dict_(to)
   {
     bddPair* rewrite = compute_pairs(from.get_dict());
-
-    const tgba_bdd_core_data& in = from.get_core_data();
-
-    data_.relation = bdd_replace(in.relation, rewrite);
-    data_.accepting_conditions = bdd_replace(in.accepting_conditions, rewrite);
-    data_.now_set = bdd_replace(in.now_set, rewrite);
-    data_.next_set = bdd_replace(in.next_set, rewrite);
-    data_.nownext_set = bdd_replace(in.nownext_set, rewrite);
-    data_.notnow_set = bdd_replace(in.notnow_set, rewrite);
-    data_.notnext_set = bdd_replace(in.notnext_set, rewrite);
-    data_.notvar_set = bdd_replace(in.notvar_set, rewrite);
-    data_.var_set = bdd_replace(in.var_set, rewrite);
-    data_.varandnext_set = bdd_replace(in.varandnext_set, rewrite);
-    data_.acc_set = bdd_replace(in.acc_set, rewrite);
-    data_.notacc_set = bdd_replace(in.notacc_set, rewrite);
-    data_.negacc_set = bdd_replace(in.negacc_set, rewrite);
-
+    data_.translate(rewrite);
     init_ = bdd_replace(from.get_init_bdd(), rewrite);
-
     bdd_freepair(rewrite);
   }
 

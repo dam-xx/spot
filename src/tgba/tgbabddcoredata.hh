@@ -122,6 +122,12 @@ namespace spot
     /// \brief Update the variable sets to take a new accepting condition
     /// into account.
     void declare_accepting_condition(bdd prom);
+
+    /// \brief Translate BDD variables.
+    ///
+    /// Rewrite the variables according to \a rewrite.
+    /// This used by spot::tgba_bdd_translate_factory.
+    void translate(bddPair* rewrite);
   };
 }
 
