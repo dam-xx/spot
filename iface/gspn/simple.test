@@ -5,6 +5,7 @@
 set -e
 
 cp -R $srcdir/examples/simple .
+chmod +w simple
 
 # Unknown properties should be flagged.
 ../dottygspn-rg simple/simple unknown && exit 1

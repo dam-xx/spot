@@ -16,13 +16,17 @@ AC_DEFUN([AX_CHECK_LBTT], [
   fi
 
   if test "$with_included_lbtt" = yes;  then
-     AC_CONFIG_SUBDIRS([lbtt])
      LBTT='${top_builddir}/lbtt/src/lbtt'
      LBTT_TRANSLATE='${top_builddir}/lbtt/src/lbtt-translate'
   else
      LBTT=lbtt
      LBTT_TRANSLATE=lbtt-translate
   fi
+  # We always configure lbtt, this is needed to ensure
+  # it gets distributed properly.  Whether with_included_buddy is
+  # set or not affects whether we *use* or *build* lbtt.
+  AC_CONFIG_SUBDIRS([lbtt])
+
   AM_CONDITIONAL([WITH_INCLUDED_LBTT], [test "$with_included_lbtt" = yes])
   AC_SUBST([LBTT])
   AC_SUBST([LBTT_TRANSLATE])

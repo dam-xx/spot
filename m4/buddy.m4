@@ -17,12 +17,16 @@ AC_DEFUN([AX_CHECK_BUDDY], [
   fi
 
   if test "$with_included_buddy" = yes;  then
-     AC_CONFIG_SUBDIRS([buddy])
      BUDDY_LDFLAGS='$(top_builddir)/buddy/src/libbdd.la'
      BUDDY_CPPFLAGS='-I$(top_srcdir)/buddy/src'
   else
      BUDDY_LDFLAGS='-lbdd'
   fi
+  # We always configure BuDDy, this is needed to ensure
+  # it gets distributed properly.  Whether with_included_buddy is
+  # set or not affects whether we *use* or *build* BuDDy.
+  AC_CONFIG_SUBDIRS([buddy])
+
   AM_CONDITIONAL([WITH_INCLUDED_BUDDY], [test "$with_included_buddy" = yes])
   AC_SUBST([BUDDY_LDFLAGS])
   AC_SUBST([BUDDY_CPPFLAGS])

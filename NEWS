@@ -1,3 +1,18 @@
+New in spot 0.0f (2003-08-01):
+
+  * More python bindings, still only for the spot::ltl:: namespace.
+  * Functional GSPN interface.  (Enable with --with-gspn=directory.)
+  * The LTL scanner recognizes /\, \/, and xor.
+  * Upgrade to lbtt 1.0.2.
+  * tgba_tba_proxy is an on-the-fly degeneralizer.
+  * Implements the "magic search" algorithm.  
+    (Works only on a tgba_tba_proxy.)
+  * Tgba's output algorithms (save(), dotty()) now non-recursive.
+  * During products, succ_iter will optimize its set of successors
+    using information computed from the current product state.
+  * BDD dictionnaries are now shared between automata and.  This
+    gets rid of all the BDD-variable translating machinery.
+
 New in spot 0.0d (2003-07-13):
 
   * Optimize translation of G operators occurring at the root

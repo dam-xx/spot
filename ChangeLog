@@ -1,5 +1,13 @@
 2003-08-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* configure.ac, NEWS: Bump version to 0.0f.
+	* iface/gspn/simple.test, iface/gspn/dcswave.test,
+	iface/gspn/dcswaveltl.test: Make sure the example directory
+	is writable.
+	* m4/lbtt.m4, m4/buddy.m4: Always configure buddy/ and lbtt/,
+	regardless of the --with-included-buddy and --with-included-lbtt
+	settings.
+
 	* wrap/python/Makefile.am (python_PYTHON, _spot_la_SOURCES):
 	Explicitely refer to spot_wrap.cxx and spot.py as
 	$(srcdir)/spot_wrap.cxx and $(srcdir)/spot.py.
@@ -251,7 +259,7 @@
 	share the same dictionary.  An empty dictionary should be
 	constructed by the user and passed to the automaton' constructors
 	as necessary.
-	This huge change removes most code than it adds.
+	This huge change removes more code than it adds.
 
 	* src/Makefile.am (libspot_la_LIBADD): Add misc/libmisc.la.
 	* src/misc/bddalloc.hh, src/misc/bddalloc.cc: New files.  These
