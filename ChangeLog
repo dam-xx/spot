@@ -1,5 +1,11 @@
 2003-10-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.cc (connected_component): Split
+	into ...
+	(emptiness_check::connected_component,
+	emptiness_check::connected_component_set): ... these.
+	* src/tgbaalgos/emptinesscheck.cc: Adjust.
+
 	* src/tgbaalgos/emptinesscheck.cc (emptiness_check::h_filt,
 	emptiness_check::~emptiness_check) New methods.
 	(emptiness_check::check): Release all iterators in todo on exit.

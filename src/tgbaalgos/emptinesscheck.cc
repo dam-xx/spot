@@ -10,16 +10,16 @@ namespace spot
   typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
   typedef std::pair<pair_state_iter, bdd> triplet;
 
-  connected_component::connected_component(int i)
+  emptiness_check::connected_component::connected_component(int i)
   {
     index = i;
     condition = bddfalse;
   }
 
   bool
-  connected_component::has_state(const state* s) const
+  emptiness_check::connected_component_set::has_state(const state* s) const
   {
-    return state_set.find(s) != state_set.end();
+    return states.find(s) != states.end();
   }
 
 
@@ -289,10 +289,11 @@ namespace spot
 
     int comp_size = root.size();
     // Transform the stack of connected component into an array.
-    connected_component* scc = new connected_component[comp_size];
+    connected_component_set* scc = new connected_component_set[comp_size];
     for (int j = comp_size - 1; 0 <= j; --j)
       {
-	scc[j] = root.top();
+	scc[j].index = root.top().index;
+	scc[j].condition = root.top().condition;
 	root.pop();
       }
     assert(root.empty());
@@ -311,7 +312,7 @@ namespace spot
 	for (j = 1; j < comp_size; ++j)
 	  if (index < scc[j].index)
 	    break;
-	scc[j - 1].state_set.insert(i->first);
+	scc[j - 1].states.insert(i->first);
       }
 
     suffix.push_front(h_filt(aut_->get_init_state()));
@@ -398,7 +399,7 @@ namespace spot
   }
 
   void
-  emptiness_check::complete_cycle(const connected_component& comp_path,
+  emptiness_check::complete_cycle(const connected_component_set& comp_path,
 				  const state* from_state,
 				  const state* to_state)
   {
@@ -452,7 +453,7 @@ namespace spot
 
   // FIXME: Derecursive this function.
   void
-  emptiness_check::accepting_path(const connected_component& comp_path,
+  emptiness_check::accepting_path(const connected_component_set& comp_path,
 				  const state* start_path, bdd to_accept)
   {
     hash_type seen_priority;

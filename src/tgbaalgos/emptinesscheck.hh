@@ -11,28 +11,6 @@
 namespace spot
 {
 
-  class connected_component
-  {
-    // During the Depth path we keep the connected component that we met.
-  public:
-    connected_component(int index = -1);
-
-  public:
-    int index;
-    /// The bdd condition is the union of all accepting condition of
-    /// transitions which connect the states of the connected component.
-    bdd condition;
-
-    typedef Sgi::hash_set<const state*,
-			  state_ptr_hash, state_ptr_equal> set_type;
-    /// for the counter example we need to know all the states of the
-    /// component
-    set_type state_set;
-
-    /// Check if the SCC contains states \a s.
-    bool has_state(const state* s) const;
-  };
-
   /// \brief Check whether the language of an automate is empty.
   ///
   /// This is based on the following paper.
@@ -73,6 +51,31 @@ namespace spot
 			       const tgba* restrict = 0) const;
 
   private:
+
+    struct connected_component
+    {
+      // During the Depth path we keep the connected component that we met.
+    public:
+      connected_component(int index = -1);
+
+      int index;
+      /// The bdd condition is the union of all accepting condition of
+      /// transitions which connect the states of the connected component.
+      bdd condition;
+    };
+
+    struct connected_component_set: public connected_component
+    {
+      typedef Sgi::hash_set<const state*,
+			    state_ptr_hash, state_ptr_equal> set_type;
+      /// for the counter example we need to know all the states of the
+      /// component
+      set_type states;
+
+      /// Check if the SCC contains states \a s.
+      bool has_state(const state* s) const;
+    };
+
     const tgba* aut_;
     std::stack<connected_component> root;
     state_sequence suffix;
@@ -98,12 +101,12 @@ namespace spot
 
     /// Called by counter_example to find a path which traverses all
     /// accepting conditions in the accepted SCC.
-    void accepting_path (const connected_component& comp_path,
+    void accepting_path (const connected_component_set& comp_path,
 			 const state* start_path, bdd to_accept);
 
     /// Complete a cycle that caraterise the period of the counter
     /// example.  Append a sequence to the path given by accepting_path.
-    void complete_cycle(const connected_component& comp_path,
+    void complete_cycle(const connected_component_set& comp_path,
 			const state* from_state,const state* to_state);
   };
 }
