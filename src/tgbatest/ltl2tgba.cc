@@ -25,6 +25,7 @@
 #include <string>
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/reducform.hh"
+#include "ltlvisit/tostring.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
 #include "tgbaalgos/ltl2tgba_lacim.hh"
@@ -39,6 +40,8 @@
 #include "tgbaparse/public.hh"
 #include "tgbaalgos/dupexp.hh"
 #include "tgbaalgos/neverclaim.hh"
+
+#include "tgbaalgos/reductgba_sim.hh"
 
 void
 syntax(char* prog)
@@ -83,6 +86,7 @@ syntax(char* prog)
 	    << "  -r3  reduce formula using implication between "
 	    << "sub-formulae" << std::endl
 	    << "  -r4  reduce formula using all rules" << std::endl
+	    << "  -rd  display the reduce formula" << std::endl
 	    << "  -R   same as -r, but as a set" << std::endl
 	    << "  -s   convert to explicit automata, and number states "
 	    << "in DFS order" << std::endl
@@ -98,7 +102,17 @@ syntax(char* prog)
 	    << "  -X   do not compute an automaton, read it from a file"
 	    << std::endl
 	    << "  -y   do not merge states with same symbolic representation "
-	    << "(implies -f)" << std::endl;
+	    << "(implies -f)" << std::endl
+	    << "  -R1  use direct simulation to reduce the automata "
+	    << "(implies -L)"
+	    << std::endl
+	    << "  -R2  use delayed simulation to reduce the automata, incorrect"
+	    << "(implies -L)"
+	    << std::endl
+	    << "  -R3  use SCC to reduce the automata"
+	    << std::endl
+	    << "  -Rd  to display simulation relation"
+	    << std::endl;
   exit(2);
 }
 
@@ -120,7 +134,10 @@ main(int argc, char** argv)
   bool magic_many = false;
   bool expect_counter_example = false;
   bool from_file = false;
+  int reduc_aut = spot::Reduce_None;
   int redopt = spot::ltl::Reduce_None;
+  bool display_reduce_form = false;
+  bool display_rel_sim = false;
   bool post_branching = false;
   bool fair_loop_approx = false;
 
@@ -226,11 +243,11 @@ main(int argc, char** argv)
 	}
       else if (!strcmp(argv[formula_index], "-r2"))
 	{
-	  redopt |= spot::ltl::Reduce_Syntactic_Implications;
+	  redopt |= spot::ltl::Reduce_Eventuality_And_Universality;
 	}
       else if (!strcmp(argv[formula_index], "-r3"))
 	{
-	  redopt |= spot::ltl::Reduce_Eventuality_And_Universality;
+	  redopt |= spot::ltl::Reduce_Syntactic_Implications;
 	}
       else if (!strcmp(argv[formula_index], "-r4"))
 	{
@@ -273,6 +290,28 @@ main(int argc, char** argv)
 	{
 	  fm_opt = true;
 	  fm_symb_merge_opt = false;
+	}
+      else if (!strcmp(argv[formula_index], "-R1"))
+	{
+	  reduc_aut |= spot::Reduce_Dir_Sim;
+	  fair_loop_approx = true;
+	}
+      else if (!strcmp(argv[formula_index], "-R2"))
+	{
+	  reduc_aut |= spot::Reduce_Del_Sim;
+	  fair_loop_approx = true;
+	}
+      else if (!strcmp(argv[formula_index], "-R3"))
+	{
+	  reduc_aut |= spot::Reduce_Scc;
+	}
+      else if (!strcmp(argv[formula_index], "-rd"))
+	{
+	  display_reduce_form = true;
+	}
+      else if (!strcmp(argv[formula_index], "-Rd"))
+	{
+	  display_rel_sim = true;
 	}
       else
 	{
@@ -341,6 +380,8 @@ main(int argc, char** argv)
 	      spot::ltl::formula* t = spot::ltl::reduce(f, redopt);
 	      spot::ltl::destroy(f);
 	      f = t;
+	      if (display_reduce_form)
+		std::cout << spot::ltl::to_string(f) << std::endl;
 	    }
 
 	  if (fm_opt)
@@ -350,6 +391,46 @@ main(int argc, char** argv)
 					       fair_loop_approx);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
+	}
+
+      /*
+	spot::tgba* aut_red = 0;
+	if (reduc_aut != spot::Reduce_None)
+	a = aut_red = spot::reduc_tgba_sim(a, reduc_aut);
+      */
+
+      spot::tgba_reduc* aut_red = 0;
+      if (reduc_aut != spot::Reduce_None)
+	{
+	  a = aut_red = new spot::tgba_reduc(a);
+	  if ((reduc_aut & spot::Reduce_Dir_Sim) ||
+	      (reduc_aut & spot::Reduce_Del_Sim))
+	    {
+	      spot::simulation_relation* rel;
+	      if (reduc_aut & spot::Reduce_Dir_Sim)
+		rel = spot::get_direct_relation_simulation(a);
+	      else if (reduc_aut & spot::Reduce_Del_Sim)
+		rel = spot::get_delayed_relation_simulation(a, 1);
+	      else
+		assert(0);
+
+	      if (display_rel_sim)
+		aut_red->display_rel_sim(rel, std::cout);
+
+	      if (reduc_aut & spot::Reduce_Dir_Sim)
+		aut_red->prune_automata(rel);
+	      else if (reduc_aut & spot::Reduce_Del_Sim)
+		aut_red->quotient_state(rel);
+	      else
+		assert(0);
+
+	      spot::free_relation_simulation(rel);
+	    }
+
+	  if (reduc_aut & spot::Reduce_Scc)
+	    {
+	      aut_red->prune_scc();
+	    }
 	}
 
       spot::tgba_tba_proxy* degeneralized = 0;
@@ -477,6 +558,8 @@ main(int argc, char** argv)
 	delete expl;
       if (degeneralize_opt)
 	delete degeneralized;
+      if (aut_red)
+	delete aut_red;
 
       delete to_free;
     }

@@ -30,15 +30,15 @@ set -e
 cat > config <<EOF
 Algorithm
 {
-   Name = "Spot (Couvreur -- LaCIM), reduction of formula"
-   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r4 -F -t'"
+   Name = "Spot (Couvreur -- LaCIM)"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -t'"
    Enabled = yes
 }
 
 Algorithm
 {
-   Name = "Spot (Couvreur -- LaCIM)"
-   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -t'"
+   Name = "Spot (Couvreur -- LaCIM), reduction of formula"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r4 -F -t'"
    Enabled = yes
 }
 
@@ -60,6 +60,48 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM)"
    Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM), basic reduction of formula"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r1 -F -f -t'"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM), reduction of formula using class of formula"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r2 -F -f -t'"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM), reduction of formula using implies relation"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r3 -F -f -t'"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM), reduction of formula (pre reduction)"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r4 -F -f -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM), post reduction"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -R1 -R2 -F -f -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM), pre + post reduction"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r4 -R1 -R2 -F -f -t'"
    Enabled = yes
 }
 
@@ -88,6 +130,13 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), fake"
    Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -F -f -T'"
+   Enabled = no
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM), reduction of formula, fake"
+   Path = "${LBTT_TRANSLATE} --spot './ltl2tgba -r4 -F -f -T'"
    Enabled = no
 }
 

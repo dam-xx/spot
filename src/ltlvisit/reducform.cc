@@ -311,6 +311,7 @@ namespace spot
 	  destroy(f2);
 	  f2 = f1;
 	}
+
       if (opt & (Reduce_Syntactic_Implications
 		 | Reduce_Eventuality_And_Universality))
 	{
@@ -322,9 +323,9 @@ namespace spot
 
 	  // Run basic_reduce again.
 	  //
-	  // Consider `F b & g'   were g is an eventual formula rewritten
-	  // as `g = F c'  Then basic_reduce with rewrite it
-	  // as F(b & c).
+	  // Consider `FG b & g'   were g is an eventual formula rewritten
+	  // as `g = FG c'  Then basic_reduce with rewrite it
+	  // as FG(b & c).
 	  if (opt & Reduce_Basics)
 	    {
 	      f1 = basic_reduce(f2);

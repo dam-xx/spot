@@ -38,6 +38,7 @@ check_PROGRAMS = \
   mixprod \
   powerset \
   readsave \
+  reductgba \
   tgbaread \
   tripprod
 
@@ -53,12 +54,14 @@ ltlprod_SOURCES  = ltlprod.cc
 mixprod_SOURCES  = mixprod.cc
 powerset_SOURCES = powerset.cc
 readsave_SOURCES = readsave.cc
+reductgba_SOURCES = reductgba.cc
 tgbaread_SOURCES = tgbaread.cc
 tripprod_SOURCES = tripprod.cc
 
 # Keep this sorted by STRENGTH.  Test basic things first,
 # because such failures will be easier to diagnose and fix.
 TESTS = \
+  reductgba.test \
   explicit.test \
   tgbaread.test \
   readsave.test \

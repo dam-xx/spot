@@ -28,7 +28,20 @@ namespace spot
 {
   namespace ltl
   {
-    // FIXME: Cite paper.
+    /// This comes from
+    /// \verbatim
+    /// @InProceedings{	  somenzi.00.cav,
+    /// author  	= {Fabio Somenzi and Roderick Bloem},
+    /// title		= {Efficient {B\"u}chi Automata for {LTL} Formulae},
+    /// booktitle	= {Proceedings of the 12th International Conference on
+    /// 		  Computer Aided Verification (CAV'00)},
+    /// pages		= {247--263},
+    /// year		= {2000},
+    /// volume  	= {1855},
+    /// series  	= {Lecture Notes in Computer Science},
+    /// publisher	= {Springer-Verlag}
+    /// }
+    /// \endverbatim
 
     /// \brief Syntactic implication.
     bool syntactic_implication(const formula* f1, const formula* f2);

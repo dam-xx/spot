@@ -23,7 +23,9 @@
 #include "ltlast/allnodes.hh"
 #include <cassert>
 
+#include "ltlvisit/clone.hh"
 #include "ltlvisit/destroy.hh"
+#include "ltlvisit/dump.hh"
 
 namespace spot
 {
@@ -85,6 +87,33 @@ namespace spot
 	result_ = c;
       }
 
+      formula*
+      param_case(multop* mo, unop::type op, multop::type op_child)
+      {
+	formula* result;
+	multop::vec* res1 = new multop::vec;
+	multop::vec* resGF = new multop::vec;
+	unsigned mos = mo->size();
+	for (unsigned i = 0; i < mos; ++i)
+	  if (is_GF(mo->nth(i)))
+	    resGF->push_back(clone(mo->nth(i)));
+	  else
+	    res1->push_back(clone(mo->nth(i)));
+	destroy(mo);
+	multop::vec* res3 = new multop::vec;
+	if (res1->size())
+	  res3->push_back(unop::instance(op,
+					 multop::instance(op_child, res1)));
+	else
+	  delete res1;
+	if (resGF->size())
+	  res3->push_back(multop::instance(op_child, resGF));
+	else
+	  delete resGF;
+	result = multop::instance(op_child, res3);
+	return result;
+      }
+
       void
       visit(unop* uo)
       {
@@ -112,30 +141,10 @@ namespace spot
 	    // X(f1 & GF(f2)) = X(f1) & GF(F2)
 	    // X(f1 | GF(f2)) = X(f1) | GF(F2)
 	    mo = dynamic_cast<multop*>(result_);
-	    if (mo && mo->size() == 2)
+	    if (mo)
 	      {
-		// FIXME: This is incomplete.  It should be done for
-		// multops of any size.
-		if (is_GF(mo->nth(0)))
-		  {
-		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::F,
-						  basic_reduce(mo->nth(1))));
-		    res->push_back(basic_reduce(mo->nth(0)));
-		    result_ = multop::instance(mo->op(), res);
-		    destroy(mo);
-		    return;
-		  }
-		if (is_GF(mo->nth(1)))
-		  {
-		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::F,
-						  basic_reduce(mo->nth(0))));
-		    res->push_back(basic_reduce(mo->nth(1)));
-		    result_ = multop::instance(mo->op(), res);
-		    destroy(mo);
-		    return;
-		  }
+		result_ = param_case(mo, unop::X, mo->op());
+		return;
 	      }
 
 	    result_ = unop::instance(unop::X, result_);
@@ -161,33 +170,11 @@ namespace spot
 
 	    // F(f1 & GF(f2)) = F(f1) & GF(F2)
 	    mo = dynamic_cast<multop*>(result_);
-	    if (mo && mo->op() == multop::And
-		// FIXME: This is incomplete.  It should be done for
-		// "And"s of any size.
-		&& mo->size() == 2)
+	    if (mo && mo->op() == multop::And)
 	      {
-		if (is_GF(mo->nth(0)))
-		  {
-		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::F,
-						  basic_reduce(mo->nth(1))));
-		    res->push_back(basic_reduce(mo->nth(0)));
-		    result_ = multop::instance(mo->op(), res);
-		    destroy(mo);
-		    return;
-		  }
-		if (is_GF(mo->nth(1)))
-		  {
-		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::F,
-						  basic_reduce(mo->nth(0))));
-		    res->push_back(basic_reduce(mo->nth(1)));
-		    result_ = multop::instance(mo->op(), res);
-		    destroy(mo);
-		    return;
-		  }
+		result_ = param_case(mo, unop::F, multop::And);
+		return;
 	      }
-
 
 	    result_ = unop::instance(unop::F, result_);
 	    return;
@@ -222,31 +209,10 @@ namespace spot
 
 	    // G(f1 | GF(f2)) = G(f1) | GF(F2)
 	    mo = dynamic_cast<multop*>(result_);
-	    if (mo && mo->op() == multop::Or
-		// FIXME: This is incomplete.  It should be done for
-		// "Or"s of any size.
-		&& mo->size() == 2)
+	    if (mo && mo->op() == multop::Or)
 	      {
-		if (is_GF(mo->nth(0)))
-		  {
-		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::F,
-						  basic_reduce(mo->nth(1))));
-		    res->push_back(basic_reduce(mo->nth(0)));
-		    result_ = multop::instance(mo->op(), res);
-		    destroy(mo);
-		    return;
-		  }
-		if (is_GF(mo->nth(1)))
-		  {
-		    multop::vec* res = new multop::vec;
-		    res->push_back(unop::instance(unop::F,
-						  basic_reduce(mo->nth(0))));
-		    res->push_back(basic_reduce(mo->nth(1)));
-		    result_ = multop::instance(mo->op(), res);
-		    destroy(mo);
-		    return;
-		  }
+		result_ = param_case(mo, unop::G, multop::Or);
+		return;
 	      }
 
 	    result_ = unop::instance(unop::G, result_);
@@ -385,17 +351,17 @@ namespace spot
 		    if (uo && uo->op() == unop::X)
 		      {
 			// Xa & Xb = X(a & b)
-			tmpX->push_back(basic_reduce(uo->child()));
+			tmpX->push_back(clone(uo->child()));
 		      }
 		    else if (is_FG(*i))
 		      {
 			// FG(a) & FG(b) = FG(a & b)
 			unop* uo2 = dynamic_cast<unop*>(uo->child());
-			tmpFG->push_back(basic_reduce(uo2->child()));
+			tmpFG->push_back(clone(uo2->child()));
 		      }
 		    else
 		      {
-			tmpOther->push_back(basic_reduce(*i));
+			tmpOther->push_back(clone(*i));
 		      }
 		  }
 		else if (bo)
@@ -414,7 +380,7 @@ namespace spot
 				&& ftmp == bo2->second())
 			      {
 				tmpUright
-				  ->push_back(basic_reduce(bo2->first()));
+				  ->push_back(clone(bo2->first()));
 				if (j != i)
 				  {
 				    destroy(*j);
@@ -428,7 +394,7 @@ namespace spot
 						      instance(multop::
 							       And,
 							       tmpUright),
-						      basic_reduce(ftmp)));
+						      clone(ftmp)));
 		      }
 		    else if (bo->op() == binop::R)
 		      {
@@ -444,7 +410,7 @@ namespace spot
 				&& ftmp == bo2->first())
 			      {
 				tmpRright
-				  ->push_back(basic_reduce(bo2->second()));
+				  ->push_back(clone(bo2->second()));
 				if (j != i)
 				  {
 				    destroy(*j);
@@ -454,19 +420,19 @@ namespace spot
 			  }
 			tmpR
 			  ->push_back(binop::instance(binop::R,
-						      basic_reduce(ftmp),
+						      clone(ftmp),
 						      multop::
 						      instance(multop::And,
 							       tmpRright)));
 		      }
 		    else
 		      {
-			tmpOther->push_back(basic_reduce(*i));
+			tmpOther->push_back(clone(*i));
 		      }
 		  }
 		else
 		  {
-		    tmpOther->push_back(basic_reduce(*i));
+		    tmpOther->push_back(clone(*i));
 		  }
 		destroy(*i);
 	      }
@@ -489,17 +455,17 @@ namespace spot
 		    if (uo && uo->op() == unop::X)
 		      {
 			// Xa | Xb = X(a | b)
-			tmpX->push_back(basic_reduce(uo->child()));
+			tmpX->push_back(clone(uo->child()));
 		      }
 		    else if (is_GF(*i))
 		      {
 			// GF(a) | GF(b) = GF(a | b)
 			unop* uo2 = dynamic_cast<unop*>(uo->child());
-			tmpGF->push_back(basic_reduce(uo2->child()));
+			tmpGF->push_back(clone(uo2->child()));
 		      }
 		    else
 		      {
-			tmpOther->push_back(basic_reduce(*i));
+			tmpOther->push_back(clone(*i));
 		      }
 		  }
 		else if (bo)
@@ -518,7 +484,7 @@ namespace spot
 				&& ftmp == bo2->first())
 			      {
 				tmpUright
-				  ->push_back(basic_reduce(bo2->second()));
+				  ->push_back(clone(bo2->second()));
 				if (j != i)
 				  {
 				    destroy(*j);
@@ -527,7 +493,7 @@ namespace spot
 			      }
 			  }
 			tmpU->push_back(binop::instance(binop::U,
-							basic_reduce(ftmp),
+							clone(ftmp),
 							multop::
 							instance(multop::Or,
 								 tmpUright)));
@@ -546,7 +512,7 @@ namespace spot
 				&& ftmp == bo2->second())
 			      {
 				tmpRright
-				  ->push_back(basic_reduce(bo->first()));
+				  ->push_back(clone(bo2->first()));
 				if (j != i)
 				  {
 				    destroy(*j);
@@ -559,16 +525,16 @@ namespace spot
 						      multop::
 						      instance(multop::Or,
 							       tmpRright),
-						      basic_reduce(ftmp)));
+						      clone(ftmp)));
 		      }
 		    else
 		      {
-			tmpOther->push_back(basic_reduce(*i));
+			tmpOther->push_back(clone(*i));
 		      }
 		  }
 		else
 		  {
-		    tmpOther->push_back(basic_reduce(*i));
+		    tmpOther->push_back(clone(*i));
 		  }
 		destroy(*i);
 	      }
@@ -582,22 +548,26 @@ namespace spot
 	res->clear();
 	delete res;
 
-	if (tmpX->size())
+
+	if (tmpX && tmpX->size())
 	  tmpOther->push_back(unop::instance(unop::X,
 					     multop::instance(mo->op(),
 							      tmpX)));
-	else
+	else if (tmpX && !tmpX->size())
 	  delete tmpX;
 
-	if (tmpU->size())
+
+	if (tmpU && tmpU->size())
 	  tmpOther->push_back(multop::instance(mo->op(), tmpU));
-	else
+	else if (tmpU && !tmpU->size())
 	  delete tmpU;
 
-	if (tmpR->size())
+
+	if (tmpR && tmpR->size())
 	  tmpOther->push_back(multop::instance(mo->op(), tmpR));
-	else
+	else if (tmpR && !tmpR->size())
 	  delete tmpR;
+
 
 	if (tmpGF && tmpGF->size())
 	  {
@@ -608,6 +578,10 @@ namespace spot
 							       tmpGF)));
 	    tmpOther->push_back(ftmp);
 	  }
+	else if (tmpGF && !tmpGF->size())
+	  delete tmpGF;
+
+
 	if (tmpFG && tmpFG->size())
 	  {
 	    formula* ftmp
@@ -617,6 +591,9 @@ namespace spot
 							       tmpFG)));
 	    tmpOther->push_back(ftmp);
 	  }
+	else if (tmpFG && !tmpFG->size())
+	  delete tmpFG;
+
 
 	result_ = multop::instance(op, tmpOther);
 

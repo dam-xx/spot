@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -28,6 +28,8 @@
 #include "ltlvisit/nenoform.hh"
 #include "ltlvisit/destroy.hh"
 #include "ltlast/allnodes.hh"
+#include "ltlvisit/reducform.hh"
+#include "ltlvisit/tostring.hh"
 
 void
 syntax(char* prog)
@@ -41,7 +43,6 @@ main(int argc, char** argv)
 {
   if (argc != 3)
     syntax(argv[0]);
-
 
   spot::ltl::parse_error_list p1;
   spot::ltl::formula* f1 = spot::ltl::parse(argv[1], p1);
@@ -78,6 +79,16 @@ main(int argc, char** argv)
   spot::ltl::destroy(tmp);
   spot::ltl::dump(std::cout, f1);
   std::cout << std::endl;
+#endif
+#ifdef REDUC
+  spot::ltl::formula* tmp;
+  tmp = f1;
+  f1 = spot::ltl::reduce(f1);
+  //std::string f2s = spot::ltl::to_string(f2);
+  //std::string f1s = spot::ltl::to_string(f1);
+  spot::ltl::destroy(tmp);
+  spot::ltl::dump(std::cout, f1);
+  //std::cout << f1s << " // " << f2s << std::endl;
 #endif
 
   int exit_code = f1 != f2;

@@ -37,7 +37,8 @@ tgbaalgos_HEADERS = \
   powerset.hh \
   reachiter.hh \
   save.hh \
-  stats.hh
+  stats.hh \
+  reductgba_sim.hh
 
 noinst_LTLIBRARIES = libtgbaalgos.la
 libtgbaalgos_la_SOURCES = \
@@ -51,6 +52,8 @@ libtgbaalgos_la_SOURCES = \
   powerset.cc \
   reachiter.cc \
   save.cc \
-  stats.cc
+  stats.cc \
+  reductgba_sim.cc \
+  reductgba_sim_del.cc
 
 libtgbaalgos_la_LIBADD = gtec/libgtec.la

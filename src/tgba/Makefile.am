@@ -1,4 +1,4 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -41,7 +41,8 @@ tgba_HEADERS = \
   tgbabddfactory.hh \
   tgbaexplicit.hh \
   tgbaproduct.hh \
-  tgbatba.hh
+  tgbatba.hh \
+  tgbareduc.hh
 
 noinst_LTLIBRARIES = libtgba.la
 libtgba_la_SOURCES = \
@@ -57,4 +58,5 @@ libtgba_la_SOURCES = \
   tgbabddcoredata.cc \
   tgbaexplicit.cc \
   tgbaproduct.cc \
-  tgbatba.cc
+  tgbatba.cc \
+  tgbareduc.cc

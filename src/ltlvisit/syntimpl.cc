@@ -72,41 +72,46 @@ namespace spot
       visit(const unop* uo)
       {
 	const formula* f1 = uo->child();
-	switch (uo->op())
+	if (uo->op() == unop::F)
 	  {
-	  case unop::Not:
-	  case unop::X:
-	    eventual = recurse_ev(f1);
+	    eventual = true;
 	    universal = recurse_un(f1);
 	    return;
-	  case unop::F:
-	    eventual = true;
-	    return;
-	  case unop::G:
-	    universal = true;
-	    return;
 	  }
-	/* Unreachable code.  */
-	assert(0);
+	if (uo->op() == unop::G)
+	  {
+	    universal = true;
+	    eventual = recurse_ev(f1);
+	  }
       }
 
       void
       visit(const binop* bo)
       {
 	const formula* f1 = bo->first();
+	const formula* f2 = bo->second();
 	switch (bo->op())
 	  {
 	  case binop::Xor:
 	  case binop::Equiv:
 	  case binop::Implies:
+	    universal = recurse_un(f1) & recurse_un(f2);
+	    eventual = recurse_ev(f1) & recurse_ev(f2);
 	    return;
 	  case binop::U:
-	    if (f1 == constant::true_instance())
+	    universal = recurse_un(f1) & recurse_un(f2);
+	    if ((f1 == constant::true_instance()) ||
+		(recurse_ev(f1)))
 	      eventual = true;
 	    return;
 	  case binop::R:
-	    if (f1 == constant::false_instance())
+	    eventual = recurse_ev(f1) & recurse_ev(f2);
+	    if ((f1 == constant::false_instance()))
+	      //||
+	      //(recurse_un(f1)))
 	      universal = true;
+	    if (!universal)
+	      universal = recurse_un(f1) & recurse_un(f2);
 	    return;
 	  }
 	/* Unreachable code.  */

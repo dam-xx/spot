@@ -35,6 +35,7 @@ check_PROGRAMS = \
   lunabbrev \
   nenoform \
   reduc \
+  reduccmp \
   syntimpl \
   tostring \
   tunabbrev \
@@ -49,6 +50,8 @@ lunabbrev_CPPFLAGS = $(AM_CPPFLAGS) -DLUNABBREV
 nenoform_SOURCES = equals.cc
 nenoform_CPPFLAGS = $(AM_CPPFLAGS) -DNENOFORM
 reduc_SOURCES = reduc.cc
+reduccmp_SOURCES = equals.cc
+reduccmp_CPPFLAGS = $(AM_CPPFLAGS) -DREDUC
 syntimpl_SOURCES = syntimpl.cc
 tostring_SOURCES = tostring.cc
 tunabbrev_SOURCES = equals.cc
@@ -70,6 +73,7 @@ TESTS = \
   nenoform.test \
   tunenoform.test \
   syntimpl.test \
-  reduc.test
+  reduc.test \
+  reduccmp.test
 
 CLEANFILES = stdout expect parse.dot result.data

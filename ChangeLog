@@ -1,3 +1,23 @@
+2004-06-15  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/tgbatest/ltl2tgba.cc: Add some option for the reduction of
+	automata.
+	* src/tgbatest/spotlbtt.test, src/tgbatest/Makefile.am: Add some
+	test for reduction of automata.
+	* src/tgbaalgos/reductgba_sim_del.cc, src/tgbaalgos/reductgba_sim.cc,
+	src/tgbaalgos/reductgba_sim.hh: Compute some simulation relation
+	to reduce a tgba.
+	* src/tgba/tgbareduc.cc, src/tgba/tgbareduc.hh: A implementation
+	of tgba for the reduction.
+	* src/tgbaalgos/Makefile.am, src/tgba/Makefile.am:
+	Add the reduction of automata.
+	* src/ltlvisit/syntimpl.cc, src/ltlvisit/basereduc.cc:
+	Lot of mistake are corrected.
+	* src/ltlvisit/syntimpl.hh, src/ltlvisit/reducform.cc,
+	src/ltlvisit/reducform.hh, src/ltltest/reduc.cc: Adjust.
+	* src/ltltest/equals.cc, src/ltltest/reduccmp.test,
+	src/ltltest/Makefile.am: Add a test for reduction.
+
 2004-06-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/common.cc, iface/gspn/common.hh: Remove the

@@ -59,6 +59,23 @@ namespace spot
     /// \brief Check whether a formula is eventual.
     ///
     /// FIXME: Describe what eventual formulae are.  Cite paper.
+
+    /// This comes from
+    /// \verbatim
+    /// @InProceedings{	  etessami.00.concur,
+    /// author  	= {Kousha Etessami and Gerard J. Holzmann},
+    /// title		= {Optimizing {B\"u}chi Automata},
+    /// booktitle	= {Proceedings of the 11th International Conference on
+    /// 		  Concurrency Theory (Concur'2000)},
+    /// pages		= {153--167},
+    /// year		= {2000},
+    /// editor  	= {C. Palamidessi},
+    /// volume  	= {1877},
+    /// series  	= {Lecture Notes in Computer Science},
+    ///  publisher	= {Springer-Verlag}
+    /// }
+    /// \endverbatim
+
     bool is_eventual(const formula* f);
 
     /// \brief Check whether a formula is universal.
