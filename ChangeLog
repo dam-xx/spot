@@ -1,4 +1,12 @@
-2004-11-18  Alexandre Duret-Lutz  <adl@gnu.org>
+2004-11-19  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/magic.hh, src/tgbaalgos/magic.cc,
+	src/tgbaalgos/se05.hh, src/tgbaalgos/se05.cc,
+	src/tgbaalgos/tau03.hh, src/tgbaalgos/tau03.cc,
+	src/tgbaalgos/tau03opt.hh, src/tgbaalgos/tau03opt.cc: Fix
+	copyright year, and do not include <iterator>.
+
+2004-11-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/randtgba.cc (main): Add options -z and -Z for statistics.
 	(ce_stat): New struct.
