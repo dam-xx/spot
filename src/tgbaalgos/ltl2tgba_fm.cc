@@ -1,5 +1,6 @@
 #include "misc/hash.hh"
 #include "misc/bddalloc.hh"
+#include "misc/minato.hh"
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlvisit/lunabbrev.hh"
@@ -440,15 +441,10 @@ namespace spot
 
 	std::string now = to_string(f);
 
-	bdd all = res;
-	bdd outside = !all;
-	while (all != bddfalse)
+	minato_isop isop(res);
+	bdd cube;
+	while ((cube = isop.next()) != bddfalse)
 	  {
-
-	    bdd cube = bdd_satone(all);
-	    cube = bdd_simplify(cube, cube | outside);
-	    all -= cube;
-
 	    ltl::formula* dest =
 	      d.conj_bdd_to_formula(bdd_existcomp(cube, d.next_set));
 
@@ -458,7 +454,6 @@ namespace spot
 
 	    d.conj_bdd_to_atomic_props(a, bdd_existcomp(cube, d.var_set), t);
 	    d.conj_bdd_to_acc(a, bdd_existcomp(cube, d.a_set), t);
-
 
 	    if (formulae_seen.find(dest) == formulae_seen.end())
 	      {
