@@ -219,29 +219,31 @@ namespace spot
 	os << "  ";
 	if (restrict)
 	  {
-	    os << restrict->format_state(aut_->project_state(*i_se, restrict))
-	       << std::endl;
+	    const state* s = aut_->project_state(*i_se, restrict);
+	    assert(s);
+	    os << restrict->format_state(s) << std::endl;
+	    delete s;
 	  }
 	else
 	  {
-	    os << aut_->format_state((*i_se)) << std::endl;
+	    os << aut_->format_state(*i_se) << std::endl;
 	  }
       }
     os << "Cycle:" <<std::endl;
     for (cycle_path::const_iterator it = period.begin();
 	 it != period.end(); ++it)
       {
+	os << "    | " << bdd_format_set(d, it->second) << std::endl;
 	os << "  ";
 	if (restrict)
 	  {
-	    os << "    | " << bdd_format_set(d, it->second) <<std::endl ;
-	    os << restrict->format_state(aut_->project_state(it->first,
-							     restrict))
-	       << std::endl;
+	    const state* s = aut_->project_state(it->first, restrict);
+	    assert(s);
+	    os << restrict->format_state(s) << std::endl;
+	    delete s;
 	  }
 	else
 	  {
-	    os << "    | " << bdd_format_set(d, it->second) <<std::endl ;
 	    os << aut_->format_state(it->first) << std::endl;
 	  }
       }
