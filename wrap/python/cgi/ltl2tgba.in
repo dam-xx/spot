@@ -47,6 +47,7 @@ extra_form_notice = ''
 
 # Location of the dot command
 dot = 'dot' # in PATH.
+dot_bgcolor = '-Gbgcolor=#FFFFFF'
 # dot = '/usr/local/bin/dot'
 
 def print_footer():
@@ -153,8 +154,8 @@ def print_stats(automaton):
     return False
 
 def render_dot(basename):
-    os.spawnlp(os.P_WAIT, dot, dot, '-Tpng', '-Gsize=14,14', '-o',
-               basename + '.png', basename + '.txt')
+    os.spawnlp(os.P_WAIT, dot, dot, dot_bgcolor, '-Tpng',
+               '-Gsize=14,14', '-o', basename + '.png', basename + '.txt')
     reset_alarm()
     b = cgi.escape(basename)
     print '<img src="' + b + '.png"><br>(<a href="' + b + '.txt">dot source</a>)'
@@ -190,9 +191,8 @@ LTL-to-B&uuml;chi translator</H1>""" % extra_header
 
 formula = form.getfirst('formula', '')
 
-#F8F0E8
-color_fm = '#E0D8E0'
-color_lacim = "#F8D8E8"
+color_fm = "#D3AEF8"
+color_lacim = "#F8AED3"
 
 options_common = [
     ('show_formula_png',    'draw the formula',                            0),

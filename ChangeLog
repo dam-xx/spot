@@ -1,5 +1,8 @@
 2004-04-21  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* wrap/python/cgi/ltl2tgba.in: Use darker color and introduce
+	the new variable dot_bgcolor.
+
 	* wrap/python/cgi/ltl2tgba.in (add_options): Revamp options output
 	using this new function.
 
