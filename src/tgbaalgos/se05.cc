@@ -19,7 +19,11 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+//#define TRACE
+
+#ifdef TRACE
 #include <iostream>
+#endif
 #include "misc/hash.hh"
 #include <list>
 #include <iterator>
@@ -68,7 +72,7 @@ namespace spot
 
       /// \brief Perform a Magic Search.
       ///
-      /// \return non null pointer iff the algorithm has found a 
+      /// \return non null pointer iff the algorithm has found a
       /// new accepting path.
       ///
       /// check() can be called several times (until it returns a null
@@ -154,7 +158,7 @@ namespace spot
       stack_type st_blue;
 
       /// \brief number of visited accepting arcs
-      /// in the blue stack. 
+      /// in the blue stack.
       int current_weight;
 
       /// \brief Stack of the red dfs.
@@ -175,12 +179,20 @@ namespace spot
         while (!st_blue.empty())
           {
             stack_item& f = st_blue.front();
+#ifdef TRACE
+            std::cout << "DFS_BLUE treats: "
+            << a->format_state(f.s) << std::endl;
+#endif
             if (!f.it->done())
               {
                 ++nbt;
                 const state *s_prime = f.it->current_state();
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
+#ifdef TRACE
+                std::cout << "  Visit the successor: "
+                          << a->format_state(s_prime) << std::endl;
+#endif
                 f.it->next();
                 typename heap::color_ref c = h.get_color_ref(s_prime);
                 if (c.is_white())
@@ -189,6 +201,9 @@ namespace spot
                     if (acc == all_cond)
                       ++current_weight;
                     ++nbn;
+#ifdef TRACE
+                    std::cout << "  It is white, go down" << std::endl;
+#endif
                     h.add_new_state(s_prime, CYAN, current_weight);
                     push(st_blue, s_prime, label, acc);
                   }
@@ -197,13 +212,21 @@ namespace spot
                     if (c.get() == CYAN &&
                           (acc == all_cond || current_weight > c.get_weight()))
                       {
+#ifdef TRACE
+                        std::cout << "  It is cyan and a cycle has been found"
+                                  << std::endl;
+#endif
                         c.set(RED);
                         push(st_red, s_prime, label, acc);
                         return true;
                       }
-                    else if (c.get() == BLUE && acc == all_cond)
+                    else if (c.get() != RED && acc == all_cond)
                       {
-                        // the test 'c.get() == BLUE' is added to limit
+#ifdef TRACE
+                        std::cout << "  It is blue and the arc is accepting"
+                                  << ", start a red dfs" << std::endl;
+#endif
+                        // the test 'c.get() != RED' is added to limit
                         // the number of runs reported by successive
                         // calls to the check method. Without this
                         // functionnality, the test can be ommited.
@@ -213,6 +236,10 @@ namespace spot
                           return true;
                       }
                     else
+#ifdef TRACE
+                      std::cout << "  It is blue or red, pop it"
+                                << std::endl;
+#endif
                       h.pop_notify(s_prime);
                   }
               }
@@ -220,6 +247,10 @@ namespace spot
             // Backtrack the edge
             //        (predecessor of f.s in st_blue, <f.label, f.acc>, f.s)
               {
+#ifdef TRACE
+                std::cout << "  All the successors have been visited"
+                          << std::endl;
+#endif
                 --sts;
                 stack_item f_dest(f);
                 delete f.it;
@@ -228,13 +259,19 @@ namespace spot
                   --current_weight;
                 typename heap::color_ref c = h.get_color_ref(f_dest.s);
                 assert(!c.is_white());
-                if (c.get() == BLUE && f_dest.acc == all_cond
+                if (c.get() != RED && f_dest.acc == all_cond
                                     && !st_blue.empty())
-                // the test 'c.get() == BLUE' is added to limit
+                // the test 'c.get() != RED' is added to limit
                 // the number of runs reported by successive
                 // calls to the check method. Without this
                 // functionnality, the test can be ommited.
                   {
+#ifdef TRACE
+                    std::cout << "  The arc from "
+                              << a->format_state(st_blue.front().s)
+                              << " to the current state is accepting,"
+                              << " start a red dfs" << std::endl;
+#endif
                     c.set(RED);
                     push(st_red, f_dest.s, f_dest.label, f_dest.acc);
                     if (dfs_red())
@@ -242,6 +279,9 @@ namespace spot
                   }
                 else
                   {
+#ifdef TRACE
+                    std::cout << "  Set it blue and pop it" << std::endl;
+#endif
                     c.set(BLUE);
                     h.pop_notify(f_dest.s);
                   }
@@ -257,20 +297,31 @@ namespace spot
         while (!st_red.empty())
           {
             stack_item& f = st_red.front();
+#ifdef TRACE
+            std::cout << "DFS_RED treats: "
+            << a->format_state(f.s) << std::endl;
+#endif
             if (!f.it->done())
               {
                 ++nbt;
                 const state *s_prime = f.it->current_state();
                 bdd label = f.it->current_condition();
                 bdd acc = f.it->current_acceptance_conditions();
+#ifdef TRACE
+                std::cout << "  Visit the successor: "
+                          << a->format_state(s_prime) << std::endl;
+#endif
                 f.it->next();
                 typename heap::color_ref c = h.get_color_ref(s_prime);
                 if (c.is_white())
-                // Notice that this case is taken into account only to  
+                // Notice that this case is taken into account only to
                 // support successive calls to the check method. Without
                 // this functionnality => assert(c.is_white())
                 // Go down the edge (f.s, <label, acc>, s_prime)
                   {
+#ifdef TRACE
+                    std::cout << "  It is white, go down" << std::endl;
+#endif
                     ++nbn;
                     h.add_new_state(s_prime, RED);
                     push(st_red, s_prime, label, acc);
@@ -279,21 +330,36 @@ namespace spot
                   {
                     if (c.get() == CYAN)
                       {
+#ifdef TRACE
+                        std::cout << "  It is cyan, report a cycle"
+                        << std::endl;
+#endif
                         c.set(RED);
                         push(st_red, s_prime, label, acc);
                         return true;
                       }
                     if (c.get() == BLUE)
                       {
+#ifdef TRACE
+                        std::cout << "  It is blue, go down" << std::endl;
+#endif
                         c.set(RED);
                         push(st_red, s_prime, label, acc);
                       }
                     else
+#ifdef TRACE
+                      std::cout << "  It is red, pop it"
+                                << std::endl;
+#endif
                       h.pop_notify(s_prime);
                   }
               }
             else // Backtrack
               {
+#ifdef TRACE
+                std::cout << "  All the successors have been visited"
+                          << ", pop it" << std::endl;
+#endif
                 --sts;
                 h.pop_notify(f.s);
                 delete f.it;
@@ -477,7 +543,7 @@ namespace spot
 
     private:
 
-      hash_type h; // associate to each blue and red state its color 
+      hash_type h; // associate to each blue and red state its color
       hcyan_type hc; // associate to each cyan state its weight
     };
 

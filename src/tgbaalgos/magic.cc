@@ -191,8 +191,8 @@ namespace spot
                   }
                 else // Backtrack the edge (f.s, <label, acc>, s_prime)
                   {
-                    if (c.get() == BLUE && acc == all_cond)
-                    // the test 'c.get() == BLUE' is added to limit
+                    if (c.get() != RED && acc == all_cond)
+                    // the test 'c.get() != RED' is added to limit
                     // the number of runs reported by successive
                     // calls to the check method. Without this
                     // functionnality, the test can be ommited.
@@ -217,9 +217,9 @@ namespace spot
                 st_blue.pop_front();
                 typename heap::color_ref c = h.get_color_ref(f_dest.s);
                 assert(!c.is_white());
-                if (c.get() == BLUE && f_dest.acc == all_cond
+                if (c.get() != RED && f_dest.acc == all_cond
                                     && !st_blue.empty())
-                // the test 'c.get() == BLUE' is added to limit
+                // the test 'c.get() != RED' is added to limit
                 // the number of runs reported by successive
                 // calls to the check method. Without this
                 // functionnality, the test can be ommited.
