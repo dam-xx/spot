@@ -162,17 +162,15 @@ namespace spot
 	successors_(0),
 	size_(0),
 	current_(0),
-	data_(data)
+	data_(data),
+	not_first_(false)
     {
     }
 
     virtual
     ~tgba_succ_iterator_gspn_eesrg()
     {
-      // If the iterator is done, successors_ has already
-      // been freed from step().  (We can't use 0 do indicate
-      // this, because successor_==0 means something else to step().)
-      if (successors_ && !done())
+      if (successors_)
 	succ_free(successors_);
       if (operand_)
 	delete operand_;
@@ -184,60 +182,71 @@ namespace spot
       if (++current_ < size_)
 	return;
 
-      if (successors_)
-	succ_free(successors_);
-
-      if (all_conds_ == bddfalse)
+      do
 	{
-	  // SUCCESSORS_ is 0 when step() is called from first().
 	  if (successors_)
 	    {
-	      assert(!operand_->done());
-	      operand_->next();
+	      succ_free(successors_);
+	      successors_ = 0;
 	    }
-	  if (operand_->done())
-	    return;
-	  all_conds_ = operand_->current_condition();
-	  outside_ = !all_conds_;
-	}
 
-      bdd cond = bdd_satone(all_conds_);
-      cond = bdd_simplify(cond, cond | outside_);
-      all_conds_ -= cond;
-
-      // Translate COND into an array of properties.
-      signed char* props = data_->all_props;
-      memset(props, -1, data_->prop_count);
-      while (cond != bddtrue)
-	{
-	  int var = bdd_var(cond);
-
-	  bdd high = bdd_high(cond);
-	  int res;
-	  if (high == bddfalse)
+	  if (all_conds_ == bddfalse)
 	    {
-	      cond = bdd_low(cond);
-	      res = 0;
+	      if (not_first_)
+		{
+		  assert(!operand_->done());
+		  operand_->next();
+		}
+	      else
+		{
+		  // operand_->first() has already been called from first().
+		  not_first_ = true;
+		}
+	      if (operand_->done())
+		return;
+	      all_conds_ = operand_->current_condition();
+	      outside_ = !all_conds_;
 	    }
-	  else
+
+	  bdd cond = bdd_satone(all_conds_);
+	  cond = bdd_simplify(cond, cond | outside_);
+	  all_conds_ -= cond;
+
+	  // Translate COND into an array of properties.
+	  signed char* props = data_->all_props;
+	  memset(props, -1, data_->prop_count);
+	  while (cond != bddtrue)
 	    {
-	      cond = high;
-	      res = 1;
+	      int var = bdd_var(cond);
+
+	      bdd high = bdd_high(cond);
+	      int res;
+	      if (high == bddfalse)
+		{
+		  cond = bdd_low(cond);
+		  res = 0;
+		}
+	      else
+		{
+		  cond = high;
+		  res = 1;
+		}
+
+	      // It's OK if VAR is unknown from GreatSPN (it might
+	      // have been used to synchornize another automaton or
+	      // something), just skip it.
+	      tgba_gspn_eesrg_private_::prop_map::iterator i =
+		data_->prop_dict.find(var);
+	      if (i != data_->prop_dict.end())
+		props[i->second] = res;
+
+	      assert(cond != bddfalse);
 	    }
 
-	  // It's OK if VAR is unknown from GreatSPN (it might have
-	  // been used to synchornize other automaton or something),
-	  // just skip it.
-	  tgba_gspn_eesrg_private_::prop_map::iterator i =
-	    data_->prop_dict.find(var);
-	  if (i != data_->prop_dict.end())
-	    props[i->second] = res;
-
-	  assert(cond != bddfalse);
+	  succ(state_, props, &successors_, &size_);
+	  current_ = 0;
 	}
-
-      succ(state_, props, &successors_, &size_);
-      current_ = 0;
+      while (size_ == 0); 	// Repeat until we have a successor.
     }
 
     virtual void
@@ -309,6 +318,7 @@ namespace spot
     size_t size_;		/// size of successors_
     size_t current_;		/// current position in successors_
     tgba_gspn_eesrg_private_* data_;
+    bool not_first_;		/// Whether this is not the first step.
   }; // tgba_succ_iterator_gspn_eesrg
 
 
@@ -355,8 +365,8 @@ namespace spot
 
   tgba_succ_iterator*
   tgba_gspn_eesrg::succ_iter(const state* state,
-		       const state* global_state,
-		       const tgba* global_automaton) const
+			     const state* global_state,
+			     const tgba* global_automaton) const
   {
     const state_gspn_eesrg* s = dynamic_cast<const state_gspn_eesrg*>(state);
     assert(s);

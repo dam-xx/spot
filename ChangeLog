@@ -1,3 +1,11 @@
+2003-11-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* iface/gspn/eesrg.cc (tgba_succ_iterator_gspn_eesrg::first_): New
+	attribute.
+	(tgba_succ_iterator_gspn_eesrg::step): Use first_.  Loop until
+	succ returns some successors.
+	Report from Soheib Baarir.
+
 2003-11-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/eesrg.cc (tgba_succ_iterator_gspn_eesrg::step): Fix
