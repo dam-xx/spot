@@ -25,6 +25,10 @@
 
 namespace spot
 {
+  /// \addtogroup hash_funcs Hashing functions
+  /// \ingroup misc_tools
+  /// @{
+
   /// \brief Thomas Wang's 32 bit hash function.
   ///
   /// Hash an integer amongst the integers.
@@ -41,6 +45,7 @@ namespace spot
     key ^=  (key >> 16);
     return key;
   }
+  /// @}
 }
 
 #endif // SPOT_MISC_HASHFUNC_HH

@@ -23,7 +23,16 @@
 
 namespace spot
 {
+  /// \addtogroup misc_tools Miscellaneous helper algorithms
+  /// @{
+  /// \brief Whether a word is bare.
+  ///
+  /// Bare words should start with a letter or an underscore, and
+  /// consist solely of alphanumeric characters and underscores.
   bool is_bare_word(const char* str);
 
+  /// \brief Double-quote words that are not bare.
+  /// \see is_bare_word
   std::string quote_unless_bare_word(const std::string& str);
+  /// @}
 }

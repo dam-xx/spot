@@ -26,6 +26,7 @@ namespace spot
 {
 
   /// \brief Loopless modular mixed radix Gray code iteration.
+  /// \ingroup misc_tools
   ///
   /// This class is based on the loopless modular mixed radix gray
   /// code algorithm described in exercise 77 of "The Art of Computer

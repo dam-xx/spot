@@ -125,6 +125,7 @@ namespace spot
 
   /// \brief Hash Function for \c state*.
   /// \ingroup tgba_essentials
+  /// \ingroup hash_funcs
   ///
   /// This is meant to be used as a hash functor for
   /// Sgi's \c hash_map whose key are of type \c state*.

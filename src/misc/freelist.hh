@@ -29,7 +29,8 @@
 namespace spot
 {
 
-  /// Manage list of free integers.
+  /// \brief Manage list of free integers.
+  /// \ingroup misc_tools
   class free_list
   {
   public:

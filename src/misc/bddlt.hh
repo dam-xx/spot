@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -27,7 +27,8 @@
 
 namespace spot
 {
-  /// Comparison functor for BDDs.
+  /// \brief Comparison functor for BDDs.
+  /// \ingroup misc_tools
   struct bdd_less_than :
     public std::binary_function<const bdd&, const bdd&, bool>
   {

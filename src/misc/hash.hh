@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -54,7 +54,8 @@
 namespace spot
 {
 
-  /// A hash function for pointers.
+  /// \brief A hash function for pointers.
+  /// \ingroup hash_funcs
   template <class T>
   struct ptr_hash :
     public std::unary_function<const T*, size_t>
@@ -65,7 +66,8 @@ namespace spot
     }
   };
 
-  /// A hash function for strings.
+  /// \brief A hash function for strings.
+  /// \ingroup hash_funcs
   struct string_hash :
     public Sgi::hash<const char*>,
     public std::unary_function<const std::string&, size_t>

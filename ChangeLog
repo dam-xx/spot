@@ -1,3 +1,11 @@
+2004-11-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/misc/bareword.hh, src/misc/bddalloc.hh, src/misc/bddlt.hh,
+	src/misc/escape.hh, src/misc/freelist.hh, src/misc/hash.hh,
+	src/misc/hashfunc.hh, src/misc/minato.hh, src/misc/modgray.hh,
+	src/misc/random.hh, src/misc/version.hh, src/tgba/state.hh: More
+	Doxygen groups.
+
 2004-11-17  Poitrenaud Denis  <denis@src.lip6.fr>
 
 	* src/tgbaalgos/magic.hh: Fix a comment and remove se05 interface.

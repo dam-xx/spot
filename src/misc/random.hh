@@ -21,6 +21,10 @@
 
 namespace spot
 {
+  /// \addtogroup random Random functions
+  /// \ingroup misc_tools
+  /// @{
+
   /// \brief Reset the seed of the pseudo-random number generator.
   ///
   /// \see drand, mrand, rrand
@@ -43,4 +47,6 @@ namespace spot
   ///
   /// \see mrand, rrand, srand
   double drand();
+
+  /// @}
 }

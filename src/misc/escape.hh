@@ -27,10 +27,15 @@
 
 namespace spot
 {
+  /// \addtogroup misc_tools
+  /// @{
+
   /// Escape " and \ characters in \a str.
   std::ostream& escape_str(std::ostream& os, const std::string& str);
   /// Escape " and \ characters in \a str.
   std::string escape_str(const std::string& str);
+
+  /// @}
 }
 
 #endif // SPOT_MISC_ESCAPE_HH

@@ -28,7 +28,8 @@
 
 namespace spot
 {
-  /// Manage ranges of variables.
+  /// \brief Manage ranges of variables.
+  /// \ingroup misc_tools
   class bdd_allocator: private free_list
   {
   public:
