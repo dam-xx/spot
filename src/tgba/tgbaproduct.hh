@@ -109,6 +109,8 @@ namespace spot
 
     virtual std::string format_state(const state* state) const;
 
+    virtual state* project_state(const state* s, const tgba* t) const;
+
     virtual bdd all_accepting_conditions() const;
     virtual bdd neg_accepting_conditions() const;
 

@@ -9,7 +9,7 @@
 namespace spot
 {
   /// \brief Emptiness check on spot::tgba_tba_proxy automata using
-  /// the Magic Search algorithm. 
+  /// the Magic Search algorithm.
   ///
   /// This algorithm comes from
   /// \verbatim
@@ -38,7 +38,7 @@ namespace spot
     ~magic_search();
 
     /// \brief Perform a Magic Search.
-    /// 
+    ///
     /// \return true iff the algorithm has found a new accepting
     ///    path.
     ///
@@ -46,8 +46,12 @@ namespace spot
     /// to enumerate all accepting paths.
     bool check();
 
-    /// Print the last accepting path found.
-    std::ostream& print_result(std::ostream& os) const;
+    /// \brief Print the last accepting path found.
+    ///
+    /// Restrict printed states to \a the state space of restrict if
+    /// supplied.
+    std::ostream& print_result(std::ostream& os, 
+			       const tgba* restrict = 0) const;
 
   private:
 
@@ -60,7 +64,7 @@ namespace spot
       bool seen_without : 1;
       bool seen_with    : 1;
     };
-    
+
     /// \brief A state for the spot::magic_search algorithm.
     struct magic_state
     {
@@ -73,7 +77,7 @@ namespace spot
     stack_type stack;		///< Stack of visited states on the path.
 
     typedef std::list<bdd> tstack_type;
-    /// \brief Stack of transitions.  
+    /// \brief Stack of transitions.
     ///
     /// This is an addition to the data from the paper.
     tstack_type tstack;
@@ -89,7 +93,7 @@ namespace spot
 
     const tgba_tba_proxy* a;	///< The automata to check.
     /// The state for which we are currently seeking an SCC.
-    const state* x;		
+    const state* x;
   };
 
 

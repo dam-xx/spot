@@ -234,6 +234,19 @@ namespace spot
 	    + right_->format_state(s->right()));
   }
 
+  state*
+  tgba_product::project_state(const state* s, const tgba* t) const
+  {
+    const state_bdd_product* s2 = dynamic_cast<const state_bdd_product*>(s);
+    assert(s2);
+    if (t == this)
+      return s2->clone();
+    state* res = left_->project_state(s2->left(), t);
+    if (res)
+      return res;
+    return right_->project_state(s2->right(), t);
+  }
+
   bdd
   tgba_product::all_accepting_conditions() const
   {

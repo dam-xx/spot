@@ -122,7 +122,7 @@ namespace spot
   }
 
   std::ostream&
-  magic_search::print_result(std::ostream& os) const
+  magic_search::print_result(std::ostream& os, const tgba* restrict) const
   {
     stack_type::const_reverse_iterator i;
     tstack_type::const_reverse_iterator ti;
@@ -133,10 +133,33 @@ namespace spot
       {
 	if (i->first.s->compare(x) == 0)
 	  os <<"Cycle:" <<std::endl;
-	os << "  " << a->format_state(i->first.s) << std::endl;
+
+	const state* s = i->first.s;
+	if (restrict)
+	  {
+	    s = a->project_state(s, restrict);
+	    assert(s);
+	    os << "  " << restrict->format_state(s) << std::endl;
+	    delete s;
+	  }
+	else
+	  {
+	    os << "  " << a->format_state(s) << std::endl;
+	  }
 	os << "    | " << bdd_format_set(d, *ti) << std::endl;
       }
-    os << "  " << a->format_state(x) << std::endl;
+
+    if (restrict)
+      {
+	const state* s = a->project_state(x, restrict);
+	assert(s);
+	os << "  " << restrict->format_state(s) << std::endl;
+	delete s;
+      }
+    else
+      {
+	os << "  " << a->format_state(x) << std::endl;
+      }
     return os;
   }
 

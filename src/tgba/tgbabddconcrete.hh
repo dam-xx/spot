@@ -46,7 +46,7 @@ namespace spot
 
     virtual std::string format_state(const state* state) const;
 
-    bdd_dict* get_dict() const;
+    virtual bdd_dict* get_dict() const;
 
     /// \brief Get the core data associated to this automaton.
     ///

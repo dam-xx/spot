@@ -117,6 +117,21 @@ namespace spot
     /// who owns the state.
     virtual std::string format_state(const state* state) const = 0;
 
+    /// \brief Project a state on an automata.
+    ///
+    /// This converts \a s, into that corresponding spot::state for \a
+    /// t.  This is useful when you have the state of a product, and
+    /// want restrict this state to a specific automata occuring in
+    /// the product.
+    ///
+    /// It goes without saying that \a s and \a t should be compatible
+    /// (i.e., \a s is a state of \a t).
+    ///
+    /// \return 0 if the projection fails (\a s is unrelated to \a t),
+    ///    or a new \c state* (the projected state) that must be
+    ///    deleted by the caller.
+    virtual state* project_state(const state* s, const tgba* t) const;
+
     /// \brief Return the set of all accepting conditions used
     /// by this automaton.
     ///

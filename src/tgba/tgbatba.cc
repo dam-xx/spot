@@ -213,12 +213,22 @@ namespace spot
   std::string
   tgba_tba_proxy::format_state(const state* state) const
   {
-    const state_tba_proxy* s =
-      dynamic_cast<const state_tba_proxy*>(state);
+    const state_tba_proxy* s = dynamic_cast<const state_tba_proxy*>(state);
     assert(s);
     return a_->format_state(s->real_state()) + "("
       + bdd_format_set(get_dict(), s->accepting_cond()) + ")";
   }
+
+  state* 
+  tgba_tba_proxy::project_state(const state* s, const tgba* t) const
+  {
+    const state_tba_proxy* s2 = dynamic_cast<const state_tba_proxy*>(s);
+    assert(s2);
+    if (t == this)
+      return s2->clone();
+    return a_->project_state(s2->real_state(), t);
+  }
+
 
   bdd
   tgba_tba_proxy::all_accepting_conditions() const

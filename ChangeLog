@@ -1,3 +1,14 @@
+2003-07-30  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/tgba.hh, src/tgba/tgba.cc
+	(tgba::project_state): New method.
+	* src/tgba/tgbaproduct.hh, src/tgba/tgbaproduct.cc
+	(tgba_product::project_state): New method.
+	* src/tgba/tgbabta.hh, src/tgba/tgbabta.cc
+	(tgba_bta_proxy::project_state): New method.
+	* src/tgbaalgos/magic.cc (magic_search::print_result): Take
+	a restrict argument.
+
 2003-07-29  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltlparse/ltlscan.ll: Allow /\, \/, and xor, used in LBTT.
