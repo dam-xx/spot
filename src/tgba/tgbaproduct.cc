@@ -11,7 +11,7 @@ namespace spot
   // state_bdd_product
 
   state_bdd_product::state_bdd_product(const state_bdd_product& o)
-    : state_bdd(o.as_bdd()),
+    : state(),
       left_(o.left()->clone()),
       right_(o.right()->clone())
   {
@@ -116,7 +116,7 @@ namespace spot
   }
 
   bool
-  tgba_product_succ_iterator::done()
+  tgba_product_succ_iterator::done() const
   {
     return !right_ || right_->done();
   }

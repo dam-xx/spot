@@ -12,6 +12,7 @@ namespace spot
       notnext_set(bddtrue),
       var_set(bddtrue),
       notvar_set(bddtrue),
+      varandnext_set(bddtrue),
       notacc_set(bddtrue),
       negacc_set(bddtrue),
       next_to_now(bdd_newpair())
@@ -28,6 +29,7 @@ namespace spot
       notnext_set(copy.notnext_set),
       var_set(copy.var_set),
       notvar_set(copy.notvar_set),
+      varandnext_set(copy.varandnext_set),
       notacc_set(copy.notacc_set),
       negacc_set(copy.negacc_set),
       next_to_now(bdd_copypair(copy.next_to_now))
@@ -47,6 +49,7 @@ namespace spot
       notnext_set(left.notnext_set & right.notnext_set),
       var_set(left.var_set & right.var_set),
       notvar_set(left.notvar_set & right.notvar_set),
+      varandnext_set(left.varandnext_set & right.varandnext_set),
       notacc_set(left.notacc_set & right.notacc_set),
       negacc_set(left.negacc_set & right.negacc_set),
       next_to_now(bdd_mergepairs(left.next_to_now, right.next_to_now))
@@ -80,6 +83,7 @@ namespace spot
     bdd both = now & next;
     notvar_set &= both;
     notacc_set &= both;
+    varandnext_set &= next;
   }
 
   void
@@ -89,6 +93,7 @@ namespace spot
     notnext_set &= var;
     notacc_set &= var;
     var_set &= var;
+    varandnext_set &= var;
   }
 
   void

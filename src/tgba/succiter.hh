@@ -51,7 +51,7 @@ namespace spot
     ///    for (s->first(); !s->done(); s->next())
     ///      ...
     /// \endcode
-    virtual bool done() = 0;
+    virtual bool done() const = 0;
 
     //@}
 

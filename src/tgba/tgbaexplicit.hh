@@ -91,7 +91,7 @@ namespace spot
 
 
   /// Successor iterators used by spot::tgba_explicit.
-  class tgba_explicit_succ_iterator : public tgba_succ_iterator
+  class tgba_explicit_succ_iterator: public tgba_succ_iterator
   {
   public:
     tgba_explicit_succ_iterator(const tgba_explicit::state* s, bdd all_acc);
@@ -103,7 +103,7 @@ namespace spot
 
     virtual void first();
     virtual void next();
-    virtual bool done();
+    virtual bool done() const;
 
     virtual state_explicit* current_state();
     virtual bdd current_condition();

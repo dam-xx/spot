@@ -79,6 +79,9 @@ namespace spot
     /// \brief The (positive) conjunction of all variables which are
     /// not atomic propositions.
     bdd notvar_set;
+    /// \brief The (positive) conjunction of all Next variables 
+    /// and atomic propositions.
+    bdd varandnext_set;
     /// \brief The (positive) conjunction of all variables which are not
     /// accepting conditions.
     bdd notacc_set;

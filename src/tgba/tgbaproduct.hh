@@ -11,7 +11,7 @@ namespace spot
   ///
   /// This state is in fact a pair of state: the state from the left
   /// automaton and that of the right.
-  class state_bdd_product : public state_bdd
+  class state_bdd_product : public state
   {
   public:
     /// \brief Constructor
@@ -20,8 +20,7 @@ namespace spot
     /// These state are acquired by spot::state_bdd_product, and will
     /// be deleted on destruction.
     state_bdd_product(state* left, state* right)
-      : state_bdd(left->as_bdd() & right->as_bdd()),
-	left_(left),
+      :	left_(left),
 	right_(right)
     {
     }
@@ -65,7 +64,7 @@ namespace spot
     // iteration
     void first();
     void next();
-    bool done();
+    bool done() const;
 
     // inspection
     state_bdd_product* current_state();

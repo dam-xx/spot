@@ -29,7 +29,7 @@ namespace spot
   }
 
   bool
-  tgba_explicit_succ_iterator::done()
+  tgba_explicit_succ_iterator::done() const
   {
     return i_ == s_->end();
   }

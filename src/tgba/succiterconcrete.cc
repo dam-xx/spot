@@ -47,8 +47,7 @@ namespace spot
     //     d * !Next[a] * Next[b]
     // (We don't really care about the Now variables here.)
     //
-    // Note: on this example we would not exactly get the six transitions
-    // mentionned, but maybe something like
+    // Note: on this example it's ok to get something like
     //     c * Next[a] * Next[b]
     //     c * Next[a] * !Next[b]
     //     c * !Next[a] * Next[b]
@@ -56,7 +55,10 @@ namespace spot
     //     d * !c * Next[a] * !Next[b]
     //     d * !c * !Next[a] * Next[b]
     // depending on the BDD order.  It doesn't really matter.  The important
-    // point is that we don't list all four possible 'c' and 'd' combinations.
+    // point is that we don't want to list all four possible 'c' and 'd' 
+    // combinations.
+    // FIXME: This is not what we do now: we list all possible combinations
+    // of atomic propositions.
 
     // FIXME: Iterating on the successors this way (calling
     // bdd_satone/bdd_fullsetone and NANDing out the result from a
@@ -67,8 +69,8 @@ namespace spot
 	succ_set_left_ &= !current_;
 	if (succ_set_left_ == bddfalse) // No more successors?
 	  return;
-	current_ = bdd_satoneset(succ_set_left_, data_.next_set, bddfalse);
-
+	current_ = bdd_satoneset(succ_set_left_,
+				 data_.varandnext_set, bddfalse);
 	// The destination state, computed here, should be
 	// compatible with the transition relation.  Otherwise
 	// it won't have any successor (a dead node).
@@ -79,7 +81,7 @@ namespace spot
   }
 
   bool
-  tgba_succ_iterator_concrete::done()
+  tgba_succ_iterator_concrete::done() const
   {
     return succ_set_left_ == bddfalse;
   }

@@ -37,13 +37,6 @@ namespace spot
     /// Duplicate a state.
     virtual state* clone() const = 0;
 
-    /// Return the BDD part of the state.
-    virtual bdd
-    as_bdd() const
-    {
-      return bddtrue;
-    }
-
     virtual ~state()
     {
     }

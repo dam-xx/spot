@@ -1,5 +1,42 @@
 2003-06-30  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* doc/Doxyfile.in (HAVE_DOT): Set to YES to output
+	collaboration diagrams.
+	* doc/mainpage.dox: Typo.
+
+	* src/tgba/state.hh (state::as_bdd): Delete.
+	* src/tgba/tgbaproduct.hh (state_bdd_product): Inherit from state,
+	not state_bdd.
+	(state_bdd_product::state_bdd_product): Adjust.
+	* src/tgba/tgbaproduct.cc (state_bdd_product::state_bdd_product):
+	Adjust.
+	
+	* src/tgba/succiter.hh (tgba_bdd_succ_iterator::done):
+	Mark as const.
+	* src/tgba/succiterconcrete.cc 
+	(tgba_succ_iterator_concrete::done): Likewise.
+	* src/tgba/succiterconcrete.hh
+	(tgba_succ_iterator_concrete::done): Likewise.
+	* src/tgba/tgbaexplicit.cc 
+	(tgba_explicit_succ_iterator::done): Likewise.
+	* src/tgba/tgbaexplicit.hh
+	(tgba_explicit_succ_iterator::done): Likewise.
+	* src/tgba/tgbaproduct.cc
+	(tgba_product_succ_iterator::done): Likewise.
+	* src/tgba/tgbaproduct.hh
+	(tgba_product_succ_iterator::done): Likewise.
+	* src/tgba/tgbatranslateproxy.hh
+	(tgba_translate_proxy_succ_iterator::done): Likewise.
+	* src/tgba/tgbatranslateproxy.cc
+	(tgba_translate_proxy_succ_iterator::done): Likewise.
+	
+	* src/tgba/succiterconcrete.cc
+	(tgba_succ_iterator_concrete::next): Call bdd_satoneset
+	on data_.varandnext_set.  The previous implementation
+	was wrong for GFa.
+	* src/tgba/tgbabddcoredata.hh: Declare varandnext_set.
+	* src/tgba/tgbabddcoredata.cc: Handle varandnext_set.	
+
 	* doc/Doxygen.in: Enable LaTeX output.
 	* doc/Makefile.am (spotref.pdf): New rule.
 	(EXTRA_DIST): Add spotref.pdf.

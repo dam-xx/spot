@@ -33,7 +33,7 @@ namespace spot
   }
 
   bool
-  tgba_translate_proxy_succ_iterator::done()
+  tgba_translate_proxy_succ_iterator::done() const
   {
     return iter_->done();
   }

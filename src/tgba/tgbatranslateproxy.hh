@@ -17,7 +17,7 @@ namespace spot
     // iteration
     void first();
     void next();
-    bool done();
+    bool done() const;
 
     // inspection
     state* current_state();
