@@ -4,3 +4,5 @@ lexer.cxx
 parser.cxx
 parser.h
 .deps
+.libs
+bddcalc
