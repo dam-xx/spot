@@ -344,11 +344,10 @@ namespace spot
 
   state* tgba_gspn_eesrg::get_init_state() const
   {
-    State s;
-    int err = initial_state(&s);
-    if (err)
-      throw gspn_exeption("initial_state()", err);
-    return new state_gspn_eesrg(s, data_->operand->get_init_state());
+    // Use 0 as initial state for the EESRG side.  State 0 does not
+    // exists, but when passed to succ() it will produce the list
+    // of initial states.
+    return new state_gspn_eesrg(0, data_->operand->get_init_state());
   }
 
   tgba_succ_iterator*
@@ -391,9 +390,17 @@ namespace spot
     assert(s);
     std::ostringstream os;
     char* str;
-    int err = print_state(s->left(), &str);
-    if (err)
-      throw gspn_exeption("print_state()", err);
+    State gs = s->left();
+    if (gs)
+      {
+	int err = print_state(gs, &str);
+	if (err)
+	  throw gspn_exeption("print_state()", err);
+      }
+    else
+      {
+	str = strdup("-1");
+      }
 
     // Rewrite all new lines as \\\n.
     const char* pos = str;
