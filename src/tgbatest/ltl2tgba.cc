@@ -127,6 +127,7 @@ syntax(char* prog)
             << std::endl
 	    << "  bsh_magic_search_repeated[(heap size in MB - 10MB"
             << " by default)]" << std::endl
+	    << "  gv04" << std::endl
 	    << "  se05_search" << std::endl
 	    << "  se05_search_repeated" << std::endl
 	    << "  bsh_se05_search[(heap size in MB - 10MB by default)]"
