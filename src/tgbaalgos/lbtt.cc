@@ -7,18 +7,10 @@
 #include "tgba/bddprint.hh"
 #include "ltlvisit/tostring.hh"
 #include "tgba/bddprint.hh"
+#include "misc/bddlt.hh"
 
 namespace spot
 {
-  struct bdd_less_than
-  {
-    bool
-    operator()(const bdd& left, const bdd& right) const
-    {
-      return left.id() < right.id();
-    }
-  };
-
   // At some point we'll need to print an accepting set into LBTT's
   // forma.  LBTT expect numbered accepting sets, so first we'll
   // number each accepting condition, and latter when we have to print
