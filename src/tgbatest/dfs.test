@@ -25,6 +25,14 @@
 
 set -e
 
+# All examples are TBA (i.e. they have a unique
+# accepting condition). Accepting arcs are
+# represented by double arrows.
+#
+# s1=>s2->s3->(large composant from s4 to s9)
+# ^       |
+# |_______|
+
 cat >blue_counter <<'EOF'
 acc = a;
 s1, s2,, a;
@@ -72,6 +80,11 @@ EOF
 run 0 ./ltl2tgba -emagic_search -X blue_counter
 run 0 ./ltl2tgba -ese05_search -X blue_counter
 
+# s1->s2->s3->(large composant from s4 to s9)
+# ^       ||
+# ||______||
+# ||______||
+
 cat >blue_last <<'EOF'
 acc = a;
 s1, s2,,;
@@ -118,6 +131,14 @@ EOF
 
 run 0 ./ltl2tgba -emagic_search -X blue_last
 run 0 ./ltl2tgba -ese05_search -X blue_last
+
+#  _______
+# |       |
+# |       v
+# s1->s2->s3->(large composant from s4 to s9)
+# ||      ^
+# ||______||
+# ||______||
 
 cat >red <<'EOF'
 acc = a;

@@ -115,8 +115,16 @@ syntax(char* prog)
 	    << "  couvreur99_shy" << std::endl
 	    << "  magic_search" << std::endl
 	    << "  magic_search_repeated" << std::endl
+	    << "  bsh_magic_search[(heap size in Mo - 10Mo by default)]"
+            << std::endl
+	    << "  bsh_magic_search_repeated[(heap size in MB - 10MB"
+            << " by default)]" << std::endl
 	    << "  se05_search" << std::endl
-	    << "  se05_search_repeated" << std::endl;
+	    << "  se05_search_repeated" << std::endl
+	    << "  bsh_se05_search[(heap size in MB - 10MB by default)]"
+            << std::endl
+	    << "  bsh_se05_search_repeated[(heap size in MB - 10MB"
+            << " by default)]" << std::endl;
   exit(2);
 }
 
@@ -134,9 +142,11 @@ main(int argc, char** argv)
   int output = 0;
   int formula_index = 0;
   std::string echeck_algo;
-  enum { None, Couvreur, Couvreur2, MagicSearch, Se04Search } echeck = None;
+  enum { None, Couvreur, Couvreur2, MagicSearch, Se05Search } echeck = None;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
   bool magic_many = false;
+  bool bit_state_hashing = false;
+  int heap_size = 10*1024*1024;
   bool expect_counter_example = false;
   bool from_file = false;
   int reduc_aut = spot::Reduce_None;
@@ -174,23 +184,33 @@ main(int argc, char** argv)
 	  degeneralize_opt = true;
 	}
       else if (!strncmp(argv[formula_index], "-e", 2))
-	{
-	  if (argv[formula_index][2] != 0)
-	    echeck_algo = argv[formula_index] + 2;
-	  else
-	    echeck_algo = "couvreur99";
-	  expect_counter_example = true;
-	  output = -1;
-	}
+        {
+          if (argv[formula_index][2] != 0)
+            {
+              char *p = strchr(argv[formula_index], '(');
+              if (p && sscanf(p+1, "%d)", &heap_size) == 1)
+                *p = '\0';
+              echeck_algo = argv[formula_index] + 2;
+            }
+          else
+            echeck_algo = "couvreur99";
+          expect_counter_example = true;
+          output = -1;
+        }
       else if (!strncmp(argv[formula_index], "-E", 2))
-	{
-	  if (argv[formula_index][2] != 0)
-	    echeck_algo = argv[formula_index] + 2;
-	  else
-	    echeck_algo = "couvreur99";
-	  expect_counter_example = false;
-	  output = -1;
-	}
+        {
+          if (argv[formula_index][2] != 0)
+            {
+              char *p = strchr(argv[formula_index], '(');
+              if (p && sscanf(p+1, "%d)", &heap_size) == 1)
+                *p = '\0';
+              echeck_algo = argv[formula_index] + 2;
+            }
+          else
+            echeck_algo = "couvreur99";
+          expect_counter_example = false;
+          output = -1;
+        }
       else if (!strcmp(argv[formula_index], "-f"))
 	{
 	  fm_opt = true;
@@ -344,15 +364,41 @@ main(int argc, char** argv)
 	  degeneralize_opt = true;
 	  magic_many = true;
 	}
+      else if (echeck_algo == "bsh_magic_search")
+	{
+	  echeck = MagicSearch;
+	  degeneralize_opt = true;
+          bit_state_hashing = true;
+	}
+      else if (echeck_algo == "bsh_magic_search_repeated")
+	{
+	  echeck = MagicSearch;
+	  degeneralize_opt = true;
+          bit_state_hashing = true;
+	  magic_many = true;
+	}
       else if (echeck_algo == "se05_search")
 	{
-	  echeck = Se04Search;
+	  echeck = Se05Search;
 	  degeneralize_opt = true;
 	}
       else if (echeck_algo == "se05_search_repeated")
 	{
-	  echeck = Se04Search;
+	  echeck = Se05Search;
 	  degeneralize_opt = true;
+	  magic_many = true;
+	}
+      else if (echeck_algo == "bsh_se05_search")
+	{
+	  echeck = Se05Search;
+	  degeneralize_opt = true;
+          bit_state_hashing = true;
+	}
+      else if (echeck_algo == "bsh_se05_search_repeated")
+	{
+	  echeck = Se05Search;
+	  degeneralize_opt = true;
+          bit_state_hashing = true;
 	  magic_many = true;
 	}
       else
@@ -575,15 +621,22 @@ main(int argc, char** argv)
 	  ec = new spot::couvreur99_check_shy(a);
 	  break;
 
-	case MagicSearch:
-	  ec_a = degeneralized;
-	  ec = spot::explicit_magic_search(degeneralized);
-	  break;
+        case MagicSearch:
+          ec_a = degeneralized;
+          if (bit_state_hashing)
+            ec = spot::bit_state_hashing_magic_search(
+                                            degeneralized, heap_size);
+          else
+            ec = spot::explicit_magic_search(degeneralized);
+          break;
 
-	case Se04Search:
-	  ec_a = degeneralized;
-	  ec = spot::explicit_se05_search(degeneralized);
-	  break;
+        case Se05Search:
+          ec_a = degeneralized;
+          if (bit_state_hashing)
+            ec = spot::bit_state_hashing_se05_search(degeneralized, heap_size);
+          else
+            ec = spot::explicit_se05_search(degeneralized);
+          break;
 	}
 
       if (ec)
@@ -593,13 +646,23 @@ main(int argc, char** argv)
 	      spot::emptiness_check_result* res = ec->check();
 	      if (!graph_run_opt)
 		ec->print_stats(std::cout);
-	      if (expect_counter_example != !!res)
+	      if (expect_counter_example != !!res &&
+                      (!bit_state_hashing || !expect_counter_example))
 		exit_code = 1;
 
 	      if (!res)
 		{
-		  std::cout << "no accepting run found" << std::endl;
-		  break;
+                  std::cout << "no accepting run found";
+                  if (bit_state_hashing && expect_counter_example)
+                    {
+                      std::cout << " even if expected" << std::endl;
+                      std::cout << "this is maybe due to the use of the bit "
+                                << "state hashing technic" << std::endl;
+                      std::cout << "you can try to increase the heap size "
+                                << "or use an explicit storage" << std::endl;
+                    }
+                  std::cout << std::endl;
+                  break;
 		}
 	      else
 		{

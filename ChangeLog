@@ -1,3 +1,12 @@
+2004-11-15  Poitrenaud Denis  <denis@src.lip6.fr>
+
+	* src/tgbaalgos/magic.cc: Add a bit state hashing version.
+	* src/tgbaalgos/se05.cc: Add a bit state hashing version.
+	* src/tgbaalgos/magic.hh: Make them public.
+	* src/tgbatest/ltl2tgba.cc: Add the two new emptiness checks.
+	* src/tgbatest/emptchk.test: Incorporate tests of src/tgbatest/dfs.test.
+	* src/tgbatest/dfs.test: Introduce new characteristic explicit tests.
+
 2004-11-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* wrap/python/cgi/ltl2tgba.in: Add options to check the produced

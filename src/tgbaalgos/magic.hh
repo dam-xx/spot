@@ -27,19 +27,19 @@
 
 namespace spot
 {
-  /// \brief Returns an emptiness check on the spot::tgba automaton \a a. 
+  /// \brief Returns an emptiness checker on the spot::tgba automaton \a a. 
+  /// During the visit of \a a, the returned checker stores explicitely all 
+  /// the traversed states.
   ///
   /// \pre The automaton \a a must have at most one accepting condition (i.e.
   /// it is a TBA).
   ///
   /// The method \a check() of the returned checker can be called several times 
   /// (until it returns a null pointer) to enumerate all the visited accepting 
-  /// paths. The method visits only a finite set of accepting paths.
-  /// 
-  /// The implemented algorithm is the following. 
+  /// paths. The implemented algorithm is the following. 
   ///
   /// \verbatim
-  /// procedure nested_dfs ()
+  /// procedure check ()
   /// begin
   ///   call dfs_blue(s0);
   /// end;
@@ -72,8 +72,8 @@ namespace spot
   /// end;
   /// \endverbatim
   ///
-  /// It is an adaptation to TBA of the Magic Search algorithm
-  /// which deals with accepting states and is presented in
+  /// This algorithm is an adaptation to TBA of the one
+  /// (which deals with accepting states) presented in
   ///
   /// \verbatim
   ///  Article{         courcoubertis.92.fmsd,
@@ -87,20 +87,35 @@ namespace spot
   ///    volume        = {1}
   ///  }
   /// \endverbatim
+  ///
   emptiness_check* explicit_magic_search(const tgba *a);
 
+  /// \brief Returns an emptiness checker on the spot::tgba automaton \a a. 
+  /// During the visit of \a a, the returned checker does not store explicitely
+  /// the traversed states but uses the bit state hashing technic. However, the
+  /// implemented algorithm is the same as the one of
+  /// spot::explicit_magic_search.
+  ///
+  /// \pre The automaton \a a must have at most one accepting condition (i.e.
+  /// it is a TBA).
+  ///
+  /// \sa spot::explicit_magic_search
+  ///
+  emptiness_check* bit_state_hashing_magic_search(const tgba *a, size_t size);
+
   /// \brief Returns an emptiness check on the spot::tgba automaton \a a. 
+  /// During the visit of \a a, the returned checker stores explicitely all 
+  /// the traversed states.
   ///
   /// \pre The automaton \a a must have at most one accepting condition (i.e.
   /// it is a TBA).
   ///  
   /// The method \a check() of the returned checker can be called several times 
   /// (until it returns a null pointer) to enumerate all the visited accepting 
-  /// paths. The method visits only a finite set of accepting paths.
+  /// paths. The implemented algorithm is the following: 
   /// 
-  /// The implemented algorithm is the following: 
-  /// 
-  /// procedure nested_dfs ()
+  /// \verbatim
+  /// procedure check ()
   /// begin
   ///   weight = 0;
   ///   call dfs_blue(s0);
@@ -143,8 +158,9 @@ namespace spot
   ///     end if;
   ///   end for;
   /// end;
+  /// \endverbatim
   /// 
-  /// It is an adaptation to TBA and an extension of the one 
+  /// It is an adaptation to TBA (and a slight extension) of the one 
   /// presented in
   /// \verbatim
   ///  InProceedings{   schwoon.05.tacas,
@@ -159,11 +175,26 @@ namespace spot
   ///  }
   /// \endverbatim
   ///
-  /// the extention consists in the introduction of a weight associated
-  /// to each state in the blue stack. The weight represents the number of
-  /// accepting arcs traversed to reach it from the initial state.
+  /// The extention consists in the introduction of a weight associated
+  /// to each state in the blue stack (the cyan states). The weight of a
+  /// cyan state corresponds to the number of accepting arcs traversed to reach
+  /// it from the initial state. Weights are used to detect accepting cycle in
+  /// the blue dfs.
   ///
   emptiness_check* explicit_se05_search(const tgba *a);
+
+  /// \brief Returns an emptiness checker on the spot::tgba automaton \a a. 
+  /// During the visit of \a a, the returned checker does not store explicitely
+  /// the traversed states but uses the bit state hashing technic. However, the
+  /// implemented algorithm is the same as the one of
+  /// spot::explicit_se05_search.
+  ///
+  /// \pre The automaton \a a must have at most one accepting condition (i.e.
+  /// it is a TBA).
+  ///
+  /// \sa spot::explicit_se05_search
+  ///
+  emptiness_check* bit_state_hashing_se05_search(const tgba *a, size_t size);
 
 }
 

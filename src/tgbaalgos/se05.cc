@@ -42,8 +42,9 @@ namespace spot
       ///
       /// \pre The automaton \a a must have at most one accepting
       /// condition (i.e. it is a TBA).
-      se05_search(const tgba *a)
-        : current_weight(0), a(a), all_cond(a->all_acceptance_conditions())
+      se05_search(const tgba *a, size_t size)
+        : current_weight(0), h(size),
+          a(a), all_cond(a->all_acceptance_conditions())
       {
         assert(a->number_of_acceptance_conditions() <= 1);
       }
@@ -82,7 +83,7 @@ namespace spot
             assert(st_blue.empty());
             const state* s0 = a->get_init_state();
             ++nbn;
-            h.add_new_state(s0, CYAN);
+            h.add_new_state(s0, CYAN, current_weight);
             push(st_blue, s0, bddfalse, bddfalse);
             if (dfs_blue())
               return new result(*this);
@@ -182,7 +183,7 @@ namespace spot
                 bdd acc = f.it->current_acceptance_conditions();
                 f.it->next();
                 typename heap::color_ref c = h.get_color_ref(s_prime);
-                if (c.is_null())
+                if (c.is_white())
                 // Go down the edge (f.s, <label, acc>, s_prime)
                   {
                     if (acc == all_cond)
@@ -211,6 +212,8 @@ namespace spot
                         if (dfs_red())
                           return true;
                       }
+                    else
+                      h.pop_notify(s_prime);
                   }
               }
             else
@@ -224,7 +227,7 @@ namespace spot
                 if (f_dest.acc == all_cond)
                   --current_weight;
                 typename heap::color_ref c = h.get_color_ref(f_dest.s);
-                assert(!c.is_null());
+                assert(!c.is_white());
                 if (c.get() == BLUE && f_dest.acc == all_cond
                                     && !st_blue.empty())
                 // the test 'c.get() == BLUE' is added to limit
@@ -262,10 +265,10 @@ namespace spot
                 bdd acc = f.it->current_acceptance_conditions();
                 f.it->next();
                 typename heap::color_ref c = h.get_color_ref(s_prime);
-                if (c.is_null())
+                if (c.is_white())
                 // Notice that this case is taken into account only to  
                 // support successive calls to the check method. Without
-                // this functionnality => assert(c.is_null())
+                // this functionnality => assert(c.is_white())
                 // Go down the edge (f.s, <label, acc>, s_prime)
                   {
                     ++nbn;
@@ -285,6 +288,8 @@ namespace spot
                         c.set(RED);
                         push(st_red, s_prime, label, acc);
                       }
+                    else
+                      h.pop_notify(s_prime);
                   }
               }
             else // Backtrack
@@ -372,10 +377,10 @@ namespace spot
           : is_cyan(false), weight(0), ph(0), phc(0), ps(0), pc(c)
           {
           }
-        int get() const
+        color get() const
           {
             if (is_cyan)
-              return CYAN; // the color cyan is fixed to 0
+              return CYAN;
             return *pc;
           }
         int get_weight() const
@@ -385,10 +390,12 @@ namespace spot
           }
         void set(color c)
           {
-            assert(!is_null());
+            assert(!is_white());
             if (is_cyan)
               {
-                phc->erase(ps);
+                int i = phc->erase(ps);
+                assert(i==1);
+                (void)i;
                 ph->insert(std::make_pair(ps, c));
               }
             else
@@ -396,7 +403,7 @@ namespace spot
                 *pc=c;
               }
           }
-        bool is_null() const
+        bool is_white() const
           {
             return !is_cyan && pc==0;
           }
@@ -409,7 +416,7 @@ namespace spot
         color *pc; // point to the color of a state stored in main hash table
       };
 
-      explicit_se05_search_heap()
+      explicit_se05_search_heap(size_t)
         {
         }
 
@@ -454,9 +461,10 @@ namespace spot
           return color_ref(&h, &hc, ic->first, ic->second); // cyan state
         }
 
-      void add_new_state(const state* s, color c, int w=0)
+      void add_new_state(const state* s, color c, int w=-1)
         {
           assert(hc.find(s)==hc.end() && h.find(s)==h.end());
+          assert(c!=CYAN || w>=0);
           if (c == CYAN)
             hc.insert(std::make_pair(s, w));
           else
@@ -469,7 +477,111 @@ namespace spot
 
     private:
 
-      hash_type h;
+      hash_type h; // associate to each blue and red state its color 
+      hcyan_type hc; // associate to each cyan state its weight
+    };
+
+    class bsh_se05_search_heap
+    {
+    private:
+      typedef Sgi::hash_map<const state*, int,
+                state_ptr_hash, state_ptr_equal> hcyan_type;
+    public:
+      class color_ref
+      {
+      public:
+        color_ref(hcyan_type* h, const state* st, int w,
+                    unsigned char *base, unsigned char offset)
+          : is_cyan(true), weight(w), phc(h), ps(st), b(base), o(offset*2)
+          {
+          }
+        color_ref(unsigned char *base, unsigned char offset)
+          : is_cyan(false), weight(0), phc(0), ps(0), b(base), o(offset*2)
+          {
+          }
+        color get() const
+          {
+            if (is_cyan)
+              return CYAN;
+            return color(((*b) >> o) & 3U);
+          }
+        int get_weight() const
+          {
+            assert(is_cyan);
+            return weight;
+          }
+        void set(color c)
+          {
+            if (is_cyan && c!=CYAN)
+              {
+                int i = phc->erase(ps);
+                assert(i==1);
+                (void)i;
+              }
+            *b =  (*b & ~(3U << o)) | (c << o);
+          }
+        bool is_white() const
+          {
+            return !is_cyan && get()==WHITE;
+          }
+        const unsigned char* base() const
+          {
+            return b;
+          }
+        unsigned char offset() const
+          {
+            return o;
+          }
+      private:
+        bool is_cyan;
+        int weight;
+        hcyan_type* phc;
+        const state* ps;
+        unsigned char *b;
+        unsigned char o;
+      };
+
+      bsh_se05_search_heap(size_t s) : size(s)
+        {
+          h = new unsigned char[size];
+          memset(h, WHITE, size);
+        }
+
+      ~bsh_se05_search_heap()
+        {
+          delete[] h;
+        }
+
+      color_ref get_color_ref(const state*& s)
+        {
+          size_t ha = s->hash();
+          hcyan_type::iterator ic = hc.find(s);
+          if (ic!=hc.end())
+            return color_ref(&hc, ic->first, ic->second, &h[ha%size], ha%4);
+          return color_ref(&h[ha%size], ha%4);
+        }
+
+      void add_new_state(const state* s, color c, int w=-1)
+        {
+          assert(c!=CYAN || w>=0);
+          assert(get_color_ref(s).is_white());
+          if (c==CYAN)
+            hc.insert(std::make_pair(s, w));
+          else
+            {
+              color_ref cr(get_color_ref(s));
+              cr.set(c);
+            }
+        }
+
+      void pop_notify(const state* s)
+        {
+          delete s;
+        }
+
+    private:
+      size_t size;
+      unsigned char* h;
       hcyan_type hc;
     };
 
@@ -477,7 +589,12 @@ namespace spot
 
   emptiness_check* explicit_se05_search(const tgba *a)
   {
-    return new se05_search<explicit_se05_search_heap>(a);
+    return new se05_search<explicit_se05_search_heap>(a, 0);
+  }
+
+  emptiness_check* bit_state_hashing_se05_search(const tgba *a, size_t size)
+  {
+    return new se05_search<bsh_se05_search_heap>(a, size);
   }
 
 }

@@ -19,6 +19,7 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+#include <cstring>
 #include <iostream>
 #include "misc/hash.hh"
 #include <list>
@@ -42,8 +43,8 @@ namespace spot
       ///
       /// \pre The automaton \a a must have at most one accepting
       /// condition (i.e. it is a TBA).
-      magic_search(const tgba *a)
-        : a(a), all_cond(a->all_acceptance_conditions())
+      magic_search(const tgba *a, size_t size)
+        : h(size), a(a), all_cond(a->all_acceptance_conditions())
       {
         assert(a->number_of_acceptance_conditions() <= 1);
       }
@@ -165,7 +166,7 @@ namespace spot
       /// The automata to check.
       const tgba* a;
 
-      /// The automata to check.
+      /// The unique accepting condition of the automaton \a a.
       bdd all_cond;
 
       bool dfs_blue()
@@ -181,7 +182,7 @@ namespace spot
                 bdd acc = f.it->current_acceptance_conditions();
                 f.it->next();
                 typename heap::color_ref c = h.get_color_ref(s_prime);
-                if (c.is_null())
+                if (c.is_white())
                 // Go down the edge (f.s, <label, acc>, s_prime)
                   {
                     ++nbn;
@@ -202,6 +203,8 @@ namespace spot
                         if (dfs_red())
                           return true;
                       }
+                    else
+                      h.pop_notify(s_prime);
                   }
               }
             else
@@ -213,7 +216,7 @@ namespace spot
                 delete f.it;
                 st_blue.pop_front();
                 typename heap::color_ref c = h.get_color_ref(f_dest.s);
-                assert(!c.is_null());
+                assert(!c.is_white());
                 if (c.get() == BLUE && f_dest.acc == all_cond
                                     && !st_blue.empty())
                 // the test 'c.get() == BLUE' is added to limit
@@ -251,10 +254,10 @@ namespace spot
                 bdd acc = f.it->current_acceptance_conditions();
                 f.it->next();
                 typename heap::color_ref c = h.get_color_ref(s_prime);
-                if (c.is_null())
+                if (c.is_white())
                 // Notice that this case is taken into account only to  
                 // support successive calls to the check method. Without
-                // this functionnality, one can check assert(c.is_null()).
+                // this functionnality, one can check assert(c.is_white()).
                 // Go down the edge (f.s, <label, acc>, s_prime)
                   {
                     ++nbn;
@@ -270,6 +273,8 @@ namespace spot
                         if (target->compare(s_prime) == 0)
                           return true;
                       }
+                    else
+                      h.pop_notify(s_prime);
                   }
               }
             else // Backtrack
@@ -342,16 +347,16 @@ namespace spot
         color_ref(color* c) :p(c)
           {
           }
-        int get() const
+        color get() const
           {
             return *p;
           }
         void set(color c)
           {
-            assert(!is_null());
+            assert(!is_white());
             *p=c;
           }
-        bool is_null() const
+        bool is_white() const
           {
             return p==0;
           }
@@ -359,7 +364,7 @@ namespace spot
         color *p;
       };
 
-      explicit_magic_search_heap()
+      explicit_magic_search_heap(size_t)
         {
         }
 
@@ -405,11 +410,78 @@ namespace spot
       hash_type h;
     };
 
+    class bsh_magic_search_heap
+    {
+    public:
+      class color_ref
+      {
+      public:
+        color_ref(unsigned char *b, unsigned char o): base(b), offset(o*2)
+          {
+          }
+        color get() const
+          {
+            return color(((*base) >> offset) & 3U);
+          }
+        void set(color c)
+          {
+            *base =  (*base & ~(3U << offset)) | (c << offset);
+          }
+        bool is_white() const
+          {
+            return get()==WHITE;
+          }
+      private:
+        unsigned char *base;
+        unsigned char offset;
+      };
+
+      bsh_magic_search_heap(size_t s)
+        {
+          size = s;
+          h = new unsigned char[size];
+          memset(h, WHITE, size);
+        }
+
+      ~bsh_magic_search_heap()
+        {
+          delete[] h;
+        }
+
+      color_ref get_color_ref(const state*& s)
+        {
+          size_t ha = s->hash();
+          return color_ref(&(h[ha%size]), ha%4);
+        }
+
+      void add_new_state(const state* s, color c)
+        {
+          color_ref cr(get_color_ref(s));
+          assert(cr.is_white());
+          cr.set(c);
+        }
+
+      void pop_notify(const state* s)
+        {
+          delete s;
+        }
+
+    private:
+      size_t size;
+      unsigned char* h;
+    };
+
   } // anonymous
 
   emptiness_check* explicit_magic_search(const tgba *a)
   {
-    return new magic_search<explicit_magic_search_heap>(a);
+    return new magic_search<explicit_magic_search_heap>(a, 0);
+  }
+
+  emptiness_check* bit_state_hashing_magic_search(
+                            const tgba *a, size_t size)
+  {
+    return new magic_search<bsh_magic_search_heap>(a, size);
   }
 
 }
