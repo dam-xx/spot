@@ -5,12 +5,10 @@ AC_DEFUN([adl_ENABLE_DEVEL],
 
  # Turn on devel options for development version, unless
  # explicitely turned off.
- if test -z "$enable_devel"; then
-   case $VERSION in
-     *[abcdefghijklmnopqrstuvwxyz])
-       enable_devel=yes ;;
-   esac
- fi
+ case $VERSION in
+   *[[abcdefghijklmnopqrstuvwxyz]])
+     enable_devel=${enable_devel-yes} ;;
+ esac
 
  if test x"$enable_devel" = xyes; then
    enable_debug=${enable_debug-yes}
