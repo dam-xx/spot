@@ -1,5 +1,8 @@
 2004-02-19  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Remove the
+	cond_for_true optimization.  It is covered by exprop.
+
 	* src/tgba/tgbatba.cc (tgba_tba_proxy_succ_iterator::current_state):
 	Fix reference to Oddoux's thesis.
 
