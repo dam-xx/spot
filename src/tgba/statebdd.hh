@@ -16,12 +16,19 @@ namespace spot
     }
 
     /// Return the BDD part of the state.
-    bdd 
+    bdd
     as_bdd() const
     {
       return state_;
     }
-    
+
+    /// Return the BDD part of the state.
+    bdd&
+    as_bdd()
+    {
+      return state_;
+    }
+
     virtual int compare(const state* other) const;
 
   protected:

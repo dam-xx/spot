@@ -12,7 +12,7 @@ namespace spot
   {
   public:
     /// \brief Build a spot::tgba_succ_iterator_concrete.
-    /// 
+    ///
     /// \param successors The set of successors with ingoing conditions
     /// and promises, represented as a BDD.  The job of this iterator
     /// will be to enumerate the satisfactions of that BDD and split

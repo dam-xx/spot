@@ -15,7 +15,7 @@ namespace spot
     /// \li "Next" variables, that encode the destination state
     /// \li atomic propositions, which are things to verify before going on
     ///     to the next state
-    /// \li promises: \c a \c U \c b, or \c F \cb, both imply that \c b
+    /// \li promises: \c a \c U \c b, or \c F \c b, both imply that \c b
     ///     should be verified eventually.  We encode this with \c Prom[b],
     ///     and check that promises are fullfilled in the emptyness check.
     bdd relation;

@@ -77,7 +77,7 @@ namespace spot
     /// This formating is the responsability of the automata
     /// who owns the state.
     virtual std::string format_state(const state* state) const = 0;
-  }; 
+  };
 
 }
 

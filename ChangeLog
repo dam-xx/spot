@@ -1,3 +1,10 @@
+2003-05-28  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/statebdd.hh (state_bdd::as_bdd): Add non-const variant.
+	* src/tgba/tgbabddtranslateproxy.cc,
+	src/tgba/tgbabddtranslateproxy.hh: New files.
+	* src/tgba/Makefile.am (libtgba_la_SOURCES): Add them.
+
 2003-05-27  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/bddprint.cc, src/tgba/bddprint.hh,
@@ -8,8 +15,8 @@
 	src/tgba/tgbabddtranslatefactory.hh, src/tgbaalgos/dotty.cc:
 	Add Doxygen comments.
 
-	* src/tgba/bddfactory.hh, src/tgba/statebdd.hh, 
-	src/tgba/succiterconcrete.hh, src/tgba/tgbabddconcrete.hh, 
+	* src/tgba/bddfactory.hh, src/tgba/statebdd.hh,
+	src/tgba/succiterconcrete.hh, src/tgba/tgbabddconcrete.hh,
 	src/tgba/tgbabddcoredata.hh, src/tgba/tgbabdddict.hh: Add
 	Doxygen comments.
 
@@ -18,7 +25,7 @@
 	* src/tgba/state.hh: Add Doxygen comments.
 	(state::compare): Take a state*, not a state&.
 	(state_ptr_less_than): New functor.
-	* src/tgba/statebdd.hh (state_bdd::compare): Take a state*, not a 
+	* src/tgba/statebdd.hh (state_bdd::compare): Take a state*, not a
 	state&.
 	* src/tgba/statebdd.cc (state_bdd::compare): Likewise.
 	* src/tgba/succiter.hh: Add Doxygen comments.
