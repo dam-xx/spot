@@ -1,5 +1,9 @@
 2003-07-29  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgbaalgos/lbtt.cc: Typos.
+
+	* lbtt/: Upgrade to lbtt 1.0.2.
+
 	* src/tgbatest/Makefile.am (check_PROGRAMS): Add tbalbtt.
 	(tbalbtt_SOURCES, tbalbtt_CXXFLAGS): New variables.
 	* src/tgbatest/spotlbtt.cc [TBA]: Build tba proxies conditionally.

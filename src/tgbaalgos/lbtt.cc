@@ -12,7 +12,7 @@
 namespace spot
 {
   // At some point we'll need to print an accepting set into LBTT's
-  // forma.  LBTT expect numbered accepting sets, so first we'll
+  // format.  LBTT expects numbered accepting sets, so first we'll
   // number each accepting condition, and latter when we have to print
   // them we'll just have to look up each of them.
   class accepting_cond_splitter
@@ -106,8 +106,8 @@ namespace spot
   // Set of states yet to produce.
   typedef std::set<state_acc_pair, state_acc_pair_less_than> todo_set;
 
-  // Each *source* car correspond to several state in the produced
-  // automate.  A minmax_pair specify the range of such associated states.
+  // Each *source* state corresponds to several states in the produced
+  // automata.  A minmax_pair specifies the range of such associated states.
   typedef std::pair<unsigned, unsigned> minmax_pair;
   typedef std::map<state*, minmax_pair, state_ptr_less_than> seen_map;
 
@@ -145,7 +145,7 @@ namespace spot
 	acc_seen.insert(si->current_accepting_conditions());
       }
 
-    // Order the creation of the supplementary initial state of needed.
+    // Order the creation of the supplementary initial state if needed.
     // Use bddtrue as accepting condition because it cannot conflict
     // with other (state, accepting cond) pairs in the maps.
     if (init && acc_seen.size() > 1)
@@ -229,7 +229,7 @@ namespace spot
 
     os << state_number << " " << acs.count() << std::endl;
     os << body.str();
-    // Finally delete all states used as keys in m:
+    // Finally delete all states used as keys in m.
     for (seen_map::iterator i = seen.begin(); i != seen.end(); ++i)
       delete i->first;
     return os;

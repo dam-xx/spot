@@ -128,7 +128,7 @@ namespace spot
     tstack_type::const_reverse_iterator ti;
     os << "Prefix:" << std::endl;
     const bdd_dict* d = a->get_dict();
-    for (i = stack.rbegin(), ti = tstack.rbegin(); 
+    for (i = stack.rbegin(), ti = tstack.rbegin();
 	 i != stack.rend(); ++i, ++ti)
       {
 	if (i->first.s->compare(x) == 0)

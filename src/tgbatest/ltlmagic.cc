@@ -52,10 +52,10 @@ main(int argc, char** argv)
     spot::ltl::destroy(f1);
 
     spot::magic_search ms(a2);
-    
+
     if (ms.check())
       {
-	do 
+	do
 	  ms.print_result (std::cout);
 	while (all_opt && ms.check());
       }
