@@ -137,7 +137,7 @@ namespace spot
 	// Pick and remove one satisfaction from trans_set_left_.
 	bdd cube = bdd_satone(trans_set_left_);
 	trans_set_left_ &= !cube;
-	// Let this cube grow as much as possible 
+	// Let this cube grow as much as possible. 
 	// (e.g., cube "(!a)&b" taken from "a | (!a)&b" can
 	// be simplified to "b").
 	cube = bdd_simplify(cube, cube | neg_trans_set_);
