@@ -3,6 +3,11 @@
 #include "tgbabddconcretefactory.hh"
 namespace spot
 {
+  tgba_bdd_concrete_factory::tgba_bdd_concrete_factory()
+    : now_to_next_(bdd_newpair())
+  {
+  }
+
   tgba_bdd_concrete_factory::~tgba_bdd_concrete_factory()
   {
     acc_map_::iterator ai;
@@ -27,6 +32,7 @@ namespace spot
     // Record that num+1 should be renamed as num when
     // the next state becomes current.
     bdd_setpair(data_.next_to_now, num + 1, num);
+    bdd_setpair(now_to_next_, num, num + 1);
 
     // Keep track of all "Now" variables for easy
     // existential quantification.
@@ -100,6 +106,15 @@ namespace spot
 	// of this accepting set.
 	data_.accepting_conditions |= ai->second & acc;
       }
+
+    // Any constraint between Now variables also exist between Next
+    // variables.  Doing this limits the quantity of useless
+    // successors we will have to explore.  (By "useless successors"
+    // I mean a combination of Next variables that represent a cul de sac
+    // state: the combination exists but won't allow further exploration
+    // because it fails the constraints.)
+    data_.relation &= bdd_replace(bdd_exist(data_.relation, data_.notnow_set),
+				  now_to_next_);
   }
 
   const tgba_bdd_core_data&
