@@ -1,3 +1,8 @@
+2003-08-11  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* wrap/python/Makefile.am (SUBDIRS): Build `.' first.
+	* wrap/python/cgi/Makefile.am (ltl2tgba.py): Depend on Makefile.
+
 2003-08-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	Revamp the multop interface to allow some basic optimizations like

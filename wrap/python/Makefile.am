@@ -1,4 +1,4 @@
-SUBDIRS = cgi tests
+SUBDIRS = . cgi tests
 
 AM_CPPFLAGS = -I$(PYTHONINC) -I$(top_srcdir)/src $(BUDDY_CPPFLAGS)
 
