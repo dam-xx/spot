@@ -21,10 +21,14 @@ namespace spot
     void release_variables(int base, int n);
 
     static bool initialized; ///< Whether the BDD library has been initialized.
-    static int varnum; ///< number of variable in use in the BDD library.
+    static int varnum; ///< number of variables in use in the BDD library.
+    int lvarnum; ///< number of variables in use in this allocator.
     typedef std::pair<int, int> pos_lenght_pair;
     typedef std::list<pos_lenght_pair> free_list_type;
     free_list_type free_list; ///< Tracks unused BDD variables.
+  private:
+    /// Require more variables.
+    void extvarnum(int more);
   };
 
 }

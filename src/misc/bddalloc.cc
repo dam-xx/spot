@@ -8,9 +8,10 @@ namespace spot
   int bdd_allocator::varnum = 2;
 
   bdd_allocator::bdd_allocator()
+    : lvarnum(varnum)
   {
     initialize();
-    free_list.push_front(pos_lenght_pair(0, varnum));
+    free_list.push_front(pos_lenght_pair(0, lvarnum));
   }
 
   void
@@ -21,6 +22,25 @@ namespace spot
     initialized = true;
     bdd_init(50000, 5000);
     bdd_setvarnum(varnum);
+  }
+
+  void
+  bdd_allocator::extvarnum(int more)
+  {
+    // If varnum has been extended from another allocator, use
+    // the new variables.
+    if (lvarnum < varnum)
+      {
+	more -= varnum - lvarnum;
+	lvarnum = varnum;
+      }
+    // If we still need more variable, do allocate them.
+    if (more > 0)
+      {
+	bdd_extvarnum(more);
+	varnum += more;
+	lvarnum = varnum;
+      }
   }
 
   int
@@ -65,22 +85,20 @@ namespace spot
     // If we already have some free variable at the end
     // of the variable space, allocate just the difference.
     if (free_list.size() > 0
-	&& free_list.back().first + free_list.back().second == varnum)
+	&& free_list.back().first + free_list.back().second == lvarnum)
       {
 	int res = free_list.back().first;
 	int endvar = free_list.back().second;
 	assert(n > endvar);
-	bdd_extvarnum(n - endvar);
-	varnum += n - endvar;
+	extvarnum(n - endvar);
 	free_list.pop_back();
 	return res;
       }
     else
       {
 	// Otherwise, allocate as much variables as we need.
-	int res = varnum;
-	bdd_extvarnum(n);
-	varnum += n;
+	int res = lvarnum;
+	extvarnum(n);
 	return res;
       }
   }
