@@ -1,3 +1,7 @@
+2003-09-11  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/state.hh: Include cassert.
+
 2003-08-29  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/state.hh (state::hash): New method.

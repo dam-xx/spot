@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <bdd.h>
+#include <cassert>
 
 namespace spot
 {
