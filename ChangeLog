@@ -1,3 +1,8 @@
+2005-01-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/ce.cc (couvreur99_check_result::accepting_cycle):
+	More ref in comment.
+
 2005-01-26  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gv04.cc, src/tgbaalgos/ndfs_result.hxx,

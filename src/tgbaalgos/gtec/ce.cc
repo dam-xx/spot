@@ -158,7 +158,18 @@ namespace spot
     // restarted from the point reached after we have discovered a
     // transition with a new acceptance conditions.
     //
-    // This idea is taken from Product<T>::findWitness in LBTT 1.1.2.
+    // This idea is taken from Product<T>::findWitness in LBTT 1.1.2,
+    // which in turn is probably inspired from
+    // @Article{	  latvala.00.fi,
+    //   author	= {Timo Latvala and Keijo Heljanko},
+    //   title		= {Coping With Strong Fairness},
+    //   journal	= {Fundamenta Informaticae},
+    //   year		= {2000},
+    //   volume	= {43},
+    //   number	= {1--4},
+    //   pages		= {1--19},
+    //   publisher	= {IOS Press}
+    // }
     const state* substart = ecs_->cycle_seed;
     do
       {
