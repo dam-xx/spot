@@ -30,15 +30,18 @@ check_SCRIPTS = defs
 # Keep this sorted alphabetically.
 check_PROGRAMS = \
   equals \
+  inf \
   ltl2dot \
   ltl2text \
   lunabbrev \
   nenoform \
+  reduc \
   tostring \
   tunabbrev \
-  tunenoform
+  tunenoform 
 
 equals_SOURCES = equals.cc
+inf_SOURCES = inf.cc
 ltl2dot_SOURCES = readltl.cc
 ltl2dot_CPPFLAGS = $(AM_CPPFLAGS) -DDOTTY
 ltl2text_SOURCES = readltl.cc
@@ -46,6 +49,7 @@ lunabbrev_SOURCES = equals.cc
 lunabbrev_CPPFLAGS = $(AM_CPPFLAGS) -DLUNABBREV
 nenoform_SOURCES = equals.cc
 nenoform_CPPFLAGS = $(AM_CPPFLAGS) -DNENOFORM
+reduc_SOURCES = reduc.cc
 tostring_SOURCES = tostring.cc
 tunabbrev_SOURCES = equals.cc
 tunabbrev_CPPFLAGS = $(AM_CPPFLAGS) -DTUNABBREV
@@ -57,6 +61,8 @@ EXTRA_DIST = $(TESTS)
 
 # Ordered by strength of the test.  Test basic features first.
 TESTS = \
+  inf.test \
+  reduc.test \
   parse.test \
   parseerr.test \
   equals.test \

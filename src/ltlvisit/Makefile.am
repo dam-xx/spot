@@ -33,7 +33,8 @@ ltlvisit_HEADERS = \
   lunabbrev.hh \
   nenoform.hh \
   postfix.hh \
-  tunabbrev.hh
+  tunabbrev.hh \
+  reducform.hh
 
 noinst_LTLIBRARIES = libltlvisit.la
 libltlvisit_la_SOURCES = \
@@ -45,4 +46,8 @@ libltlvisit_la_SOURCES = \
   lunabbrev.cc \
   nenoform.cc \
   postfix.cc \
-  tunabbrev.cc
+  tunabbrev.cc \
+  reducform.cc \
+  basereduc.cc \
+  forminf.cc \
+  formlength.cc

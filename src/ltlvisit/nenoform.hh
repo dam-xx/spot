@@ -43,6 +43,7 @@ namespace spot
     /// or spot::ltl::unabbreviate_ltl first.  (Calling these functions
     /// after spot::ltl::negative_normal_form would likely produce a
     /// formula which is not in negative normal form.)
+
     formula* negative_normal_form(const formula* f, bool negated = false);
   }
 }
