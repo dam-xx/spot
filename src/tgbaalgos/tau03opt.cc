@@ -481,6 +481,7 @@ namespace spot
           return true;
         }
 
+      enum { Has_Size = 1 };
       int size() const
         {
           return h.size() + hc.size();

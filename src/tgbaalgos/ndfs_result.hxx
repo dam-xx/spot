@@ -61,23 +61,43 @@ namespace spot
 
   typedef std::list<stack_item> stack_type;
 
+  namespace
+  {
+    // The acss_statistics is available only when the heap has a
+    // size() method (which we indicate using n==1).
+
+    template <typename T, int n>
+    struct acss_interface
+    {
+    };
+
+    template <typename T>
+    struct acss_interface<T, 1>
+      : public acss_statistics
+    {
+      int
+      acss_states() const
+      {
+	// all visited states are in the state space search
+	return dynamic_cast<const T*>(this)->h_.size();
+      }
+    };
+
+  }
+
+
   template <typename ndfs_search, typename heap>
   class ndfs_result:
     public emptiness_check_result,
     public ars_statistics,
-    public acss_statistics
+    // Conditionally inherit from acss_statistics.
+    public acss_interface<ndfs_result<ndfs_search, heap>, heap::Has_Size>
   {
   public:
     ndfs_result(const ndfs_search& ms)
       : emptiness_check_result(ms.automaton()), ms_(ms),
         h_(ms_.get_heap())
     {
-    }
-
-    int acss_states() const
-    {
-      // all visited states are in the state space search
-      return h_.size();
     }
 
     virtual ~ndfs_result()
@@ -195,6 +215,8 @@ namespace spot
   private:
     const ndfs_search& ms_;
     const heap& h_;
+    template <typename T, int n>
+    friend struct acss_interface;
 
     struct transition {
       const state* source;

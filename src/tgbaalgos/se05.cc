@@ -445,6 +445,7 @@ namespace spot
           return true;
         }
 
+      enum { Has_Size = 1 };
       int size() const
         {
           return h.size() + hc.size();
@@ -548,12 +549,7 @@ namespace spot
           return color((h[ha%size_] >> ((ha%4)*2)) & 3U) != WHITE;
         }
 
-      int size() const
-        {
-          // this method must return the number of state stored in the heap. Due
-          // to potential conflicts this size cannot be computed.
-          return 0;
-        }
+      enum { Has_Size = 0 };
 
     private:
       size_t size_;

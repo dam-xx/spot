@@ -361,6 +361,7 @@ namespace spot
           return (it != h.end());
         }
 
+      enum { Has_Size = 1 };
       int size() const
         {
           return h.size();
