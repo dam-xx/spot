@@ -84,7 +84,7 @@ namespace spot
 
     virtual state_gspn_eesrg* clone() const
     {
-      return new state_gspn_eesrg(left(), right());
+      return new state_gspn_eesrg(left(), right()->clone());
     }
 
     State
