@@ -9,6 +9,7 @@ dnl -Wredundant-decls (system headers make this too noisy)
 dnl -pedantic
 dnl -Wunreachable-code (broken, see GCC PR/7827)
 dnl -Wredundant-decls (too many warnings in GLIBC's header with old GCC)
+dnl -Wstrict-prototypes (not valid in C++, gcc-3.4 complains)
 dnl
 dnl A few other options have been left out because they are annoying in C++.
 
@@ -27,7 +28,6 @@ EOF
    Wcast-align \
    Wpointer-arith \
    Wwrite-strings \
-   Wstrict-prototypes \
    Wcast-qual \
    Werror
   do

@@ -1,5 +1,8 @@
 2004-07-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* m4/gccwarn.m4: Do not check nor use -Wstrict-prototypes.
+	g++-3.4 complains it makes no sense in C++.
+
 	* iface/gspn/ssp.cc: Typos.
 
 	* iface/gspn/gspn.cc (tgba_succ_iterator_gspn::tgba_succ_iterator_gspn):
