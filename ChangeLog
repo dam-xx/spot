@@ -3,6 +3,8 @@
 	* doc/Makefile.am (doc): Typo.
 	* src/ltlvisit/tostring.hh (to_string): Add doxygen comments.
 	* src/ltlast/multop.hh (multop::paircmp): Add doxygen comments.
+	* src/tgba/tgbaexplicit.hh (tgba_explicit::transtion,
+	state_explicit, tgba_explicit_succ_iterator): Add doxygen comments.
 	* src/ltlvisit/postfix.hh: Typo.
 
 	* src/ltlast/Makefile.am (ltlastdir, ltlast_HEADERS): New variables.
