@@ -1,3 +1,11 @@
+2003-05-15  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/ltlparse/ltlparse.yy (error_list, parse_environment, result):
+	CVS Bison now supports %parse-param for the C++ skeleton; pass these
+	variables as arguments to the Parser::Parser constructor instead of
+	using globals.
+	(parse): Adjust Parser::Parser call.
+
 2003-05-12  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltlvisit/tostring.cc: Reindent and strip out superfluous
@@ -17,9 +25,9 @@
 
 	* src/ltlvisit/Makefile.am (lib_LTLIBRARIES): Rename as ...
 	(noinst_LTLIBRARIES): ... this.
-	* src/ltlenv/Makefile.am, src/ltlast/Makefile.am, 
+	* src/ltlenv/Makefile.am, src/ltlast/Makefile.am,
 	src/ltlparse/Makefile.am: Likewise.
-	* src/Makefile.am (lib_LTLIBRARIES, libspot_la_SOURCES, 
+	* src/Makefile.am (lib_LTLIBRARIES, libspot_la_SOURCES,
 	libspot_la_LIBADD): New variable.   Build a libspot.la library
 	from all the sub-libraries.
 
@@ -32,7 +40,7 @@
 2003-04-29  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
 	* configure.ac: Call AC_PROG_LIBTOOL.
-	* src/ltlast/Makefile.am, src/ltlenv/Makefile.am, 
+	* src/ltlast/Makefile.am, src/ltlenv/Makefile.am,
 	src/ltlparse/Makefile.am, src/ltltest/Makefile.am,
 	src/ltlvisit/Makefile.am: Adust to build libtool libraries.
 
@@ -42,12 +50,12 @@
 	* src/ltltest/tostring.test: Simplify with set -e.  Move the
 	description of the test ...
 	* src/ltltest/tostring.cc: ... here, where it is actually coded.
-	* src/ltltest/lunabbrev.test, src/ltltest/tunabbrev.test, 
-	src/ltltest/nenoform.test,  src/ltltest/tunenoform.test: 
+	* src/ltltest/lunabbrev.test, src/ltltest/tunabbrev.test,
+	src/ltltest/nenoform.test,  src/ltltest/tunenoform.test:
 	Simplify with set -e.
 
 	* configure.ac (AM_INIT_AUTOMAKE): Use nostdinc, to make
-	sure we always use paths relative to src/ in src/'s 
+	sure we always use paths relative to src/ in src/'s
 	subdirectories.
 
 2003-04-28  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
@@ -75,7 +83,7 @@
 	src/ltlparse/public.hh, src/ltlvisit/clone.hh,
 	src/ltlvisit/dotty.hh, src/ltlvisit/dump.hh,
 	src/ltlvisit/equals.hh, src/ltlvisit/lunabbrev.hh,
-	src/ltlvisit/nenoform.hh, src/ltlvisit/tunabbrev.hh: Add 
+	src/ltlvisit/nenoform.hh, src/ltlvisit/tunabbrev.hh: Add
 	Doxygen comments.
 	* src/visitor.hh: Do not use const_sel.  This clarifies
 	the code and helps Doxygen.
@@ -83,9 +91,9 @@
 	* configure.ac: Output doc/Doxyfile and doc/Makefile.
 	* doc/Makefile.am, doc/Doxyfile.in: New files.
 	* Makefile.am (SUBDIRS): Add doc.
-	
+
 	* src/ltlparse/ltlscan.ll: Recognize && and ||.
-	* src/ltltest/parse.test, src/ltltest/parseerr.test, 
+	* src/ltltest/parse.test, src/ltltest/parseerr.test,
 	src/ltltest/equals.test: Use these operators..
 
 2003-04-17  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
@@ -100,10 +108,10 @@
 	* src/ltlast/atomic_prop.cc (atomic_prop, env): Likewise.
 	* src/ltlenv/defaultenv.cc (require): Pass *this as the
 	environment argument to atomic_prop.
-	* src/ltlvisit/clone.cc (visit(const atomic_prop*)): Also copy 
+	* src/ltlvisit/clone.cc (visit(const atomic_prop*)): Also copy
 	the environment.
 	* src/ltlvisit/nenoform.cc (visit(const atomic_prop*)): Likewise.
-	
+
 	* configure.ac: Output src/ltlenv/Makefile.
 	* src/ltlenv/Makefile.am, src/ltlenv/defaultenv.cc,
 	src/ltlenv/defaultenv.hh, src/ltlenv/environment.hh: New files.
@@ -125,7 +133,7 @@
 	* src/ltltest/nenoform.test, src/ltltest/tunenoform.test: New files.
 	* src/ltltest/Makefile.am (check_PROGRAMS): Add nenoform and
 	tunenoform.
-	(nenoform_SOURCES, nenoform_CPPFLAGS, tunenoform_SOURCES, 
+	(nenoform_SOURCES, nenoform_CPPFLAGS, tunenoform_SOURCES,
 	tunenoform_CPPFLAGS): New variables.
 	(TESTS): Add nenoform.test and tunenoform.test.
 
@@ -145,7 +153,7 @@
 	New virtual function.
 	* src/ltlvisit/lunabbrev.cc (unabbreviate_logic_visitor::recurse):
 	Likewise.
-	(unabbreviate_logic_visitor::visit): Use it instead of calling 
+	(unabbreviate_logic_visitor::visit): Use it instead of calling
 	unabbreviate_logic directly.
 
 	* src/ltlvisit/lunabbrev.hh: Add missing include guard.
@@ -169,7 +177,7 @@
 	* src/ltlast/formula.hh (formulae): Rename as ...
 	(formula): ... this.
 	Adjust all uses.
-	
+
 	* src/ltlparse/public.hh (format_parse_errors): New function.
 	* src/ltlparse/fmterror.cc: New file.
 	* src/ltlparse/Makefile.am (libltlparse_a_SOURCES): Add fmterror.cc.
@@ -185,7 +193,7 @@
 	(TESTS): Add equals.test.
 
 	* src/ltlast/multop.cc (multop::multop): Use multop::add.
-	(multop::add): If the formulae we add is itself a multop for the 
+	(multop::add): If the formulae we add is itself a multop for the
 	same operator, merge its children with ours.
 	* src/ltltest/parseerr.test: Add two tests for multop merging.
 
@@ -216,6 +224,6 @@
 	src/ltlvisit/dotty.cc, src/ltlvisit/dotty.hh,
 	src/ltlvisit/dump.cc, src/ltlvisit/dump.hh,
 	src/ltlvisit/rewrite.cc, src/ltlvisit/rewrite.hh,
-	src/ltltest/Makefile.am, src/ltltest/defs.in, src/ltltest/readltl.cc, 
-	src/ltltest/parse.test, src/ltltest/parseerr.test, 
+	src/ltltest/Makefile.am, src/ltltest/defs.in, src/ltltest/readltl.cc,
+	src/ltltest/parse.test, src/ltltest/parseerr.test,
 	src/misc/Makefile.am, src/misc/const_sel.hh: New files.
