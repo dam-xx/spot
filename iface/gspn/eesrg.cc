@@ -208,26 +208,28 @@ namespace spot
       while (cond != bddtrue)
 	{
 	  int var = bdd_var(cond);
-	  tgba_gspn_eesrg_private_::prop_map::iterator i =
-	    data_->prop_dict.find(var);
-
-	  // It's OK if VAR is unknown from GreatSPN (it might have
-	  // been used to synchornize other automaton or something),
-	  // just skip it.
-	  if (i != data_->prop_dict.end())
-	    continue;
 
 	  bdd high = bdd_high(cond);
+	  int res;
 	  if (high == bddfalse)
 	    {
 	      cond = bdd_low(cond);
-	      props[i->second] = 0;
+	      res = 0;
 	    }
 	  else
 	    {
 	      cond = high;
-	      props[i->second] = 1;
+	      res = 1;
 	    }
+
+	  // It's OK if VAR is unknown from GreatSPN (it might have
+	  // been used to synchornize other automaton or something),
+	  // just skip it.
+	  tgba_gspn_eesrg_private_::prop_map::iterator i =
+	    data_->prop_dict.find(var);
+	  if (i != data_->prop_dict.end())
+	    props[i->second] = res;
+
 	  assert(cond != bddfalse);
 	}
 
