@@ -1,5 +1,7 @@
 2003-11-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/misc/minato.cc: Include cassert.
+
 	* src/misc/minato.cc, src/misc/minato.hh: New files.
 	* src/misc/Makefile.am (misc_HEADERS, libmisc_la_SOURCES): Add them.
 	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Use minato_isop.

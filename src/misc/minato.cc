@@ -1,5 +1,6 @@
 #include "minato.hh"
 #include <utility>
+#include <cassert>
 
 namespace spot
 {
