@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include "Alloc.h"
+#include "ObstackAlloc.h"
 #include "BuchiAutomaton.h"
 #include "Configuration.h"
 #include "ProductAutomaton.h"

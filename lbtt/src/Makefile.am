@@ -1,20 +1,57 @@
 bin_PROGRAMS = lbtt lbtt-translate
-lbtt_SOURCES = Alloc.h BitArray.h Bitset.h BitArray.cc BuchiAutomaton.h \
-BuchiAutomaton.cc Config-parse.yy Config-lex.ll Configuration.h \
-Configuration.cc DispUtil.h DispUtil.cc EdgeContainer.h Exception.h \
-FormulaRandomizer.h FormulaRandomizer.cc FormulaWriter.h LtlFormula.h \
-LtlFormula.cc main.cc PathEvaluator.h PathEvaluator.cc PathIterator.h \
-PathIterator.cc ProductAutomaton.h ProductAutomaton.cc Random.h SccIterator.h \
-SharedTestData.h StatDisplay.h StatDisplay.cc StateSpace.h StateSpace.cc \
-StateSpaceRandomizer.h StateSpaceRandomizer.cc StringUtil.h StringUtil.cc \
-TestOperations.h TestOperations.cc TestRoundInfo.h TestStatistics.h \
-TestStatistics.cc UserCommandReader.h UserCommandReader.cc UserCommands.h \
-UserCommands.cc
+lbtt_SOURCES = \
+  BitArray.cc \
+  BitArray.h \
+  Bitset.h \
+  BuchiAutomaton.cc \
+  BuchiAutomaton.h \
+  Config-lex.ll \
+  Config-parse.yy \
+  Configuration.cc \
+  Configuration.h \
+  DispUtil.cc \
+  DispUtil.h \
+  EdgeContainer.h \
+  Exception.h \
+  FormulaRandomizer.cc \
+  FormulaRandomizer.h \
+  FormulaWriter.h \
+  LtlFormula.cc \
+  LtlFormula.h \
+  main.cc \
+  ObstackAlloc.h \
+  PathEvaluator.cc \
+  PathEvaluator.h \
+  PathIterator.cc \
+  PathIterator.h \
+  ProductAutomaton.cc \
+  ProductAutomaton.h \
+  Random.h \
+  SccIterator.h \
+  SharedTestData.h \
+  StatDisplay.cc \
+  StatDisplay.h \
+  StateSpace.cc \
+  StateSpace.h \
+  StateSpaceRandomizer.cc \
+  StateSpaceRandomizer.h \
+  StringUtil.cc \
+  StringUtil.h \
+  TestOperations.cc \
+  TestOperations.h \
+  TestRoundInfo.h \
+  TestStatistics.cc \
+  TestStatistics.h \
+  UserCommandReader.cc \
+  UserCommandReader.h \
+  UserCommands.cc \
+  UserCommands.h
+
 EXTRA_lbtt_SOURCES = gnu-getopt.h Config-parse.h
-lbtt_LDADD = @LIBOBJS@ @READLINELIBS@
+lbtt_LDADD = $(LIBOBJS) $(READLINELIBS)
 
 lbtt_translate_SOURCES = \
-  Alloc.h \
+  ObstackAlloc.h \
   BitArray.h \
   BitArray.cc \
   Exception.h \
@@ -39,4 +76,4 @@ lbtt_translate_SOURCES = \
   TranslatorInterface.h
 
 EXTRA_lbtt_translate_SOURCES = gnu-getopt.h NeverClaim-parse.h
-lbtt_translate_LDADD = @LIBOBJS@
+lbtt_translate_LDADD = $(LIBOBJS)

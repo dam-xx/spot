@@ -31,7 +31,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "Alloc.h"
+#include "ObstackAlloc.h"
 #include "Exception.h"
 #include "FormulaRandomizer.h"
 #include "StateSpaceRandomizer.h"

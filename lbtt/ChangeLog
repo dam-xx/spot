@@ -1,3 +1,18 @@
+2004-01-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/Alloc.h: Rename as ...
+	* src/ObstackAlloc.h: ... this.  The problem is that alloc.h is a
+	system header in g++ < 3.0, and Darwin has a case-insensitive
+	filesystem.  System headers that include alloc.h pick the local
+	Alloc.h version.
+	* BuchiAutomaton.h, Configuration.h, DispUtil.cc,
+	ExternalTranslator.h, FormulaRandomizer.h, Graph.h.in,
+	LtlFormula.h, Makefile.am, NeverClaimAutomaton.h, PathEvaluator.h,
+	ProductAutomaton.h, SccIterator.h, SharedTestData.h,
+	StatDisplay.h, StateSpace.h, StateSpaceRandomizer.cc,
+	StringUtil.h, TestOperations.h, TestRoundInfo.h, TestStatistics.h,
+	UserCommandReader.h, UserCommands.h, main.cc: Adjust includes.
+
 2003-12-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* doc/texinfo.tex: New upstream version.

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003
  *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -33,7 +33,7 @@
 #include <strstream>
 #endif /* HAVE_SSTREAM */
 #include <vector>
-#include "Alloc.h"
+#include "ObstackAlloc.h"
 #include "Exception.h"
 
 using namespace std;

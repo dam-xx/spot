@@ -33,7 +33,7 @@
 #else
 #include <strstream>
 #endif /* HAVE_SSTREAM */
-#include "Alloc.h"
+#include "ObstackAlloc.h"
 #include "Exception.h"
 #include "LtlFormula.h"
 #include "translate.h"

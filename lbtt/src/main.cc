@@ -28,7 +28,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif  /* HAVE_READLINE */
-#include "Alloc.h"
+#include "ObstackAlloc.h"
 #include "Configuration.h"
 #include "DispUtil.h"
 #include "Exception.h"
