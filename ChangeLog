@@ -1,5 +1,7 @@
 2004-05-17  Thomas Martinez  <martinez@src.lip6.fr>
 
+	* src/ltlvisit/basereduc.cc, src/ltltest/inf.cc (main): Style.
+
 	* src/ltlvisit/basereduc.cc (spot): 80 columns.
 	* src/ltlvisit/reducform.cc (spot), src/ltltest/inf.cc,
 	src/ltltest/reduc.cc (main), src/ltlvisit/reducform.hh,

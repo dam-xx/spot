@@ -86,7 +86,8 @@ namespace spot
 	      return;
 
 	    /* XGF(f) = GF(f) */
-	    if (is_GF(result_)) return;
+	    if (is_GF(result_))
+	      return;
 
 	    /* X(f1 & GF(f2)) = X(f1) & GF(F2) */
 	    /* X(f1 | GF(f2)) = X(f1) | GF(F2) */
@@ -338,7 +339,6 @@ namespace spot
       void
       visit(multop* mo)
       {
-	if (mo == NULL);
 	multop::type op = mo->op();
 	unsigned mos = mo->size();
 	multop::vec* res = new multop::vec;
@@ -402,7 +402,8 @@ namespace spot
 			tmpUright = new multop::vec;
 			for (multop::vec::iterator j = i; j != res->end(); j++)
 			  {
-			    if (*j == NULL) continue;
+			    if (*j == NULL)
+			      continue;
 			    if ((node_type(*j) == node_type_form_visitor::Binop)
 				&&
 				(dynamic_cast<binop*>(*j)->op() == binop::U) &&
@@ -435,7 +436,8 @@ namespace spot
 			tmpRright = new multop::vec;
 			for (multop::vec::iterator j = i; j != res->end(); j++)
 			  {
-			    if (*j == NULL) continue;
+			    if (*j == NULL)
+			      continue;
 			    if ((node_type(*j) == node_type_form_visitor::Binop)
 				&&
 				(dynamic_cast<binop*>(*j)->op() == binop::R) &&
@@ -477,7 +479,8 @@ namespace spot
 
 	    for (multop::vec::iterator i = res->begin(); i != res->end(); i++)
 	      {
-		if (*i == NULL) continue;
+		if (*i == NULL)
+		  continue;
 		switch (node_type(*i))
 		  {
 
@@ -510,7 +513,8 @@ namespace spot
 			tmpUright = new multop::vec;
 			for (multop::vec::iterator j = i; j != res->end(); j++)
 			  {
-			    if (*j == NULL) continue;
+			    if (*j == NULL)
+			      continue;
 			    if ((node_type(*j) == node_type_form_visitor::Binop)
 				&&
 				(dynamic_cast<binop*>(*j)->op() == binop::U) &&
@@ -541,7 +545,8 @@ namespace spot
 			tmpRright = new multop::vec;
 			for (multop::vec::iterator j = i; j != res->end(); j++)
 			  {
-			    if (*j == NULL) continue;
+			    if (*j == NULL)
+			      continue;
 			    if ((node_type(*j) == node_type_form_visitor::Binop)
 				&&
 				(dynamic_cast<binop*>(*j)->op() == binop::R) &&

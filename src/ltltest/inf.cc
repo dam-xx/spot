@@ -92,7 +92,8 @@ main(int argc, char** argv)
 	  exit_return = 1;
 	}
       break;
-    default: break;
+    default:
+      break;
     }
 
   spot::ltl::dump(std::cout, f1); std::cout << std::endl;
