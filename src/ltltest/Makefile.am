@@ -1,4 +1,4 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -38,7 +38,7 @@ check_PROGRAMS = \
   reduc \
   tostring \
   tunabbrev \
-  tunenoform 
+  tunenoform
 
 equals_SOURCES = equals.cc
 inf_SOURCES = inf.cc
@@ -61,8 +61,6 @@ EXTRA_DIST = $(TESTS)
 
 # Ordered by strength of the test.  Test basic features first.
 TESTS = \
-  inf.test \
-  reduc.test \
   parse.test \
   parseerr.test \
   equals.test \
@@ -70,6 +68,8 @@ TESTS = \
   lunabbrev.test \
   tunabbrev.test \
   nenoform.test \
-  tunenoform.test
+  tunenoform.test \
+  inf.test \
+  reduc.test
 
 CLEANFILES = stdout expect parse.dot
