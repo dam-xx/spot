@@ -125,6 +125,9 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
     egrep '^[^=]*([+][+]|--);' $tmp &&
       diag 'Take good habits: use ++i instead of i++ when you have the choice.'
 
+    grep '[^a-zA-Z0-9_](\*[a-zA-Z0-9_]*)\.' $tmp &&
+      diag 'Use "x->y", not "(*x).y"'
+
     case $file in
       *.hh | *.hxx)
         if egrep '(cout|cerr|clog)' $tmp >/dev/null; then

@@ -35,13 +35,11 @@ namespace spot
     for (stack_type::iterator i = stack.begin();
 	 i != stack.end(); ++i)
       {
-	//if ((*i).s)
 	hash_type::iterator hi = h.find(i->s);
 	if (hi != h.end())
 	  h.erase(hi);
-	delete (*i).s;
-	//if ((*i).lasttr)
-	delete (*i).lasttr;
+	delete i->s;
+	delete i->lasttr;
       }
 
     for (hash_type::iterator i = h.begin();
@@ -195,7 +193,7 @@ namespace spot
 
     stack_type::const_iterator i;
     for (i = stack.begin(); i != stack.end(); ++i, ++n)
-      if (s->compare((*i).s) == 0)
+      if (s->compare(i->s) == 0)
 	break;
 
     if (i == stack.end())
@@ -212,17 +210,17 @@ namespace spot
     stack_type::iterator i;
     for (i = stack.begin(); i != stack.end(); ++i)
       {
-	if (x && x->compare((*i).s) == 0)
+	if (x && x->compare(i->s) == 0)
 	  break;
 
-	ce->prefix.push_back(ce::state_ce((*i).s->clone(),
-					  (*i).lasttr->current_condition()));
+	ce->prefix.push_back(ce::state_ce(i->s->clone(),
+					  i->lasttr->current_condition()));
       }
 
     for (; i != stack.end(); ++i)
       {
-	ce->cycle.push_back(ce::state_ce((*i).s->clone(),
-					 (*i).lasttr->current_condition()));
+	ce->cycle.push_back(ce::state_ce(i->s->clone(),
+					 i->lasttr->current_condition()));
       }
 
     return ce;
