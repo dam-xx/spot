@@ -909,6 +909,11 @@ namespace spot
     }
 
   protected:
+
+    // If a new state includes an older state, we may have to add new
+    // children to the list of children of that older state.  We cannot
+    // to this by sub-classing numbered_state_heap since TODO is not
+    // available.  So we override find_state() instead.
     virtual int*
     find_state(const state* s)
     {

@@ -135,6 +135,14 @@ namespace spot
     typedef std::pair<const state*, succ_queue> pair_state_successors;
     std::stack<pair_state_successors> todo;
 
+    /// \brief find the SCC number of a unprocessed state.
+    ///
+    /// Sometimes we want to modify some of the above structures when
+    /// looking up a new state.  This happens for instance when find()
+    /// must perform inclusion checking and add new states to process
+    /// to TODO during this step.  (Because TODO must be known,
+    /// sub-classing spot::numbered_state_heap is not enough.)  Then
+    /// overriding this method is the way to go.
     virtual int* find_state(const state* s);
   };
 

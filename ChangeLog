@@ -1,3 +1,10 @@
+2004-07-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/gtec.hh (emptiness_check_shy::find_state): Add
+	comments.
+	* iface/gspn/ssp.cc (emptiness_check_shy_ssp::find_state): Likewise.
+	Soheib and I had a hard time figuring why we did this...
+
 2004-07-02  Thomas Martinez  <martinez@src.lip6.fr>
 
 	* src/tgba/tgbareduc.cc, src/tgba/tgbareduc.hh,
