@@ -119,13 +119,20 @@ namespace spot
   typedef std::pair<unsigned, unsigned> minmax_pair;
   typedef std::map<state*, minmax_pair, state_ptr_less_than> seen_map;
 
-  // Take a STATE from the source automata, and fill TODO with
+  // Take a STATE from the source automaton, and fill TODO with
   // the list of associated states to output.  Return the correponding
   // range in MMP.  Update SEEN, ACP_SEEN, and STATE_NUMBER.
+  //
+  // INIT must be set to true when registering the initial state.
+  // This allows us to create an additional state if required.  (LBTT
+  // supports only one initial state, so whenever the initial state
+  // of the source automaton has to be split, we need to create
+  // a supplementary state, to act as initial state for LBTT.)
   void
   fill_todo(todo_set& todo, seen_map& seen, acp_seen_map& acp_seen,
 	    state* state, const tgba& g,
-	    minmax_pair& mmp, unsigned& state_number)
+	    minmax_pair& mmp, unsigned& state_number,
+	    bool init)
   {
     typedef std::set<bdd, bdd_less_than> bdd_set;
 
@@ -145,6 +152,18 @@ namespace spot
       {
 	acc_seen.insert(si->current_accepting_conditions());
       }
+
+    // Order the creation of the supplementary initial state of needed.
+    // Use bddtrue as accepting condition because it cannot conflict
+    // with other (state, accepting cond) pairs in the maps.
+    if (init && acc_seen.size() > 1)
+      {
+	state_acc_pair p(state, bddtrue);
+	todo.insert(p);
+	acp_seen[p] = state_number++;
+      }
+
+    // Order the creation of normal states.
     mmp.first = state_number;
     for (bdd_set::iterator i = acc_seen.begin(); i != acc_seen.end(); ++i)
       {
@@ -170,7 +189,7 @@ namespace spot
     minmax_pair mmp;
 
     fill_todo(todo, seen, acp_seen,
-	      g.get_init_state(), g, mmp, state_number);
+	      g.get_init_state(), g, mmp, state_number, true);
     accepting_cond_splitter acs(g.all_accepting_conditions());
 
     while(! todo.empty())
@@ -179,11 +198,15 @@ namespace spot
 	todo.erase(todo.begin());
 	unsigned number = acp_seen[sap];
 
-	body << number << " "
-	     // Mark the initial state.
-	     << ((number >= mmp.first && number < mmp.second) ? 1 : 0) << " ";
-
-	acs.split(body, sap.second);
+	// number == 0 is the initial state.  bddtrue as an accepting
+	// conditions indicates a "fake" initial state introduced
+	// because the original initial state was split into many
+	// states (with different accepting conditions).
+	// As this "fake" state has no input transitions, there is
+	// no point in computing any accepting conditions.
+	body << number << (number ? " 0 " : " 1 ");
+	if (sap.second != bddtrue)
+	  acs.split(body, sap.second);
 	body << "-1" << std::endl;
 
 	tgba_succ_iterator* si = g.succ_iter(sap.first);
@@ -192,12 +215,14 @@ namespace spot
 	    // We have put the accepting conditions on the state,
 	    // so draw only outgoing transition with these accepting
 	    // conditions.
-	    if (si->current_accepting_conditions() != sap.second)
+
+	    if (sap.second != bddtrue
+		&& si->current_accepting_conditions() != sap.second)
 	      continue;
 
 	    minmax_pair destrange;
 	    fill_todo(todo, seen, acp_seen,
-		      si->current_state(), g, destrange, state_number);
+		      si->current_state(), g, destrange, state_number, false);
 
 	    // Link to all instances of the successor.
 	    std::string s = bdd_to_lbtt(si->current_condition(), d);

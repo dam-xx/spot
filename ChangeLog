@@ -1,5 +1,12 @@
 2003-07-09  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	Make sure we only output one initial state in LBTT's output.
+	* src/tgbaalgos/lbtt.cc (fill_todo): Add the 'first' argument
+	to designate initial states.
+	(lbtt_reachable): Adjust calls to fill_todo.  Handle the
+	fake initial state accepting conditions specially.
+	* src/tgbaalgos/lbtt.hh: Update comments.
+
 	* src/tgbaalgos/lbtt.cc (lbtt_reachable): Do not end transitions
 	guards with -1 in output.
 
