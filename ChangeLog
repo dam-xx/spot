@@ -1,5 +1,9 @@
 2004-06-17  Thomas Martinez  <martinez@src.lip6.fr>
 
+	* src/ltltest/reduccmp.test: Wrong test are removed.
+
+2004-06-17  Thomas Martinez  <martinez@src.lip6.fr>
+
 	* src/tgbatest/spotlbtt.test: We don't check the post-reduction
 	with scc and delayed simulation.
 
