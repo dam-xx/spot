@@ -1,5 +1,8 @@
 2003-07-15  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* m4/lbtt.m4 (AX_CHECK_LBTT): Set LBTT and LBTT_TRANSLATE
+	when using an already installed lbtt.
+
 	Homogenize passing of automata as pointers, not references.
 	Disallow copy for security.
 
