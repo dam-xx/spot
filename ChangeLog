@@ -1,4 +1,11 @@
-2005-01-29  Alexandre Duret-Lutz  <adl@gnu.org>
+2005-01-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* bench/emptchk/Makefile.am (dist_noinst_SCRIPTS): Add pml-clserv.sh
+	and pml-eeaean.sh.
+	* bench/emptchk/ltl-human.sh: Typo in densities.
+	Reported by Denis.
+
+2005-01-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* doc/mainpage.dox: More text, and a link to "Modules".
 
@@ -13,7 +20,7 @@
 
 	* src/tgbatest/randtgba.cc (syntax): Missing std::endl.
 
-2005-01-29  Alexandre Duret-Lutz  <adl@gnu.org>
+2005-01-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 	    Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* bench/Makefile.am, bench/emptchk/Makefile.am,

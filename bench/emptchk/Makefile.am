@@ -26,7 +26,9 @@ noinst_SCRIPTS = defs
 dist_noinst_SCRIPTS = \
   pml2tgba.pl \
   ltl-human.sh \
-  ltl-random.sh
+  ltl-random.sh \
+  pml-clserv.sh \
+  pml-eeaean.sh
 
 dist_noinst_DATA = \
   models/cl3serv1.pml \

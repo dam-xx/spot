@@ -27,14 +27,14 @@ opts="-1 -D -e 15 -n 1024 -t 0.5 -r -z -i $FORMULAE"
 
 echo "WITHOUT ADDITIONAL ACCEPTING CONDITIONS"
 
-for d in 0.001 0.002 0.1; do
+for d in 0.001 0.002 0.01; do
   echo "density: $d"
   $RANDTGBA -d $d $opts
 done
 
 echo "WITH 3 ADDITIONAL ACCEPTING CONDITIONS"
 
-for d in 0.001 0.002 0.1; do
+for d in 0.001 0.002 0.01; do
   echo "density: $d"
   $RANDTGBA -a 3 0.0133333 -d $d $opts
 done
