@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_TGBAALGOS_NDFS_RESULT_HH
-# define SPOT_TGBAALGOS_NDFS_RESULT_HH
+#ifndef SPOT_TGBAALGOS_NDFS_RESULT_HXX
+# define SPOT_TGBAALGOS_NDFS_RESULT_HXX
 
 //#define NDFSR_TRACE
 
@@ -628,4 +628,4 @@ namespace spot
 
 #undef ndfsr_trace
 
-#endif // SPOT_TGBAALGOS_NDFS_RESULT_HH
+#endif // SPOT_TGBAALGOS_NDFS_RESULT_HXX
