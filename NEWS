@@ -1,4 +1,29 @@
-New in spot 0.0y:
+New in spot 0.1 (2005-01-31):
+
+  * Emptiness checks:
+    - They all follow the same interface, and gather statistical data.
+    - New algorithms: gv04.hh, se05.hh, tau03.hh, tau03opt.hh
+    - New options for couvreur99: poprem and group.
+    - reduce_run() try to reduce accepting runs produced by emptiness checks.
+    - replay_run() ensure accepting runs are actually accepting runs.
+  * New testing tools:
+    - ltltest/randltl: Generate random LTL formulae.
+    - tgbatest/randtgba: Generate random TGBAs.  Optionally multiply them
+        against random LTL formulae.  Optionally check them for emptiness
+        with all available algorithms.  Optionally gather statistics.
+  * bench/emptchk/: Contains scripts that benchmark emptiness-checks.
+  * Split the degeneralization proxy in two:
+    - tgba_tba_proxy  uses at most max(N,1) copies
+    - tgba_sba_proxy  uses at most 1+max(N,1) copies and has a
+                      state_is_accepting() method
+  * tgba::transition_annotation annotate a transition with some string.
+    This comes handy to associate that transition to its high-level name.
+  * Preliminary support for Event-based GBA (the evtgba*/ directories).
+    This might as well disappear in a future release.
+  * LTL formulae are now sorting using their string representation, instead
+    of their memory address (which is still unique).  This makes the output
+    of the various functions more deterministic.
+  * The Doxygen documentation is now organized using modules.
 
 New in spot 0.0x (2004-08-13):
 

@@ -1,3 +1,7 @@
+2005-01-31  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* configure.ac, NEWS: Bump version to 0.1.
+
 2005-01-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* bench/emptchk/Makefile.am (dist_noinst_SCRIPTS): Add pml-clserv.sh
