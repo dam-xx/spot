@@ -1,5 +1,10 @@
 2004-11-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaparse/tgbaparse.yy: Add `%destructor's so the parser
+	does not leak on errors.
+	* src/tgbatest/ltl2tgba.cc: Free the automata if it could not be
+	fully parsed.
+
 	* src/tgbaalgos/gtec/ce.cc (couvreur99_check_result::accepting_run):
 	Remove spurious FIXME.
 

@@ -410,7 +410,11 @@ main(int argc, char** argv)
 	  spot::tgba_explicit* e;
 	  to_free = a = e = spot::tgba_parse(input, pel, dict, env, debug_opt);
 	  if (spot::format_tgba_parse_errors(std::cerr, pel))
-	    return 2;
+	    {
+	      delete to_free;
+	      delete dict;
+	      return 2;
+	    }
 	  e->merge_transitions();
 	}
       else

@@ -1,4 +1,4 @@
-/* Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -62,6 +62,15 @@ typedef std::pair<bool, spot::ltl::formula*> pair;
 %type <f> condition
 %type <list> acc_list
 %token ACC_DEF
+
+%destructor { delete $$; } STRING UNTERMINATED_STRING IDENT strident string
+%destructor { spot::ltl::destroy($$); } condition
+%destructor {
+  for (std::list<spot::ltl::formula*>::iterator i = $$->begin();
+       i != $$->end(); ++i)
+    spot::ltl::destroy(*i);
+  delete $$;
+  } acc_list
 
 %%
 tgba: acceptance_decl lines | lines;
