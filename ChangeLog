@@ -1,3 +1,8 @@
+2004-10-11  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* configure.ac: Empty CFLAGS and CXXFLAGS.
+	* m4/debug.m4: Update CXXFLAGS too.
+
 2004-10-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* doc/Doxyfile.in: Upgrade to Doxygen 1.3.9.
