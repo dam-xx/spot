@@ -271,13 +271,13 @@ main(int argc, char** argv)
       if (strcmp(argv[formula_index], "-"))
 	{
 	  std::ifstream fin(argv[formula_index]);
-	  if (! fin)
+	  if (!fin)
 	    {
 	      std::cerr << "Cannot open " << argv[formula_index] << std::endl;
 	      exit(2);
 	    }
 
-	  if (! std::getline(fin, input, '\0'))
+	  if (!std::getline(fin, input, '\0'))
 	    {
 	      std::cerr << "Cannot read " << argv[formula_index] << std::endl;
 	      exit(2);
@@ -320,11 +320,11 @@ main(int argc, char** argv)
 	}
       else
 	{
-	  
+
 	  spot::ltl::formula* ftmp = f;
 	  if (reduc)
 	    f = spot::ltl::reduce(f);
-	  
+
 	  if (fm_opt)
 	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt,
 					       fm_symb_merge_opt,
@@ -332,7 +332,7 @@ main(int argc, char** argv)
 					       fair_loop_approx);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
-	  
+
 	  if (reduc)
 	    spot::ltl::destroy(ftmp);
 	}

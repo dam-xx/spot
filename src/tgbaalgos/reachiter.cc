@@ -59,7 +59,7 @@ namespace spot
 	int tn = seen[t];
 	tgba_succ_iterator* si = automata_->succ_iter(t);
 	process_state(t, tn, si);
-	for (si->first(); ! si->done(); si->next())
+	for (si->first(); !si->done(); si->next())
 	  {
 	    const state* current = si->current_state();
 	    seen_map::const_iterator s = seen.find(current);

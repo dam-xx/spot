@@ -377,7 +377,7 @@ namespace spot
 	todo.push(pair_state_successors(succ.s, succ_queue()));
 	succ_queue& new_queue = todo.top().second;
 	tgba_succ_iterator* iter = ecs_->aut->succ_iter(succ.s);
-	for (iter->first(); ! iter->done(); iter->next())
+	for (iter->first(); !iter->done(); iter->next())
 	  new_queue.push_back(successor(iter->current_acceptance_conditions(),
 					iter->current_state()));
 	delete iter;

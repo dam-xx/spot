@@ -169,7 +169,7 @@ namespace spot
     // If by change or period already ends on the state we have
     // to reach back, we are done.
     if (from == to
-	&& ! period.empty())
+	&& !period.empty())
       return;
 
     // Records backlinks to parent state during the BFS.

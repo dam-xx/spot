@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -214,7 +214,7 @@ namespace spot
 
     // If global_automaton is not specified, THIS is the root of a
     // product tree.
-    if (! global_automaton)
+    if (!global_automaton)
       {
 	global_automaton = this;
 	global_state = local_state;

@@ -188,7 +188,7 @@ namespace spot
     if (si == s.end())
       return;
     s.erase(si);
-    if (! s.empty())
+    if (!s.empty())
       return;
 
     // ME was the last user of this variable.
@@ -328,25 +328,25 @@ namespace spot
 	&& now_map.empty()
 	&& acc_map.empty())
       {
-	if (! var_formula_map.empty())
+	if (!var_formula_map.empty())
 	  {
 	    std::cerr << "var_map is empty but var_formula_map is not"
 		      << std::endl;
 	    fail = true;
 	  }
-	if (! now_formula_map.empty())
+	if (!now_formula_map.empty())
 	  {
 	    std::cerr << "now_map is empty but now_formula_map is not"
 		      << std::endl;
 	    fail = true;
 	  }
-	if (! acc_formula_map.empty())
+	if (!acc_formula_map.empty())
 	  {
 	    std::cerr << "acc_map is empty but acc_formula_map is not"
 		      << std::endl;
 	    fail = true;
 	  }
-	if (! var_refs.empty())
+	if (!var_refs.empty())
 	  {
 	    std::cerr << "maps are empty but var_refs is not" << std::endl;
 	    fail = true;
@@ -355,7 +355,7 @@ namespace spot
 	      std::cerr << " " << i->first << ":" << i->second.size();
 	    std::cerr << std::endl;
 	  }
-	if (! fail)
+	if (!fail)
 	  return;
       }
     else

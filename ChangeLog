@@ -1,5 +1,15 @@
 2004-05-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/sanity/style.test: New file.
+	* src/sanity/Makefile.am (check-local): Run it.
+	* src/ltlvisit/nenoform.cc, src/ltlvisit/tostring.cc,
+	src/tgba/bdddict.cc, src/tgba/bddprint.cc, src/tgba/tgba.cc,
+	src/tgba/tgbaproduct.cc, src/tgbaalgos/lbtt.cc,
+	src/tgbaalgos/magic.cc, src/tgbaalgos/powerset.cc,
+	src/tgbaalgos/reachiter.cc, src/tgbaalgos/gtec/ce.cc,
+	src/tgbaalgos/gtec/gtec.cc, src/tgbatest/ltl2tgba.cc: Fix style
+	issues reported by style.test.
+
 	* src/ltltest/inf.cc, src/ltltest/inf.test, src/ltltest/reduc.test,
 	src/ltlvisit/formlength.cc, src/ltlvisit/reducform.cc,
 	src/ltlvisit/reducform.hh: Fix copyright year, these files were

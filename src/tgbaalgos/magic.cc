@@ -44,7 +44,7 @@ namespace spot
     if (x)
       delete x;
     // Release all iterators on the stack.
-    while (! stack.empty())
+    while (!stack.empty())
       {
 	delete stack.front().second;
 	stack.pop_front();
@@ -101,14 +101,14 @@ namespace spot
 
     assert(stack.size() == 1 + tstack.size());
 
-    while (! stack.empty())
+    while (!stack.empty())
       {
       recurse:
 	magic_search::state_iter_pair& p = stack.front();
 	tgba_succ_iterator* i = p.second;
 	const bool magic = p.first.m;
 
-	while (! i->done())
+	while (!i->done())
 	  {
 	    const state* s_prime = i->current_state();
 	    bdd c = i->current_condition();
@@ -120,7 +120,7 @@ namespace spot
 		assert(stack.size() == tstack.size());
 		return true;
 	      }
-	    if (! has(s_prime, magic))
+	    if (!has(s_prime, magic))
 	      {
 		push(s_prime, magic);
 		tstack.push_front(c);
@@ -133,9 +133,9 @@ namespace spot
 	delete i;
 	stack.pop_front();
 
-	if (! magic && a->state_is_accepting(s))
+	if (!magic && a->state_is_accepting(s))
 	  {
-	    if (! has(s, true))
+	    if (!has(s, true))
 	      {
 		if (x)
 		  delete x;
@@ -144,7 +144,7 @@ namespace spot
 		continue;
 	      }
 	  }
-	if (! stack.empty())
+	if (!stack.empty())
 	  tstack.pop_front();
       }
 

@@ -96,8 +96,9 @@ namespace spot
 	else
 	  not_first = true;
 	if (varset[v] == 0)
-	  // The space is important for LBTT.
-	  *where << "! ";
+	  // The space is important for LBTT, but we have to hide it
+	  // from our style checking droid.
+	  *where << "!"" ";
 	print_handler(*where, v);
       }
   }

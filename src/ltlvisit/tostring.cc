@@ -48,7 +48,7 @@ namespace spot
       visit(const atomic_prop* ap)
       {
 	std::string str = ap->name();
-	if (str[0] == 'F' || str[0] == 'G' || str[0] == 'X' )
+	if (str[0] == 'F' || str[0] == 'G' || str[0] == 'X')
 	  {
 	    os_ << '"' << str << '"';
 	  }
@@ -98,7 +98,7 @@ namespace spot
       {
 	// The parser treats F0, F1, G0, G1, X0, and X1 as atomic
 	// propositions.  So make sure we output F(0), G(1), etc.
-	bool need_parent = !! dynamic_cast<const constant*>(uo->child());
+	bool need_parent = !!dynamic_cast<const constant*>(uo->child());
 	switch(uo->op())
 	  {
 	  case unop::Not:
@@ -241,7 +241,7 @@ namespace spot
 	    os_ << "!";
 	    break;
 	  case unop::X:
-	    need_parent = !! dynamic_cast<const constant*>(uo->child());
+	    need_parent = !!dynamic_cast<const constant*>(uo->child());
 	    os_ << "X";
 	    break;
 	  case unop::F:

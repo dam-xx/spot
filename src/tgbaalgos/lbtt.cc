@@ -222,7 +222,7 @@ namespace spot
 	      g->get_init_state(), g, mmp, state_number, true);
     acceptance_cond_splitter acs(g->all_acceptance_conditions());
 
-    while(! todo.empty())
+    while (!todo.empty())
       {
 	state_acc_pair sap = *todo.begin();
 	todo.erase(todo.begin());

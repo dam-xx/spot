@@ -55,7 +55,7 @@ namespace spot
 
     unsigned state_num = 1;
 
-    while (! todo.empty())
+    while (!todo.empty())
       {
 	power_state src = todo.front();
 	todo.pop_front();
@@ -78,7 +78,7 @@ namespace spot
 	    for (i = src.begin(); i != src.end(); ++i)
 	      {
 		tgba_succ_iterator *si = aut->succ_iter(*i);
-		for (si->first(); ! si->done(); si->next())
+		for (si->first(); !si->done(); si->next())
 		  if ((cond >> si->current_condition()) == bddtrue)
 		    {
 		      const state* s = si->current_state();

@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -40,7 +40,7 @@ namespace spot
   bdd
   tgba::support_conditions(const state* state) const
   {
-    if (! last_support_conditions_input_
+    if (!last_support_conditions_input_
 	|| last_support_conditions_input_->compare(state) != 0)
       {
 	last_support_conditions_output_ =
@@ -55,7 +55,7 @@ namespace spot
   bdd
   tgba::support_variables(const state* state) const
   {
-    if (! last_support_variables_input_
+    if (!last_support_variables_input_
 	|| last_support_variables_input_->compare(state) != 0)
       {
 	last_support_variables_output_ =
