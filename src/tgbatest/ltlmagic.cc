@@ -3,7 +3,7 @@
 #include "ltlvisit/destroy.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
-#include "tgbaalgos/ltl2tgba.hh"
+#include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/magic.hh"
 
 void
@@ -47,7 +47,7 @@ main(int argc, char** argv)
 
   spot::bdd_dict* dict = new spot::bdd_dict();
   {
-    spot::tgba_bdd_concrete* a1 = spot::ltl_to_tgba(f1, dict);
+    spot::tgba_bdd_concrete* a1 = spot::ltl_to_tgba_lacim(f1, dict);
     spot::tgba_tba_proxy* a2 = new spot::tgba_tba_proxy(a1);
     spot::ltl::destroy(f1);
 

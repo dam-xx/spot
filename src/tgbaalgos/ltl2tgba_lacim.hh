@@ -24,7 +24,7 @@ namespace spot
   ///   editor        = {Pierre Leroux}
   /// }
   /// \endverbatim
-  tgba_bdd_concrete* ltl_to_tgba(const ltl::formula* f, bdd_dict* dict);
+  tgba_bdd_concrete* ltl_to_tgba_lacim(const ltl::formula* f, bdd_dict* dict);
 }
 
 #endif // SPOT_TGBA_LTL2TGBA_HH

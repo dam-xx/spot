@@ -7,8 +7,8 @@ tgbaalgos_HEADERS = \
   reachiter.hh \
   dotty.hh \
   lbtt.hh \
-  ltl2tgba.hh \
   ltl2tgba_fm.hh \
+  ltl2tgba_lacim.hh \
   magic.hh \
   save.hh
 
@@ -17,7 +17,7 @@ libtgbaalgos_la_SOURCES = \
   reachiter.cc \
   dotty.cc \
   lbtt.cc \
-  ltl2tgba.cc \
   ltl2tgba_fm.cc \
+  ltl2tgba_lacim.cc \
   magic.cc \
   save.cc

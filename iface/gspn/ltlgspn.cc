@@ -3,7 +3,7 @@
 #include "ltlvisit/destroy.hh"
 #include "tgba/tgbatba.hh"
 #include "tgba/tgbaproduct.hh"
-#include "tgbaalgos/ltl2tgba.hh"
+#include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"
 #include "tgbaalgos/magic.hh"
 
@@ -38,7 +38,7 @@ main(int argc, char **argv)
 #if FM
       spot::tgba* a_f = spot::ltl_to_tgba_fm(f, dict);
 #else
-      spot::tgba* a_f = spot::ltl_to_tgba(f, dict);
+      spot::tgba* a_f = spot::ltl_to_tgba_lacim(f, dict);
 #endif
       spot::ltl::destroy(f);
 

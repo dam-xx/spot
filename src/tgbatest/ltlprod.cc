@@ -3,7 +3,7 @@
 #include "ltlvisit/destroy.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
-#include "tgbaalgos/ltl2tgba.hh"
+#include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgba/tgbaproduct.hh"
 #include "tgba/tgbabddconcreteproduct.hh"
 #include "tgbaalgos/dotty.hh"
@@ -39,8 +39,8 @@ main(int argc, char** argv)
 
   spot::bdd_dict* dict = new spot::bdd_dict();
   {
-    spot::tgba_bdd_concrete* a1 = spot::ltl_to_tgba(f1, dict);
-    spot::tgba_bdd_concrete* a2 = spot::ltl_to_tgba(f2, dict);
+    spot::tgba_bdd_concrete* a1 = spot::ltl_to_tgba_lacim(f1, dict);
+    spot::tgba_bdd_concrete* a2 = spot::ltl_to_tgba_lacim(f2, dict);
     spot::ltl::destroy(f1);
     spot::ltl::destroy(f2);
 

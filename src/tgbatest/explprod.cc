@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cassert>
-#include "tgbaalgos/ltl2tgba.hh"
 #include "tgba/tgbaexplicit.hh"
 #include "tgba/tgbaproduct.hh"
 #include "tgbaparse/public.hh"

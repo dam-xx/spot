@@ -6,7 +6,7 @@
 #include "tgba/tgbabddconcretefactory.hh"
 #include <cassert>
 
-#include "ltl2tgba.hh"
+#include "ltl2tgba_lacim.hh"
 
 namespace spot
 {
@@ -231,7 +231,7 @@ namespace spot
   };
 
   tgba_bdd_concrete*
-  ltl_to_tgba(const ltl::formula* f, bdd_dict* dict)
+  ltl_to_tgba_lacim(const ltl::formula* f, bdd_dict* dict)
   {
     // Normalize the formula.  We want all the negations on
     // the atomic propositions.  We also suppress logic

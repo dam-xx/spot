@@ -7,7 +7,7 @@ e = spot.default_environment.instance()
 p = spot.empty_parse_error_list()
 f = spot.parse('GFa', p, e)
 dict = spot.bdd_dict()
-a = spot.ltl_to_tgba(f, dict)
+a = spot.ltl_to_tgba_lacim(f, dict)
 s0 = a.get_init_state()
 b = s0.as_bdd()
 print b

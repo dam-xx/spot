@@ -77,7 +77,7 @@ if f:
         a = spot.ltl_to_tgba_fm(f, dict)
         concrete = 0
     else:
-        a = concrete = spot.ltl_to_tgba(f, dict)
+        a = concrete = spot.ltl_to_tgba_lacim(f, dict)
     spot.destroy(f)
     del f
 

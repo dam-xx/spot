@@ -5,7 +5,7 @@
 #include "ltlvisit/destroy.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
-#include "tgbaalgos/ltl2tgba.hh"
+#include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"
 #include "tgba/bddprint.hh"
 #include "tgbaalgos/dotty.hh"
@@ -139,7 +139,7 @@ main(int argc, char** argv)
       if (fm_opt)
 	to_free = a = spot::ltl_to_tgba_fm(f, dict);
       else
-	to_free = a = concrete = spot::ltl_to_tgba(f, dict);
+	to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 
       spot::ltl::destroy(f);
 

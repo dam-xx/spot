@@ -161,7 +161,7 @@ print '<p>Building automaton...',
 sys.stdout.flush()
 
 if trans_lacim:
-    automaton = spot.ltl_to_tgba(f, dict)
+    automaton = spot.ltl_to_tgba_lacim(f, dict)
 elif trans_fm:
     automaton = spot.ltl_to_tgba_fm(f, dict)
 

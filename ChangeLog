@@ -1,3 +1,15 @@
+2003-09-22  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba.cc, src/tgbaalgos/ltl2tgba.hh: Rename as ...
+	* src/tgbaalgos/ltl2tgba_lacim.cc, src/tgbaalgos/ltl2tgba_lacim.hh:
+	... this, and rename ltl_to_tgba() as ltl_to_tgba_lacim as well.
+	* iface/gspn/ltlgspn.cc, src/tgbatest/explprod.cc,
+	src/tgbatest/ltl2tgba.cc, src/tgbatest/ltlmagic.cc,
+	src/tgbatest/ltlprod.cc, src/tgbatest/mixprod.cc,
+	src/tgbatest/tripprod.cc, wrap/python/spot.i,
+	wrap/python/cgi/ltl2tgba.in, wrap/python/tests/interdep.py,
+	wrap/python/tests/ltl2tgba.py: Adjust.
+
 2003-09-11  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/state.hh: Include cassert.
