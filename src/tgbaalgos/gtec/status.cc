@@ -24,7 +24,7 @@
 
 namespace spot
 {
-  emptiness_check_status::emptiness_check_status
+  couvreur99_check_status::couvreur99_check_status
     (const tgba* aut,
      const numbered_state_heap_factory* nshf)
       : aut(aut),
@@ -32,13 +32,13 @@ namespace spot
   {
   }
 
-  emptiness_check_status::~emptiness_check_status()
+  couvreur99_check_status::~couvreur99_check_status()
   {
     delete h;
   }
 
   void
-  emptiness_check_status::print_stats(std::ostream& os) const
+  couvreur99_check_status::print_stats(std::ostream& os) const
   {
     os << h->size() << " unique states visited" << std::endl;
     os << root.size()

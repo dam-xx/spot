@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -27,6 +27,7 @@
 #include <utility>
 #include <ostream>
 #include "tgba/tgbatba.hh"
+#include "emptiness.hh"
 
 namespace spot
 {
@@ -53,11 +54,11 @@ namespace spot
   ///   isbn          = {0-444-81648-8}
   /// }
   /// \endverbatim
-  struct magic_search
+  struct magic_search : public emptiness_check
   {
     /// Initialize the Magic Search algorithm on the automaton \a a.
     magic_search(const tgba_tba_proxy *a);
-    ~magic_search();
+    virtual ~magic_search();
 
     /// \brief Perform a Magic Search.
     ///
@@ -66,14 +67,7 @@ namespace spot
     ///
     /// check() can be called several times until it return false,
     /// to enumerate all accepting paths.
-    bool check();
-
-    /// \brief Print the last accepting path found.
-    ///
-    /// Restrict printed states to \a the state space of restrict if
-    /// supplied.
-    std::ostream& print_result(std::ostream& os,
-			       const tgba* restrict = 0) const;
+    virtual emptiness_check_result* check();
 
   private:
 
@@ -116,8 +110,18 @@ namespace spot
     const tgba_tba_proxy* a;	///< The automata to check.
     /// The state for which we are currently seeking an SCC.
     const state* x;
-  };
 
+#ifndef SWIG
+    class result: public emptiness_check_result
+    {
+    public:
+      result(magic_search& ms);
+      virtual tgba_run* accepting_run();
+    private:
+      magic_search& ms_;
+    };
+#endif // SWIG
+  };
 
 }
 

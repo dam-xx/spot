@@ -533,66 +533,60 @@ main(int argc, char** argv)
 	  assert(!"unknown output option");
 	}
 
+      spot::emptiness_check* ec = 0;
+      spot::tgba* ec_a = 0;
       switch (echeck)
 	{
 	case None:
 	  break;
 
 	case Couvreur:
+	  ec_a = a;
+	  ec = new spot::couvreur99_check(a);
+	  break;
+
 	case Couvreur2:
-	  {
-	    std::cout << "Tarjan Couvreur" << std::endl;
-	    spot::emptiness_check* ec;
-	    if (echeck == Couvreur)
-	      ec = new spot::emptiness_check(a);
-	    else
-	      ec = new spot::emptiness_check_shy(a);
-	    bool res = ec->check();
-	    if (expect_counter_example)
-	      {
-		if (res)
-		  {
-		    exit_code = 1;
-		    delete ec;
-		    break;
-		  }
-		spot::counter_example ce(ec->result());
-		ce.print_result(std::cout);
-		ce.print_stats(std::cout);
-	      }
-	    else
-	      {
-		exit_code = !res;
-	      }
-	    delete ec;
-	  }
+	  ec_a = a;
+	  ec = new spot::couvreur99_check_shy(a);
 	  break;
 
 	case MagicSearch:
-	  {
-	    std::cout << "Magic Search" << std::endl;
-	    spot::magic_search ms(degeneralized);
-	    bool res = ms.check();
-	    if (expect_counter_example)
-	      {
-		if (!res)
-		  {
-		    exit_code = 1;
-		    break;
-		  }
-		do
-		  ms.print_result(std::cout);
-		while (magic_many && ms.check());
-	      }
-	    else
-	      {
-		exit_code = res;
-	      }
-	  }
+	  ec_a = degeneralized;
+	  ec = new spot::magic_search(degeneralized);
 	  break;
+	}
 
-	default:
-	  assert(0);
+      if (ec)
+	{
+	  do
+	    {
+	      spot::emptiness_check_result* res = ec->check();
+	      if (expect_counter_example != !!res)
+		exit_code = 1;
+
+	      if (!res)
+		{
+		  std::cout << "no accepting run found" << std::endl;
+		  break;
+		}
+	      else
+		{
+
+		  spot::tgba_run* run = res->accepting_run();
+		  if (!run)
+		    {
+		      std::cout << "an accepting run exist" << std::endl;
+		    }
+		  else
+		    {
+		      spot::print_tgba_run(std::cout, run, ec_a);
+		      delete run;
+		    }
+		}
+	      delete res;
+	    }
+	  while (magic_many);
+	  delete ec;
 	}
 
       if (f)

@@ -34,12 +34,12 @@ namespace spot
   /// This contains everything needed to construct a counter-example:
   /// the automata, the stack of SCCs traversed by the counter-example,
   /// and the heap of visited states with their indexes.
-  class emptiness_check_status
+  class couvreur99_check_status
   {
   public:
-    emptiness_check_status(const tgba* aut,
+    couvreur99_check_status(const tgba* aut,
 			   const numbered_state_heap_factory* nshf);
-    ~emptiness_check_status();
+    ~couvreur99_check_status();
 
     const tgba* aut;
     scc_stack root;

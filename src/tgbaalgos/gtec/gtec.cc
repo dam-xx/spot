@@ -20,6 +20,7 @@
 // 02111-1307, USA.
 
 #include "gtec.hh"
+#include "ce.hh"
 
 namespace spot
 {
@@ -28,19 +29,19 @@ namespace spot
     typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
   }
 
-  emptiness_check::emptiness_check(const tgba* a,
-				   const numbered_state_heap_factory* nshf)
+  couvreur99_check::couvreur99_check(const tgba* a,
+				     const numbered_state_heap_factory* nshf)
   {
-    ecs_ = new emptiness_check_status(a, nshf);
+    ecs_ = new couvreur99_check_status(a, nshf);
   }
 
-  emptiness_check::~emptiness_check()
+  couvreur99_check::~couvreur99_check()
   {
     delete ecs_;
   }
 
   void
-  emptiness_check::remove_component(const state* from)
+  couvreur99_check::remove_component(const state* from)
   {
     // Remove from H all states which are reachable from state FROM.
 
@@ -87,12 +88,12 @@ namespace spot
       }
   }
 
-  bool
-  emptiness_check::check()
+  emptiness_check_result*
+  couvreur99_check::check()
   {
     // We use five main data in this algorithm:
-    // * emptiness_check::root, a stack of strongly connected components (SCC),
-    // * emptiness_check::h, a hash of all visited nodes, with their order,
+    // * couvreur99_check::root, a stack of strongly connected components (SCC),
+    // * couvreur99_check::h, a hash of all visited nodes, with their order,
     //   (it is called "Hash" in Couvreur's paper)
     // * arc, a stack of acceptance conditions between each of these SCC,
     std::stack<bdd> arc;
@@ -220,25 +221,25 @@ namespace spot
 		delete todo.top().second;
 		todo.pop();
 	      }
-	    return false;
+	    return new couvreur99_check_result(ecs_);
 	  }
       }
     // This automaton recognizes no word.
-    return true;
+    return 0;
   }
 
-  const emptiness_check_status*
-  emptiness_check::result() const
+  const couvreur99_check_status*
+  couvreur99_check::result() const
   {
     return ecs_;
   }
 
   //////////////////////////////////////////////////////////////////////
 
-  emptiness_check_shy::emptiness_check_shy(const tgba* a,
-					   const numbered_state_heap_factory*
-					   nshf)
-    : emptiness_check(a, nshf), num(1)
+  couvreur99_check_shy::couvreur99_check_shy(const tgba* a,
+					     const numbered_state_heap_factory*
+					     nshf)
+    : couvreur99_check(a, nshf), num(1)
   {
     // Setup depth-first search from the initial state.
     todo.push(pair_state_successors(0, succ_queue()));
@@ -246,12 +247,12 @@ namespace spot
 					   ecs_->aut->get_init_state()));
   }
 
-  emptiness_check_shy::~emptiness_check_shy()
+  couvreur99_check_shy::~couvreur99_check_shy()
   {
   }
 
-  bool
-  emptiness_check_shy::check()
+  emptiness_check_result*
+  couvreur99_check_shy::check()
   {
 
     for (;;)
@@ -336,7 +337,7 @@ namespace spot
 			  }
 			todo.pop();
 		      }
-		    return false;
+		    return new couvreur99_check_result(ecs_);
 		  }
 	      }
 	    // Remove that state from the queue, so we do not
@@ -354,7 +355,7 @@ namespace spot
 	    todo.pop();
 	    if (todo.empty())
 	      // This automaton recognizes no word.
-	      return true;
+	      return 0;
 
 	    // When backtracking the root of an SCC, we must also
 	    // remove that SCC from the ARC/ROOT stacks.  We must
@@ -393,7 +394,7 @@ namespace spot
   }
 
   int*
-  emptiness_check_shy::find_state(const state* s)
+  couvreur99_check_shy::find_state(const state* s)
   {
     return ecs_->h->find(s).second;
   }

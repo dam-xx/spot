@@ -48,11 +48,12 @@ namespace spot
     const ltl::declarative_environment& env_;
   };
 
-  emptiness_check* emptiness_check_ssp_semi(const tgba* ssp_automata);
-  emptiness_check* emptiness_check_ssp_shy_semi(const tgba* ssp_automata);
-  emptiness_check* emptiness_check_ssp_shy(const tgba* ssp_automata);
+  couvreur99_check* couvreur99_check_ssp_semi(const tgba* ssp_automata);
+  couvreur99_check* couvreur99_check_ssp_shy_semi(const tgba* ssp_automata);
+  couvreur99_check* couvreur99_check_ssp_shy(const tgba* ssp_automata);
 
-  counter_example* counter_example_ssp(const emptiness_check_status* status);
+  couvreur99_check_result*
+  counter_example_ssp(const couvreur99_check_status* status);
 }
 
 #endif // SPOT_IFACE_GSPN_SSP_GSPN_SSP_HH

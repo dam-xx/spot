@@ -216,25 +216,25 @@ main(int argc, char **argv)
 	case Couvreur4:
 	case Couvreur5:
 	  {
-	    spot::emptiness_check* ec;
+	    spot::couvreur99_check* ec;
 
 	    switch (check)
 	      {
 	      case Couvreur:
-		ec = new spot::emptiness_check(prod);
+		ec = new spot::couvreur99_check(prod);
 		break;
 	      case Couvreur2:
-		ec = new spot::emptiness_check_shy(prod);
+		ec = new spot::couvreur99_check_shy(prod);
 		break;
 #ifdef SSP
 	      case Couvreur3:
-		ec = spot::emptiness_check_ssp_semi(prod);
+		ec = spot::couvreur99_check_ssp_semi(prod);
 		break;
 	      case Couvreur4:
-		ec = spot::emptiness_check_ssp_shy_semi(prod);
+		ec = spot::couvreur99_check_ssp_shy_semi(prod);
 		break;
 	      case Couvreur5:
-		ec = spot::emptiness_check_ssp_shy(prod);
+		ec = spot::couvreur99_check_ssp_shy(prod);
 		break;
 #endif
 	      default:
@@ -244,30 +244,32 @@ main(int argc, char **argv)
 		ec = 0;
 	      }
 
-	    bool res = ec->check();
-
-	    const spot::emptiness_check_status* ecs = ec->result();
-	    if (!res)
+	    spot::emptiness_check_result* res = ec->check();
+	    const spot::couvreur99_check_status* ecs = ec->result();
+	    if (res)
 	      {
 		if (compute_counter_example)
 		  {
-		    spot::counter_example* ce;
+		    spot::couvreur99_check_result* ce;
 #ifndef SSP
-		    ce = new spot::counter_example(ecs);
+		    ce = new spot::couvreur99_check_result(ecs);
 #else
 		    switch (check)
 		      {
 		      case Couvreur:
 		      case Couvreur2:
 		      case Couvreur5:
-			ce = new spot::counter_example(ecs);
+			ce = new spot::couvreur99_check_result(ecs);
 			break;
 		      default:
 			ce = spot::counter_example_ssp(ecs);
 		      }
 #endif
-		    ce->print_result(std::cout, proj ? model : 0);
+		    spot::tgba_run* run = ce->accepting_run();
+		    // FIXME: reimplement the projection
+		    spot::print_tgba_run(std::cout, run, prod);
 		    ce->print_stats(std::cout);
+		    delete run;
 		    delete ce;
 		  }
 		else
@@ -275,6 +277,7 @@ main(int argc, char **argv)
 		    std::cout << "non empty" << std::endl;
 		    ecs->print_stats(std::cout);
 		  }
+		delete res;
 	      }
 	    else
 	      {
@@ -283,7 +286,7 @@ main(int argc, char **argv)
 	      }
 	    std::cout << std::endl;
 	    delete ec;
-	    if (!res)
+	    if (res)
 	      exit(1);
 	  }
 	  break;
@@ -292,12 +295,19 @@ main(int argc, char **argv)
 	    spot::tgba_tba_proxy* d  = new spot::tgba_tba_proxy(prod);
 	    spot::magic_search ms(d);
 
-	    if (ms.check())
+	    spot::emptiness_check_result* res = ms.check();
+	    if (res)
 	      {
 		if (compute_counter_example)
-		  ms.print_result (std::cout, proj ? model : 0);
+		  {
+		    spot::tgba_run* run = res->accepting_run();
+		    // FIXME: reimplement the projection
+		    spot::print_tgba_run(std::cout, run, prod);
+		    delete run;
+		  }
 		else
 		  std::cout << "non-empty" << std::endl;
+		delete res;
 		exit(1);
 	      }
 	    else

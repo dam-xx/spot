@@ -24,35 +24,26 @@
 
 #include "status.hh"
 #include "explscc.hh"
+#include "tgbaalgos/emptiness.hh"
 
 namespace spot
 {
-  /// Compute a counter example from a spot::emptiness_check_status
-  class counter_example
+  /// Compute a counter example from a spot::couvreur99_check_status
+  class couvreur99_check_result: public emptiness_check_result
   {
   public:
-    counter_example(const emptiness_check_status* ecs,
-		    const explicit_connected_component_factory*
-		    eccf = connected_component_hash_set_factory::instance());
+    couvreur99_check_result(const couvreur99_check_status* ecs,
+			    const explicit_connected_component_factory*
+			    eccf =
+			    connected_component_hash_set_factory::instance());
 
-    typedef std::pair<const state*, bdd> state_proposition;
-    typedef std::list<const state*> state_sequence;
-    typedef std::list<state_proposition> cycle_path;
-    state_sequence suffix;
-    cycle_path period;
 
-    /// \brief Display the example computed by counter_example().
-    ///
-    /// \param os the output stream
-    /// \param restrict optional automaton to project the example on.
-    std::ostream& print_result(std::ostream& os,
-			       const tgba* restrict = 0) const;
+    virtual tgba_run* accepting_run();
 
-    /// Output statistics about this object.
     void print_stats(std::ostream& os) const;
 
   protected:
-    /// Called by counter_example to find a path which traverses all
+    /// Called by couvreur99_check_result to find a path which traverses all
     /// acceptance conditions in the accepted SCC.
     void accepting_path (const explicit_connected_component* scc,
 			 const state* start, bdd acc_to_traverse);
@@ -63,7 +54,9 @@ namespace spot
 			const state* from, const state* to);
 
   private:
-    const emptiness_check_status* ecs_;
+    const couvreur99_check_status* ecs_;
+    const explicit_connected_component_factory* eccf_;
+    tgba_run* run_;
   };
 }
 

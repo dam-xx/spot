@@ -28,15 +28,22 @@ namespace spot
   namespace
   {
     typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
+    typedef std::pair<const state*, bdd> state_proposition;
   }
 
-  counter_example::counter_example(const emptiness_check_status* ecs,
-				   const explicit_connected_component_factory*
-				   eccf)
-    : ecs_(ecs)
+  couvreur99_check_result::couvreur99_check_result
+  (const couvreur99_check_status* ecs,
+   const explicit_connected_component_factory* eccf)
+    : ecs_(ecs), eccf_(eccf)
   {
+  }
+
+  tgba_run*
+  couvreur99_check_result::accepting_run()
+  {
+    run_ = new tgba_run;
+
     assert(!ecs_->root.empty());
-    assert(suffix.empty());
 
     scc_stack::stack_type root = ecs_->root.s;
     int comp_size = root.size();
@@ -45,7 +52,7 @@ namespace spot
       new explicit_connected_component*[comp_size];
     for (int j = comp_size - 1; 0 <= j; --j)
       {
-	scc[j] = eccf->build();
+	scc[j] = eccf_->build();
 	scc[j]->index = root.top().index;
 	scc[j]->condition = root.top().condition;
 	root.pop();
@@ -74,7 +81,9 @@ namespace spot
     numbered_state_heap::state_index_p spi =
       ecs_->h->index(ecs_->aut->get_init_state());
     assert(spi.first);
-    suffix.push_front(spi.first);
+    /// FIXME: Should compute label and acceptance condition.
+    tgba_run::step s = { spi.first, bddtrue, bddfalse };
+    run_->prefix.push_front(s);
 
     // We build a path trough each SCC in the stack.  For the
     // first SCC, the starting state is the initial state of the
@@ -93,7 +102,7 @@ namespace spot
 	father_map father;
 
 	// Initial state of the BFS.
-	const state* start = suffix.back();
+	const state* start = run_->prefix.back().s;
 	{
 	  tgba_succ_iterator* i = ecs_->aut->succ_iter(start);
 	  todo.push_back(pair_state_iter(start, i));
@@ -114,20 +123,26 @@ namespace spot
 		if (!h_dest)
 		  {
 		    // If we have found a state in the next SCC.
-		    // Unwind the path and populate SUFFIX.
+		    // Unwind the path and populate RUN_->PREFIX.
 		    h_dest = scc[k+1]->has_state(dest);
 		    if (h_dest)
 		      {
-			state_sequence seq;
+			tgba_run::steps seq;
 
-			seq.push_front(h_dest);
+			/// FIXME: Should compute label and acceptance
+			/// condition.
+			tgba_run::step s = { h_dest, bddtrue, bddfalse };
+			seq.push_front(s);
 			while (src->compare(start))
 			  {
-			    seq.push_front(src);
+			    /// FIXME: Should compute label and acceptance
+			    /// condition.
+			    tgba_run::step s = { h_dest, bddtrue, bddfalse };
+			    seq.push_front(s);
 			    src = father[src];
 			  }
-			// Append SEQ to SUFFIX.
-			suffix.splice(suffix.end(), seq);
+			// Append SEQ to RUN_->PREFIX.
+			run_->prefix.splice(run_->prefix.end(), seq);
 			// Exit this BFS for this SCC.
 			while (!todo.empty())
 			  {
@@ -152,24 +167,37 @@ namespace spot
 	  }
       }
 
-    accepting_path(scc[comp_size - 1], suffix.back(),
+    accepting_path(scc[comp_size - 1], run_->prefix.back().s,
 		   scc[comp_size - 1]->condition);
-
+    run_->prefix.pop_back(); // this state belongs to the cycle.
 
     for (int j = comp_size - 1; 0 <= j; --j)
       delete scc[j];
     delete[] scc;
+
+    // Clone every state in the run before returning it.  (We didn't
+    // do that before in the algorithm, because it's easier to follow
+    // if every state manipulated is the instance in the hash table.)
+    for (tgba_run::steps::iterator i = run_->prefix.begin();
+	 i != run_->prefix.end(); ++i)
+      i->s = i->s->clone();
+    for (tgba_run::steps::iterator i = run_->cycle.begin();
+	 i != run_->cycle.end(); ++i)
+      i->s = i->s->clone();
+
+    return run_;
   }
 
   void
-  counter_example::complete_cycle(const explicit_connected_component* scc,
-				  const state* from,
-				  const state* to)
+  couvreur99_check_result::complete_cycle(const explicit_connected_component*
+					  scc,
+					  const state* from,
+					  const state* to)
   {
-    // If by change or period already ends on the state we have
+    // If by chance our cycle already ends on the state we have
     // to reach back, we are done.
     if (from == to
-	&& !period.empty())
+	&& !run_->cycle.empty())
       return;
 
     // Records backlinks to parent state during the BFS.
@@ -207,18 +235,22 @@ namespace spot
 	    bdd cond = i->current_condition();
 
 	    // If we have reached our destination, unwind the path
-	    // and populate PERIOD.
+	    // and populate RUN_->CYCLE.
 	    if (h_dest == to)
 	      {
-		cycle_path p;
-		p.push_front(state_proposition(h_dest, cond));
+		tgba_run::steps p;
+		// FIXME: should compute acceptance condition.
+		tgba_run::step s = { h_dest, cond, bddfalse };
+		p.push_front(s);
 		while (src != from)
 		  {
 		    const state_proposition& psi = father[src];
-		    p.push_front(state_proposition(src, psi.second));
+		    // FIXME: should compute acceptance condition.
+		    tgba_run::step s = { src, psi.second, bddfalse };
+		    p.push_front(s);
 		    src = psi.first;
 		  }
-		period.splice(period.end(), p);
+		run_->cycle.splice(run_->cycle.end(), p);
 
 		// Exit the BFS, but release all iterators first.
 		while (!todo.empty())
@@ -257,8 +289,10 @@ namespace spot
   }
 
   void
-  counter_example::accepting_path(const explicit_connected_component* scc,
-				  const state* start, bdd acc_to_traverse)
+  couvreur99_check_result::accepting_path(const explicit_connected_component*
+					  scc,
+					  const state* start, bdd
+					  acc_to_traverse)
   {
     // State seen during the DFS.
     typedef Sgi::hash_set<const state*,
@@ -278,9 +312,9 @@ namespace spot
 	}
 
 	// The path being explored currently.
-	cycle_path path;
+	tgba_run::steps path;
 	// The best path seen so far.
-	cycle_path best_path;
+	tgba_run::steps best_path;
 	// The acceptance conditions traversed by BEST_PATH.
 	bdd best_acc = bddfalse;
 
@@ -314,8 +348,9 @@ namespace spot
 	      }
 
 	    bdd acc = iter->current_acceptance_conditions() | todo.top().acc;
-	    path.push_back(state_proposition(h_dest,
-					     iter->current_condition()));
+	    tgba_run::step st = { h_dest, iter->current_condition(),
+				 iter->current_acceptance_conditions() };
+	    path.push_back(st);
 
 	    // Advance iterator for next step.
 	    iter->next();
@@ -377,71 +412,30 @@ namespace spot
 	      path.pop_back();
 	  }
 
-	// Append our best path to the period.
-	for (cycle_path::iterator it = best_path.begin();
+	// Append our best path to the run_->cycle.
+	for (tgba_run::steps::iterator it = best_path.begin();
 	     it != best_path.end(); ++it)
-	  period.push_back(*it);
+	  run_->cycle.push_back(*it);
 
 	// Prepare to find another path for the remaining acceptance
 	// conditions.
 	acc_to_traverse -= best_acc;
-	start = period.back().first;
+	start = run_->cycle.back().s;
       }
 
     // Complete the path so that it goes back to its beginning,
     // forming a cycle.
-    complete_cycle(scc, start, suffix.back());
+    complete_cycle(scc, start, run_->prefix.back().s);
   }
-
-  std::ostream&
-  counter_example::print_result(std::ostream& os, const tgba* restrict) const
-  {
-    os << "Prefix:" << std::endl;
-    const bdd_dict* d = ecs_->aut->get_dict();
-    for (state_sequence::const_iterator i_se = suffix.begin();
-	 i_se != suffix.end(); ++i_se)
-      {
-	os << "  ";
-	if (restrict)
-	  {
-	    const state* s = ecs_->aut->project_state(*i_se, restrict);
-	    assert(s);
-	    os << restrict->format_state(s) << std::endl;
-	    delete s;
-	  }
-	else
-	  {
-	    os << ecs_->aut->format_state(*i_se) << std::endl;
-	  }
-      }
-    os << "Cycle:" <<std::endl;
-    for (cycle_path::const_iterator it = period.begin();
-	 it != period.end(); ++it)
-      {
-	os << "    | " << bdd_format_set(d, it->second) << std::endl;
-	os << "  ";
-	if (restrict)
-	  {
-	    const state* s = ecs_->aut->project_state(it->first, restrict);
-	    assert(s);
-	    os << restrict->format_state(s) << std::endl;
-	    delete s;
-	  }
-	else
-	  {
-	    os << ecs_->aut->format_state(it->first) << std::endl;
-	  }
-      }
-    return os;
-  }
-
 
   void
-  counter_example::print_stats(std::ostream& os) const
+  couvreur99_check_result::print_stats(std::ostream& os) const
   {
     ecs_->print_stats(os);
-    os << suffix.size() << " states in suffix" << std::endl;
-    os << period.size() << " states in period" << std::endl;
+    // FIXME: This is bogusly assuming run_ exists.  (Even if we
+    // created it, the user might have delete it.)
+    os << run_->prefix.size() << " states in run_->prefix" << std::endl;
+    os << run_->cycle.size() << " states in run_->cycle" << std::endl;
   }
 
 }

@@ -26,6 +26,34 @@
 
 namespace spot
 {
+  magic_search::result::result(magic_search& ms)
+    : ms_(ms)
+  {
+  }
+
+  tgba_run*
+  magic_search::result::accepting_run()
+  {
+    tgba_run* run = new tgba_run;
+
+    stack_type::const_reverse_iterator i, e = ms_.stack.rend();
+    tstack_type::const_reverse_iterator ti;
+    tgba_run::steps* l = &run->prefix;
+
+    for (i = ms_.stack.rbegin(), ti = ms_.tstack.rbegin(); i != e; ++i, ++ti)
+      {
+	if (i->first.s->compare(ms_.x) == 0)
+	  l = &run->cycle;
+
+	// FIXME: We need to keep track of the acceptance condition.
+	tgba_run::step s = { i->first.s->clone(), *ti, bddfalse };
+	l->push_back(s);
+      }
+
+    return run;
+  }
+
+
   magic_search::magic_search(const tgba_tba_proxy* a)
     : a(a), x(0)
   {
@@ -89,7 +117,7 @@ namespace spot
     return false;
   }
 
-  bool
+  emptiness_check_result*
   magic_search::check()
   {
     if (stack.empty())
@@ -118,7 +146,7 @@ namespace spot
 		delete s_prime;
 		tstack.push_front(c);
 		assert(stack.size() == tstack.size());
-		return true;
+		return new result(*this);
 	      }
 	    if (!has(s_prime, magic))
 	      {
@@ -149,49 +177,7 @@ namespace spot
       }
 
     assert(tstack.empty());
-    return false;
-  }
-
-  std::ostream&
-  magic_search::print_result(std::ostream& os, const tgba* restrict) const
-  {
-    stack_type::const_reverse_iterator i;
-    tstack_type::const_reverse_iterator ti;
-    os << "Prefix:" << std::endl;
-    const bdd_dict* d = a->get_dict();
-    for (i = stack.rbegin(), ti = tstack.rbegin();
-	 i != stack.rend(); ++i, ++ti)
-      {
-	if (i->first.s->compare(x) == 0)
-	  os <<"Cycle:" <<std::endl;
-
-	const state* s = i->first.s;
-	if (restrict)
-	  {
-	    s = a->project_state(s, restrict);
-	    assert(s);
-	    os << "  " << restrict->format_state(s) << std::endl;
-	    delete s;
-	  }
-	else
-	  {
-	    os << "  " << a->format_state(s) << std::endl;
-	  }
-	os << "    | " << bdd_format_set(d, *ti) << std::endl;
-      }
-
-    if (restrict)
-      {
-	const state* s = a->project_state(x, restrict);
-	assert(s);
-	os << "  " << restrict->format_state(s) << std::endl;
-	delete s;
-      }
-    else
-      {
-	os << "  " << a->format_state(x) << std::endl;
-      }
-    return os;
+    return 0;
   }
 
 }

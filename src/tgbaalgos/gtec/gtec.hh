@@ -23,6 +23,7 @@
 # define SPOT_TGBAALGOS_GTEC_GTEC_HH
 
 #include "status.hh"
+#include "tgbaalgos/emptiness.hh"
 
 namespace spot
 {
@@ -51,32 +52,32 @@ namespace spot
   /// it return false, a stack of SCC has been built is available
   /// using result() (spot::counter_example needs it).
   ///
-  /// There are two variants of this algorithm: spot::emptiness_check and
-  /// spot::emptiness_check_shy.  They differ in their memory usage, the
+  /// There are two variants of this algorithm: spot::couvreur99_check and
+  /// spot::couvreur99_check_shy.  They differ in their memory usage, the
   /// number for successors computed before they are used and the way
   /// the depth first search is directed.
   ///
-  /// spot::emptiness_check performs a straightforward depth first search.
+  /// spot::couvreur99_check performs a straightforward depth first search.
   /// The DFS stacks store tgba_succ_iterators, so that only the
   /// iterators which really are explored are computed.
   ///
-  /// spot::emptiness_check_shy tries to explore successors which are
+  /// spot::couvreur99_check_shy tries to explore successors which are
   /// visited states first.  this helps to merge SCCs and generally
   /// helps to produce shorter counter-examples.  However this
   /// algorithm cannot stores unprocessed successors as
   /// tgba_succ_iterators: it must compute all successors of a state
   /// at once in order to decide which to explore first, and must keep
   /// a list of all unexplored successors in its DFS stack.
-  class emptiness_check
+  class couvreur99_check: public emptiness_check
   {
   public:
-    emptiness_check(const tgba* a,
-		    const numbered_state_heap_factory* nshf
-		    = numbered_state_heap_hash_map_factory::instance());
-    virtual ~emptiness_check();
+    couvreur99_check(const tgba* a,
+		     const numbered_state_heap_factory* nshf
+		     = numbered_state_heap_hash_map_factory::instance());
+    virtual ~couvreur99_check();
 
     /// Check whether the automaton's language is empty.
-    virtual bool check();
+    virtual emptiness_check_result* check();
 
     /// \brief Return the status of the emptiness-check.
     ///
@@ -85,11 +86,11 @@ namespace spot
     ///
     /// This status should not be deleted, it is a pointer
     /// to a member of this class that will be deleted when
-    /// the emptiness_check object is deleted.
-    const emptiness_check_status* result() const;
+    /// the couvreur99 object is deleted.
+    const couvreur99_check_status* result() const;
 
   protected:
-    emptiness_check_status* ecs_;
+    couvreur99_check_status* ecs_;
     /// \brief Remove a strongly component from the hash.
     ///
     /// This function remove all accessible state from a given
@@ -98,19 +99,19 @@ namespace spot
     void remove_component(const state* start_delete);
   };
 
-  /// \brief A version of spot::emptiness_check that tries to visit
+  /// \brief A version of spot::couvreur99_check that tries to visit
   /// known states first.
   ///
-  /// See the documentation for spot::emptiness_check
-  class emptiness_check_shy : public emptiness_check
+  /// See the documentation for spot::couvreur99_check
+  class couvreur99_check_shy : public couvreur99_check
   {
   public:
-    emptiness_check_shy(const tgba* a,
-			const numbered_state_heap_factory* nshf
-			= numbered_state_heap_hash_map_factory::instance());
-    virtual ~emptiness_check_shy();
+    couvreur99_check_shy(const tgba* a,
+			 const numbered_state_heap_factory* nshf
+			 = numbered_state_heap_hash_map_factory::instance());
+    virtual ~couvreur99_check_shy();
 
-    virtual bool check();
+    virtual emptiness_check_result* check();
 
   protected:
     struct successor {
@@ -120,8 +121,8 @@ namespace spot
     };
 
     // We use five main data in this algorithm:
-    // * emptiness_check::root, a stack of strongly connected components (SCC),
-    // * emptiness_check::h, a hash of all visited nodes, with their order,
+    // * couvreur99_check::root, a stack of strongly connected components (SCC),
+    // * couvreur99_check::h, a hash of all visited nodes, with their order,
     //   (it is called "Hash" in Couvreur's paper)
     // * arc, a stack of acceptance conditions between each of these SCC,
     std::stack<bdd> arc;

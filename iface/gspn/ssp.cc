@@ -802,7 +802,7 @@ namespace spot
     hash_type h;		///< Map of visited states.
 
     friend class numbered_state_heap_ssp_const_iterator;
-    friend class emptiness_check_shy_ssp;
+    friend class couvreur99_check_shy_ssp;
   };
 
 
@@ -896,12 +896,12 @@ namespace spot
   };
 
 
-  class emptiness_check_shy_ssp : public emptiness_check_shy
+  class couvreur99_check_shy_ssp : public couvreur99_check_shy
   {
   public:
-    emptiness_check_shy_ssp(const tgba* a)
-      : emptiness_check_shy(a,
-			    numbered_state_heap_ssp_factory_semi::instance())
+    couvreur99_check_shy_ssp(const tgba* a)
+      : couvreur99_check_shy(a,
+			     numbered_state_heap_ssp_factory_semi::instance())
     {
     }
 
@@ -976,36 +976,37 @@ namespace spot
 
 
 
-  emptiness_check*
-  emptiness_check_ssp_semi(const tgba* ssp_automata)
+  couvreur99_check*
+  couvreur99_check_ssp_semi(const tgba* ssp_automata)
   {
     assert(dynamic_cast<const tgba_gspn_ssp*>(ssp_automata));
     return
-      new emptiness_check(ssp_automata,
-			  numbered_state_heap_ssp_factory_semi::instance());
+      new couvreur99_check(ssp_automata,
+			   numbered_state_heap_ssp_factory_semi::instance());
   }
 
-  emptiness_check*
-  emptiness_check_ssp_shy_semi(const tgba* ssp_automata)
+  couvreur99_check*
+  couvreur99_check_ssp_shy_semi(const tgba* ssp_automata)
   {
     assert(dynamic_cast<const tgba_gspn_ssp*>(ssp_automata));
     return
-      new emptiness_check_shy
-        (ssp_automata,
+      new couvreur99_check_shy
+      (ssp_automata,
 	 numbered_state_heap_ssp_factory_semi::instance());
   }
 
-  emptiness_check*
-  emptiness_check_ssp_shy(const tgba* ssp_automata)
+  couvreur99_check*
+  couvreur99_check_ssp_shy(const tgba* ssp_automata)
   {
     assert(dynamic_cast<const tgba_gspn_ssp*>(ssp_automata));
-    return new emptiness_check_shy_ssp(ssp_automata);
+    return new couvreur99_check_shy_ssp(ssp_automata);
   }
 
-  counter_example*
-  counter_example_ssp(const emptiness_check_status* status)
+  couvreur99_check_result*
+  counter_example_ssp(const couvreur99_check_status* status)
   {
-    return new counter_example(status,
-			       connected_component_ssp_factory::instance());
+    return new
+      couvreur99_check_result(status,
+			      connected_component_ssp_factory::instance());
   }
 }

@@ -1,5 +1,23 @@
 2004-10-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	Introduce an emptiness-check interface, and modify the existing
+	algorithms to conform to it, uniformly.  This will unfortunately
+	break third-party code that were using these algorithms.
+	* src/tgbaalgos/emptiness.cc, src/tgbaalgos/emptiness.hh: New files.
+	* src/tgbaalgos/Makefile.am: New files.
+	* src/tgbaalgos/magic.cc, src/tgbaalgos/magic.hh: Adjust to
+	conform to the new emptiness-check interface.
+	* src/tgbaalgos/gtec/ce.cc, src/tgbaalgos/gtec/ce.hh,
+	src/tgbaalgos/gtec/gtec.cc, src/tgbaalgos/gtec/gtec.hh,
+	src/tgbaalgos/gtec/status.cc, src/tgbaalgos/gtec/status.hh:
+	Likewise.  The classes have been renamed are as following
+	  emptiness_check -> couvreur99_check
+	  emptiness_check_shy -> couvreur99_check_shy
+          emptiness_check_status -> couvreur99_check_status
+	  counter_example -> couvreur99_check_result
+	* src/tgbatest/ltl2tgba.cc, iface/gspn/ltlgspn.cc, iface/gspn/ssp.hh,
+	iface/gspn/ssp.cc: Adjust to renaming and new interface.
+
 	* src/evtgbaalgos/tgba2evtgba.cc, src/evtgbaalgos/tgba2evtgba.hh:
 	New files.
 	* src/evtgbaalgos/Makefile.am (evtgbaalgos_HEADERS,

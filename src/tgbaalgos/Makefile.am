@@ -29,6 +29,7 @@ tgbaalgosdir = $(pkgincludedir)/tgbaalgos
 tgbaalgos_HEADERS = \
   dotty.hh \
   dupexp.hh \
+  emptiness.hh \
   lbtt.hh \
   ltl2tgba_fm.hh \
   ltl2tgba_lacim.hh \
@@ -44,6 +45,7 @@ noinst_LTLIBRARIES = libtgbaalgos.la
 libtgbaalgos_la_SOURCES = \
   dotty.cc \
   dupexp.cc \
+  emptiness.cc \
   lbtt.cc \
   ltl2tgba_fm.cc \
   ltl2tgba_lacim.cc \
