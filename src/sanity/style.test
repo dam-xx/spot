@@ -15,10 +15,12 @@ diag()
 rm -f failures
 
 # Get some help from GNU grep.
-GREP_OPTIONS='--color=auto -n'
-GREP_COLOR='1;31'
-export GREP_OPTIONS
-export GREP_COLOR
+if (grep --color=auto -n --version)>/dev/null 2>&1; then
+  GREP_OPTIONS='--color=auto -n'
+  GREP_COLOR='1;31'
+  export GREP_OPTIONS
+  export GREP_COLOR
+fi
 
 tmp=incltest.tmp
 

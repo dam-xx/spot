@@ -1,5 +1,8 @@
 2004-11-28  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/sanity/style.test: Make sure grep supports the options put
+	into GREP_OPTIONS.
+
 	* wrap/python/tests/run.in: Define DYLD_LIBRARY_PATH so that
 	Darwin finds non-installed libraries.
 	Report from Akim Demaille.
