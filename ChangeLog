@@ -1,3 +1,10 @@
+2003-12-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* doc/Doxyfile.in: Upgrade to Doxygen 1.3.5.  Build
+	documentation for iface/.
+	* dox/mainpage.dox: Fix reference to ltl_to_tgba.
+	* src/ltlenv/environment.hh: Typo.
+
 2003-12-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgba/tgbaexplicit.cc, src/tgba/tgbaexplicit.hh

@@ -9,7 +9,8 @@
 ///                         spot::ltl::formula.
 /// \li spot::tgba          Base class for Transition-based
 ///                         Generalized Büchi Automaton.
-/// \li spot::ltl_to_tgba   Convert a spot::ltl::formula into a
-///                         spot::tgba.
+/// \li spot::ltl_to_tgba_fm  Convert a spot::ltl::formula into a
+///                           spot::tgba.
+/// \li spot::ltl_to_tgba_lacim Likewise.
 
 

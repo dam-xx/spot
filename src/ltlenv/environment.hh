@@ -30,7 +30,7 @@ namespace spot
   namespace ltl
   {
 
-    /// An environment that describe atomic propositions.
+    /// An environment that describes atomic propositions.
     class environment
     {
     public:
