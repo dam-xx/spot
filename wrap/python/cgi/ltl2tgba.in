@@ -26,9 +26,20 @@ import os
 import cgi
 import cgitb; cgitb.enable()
 
+print "Content-Type: text/html"
+print
+
+# Redirect stderr to stdout.
+os.close(sys.stderr.fileno())
+os.dup2(sys.stdout.fileno(), sys.stderr.fileno())
+
 sys.path.insert(0, '@pythondir@')
 # Directory for temporary files (images and other auxiliary files).
 imgdir = 'spotimg'
+
+import spot
+import buddy
+
 
 # Cleanup stale files from our image directory.
 os.system('find ' + imgdir + ' -type f -amin +10 -print | xargs rm -f')
@@ -104,15 +115,6 @@ def render_bdd(basename, dictionary, bdd):
     del outfile
     render_dot(basename)
 
-
-print "Content-Type: text/html"
-print
-
-os.close(sys.stderr.fileno())
-os.dup2(sys.stdout.fileno(), sys.stderr.fileno())
-
-import spot
-import buddy
 
 print "<TITLE>LTL-to-Büchi test</TITLE>"
 print "<H1>Input</H1>"

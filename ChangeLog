@@ -1,5 +1,8 @@
 2004-02-02  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* wrap/python/cgi/ltl2tgba.in: Import spot and redirect stderr
+	to stdout early.
+
 	* wrap/python/cgi/ltl2tgba.in (print_stats): Compute and display
 	the number of acceptance conditions.
 
