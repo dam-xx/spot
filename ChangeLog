@@ -1,5 +1,15 @@
 2003-04-17  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* configure.ac: Output src/ltlenv/Makefile.
+	* src/ltlenv/Makefile.am, src/ltlenv/defaultenv.cc,
+	src/ltlenv/defaultenv.hh, src/ltlenv/environment.hh: New files.
+	* src/ltlparse/public.hh (parse): Take an environment as third
+	argument.
+	* src/ltlparse/ltlparse.yy (ATOMIC_PROP, parse): Require the
+	atomic proposition via the environment.
+	* src/ltltest/readltl.cc (main): Adjust the call to parse().
+	* src/ltltest/Makefile.am (LDADD): Add ../ltlenv/libltlenv.a.
+
 	* src/ltlvisit/clone.hh, src/ltlvisit/clone.cc: New files.
 	* src/ltlvisit/Makefile.am (libltlvisit_a_SOURCES): Add them.
 	* src/ltlvisit/lunabbrev.hh, src/ltlvisit/lunabbrev.cc: Inherit

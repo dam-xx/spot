@@ -18,6 +18,7 @@ AC_CHECK_PROG([DOT], [dot], [dot])
 AC_CONFIG_FILES([
   Makefile
   src/Makefile
+  src/ltlenv/Makefile
   src/ltlast/Makefile
   src/ltlparse/Makefile
   src/ltltest/Makefile

@@ -29,9 +29,10 @@ main(int argc, char **argv)
       formula_index = 2;
     }    
   
+  spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::parse_error_list pel;
   spot::ltl::formula *f = spot::ltl::parse(argv[formula_index], 
-					    pel, debug);
+					   pel, env, debug);
 
   spot::ltl::parse_error_list::iterator it;
   exit_code = 

@@ -31,6 +31,7 @@ namespace spot
   namespace ltl
   {
     extern parse_error_list* error_list;
+    extern environment* parse_environment;
   }
 }
 %}
@@ -93,7 +94,22 @@ many_errors: error
 	    | many_errors error
 
 subformula: ATOMIC_PROP
-	      { $$ = new atomic_prop(*$1); delete $1; }
+	      { 
+		$$ = parse_environment->require(*$1); 
+		if (! $$)
+		  {
+		    std::string s = "unknown atomic proposition `";
+		    s += *$1;
+		    s += "' in environment `";
+		    s += parse_environment->name();
+		    s += "'";
+		    error_list->push_back(parse_error(@1, s));
+		    delete $1; 
+		    YYERROR;
+		  }
+		else
+		  delete $1; 
+	      }
 	    | CONST_TRUE
               { $$ = new constant(constant::True); }
 	    | CONST_FALSE
@@ -162,14 +178,17 @@ namespace spot
   namespace ltl
   {
     parse_error_list* error_list;
+    environment* parse_environment;
 
     formula*
     parse(const std::string& ltl_string, 
 	  parse_error_list& error_list,
+	  environment& env,
 	  bool debug)
     {
       result = 0;
       ltl::error_list = &error_list;
+      parse_environment = &env;
       flex_set_buffer(ltl_string.c_str());
       yy::Parser parser(debug, yy::Location());
       parser.parse();  

@@ -1,7 +1,8 @@
 AM_CPPFLAGS = -I$(srcdir)/..
 LDADD = ../ltlparse/libltlparse.a \
         ../ltlvisit/libltlvisit.a \
-        ../ltlast/libltlast.a 
+        ../ltlast/libltlast.a \
+	../ltlenv/libltlenv.a 
 
 check_SCRIPTS = defs
 

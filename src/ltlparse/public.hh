@@ -1,9 +1,10 @@
 #ifndef SPOT_LTLPARSE_PUBLIC_HH
 # define SPOT_LTLPARSE_PUBLIC_HH
 
-# include <string>
 # include "ltlast/formula.hh"
 # include "location.hh"
+# include "ltlenv/defaultenv.hh"
+# include <string>
 # include <list>
 # include <utility>
 # include <iostream>
@@ -17,8 +18,9 @@ namespace spot
 
     // Beware: this function is *not* reentrant.
     formula* parse(const std::string& ltl_string, 
-		    parse_error_list& error_list,
-		    bool debug = false);
+		   parse_error_list& error_list,
+		   environment& env = default_environment::instance(),
+		   bool debug = false);
 
     // Return true iff any diagnostic was output to os.
     bool format_parse_errors(std::ostream& os,
