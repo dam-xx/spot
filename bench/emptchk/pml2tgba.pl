@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2004 Stefan Schwoon
+# Copyright (C) 2004  Stefan Schwoon
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 #
 #
-# This script was originally distributed by Schwoon alongside with
+# This script was originally distributed by Schwoon alongside
 #
 # @InProceedings{   schwoon.05.tacas,
 #   author        = {Stefan Schwoon and Javier Esparza},
@@ -45,8 +45,8 @@ my %props;
 sub usage()
 {
   print <<EOF;
-Usage: pan2tgba.pl [-w] promela-model properties...
-Extracts the product state space of the model, observing properties.
+Usage: pml2tgba.pl [-w] promela-model properties...
+Extract the state-space of the promela-model, observing properties.
 If -w is given, output acceptance conditions to ensure weak fairness.
 EOF
   exit 1;
