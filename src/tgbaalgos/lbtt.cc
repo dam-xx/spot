@@ -203,7 +203,7 @@ namespace spot
 	    std::string s = bdd_to_lbtt(si->current_condition(), d);
 	    for (unsigned i = destrange.first; i < destrange.second; ++i)
 	      {
-		body << i << " " << s << " " << "-1" << std::endl;
+		body << i << " " << s << std::endl;
 	      }
 	  }
 	body << "-1" << std::endl;

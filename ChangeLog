@@ -1,3 +1,8 @@
+2003-07-09  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgbaalgos/lbtt.cc (lbtt_reachable): Do not end transitions
+	guards with -1 in output.
+
 2003-07-08  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgbatest/ltl2tgba.cc: Add option -t to output the LBTT automata.
