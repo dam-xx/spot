@@ -1,63 +1,60 @@
-#include <set>
 #include "tgba/tgba.hh"
 #include "save.hh"
 #include "tgba/bddprint.hh"
 #include "ltlvisit/tostring.hh"
+#include "reachiter.hh"
 
 namespace spot
 {
-  typedef std::set<state*, state_ptr_less_than> seen_set;
 
-  /// Process successors.
-  static void
-  save_rec(std::ostream& os, const tgba* g, state* st, seen_set& m)
+  class save_bfs : public tgba_reachable_iterator_breadth_first
   {
-    m.insert(st);
-    std::string cur = g->format_state(st);
-    tgba_succ_iterator* si = g->succ_iter(st);
-    for (si->first(); !si->done(); si->next())
-      {
-	state* s = si->current_state();
-	os << "\"" << cur << "\", \"" << g->format_state(s) << "\", ";
+  public:
+    save_bfs(const tgba* a, std::ostream& os)
+      : tgba_reachable_iterator_breadth_first(a), os_(os)
+    {
+    }
 
-	bdd_print_sat(os, g->get_dict(), si->current_condition()) << ",";
-	bdd_print_acc(os, g->get_dict(), si->current_accepting_conditions())
-	  << ";" << std::endl;
+    void
+    start()
+    {
+      const bdd_dict* d = automata_->get_dict();
+      os_ << "acc =";
+      for (bdd_dict::fv_map::const_iterator ai = d->acc_map.begin();
+	   ai != d->acc_map.end(); ++ai)
+	{
+	  os_ << " \"";
+	  ltl::to_string(ai->first, os_) << "\"";
+	}
+      os_ << ";" << std::endl;
+    }
 
-	// Destination already explored?
-	seen_set::iterator i = m.find(s);
-	if (i != m.end())
-	  {
-	    delete s;
-	  }
-	else
-	  {
-	    save_rec(os, g, s, m);
-	    // Do not delete S, it is used as key in M.
-	  }
-      }
-    delete si;
-  }
+    void
+    process_state(const state* s, int, tgba_succ_iterator* si)
+    {
+      const bdd_dict* d = automata_->get_dict();
+      std::string cur = automata_->format_state(s);
+      for (si->first(); !si->done(); si->next())
+	{
+	  state* dest = si->current_state();
+	  os_ << "\"" << cur << "\", \"" 
+	      << automata_->format_state(dest) << "\", ";
+	  bdd_print_sat(os_, d, si->current_condition()) << ",";
+	  bdd_print_acc(os_, d, si->current_accepting_conditions());
+	  os_ << ";" << std::endl;
+	}
+    }
+
+  private:
+    std::ostream& os_;
+  };
+
 
   std::ostream&
   tgba_save_reachable(std::ostream& os, const tgba* g)
   {
-    const bdd_dict* d = g->get_dict();
-    os << "acc =";
-    for (bdd_dict::fv_map::const_iterator ai = d->acc_map.begin();
-	 ai != d->acc_map.end(); ++ai)
-      {
-	os << " \"";
-	ltl::to_string(ai->first, os) << "\"";
-      }
-    os << ";" << std::endl;
-
-    seen_set m;
-    state* state = g->get_init_state();
-    save_rec(os, g, state, m);
-    // Finally delete all states used as keys in m:
-    for (seen_set::iterator i = m.begin(); i != m.end(); ++i)
-      delete *i;
+    save_bfs b(g, os);
+    b.run();
     return os;
   }
 }

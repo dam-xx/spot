@@ -1,0 +1,94 @@
+#ifndef SPOT_TGBAALGOS_REACHITER_HH
+# define SPOT_TGBAALGOS_REACHITER_HH
+
+#include "tgba/tgba.hh"
+#include <stack>
+#include <deque>
+
+namespace spot
+{
+  /// \brief Iterate over all reachable states of a spot::tgba.
+  class tgba_reachable_iterator
+  {
+  public:
+    tgba_reachable_iterator(const tgba* a);
+    virtual ~tgba_reachable_iterator();
+
+    /// \brief Iterate over all reachable states of a spot::tgba.
+    ///
+    /// This is a template method that will call add_state(), next_state(),
+    /// start(), end(), process_state(), and process_link(), while it
+    /// iterate over state.
+    void run();
+
+    /// \name Todo list management.
+    ///
+    /// spot::tgba_reachable_iterator_depth_first and
+    /// spot::tgba_reachable_iterator_breadth_first offer two precanned
+    /// implementations for these functions.
+    /// \{
+    /// \brief Called by run() to register newly discovered states.
+    virtual void add_state(const state* s) = 0;
+    /// \brief Called by run() to obtain the
+    virtual const state* next_state() = 0;
+    /// \}
+
+    /// Called by run() before starting its iteration.
+    virtual void start();
+    /// Called by run() once all states have been explored.
+    virtual void end();
+
+    /// Called by run() to process a state.
+    ///
+    /// \param s The current state.
+    /// \param n An unique number assigned to \a s.
+    /// \param si The spot::tgba_succ_iterator for \a s.
+    virtual void process_state(const state* s, int n, tgba_succ_iterator* si);
+    /// Called by run() to process a transition.
+    ///
+    /// \param in The source state number.
+    /// \param out The destination state number.
+    /// \param si The spot::tgba_succ_iterator positionned on the current
+    ///             transition.
+    virtual void process_link(int in, int out, const tgba_succ_iterator* si);
+
+  protected:
+    const tgba* automata_;	///< The spot::tgba to explore.
+
+    typedef std::map<const state*, int, state_ptr_less_than> seen_map;
+    seen_map seen;		///< States already seen.
+  };
+
+  /// \brief An implementation of spot::tgba_reachable_iterator that browses
+  /// states depth first.
+  class tgba_reachable_iterator_depth_first : public tgba_reachable_iterator
+  {
+  public:
+    tgba_reachable_iterator_depth_first(const tgba* a);
+
+    virtual void add_state(const state* s);
+    virtual const state* next_state();
+
+  protected:
+    std::stack<const state*> todo; ///< A stack of state yet to explore.
+  };
+
+  /// \brief An implementation of spot::tgba_reachable_iterator that browses
+  /// states breadth first.
+  class tgba_reachable_iterator_breadth_first : public tgba_reachable_iterator
+  {
+  public:
+    tgba_reachable_iterator_breadth_first(const tgba* a);
+
+    virtual void add_state(const state* s);
+    virtual const state* next_state();
+
+  protected:
+    std::deque<const state*> todo; ///< A queue of state yet to explore.
+  };
+
+
+}
+
+
+#endif // SPOT_TGBAALGOS_REACHITER_HH

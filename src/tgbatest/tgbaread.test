@@ -17,12 +17,12 @@ cat >expected <<EOF
 digraph G {
   size="7.26,10.69"
   0 [label="", style=invis]
-  1 [label="s1"]
   0 -> 1
-  2 [label="s2"]
+  1 [label="s1"]
   1 -> 2 [label="<a:1, b:0>\n<Acc[c]:0, Acc[d]:1><Acc[c]:1, Acc[d]:0>"]
-  3 [label="state 3"]
+  2 [label="s2"]
   2 -> 3 [label="<a:1>\n<Acc[c]:1, Acc[d]:0>"]
+  3 [label="state 3"]
   3 -> 1 [label="T\nF"]
 }
 EOF

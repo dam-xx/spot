@@ -30,9 +30,9 @@ cat >expected <<EOF
 acc = "p1" "p2" "p3" "p4";
 "s1 * s1 * s1", "s3 * s2 * s2", a b, "p1" "p2";
 "s1 * s1 * s1", "s2 * s2 * s2", a b, "p1" "p2";
-"s2 * s2 * s2", "s3 * s1 * s3", a c, "p3" "p4";
 "s1 * s1 * s1", "s3 * s2 * s3", a b, "p1" "p2";
 "s1 * s1 * s1", "s2 * s2 * s3", b, "p1" "p2";
+"s2 * s2 * s2", "s3 * s1 * s3", a c, "p3" "p4";
 "s2 * s2 * s3", "s3 * s1 * s2", a c, "p3" "p4";
 EOF
 
