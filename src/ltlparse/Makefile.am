@@ -18,8 +18,12 @@ BUILT_SOURCES = $(FROM_LTLPARSE_YY)
 MAINTAINERCLEANFILES = $(FROM_LTLPARSE_YY)
 
 $(FROM_LTLPARSE_YY_MAIN): $(srcdir)/$(LTLPARSE_YY)
-	bison --defines --locations --skeleton=lalr1.cc --report=all \
-	  $(srcdir)/$(LTLPARSE_YY) -o $@
+## We must cd into $(srcdir) first because if we tell bison to read
+## $(srcdir)/$(LTLPARSE_YY), it will also use the value of $(srcdir)/
+## in the generated include statements.
+	cd $(srcdir) && \
+	  bison --defines --locations --skeleton=lalr1.cc --report=all \
+	  $(LTLPARSE_YY) -o $@
 $(FROM_LTLPARSE_YY_OTHERS): $(LTLPARSE_YY)
 	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) $(FROM_LTLPARSE_YY_MAIN)
 

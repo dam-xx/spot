@@ -1,5 +1,11 @@
 2003-11-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlparse/Makefile.am ($(FROM_LTLPARSE_YY_MAIN)): cd into
+	$(srcdir) before running bison, so that bison does not put
+	absolute filenames in generated files.
+	* src/tgbaparse/Makefile.am ($(FROM_TGBAPARSE_YY_MAIN)): Likewise.
+	Reported by Soheib Baarir.
+
 	* iface/gspn/Makefile.am (gspn_HEADERS): Add eesrg.hh.
 	Reported by Soheib Baarir.
 

@@ -22,8 +22,12 @@ BUILT_SOURCES = $(FROM_TGBAPARSE_YY)
 MAINTAINERCLEANFILES = $(FROM_TGBAPARSE_YY)
 
 $(FROM_TGBAPARSE_YY_MAIN): $(srcdir)/$(TGBAPARSE_YY)
-	bison --defines --locations --skeleton=lalr1.cc --report=all \
-	  $(srcdir)/$(TGBAPARSE_YY) -o $@
+## We must cd into $(srcdir) first because if we tell bison to read
+## $(srcdir)/$(TGBAPARSE_YY), it will also use the value of $(srcdir)/
+## in the generated include statements.
+	cd $(srcdir) && \
+	  bison --defines --locations --skeleton=lalr1.cc --report=all \
+	  $(TGBAPARSE_YY) -o $@
 $(FROM_TGBAPARSE_YY_OTHERS): $(TGBAPARSE_YY)
 	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) $(FROM_TGBAPARSE_YY_MAIN)
 
