@@ -721,14 +721,6 @@ main(int argc, char** argv)
 		spot::counter_example ce(ec->result());
 		ce.print_result(std::cout);
 		ce.print_stats(std::cout);
-
-		//spot::ce::counter_example* res2 = ce.get_counter_example();
-		//spot::tgba* aut = res2->ce2tgba();
-		//spot::dotty_reachable(std::cout, aut);
-		//res2->print(std::cout);
-		//delete res2;
-		//delete aut;
-
 	      }
 	    else
 	      {
@@ -744,15 +736,7 @@ main(int argc, char** argv)
 	    spot::nesteddfsgen_search* ec = new spot::nesteddfsgen_search(a);
 	    bool res = ec->check();
 	    ec->print_stats(std::cout);
-	    if (expect_counter_example)
-	      {
-		if (!res)
-		  exit_code = 1;
-	      }
-	    else
-	      {
-		exit_code = res;
-	      }
+	    exit_code = expect_counter_example ? !res : res;
 	    delete ec;
 	  }
 	  break;
@@ -786,9 +770,14 @@ main(int argc, char** argv)
 	  break;
 
 	case TarjanOnFly:
-	  std::cout << "Tarjan On Fly" << std::endl;
-	  es = new spot::tarjan_on_fly(degeneralized);
-	  break;
+	  {
+	    std::cout << "Tarjan On Fly" << std::endl;
+	    spot::tarjan_on_fly* tof = new spot::tarjan_on_fly(degeneralized);
+	    bool res = tof->check();
+	    exit_code = expect_counter_example ? !res : res;
+	    delete tof;
+	    break;
+	  }
 
 	case MinimalSearch:
 	  {
@@ -804,7 +793,7 @@ main(int argc, char** argv)
 	  break;
 
 	case MinimalSearchIterative:
-	    std::cout << "Iterative Minimal Search" << std::endl;
+	  std::cout << "Iterative Minimal Search" << std::endl;
 	  es = new spot::minimalce_search(degeneralized, true);
 	  break;
 

@@ -27,13 +27,11 @@
 #include <utility>
 #include <ostream>
 #include "tgba/tgbatba.hh"
-//#include "tgba/bddprint.hh"
-#include "tgbaalgos/minimalce.hh"
 
 namespace spot
 {
 
-  class tarjan_on_fly: public emptiness_search
+  class tarjan_on_fly
   {
 
   public:
@@ -41,8 +39,8 @@ namespace spot
     tarjan_on_fly(const tgba_tba_proxy *a);
     virtual ~tarjan_on_fly();
 
-    /// \brief Find a counter example.
-    virtual ce::counter_example* check();
+    /// \brief Return true if there exits an accepting path.
+    bool check();
 
     /// \brief Print Stat.
     std::ostream& print_stat(std::ostream& os) const;
@@ -56,8 +54,6 @@ namespace spot
       int lowlink;
       int pre;
       int acc;
-
-      //int pos;
     };
 
     //typedef std::pair<int, tgba_succ_iterator*> state_iter_pair;
@@ -65,8 +61,6 @@ namespace spot
 			  state_ptr_hash, state_ptr_equal> hash_type;
     hash_type h;		///< Map of visited states.
 
-
-    //typedef std::pair<const state*, struct_state> pair_type;
     typedef std::vector<struct_state> stack_type;
     stack_type stack;		///< Stack of visited states on the path.
 
@@ -77,16 +71,11 @@ namespace spot
     bool violation;
 
     const state* x;
-    ce::counter_example* ce;
 
     void push(const state* s);
     void pop();
     void lowlinkupdate(int f, int t);
     int in_stack(const state* s) const;
-
-    ce::counter_example* build_counter();
-    //clock_t tps_;
-
   };
 
 }

@@ -51,7 +51,7 @@ namespace spot
       }
   }
 
-  ce::counter_example*
+  bool
   tarjan_on_fly::check()
   {
     tgba_succ_iterator* iter = 0;
@@ -96,12 +96,7 @@ namespace spot
 	  pop();
       }
 
-    if (violation)
-      return build_counter();
-
-    //std::cout << "NO COUNTER EXAMPLE FOUND" << std::endl;
-
-    return 0;
+    return violation;
   }
 
   void
@@ -148,12 +143,6 @@ namespace spot
   void
   tarjan_on_fly::pop()
   {
-    /*
-      const state *s = stack[dftop].s;
-      hash_type::iterator hi = h.find(s);
-      hi->second = -1;
-    */
-
     int p = stack[dftop].pre;
 
     if (p >= 0)
@@ -183,14 +172,6 @@ namespace spot
   {
     int n = 0;
 
-    /*
-    hash_type::const_iterator hi = h.find(s);
-    if (hi != h.end())
-      n = hi->second;
-    else
-      n = -1;
-    */
-
     stack_type::const_iterator i;
     for (i = stack.begin(); i != stack.end(); ++i, ++n)
       if (s->compare(i->s) == 0)
@@ -202,38 +183,10 @@ namespace spot
     return n;
   }
 
-  ce::counter_example*
-  tarjan_on_fly::build_counter()
-  {
-    ce = new ce::counter_example(a);
-
-    stack_type::iterator i;
-    for (i = stack.begin(); i != stack.end(); ++i)
-      {
-	if (x && x->compare(i->s) == 0)
-	  break;
-
-	ce->prefix.push_back(ce::state_ce(i->s->clone(),
-					  i->lasttr->current_condition()));
-      }
-
-    for (; i != stack.end(); ++i)
-      {
-	ce->cycle.push_back(ce::state_ce(i->s->clone(),
-					 i->lasttr->current_condition()));
-      }
-
-    return ce;
-  }
-
   std::ostream&
   tarjan_on_fly::print_stat(std::ostream& os) const
   {
-    int ce_size = 0;
-    if (ce)
-      ce_size = ce->size();
-    os << "Size of Counter Example : " << ce_size << std::endl
-       << "States explored : " << h.size() << std::endl;
+    os << "States explored : " << h.size() << std::endl;
     return os;
   }
 

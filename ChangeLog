@@ -1,5 +1,16 @@
 2004-10-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	The computation of the counter example fails the valgrind tests
+	and is wrong into two ways: the search stack is generally not a
+	path, and does not run until the end of the STL container.
+	Remove it.
+	* src/tgbaalgos/tarjan_on_fly.cc, src/tgbaalgos/tarjan_on_fly.hh
+	(tarjan_on_fly): Do not inherit from the emptiness_search class,
+	because the check method will no longer return a counter example.
+	(tarjan_on_fly::check): Return only a boolean.
+	(tarjan_on_fly::build_counter): Delete.
+	* src/tgbatest/ltl2tgba.cc: Adjust.
+
 	* src/tgba/tgbaexplicit.cc (tgba_explicit_succ_iterator::current_state,
 	tgba_explicit_succ_iterator::current_condition,
 	tgba_explicit_succ_iterator::current_accepting_conditions): Assert
@@ -109,7 +120,7 @@
 	src/tgbaalgos/minimalce.hh,
 	src/tgbaalgos/minimalce.cc,
 	src/tgbaalgos/colordfs.hh,
-	src/tgbaalgos/colordfs.cc: four new algorithms for emptyness check.
+	src/tgbaalgos/colordfs.cc: four new algorithms for emptiness check.
 
 	* src/tgbaalgos/gtec/ce.hh,
 	src/tgbaalgos/gtec/ce.cc: Adapt the counter exemple for the ce
@@ -117,7 +128,7 @@
 
 	* src/tgbatest/ltl2tgba.cc,
 	src/tgbatest/emptchk.test,
-	src/tgbaalgos/Makefile.am: Add files for emptyness-check.
+	src/tgbaalgos/Makefile.am: Add files for emptiness-check.
 
 2004-08-23  Thomas Martinez  <martinez@src.lip6.fr>
 
@@ -3174,7 +3185,7 @@
 
 	Switch from "promises" to "accepting sets".  Fix the definitions
 	of these accepting sets so that they are really useful.  Provide
-	an all_accepting_conditions() method for use in the emptyness
+	an all_accepting_conditions() method for use in the emptiness
 	check, and a neg_accepting_conditions() for products.  Predeclare
 	TGBA accepting conditions in the i/o.
 
