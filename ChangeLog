@@ -1,5 +1,9 @@
 2004-04-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/sanity/Makefile.am, src/sanity/includes.test: New files.
+	* src/Makefile.am (SUBDIRS): Add sanity.
+	* configure.ac: Output src/sanity/Makefile.in.
+
 	* src/tgbatest/Makefile.am (check_PROGRAMS): Move ltl2tgba ...
 	(noinst_PROGRAMS): ... here.
 	* iface/gspn/Makefile.am (check_PROGRAMS): Rename as ...

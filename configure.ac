@@ -50,25 +50,26 @@ AC_CHECK_PROG([VALGRIND], [valgrind], [valgrind])
 
 AC_CONFIG_FILES([
   Makefile
-  doc/Makefile
   doc/Doxyfile
+  doc/Makefile
   iface/Makefile
   iface/gspn/Makefile
   iface/gspn/defs
   src/Makefile
-  src/ltlenv/Makefile
   src/ltlast/Makefile
+  src/ltlenv/Makefile
   src/ltlparse/Makefile
   src/ltltest/Makefile
   src/ltltest/defs
   src/ltlvisit/Makefile
+  src/misc/Makefile
+  src/sanity/Makefile
   src/tgba/Makefile
   src/tgbaalgos/Makefile
   src/tgbaalgos/gtec/Makefile
   src/tgbaparse/Makefile
   src/tgbatest/Makefile
   src/tgbatest/defs
-  src/misc/Makefile
   wrap/Makefile
   wrap/python/Makefile
   wrap/python/cgi/Makefile

@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -19,22 +19,25 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-AUTOMAKE_OPTIONS = subdir-objects
+AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
+AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-# List directories in the order they must be built.
-# Keep tests at the end.
-SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse tgba tgbaalgos tgbaparse . \
-	  ltltest tgbatest sanity
+# Run `make TESTHEADER=foo.hh check' if you want to check only one
+# header.
+check-local:
+	CXX='$(CXX)' \
+	CPPFLAGS='$(AM_CPPFLAGS) $(CPPFLAGS)' \
+	CXXFLAGS='$(AM_CXXFLAGS) $(CXXFLAGS)' \
+	INCDIR='$(top_srcdir)/src' \
+	$(SHELL) $(srcdir)/includes.test $(TESTHEADER)
 
-lib_LTLIBRARIES = libspot.la
-libspot_la_SOURCES =
-libspot_la_LDFLAGS = $(BUDDY_LDFLAGS)
-libspot_la_LIBADD =  \
-  misc/libmisc.la \
-  ltlenv/libltlenv.la \
-  ltlparse/libltlparse.la \
-  ltlvisit/libltlvisit.la \
-  ltlast/libltlast.la \
-  tgba/libtgba.la \
-  tgbaalgos/libtgbaalgos.la \
-  tgbaparse/libtgbaparse.la
+# Ensure we have not forgotten to include an header.
+installcheck-local:
+	CXX='$(CXX)' \
+	CPPFLAGS='-I $(includedir) -I$(pkgincludedir) $(LIBGSPN_CPPFLAGS) $(CPPFLAGS)' \
+	CXXFLAGS='$(AM_CXXFLAGS) $(CXXFLAGS)' \
+	INCDIR='$(pkgincludedir)' \
+	$(SHELL) $(srcdir)/includes.test $(TESTHEADER)
+
+
+CLEANFILES = failures incltest.*
