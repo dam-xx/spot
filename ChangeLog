@@ -1,3 +1,8 @@
+2003-08-25  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/tgba/state.hh (state_ptr_less_than): Make sure left is
+	non-null.  Suggested by Denis Poitreneaud.
+
 2003-08-23  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* wrap/python/Makefile.am (MAINTAINERCLEANFILES): Add

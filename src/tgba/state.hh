@@ -46,6 +46,7 @@ namespace spot
     bool
     operator()(const state* left, const state* right) const
     {
+      assert(left);
       return left->compare(right) < 0;
     }
   };
