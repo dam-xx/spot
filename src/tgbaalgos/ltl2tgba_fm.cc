@@ -529,7 +529,7 @@ namespace spot
 	      {
 		dest->accept(v);
 		bdd succbdd = v.result();
-		succ_to_string::iterator cs = canonical_succ.find(succbdd);
+		succ_to_formula::iterator cs = canonical_succ.find(succbdd);
 		if (cs != canonical_succ.end())
 		  {
 		    destroy(dest);

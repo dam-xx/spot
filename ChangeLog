@@ -1,5 +1,10 @@
 2004-02-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Identify states
+	with identical successors.  This optimizes the translation
+	of `a R (b R c)', for instance.
+	* src/tgbatest/ltl2tgba.test: Add two new tests.
+
 	Hide the tgba_gspn and tgba_gspn_eesrg classes.  Offer the
 	corresponding automaton via the automaton() method of the
 	gspn_interface and gspn_eesrg_interface classes.
