@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 #include "ltlparse/public.hh"
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/tunabbrev.hh"

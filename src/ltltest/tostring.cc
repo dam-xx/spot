@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 #include "ltlparse/public.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/destroy.hh"

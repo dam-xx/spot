@@ -1,4 +1,5 @@
 #include <sstream>
+#include <cassert>
 #include "bddprint.hh"
 #include "ltlvisit/tostring.hh"
 

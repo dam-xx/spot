@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 #include "ltlparse/public.hh"
 #include "ltlvisit/dump.hh"
 #include "ltlvisit/dotty.hh"

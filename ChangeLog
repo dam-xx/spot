@@ -1,3 +1,8 @@
+2003-06-06  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/ltltest/equals.cc, src/ltltest/readltl.cc,
+	src/tgba/bddprint.cc, src/ltltest/tostring.cc: Include <cassert>.
+
 2003-06-05  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgba/bddprint.cc (dict): Make this variable static.
