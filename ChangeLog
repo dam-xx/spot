@@ -9,11 +9,11 @@
 
 2003-06-23  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
-	Switch from "promises" to "accepting set".  Fix the definitions
-	of these accepting set so that they are really usable.  Provide
-	a all_accepting_conditions() method for use in the emptyness
-	check, and a neg_accepting_conditions() for products.
-	Predeclare TGBA accepting conditions is the i/o.
+	Switch from "promises" to "accepting sets".  Fix the definitions
+	of these accepting sets so that they are really useful.  Provide
+	an all_accepting_conditions() method for use in the emptyness
+	check, and a neg_accepting_conditions() for products.  Predeclare
+	TGBA accepting conditions in the i/o.
 
 	* src/tgba/bddprint.cc (want_prom): Rename as ...
 	(want_prom): ... this.
