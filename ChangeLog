@@ -1,5 +1,8 @@
 2004-05-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Refine
+	fair_loop_approximation when branching postponement is not used.
+
 	Cache formula translations, and canonize formulae before doing
 	branching postponement.
 	* src/tgbaalgos/ltl2tgba_fm.cc (formula_canonizer): New class, with

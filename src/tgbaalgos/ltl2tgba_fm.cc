@@ -684,6 +684,11 @@ namespace spot
 
 	std::string now = to_string(f);
 
+	// When branching_postponement is used, we must assume that
+	// the source state is in a fair loop.
+	bool pflc_from =
+	  (fair_loop_approx && !branching_postponement) ? pflc.check(f) : true;
+
 	// We used to factor only Next and A variables while computing
 	// prime implicants, with
 	//    minato_isop isop(res, d.next_set & d.a_set);
@@ -752,8 +757,8 @@ namespace spot
 		// If the destination cannot possibly be part of a fair
 		// loop, make all possible promises.
 		if (fair_loop_approx
-		    && dest != constant::true_instance()
-		    && !pflc.check(dest))
+		    && !(dest == constant::true_instance()
+			 || (pflc_from && pflc.check(dest))))
 		  label &= all_promises;
 
 		// If we are not postponing the branching, we can
