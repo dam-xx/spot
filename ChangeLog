@@ -1,5 +1,7 @@
 2004-03-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* configure.ac, NEWS: Bump version to 0.0r.
+
 	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm) <exprop>: Do not
 	blindly enumerate all combinations of atomic properties; initially
 	set all_props to the set of all possibly satisfiable combinations.

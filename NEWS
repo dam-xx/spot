@@ -1,4 +1,12 @@
-New in spot 0.0q:
+New in spot 0.0r (2004-03-08):
+
+  * In ltl_to_tgba_fm:
+    - New option `exprop' to optimize determinism.
+    - Make the `symbolic indentification' from 0.0p optional.
+  * `nonacceptant_lbtt_reachable' new function to help getting
+    accurate statistics from LBTT.
+  * Revamp the cgi script's user interface.
+  * Upgrade to lbtt 1.0.3, swig 1.3.21, automake 1.8.3
 
 New in spot 0.0p (2004-02-03):
 
