@@ -1,3 +1,7 @@
+2004-12-10  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/misc/timer.cc, src/tgbatest/randtgba.cc: Format the statistics.
+
 2004-12-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/emptchkr.test: Tune the "big degeneralized" test

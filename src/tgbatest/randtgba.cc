@@ -91,11 +91,9 @@ ec_algo ec_algos[] =
     { "couvreur99_shy-",       couvreur99_shy_minus_cons,       0, -1U, true },
     { "couvreur99_shy",        couvreur99_shy_cons,             0, -1U, true },
     { "explicit_magic_search", spot::explicit_magic_search,     0,   1, true },
-    { "bit_state_hashing_magic_search",
-                               bsh_ms_cons,                     0,   1, false },
+    { "bsh_magic_search",      bsh_ms_cons,                     0,   1, false },
     { "explicit_se05",         spot::explicit_se05_search,      0,   1, true },
-    { "bit_state_hashing_se05",
-                               bsh_se05_cons,                   0,   1, false },
+    { "bsh_se05",              bsh_se05_cons,                   0,   1, false },
     { "explicit_gv04",         spot::explicit_gv04_check,       0,   1, true },
     { "explicit_tau03",        spot::explicit_tau03_search,     1, -1U, true },
     { "explicit_tau03_opt",    spot::explicit_tau03_opt_search, 0, -1U, true },
@@ -276,62 +274,69 @@ ar_stats_type mar_stats;        // ... about minimized accepting runs.
 void
 print_ar_stats(ar_stats_type& ar_stats)
 {
-      std::cout << std::setw(32) << ""
-		<< " |       prefix      |       cycle       |"
-		<< std::endl << std::setw(32) << "algorithm"
-		<< " |  min < mean < max |  min < mean < max |   n "
-		<< std::endl
-		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl << std::setprecision(3);
-      for (ar_stats_type::const_iterator i = ar_stats.begin();
-	   i != ar_stats.end(); ++i)
-	std::cout << std::setw(32) << i->first << " |"
-		  << std::setw(5) << i->second.min_prefix
-		  << " "
-		  << std::setw(6)
-		  << static_cast<float>(i->second.tot_prefix) / i->second.n
-		  << " "
-		  << std::setw(5) << i->second.max_prefix
-		  << " |"
-		  << std::setw(5) << i->second.min_cycle
-		  << " "
-		  << std::setw(6)
-		  << static_cast<float>(i->second.tot_cycle) / i->second.n
-		  << " "
-		  << std::setw(5) << i->second.max_cycle
-		  << " |"
-		  << std::setw(5) << i->second.n
-		  << std::endl;
-      std::cout << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl
-		<< std::setw(32) << ""
-		<< " |        runs       |       total      |"
-		<< std::endl << std::setw(32) << "algorithm"
-		<< " |  min < mean < max | pre.  cyc.  runs |   n "
-		<< std::endl
-		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl;
-      for (ar_stats_type::const_iterator i = ar_stats.begin();
-	   i != ar_stats.end(); ++i)
-	std::cout << std::setw(32) << i->first << " |"
-		  << std::setw(5)
-		  << i->second.min_run
-		  << " "
-		  << std::setw(6)
-		  << static_cast<float>(i->second.tot_prefix
-					+ i->second.tot_cycle) / i->second.n
-		  << " "
-		  << std::setw(5)
-		  << i->second.max_run
-		  << " |"
-		  << std::setw(5) << i->second.tot_prefix
-		  << " "
-		  << std::setw(5) << i->second.tot_cycle
-		  << " "
-		  << std::setw(5) << i->second.tot_prefix + i->second.tot_cycle
-		  << " |"
-		  << std::setw(5) << i->second.n
-		  << std::endl;
+  std::ios::fmtflags old = std::cout.flags();
+  std::cout << std::right << std::fixed << std::setprecision(1);
+
+  std::cout << std::setw(22) << ""
+            << " |         prefix        |         cycle         |"
+            << std::endl
+            << std::setw(22) << "algorithm"
+            << " |   min   < mean  < max |   min   < mean  < max |   n "
+            << std::endl
+            << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+            << std::endl;
+  for (ar_stats_type::const_iterator i = ar_stats.begin();
+        i != ar_stats.end(); ++i)
+    std::cout << std::setw(22) << i->first << " |"
+              << std::setw(6) << i->second.min_prefix
+              << " "
+              << std::setw(8)
+              << static_cast<float>(i->second.tot_prefix) / i->second.n
+              << " "
+              << std::setw(6) << i->second.max_prefix
+              << " |"
+              << std::setw(6) << i->second.min_cycle
+              << " "
+              << std::setw(8)
+              << static_cast<float>(i->second.tot_cycle) / i->second.n
+              << " "
+              << std::setw(6) << i->second.max_cycle
+              << " |"
+              << std::setw(4) << i->second.n
+              << std::endl;
+  std::cout << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+            << std::endl
+            << std::setw(22) << ""
+            << " |          runs         |         total         |"
+            << std::endl <<
+            std::setw(22) << "algorithm"
+            << " |   min   < mean  < max |  pre.   cyc.     runs |   n "
+            << std::endl
+            << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
+            << std::endl;
+  for (ar_stats_type::const_iterator i = ar_stats.begin();
+        i != ar_stats.end(); ++i)
+    std::cout << std::setw(22) << i->first << " |"
+              << std::setw(6)
+              << i->second.min_run
+              << " "
+              << std::setw(8)
+              << static_cast<float>(i->second.tot_prefix
+                                    + i->second.tot_cycle) / i->second.n
+              << " "
+              << std::setw(6)
+              << i->second.max_run
+              << " |"
+              << std::setw(6) << i->second.tot_prefix
+              << " "
+              << std::setw(6) << i->second.tot_cycle
+              << " "
+              << std::setw(8) << i->second.tot_prefix + i->second.tot_cycle
+              << " |"
+              << std::setw(4) << i->second.n
+              << std::endl;
+
+  std::cout << std::setiosflags(old);
 }
 
 int
@@ -629,56 +634,62 @@ main(int argc, char** argv)
 
   if (!ec_stats.empty())
     {
+      std::ios::fmtflags old = std::cout.flags();
+      std::cout << std::right << std::fixed << std::setprecision(1);
+
       std::cout << "Statistics about emptiness checkers:" << std::endl;
-      std::cout << std::setw(32) << ""
-		<< " |       states      |    transitions    |"
-		<< std::endl << std::setw(32) << "algorithm"
-		<< " |  min < mean < max |  min < mean < max |   n "
+      std::cout << std::setw(22) << ""
+		<< " |         states        |      transitions      |"
+		<< std::endl << std::setw(22) << "algorithm"
+		<< " |   min   < mean  < max |   min   < mean  < max |   n "
 		<< std::endl
 		<< std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
-		<< std::endl << std::setprecision(3);
+		<< std::endl;
       for (ec_stats_type::const_iterator i = ec_stats.begin();
                                                 i != ec_stats.end(); ++i)
-	std::cout << std::setw(32) << i->first << " |"
-		  << std::setw(5) << i->second.min_states
+	std::cout << std::setw(22) << i->first << " |"
+		  << std::setw(6) << i->second.min_states
 		  << " "
-		  << std::setw(6)
+		  << std::setw(8)
 		  << static_cast<float>(i->second.tot_states) / i->second.n
 		  << " "
-		  << std::setw(5) << i->second.max_states
+		  << std::setw(6) << i->second.max_states
 		  << " |"
-		  << std::setw(5) << i->second.min_transitions
+		  << std::setw(6) << i->second.min_transitions
 		  << " "
-		  << std::setw(6)
+		  << std::setw(8)
 		  << static_cast<float>(i->second.tot_transitions) / i->second.n
 		  << " "
-		  << std::setw(5) << i->second.max_transitions
+		  << std::setw(6) << i->second.max_transitions
 		  << " |"
-		  << std::setw(5) << i->second.n
+		  << std::setw(4) << i->second.n
 		  << std::endl;
       std::cout << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
 		<< std::endl
-		<< std::setw(32) << ""
-		<< " |   maximal depth   |"
-		<< std::endl << std::setw(32) << "algorithm"
-		<< " |  min < mean < max |   n "
+		<< std::setw(22) << ""
+		<< " |     maximal depth     |"
+		<< std::endl
+                << std::setw(22) << "algorithm"
+		<< " |   min   < mean  < max |   n "
 		<< std::endl
 		<< std::setw(59) << std::setfill('-') << "" << std::setfill(' ')
 		<< std::endl;
       for (ec_stats_type::const_iterator i = ec_stats.begin();
                                                 i != ec_stats.end(); ++i)
-	std::cout << std::setw(32) << i->first << " |"
-		  << std::setw(5)
+	std::cout << std::setw(22) << i->first << " |"
+		  << std::setw(6)
 		  << i->second.min_max_depth
 		  << " "
-		  << std::setw(6)
+		  << std::setw(8)
 		  << static_cast<float>(i->second.tot_max_depth) / i->second.n
 		  << " "
-		  << std::setw(5)
+		  << std::setw(6)
 		  << i->second.max_max_depth
 		  << " |"
-		  << std::setw(5) << i->second.n
+		  << std::setw(4) << i->second.n
 		  << std::endl;
+
+      std::cout << std::setiosflags(old);
     }
 
   if (!ar_stats.empty())

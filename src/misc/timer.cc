@@ -29,6 +29,9 @@ namespace spot
   std::ostream&
   timer_map::print(std::ostream& os) const
   {
+    std::ios::fmtflags old = std::cout.flags();
+    std::cout << std::right << std::fixed << std::setprecision(1);
+
     time_info total;
     for (tm_type::const_iterator i = tm.begin(); i != tm.end(); ++i)
       {
@@ -37,47 +40,49 @@ namespace spot
       }
     clock_t grand_total = total.utime + total.stime;
 
-    os << std::setw(33) << ""
-       << "|  user time |  sys. time |    total   |"
+    os << std::setw(23) << ""
+       << "|    user time   |    sys. time   |      total     |"
        << std::endl
-       << std::setw(33) << "name "
-       << "| ticks    % | tics     % | tics     % |   n"
+       << std::setw(23) << "name "
+       << "| ticks        % | ticks        % | ticks        % |   n"
        << std::endl
        << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
        << std::endl;
     for (tm_type::const_iterator i = tm.begin(); i != tm.end(); ++i)
       {
 	const spot::timer& t = i->second.first;
-	os << std::setw(32) << i->first << " |"
-	   << std::setw(6) << t.utime()
-	   << std::setw(5) << (total.utime ?
-			       100.0 * t.utime() / total.utime : 0)
+	os << std::setw(22) << i->first << " |"
+	   << std::setw(6) << t.utime() << " "
+	   << std::setw(8) << (total.utime ?
+			       100.0 * t.utime() / total.utime : 0.)
 	   << " |"
-	   << std::setw(6) << t.stime()
-	   << std::setw(5) << (total.stime ?
-			       100.0 * t.stime() / total.stime : 0)
+	   << std::setw(6) << t.stime() << " "
+	   << std::setw(8) << (total.stime ?
+			       100.0 * t.stime() / total.stime : 0.)
 	   << " |"
-	   << std::setw(6) << t.utime() + t.stime()
-	   << std::setw(5) << (grand_total ?
+	   << std::setw(6) << t.utime() + t.stime() << " "
+	   << std::setw(8) << (grand_total ?
 			       (100.0 * (t.utime() + t.stime()) /
-				grand_total) : 0)
+				grand_total) : 0.)
 	   << " |"
 	   << std::setw(4) << i->second.second
 	   << std::endl;
       }
     os << std::setw(79) << std::setfill('-') << "" << std::setfill(' ')
        << std::endl
-       << std::setw(32) << "TOTAL" << " |"
-       << std::setw(6) << total.utime
-       << std::setw(5) << 100
+       << std::setw(22) << "TOTAL" << " |"
+       << std::setw(6) << total.utime << " "
+       << std::setw(8) << 100.
        << " |"
-       << std::setw(6) << total.stime
-       << std::setw(5) << 100
+       << std::setw(6) << total.stime << " "
+       << std::setw(8) << 100.
        << " |"
-       << std::setw(6) << grand_total
-       << std::setw(5) << 100
+       << std::setw(6) << grand_total << " "
+       << std::setw(8) << 100.
        << " |"
        << std::endl;
+
+    std::cout << std::setiosflags(old);
     return os;
   }
 
