@@ -1,5 +1,5 @@
 #!@PYTHON@
-# -*- python -*-
+# -*- mode: python; coding: iso-8859-1 -*-
 # Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
@@ -70,6 +70,25 @@ def print_stats(automaton):
         print " transitions",
     print "</p>"
     sys.stdout.flush()
+
+def render_dot(basename):
+    os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
+               basename + '.gif', basename + '.dot')
+    os.spawnlp(os.P_WAIT, 'convert', 'convert',
+               basename + '.gif', basename + '.png')
+    print '<img src="' + basename + '.png">'
+
+def render_automaton(basename, automata):
+    outfile = spot.ofstream(basename + '.dot')
+    spot.dotty_reachable(outfile, automata)
+    del outfile
+    render_dot(basename)
+
+def render_bdd(basename, dictionary, bdd):
+    outfile = spot.ofstream(basename + '.dot')
+    spot.bdd_print_dot(outfile, dictionary, bdd)
+    del outfile
+    render_dot(basename)
 
 
 print "Content-Type: text/html"
@@ -214,15 +233,7 @@ if show_automaton_dot:
     print '</pre>'; sys.stdout.flush()
 
 if show_automaton_gif:
-    outfile = spot.ofstream(imgprefix + '-a.dot')
-    spot.dotty_reachable(outfile, automaton)
-    del outfile
-    os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
-	       imgprefix + '-a.gif', imgprefix + '-a.dot')
-    os.spawnlp(os.P_WAIT, 'convert', 'convert',
-               imgprefix + '-a.gif', imgprefix + '-a.png')
-    print '<img src="' + imgprefix + '-a.png">'
-
+    render_automaton(imgprefix + '-a', automaton)
 
 if show_degen_dot or show_degen_gif:
     print '<H3>Degeneralized automaton</H3>'
@@ -236,14 +247,7 @@ if show_degen_dot or show_degen_gif:
 	del s
 	print '</pre>'; sys.stdout.flush()
     if show_degen_gif:
-	outfile = spot.ofstream(imgprefix + '-d.dot')
-	spot.dotty_reachable(outfile, degen)
-	del outfile
-	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
-		   imgprefix + '-d.gif', imgprefix + '-d.dot')
-        os.spawnlp(os.P_WAIT, 'convert', 'convert',
-                   imgprefix + '-d.gif', imgprefix + '-d.png')
-	print '<img src="' + imgprefix + '-d.png">'
+        render_automaton(imgprefix + '-d', degen)
 else:
     degen = 0
 
@@ -264,35 +268,21 @@ if (type(automaton) == spot.tgba_bdd_concretePtr
 	escaped_print_set(automaton.get_dict(),
 			  automaton.get_core_data().relation)
     if show_relation_gif:
-	outfile = spot.ofstream(imgprefix + '-b.dot')
-	spot.bdd_print_dot(outfile, automaton.get_dict(),
-			   automaton.get_core_data().relation)
-	del outfile
-	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
-		   imgprefix + '-b.gif', imgprefix + '-b.dot')
-        os.spawnlp(os.P_WAIT, 'convert', 'convert',
-                   imgprefix + '-b.gif', imgprefix + '-b.png')
-	print '<img src="' + imgprefix + '-b.png">'
+        render_bdd(imgprefix + '-b', automaton.get_dict(),
+                   automaton.get_core_data().relation)
 
 if (type(automaton) == spot.tgba_bdd_concretePtr
     and (show_acceptance_dot or show_acceptance_set or show_acceptance_gif)):
     print '<H3>Acceptance relation</H3>'
     if show_acceptance_dot:
 	escaped_print_dot(automaton.get_dict(),
-			  automaton.get_core_data().accepting_conditions)
+			  automaton.get_core_data().acceptance_conditions)
     if show_acceptance_set:
 	escaped_print_set(automaton.get_dict(),
-			  automaton.get_core_data().accepting_conditions)
+			  automaton.get_core_data().acceptance_conditions)
     if show_acceptance_gif:
-	outfile = spot.ofstream(imgprefix + '-c.dot')
-	spot.bdd_print_dot(outfile, automaton.get_dict(),
-			   automaton.get_core_data().accepting_conditions)
-	del outfile
-	os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tgif', '-Gsize=14,14', '-o',
-		   imgprefix + '-c.gif', imgprefix + '-c.dot')
-        os.spawnlp(os.P_WAIT, 'convert', 'convert',
-                   imgprefix + '-c.gif', imgprefix + '-c.png')
-	print '<img src="' + imgprefix + '-c.png">'
+        render_bdd(imgprefix + '-c', automaton.get_dict(),
+                   automaton.get_core_data().acceptance_conditions)
 
 if show_lbtt:
     print '<H3>LBTT conversion</H3>'

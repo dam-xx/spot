@@ -1,5 +1,8 @@
 2004-02-02  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* wrap/python/cgi/ltl2tgba.in (render_dot, render_automaton)
+	(render_bdd): New functions, extracted from the rest of the code.
+
 	* wrap/python/cgi/ltl2tgba.in (default_translator): Default
 	to trans_fm.
 	(translators): Show trans_fm before trans_lacim.
