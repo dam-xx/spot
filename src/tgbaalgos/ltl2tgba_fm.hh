@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_TGBA_LTL2TGBA_FME_HH
-# define SPOT_TGBA_LTL2TGBA_FME_HH
+#ifndef SPOT_TGBAALGOS_LTL2TGBA_FM_HH
+# define SPOT_TGBAALGOS_LTL2TGBA_FM_HH
 
 #include "ltlast/formula.hh"
 #include "tgba/tgbaexplicit.hh"
@@ -103,4 +103,4 @@ namespace spot
 				const ltl::atomic_prop_set* unobs = 0);
 }
 
-#endif // SPOT_TGBA_LTL2TGBA_HH
+#endif // SPOT_TGBAALGOS_LTL2TGBA_FM_HH

@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_TGBA_LTL2TGBA_HH
-# define SPOT_TGBA_LTL2TGBA_HH
+#ifndef SPOT_TGBAALGOS_LTL2TGBA_LACIM_HH
+# define SPOT_TGBAALGOS_LTL2TGBA_LACIM_HH
 
 #include "ltlast/formula.hh"
 #include "tgba/tgbabddconcrete.hh"
@@ -52,4 +52,4 @@ namespace spot
   tgba_bdd_concrete* ltl_to_tgba_lacim(const ltl::formula* f, bdd_dict* dict);
 }
 
-#endif // SPOT_TGBA_LTL2TGBA_HH
+#endif // SPOT_TGBAALGOS_LTL2TGBA_LACIM_HH

@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -21,8 +21,8 @@
 
 /// \file ltlast/formula.hh
 /// \brief LTL formula interface
-#ifndef SPOT_LTLAST_FORMULAE_HH
-# define SPOT_LTLAST_FORMULAE_HH
+#ifndef SPOT_LTLAST_FORMULA_HH
+# define SPOT_LTLAST_FORMULA_HH
 
 #include "predecl.hh"
 
@@ -102,6 +102,4 @@ namespace spot
   }
 }
 
-
-
-#endif // SPOT_LTLAST_FORMULAE_HH
+#endif // SPOT_LTLAST_FORMULA_HH

@@ -1,3 +1,16 @@
+2005-01-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/evtgba/evtgbaiter.hh, src/ltlast/formula.hh,
+	src/ltlast/refformula.hh, src/ltlenv/defaultenv.hh,
+	src/misc/bareword.hh, src/tgba/succiter.hh,
+	src/tgba/tgbabddfactory.hh, src/tgba/tgbareduc.hh,
+	src/tgbaalgos/dupexp.hh, src/tgbaalgos/emptiness_stats.hh,
+	src/tgbaalgos/ltl2tgba_fm.hh, src/tgbaalgos/ltl2tgba_lacim.hh,
+	src/tgbaalgos/reductgba_sim.hh, src/tgbaalgos/tau03opt.hh: Add
+	or fix include guards.
+	* src/sanity/includes.test: Check the presence of the include
+	guard.
+
 2004-12-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gtec/nsheap.hh, src/tgbaalgos/gtec/nsheap.cc

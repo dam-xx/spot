@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_TGBA_SUCCITER_H
-# define SPOT_TGBA_SUCCITER_H
+#ifndef SPOT_TGBA_SUCCITER_HH
+# define SPOT_TGBA_SUCCITER_HH
 
 #include "state.hh"
 
@@ -99,4 +99,4 @@ namespace spot
 }
 
 
-#endif // SPOT_TGBA_SUCCITER_H
+#endif // SPOT_TGBA_SUCCITER_HH

@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -20,8 +20,8 @@
 // 02111-1307, USA.
 
 
-#ifndef SPOT_REDUC_TGBA_SIM_HH
-#define SPOT_REDUC_TGBA_SIM_HH
+#ifndef SPOT_TGBAALGOS_REDUCTGBA_SIM_HH
+#define SPOT_TGBAALGOS_REDUCTGBA_SIM_HH
 
 #include "tgba/tgbareduc.hh"
 #include "tgbaalgos/reachiter.hh"
@@ -333,4 +333,4 @@ namespace spot
   /// @}
 }
 
-#endif
+#endif // SPOT_TGBAALGOS_REDUCTGBA_SIM_HH

@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_EVTGBA_ITER_HH
-# define SPOT_EVTGBA_ITER_HH
+#ifndef SPOT_EVTGBA_EVTGBAITER_HH
+# define SPOT_EVTGBA_EVTGBAITER_HH
 
 #include "tgba/state.hh"
 #include "symbol.hh"
@@ -47,4 +47,4 @@ namespace spot
   };
 }
 
-#endif // SPOT_EVTGBA_ITER_HH
+#endif // SPOT_EVTGBA_EVTGBAITER_HH

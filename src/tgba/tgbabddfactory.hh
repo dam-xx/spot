@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_TGBA_TGBABDDFACTORY_H
-# define SPOT_TGBA_TGBABDDFACTORY_H
+#ifndef SPOT_TGBA_TGBABDDFACTORY_HH
+# define SPOT_TGBA_TGBABDDFACTORY_HH
 
 #include "tgbabddcoredata.hh"
 
@@ -38,4 +38,4 @@ namespace spot
   };
 }
 
-#endif // SPOT_TGBA_TGBABDDFACTORY_H
+#endif // SPOT_TGBA_TGBABDDFACTORY_HH
