@@ -1,3 +1,7 @@
+2003-08-10  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* src/ltlenv/environment.hh: Typo in comments.
+
 2003-08-08  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/ltlparse/ltlparse.yy: Handle and diagnose mismatched parentheses.
@@ -19,7 +23,7 @@
 	* src/ltltest/equals.test: Check this.
 
 	* src/ltlvisit/dotty.cc (draw_node_): s/shabe/shape/.
-	(visit): Draw rectangular node for atomic propositions and
+	(visit): Draw rectangular nodes for atomic propositions and
 	constant.  This is an attempt to mimic BuDDy's output.
 
 	* wrap/python/cgi/ltl2tgba.in: Handle show_formula_dot and

@@ -16,11 +16,11 @@ namespace spot
       /// \brief Obtain the formula associated to \a prop_str
       ///
       /// Usually \a prop_str, is the name of an atomic proposition,
-      /// a spot::ltl::require simply returns the associated
+      /// and spot::ltl::require simply returns the associated
       /// spot::ltl::atomic_prop.
       ///
-      /// Note this is not a \c const method.  Some environment will
-      /// "create" the atomic proposition when asked.
+      /// Note this is not a \c const method.  Some environments will
+      /// "create" the atomic proposition when requested.
       ///
       /// We return a spot::ltl::formula instead of an
       /// spot::ltl::atomic_prop, because this
@@ -38,7 +38,7 @@ namespace spot
       virtual
       ~environment()
       {
-      };
+      }
 
       // FIXME: More functions will be needed later, but
       // it's enough for now.
