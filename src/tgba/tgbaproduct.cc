@@ -81,8 +81,7 @@ namespace spot
   tgba_succ_iterator_product::~tgba_succ_iterator_product()
   {
     delete left_;
-    if (right_)
-      delete right_;
+    delete right_;
   }
 
   void

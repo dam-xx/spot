@@ -509,11 +509,6 @@ namespace spot
 		  destroy(*i);
 		}
 
-	      /*
-		delete tmpFG;
-		tmpFG = 0;
-	      */
-
 	      break;
 	    }
 
@@ -525,21 +520,20 @@ namespace spot
 	    tmpOther->push_back(unop::instance(unop::X,
 					       multop::instance(mo->op(),
 								tmpX)));
-	  else if (tmpX)
+	  else
 	    delete tmpX;
 
 
 	  if (tmpU && !tmpU->empty())
 	    tmpOther->push_back(multop::instance(mo->op(), tmpU));
-	  else if (tmpU)
+	  else
 	    delete tmpU;
 
 
 	  if (tmpR && !tmpR->empty())
 	    tmpOther->push_back(multop::instance(mo->op(), tmpR));
-	  else if (tmpR)
+	  else
 	    delete tmpR;
-
 
 	  if (tmpGF && !tmpGF->empty())
 	    {
@@ -550,7 +544,7 @@ namespace spot
 								 tmpGF)));
 	      tmpOther->push_back(ftmp);
 	    }
-	  else if (tmpGF)
+	  else
 	    delete tmpGF;
 
 
@@ -569,14 +563,13 @@ namespace spot
 				   multop::instance(mo->op(), tmpFG));
 	      tmpOther->push_back(ftmp);
 	    }
-	  else if (tmpFG)
+	  else
 	    delete tmpFG;
 
 
 	  result_ = multop::instance(op, tmpOther);
 
 	  return;
-
 	}
 
       protected:

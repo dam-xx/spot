@@ -37,7 +37,7 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
     sed 's,[	 ]*//.*,,' < $file > $tmp
 
     grep '[	 ]$' $tmp &&
-      diag 'Trailing space or tab.'
+      diag 'Trailing whitespace.'
 
     grep '[	 ]if(' $tmp &&
       diag 'Missing space after "if"'
@@ -136,6 +136,14 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
 
     grep '[^a-zA-Z0-9_](\*[a-zA-Z0-9_]*)\.' $tmp &&
       diag 'Use "x->y", not "(*x).y"'
+
+    res=`perl -ne '$/ = undef;
+      print "$&\n"
+      while /if \((.*)(\s*==\s*0)?\)\s*delete(\[\])?\s+\1;(?!\s+else)/g' $tmp`
+    if test -n "$res"; then
+       echo "$res"
+       diag 'No "if (x)" required before "delete x;".'
+    fi
 
     case $file in
       *.hh | *.hxx)

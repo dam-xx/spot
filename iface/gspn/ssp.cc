@@ -162,8 +162,7 @@ namespace spot
     tgba_gspn_ssp_private_::~tgba_gspn_ssp_private_()
     {
       dict->unregister_all_my_variables(this);
-      if (all_props)
-	delete[] all_props;
+      delete[] all_props;
     }
   };
 

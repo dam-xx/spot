@@ -1,5 +1,11 @@
 2004-10-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/sanity/style.test: Diagnose superfluous constructs such
+	as `if (x) delete x;'.
+	* iface/gspn/gspn.cc, iface/gspn/ssp.cc, src/ltlvisit/basicreduce.cc,
+	src/tgba/tgba.cc, src/tgba/tgbaproduct.cc, src/tgbaalgos/magic.cc,
+	src/tgbatest/ltl2tgba.cc: Remove such constructs.
+
 	* src/tgbatest/ltl2tgba.cc: Replace -e, -E, -m, -M, and -n by
 	-eALGO and -EALGO to ease the addition of new algorithms.
 	* src/tgbatest/emptchk.test, src/tgbatest/emptchke.test: Adjust.

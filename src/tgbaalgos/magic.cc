@@ -68,8 +68,7 @@ namespace spot
 	++s;
 	delete ptr;
       }
-    if (x)
-      delete x;
+    delete x;
     // Release all iterators on the stack.
     while (!stack.empty())
       {
@@ -165,8 +164,7 @@ namespace spot
 	  {
 	    if (!has(s, true))
 	      {
-		if (x)
-		  delete x;
+		delete x;
 		x = s->clone();
 		push(s, true);
 		continue;

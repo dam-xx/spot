@@ -116,8 +116,7 @@ syntax(char* prog)
 	    << "  couvreur99" << std::endl
 	    << "  couvreur99_shy" << std::endl
 	    << "  magic_search" << std::endl
-	    << "  magic_search_repeated" << std::endl
-    ;
+	    << "  magic_search_repeated" << std::endl;
   exit(2);
 }
 
@@ -319,31 +318,33 @@ main(int argc, char** argv)
 	}
     }
 
-  if (echeck_algo == "couvreur99")
+  if (echeck_algo != "")
     {
-      echeck = Couvreur;
+      if (echeck_algo == "couvreur99")
+	{
+	  echeck = Couvreur;
+	}
+      else if (echeck_algo == "couvreur99_shy")
+	{
+	  echeck = Couvreur2;
+	}
+      else if (echeck_algo == "magic_search")
+	{
+	  echeck = MagicSearch;
+	  degeneralize_opt = true;
+	}
+      else if (echeck_algo == "magic_search_repeated")
+	{
+	  echeck = MagicSearch;
+	  degeneralize_opt = true;
+	  magic_many = true;
+	}
+      else
+	{
+	  std::cerr << "unknown emptiness-check: " << echeck_algo << std::endl;
+	  syntax(argv[0]);
+	}
     }
-  else if (echeck_algo == "couvreur99_shy")
-    {
-      echeck = Couvreur2;
-    }
-  else if (echeck_algo == "magic_search")
-    {
-      echeck = MagicSearch;
-      degeneralize_opt = true;
-    }
-  else if (echeck_algo == "magic_search_repeated")
-    {
-      echeck = MagicSearch;
-      degeneralize_opt = true;
-      magic_many = true;
-    }
-  else
-    {
-      std::cerr << "unknown emptiness-check: " << echeck_algo << std::endl;
-      syntax(argv[0]);
-    }
-
 
   std::string input;
 
@@ -591,13 +592,9 @@ main(int argc, char** argv)
 
       if (f)
         spot::ltl::destroy(f);
-      if (expl)
-	delete expl;
-      if (degeneralize_opt)
-	delete degeneralized;
-      if (aut_red)
-	delete aut_red;
-
+      delete expl;
+      delete degeneralized;
+      delete aut_red;
       delete to_free;
     }
   else

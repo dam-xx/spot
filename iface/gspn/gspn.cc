@@ -175,10 +175,8 @@ namespace spot
       tgba_gspn_private_::~tgba_gspn_private_()
       {
 	dict->unregister_all_my_variables(this);
-	if (last_state_conds_input)
-	  delete last_state_conds_input;
-	if (all_indexes)
-	  delete[] all_indexes;
+	delete last_state_conds_input;
+	delete[] all_indexes;
       }
 
       bdd index_to_bdd(AtomicProp index) const
@@ -213,8 +211,7 @@ namespace spot
 	      }
 	    satisfy_free(cube);
 
-	    if (last_state_conds_input)
-	      delete last_state_conds_input;
+	    delete last_state_conds_input;
 	    last_state_conds_input = s->clone();
 	  }
 	return last_state_conds_output;
