@@ -1,5 +1,8 @@
 2004-12-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/emptchkr.test: Tune the "big degeneralized" test
+	so it actually explore some accepting automata.
+
 	* src/tgbaalgos/gtec/gtec.hh, src/tgbaalgos/gtec/gtec.cc
 	(couvreur99_check_shy::couvreur99_check_shy): Add the group option,
 	and redefine todo as a list so it can be iterated over.
