@@ -1,4 +1,5 @@
 #include <cassert>
+#include <utility>
 #include "binop.hh"
 #include "visitor.hh"
 
@@ -89,6 +90,23 @@ namespace spot
     binop*
     binop::instance(type op, formula* first, formula* second)
     {
+      // Sort the operands of associative operators, so that for
+      // example the formula instance for 'a xor b' is the same as
+      // that for 'b xor a'.
+      switch (op)
+	{
+	case Xor:
+	case Equiv:
+	  if (second < first)
+	    std::swap(first, second);
+	  break;
+	case Implies:
+	case U:
+	case R:
+	  // Non associative operators.
+	  break;
+	}
+
       pairf pf(first, second);
       pair p(op, pf);
       map::iterator i = instances.find(p);

@@ -37,5 +37,8 @@ check 1 'a & b & c' 'c & a'
 check 1 'b & c' 'c & a & b'
 check 1 'a & b & (c |(f U g)| e)' 'b & a & a & (c | e |(g U g)| e | c) & b'
 
+# Precedence
+check 0 'a & b ^ c | d' 'd | c ^ b & a'
+
 # Success.
 :

@@ -32,7 +32,9 @@ using namespace spot::ltl;
 %}
 
 /* Logical operators.  */
-%left <token> OP_AND OP_XOR OP_OR
+%left <token> OP_OR
+%left <token> OP_XOR
+%left <token> OP_AND
 %left <token> OP_IMPLIES OP_EQUIV
 
 /* LTL operators.  */

@@ -1,5 +1,11 @@
 2003-08-06  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/ltlparse/ltlparse.yy: Fix precedence OP_OR < OP_XOR < OP_AND.
+	* src/ltlast/binop.cc (binop::instance): Order operands for
+	associative operators, so that e.g. "a xor b" and "b xor a" are
+	mapped to the same formula.
+	* src/ltltest/equals.test: Check this.
+
 	* src/ltlvisit/dotty.cc (draw_node_): s/shabe/shape/.
 	(visit): Draw rectangular node for atomic propositions and
 	constant.  This is an attempt to mimic BuDDy's output.
