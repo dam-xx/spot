@@ -1,5 +1,8 @@
 2004-05-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* ltltest/inf.cc, ltltest/reduc.cc, ltlvisit/reducform.cc: Fix style.
+	* sanity/style.test: More tests.
+
 	* src/tgbatest/ltl2tgba.cc (main): Fix style.
 	* HACKING: Mention `else if'.
 

@@ -45,20 +45,22 @@ main(int argc, char** argv)
     syntax(argv[0]);
 
   spot::ltl::option o;
-  switch(atoi(argv[1])){
-  case 0:
-    o = spot::ltl::Base;
-    break;
-  case 1:
-    o = spot::ltl::Inf;
-    break;
-  case 2:
-    o = spot::ltl::EventualUniversal;
-    break;
-  case 3:
-    o = spot::ltl::BRI;
-    break;
-  default: return 2;
+  switch (atoi(argv[1]))
+    {
+    case 0:
+      o = spot::ltl::Base;
+      break;
+    case 1:
+      o = spot::ltl::Inf;
+      break;
+    case 2:
+      o = spot::ltl::EventualUniversal;
+      break;
+    case 3:
+      o = spot::ltl::BRI;
+      break;
+    default:
+      return 2;
   }
 
   spot::ltl::parse_error_list p1;
@@ -69,12 +71,13 @@ main(int argc, char** argv)
     return 2;
 
 
-  if (argc == 4){
-    spot::ltl::parse_error_list p2;
-    f2 = spot::ltl::parse(argv[3], p2);
-    if (spot::ltl::format_parse_errors(std::cerr, argv[3], p2))
-      return 2;
-  }
+  if (argc == 4)
+    {
+      spot::ltl::parse_error_list p2;
+      f2 = spot::ltl::parse(argv[3], p2);
+      if (spot::ltl::format_parse_errors(std::cerr, argv[3], p2))
+	return 2;
+    }
 
   int exit_code = 0;
 
@@ -93,7 +96,7 @@ main(int argc, char** argv)
   std::string f1s_before = spot::ltl::to_string(f1);
 
   ftmp1 = f1;
-  f1 = spot::ltl::reduce(f1,o);
+  f1 = spot::ltl::reduce(f1, o);
   ftmp2 = f1;
   f1 = spot::ltl::unabbreviate_logic(f1);
   spot::ltl::destroy(ftmp1);
@@ -103,51 +106,56 @@ main(int argc, char** argv)
   std::string f1s_after = spot::ltl::to_string(f1);
 
   bool red = (length_f1_after < length_f1_before);
-  if (red);
   std::string f2s = "";
-  if (f2 != NULL) {
-    ftmp1 = f2;
-    f2 = unabbreviate_logic(f2);
-    ftmp2 = f2;
-    f2 = negative_normal_form(f2);
-    spot::ltl::destroy(ftmp1);
-    spot::ltl::destroy(ftmp2);
-    ftmp1 = f2;
-    f2 = unabbreviate_logic(f2);
-    spot::ltl::destroy(ftmp1);
-    f2s = spot::ltl::to_string(f2);
-  }
+  if (f2 != NULL)
+    {
+      ftmp1 = f2;
+      f2 = unabbreviate_logic(f2);
+      ftmp2 = f2;
+      f2 = negative_normal_form(f2);
+      spot::ltl::destroy(ftmp1);
+      spot::ltl::destroy(ftmp2);
+      ftmp1 = f2;
+      f2 = unabbreviate_logic(f2);
+      spot::ltl::destroy(ftmp1);
+      f2s = spot::ltl::to_string(f2);
+    }
 
+  if (red && !f2)
+    {
+      std::cout << length_f1_before << " " << length_f1_after
+		<< " '" << f1s_before << "' reduce to '" << f1s_after << "'"
+		<< std::endl;
+    }
 
-  if (red && (f2 == NULL)) {
-    std::cout << length_f1_before << " " << length_f1_after
-	      << " '" << f1s_before << "' reduce to '" << f1s_after << "'"
-	      << std::endl;
-  }
-
-  if (f2 != NULL){
-    if (f1 != f2) {
+  if (f2)
+    {
+      if (f1 != f2)
+	{
+	  if (length_f1_after < length_f1_before)
+	    std::cout << f1s_before << " ** " << f2s << " ** " << f1s_after
+		      << " KOREDUC " << std::endl;
+	  else
+	    std::cout << f1s_before << " ** " << f2s << " ** " << f1s_after
+		      << " KOIDEM " << std::endl;
+	  exit_code = 1;
+	}
+      else
+	{
+	  if (f1s_before != f1s_after)
+	    std::cout << f1s_before << " ** " << f2s << " ** " << f1s_after
+		      << " OKREDUC " << std::endl;
+	  else
+	    std::cout << f1s_before << " ** " << f2s << " ** " << f1s_after
+		      << " OKIDEM" << std::endl;
+	  exit_code = 0;
+	}
+    }
+  else
+    {
       if (length_f1_after < length_f1_before)
-	std::cout << f1s_before << " ** " << f2s << " ** " << f1s_after
-		  << " KOREDUC " << std::endl;
-      else
-	std::cout << f1s_before << " ** " << f2s << " ** " << f1s_after
-		  << " KOIDEM " << std::endl;
-      exit_code = 1;
+	exit_code = 0;
     }
-    else {
-      if (f1s_before != f1s_after)
-	std::cout << f1s_before << " ** " << f2s << " ** " << f1s_after
-		  << " OKREDUC " << std::endl;
-      else
-	std::cout << f1s_before << " ** " << f2s << " ** " << f1s_after
-		  << " OKIDEM" << std::endl;
-      exit_code = 0;
-    }
-  }
-  else{
-    if (length_f1_after < length_f1_before) exit_code = 0;
-  }
 
   spot::ltl::destroy(f1);
   if (f2 != NULL)

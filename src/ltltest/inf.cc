@@ -64,23 +64,26 @@ main(int argc, char** argv)
   int exit_return = 0;
 
   std::cout << "Test f1 < f2" << std::endl;
-  if (spot::ltl::inf_form(f1,f2)) {
-    std::cout << f1s << " < " << f2s << std::endl;
-    exit_return = 1;
-  }
+  if (spot::ltl::inf_form(f1, f2))
+    {
+      std::cout << f1s << " < " << f2s << std::endl;
+      exit_return = 1;
+    }
 
   /*
   std::cout << "Test !f1 < f2" << std::endl;
-  if (spot::ltl::infneg_form(f1,f2,0)) {
-    std::cout << "!(" << f1s << ") < " << f2s << std::endl;
-    exit_return = 2;
-  }
+  if (spot::ltl::infneg_form(f1, f2, 0))
+    {
+      std::cout << "!(" << f1s << ") < " << f2s << std::endl;
+      exit_return = 2;
+    }
 
   std::cout << "Test f1 < !f2" << std::endl;
-  if (spot::ltl::infneg_form(f1,f2,1)) {
-    std::cout << f1s << " < !(" << f2s << ")" << std::endl;
-    exit_return = 3;
-  }
+  if (spot::ltl::infneg_form(f1, f2, 1))
+    {
+      std::cout << f1s << " < !(" << f2s << ")" << std::endl;
+      exit_return = 3;
+    }
   */
 
   spot::ltl::dump(std::cout, f1); std::cout << std::endl;

@@ -39,17 +39,26 @@ while read file; do
    grep '[	 ]if (.*).*{' $tmp &&
      diag 'Opening { should be on its own line.'
 
+   grep '[	 ]if (.*).*;' $tmp &&
+     diag 'if body should be on another line.'
+
    grep '[	 ]while(' $tmp &&
      diag 'Missing space after "while"'
 
    grep '[	 ]while (.*).*{' $tmp &&
      diag 'Opening { should be on its own line.'
 
+   grep '[	 ]while (.*).*[^)];' $tmp &&
+     diag 'while body should be on another line.'
+
    grep '[	 ]for(' $tmp &&
      diag 'Missing space after "for"'
 
    grep '[	 ]for (.*).*{' $tmp &&
      diag 'Opening { should be on its own line.'
+
+   grep '[	 ]for (.*;.*;.*).*;' $tmp &&
+     diag 'for body should be on another line.'
 
    grep '[	 ]switch(' $tmp &&
      diag 'Missing space after "switch"'
@@ -74,6 +83,12 @@ while read file; do
 
    grep '[^	 ]||[^	 ]' $tmp &&
      diag 'Space arround binary operators.'
+
+   grep '[	 ]default:[^:].*;' $tmp &&
+     diag 'Label should be on their own line.'
+
+   grep '[	 ]case.*:[^:].*;' $tmp &&
+     diag 'Label should be on their own line.'
 
    $fail && echo "$file" >>failures
 done
