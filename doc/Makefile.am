@@ -2,19 +2,19 @@ DOXYGEN = doxygen
 
 .PHONY: doc spot
 
-all-local: stamp
+all-local: $(srcdir)/stamp
 
 doc:
-	rm stamp
-	$(AMKE) stamp
+	rm $(srcdir)/stamp
+	$(AMKE) $(srcdir)/stamp
 
-stamp: Doxyfile.in ../configure.ac
+$(srcdir)/stamp: $(srcdir)/Doxyfile.in $(top_srcdir)/configure.ac
 	$(MAKE) Doxyfile
 	rm -rf spot.html spot.latex
 	$(DOXYGEN)
-	: > $@
+	touch $@
 
-spot.html: stamp
-spot.latex: stamp
+spot.html: $(srcdir)/stamp
+spot.latex: $(srcdir)/stamp
 
-EXTRA_DIST = stamp spot.html
+EXTRA_DIST = $(srcdir)/stamp spot.html

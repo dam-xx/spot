@@ -1,5 +1,7 @@
 2003-06-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* doc/Makefile.am (stamp): Prefix $(srcdir) explicitely.
+
 	* m4/buddy.m4 (BUDDY_LDFLAGS): Use $(top_builddir), not $(top_srcdir).
 	* src/tgbaparse/Makefile.am (AM_CPPFLAGS): Add $(BUDDY_CPPFLAGS).
 
