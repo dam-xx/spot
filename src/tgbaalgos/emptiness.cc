@@ -148,7 +148,7 @@ namespace spot
     ++number;
     seen.insert(std::make_pair(i->s, source));
 
-    for (; i != l->end(); )
+    for (; i != l->end();)
       {
         // expected outgoing transition
         bdd label = i->label;

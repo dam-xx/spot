@@ -1,4 +1,8 @@
-2004-12-07  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+2004-12-08  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/tgbaalgos/emptiness.cc: Suppress a horrible space before a ')'.
+
+2004-12-08  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/tgba/tgbaexplicit.hh, src/tgba/tgbaexplicit.cc
 	(set_init_state): Return a pointer to the initial state.
