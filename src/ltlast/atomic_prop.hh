@@ -18,8 +18,6 @@ namespace spot
       virtual void accept(visitor& visitor);
       virtual void accept(const_visitor& visitor) const;
 
-      virtual bool equals(const formulae* f) const;
-
       const std::string& name() const;
     private:
       std::string name_;

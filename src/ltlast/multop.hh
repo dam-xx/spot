@@ -24,8 +24,6 @@ namespace spot
       virtual void accept(visitor& v);
       virtual void accept(const_visitor& v) const;
 
-      virtual bool equals(const formulae* f) const;
-
       unsigned size() const;
       const formulae* nth(unsigned n) const;
       formulae* nth(unsigned n);

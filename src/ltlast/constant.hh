@@ -19,8 +19,6 @@ namespace spot
       virtual void accept(visitor& v);
       virtual void accept(const_visitor& v) const;
 
-      virtual bool equals(const formulae* h) const;
-
       const formulae* child() const;
       formulae* child();
 

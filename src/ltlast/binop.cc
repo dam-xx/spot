@@ -51,15 +51,6 @@ namespace spot
       return second_;
     }
 
-    bool 
-    binop::equals(const formulae* f) const
-    {
-      const binop* p = dynamic_cast<const binop*>(f);
-      return p && p->op() == op() 
-	&& first()->equals(p->first())
-	&& second()->equals(p->second());
-    }
-
     binop::type 
     binop::op() const
     {

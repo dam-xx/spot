@@ -27,13 +27,6 @@ namespace spot
       v.visit(this);
     }
 
-    bool 
-    constant::equals(const formulae* f) const
-    {
-      const constant* p = dynamic_cast<const constant*>(f);
-      return p && p->val() == val();
-    }
-
     constant::type 
     constant::val() const
     {

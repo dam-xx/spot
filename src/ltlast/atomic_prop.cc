@@ -27,13 +27,6 @@ namespace spot
       v.visit(this);
     }   
 
-    bool 
-    atomic_prop::equals(const formulae* f) const
-    {
-      const atomic_prop* p = dynamic_cast<const atomic_prop*>(f);
-      return p && p->name() == name();
-    }
-
     const std::string&
     atomic_prop::name() const
     {

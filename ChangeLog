@@ -1,5 +1,17 @@
 2003-04-15  Alexandre DURET-LUTZ  <aduret@src.lip6.fr>
 
+	* src/ltlast/formulae.hh (formulae::equals): Remove.
+	* src/ltlast/unop.hh (unop::equals): Remove.
+	* src/ltlast/unop.cc (unop::equals): Remove.
+	* src/ltlast/binop.hh (binop::equals): Remove.
+	* src/ltlast/binop.cc (binop::equals): Remove.
+	* src/ltlast/multop.hh (multop::equals): Remove.
+	* src/ltlast/multop.cc (multop::equals): Remove.
+	* src/ltlast/atomic_prop.hh (atomic_prop::equals): Remove.
+	* src/ltlast/atomic_prop.cc (atomic_prop::equals): Remove.
+	* src/ltlast/constant.hh (constant::equals): Remove.
+	* src/ltlast/constant.cc (constant::equals): Remove.
+
 	* HACKING, Makefile.am, configure.ac, m4/gccwarn.m4,
 	src/Makefile.am, src/ltlast/Makefile.am, src/ltlast/allnodes.hh,
 	src/ltlast/atomic_prop.cc, src/ltlast/atomic_prop.hh,

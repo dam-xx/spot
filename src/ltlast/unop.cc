@@ -39,13 +39,6 @@ namespace spot
       return child_;
     }
 
-    bool 
-    unop::equals(const formulae* f) const
-    {
-      const unop* p = dynamic_cast<const unop*>(f);
-      return p && p->op() == op() && child()->equals(p->child());
-    }
-
     unop::type 
     unop::op() const
     {
