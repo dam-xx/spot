@@ -30,6 +30,7 @@ namespace spot
   colordfs_search::colordfs_search(const tgba_tba_proxy* a)
     : a(a), x(0), counter_(0)
   {
+    Maxdepth = -1;
   }
 
   colordfs_search::~colordfs_search()
@@ -111,9 +112,7 @@ namespace spot
     int n = 0;
     for (i->first(); !i->done(); i->next(), n++)
       {
-	//std::cout << "iter : " << n << std::endl;
 	s2 = i->current_state();
-	//std::cout << a->format_state(s2) << std::endl;
 	hi = h.find(s2);
 	if (hi != h.end())
 	  return_value &= (hi->second.c == black);
@@ -122,8 +121,6 @@ namespace spot
 	delete s2;
       }
     delete i;
-
-    //std::cout << "End Loop" << std::endl;
 
     hi = h.find(s);
     assert(hi != h.end());
@@ -138,8 +135,8 @@ namespace spot
   {
     clock();
     counter_ = new ce::counter_example(a);
-    const state* s = a->get_init_state();
-    if (dfs_blue(s))
+    const state *s = a->get_init_state();
+    if (dfs_blue_min(s))
       counter_->build_cycle(x);
     else
       {
@@ -154,49 +151,60 @@ namespace spot
   bool
   colordfs_search::dfs_blue(const state* s, bdd)
   {
-    //std::cout << "dfs_blue : " << a->format_state(s) << std::endl;
-    if (!push(s, blue))
-      return false;
+    std::cout << "dfs_blue : " << std::endl;
 
-    hash_type::iterator hi;
-    tgba_succ_iterator* i = a->succ_iter(s);
-    int n = 0;
-    for (i->first(); !i->done(); i->next(), n++)
+    if (stack.empty())
+      // It's a new search.
+      push(a->get_init_state(), blue);
+    else
+      tstack.pop_front();
+
+    while (!stack.empty())
       {
-	const state* s2 = i->current_state();
-	//std::cout << "s2 : " << a->format_state(s2) << std::endl;
-	hi = h.find(s2);
-	if (a->state_is_accepting(s2) &&
-	    (hi != h.end() && hi->second.is_in_cp))
+      recurse:
+	tgba_succ_iterator *i = stack.front().second;
+	hash_type::iterator hi;
+
+	//std::cout << a->format_state(p.first) << std::endl;
+	while (!i->done())
 	  {
-	    ce::state_ce ce;
-	    ce = ce::state_ce(s2, i->current_condition());
-	    x = const_cast<state*>(s2);
-	    delete i;
-	    return true;// a counter example is found !!
-	  }
-	else if (hi == h.end() || hi->second.c == white)
-	  {
-	    int res = dfs_blue(s2, i->current_acceptance_conditions());
-	    if (res == 1)
+	    const state* s2 = i->current_state();
+	    hi = h.find(s2);
+	    if (a->state_is_accepting(s2) &&
+		(hi != h.end() && hi->second.is_in_cp))
 	      {
-		delete i;
-		return true;
+		//ce::state_ce ce;
+		//ce = ce::state_ce(s2, i->current_condition());
+		x = const_cast<state*>(s2);
+		//push(s2, blue); //
+		//delete i;
+		return true;// a counter example is found !!
 	      }
+	    else if (hi == h.end() || hi->second.c == white)
+	      {
+		push(s2, blue);
+		goto recurse;
+	      }
+	    else
+	      delete s2;
+	    i->next();
 	  }
-	else
-	  delete s2; // FIXME
-      }
-    delete i;
 
-    pop();
+	s = stack.front().first;
+	pop();
 
-    if (!all_succ_black(s) &&
-	a->state_is_accepting(s))
-      {
-	if (dfs_red(s))
-	  return 1;
-	dfs_black(s);
+	if (!all_succ_black(s) &&
+	    a->state_is_accepting(s))
+	  {
+	    if (dfs_red(s))
+	      return true;
+
+	    hash_type::iterator hi = h.find(s);
+	    assert(hi == h.end());
+	    hi->second.c = black;
+	  }
+
+	delete s; //
       }
 
     return false;
@@ -205,7 +213,7 @@ namespace spot
   bool
   colordfs_search::dfs_red(const state* s)
   {
-    //std::cout << "dfs_red : " << a->format_state(s) << std::endl;
+    std::cout << "dfs_red : " << a->format_state(s) << std::endl;
     if (!push(s, red))
       return false;
 
@@ -240,11 +248,142 @@ namespace spot
       }
     delete i;
 
+    hi = h.find(s);
+    assert(hi == h.end());
+    hi->second.c = black;
     //std::cout << "dfs_red : pop" << std::endl;
     pop();
 
     return false;
   }
+
+  ///////////////////////////////////////////////////////////////////////
+  // for minimisation
+
+  bool
+  colordfs_search::dfs_blue_min(const state* s, bdd)
+  {
+    //std::cout << "dfs_blue : " << a->format_state(s) << std::endl;
+    if (!push(s, blue))
+      return false;
+
+    hash_type::iterator hi = h.find(s);
+    if (hi != h.end())
+      {
+	if (((int)stack.size() + 1) < hi->second.depth)
+	  hi->second.depth = stack.size(); // for minimize
+      }
+    else
+      {
+	assert(0);
+      }
+
+    if (Maxdepth == -1 || ((int)stack.size() + 1 < Maxdepth))
+      {
+	tgba_succ_iterator* i = a->succ_iter(s);
+	int n = 0;
+	for (i->first(); !i->done(); i->next(), n++)
+	  {
+	    const state* s2 = i->current_state();
+	    //std::cout << "s2 : " << a->format_state(s2) << std::endl;
+	    hi = h.find(s2);
+
+	    if (a->state_is_accepting(s2) &&
+		(hi != h.end() && hi->second.is_in_cp))
+	      {
+		Maxdepth = stack.size();
+		ce::state_ce ce;
+		ce = ce::state_ce(s2, i->current_condition());
+		x = const_cast<state*>(s2);
+		delete i;
+		return true;// a counter example is found !!
+	      }
+	    else if (hi == h.end() || hi->second.c == white)
+	      {
+		int res = dfs_blue_min(s2, i->current_acceptance_conditions());
+		if (res == 1)
+		  {
+		    delete i;
+		    return true;
+		  }
+	      }
+	    else
+	      delete s2; // FIXME
+	  }
+	delete i;
+
+
+	pop();
+
+	if (!all_succ_black(s) &&
+	    a->state_is_accepting(s))
+	  {
+	    if (dfs_red_min(s))
+	      return 1;
+	    dfs_black(s);
+	  }
+      }
+
+    return false;
+  }
+
+  bool
+  colordfs_search::dfs_red_min(const state* s)
+  {
+    //std::cout << "dfs_red : " << a->format_state(s) << std::endl;
+    if (!push(s, red))
+      return false;
+
+    hash_type::iterator hi = h.find(s);
+    if (hi != h.end())
+      {
+	if (((int)stack.size() + 1) < hi->second.depth)
+	  hi->second.depth = stack.size(); // for minimize
+      }
+    else
+      assert(0);
+
+    if (Maxdepth == -1 || ((int)stack.size() + 1 < Maxdepth))
+      {
+	tgba_succ_iterator* i = a->succ_iter(s);
+	int n = 0;
+	for (i->first(); !i->done(); i->next(), n++)
+	  {
+	    const state* s2 = i->current_state();
+	    hi = h.find(s2);
+	    if (hi != h.end() && hi->second.is_in_cp &&
+		(a->state_is_accepting(s2) ||
+		 (hi->second.c == blue)))
+	      {
+		Maxdepth = stack.size();
+		ce::state_ce ce;
+		ce = ce::state_ce(s2->clone(), i->current_condition());
+		x = const_cast<state*>(s2);
+		delete i;
+		return true;// a counter example is found !!
+	      }
+	    if (hi != h.end() &&
+		(hi->second.c == blue))
+	      // || ((int)stack.size() + 1) < hi->second.depth))
+	      {
+		delete s2; // FIXME
+		if (dfs_red_min(hi->first))
+		  {
+		    delete i;
+		    return true;
+		  }
+	      }
+	    else
+	      delete s2;
+	  }
+	delete i;
+
+	//std::cout << "dfs_red : pop" << std::endl;
+	pop();
+      }
+    return false;
+  }
+
 
   void
   colordfs_search::dfs_black(const state* s)

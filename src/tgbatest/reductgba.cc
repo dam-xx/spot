@@ -66,18 +66,28 @@ main(int argc, char** argv)
       o = spot::Reduce_Scc;
       break;
     case 1:
-      o = spot::Reduce_Dir_Sim;
+      o = spot::Reduce_quotient_Dir_Sim;
       break;
     case 2:
-      o = spot::Reduce_Del_Sim;
+      o = spot::Reduce_transition_Dir_Sim;
       break;
     case 3:
-      o = spot::Reduce_Dir_Sim | spot::Reduce_Scc;
+      o = spot::Reduce_quotient_Del_Sim;
       break;
     case 4:
-      o = spot::Reduce_Del_Sim | spot::Reduce_Scc;
+      o = spot::Reduce_transition_Del_Sim;
       break;
     case 5:
+      o = spot::Reduce_quotient_Dir_Sim |
+	spot::Reduce_transition_Dir_Sim |
+	spot::Reduce_Scc;
+      break;
+    case 6:
+      o = spot::Reduce_quotient_Del_Sim |
+	spot::Reduce_transition_Del_Sim |
+	spot::Reduce_Scc;
+      break;
+    case 7:
       // No Reduction
       break;
     default:
@@ -85,7 +95,8 @@ main(int argc, char** argv)
   }
 
   int exit_code = 0;
-  spot::simulation_relation* rel = 0;
+  spot::direct_simulation_relation* rel_dir = 0;
+  spot::delayed_simulation_relation* rel_del = 0;
   spot::tgba* automata = 0;
   spot::tgba_reduc* automatareduc = 0;
 
@@ -110,21 +121,30 @@ main(int argc, char** argv)
   spot::dotty_reachable(std::cout, automata);
   automatareduc = new spot::tgba_reduc(automata);
 
-  if (o & spot::Reduce_Dir_Sim)
+  if (o & spot::Reduce_quotient_Dir_Sim)
     {
-      rel = spot::get_direct_relation_simulation(automatareduc, std::cout);
-      automatareduc->prune_automata(rel);
+      rel_dir = spot::get_direct_relation_simulation(automatareduc, std::cout);
+      automatareduc->quotient_state(rel_dir);
     }
-  else if (o & spot::Reduce_Del_Sim)
+  else if (o & spot::Reduce_quotient_Del_Sim)
     {
-      rel = spot::get_delayed_relation_simulation(automatareduc, std::cout);
-      automatareduc->quotient_state(rel);
+      std::cout << "get delayed" << std::endl;
+      rel_del = spot::get_delayed_relation_simulation(automatareduc, std::cout);
+      std::cout << "quotient state" << std::endl;
+      automatareduc->quotient_state(rel_del);
+      std::cout << "end" << std::endl;
     }
 
-  if (rel != 0)
+  if (rel_dir != 0)
     {
-      automatareduc->display_rel_sim(rel, std::cout);
-      spot::free_relation_simulation(rel);
+      automatareduc->display_rel_sim(rel_dir, std::cout);
+      spot::free_relation_simulation(rel_dir);
+    }
+
+  if (rel_del != 0)
+    {
+      automatareduc->display_rel_sim(rel_del, std::cout);
+      spot::free_relation_simulation(rel_del);
     }
 
   if (o & spot::Reduce_Scc)

@@ -22,11 +22,12 @@
 
 
 # Check for the reduc visitor.
-. ./defs || exit 1
+# . ./defs || exit 1
 
 set -e
 
-FICH=${1-$srcdir/formulae.txt}
+#FICH=${1-$srcdir/formulae.txt}
+FICH=${1-$srcdir/formules3.ltl}
 
 for opt in 0 1 2 3; do
   rm -f result.data

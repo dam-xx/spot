@@ -34,6 +34,15 @@ namespace spot
   typedef Sgi::pair<const spot::state*, const spot::state*> state_couple;
   typedef Sgi::vector<state_couple*> simulation_relation;
 
+  /*
+    typedef Sgi::vector<state_couple*> direct_simulation_relation;
+    typedef Sgi::vector<state_couple*> delayed_simulation_relation;
+  */
+
+  class direct_simulation_relation : public simulation_relation{};
+  class delayed_simulation_relation : public simulation_relation{};
+
+
   class tgba_reduc: public tgba_explicit,
 		    public tgba_reachable_iterator_breadth_first
   {
@@ -46,11 +55,15 @@ namespace spot
 
     /// Reduce the automata using a relation simulation
     /// Do not call this method with a delayed simulation relation.
-    void prune_automata(simulation_relation* rel);
+    void quotient_state(direct_simulation_relation* rel);
 
     /// Build the quotient automata. Call this method
     /// when use to a delayed simulation relation.
-    void quotient_state(simulation_relation* rel);
+    void quotient_state(delayed_simulation_relation* rel);
+
+    /// \brief Delete some transitions with help of a simulation
+    /// relation.
+    void delete_transitions(simulation_relation* rel);
 
     /// Remove all state which not lead to an accepting cycle.
     void prune_scc();
@@ -144,9 +157,9 @@ namespace spot
     ///  publisher	= {Springer-Verlag}
     /// }
     /// \endverbatim
-    bool is_alpha_ball(const spot::state* s,
-		       bdd label = bddfalse,
-		       int n = -1);
+    // bool is_alpha_ball(const spot::state* s,
+    // bdd label = bddfalse,
+    // int n = -1);
 
     // Return true if we can't reach a state with
     // an other value of scc.
@@ -165,10 +178,12 @@ namespace spot
     void remove_scc(spot::state* s);
 
     /// Same as remove_scc but more efficient.
-    void remove_scc_depth_first(spot::state* s, int n = -1);
+    // void remove_scc_depth_first(spot::state* s, int n = -1);
 
     /// For compute_scc.
     void remove_component(const spot::state* from);
+
+    int tgba_reduc::nb_set_acc_cond() const;
 
   };
 }

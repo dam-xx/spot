@@ -45,11 +45,11 @@ namespace spot
   public:
 
     /// Initialize the Nesteddfs Search algorithm on the automaton \a a.
-    nesteddfs_search(const tgba_tba_proxy *a, int opt = my_nested);
+    nesteddfs_search(const tgba_tba_proxy *a, int opt = nested);
 
     virtual ~nesteddfs_search();
 
-    /// \brief Perform a Nested DFS Search.
+    /// \brief Perform a Magic or a Nested DFS Search.
     ///
     /// \return true iff the algorithm has found a new accepting
     ///    path.
@@ -79,6 +79,7 @@ namespace spot
       bool seen_without : 1;
       bool seen_with    : 1;
       bool seen_path    : 1;
+      //unsigned int depth;
     };
 
     /// \brief A state for the spot::magic_search algorithm.
@@ -127,8 +128,9 @@ namespace spot
     bool accepted_path_;
     int accepted_depth_;
 
+    unsigned int Maxsize;
+
     ce::counter_example* counter_;
-    clock_t tps_;
 
   };
 

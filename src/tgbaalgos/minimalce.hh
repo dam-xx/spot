@@ -58,7 +58,7 @@ namespace spot
 
       /// \brief Project a counter example on a tgba.
       void project_ce(const tgba* aut, std::ostream& os = std::cout);
-      // \brief Build a tgba from a counter example.
+      /// \brief Build a tgba from a counter example.
       tgba* ce2tgba();
 
       l_state_ce prefix;
@@ -89,7 +89,7 @@ namespace spot
   class minimalce_search: public emptyness_search
   {
   public:
-    minimalce_search(const tgba_tba_proxy *a);
+    minimalce_search(const tgba_tba_proxy *a, bool mode = false);
 
     virtual ~minimalce_search();
 
@@ -98,6 +98,8 @@ namespace spot
 
     /// \brief Find a counter example shorter than \a min_ce.
     ce::counter_example* check(ce::counter_example* min_ce);
+
+    ce::counter_example* find();
 
     /// \brief Print Stat.
     std::ostream& print_stat(std::ostream& os) const;
@@ -119,7 +121,8 @@ namespace spot
 			  state_ptr_hash, state_ptr_equal> hash_type;
     hash_type h_lenght;		///< Map of visited states.
 
-    typedef std::pair<const state*, bdd> state_pair;
+    typedef std::pair<const state*, tgba_succ_iterator*> state_pair;
+    //typedef std::pair<const state*, bdd> state_pair;
     typedef std::list<state_pair> stack_type;
     //typedef std::list<const state*> stack_type;
     stack_type stack;		///< Stack of visited states on the path.
@@ -130,8 +133,20 @@ namespace spot
     ce::counter_example* min_ce;
     std::list<ce::counter_example*> l_ce;
     int nb_found;
+    bool mode_;
     clock_t tps_;
 
+    /// \brief Perform the minimal search as explain in
+    /// @InProceedings(GaMoZe04spin,
+    /// Author = "Gastin, P. and Moro, P. and Zeitoun, M.",
+    /// Title = "Minimization of counterexamples in {SPIN}",
+    /// BookTitle = "Proceedings of the 11th SPIN Workshop (SPIN'04)",
+    /// Editor = "Graf, S. and Mounier, L.",
+    /// Publisher = SPRINGER,
+    /// Series = LNCS,
+    /// Number = 2989,
+    /// Year = 2004,
+    /// Pages = "92-108")
     void recurse_find(const state* it,
 		      std::ostringstream& os,
 		      int mode = normal);

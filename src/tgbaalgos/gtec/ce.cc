@@ -35,7 +35,10 @@ namespace spot
 				   eccf)
     : ecs_(ecs)
   {
-    counter_ = new ce::counter_example(ecs->aut);
+
+    std::cout << "counter_example" << std::endl;
+
+    //counter_ = new ce::counter_example(ecs->aut);
 
     assert(!ecs_->root.empty());
     assert(suffix.empty());
@@ -79,7 +82,7 @@ namespace spot
     suffix.push_front(spi.first);
 
     /////
-    counter_->prefix.push_front(ce::state_ce(spi.first->clone(), bddfalse));
+    // counter_->prefix.push_front(ce::state_ce(spi.first->clone(), bddfalse));
     ////
 
     // We build a path trough each SCC in the stack.  For the
@@ -127,14 +130,15 @@ namespace spot
 			state_sequence seq;
 
 			///
-			ce::l_state_ce seq_count;
+			// ce::l_state_ce seq_count;
 			///
 
 			seq.push_front(h_dest);
 			while (src->compare(start))
 			  {
 			    ///
-			    seq_count.push_front(ce::state_ce(src->clone(), bddfalse));
+			    // seq_count.push_front(ce::state_ce(src->clone(),
+			    // bddfalse));
 			    ///
 
 			    seq.push_front(src);
@@ -144,8 +148,8 @@ namespace spot
 			suffix.splice(suffix.end(), seq);
 
 			///
-			counter_->prefix.splice(counter_->prefix.end(),
-						seq_count);
+			// counter_->prefix.splice(counter_->prefix.end(),
+			// seq_count);
 			///
 
 			// Exit this BFS for this SCC.
@@ -186,6 +190,8 @@ namespace spot
 				  const state* from,
 				  const state* to)
   {
+    //std::cout << "complete_cycle" << std::endl;
+
     // If by change or period already ends on the state we have
     // to reach back, we are done.
     if (from == to
@@ -233,8 +239,8 @@ namespace spot
 		cycle_path p;
 
 		///
-		ce::l_state_ce p_counter;
-		p_counter.push_front(ce::state_ce(h_dest->clone(), cond));
+		// ce::l_state_ce p_counter;
+		// p_counter.push_front(ce::state_ce(h_dest->clone(), cond));
 		///
 
 		p.push_front(state_proposition(h_dest, cond));
@@ -242,15 +248,16 @@ namespace spot
 		  {
 		    const state_proposition& psi = father[src];
 		    ///
-		    p_counter.push_front(ce::state_ce(src->clone(), psi.second));
+		    // p_counter.push_front(ce::state_ce(src->clone(),
+		    // psi.second));
 		    ///
 		    p.push_front(state_proposition(src, psi.second));
 		    src = psi.first;
 		  }
 		period.splice(period.end(), p);
 		///
-		counter_->cycle.splice(counter_->cycle.end(),
-				       p_counter);
+		// counter_->cycle.splice(counter_->cycle.end(),
+		// p_counter);
 		///
 
 		// Exit the BFS, but release all iterators first.
@@ -441,6 +448,8 @@ namespace spot
   counter_example::accepting_path(const explicit_connected_component* scc,
 				  const state* start, bdd acc_to_traverse)
   {
+    //std::cout << "accepting_path" << std::endl;
+
     // State seen during the DFS.
     typedef Sgi::hash_set<const state*,
                           state_ptr_hash, state_ptr_equal> set_type;
@@ -450,6 +459,9 @@ namespace spot
 
     while (acc_to_traverse != bddfalse)
       {
+	//std::cout << "accepting_path : while (acc_to_traverse != bddfalse)"
+	// << std::endl;
+
 	// Initial state.
 	{
 	  tgba_succ_iterator* i = ecs_->aut->succ_iter(start);
@@ -467,6 +479,9 @@ namespace spot
 
 	while (!todo.empty())
 	  {
+	    // std::cout << "accepting_path : while (!todo.empty())"
+	    // << std::endl;
+
 	    tgba_succ_iterator* iter = todo.top().iter;
 	    const state* s = todo.top().s;
 
@@ -563,8 +578,8 @@ namespace spot
 	     it != best_path.end(); ++it)
 	  {
 	    period.push_back(*it);
-	    ce::state_ce ce(it->first->clone(), it->second);
-	    counter_->cycle.push_back(ce);
+	    //ce::state_ce ce(it->first->clone(), it->second);
+	    //counter_->cycle.push_back(ce);
 	    //counter_->cycle.push_back(*it);
 	  }
 

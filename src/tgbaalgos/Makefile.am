@@ -36,6 +36,7 @@ tgbaalgos_HEADERS = \
   magic.hh \
   minimalce.hh \
   nesteddfs.hh \
+  nesteddfsgen.hh \
   neverclaim.hh \
   powerset.hh \
   reachiter.hh \
@@ -55,6 +56,7 @@ libtgbaalgos_la_SOURCES = \
   magic.cc \
   minimalce.cc \
   nesteddfs.cc \
+  nesteddfsgen.cc \
   neverclaim.cc \
   powerset.cc \
   reachiter.cc \

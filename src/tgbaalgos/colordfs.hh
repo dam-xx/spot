@@ -97,6 +97,8 @@ namespace spot
     /// Pages = "92-108")
     bool dfs_blue(const state* s, bdd acc = bddfalse);
     bool dfs_red(const state* s);
+    bool dfs_blue_min(const state* s, bdd acc = bddfalse);
+    bool dfs_red_min(const state* s);
     void dfs_black(const state* s);
 
     /// Append a new state to the current path.
@@ -110,6 +112,7 @@ namespace spot
     const tgba_tba_proxy* a;	///< The automata to check.
     /// The state for which we are currently seeking an SCC.
     const state* x;
+    int Maxdepth; ///< The size of the current counter example.
 
     ce::counter_example* counter_;
     clock_t tps_;

@@ -223,14 +223,15 @@ namespace spot
   /////////////////////////////////////////////////////////////////////////////
   // minimal_search
 
-  minimalce_search::minimalce_search(const tgba_tba_proxy *a)
+  minimalce_search::minimalce_search(const tgba_tba_proxy *a,
+				     bool mode)
     : a(a), min_ce(0)
   {
+    mode_ = mode;
   }
 
   minimalce_search::~minimalce_search()
   {
-
     hash_type::const_iterator s = h_lenght.begin();
     while (s != h_lenght.end())
       {
@@ -244,11 +245,13 @@ namespace spot
 	 i != l_ce.end();)
       {
 	//std::cout << "delete a counter" << std::endl;
-	if (*i == min_ce)
+	/*
+	  if (*i == min_ce)
 	  {
-	    ++i;
-	    continue;
+	  ++i;
+	  continue;
 	  }
+	*/
 	ce::counter_example* ce = *i;
 	++i;
 	delete ce;
@@ -262,11 +265,22 @@ namespace spot
   {
     clock();
     nb_found = 0;
-    min_ce = new ce::counter_example(a);
+
+    if ((!min_ce && mode_) ||
+	!mode_)
+      min_ce = new ce::counter_example(a);
+
+    if (mode_)
+      {
+	min_ce = find();
+	tps_ = clock();
+	return min_ce;
+      }
+
     std::ostringstream os;
     const state* s = a->get_init_state();
     recurse_find(s, os);
-    std::cout << "nb_found : " << nb_found << std::endl;
+    //std::cout << "nb_found : " << nb_found << std::endl;
 
     if (min_ce->size() == 0)
       {
@@ -279,36 +293,201 @@ namespace spot
   }
 
   ce::counter_example*
-  minimalce_search::check(ce::counter_example*)
+  minimalce_search::check(ce::counter_example* ce)
   {
-    min_ce = new ce::counter_example(a);
+    min_ce = ce;
 
-    /*
-    ce::l_state_ce::iterator i;
-    int depth = 0;
-    for (i = min_ce->prefix.begin();
-	 i != min_ce->prefix.end(); ++i, ++depth)
-      {
-	stack.push_front(i->first);
-	//if (h_lenght.find(i->first) == h_lenght.end())
-	h_lenght[i->first] = depth;
-      }
-    for (i = min_ce->cycle.begin();
-	 i != min_ce->cycle.end(); ++i, ++depth)
-      {
-	stack.push_front(i->first);
-	if (h_lenght.find(i->first) == h_lenght.end())
-	  h_lenght[i->first] = depth;
-      }
-    */
-
-    const state* s = a->get_init_state();
     std::ostringstream os;
+    const state* s = a->get_init_state();
     recurse_find(s, os);
-    //if (recurse_find(s))
-    //return min_ce;
-    //else
+    //std::cout << "nb_found : " << nb_found << std::endl;
+    tps_ = clock();
     return min_ce;
+  }
+
+  ce::counter_example*
+  minimalce_search::find()
+  {
+    /// FIXME
+    std::ostringstream os;
+
+    int mode = normal;
+    int depth_mode = 0;
+    int depth_mode_memory = -1;
+    const state* s = 0;
+    hash_type::iterator i;
+    tgba_succ_iterator* iter = 0;
+
+    if (!h_lenght.size())
+      {
+	// it's a new search
+	//std::cout << "it's a new search" << std::endl;
+	s = a->get_init_state();
+	i = h_lenght.find(s);
+	if (i != h_lenght.end())
+	  {
+	    delete s;
+	    s = i->first;
+	    if (((int)stack.size() + 1) < i->second)
+	      i->second = stack.size() + 1;
+	  }
+	else
+	  h_lenght[s] = stack.size();
+	iter = a->succ_iter(s);
+	iter->first();
+	stack.push_front(state_pair(s, iter));
+	depth_mode++;
+      }
+    else
+      s = stack.front().first;
+
+    while (!stack.empty())
+      {
+      recurse:
+	//std::cout << "recurse: " << a->format_state(s) << std::endl;
+	/*
+	  if (iter)
+	  delete iter;
+	*/
+
+	iter = stack.front().second;
+	while (!iter->done())
+	  {
+	    //std::cout << "iter" << std::endl;
+
+	    //stack_type::iterator j = stack.begin();
+	    //j->second = iter->current_condition();
+
+	    const state* succ = iter->current_state();
+
+	    if ((min_ce->size() == 0) ||
+		((int)stack.size() + 1 <= min_ce->size()))
+	      {
+		int depth = in_stack(succ, os);
+		if (depth != -1)
+		  {
+		    if (closes_accepting(succ, depth, os))
+		      {
+			// New counter example is found !!
+			//std::cout << "CE found !!" << std::endl;
+			save_counter(succ, os);
+
+			i = h_lenght.find(succ);
+			if (i == h_lenght.end())
+			  h_lenght[succ] = stack.size() + 1;
+			else
+			  {
+			    delete succ;
+			    if (((int)stack.size() + 1) < i->second)
+			      i->second = stack.size() + 1;
+			  }
+
+			iter->next();
+			return min_ce;
+		      }
+		    else
+		      delete succ;
+		  }
+
+		else if ((mode == careful) ||
+			 a->state_is_accepting(succ))
+		  {
+		    s = succ;
+		    iter->next();
+
+		    if (mode != careful)
+		      depth_mode_memory = depth_mode;
+		    mode = careful;
+		    hash_type::iterator i = h_lenght.find(s);
+		    if (i != h_lenght.end())
+		      {
+			delete s;
+			s = i->first;
+			if (((int)stack.size() + 1) < i->second)
+			  i->second = stack.size() + 1;
+		      }
+		    else
+		      h_lenght[s] = stack.size();
+
+		    iter = a->succ_iter(s);
+		    iter->first();
+		    stack.push_front(state_pair(s, iter));
+		    depth_mode++;
+		    goto recurse;
+		  }
+
+		else if (h_lenght.find(succ) == h_lenght.end())
+		  {
+		    s = succ;
+		    iter->next();
+
+		    hash_type::iterator i = h_lenght.find(s);
+		    if (i != h_lenght.end())
+		      {
+			delete s;
+			s = i->first;
+			if (((int)stack.size() + 1) < i->second)
+			  i->second = stack.size() + 1;
+		      }
+		    else
+		      h_lenght[s] = stack.size();
+
+		    iter = a->succ_iter(s);
+		    iter->first();
+		    stack.push_front(state_pair(s, iter));
+		    depth_mode++;
+		    goto recurse;
+		  }
+
+		else if ((h_lenght[succ] > (int)stack.size() + 1) &&
+			 (min_ce->size() != 0))
+		  {
+		    s = succ;
+		    iter->next();
+
+		    if (mode != careful)
+		      depth_mode_memory = depth_mode;
+		    mode = careful;
+		    hash_type::iterator i = h_lenght.find(s);
+		    if (i != h_lenght.end())
+		      {
+			delete s;
+			s = i->first;
+			if (((int)stack.size() + 1) < i->second)
+			  i->second = stack.size() + 1;
+		      }
+		    else
+		      h_lenght[s] = stack.size();
+
+		    iter = a->succ_iter(s);
+		    iter->first();
+		    stack.push_front(state_pair(s, iter));
+		    depth_mode++;
+		    goto recurse;
+		  }
+		else
+		  delete succ;
+	      }
+	    else
+	      delete succ;
+
+	    iter->next();
+	  }
+
+	delete iter;
+
+	depth_mode--;
+	if (depth_mode_memory == depth_mode)
+	  {
+	    depth_mode_memory = -1;
+	    mode = normal;
+	  }
+
+	stack.pop_front();
+	s = stack.front().first;
+      }
+
+    return 0;
   }
 
   void
@@ -316,8 +495,10 @@ namespace spot
 				 std::ostringstream& os,
 				 int mode)
   {
+    /*
     std::cout << os.str() << "recurse find : "
 	      << a->format_state(s) << std::endl;
+    */
 
     hash_type::iterator i = h_lenght.find(s);
     if (i != h_lenght.end())
@@ -328,22 +509,20 @@ namespace spot
 	  i->second = stack.size() + 1;
       }
     else
-      h_lenght[s] = stack.size();
+      h_lenght[s] = stack.size() + 1;
 
-    stack.push_front(state_pair(s, bddfalse));
-    //stack.push_front(s);
+    //stack.push_front(state_pair(s, bddfalse));
 
     tgba_succ_iterator* iter = a->succ_iter(s);
+    stack.push_front(state_pair(s, iter));
     iter->first();
     while (!iter->done())
       {
-	stack_type::iterator j = stack.begin();
-	j->second = iter->current_condition();
+	//stack_type::iterator j = stack.begin();
+	//j->second = iter->current_condition();
 
 	const state* succ = iter->current_state();
 
-	std::cout << "stack.size() +1: " << (int)stack.size() + 1
-		  << "min_ce->size() : " << min_ce->size()<< std::endl;
 	if ((min_ce->size() == 0) ||
 	    ((int)stack.size() + 1 <= min_ce->size()))
 	  {
@@ -479,9 +658,7 @@ namespace spot
     //std::cout << os.str() << "save counter" << std::endl;
 
     nb_found++;
-    if (min_ce->size())
-      l_ce.push_front(min_ce);
-    else
+    if (!min_ce->size())
       delete min_ce;
 
     min_ce = new ce::counter_example(a);
@@ -489,8 +666,8 @@ namespace spot
     for (stack_type::iterator i = stack.begin();
 	 i != stack.end(); ++i)
       {
-	ce = ce::state_ce(i->first->clone(), i->second);
-	//ce = ce::state_ce((*i)->clone(), bddfalse);
+	//ce = ce::state_ce(i->first->clone(), i->second->current_condition());
+	ce = ce::state_ce(i->first->clone(), bddfalse);
 	min_ce->prefix.push_front(ce);
       }
 
@@ -500,6 +677,7 @@ namespace spot
 
     //const state* s = *i;
     min_ce->build_cycle(s);
+    l_ce.push_front(min_ce);
   }
 
   std::ostream&

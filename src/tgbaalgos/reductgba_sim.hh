@@ -37,12 +37,16 @@ namespace spot
     {
       /// No reduction.
       Reduce_None = 0,
-      /// Reduction using direct simulation relation.
-      Reduce_Dir_Sim = 1,
-      /// Reduction using delayed simulation relation.
-      Reduce_Del_Sim = 2,
+      /// Reduction of state using direct simulation relation.
+      Reduce_quotient_Dir_Sim = 1,
+      /// Reduction of transitions using direct simulation relation.
+      Reduce_transition_Dir_Sim = 2,
+      /// Reduction of state using delayed simulation relation.
+      Reduce_quotient_Del_Sim = 4,
+      /// Reduction of transition using delayed simulation relation.
+      Reduce_transition_Del_Sim = 8,
       /// Reduction using SCC.
-      Reduce_Scc = 4,
+      Reduce_Scc = 16,
       /// All reductions.
       Reduce_All = -1U
     };
@@ -57,19 +61,21 @@ namespace spot
   tgba* reduc_tgba_sim(const tgba* a, int opt = Reduce_All);
 
   /// \brief Compute a direct simulation relation on state of tgba \a f.
-  simulation_relation* get_direct_relation_simulation(const tgba* a,
-						      std::ostream& os,
-						      int opt = -1);
+  direct_simulation_relation* get_direct_relation_simulation(const tgba* a,
+							     std::ostream& os,
+							     int opt = -1);
 
   /// Compute a delayed simulation relation on state of tgba \a f.
   // FIXME: This method is correct but it builds sometime (when there are more
   // than one acceptance condition) only a part of the simulation relation.
-  simulation_relation* get_delayed_relation_simulation(const tgba* a,
-						       std::ostream& os,
-						       int opt = -1);
+  delayed_simulation_relation* get_delayed_relation_simulation(const tgba* a,
+							       std::ostream& os,
+							       int opt = -1);
 
   /// To free a simulation relation.
-  void free_relation_simulation(simulation_relation* rel);
+  void free_relation_simulation(direct_simulation_relation* rel);
+  /// To free a simulation relation.
+  void free_relation_simulation(delayed_simulation_relation* rel);
 
   ///////////////////////////////////////////////////////////////////////
   // simulation.
@@ -185,7 +191,7 @@ namespace spot
     parity_game_graph_direct(const tgba* a);
     ~parity_game_graph_direct();
 
-    virtual simulation_relation* get_relation();
+    virtual direct_simulation_relation* get_relation();
 
   protected:
     virtual void build_graph();
@@ -282,7 +288,7 @@ namespace spot
     parity_game_graph_delayed(const tgba* a);
     ~parity_game_graph_delayed();
 
-    virtual simulation_relation* get_relation();
+    virtual delayed_simulation_relation* get_relation();
 
   private:
 

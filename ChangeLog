@@ -1,3 +1,26 @@
+2004-09-13  Thomas Martinez  <martinez@src.lip6.fr>
+
+	* src/tgbatest/spotlbtt.test,
+	src/tgbatest/reductgba.cc,
+	src/tgbatest/ltl2tgba.cc:
+	Add option for reduction of TGBA.
+
+	* src/tgbatest/emptchk.test, src/tgbaalgos/Makefile.am,
+	src/tgbaalgos/tarjan_on_fly.hh, src/tgbaalgos/tarjan_on_fly.cc,
+	src/tgbaalgos/nesteddfs.hh, src/tgbaalgos/nesteddfs.cc,
+	src/tgbaalgos/minimalce.hh, src/tgbaalgos/minimalce.cc,
+	src/tgbaalgos/colordfs.hh, src/tgbaalgos/colordfs.cc:
+	Remove some bugs.
+
+	src/tgbaalgos/gtec/ce.cc:
+	Modification of construction of counter example.
+
+	* src/tgbaalgos/reductgba_sim.hh src/tgbaalgos/reductgba_sim.cc,
+	src/tgbaalgos/reductgba_sim_del.cc,
+	src/tgba/tgbareduc.hh, src/tgba/tgbareduc.cc:
+	Modification for delayed simulation.
+
+
 2004-08-23  Thomas Martinez  <martinez@src.lip6.fr>
 
 	* src/tgbaalgos/tarjan_on_fly.hh,
@@ -9,11 +32,11 @@
 	src/tgbaalgos/colordfs.hh,
 	src/tgbaalgos/colordfs.cc: four new algorithms for emptyness check.
 
-	src/tgbaalgos/gtec/ce.hh,
+	* src/tgbaalgos/gtec/ce.hh,
 	src/tgbaalgos/gtec/ce.cc: Adapt the counter exemple for the ce
 	object in minimalce.hh.
 
-	src/tgbatest/ltl2tgba.cc,
+	* src/tgbatest/ltl2tgba.cc,
 	src/tgbatest/emptchk.test,
 	src/tgbaalgos/Makefile.am: Add files for emptyness-check.
 

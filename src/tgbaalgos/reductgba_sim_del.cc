@@ -622,15 +622,17 @@ namespace spot
     //std::cout << "lift::change = false" << std::endl;
   }
 
-  simulation_relation*
+  delayed_simulation_relation*
   parity_game_graph_delayed::get_relation()
   {
-    simulation_relation* rel = new simulation_relation();
+    delayed_simulation_relation* rel = new delayed_simulation_relation;
     state_couple* p = 0;
     seen_map::iterator j;
 
-    if (this->nb_set_acc_cond() > 1)
+    /*
+      if (this->nb_set_acc_cond() > 1)
       return rel;
+    */
 
     for (Sgi::vector<spoiler_node*>::iterator i
 	   = spoiler_vertice_.begin();
@@ -674,15 +676,48 @@ namespace spot
   }
 
   ///////////////////////////////////////////
-  simulation_relation*
+  delayed_simulation_relation*
   get_delayed_relation_simulation(const tgba* f, std::ostream& os, int opt)
   {
     parity_game_graph_delayed* G = new parity_game_graph_delayed(f);
-    simulation_relation* rel = G->get_relation();
+    delayed_simulation_relation* rel = G->get_relation();
     if (opt == 1)
       G->print(os);
     delete G;
     return rel;
+  }
+
+  void
+  free_relation_simulation(delayed_simulation_relation* rel)
+  {
+    if (rel == 0)
+      return;
+
+    Sgi::hash_map<const spot::state*, int,
+      state_ptr_hash, state_ptr_equal> seen;
+    Sgi::hash_map<const spot::state*, int,
+      state_ptr_hash, state_ptr_equal>::iterator j;
+
+    delayed_simulation_relation::iterator i;
+    for (i = rel->begin(); i != rel->end(); ++i)
+      {
+	if ((j = seen.find((*i)->first)) == seen.end())
+	    seen[(*i)->first] = 0;
+
+	if ((j = seen.find((*i)->second)) == seen.end())
+	    seen[(*i)->second] = 0;
+
+	delete *i;
+      }
+    delete rel;
+    rel = 0;
+
+    for (j = seen.begin(); j != seen.end();)
+      {
+	const state* ptr = j->first;
+	++j;
+	delete ptr;
+      }
   }
 
 }

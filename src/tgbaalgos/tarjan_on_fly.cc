@@ -35,20 +35,19 @@ namespace spot
     for (stack_type::iterator i = stack.begin();
 	 i != stack.end(); ++i)
       {
-	if ((*i).s)
-	  delete (*i).s;
-	if ((*i).lasttr)
-	  delete (*i).lasttr;
+	//if ((*i).s)
+	delete (*i).s;
+	//if ((*i).lasttr)
+	delete (*i).lasttr;
       }
   }
 
   ce::counter_example*
   tarjan_on_fly::check()
   {
-    std::cout << "tarjan_on_fly::check()" << std::endl;
-
-    clock();
-
+    tgba_succ_iterator* iter = 0;
+    const state* succ = 0;
+    int pos = 0;
     top = dftop = -1;
     violation = false;
 
@@ -57,24 +56,20 @@ namespace spot
 
     while (!violation && dftop >= 0)
       {
-	//std::cout << "iter while" << std::endl;
 	s = stack[dftop].s;
-	std::cout << "s : " << a->format_state(s) << std::endl;
-	tgba_succ_iterator* iter = stack[dftop].lasttr;
+	iter = stack[dftop].lasttr;
 	if (iter == 0)
 	  {
 	    iter = a->succ_iter(s);
-	    //std::cout << "iter->first" << std::endl;
 	    iter->first();
 	    stack[dftop].lasttr = iter;
 	  }
 	else
 	  {
-	    //std::cout << "iter->next" << std::endl;
 	    iter->next();
 	  }
 
-	const state* succ = 0;
+	succ = 0;
 	if (!iter->done())
 	  {
 	    succ = iter->current_state();
@@ -82,7 +77,7 @@ namespace spot
 	      push(succ);
 	    else
 	      {
-		int pos = in_stack(succ);
+		pos = in_stack(succ);
 		delete succ;
 		if (pos != -1) // succ is in stack
 		  lowlinkupdate(dftop, pos);
@@ -92,7 +87,6 @@ namespace spot
 	  pop();
       }
 
-    tps_ = clock();
     if (violation)
       return build_counter();
 
@@ -104,9 +98,6 @@ namespace spot
   void
   tarjan_on_fly::push(const state* s)
   {
-    std::cout << "tarjan_on_fly::push() : "
-	      << a->format_state(s) << " : " << std::endl;
-
     h[s] = 1;
     top++;
 
@@ -122,33 +113,19 @@ namespace spot
     else
       ss.acc = -1;
 
-    /*
-    std::cout << "    lowlink : " << ss.lowlink << std::endl;
-    std::cout << "    pre     : " << ss.pre << std::endl;
-    std::cout << "    acc     : " << ss.acc << std::endl;
-    */
-
     if (top < (int)stack.size())
       {
-	std::cout << "MAJ" << std::endl;
-
-	/*
 	const state* sdel = stack[top].s;
 	tgba_succ_iterator* iter = stack[top].lasttr;
-	*/
-
-	stack[top] = ss;
-
-	/*
 	delete sdel;
 	if (iter)
 	  delete iter;
-	*/
 
+
+	stack[top] = ss;
       }
     else
       {
-	std::cout << "INS" << std::endl;
 	stack.push_back(ss);
       }
 
@@ -158,8 +135,6 @@ namespace spot
   void
   tarjan_on_fly::pop()
   {
-    std::cout << "tarjan_on_fly::pop()" << std::endl;
-
     int p = stack[dftop].pre;
 
     if (p >= 0)
@@ -174,20 +149,11 @@ namespace spot
   void
   tarjan_on_fly::lowlinkupdate(int f, int t)
   {
-    /*
-    std::cout << "tarjan_on_fly::lowlinkupdate() : " << std::endl
-	      << "     stack[t].lowlink : " << stack[t].lowlink
-	      << "     stack[f].lowlink : " << stack[f].lowlink
-	      << "     stack[f].acc     : " << stack[f].acc
-	      << std::endl;
-    */
-
     if (stack[t].lowlink <= stack[f].lowlink)
       {
 	if (stack[t].lowlink <= stack[f].acc)
 	  {
 	    violation = true;
-	    std::cout << "VIOLATION DETECTED" << std::endl;
 	  }
 	stack[f].lowlink = stack[t].lowlink;
       }
@@ -196,9 +162,6 @@ namespace spot
   int
   tarjan_on_fly::in_stack(const state* s) const
   {
-    std::cout << "tarjan_on_fly::in_stack() : "
-	      << a->format_state(s) << std::endl;
-
     int n = 0;
     stack_type::const_iterator i;
     for (i = stack.begin(); i != stack.end(); ++i, ++n)
@@ -214,8 +177,6 @@ namespace spot
   ce::counter_example*
   tarjan_on_fly::build_counter()
   {
-    std::cout << "tarjan_on_fly::build_counter()" << std::endl;
-
     ce = new ce::counter_example(a);
 
     stack_type::iterator i;
@@ -224,20 +185,14 @@ namespace spot
 	if (x && x->compare((*i).s) == 0)
 	  break;
 
-	//os << "  " << a->format_state(i->first) << std::endl;
-
 	ce->prefix.push_back(ce::state_ce((*i).s->clone(),
-					   //bddtrue));
-					   (*i).lasttr->current_condition()));
+					  (*i).lasttr->current_condition()));
       }
 
     for (; i != stack.end(); ++i)
       {
-	//os << "  " << a->format_state(i->first) << std::endl;
-
 	ce->cycle.push_back(ce::state_ce((*i).s->clone(),
-					   //bddtrue));
-					   (*i).lasttr->current_condition()));
+					 (*i).lasttr->current_condition()));
       }
 
     return ce;
@@ -250,8 +205,7 @@ namespace spot
     if (ce)
       ce_size = ce->size();
     os << "Size of Counter Example : " << ce_size << std::endl
-       << "States explored : " << h.size() << std::endl
-       << "Computed time : " << tps_ << " microseconds" << std::endl;
+       << "States explored : " << h.size() << std::endl;
     return os;
   }
 

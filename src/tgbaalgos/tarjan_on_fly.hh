@@ -85,7 +85,7 @@ namespace spot
     int in_stack(const state* s) const;
 
     ce::counter_example* build_counter();
-    clock_t tps_;
+    //clock_t tps_;
 
   };
 

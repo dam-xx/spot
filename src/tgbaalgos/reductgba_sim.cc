@@ -562,10 +562,10 @@ namespace spot
       }
   }
 
-  simulation_relation*
+  direct_simulation_relation*
   parity_game_graph_direct::get_relation()
   {
-    simulation_relation* rel = new simulation_relation();
+    direct_simulation_relation* rel = new direct_simulation_relation;
     state_couple* p = 0;
     seen_map::iterator j;
 
@@ -611,13 +611,13 @@ namespace spot
 
   ///////////////////////////////////////////////////////////////////////
 
-  simulation_relation*
+  direct_simulation_relation*
   get_direct_relation_simulation(const tgba* f,
 				 std::ostream& os,
 				 int opt)
   {
     parity_game_graph_direct* G = new parity_game_graph_direct(f);
-    simulation_relation* rel = G->get_relation();
+    direct_simulation_relation* rel = G->get_relation();
     if (opt == 1)
       G->print(os);
     delete G;
@@ -625,7 +625,7 @@ namespace spot
   }
 
   void
-  free_relation_simulation(simulation_relation* rel)
+  free_relation_simulation(direct_simulation_relation* rel)
   {
     if (rel == 0)
       return;
@@ -668,24 +668,26 @@ namespace spot
   {
     spot::tgba_reduc* automatareduc = new  spot::tgba_reduc(f);
 
-    if (opt & Reduce_Dir_Sim)
+    if (opt & (Reduce_quotient_Dir_Sim | Reduce_transition_Dir_Sim))
       {
-	simulation_relation* rel
+	direct_simulation_relation* rel
 	  = get_direct_relation_simulation(automatareduc, std::cout);
 
 	automatareduc->display_rel_sim(rel, std::cout);
-	automatareduc->prune_automata(rel);
+	automatareduc->quotient_state(rel);
+	automatareduc->delete_transitions(rel);
 
 	free_relation_simulation(rel);
       }
     else
-      if (opt & Reduce_Del_Sim)
+      if (opt & (Reduce_quotient_Del_Sim | Reduce_transition_Del_Sim))
 	{
-	  simulation_relation* rel
+	  delayed_simulation_relation* rel
 	    = get_delayed_relation_simulation(automatareduc, std::cout);
 
 	  automatareduc->display_rel_sim(rel, std::cout);
-	  automatareduc->prune_automata(rel);
+	  automatareduc->quotient_state(rel);
+	  automatareduc->delete_transitions(rel);
 
 	  free_relation_simulation(rel);
 	}

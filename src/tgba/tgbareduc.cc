@@ -35,7 +35,7 @@ namespace spot
       tgba_reachable_iterator_breadth_first(a),
       h_(nshf->build())
   {
-    dict_->register_all_variables_of(a, this); // useful ??
+    dict_->register_all_variables_of(a, this);
 
     run();
     all_acceptance_conditions_ = a->all_acceptance_conditions();
@@ -57,12 +57,12 @@ namespace spot
   }
 
   void
-  tgba_reduc::prune_automata(simulation_relation* rel)
+  tgba_reduc::quotient_state(direct_simulation_relation* rel)
   {
-    // Remember that for each state couple (*i)->second
-    // simulate (*i)->first.
+    // Remember that for each state couple
+    // (*i)->second simulate (*i)->first.
 
-    for (simulation_relation::iterator i = rel->begin();
+    for (direct_simulation_relation::iterator i = rel->begin();
 	 i != rel->end(); ++i)
       {
 
@@ -72,28 +72,29 @@ namespace spot
 
 	// We check if the two state are co-simulate.
 	bool recip = false;
-	for (spot::simulation_relation::iterator j = i;
+	for (direct_simulation_relation::iterator j = i;
 	     j != rel->end(); ++j)
 	  if ((((*i)->first)->compare((*j)->second) == 0) &&
 	      (((*j)->first)->compare((*i)->second) == 0))
 	    recip = true;
 
-	if (!recip)
-	    this->redirect_transition((*i)->first, (*i)->second);
-	else
-	    this->merge_state((*i)->first, (*i)->second);
+	if (recip)
+	  //this->redirect_transition((*i)->first, (*i)->second);
+	  this->merge_state((*i)->first, (*i)->second);
       }
 
     this->merge_transitions();
   }
 
   void
-  tgba_reduc::quotient_state(simulation_relation* rel)
+  tgba_reduc::quotient_state(delayed_simulation_relation* rel)
   {
-    // Remember that for each state couple (*i)->second
-    // simulate (*i)->first.
+    if (nb_set_acc_cond() > 1)
+      return;
 
-    for (simulation_relation::iterator i = rel->begin();
+    //this->quotient_state(rel);
+
+    for (delayed_simulation_relation::iterator i = rel->begin();
 	 i != rel->end(); ++i)
       {
 
@@ -103,7 +104,7 @@ namespace spot
 
 	// We check if the two state are co-simulate.
 	bool recip = false;
-	for (spot::simulation_relation::iterator j = i;
+	for (delayed_simulation_relation::iterator j = i;
 	     j != rel->end(); ++j)
 	  if ((((*i)->first)->compare((*j)->second) == 0) &&
 	      (((*j)->first)->compare((*i)->second) == 0))
@@ -113,6 +114,19 @@ namespace spot
 	  this->merge_state((*i)->first, (*i)->second);
       }
 
+    this->merge_transitions();
+  }
+
+  void
+  tgba_reduc::delete_transitions(simulation_relation* rel)
+  {
+    for (simulation_relation::iterator i = rel->begin();
+	 i != rel->end(); ++i)
+      {
+	if (((*i)->first)->compare((*i)->second) == 0)
+	  continue;
+	this->redirect_transition((*i)->first, (*i)->second);
+      }
     this->merge_transitions();
   }
 
@@ -146,6 +160,7 @@ namespace spot
   }
 
   ////////////////////////////////////////////
+  // for build tgba_reduc
 
   void
   tgba_reduc::start()
@@ -430,10 +445,12 @@ namespace spot
   tgba_reduc::merge_state_delayed(const spot::state*,
 				  const spot::state*)
   {
+    // TO DO
   }
 
   /////////////////////////////////////////
   /////////////////////////////////////////
+  // Compute SCC
 
   // From gtec.cc
   void
@@ -604,24 +621,24 @@ namespace spot
 		 i != s1->end(); ++i)
 	      (*i)->acceptance_conditions = bddfalse;
 	  }
-	else
+	/*
+	  else
 	  {
-	    // FIXME
-	    /*
-	      tgba_succ_iterator* si = this->succ_iter(sm->first);
-	      spot::state* s2 = si->current_state();
-	      seen_map::iterator sm2 = si_.find(s2);
-	      if (sm2->second == n)
-	      {
-	      s1 = name_state_map_[tgba_explicit::format_state(sm2->first)];
-	      for (state::iterator i = s1->begin();
-	      i != s1->end(); ++i)
-	      (*i)->acceptance_conditions = bddfalse;
-	      }
-	      delete s2;
-	      delete si;
-	    */
+	  // FIXME
+	  tgba_succ_iterator* si = this->succ_iter(sm->first);
+	  spot::state* s2 = si->current_state();
+	  seen_map::iterator sm2 = si_.find(s2);
+	  if (sm2->second == n)
+	  {
+	  s1 = name_state_map_[tgba_explicit::format_state(sm2->first)];
+	  for (state::iterator i = s1->begin();
+	  i != s1->end(); ++i)
+	  (*i)->acceptance_conditions = bddfalse;
 	  }
+	  delete s2;
+	  delete si;
+	  }
+	*/
 
       }
   }
@@ -825,6 +842,7 @@ namespace spot
 
   }
 
+  /*
   void
   tgba_reduc::remove_scc_depth_first(spot::state* s, int n)
   {
@@ -853,7 +871,9 @@ namespace spot
 	seen_ = 0;
       }
   }
+  */
 
+  /*
   bool
   tgba_reduc::is_alpha_ball(const spot::state* s, bdd label, int n)
   {
@@ -908,6 +928,21 @@ namespace spot
       }
 
     return ret;
+  }
+  */
+
+  int
+  tgba_reduc::nb_set_acc_cond() const
+  {
+    bdd acc, all;
+    acc = all = this->all_acceptance_conditions();
+    int count = 0;
+    while (all != bddfalse)
+      {
+	all -= bdd_satone(all);
+	count++;
+      }
+    return count;
   }
 
   //////// JUST FOR DEBUG //////////

@@ -37,6 +37,7 @@ namespace spot
       nested_ = true;
     if (opt == my_nested)
       my_nested_ = true;
+    Maxsize = 0;
   }
 
   nesteddfs_search::~nesteddfs_search()
@@ -62,13 +63,20 @@ namespace spot
   bool
   nesteddfs_search::push(const state* s, bool m)
   {
+    /*
+      if ((Maxsize != 0) && // for minimize
+      (stack.size() + 1 > Maxsize))
+      return false;
+    */
+
     tgba_succ_iterator* i = a->succ_iter(s);
     i->first();
 
     hash_type::iterator hi = h.find(s);
     if (hi == h.end())
       {
-	magic d = { !m, m, true };
+	//magic d = { !m, m, true, stack.size() + 1};
+	magic d = { !m, m, true, };
 	h[s] = d;
       }
     else
@@ -76,30 +84,17 @@ namespace spot
 	hi->second.seen_without |= !m;
 	hi->second.seen_with |= m;
 	hi->second.seen_path = true; // for nested search
+	/*
+	  if ((stack.size() + 1) < hi->second.depth) // for minimize
+	  hi->second.depth = stack.size() + 1;
+	*/
 	if (hi->first != s)
 	  delete s;
 	s = hi->first;
-
-	/*
-	if (hi->second.depth != -1 &&
-	    hi->second.depth > (int)stack.size())
-	  return false;
-	*/
-
       }
 
     magic_state ms = { s, m };
     stack.push_front(state_iter_pair(ms, i));
-
-    // We build the counter example.
-    /*
-      bdd b = bddfalse;
-      if (!i->done()) // if the state is dead.
-      b = i->current_condition();
-      ce::state_ce ce;
-      ce = ce::state_ce(s->clone(), b);
-      counter_->prefix.push_back(ce);
-    */
 
     return true;
   }
@@ -146,29 +141,6 @@ namespace spot
   ce::counter_example*
   nesteddfs_search::check()
   {
-
-    ///
-    hash_type::const_iterator s = h.begin();
-    while (s != h.end())
-      {
-	// Advance the iterator before deleting the "key" pointer.
-	const state* ptr = s->first;
-	++s;
-	delete ptr;
-      }
-    if (x)
-      delete x;
-    while (!stack.empty())
-      {
-	delete stack.front().second;
-	stack.pop_front();
-      }
-    ///
-
-    //counter_ = new ce::counter_example(a);
-
-    clock();
-
     if (my_nested_)
       {
 	accepted_path_ = false;
@@ -215,8 +187,8 @@ namespace spot
 		assert(stack.size() == tstack.size());
 
 		build_counter();
+		//Maxsize = stack.size();
 		//counter_->build_cycle(x);
-		tps_ = clock();
 		return counter_;
 	      }
 	    if (!has(s_prime, magic))
@@ -226,9 +198,12 @@ namespace spot
 		    accepted_path_ = true;
 		    accepted_depth_ = stack.size();
 		  }
-		push(s_prime, magic);
-		tstack.push_front(c);
-		goto recurse;
+		if (push(s_prime, magic))
+		  {
+		    tstack.push_front(c);
+		    goto recurse;
+		  }
+		// for minimize
 	      }
 	    delete s_prime;
 	  }
@@ -242,10 +217,6 @@ namespace spot
 	    hi->second.seen_path = false;
 	  }
 	stack.pop_front();
-	/*
-	  delete (counter_->prefix.back()).first;
-	  counter_->prefix.pop_back();
-	*/
 
 	if (!magic && a->state_is_accepting(s))
 	  {
@@ -265,9 +236,6 @@ namespace spot
     std::cout << "END CHECK" << std::endl;
 
     assert(tstack.empty());
-    //delete counter_;
-
-    tps_ = clock();
 
     return 0;
   }
@@ -322,8 +290,7 @@ namespace spot
     if (counter_)
       ce_size = counter_->size();
     os << "Size of Counter Example : " << ce_size << std::endl
-       << "States explored : " << h.size() << std::endl
-       << "Computed time : " << tps_ << " microseconds" << std::endl;
+       << "States explored : " << h.size() << std::endl;
     return os;
   }
 
