@@ -6,4 +6,5 @@ check_SCRIPTS = run
 
 TESTS = \
   ltlsimple.py \
+  ltlparse.py \
   bddnqueen.py

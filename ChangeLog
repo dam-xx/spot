@@ -1,3 +1,8 @@
+2003-08-04  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
+
+	* wrap/python/tests/ltlparse.py: New file.
+	* wrap/python/tests/Makefile.am (TESTS): Add it.
+
 2003-08-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* wrap/python/buddy.i: New file.
