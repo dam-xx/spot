@@ -147,6 +147,8 @@ Formating
         ...
       }
 
+  * `else if' can be put as-is on a single line.
+
   * No line should be larger than 80 columns.
     If a line takes more than 80 columns, split it or rethink it.
 

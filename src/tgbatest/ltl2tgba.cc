@@ -346,9 +346,11 @@ main(int argc, char** argv)
 
 	  spot::ltl::formula* ftmp = f;
 	  if (reduc_r4)
-	    f = spot::ltl::reduce(f);
-	  else {
-	    if (reduc_r1 | reduc_r2 | reduc_r3) {
+	    {
+	      f = spot::ltl::reduce(f);
+	    }
+	  else if (reduc_r1 | reduc_r2 | reduc_r3)
+	    {
 	      spot::ltl::option o = spot::ltl::BRI;
 	      if (reduc_r1)
 		o = spot::ltl::Base;
@@ -358,7 +360,6 @@ main(int argc, char** argv)
 		o = spot::ltl::Inf;
 	      f = spot::ltl::reduce(f, o);
 	    }
-	  }
 
 	  if (fm_opt)
 	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt,

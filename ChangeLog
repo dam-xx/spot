@@ -1,5 +1,8 @@
 2004-05-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbatest/ltl2tgba.cc (main): Fix style.
+	* HACKING: Mention `else if'.
+
 	* src/tgbaalgos/neverclaim.cc (never_claim_bfs): Do not output
 	space before colon, and do not output the top-level formula using
 	Spin's syntax.
