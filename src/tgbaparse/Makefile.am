@@ -1,4 +1,4 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -48,7 +48,7 @@ $(FROM_TGBAPARSE_YY_MAIN): $(srcdir)/$(TGBAPARSE_YY)
 ## in the generated include statements.
 	cd $(srcdir) && \
 	  bison --defines --locations --skeleton=lalr1.cc --report=all \
-	  $(TGBAPARSE_YY) -o $@
+	  $(TGBAPARSE_YY) -o $(FROM_TGBAPARSE_YY_MAIN)
 $(FROM_TGBAPARSE_YY_OTHERS): $(TGBAPARSE_YY)
 	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) $(FROM_TGBAPARSE_YY_MAIN)
 

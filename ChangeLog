@@ -1,5 +1,10 @@
 2004-01-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlparse/Makefile.am ($(FROM_LTLPARSE_YY_MAIN)):
+	Use $(FROM_LTLPARSE_YY_MAIN), not $@, because $@ can contains
+	VPATH and we do not want Bison to see absolute paths.
+	* src/tgbaparse/Makefile.am ($(FROM_TGBAPARSE_YY_MAIN)): Likewise.
+
 	* src/ltltest/parseerr.test: Adjust.
 	* src/ltlparse/ltlparse.yy: Simplify error handling now that Bison
 	will call destructors.  Give each operator a full name, so that
