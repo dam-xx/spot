@@ -1,5 +1,12 @@
 2003-10-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* iface/gspn/Makefile.am (check_PROGRAMS): Add eltlgspn-srg.
+	(eltlgspn_srg_SOURCES, eltlgspn_srg_LDADD, eltlgspn_srg_CPPFLAGS):
+	New variables.
+	(TESTS): Add dcswaveeltl.test.
+	* iface/gspn/dcswaveeltl.test: New file.
+	* iface/gspn/ltlgspn.cc [CEC]: Use emptiness_check.
+
 	* m4/debug.m4, m4/devel.m4, m4/gccoptim.m4, m4/ndebug.m4: New files.
 	* Makefile.am (EXTRA_DIST): Add them.
 	* configure.ac: Call adl_ENABLE_DEVEL, adl_ENABLE_DEBUG, ad_GCC_OPTIM,

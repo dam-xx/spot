@@ -16,6 +16,7 @@ check_PROGRAMS = \
   dottygspn-srg \
   ltlgspn-rg \
   ltlgspn-srg \
+  eltlgspn-srg \
   fmgspn-rg \
   fmgspn-srg
 
@@ -30,6 +31,10 @@ ltlgspn_rg_LDADD = libspotgspn.la $(LIBGSPNRG_LDFLAGS)
 
 ltlgspn_srg_SOURCES = ltlgspn.cc
 ltlgspn_srg_LDADD = libspotgspn.la $(LIBGSPNSRG_LDFLAGS)
+
+eltlgspn_srg_SOURCES = ltlgspn.cc
+eltlgspn_srg_LDADD = libspotgspn.la $(LIBGSPNSRG_LDFLAGS)
+eltlgspn_srg_CPPFLAGS = -DCEC $(AM_CPPFLAGS)
 
 fmgspn_rg_SOURCES = ltlgspn.cc
 fmgspn_rg_CPPFLAGS = -DFM $(AM_CPPFLAGS)
@@ -52,7 +57,8 @@ TESTS = \
   simple.test \
   dcswave.test \
   dcswaveltl.test \
-  dcswavefm.test
+  dcswavefm.test \
+  dcswaveeltl.test
 
 # Each test case depends on defs.
 check_SCRIPTS = defs

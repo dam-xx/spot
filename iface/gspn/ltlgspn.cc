@@ -6,6 +6,7 @@
 #include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"
 #include "tgbaalgos/magic.hh"
+#include "tgbaalgos/emptinesscheck.hh"
 
 int
 main(int argc, char **argv)
@@ -44,8 +45,22 @@ main(int argc, char **argv)
 
       spot::tgba* model        = new spot::tgba_gspn(dict, env);
       spot::tgba_product* prod = new spot::tgba_product(model, a_f);
+#if CEC
+      {
+	spot::emptiness_check empty_check;
+	bool res = empty_check.tgba_emptiness_check(prod);
+	if (!res)
+	  {
+	    empty_check.counter_example(prod);
+	    exit(1);
+	  }
+	else
+	  {
+	    std::cout << "not found";
+	  }
+      }
+#else
       spot::tgba_tba_proxy* d  = new spot::tgba_tba_proxy(prod);
-
       {
 	spot::magic_search ms(d);
 
@@ -59,8 +74,8 @@ main(int argc, char **argv)
 	    std::cout << "not found";
 	  }
       }
-
       delete d;
+#endif
       delete prod;
       delete model;
       delete a_f;
