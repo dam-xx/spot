@@ -1,4 +1,18 @@
 2004-04-14  Soheib Baarir  <Souheib.Baarir@lip6.fr>
+	    Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* iface/gspn/ltlgspn.cc (connected_component_eesrg,
+	connected_component_eesrg_factory, numbered_state_heap_eesrg_semi,
+	numbered_state_heap_eesrg_const_iterator,
+	numbered_state_heap_eesrg_factory_semi): New classes.
+	(emptiness_check_eesrg_semi, emptiness_check_eesrg_shy_semi,
+	counter_example_eesrg): New functions.
+	* iface/gspn/eesrg.hh (emptiness_check_eesrg_semi,
+	emptiness_check_eesrg_shy_semi, counter_example_eesrg): New
+	functions.
+	* iface/gspn/ltlgspn.cc [EESRG]: Adjust to call these new functions.
+
+2004-04-14  Soheib Baarir  <Souheib.Baarir@lip6.fr>
 
 	* iface/gspn/eesrg.cc (tgba_succ_iterator_gspn_eesrg,
 	state_gspn_eesrg): Compute the array of all successors of the

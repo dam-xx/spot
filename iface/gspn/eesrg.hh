@@ -28,6 +28,8 @@
 # include <string>
 # include "tgba/tgba.hh"
 # include "common.hh"
+# include "tgbaalgos/gtec/gtec.hh"
+# include "tgbaalgos/gtec/ce.hh"
 
 namespace spot
 {
@@ -44,6 +46,9 @@ namespace spot
     const gspn_environment& env_;
   };
 
+  emptiness_check* emptiness_check_eesrg_semi(const tgba* eesrg_automata);
+  emptiness_check* emptiness_check_eesrg_shy_semi(const tgba* eesrg_automata);
+  counter_example* counter_example_eesrg(const emptiness_check_status* status);
 }
 
 #endif // SPOT_IFACE_GSPN_EESRG_GSPN_EESRG_HH

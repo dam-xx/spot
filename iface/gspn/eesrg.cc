@@ -26,6 +26,8 @@
 #include "eesrg.hh"
 #include "misc/bddlt.hh"
 #include <bdd.h>
+#include "tgbaalgos/gtec/explscc.hh"
+#include "tgbaalgos/gtec/nsheap.hh"
 
 namespace spot
 {
@@ -553,4 +555,298 @@ namespace spot
     return new tgba_gspn_eesrg(dict_, env_, operand);
   }
 
+
+  //////////////////////////////////////////////////////////////////////
+
+  class connected_component_eesrg: public explicit_connected_component
+  {
+  public:
+    virtual
+    ~connected_component_eesrg()
+    {
+    }
+
+    virtual const state*
+    has_state(const state* s) const
+    {
+      set_type::iterator i;
+
+      for (i = states.begin(); i !=states.end(); i++)
+	{
+	  const state_gspn_eesrg* old_state = (const state_gspn_eesrg*)(*i);
+	  const state_gspn_eesrg* new_state = (const state_gspn_eesrg*)(s);
+
+	  if ((old_state->right())->compare(new_state->right()) == 0
+	      && old_state->left()
+	      && new_state->left())
+	    if (spot_inclusion(new_state->left(), old_state->left()))
+	      return (*i);
+	}
+      return 0;
+    }
+
+    virtual void
+    insert(const state* s)
+    {
+      states.insert(s);
+    }
+
+  protected:
+    typedef Sgi::hash_set<const state*,
+			  state_ptr_hash, state_ptr_equal> set_type;
+    set_type states;
+  };
+
+  class connected_component_eesrg_factory :
+    public explicit_connected_component_factory
+  {
+  public:
+    virtual connected_component_eesrg*
+    build() const
+    {
+      return new connected_component_eesrg();
+    }
+
+    /// Get the unique instance of this class.
+    static const connected_component_eesrg_factory*
+    instance()
+    {
+      static connected_component_eesrg_factory f;
+      return &f;
+    }
+
+  protected:
+    virtual
+    ~connected_component_eesrg_factory()
+    {
+    }
+    /// Construction is forbiden.
+    connected_component_eesrg_factory()
+    {
+    }
+  };
+
+  //////////////////////////////////////////////////////////////////////
+
+
+  class numbered_state_heap_eesrg_semi : public numbered_state_heap
+  {
+  public:
+    virtual
+    ~numbered_state_heap_eesrg_semi()
+    {
+      // Free keys in H.
+      hash_type::iterator i = h.begin();
+      while (i != h.end())
+	{
+	  // Advance the iterator before deleting the key.
+	  const state* s = i->first;
+	  ++i;
+	  delete s;
+	}
+    }
+
+    virtual const int*
+    find(const state* s) const
+    {
+      hash_type::const_iterator i;
+      for (i = h.begin(); i != h.end(); ++i)
+	{
+	  const state_gspn_eesrg* old_state =
+	    dynamic_cast<const state_gspn_eesrg*>(i->first);
+	  const state_gspn_eesrg* new_state =
+	    dynamic_cast<const state_gspn_eesrg*>(s);
+	  assert(old_state);
+	  assert(new_state);
+
+	  if ((old_state->right())->compare(new_state->right()) == 0)
+	    {
+	      if (old_state->left() == new_state->left())
+		break;
+
+	      if (old_state->left()
+		  && new_state->left()
+		  && spot_inclusion(new_state->left(),old_state->left()))
+		break;
+	    }
+	}
+      if (i == h.end())
+	return 0;
+      return &i->second;
+    }
+
+    virtual int*
+    find(const state* s)
+    {
+      return const_cast<int*>
+	(const_cast<const numbered_state_heap_eesrg_semi*>(this)->find(s));
+    }
+
+    virtual void
+    insert(const state* s, int index)
+    {
+      h[s] = index;
+    }
+
+    virtual int
+    size() const
+    {
+      return h.size();
+    }
+
+    virtual numbered_state_heap_const_iterator* iterator() const;
+
+    virtual const state*
+    filter(const state* s) const
+    {
+      hash_type::const_iterator i;
+      for (i = h.begin(); i != h.end(); ++i)
+	{
+	  const state_gspn_eesrg* old_state =
+	    dynamic_cast<const state_gspn_eesrg*>(i->first);
+	  const state_gspn_eesrg* new_state =
+	    dynamic_cast<const state_gspn_eesrg*>(s);
+	  assert(old_state);
+	  assert(new_state);
+
+	  if ((old_state->right())->compare(new_state->right()) == 0)
+	    {
+	      if (old_state->left() == new_state->left())
+		break;
+
+	      if (old_state->left()
+		  && new_state->left()
+		  && spot_inclusion(new_state->left(),old_state->left()))
+		break;
+	    }
+	}
+      assert(i != h.end());
+      if (s != i->first)
+	delete s;
+      return i->first;
+    }
+
+  protected:
+    typedef Sgi::hash_map<const state*, int,
+			  state_ptr_hash, state_ptr_equal> hash_type;
+    hash_type h;		///< Map of visited states.
+
+    friend class numbered_state_heap_eesrg_const_iterator;
+  };
+
+
+  class numbered_state_heap_eesrg_const_iterator :
+    public numbered_state_heap_const_iterator
+  {
+  public:
+    numbered_state_heap_eesrg_const_iterator
+      (const numbered_state_heap_eesrg_semi::hash_type& h)
+	: numbered_state_heap_const_iterator(), h(h)
+    {
+    }
+
+    ~numbered_state_heap_eesrg_const_iterator()
+    {
+    }
+
+    virtual void
+    first()
+    {
+      i = h.begin();
+    }
+
+    virtual void
+    next()
+    {
+      ++i;
+    }
+
+    virtual bool
+    done() const
+    {
+      return i == h.end();
+    }
+
+    virtual const state*
+    get_state() const
+    {
+      return i->first;
+    }
+
+    virtual int
+    get_index() const
+    {
+      return i->second;
+    }
+
+  private:
+    numbered_state_heap_eesrg_semi::hash_type::const_iterator i;
+    const numbered_state_heap_eesrg_semi::hash_type& h;
+  };
+
+  numbered_state_heap_const_iterator*
+  numbered_state_heap_eesrg_semi::iterator() const
+  {
+    return new numbered_state_heap_eesrg_const_iterator(h);
+  }
+
+
+  /// \brief Factory for numbered_state_heap_eesrg_semi
+  ///
+  /// This class is a singleton.  Retrieve the instance using instance().
+  class numbered_state_heap_eesrg_factory_semi:
+    public numbered_state_heap_factory
+  {
+  public:
+    virtual numbered_state_heap_eesrg_semi*
+    build() const
+    {
+      return new numbered_state_heap_eesrg_semi();
+    }
+
+    /// Get the unique instance of this class.
+    static const numbered_state_heap_eesrg_factory_semi*
+    instance()
+    {
+      static numbered_state_heap_eesrg_factory_semi f;
+      return &f;
+    }
+
+  protected:
+    virtual
+    ~numbered_state_heap_eesrg_factory_semi()
+    {
+    }
+
+    numbered_state_heap_eesrg_factory_semi()
+    {
+    }
+  };
+
+
+  emptiness_check*
+  emptiness_check_eesrg_semi(const tgba* eesrg_automata)
+  {
+    assert(dynamic_cast<const tgba_gspn_eesrg*>(eesrg_automata));
+    return
+      new emptiness_check(eesrg_automata,
+			  numbered_state_heap_eesrg_factory_semi::instance());
+  }
+
+  emptiness_check*
+  emptiness_check_eesrg_shy_semi(const tgba* eesrg_automata)
+  {
+    assert(dynamic_cast<const tgba_gspn_eesrg*>(eesrg_automata));
+    return
+      new emptiness_check_shy
+        (eesrg_automata,
+	 numbered_state_heap_eesrg_factory_semi::instance());
+  }
+
+  counter_example*
+  counter_example_eesrg(const emptiness_check_status* status)
+  {
+    return new counter_example(status,
+			       connected_component_eesrg_factory::instance());
+  }
 }

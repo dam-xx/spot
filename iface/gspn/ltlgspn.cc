@@ -172,10 +172,17 @@ main(int argc, char **argv)
 	  {
 	    spot::emptiness_check* ec;
 
+#ifndef EESRG
 	    if (check == Couvreur)
 	      ec = new spot::emptiness_check(prod);
 	    else
 	      ec = new spot::emptiness_check_shy(prod);
+#else
+	    if (check == Couvreur)
+	      ec = spot::emptiness_check_eesrg_semi(prod);
+	    else
+	      ec = spot::emptiness_check_eesrg_shy_semi(prod);
+#endif
 
 	    bool res = ec->check();
 
@@ -184,9 +191,15 @@ main(int argc, char **argv)
 	      {
 		if (compute_counter_example)
 		  {
-		    spot::counter_example ce(ecs);
-		    ce.print_result(std::cout, proj ? model : 0);
-		    ce.print_stats(std::cout);
+		    spot::counter_example* ce;
+#ifndef EESRG
+		    ce = new spot::counter_example(ecs);
+#else
+		    ce = spot::counter_example_eesrg(ecs);
+#endif
+		    ce->print_result(std::cout, proj ? model : 0);
+		    ce->print_stats(std::cout);
+		    delete ce;
 		  }
 		else
 		  {
