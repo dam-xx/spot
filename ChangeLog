@@ -1,3 +1,8 @@
+2004-04-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* wrap/python/cgi/ltl2tgba.in: Print degeneralized statistics
+	when show_never_claim.  Change the title to LTL-to-TGBA.
+
 2004-04-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* wrap/python/cgi/ltl2tgba.in (print_footer): Make ltl2tgba.py's

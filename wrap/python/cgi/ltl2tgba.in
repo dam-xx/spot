@@ -184,12 +184,12 @@ def render_bdd(basename, dictionary, bdd):
 print """
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <HTML lang="en"><HEAD>
-<TITLE>Spot's on-line LTL-to-Buchi translator</TITLE>
+<TITLE>Spot's on-line LTL-to-TGBA translator</TITLE>
 <META NAME="keywords" CONTENT="Spot,LTL,automata,B&uuml;chi,translation,TGBA">
 %s</HEAD>
 <BODY>
 <H1><a href="http://spot.lip6.fr/">Spot</a>'s on-line
-LTL-to-B&uuml;chi translator</H1>""" % extra_header
+LTL-to-TGBA translator</H1>""" % extra_header
 
 formula = form.getfirst('formula', '')
 
@@ -423,14 +423,13 @@ if show_automaton_png:
     render_automaton(imgprefix + '-a', automaton, dont_run_dot)
 
 if show_degen_png or show_never_claim:
+    print '<H3>Degeneralized automaton</H3>'
     degen = spot.tgba_tba_proxy(automaton)
+    dont_run_dot = print_stats(degen)
+    if show_degen_png:
+        render_automaton(imgprefix + '-d', degen, dont_run_dot)
 else:
     degen = 0
-
-if show_degen_png:
-    print '<H3>Degeneralized automaton</H3>'
-    dont_run_dot = print_stats(degen)
-    render_automaton(imgprefix + '-d', degen, dont_run_dot)
 
 if show_never_claim:
     print '<H3>Never claim (for degeneralized automaton)</H3>'
