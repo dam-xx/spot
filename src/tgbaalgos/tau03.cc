@@ -351,21 +351,14 @@ namespace spot
           h.insert(std::make_pair(s, std::make_pair(c, bddfalse)));
         }
 
-      void pop_notify(const state*)
+      void pop_notify(const state*) const
         {
         }
 
-      bool has_been_visited(const state*& s) const
+      bool has_been_visited(const state* s) const
         {
           hash_type::const_iterator it = h.find(s);
-          if (it == h.end())
-            return false;
-          else if (s != it->first)
-            {
-              delete s;
-              s = it->first;
-            }
-          return true;
+          return (it != h.end());
         }
     private:
 

@@ -22,6 +22,8 @@
 #ifndef SPOT_TGBAALGOS_BFSSTEPS_HH
 # define SPOT_TGBAALGOS_BFSSTEPS_HH
 
+#include <map>
+#include "tgba/state.hh"
 #include "emptiness.hh"
 
 namespace spot
@@ -82,6 +84,14 @@ namespace spot
     /// augmented with the shortest past that ends with this
     /// transition.
     virtual bool match(tgba_run::step& step, const state* dest) = 0;
+
+    virtual void finalize(const std::map<const state*,
+                tgba_run::step,
+                state_ptr_less_than>& father,
+                const tgba_run::step& s,
+                const state* start,
+                tgba_run::steps& l);
+
   protected:
     const tgba* a_;		///< The spot::tgba we are searching into.
   };

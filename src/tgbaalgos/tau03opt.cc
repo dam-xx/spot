@@ -466,31 +466,17 @@ namespace spot
           hc.insert(std::make_pair(s, std::make_pair(w, bddfalse)));
         }
 
-      void pop_notify(const state*)
+      void pop_notify(const state*) const
         {
         }
 
-      bool has_been_visited(const state*& s) const
+      bool has_been_visited(const state* s) const
         {
           hcyan_type::const_iterator ic = hc.find(s);
           if (ic == hc.end())
             {
               hash_type::const_iterator it = h.find(s);
-              if (it == h.end())
-                // white state
-                return false;
-              if (s != it->first)
-                {
-                  delete s;
-                  s = it->first;
-                }
-              // blue or red state
-              return true;
-            }
-          else if (s != ic->first)
-            {
-              delete s;
-              s = ic->first;
+              return (it != h.end());
             }
           return true;
         }

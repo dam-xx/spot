@@ -22,25 +22,24 @@
 #ifndef SPOT_TGBAALGOS_NDFS_RESULT_HH
 # define SPOT_TGBAALGOS_NDFS_RESULT_HH
 
-//#define TRACE
+//#define NDFSR_TRACE
 
 #include <iostream>
-#ifdef TRACE
-#define trace std::cerr
+#ifdef NDFSR_TRACE
+#define ndfsr_trace std::cerr
 #else
-#define trace while (0) std::cerr
+#define ndfsr_trace while (0) std::cerr
 #endif
 
 #include <cassert>
 #include <list>
+#include "misc/hash.hh"
 #include "tgba/tgba.hh"
 #include "emptiness.hh"
 #include "emptiness_stats.hh"
 #include "bfssteps.hh"
 #include "misc/hash.hh"
 
-/// FIXME:
-/// * Add the necessary calls to pop_notify.
 
 namespace spot
 {
@@ -73,11 +72,6 @@ namespace spot
 
     virtual ~ndfs_result()
       {
-        while (!st1.empty())
-          {
-            delete st1.front().it;
-            st1.pop_front();
-          }
       }
 
     virtual tgba_run* accepting_run()
@@ -87,60 +81,107 @@ namespace spot
 
         assert(!stb.empty());
 
-        tgba_run* run = new tgba_run;
-
-        const state* target = str.empty()?stb.front().s:str.front().s;
         bdd covered_acc = bddfalse;
-        typename stack_type::const_reverse_iterator i, j;
+        accepting_transitions_list acc_trans;
 
-        i = j = stb.rbegin(); ++j;
-        for (; i->s->compare(target) != 0; ++i, ++j)
-          {
-            tgba_run::step s = { i->s->clone(), j->label, j->acc };
-            run->prefix.push_back(s);
-          }
+        const state* start;
 
-        if (!str.empty())
+        if (str.empty())
+          start = stb.front().s->clone();
+        else
           {
-            typename stack_type::const_reverse_iterator end = stb.rend();
-            for (; j != end; ++i, ++j)
+            start = str.front().s->clone();
+            if (a_->number_of_acceptance_conditions() == 0)
               {
-                covered_acc |= j->acc;
-                tgba_run::step s = { i->s->clone(), j->label, j->acc };
-                run->cycle.push_back(s);
+                // take arbitrarily the last transition on the red stack
+                stack_type::const_iterator i, j;
+                i = j = str.begin(); ++i;
+                if (i == str.end())
+                  i = stb.begin();
+                transition t = { i->s->clone(), j->label, j->acc,
+                                                              j->s->clone() };
+                assert(h_.has_been_visited(t.source));
+                assert(h_.has_been_visited(t.dest));
+                acc_trans.push_back(t);
               }
-
-            j = str.rbegin();
-            covered_acc |= j->acc;
-            tgba_run::step s = { i->s->clone(), j->label, j->acc };
-            run->cycle.push_back(s);
-
-            i = j; ++j;
-            end = str.rend();
-            for (; j != end; ++i, ++j)
+            else
               {
-                covered_acc |= j->acc;
-                tgba_run::step s = { i->s->clone(), j->label, j->acc };
-                run->cycle.push_back(s);
+                // ignore the prefix
+                stack_type::const_reverse_iterator i, j;
+
+                i = j = stb.rbegin(); ++j;
+                for (; i->s->compare(start) != 0; ++i, ++j)
+                  {
+                  }
+
+
+                stack_type::const_reverse_iterator end = stb.rend();
+                for (; j != end; ++i, ++j)
+                  {
+                    if ((covered_acc & j->acc) != j->acc)
+                      {
+                        transition t = { i->s->clone(), j->label, j->acc,
+                                                                j->s->clone() };
+                        assert(h_.has_been_visited(t.source));
+                        assert(h_.has_been_visited(t.dest));
+                        acc_trans.push_back(t);
+                        covered_acc |= j->acc;
+                      }
+                  }
+
+                j = str.rbegin();
+                if ((covered_acc & j->acc) != j->acc)
+                  {
+                    transition t = { i->s->clone(), j->label, j->acc,
+                                                              j->s->clone() };
+                    assert(h_.has_been_visited(t.source));
+                    assert(h_.has_been_visited(t.dest));
+                    acc_trans.push_back(t);
+                    covered_acc |= j->acc;
+                  }
+
+                i = j; ++j;
+                end = str.rend();
+                for (; j != end; ++i, ++j)
+                  {
+                    if ((covered_acc & j->acc) != j->acc)
+                      {
+                        transition t = { i->s->clone(), j->label, j->acc,
+                                                                j->s->clone() };
+                        assert(h_.has_been_visited(t.source));
+                        assert(h_.has_been_visited(t.dest));
+                        acc_trans.push_back(t);
+                        covered_acc |= j->acc;
+                      }
+                  }
               }
           }
 
         if (a_->all_acceptance_conditions() != covered_acc)
           {
-            // try if any to minimize the first loop in run->cycle ??
-            // what transitions have to be preserved  (it depend on
-            // the detection (in the blue or red dfs) ??
-            tgba_succ_iterator* i = a_->succ_iter(target);
-            i->first();
-            st1.push_front(stack_item(target, i, bddfalse, bddfalse));
-            bool b = dfs(target, run->cycle, covered_acc);
+            bool b = dfs(start, acc_trans, covered_acc);
             assert(b);
             (void)b;
-            while (!st1.empty())
-              {
-                delete st1.front().it;
-                st1.pop_front();
-              }
+          }
+
+        delete start;
+
+        assert(!acc_trans.empty());
+
+        tgba_run* run = new tgba_run;
+        // construct run->cycle from acc_trans.
+        construct_cycle(run, acc_trans);
+        // construct run->prefix (a minimal path from the initial state to any
+        // state of run->cycle) and adjust the cycle to the state reached by the
+        // prefix.
+        construct_prefix(run);
+
+        for (typename accepting_transitions_list::const_iterator i =
+                                                            acc_trans.begin();
+                                                     i != acc_trans.end(); ++i)
+          {
+            delete i->source;
+            delete i->dest;
           }
 
         return run;
@@ -149,26 +190,175 @@ namespace spot
   private:
     const ndfs_search& ms_;
     const heap& h_;
-    stack_type st1;
+
+    struct transition {
+      const state* source;
+      bdd label;
+      bdd acc;
+      const state* dest;
+    };
+    typedef std::list<transition> accepting_transitions_list;
 
     typedef Sgi::hash_set<const state*,
                           state_ptr_hash, state_ptr_equal> state_set;
 
-    class shortest_path: public bfs_steps
+    void clean(stack_type& st1, state_set& seen, state_set& dead)
+      {
+        while (!st1.empty())
+          {
+            delete st1.front().it;
+            st1.pop_front();
+          }
+          for (state_set::iterator i = seen.begin(); i != seen.end();)
+            {
+              const state* s = *i;
+              ++i;
+              delete s;
+            }
+          for (state_set::iterator i = dead.begin(); i != dead.end();)
+            {
+              const state* s = *i;
+              ++i;
+              delete s;
+            }
+      }
+
+    bool dfs(const state* target, accepting_transitions_list& acc_trans,
+                                                               bdd& covered_acc)
+      {
+        assert(h_.has_been_visited(target));
+        stack_type st1;
+
+        state_set seen, dead;
+        const state* start = target->clone();
+
+        seen.insert(start);
+        tgba_succ_iterator* i = a_->succ_iter(start);
+        i->first();
+        st1.push_front(stack_item(start, i, bddfalse, bddfalse));
+
+        while (!st1.empty())
+          {
+            stack_item& f = st1.front();
+            ndfsr_trace << "DFS1 treats: " << a_->format_state(f.s)
+                        << std::endl;
+            if (!f.it->done())
+              {
+                const state *s_prime = f.it->current_state();
+                ndfsr_trace << "  Visit the successor: "
+                            << a_->format_state(s_prime) << std::endl;
+                bdd label = f.it->current_condition();
+                bdd acc = f.it->current_acceptance_conditions();
+                f.it->next();
+                if (h_.has_been_visited(s_prime))
+                  {
+                    if (dead.find(s_prime) != dead.end())
+                      {
+                        ndfsr_trace << "  it is dead, pop it" << std::endl;
+                        delete s_prime;
+                      }
+                    else if (seen.find(s_prime) == seen.end())
+                      {
+                        ndfsr_trace << "  it is not seen, go down" << std::endl;
+                        seen.insert(s_prime);
+                        tgba_succ_iterator* i = a_->succ_iter(s_prime);
+                        i->first();
+                        st1.push_front(stack_item(s_prime, i, label, acc));
+                      }
+                    else if ((acc & covered_acc) != acc)
+                      {
+                        ndfsr_trace << "  a propagation is needed, "
+                                    << "start a search" << std::endl;
+                        if (search(s_prime, target, dead))
+                          {
+                            transition t = { f.s->clone(), label, acc,
+                                                            s_prime->clone() };
+                            assert(h_.has_been_visited(t.source));
+                            assert(h_.has_been_visited(t.dest));
+                            acc_trans.push_back(t);
+                            covered_acc |= acc;
+                            if (covered_acc == a_->all_acceptance_conditions())
+                              {
+                                clean(st1, seen, dead);
+                                delete s_prime;
+                                return true;
+                              }
+                          }
+                        delete s_prime;
+                      }
+                    else
+                      {
+                        ndfsr_trace << "  already seen, pop it" << std::endl;
+                        delete s_prime;
+                      }
+                  }
+                else
+                  {
+                    ndfsr_trace << "  not seen during the search, pop it"
+                                << std::endl;
+                    delete s_prime;
+                  }
+              }
+            else
+              {
+                ndfsr_trace << "  all the successors have been visited"
+                            << std::endl;
+                stack_item f_dest(f);
+                delete st1.front().it;
+                st1.pop_front();
+                if (!st1.empty() && (f_dest.acc & covered_acc) != f_dest.acc)
+                  {
+                    ndfsr_trace << "  a propagation is needed, start a search"
+                                << std::endl;
+                    if (search(f_dest.s, target, dead))
+                      {
+                            transition t = { st1.front().s->clone(),
+                                            f_dest.label, f_dest.acc,
+                                            f_dest.s->clone() };
+                        assert(h_.has_been_visited(t.source));
+                        assert(h_.has_been_visited(t.dest));
+                        acc_trans.push_back(t);
+                        covered_acc |= f_dest.acc;
+                        if (covered_acc == a_->all_acceptance_conditions())
+                          {
+                            clean(st1, seen, dead);
+                            return true;
+                          }
+                      }
+                  }
+                else
+                  {
+                    ndfsr_trace << "  no propagation needed, pop it"
+                                << std::endl;
+                  }
+              }
+          }
+
+        clean(st1, seen, dead);
+        return false;
+      }
+
+    class test_path: public bfs_steps
     {
     public:
-      shortest_path(const tgba* a, const state* t,
+      test_path(const tgba* a, const state* t,
                   const state_set& d, const heap& h)
         : bfs_steps(a), target(t), dead(d), h(h)
       {
       }
 
-      ~shortest_path()
+      ~test_path()
       {
+        state_set::const_iterator i = seen.begin();
+        while (i != seen.end())
+          {
+            const state* ptr = *i;
+            ++i;
+            delete ptr;
+          }
       }
 
-      const state*
-      search(const state* start, tgba_run::steps& l)
+      const state* search(const state* start, tgba_run::steps& l)
       {
         const state* s = filter(start);
         if (s)
@@ -177,28 +367,30 @@ namespace spot
           return 0;
       }
 
-      const state*
-      filter(const state* s)
+      const state* filter(const state* s)
       {
-        if (!h.has_been_visited(s))
+        if (!h.has_been_visited(s) || seen.find(s) != seen.end() ||
+                                                    dead.find(s) != dead.end())
           {
             delete s;
             return 0;
           }
-        if (dead.find(s) != dead.end())
-          return 0;
         seen.insert(s);
         return s;
       }
 
-      const state_set&
-      get_seen() const
+      void finalize(
+          const std::map<const state*, tgba_run::step, state_ptr_less_than>&,
+          const tgba_run::step&, const state*, tgba_run::steps&)
+      {
+      }
+
+      const state_set& get_seen() const
       {
         return seen;
       }
 
-      bool
-      match(tgba_run::step&, const state* dest)
+      bool match(tgba_run::step&, const state* dest)
       {
         return target->compare(dest) == 0;
       }
@@ -210,139 +402,228 @@ namespace spot
       const heap& h;
     };
 
-    void complete_cycle(tgba_run::steps& cycle, bdd& covered_acc,
-                  const tgba_run::step& start, tgba_run::steps& path,
-                  const state_set& dead)
+    bool search(const state* start, const state* target, state_set& dead)
       {
-        tgba_run::steps new_cycle;
+        tgba_run::steps path;
+        if (start->compare(target) == 0)
+          return true;
 
-        // find the minimal path between st1.back().s and st1.front().s
-        if (st1.back().s->compare(st1.front().s)!=0)
+        test_path s(a_, target, dead, h_);
+        const state* res = s.search(start->clone(), path);
+        if (res)
           {
-            shortest_path s(a_, st1.front().s, dead, h_);
-            const state* res = s.search(st1.back().s, new_cycle);
-            assert(res && res->compare(st1.front().s) == 0);
-            (void)res;
-            for (tgba_run::steps::const_iterator it = new_cycle.begin();
-                                                  it != new_cycle.end(); ++it)
-              covered_acc |= it->acc;
+            assert(res->compare(target) == 0);
+            return true;
           }
-
-        // traverse the accepting transition
-        covered_acc |= start.acc;
-        tgba_run::step s = { st1.front().s->clone(), start.label, start.acc };
-        new_cycle.push_back(s);
-
-        // follow the minimal path returning to st1.back().s
-        for (tgba_run::steps::const_iterator it = path.begin();
-                                                    it != path.end(); ++it)
-          covered_acc |= it->acc;
-        new_cycle.splice(new_cycle.end(), path);
-
-        // concat this new loop to the existing ones
-        cycle.splice(cycle.end(), new_cycle);
+        else
+          {
+            state_set::const_iterator it;
+            for (it = s.get_seen().begin(); it != s.get_seen().end(); ++it)
+              dead.insert((*it)->clone());
+            return false;
+          }
       }
 
-    bool dfs(const state* target, tgba_run::steps& cycle, bdd& covered_acc)
-      {
-        state_set seen, dead;
+    typedef Sgi::hash_multimap<const state*, transition,
+                          state_ptr_hash, state_ptr_equal> m_source_trans;
 
-        seen.insert(target);
-        while (!st1.empty())
+    class min_path: public bfs_steps
+    {
+    public:
+      min_path(const tgba* a, const m_source_trans& target, const heap& h)
+        : bfs_steps(a), target(target), h(h)
+      {
+      }
+
+      ~min_path()
+      {
+        state_set::const_iterator i = seen.begin();
+        while (i != seen.end())
           {
-            stack_item& f = st1.front();
-            trace << "DFS1 treats: " << a_->format_state(f.s) << std::endl;
-            if (!f.it->done())
+            const state* ptr = *i;
+            ++i;
+            delete ptr;
+          }
+      }
+
+      const state* search(const state* start, tgba_run::steps& l)
+      {
+        const state* s = filter(start);
+        if (s)
+          return this->bfs_steps::search(s, l);
+        else
+          return 0;
+      }
+
+      const state* filter(const state* s)
+      {
+        ndfsr_trace << "filter: " << a_->format_state(s);
+        if (!h.has_been_visited(s) || seen.find(s) != seen.end())
+          {
+            if (!h.has_been_visited(s))
+              ndfsr_trace << " not visited" << std::endl;
+            else
+              ndfsr_trace << " already seen" << std::endl;
+            delete s;
+            return 0;
+          }
+        ndfsr_trace << " OK" << std::endl;
+        seen.insert(s);
+        return s;
+      }
+
+      bool match(tgba_run::step&, const state* dest)
+      {
+        ndfsr_trace << "match: " << a_->format_state(dest)
+                    << std::endl;
+        return target.find(dest) != target.end();
+      }
+
+    private:
+      state_set seen;
+      const m_source_trans& target;
+      const heap& h;
+    };
+
+    void construct_cycle(tgba_run* run,
+                                    const accepting_transitions_list& acc_trans)
+      {
+        assert(!acc_trans.empty());
+        transition current = acc_trans.front();
+        // insert the first accepting transition in the cycle
+        ndfsr_trace << "the initial accepting transition is from "
+                    << a_->format_state(current.source) << " to "
+                    << a_->format_state(current.dest) << std::endl;
+        const state* begin = current.source;
+
+        m_source_trans target;
+        typename accepting_transitions_list::const_iterator i =
+                                                            acc_trans.begin();
+        ndfsr_trace << "targets are the source states: ";
+        for (++i; i!=acc_trans.end(); ++i)
+          {
+            if (i->source->compare(begin) == 0 &&
+                  i->source->compare(i->dest) == 0)
               {
-                const state *s_prime = f.it->current_state();
-                trace << "  Visit the successor: "
-                      << a_->format_state(s_prime) << std::endl;
-                bdd label = f.it->current_condition();
-                bdd acc = f.it->current_acceptance_conditions();
-                f.it->next();
-                if (h_.has_been_visited(s_prime))
-                  {
-                    if (dead.find(s_prime) != dead.end())
-                      {
-                        trace << "  it is dead, pop it" << std::endl;
-                      }
-                    else if (seen.find(s_prime) == seen.end())
-                      {
-                        trace << "  it is not seen, go down" << std::endl;
-                        seen.insert(s_prime);
-                        tgba_succ_iterator* i = a_->succ_iter(s_prime);
-                        i->first();
-                        st1.push_front(stack_item(s_prime, i, label, acc));
-                      }
-                    else if ((acc & covered_acc) != acc)
-                      {
-                        trace << "  a propagation is needed, start a search"
-                              << std::endl;
-                        tgba_run::step s = {s_prime, label, acc};
-                        if (search(s, target, dead, cycle, covered_acc))
-                          return true;
-                      }
-                    else
-                      {
-                        trace << "  already seen, pop it" << std::endl;
-                      }
-                  }
-                else
-                  delete s_prime;
+                ndfsr_trace << "(self loop " << a_->format_state(i->source)
+                            << " -> " << a_->format_state(i->dest)
+                            << " ignored) ";
+                tgba_run::step st = { i->source->clone(), i->label, i->acc };
+                run->cycle.push_back(st);
               }
             else
               {
-                trace << "  all the successors have been visited"
-                      << std::endl;
-                stack_item f_dest(f);
-                delete st1.front().it;
-                st1.pop_front();
-                if (!st1.empty() && (f_dest.acc & covered_acc) != f_dest.acc)
-                  {
-                    trace << "  a propagation is needed, start a search"
-                          << std::endl;
-                        tgba_run::step s = {f_dest.s,
-                                            f_dest.label,
-                                            f_dest.acc};
-                        if (search(s, target, dead, cycle, covered_acc))
-                          return true;
-                  }
-                else
-                  {
-                    trace << "  no propagation needed, pop it" << std::endl;
-                  }
+                ndfsr_trace << a_->format_state(i->source) << " (-> "
+                            << a_->format_state(i->dest) << ") ";
+                target.insert(std::make_pair(i->source, *i));
               }
           }
-        return false;
-      }
+        ndfsr_trace << std::endl;
 
-    bool search(const tgba_run::step& start, const state* target,
-                  state_set& dead, tgba_run::steps& cycle, bdd& covered_acc)
-      {
-        tgba_run::steps path;
-        if (start.s->compare(target)==0)
+        tgba_run::step st = { current.source->clone(), current.label,
+                                                                 current.acc };
+        run->cycle.push_back(st);
+
+        while (!target.empty())
           {
-            trace << "  complete the cycle" << std::endl;
-            complete_cycle(cycle, covered_acc, start, path, dead);
-            return covered_acc == a_->all_acceptance_conditions();
+            // find a minimal path from current.dest to any source state in
+            // target.
+            ndfsr_trace << "looking for a path from "
+                        << a_->format_state(current.dest) << std::endl;
+            typename m_source_trans::iterator i = target.find(current.dest);
+            if (i == target.end())
+              {
+                min_path s(a_, target, h_);
+                const state* res = s.search(current.dest->clone(), run->cycle);
+                // init current to the corresponding transition.
+                assert(res);
+                ndfsr_trace << a_->format_state(res) << " reached" << std::endl;
+                i = target.find(res);
+                assert(i != target.end());
+              }
+            else
+              {
+                ndfsr_trace << "this is a target" << std::endl;
+              }
+            current = i->second;
+            // complete the path with the corresponding transition
+            tgba_run::step st = { current.source->clone(), current.label,
+                                                            current.acc };
+            run->cycle.push_back(st);
+            // remove this source state of target
+            target.erase(i);
           }
 
-          shortest_path s(a_, target, dead, h_);
-          const state* res = s.search(start.s, path);
-          if (res)
-            {
-              assert(res->compare(target) == 0);
-              trace << "  complete the cycle" << std::endl;
-              complete_cycle(cycle, covered_acc, start, path, dead);
-              return covered_acc == a_->all_acceptance_conditions();
-            }
-          state_set::const_iterator it;
-          for (it = s.get_seen().begin(); it != s.get_seen().end(); ++it)
-            dead.insert(*it);
-          return false;
+        if (current.dest->compare(begin) != 0)
+          {
+            // close the cycle by adding a path from the destination of the
+            // last inserted transition to the source of the first one
+            ndfsr_trace << std::endl << "looking for a path from "
+                        << a_->format_state(current.dest) << " to "
+                        << a_->format_state(begin) << std::endl;
+            transition tmp;
+            target.insert(std::make_pair(begin, tmp));
+            min_path s(a_, target, h_);
+            const state* res = s.search(current.dest->clone(), run->cycle);
+            assert(res);
+            assert(res->compare(begin) == 0);
+            (void)res;
+          }
       }
+
+    void construct_prefix(tgba_run* run)
+      {
+        m_source_trans target;
+        transition tmp;
+
+
+        // Register all states from the cycle as target of the BFS.
+        for (tgba_run::steps::const_iterator i = run->cycle.begin();
+            i != run->cycle.end(); ++i)
+          target.insert(std::make_pair(i->s, tmp));
+
+        const state* prefix_start = a_->get_init_state();
+        // There are two cases: either the initial state is already on
+        // the cycle, or it is not.  If it is, we will have to rotate
+        // the cycle so it begins on this position.  Otherwise we will shift
+        // the cycle so it begins on the state that follows the prefix.
+        // cycle_entry_point is that state.
+        const state* cycle_entry_point;
+        typename m_source_trans::const_iterator ps = target.find(prefix_start);
+        if (ps != target.end())
+          {
+            // The initial state is on the cycle.
+            delete prefix_start;
+            cycle_entry_point = ps->first->clone();
+          }
+        else
+          {
+            // This initial state is outside the cycle.  Compute the prefix.
+            min_path s(a_, target, h_);
+            cycle_entry_point = s.search(prefix_start, run->prefix);
+            assert(cycle_entry_point);
+            cycle_entry_point = cycle_entry_point->clone();
+          }
+
+        // Locate cycle_entry_point on the cycle.
+        tgba_run::steps::iterator cycle_ep_it;
+        for (cycle_ep_it = run->cycle.begin();
+            cycle_ep_it != run->cycle.end()
+              && cycle_entry_point->compare(cycle_ep_it->s); ++cycle_ep_it)
+          continue;
+        assert(cycle_ep_it != run->cycle.end());
+        delete cycle_entry_point;
+
+        // Now shift the cycle so it starts on cycle_entry_point.
+        run->cycle.splice(run->cycle.end(), run->cycle,
+                          run->cycle.begin(), cycle_ep_it);
+        run->cycle.erase(run->cycle.begin(), cycle_ep_it);
+      }
+
   };
 
 }
+
+#undef ndfsr_trace
 
 #endif // SPOT_TGBAALGOS_NDFS_RESULT_HH

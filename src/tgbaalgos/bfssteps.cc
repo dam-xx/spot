@@ -19,7 +19,6 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include <map>
 #include <deque>
 #include <utility>
 #include "tgba/tgba.hh"
@@ -35,6 +34,28 @@ namespace spot
 
   bfs_steps::~bfs_steps()
   {
+  }
+
+  void
+  bfs_steps::finalize(const std::map<const state*, tgba_run::step,
+                state_ptr_less_than>& father, const tgba_run::step& s,
+                const state* start, tgba_run::steps& l)
+  {
+    tgba_run::steps p;
+    tgba_run::step current = s;
+    for (;;)
+      {
+        tgba_run::step tmp = current;
+        tmp.s = tmp.s->clone();
+        p.push_front(tmp);
+        if (current.s == start)
+          break;
+        std::map<const state*, tgba_run::step,
+            state_ptr_less_than>::const_iterator it = father.find(current.s);
+        assert(it!=father.end());
+        current = it->second;
+      }
+    l.splice(l.end(), p);
   }
 
   const state*
@@ -68,19 +89,7 @@ namespace spot
 	    if (match(s, dest))
 	      {
 		// Found it!
-
-		tgba_run::steps p;
-		for (;;)
-		  {
-		    tgba_run::step tmp = s;
-		    tmp.s = tmp.s->clone();
-		    p.push_front(tmp);
-		    if (s.s == start)
-		      break;
-		    s = father[s.s];
-		  }
-
-		l.splice(l.end(), p);
+                finalize(father, s, start, l);
 		delete i;
 		return dest;
 	      }

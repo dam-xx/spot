@@ -430,31 +430,19 @@ namespace spot
             h.insert(std::make_pair(s, c));
         }
 
-      void pop_notify(const state*)
+      void pop_notify(const state*) const
         {
         }
 
-      bool has_been_visited(const state*& s) const
+      bool has_been_visited(const state* s) const
         {
           hcyan_type::const_iterator ic = hc.find(s);
-          if (ic==hc.end())
+          if (ic == hc.end())
             {
               hash_type::const_iterator it = h.find(s);
-              if (it==h.end())
-                return false; // white state
-              if (s!=it->first)
-                {
-                  delete s;
-                  s = it->first;
-                }
-              return true; // blue or red state
+              return (it != h.end());
             }
-          if (s!=*ic)
-            {
-              delete s;
-              s = *ic;
-            }
-          return true; // cyan state
+          return true;
         }
 
     private:
@@ -541,18 +529,18 @@ namespace spot
             }
         }
 
-      void pop_notify(const state* s)
+      void pop_notify(const state* s) const
         {
           delete s;
         }
 
-      bool has_been_visited(const state*& s) const
+      bool has_been_visited(const state* s) const
         {
           hcyan_type::const_iterator ic = hc.find(s);
-          if (ic!=hc.end())
+          if (ic != hc.end())
             return true;
           size_t ha = s->hash();
-          return color((h[ha%size] >> (ha%4)) & 3U) != WHITE;
+          return color((h[ha%size] >> ((ha%4)*2)) & 3U) != WHITE;
         }
 
     private:

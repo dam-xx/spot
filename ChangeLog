@@ -1,3 +1,15 @@
+2004-12-20  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
+
+	* src/tgbaalgos/ndfs_result.hh: Rewrite the computation of accepting
+	runs.
+	* src/tgbaalgos/bfssteps.hh, src/tgbaalgos/bfssteps.cc: Add the method
+	finalize witch compute (by default) the traversed path.
+	* src/tgbaalgos/magic.cc, src/tgbaalgos/se05.cc: Fix a bug concerning
+	the heap used for bit state hashing version and ajust the prototype of
+	has_been_visited and pop_notify.
+	* src/tgbaalgos/tau03.cc, src/tgbaalgos/tau03opt.cc: ajust the prototype
+	of has_been_visited and pop_notify.
+
 2004-12-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/ndfs_result.hh: Include misc/hash.hh.

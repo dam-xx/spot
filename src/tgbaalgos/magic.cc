@@ -377,21 +377,14 @@ namespace spot
           h.insert(std::make_pair(s, c));
         }
 
-      void pop_notify(const state*)
+      void pop_notify(const state*) const
         {
         }
 
-      bool has_been_visited(const state*& s) const
+      bool has_been_visited(const state* s) const
         {
           hash_type::const_iterator it = h.find(s);
-          if (it==h.end())
-            return false;
-          if (s!=it->first)
-            {
-              delete s;
-              s = it->first;
-            }
-          return true;
+          return (it != h.end());
         }
 
     private:
@@ -452,15 +445,15 @@ namespace spot
           cr.set_color(c);
         }
 
-      void pop_notify(const state* s)
+      void pop_notify(const state* s) const
         {
           delete s;
         }
 
-      bool has_been_visited(const state*& s) const
+      bool has_been_visited(const state* s) const
         {
           size_t ha = s->hash();
-          return color((h[ha%size] >> (ha%4)) & 3U) != WHITE;
+          return color((h[ha%size] >> ((ha%4)*2)) & 3U) != WHITE;
         }
 
     private:
