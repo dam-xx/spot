@@ -1,5 +1,8 @@
 2005-02-04  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/misc/ltstr.hh: New file.
+	* src/misc/Makefile.am (misc_HEADERS): Add it.
+
 	* src/tgbaalgos/emptiness_stats.hh (unsigned_statistics::stats_map_):
 	Use char* for keys, not std::string.
 
