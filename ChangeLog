@@ -1,5 +1,7 @@
 2004-02-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* wrap/python/cgi/ltl2tgba.in: Process ltl2tgba.opt if it exists.
+
 	* wrap/python/cgi/ltl2tgba.in: Color translators and their options.
 
 2004-02-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>

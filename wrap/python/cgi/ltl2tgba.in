@@ -42,13 +42,25 @@ imgdir = 'spotimg'
 extra_header = ''
 # extra_header = '<LINK REL="stylesheet" TYPE="text/css" HREF="style.css">'
 
-import spot
-import buddy
+# Extra notice to display after the Send button.
+extra_form_notice = ''
+
+# Location of the dot command
+dot = 'dot' # in PATH.
+# dot = '/usr/local/bin/dot'
 
 def print_footer():
     print '<hr>'
     print 'ltl2tgba.py @PACKAGE_VERSION@; Spot', spot.version()
     print '</BODY></HTML>'
+
+try:
+    execfile('ltl2tgba.opt')
+except IOError:
+    pass
+
+import spot
+import buddy
 
 # We want the script to kill itself whenever it run for more than 30
 # seconds.  `dot' can be very long at drawing huge graphs, and may
@@ -85,7 +97,7 @@ reset_alarm()
 
 
 # Cleanup stale files from our image directory.
-os.system('find ' + imgdir + ' -type f -amin +10 -print | xargs rm -f')
+os.system('find ' + imgdir + ' -type f -amin +15 -print | xargs rm -f')
 
 myself = os.environ['SCRIPT_NAME'];
 form = cgi.FieldStorage()
@@ -141,7 +153,7 @@ def print_stats(automaton):
     return False
 
 def render_dot(basename):
-    os.spawnlp(os.P_WAIT, 'dot', 'dot', '-Tpng', '-Gsize=14,14', '-o',
+    os.spawnlp(os.P_WAIT, dot, dot, '-Tpng', '-Gsize=14,14', '-o',
                basename + '.png', basename + '.txt')
     reset_alarm()
     b = cgi.escape(basename)
@@ -330,7 +342,7 @@ for d in range(depth):
     print '</TR>'
 print '</TABLE>'
 
-print '<INPUT type="submit" value="Send"></FORM>'
+print '<INPUT type="submit" value="Send">%s</FORM>' % extra_form_notice
 
 if not filled:
     print_footer()
