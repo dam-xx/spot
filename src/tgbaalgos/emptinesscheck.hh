@@ -1,0 +1,139 @@
+#ifndef SPOT_EMPTINESS_CHECK_HH
+# define SPOT_EMPTINESS_CHECK_HH
+//#include "tgba/bddfactory.hh"
+#include "tgba/tgba.hh"
+#include "tgba/statebdd.hh"
+#include "tgba/tgbabddfactory.hh"
+#include "tgba/succiterconcrete.hh"
+#include "tgba/tgbabddconcrete.hh"
+#include <map>
+#include <stack>
+#include <list>
+#include <vector>
+#include <set>
+
+namespace spot
+{
+  /// \brief Emptiness check on spot::tgba
+
+  class connected_component
+  {
+  /// During the Depth path we keep the connected component that we met.
+  public:
+    connected_component();
+    connected_component(int i, bdd a);
+    virtual
+    ~connected_component();
+    std::string
+    to_string_component();
+    bool
+    isAccepted(tgba* aut);
+
+  public:
+    int index;
+    /// The bdd condition is the union of all accepting condition of
+    /// transitions which connect the states of the connected component.
+    bdd condition;
+    typedef std::set<const spot::state*, spot::state_ptr_less_than> set_of_state;
+    /// for the counter example we need to know all the states of the
+    ///component
+    set_of_state state_set;
+    int transition_acc;
+    int nb_transition;
+    int nb_state;
+    bool not_null;
+  };
+
+  class emptiness_check
+  {
+
+    typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
+    typedef std::pair<pair_state_iter, bdd> triplet;
+    typedef std::map <const spot::state*, int, spot::state_ptr_less_than> seen;
+    typedef std::list<const state*> state_sequence;
+    typedef std::pair<const spot::state*, bdd> state_proposition;
+    typedef std::list<state_proposition> cycle_path;
+
+  public:
+
+virtual
+    ~emptiness_check();
+
+    emptiness_check();
+
+    /// this function remove all accessible state from a given
+    /// state. In other words, it removes the strongly connected
+    /// component that contents this state.
+    void
+    remove_component(const tgba& aut, seen& state_map, const spot::state* start_delete);
+
+ /// \brief Emptiness check on spot::tgba
+  /// This is based on the following papers.
+  /// \verbatim
+  /// @InProceedings{   couvreur.00.lacim,
+  ///   author        = {Jean-Michel Couvreur},
+  ///   title         = {Un point de vue symbolique sur la logique temporelle
+  ///                   lin{\'e}aire},
+  ///   booktitle     = {Actes du Colloque LaCIM 2000},
+  ///   month         = {August},
+  ///   year          = {2000},
+  ///   pages         = {131--140},
+  ///   volume        = {27},
+  ///   series        = {Publications du LaCIM},
+  ///   publisher     = {Universit{\'e} du Qu{\'e}bec {\`a} Montr{\'e}al},
+  ///   editor        = {Pierre Leroux}
+  /// }
+  /// \endverbatim
+  /// and
+  /// \verbatim
+  /// @InProceedings{couvreur.99.fm,
+  ///   author	  = {Jean-Michel Couvreur},
+  ///   title     = {On-the-fly Verification of Temporal Logic},
+  ///   pages     = {253--271},
+  ///   editor	  = {Jeannette M. Wing and Jim Woodcock and Jim Davies},
+  ///   booktitle = {Proceedings of the World Congress on Formal Methods in the
+  /// 		     Development of Computing Systems (FM'99)},
+  ///   publisher = {Springer-Verlag},
+  ///   series	  = {Lecture Notes in Computer Science},
+  ///   volume	  = {1708},
+  ///   year      = {1999},
+  ///   address	  = {Toulouse, France},
+  ///   month	  = {September},
+  ///   isbn      = {3-540-66587-0}
+  /// }
+  /// \endverbatim
+  /// This function return true if the automata is empty and build a stack of SCC.
+    bool
+    tgba_emptiness_check(const spot::tgba* aut_check);
+
+    /// counter_example check if the automata is empty. If it is not,
+    ///then this function return an accepted word (a trace) and an accepted sequence.
+
+    void
+ counter_example(const spot::tgba* aut_counter);
+
+    std::stack <bdd> arc_accepting;
+    std::stack <connected_component> root_component;
+    seen seen_state_num;
+    state_sequence seq_counter;
+    cycle_path periode;
+  private:
+    std::stack <pair_state_iter> todo;
+    std::vector<state_sequence> vec_sequence;
+
+    /// This function is called by counter_example to find a path
+    /// which contents all accepting conditions in the accepted SCC (get all the
+    /// accepting conditions).
+
+    void
+    accepting_path (const spot::tgba* aut_counter, const connected_component& comp_path, const spot::state* start_path, bdd to_accept);
+
+
+    /// This function is called by counter_example (after
+    //accepting_path) to complete the cycle that caraterise the periode
+    //of the counter example.  Append a sequence to the path given by  accepting_path.
+    void
+    complete_cycle(const spot::tgba* aut_counter, const connected_component& comp_path, const state* from_state,const state* to_state);
+  };
+}
+#endif // SPOT_EMPTINESS_CHECK_HH

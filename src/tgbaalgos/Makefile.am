@@ -10,6 +10,7 @@ tgbaalgos_HEADERS = \
   ltl2tgba_fm.hh \
   ltl2tgba_lacim.hh \
   magic.hh \
+  emptinesscheck.hh \
   save.hh
 
 noinst_LTLIBRARIES = libtgbaalgos.la
@@ -20,4 +21,5 @@ libtgbaalgos_la_SOURCES = \
   ltl2tgba_fm.cc \
   ltl2tgba_lacim.cc \
   magic.cc \
+  emptinesscheck.cc \
   save.cc

@@ -6,6 +6,8 @@ check_SCRIPTS = defs
 check_PROGRAMS = \
   bddprod \
   explicit \
+  emptinesscheck \
+emptinesscheckexplicit \
   explprod \
   ltl2tgba \
   ltlmagic \
@@ -18,6 +20,8 @@ check_PROGRAMS = \
 # Keep this sorted alphabetically.
 bddprod_SOURCES  = ltlprod.cc
 bddprod_CXXFLAGS = -DBDD_CONCRETE_PRODUCT
+emptinesscheck_SOURCES = emptinesscheck.cc
+emptinesscheckexplicit_SOURCES = emptinesscheckexplicit.cc
 explicit_SOURCES = explicit.cc
 explprod_SOURCES = explprod.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
@@ -42,6 +46,8 @@ TESTS = \
   explpro3.test \
   tripprod.test \
   mixprod.test \
+  emptinesscheck.test \
+  emptinesscheckexplicit.test \
   ltlmagic.test \
   spotlbtt.test
 

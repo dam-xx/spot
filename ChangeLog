@@ -1,3 +1,17 @@
+2003-09-25  Rachid REBIHA  <rebiha@nyx>
+
+	* src/tgbatest/emptinesscheckexplicit.test (acc): New file.
+
+	* src/tgbatest/emptinesscheckexplicit.cc (main): New file.
+
+	* src/tgbatest/emptinesscheck.test: New file.
+
+	* src/tgbatest/emptinesscheck.cc (main): New file.
+
+	* src/tgbaalgos/emptinesscheck.cc (spot): New method.
+
+	* src/tgbaalgos/emptinesscheck.hh: New interface.
+
 2003-09-22  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
 	* src/tgbaalgos/ltl2tgba.cc, src/tgbaalgos/ltl2tgba.hh: Rename as ...

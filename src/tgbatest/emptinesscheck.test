@@ -1,0 +1,20 @@
+#!/bin/sh
+
+. ./defs
+
+set -e
+
+# We don't check the output, but just running these might be enough to
+# trigger assertions.
+
+./emptinesscheck -e 'a'
+./emptinesscheck -e 'a U b'
+./emptinesscheck -e 'X a'
+./emptinesscheck -e 'a & b & c'
+./emptinesscheck -e 'a | b | (c U (d & (g U (h ^ i))))'
+./emptinesscheck -e 'Xa & (b U !a) & (b U !a)'
+./emptinesscheck -e 'Fa & Xb & GFc & Gd'
+./emptinesscheck -e 'Fa & Xa & GFc & Gc'
+./emptinesscheck -e 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+./emptinesscheck -e '!((FF a) <=> (F x))'
+./emptinesscheck -e '!((FF a) <=> (F a))'
