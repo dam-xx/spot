@@ -5,6 +5,8 @@ noinst_LTLIBRARIES = libtgba.la
 libtgba_la_SOURCES = \
   bddfactory.cc \
   bddfactory.hh \
+  bddprint.cc \
+  bddprint.hh \
   dictunion.cc \
   dictunion.hh \
   ltl2tgba.cc \

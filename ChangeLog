@@ -1,12 +1,16 @@
 2003-05-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* src/tgba/bddprint.hh, src/tgba/bddprint.cc: New files.
+	* src/tgba/Makefile.am (libtgba_la_SOURCES): Add them.
+	* src/tgba/public.hh: Include bddprint.hh.
+
 	* src/tgba/tgba.hh: Rename as ...
 	* src/tgba/public.hh: .. this.
 	* src/tgba/tgba.hh: New file.
 	* src/tgba/Makefile.am (libtgba_la_SOURCES): Add public.hh.
 	* src/tgba/tgbabddconcrete.hh (tgba_bdd_concrete): Inherit from tgba.
 	(tgba_bdd_concrete::init_iter): Delete.
-	(tgba_bdd_concrete::succ_iter): Take a state_bdd as argument, 
+	(tgba_bdd_concrete::succ_iter): Take a state_bdd as argument,
 	not a bdd.
 	* src/tgba/tgbabddconcrete.cc: Likewise.
 
