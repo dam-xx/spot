@@ -1,5 +1,7 @@
 2004-07-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* THANKS: Fill in.
+
 	* src/tgbatest/ltl2baw.pl: Do not use -T anymore.  Fix comments.
 
 2004-07-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
