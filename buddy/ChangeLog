@@ -4,7 +4,7 @@
 
 2003-07-17  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
-	* rsc/bdd.h (bdd_existcomp, bdd_forallcomp,
+	* src/bdd.h (bdd_existcomp, bdd_forallcomp,
 	bdd_uniquecomp, bdd_appexcomp, bdd_appallcomp,
 	bdd_appunicomp): Declare for C and C++.
 	* src/bddop.c (CACHEID_EXISTC, CACHEID_FORALLC,
