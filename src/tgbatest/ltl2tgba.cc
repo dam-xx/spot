@@ -264,8 +264,8 @@ main(int argc, char** argv)
 	  break;
 	case Couvreur:
 	  {
-	    spot::emptiness_check ec = spot::emptiness_check();
-	    bool res = ec.tgba_emptiness_check(a);
+	    spot::emptiness_check ec = spot::emptiness_check(a);
+	    bool res = ec.check();
 	    if (expect_counter_example)
 	      {
 		if (res)
@@ -273,8 +273,8 @@ main(int argc, char** argv)
 		    exit_code = 1;
 		    break;
 		  }
-		ec.counter_example(a);
-		ec.print_result(std::cout, a);
+		ec.counter_example();
+		ec.print_result(std::cout);
 	      }
 	    else
 	      {

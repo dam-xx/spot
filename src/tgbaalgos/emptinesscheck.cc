@@ -27,17 +27,19 @@ namespace spot
     condition = bddfalse;
   }
 
-  /// \brief Remove all the nodes accessible from the given node start_delete.
-  ///
-  /// The removed graph is the subgraph containing nodes stored
-  /// in table state_map with order -1.
-  void
-  emptiness_check::remove_component(const tgba& aut, seen& state_map,
-				    const spot::state* start_delete)
+
+  emptiness_check::emptiness_check(const tgba* a)
+    : aut_(a)
   {
-    std::stack<spot::tgba_succ_iterator*> to_remove;
+  }
+
+  void
+  emptiness_check::remove_component(seen& state_map,
+				    const state* start_delete)
+  {
+    std::stack<tgba_succ_iterator*> to_remove;
     state_map[start_delete] = -1;
-    tgba_succ_iterator* iter_delete = aut.succ_iter(start_delete);
+    tgba_succ_iterator* iter_delete = aut_->succ_iter(start_delete);
     iter_delete->first();
     to_remove.push(iter_delete);
     while (!to_remove.empty())
@@ -52,7 +54,7 @@ namespace spot
 	    if (state_map[curr_state] != -1)
 	      {
 		state_map[curr_state] = -1;
-		tgba_succ_iterator* succ_delete2 = aut.succ_iter(curr_state);
+		tgba_succ_iterator* succ_delete2 = aut_->succ_iter(curr_state);
 		succ_delete2->first();
 		to_remove.push(succ_delete2);
 	      }
@@ -60,21 +62,17 @@ namespace spot
       }
   }
 
-  /// \brief On-the-fly emptiness check.
-  ///
-  /// The algorithm used here is adapted from Jean-Michel Couvreur's
-  /// Probataf tool.
   bool
-  emptiness_check::tgba_emptiness_check(const spot::tgba* aut_check)
+  emptiness_check::check()
   {
     std::stack<pair_state_iter> todo;
     std::stack<bdd> arc_accepting;
     int nbstate = 1;
-    state* init = aut_check->get_init_state();
+    state* init = aut_->get_init_state();
     seen_state_num[init] = 1;
-    root_component.push(spot::connected_component(1));
+    root_component.push(connected_component(1));
     arc_accepting.push(bddfalse);
-    tgba_succ_iterator* iter_ = aut_check->succ_iter(init);
+    tgba_succ_iterator* iter_ = aut_->succ_iter(init);
     iter_->first();
     todo.push(pair_state_iter(init, iter_ ));
     while (!todo.empty())
@@ -90,10 +88,8 @@ namespace spot
 	    assert(i_0 != seen_state_num.end());
 	    if (comp_tmp.index == seen_state_num[step.first])
 	      {
-		/// The current node is a root of a Strong Connected Component.
-		spot::emptiness_check::remove_component(*aut_check,
-							seen_state_num,
-							step.first);
+		// The current node is a root of a Strong Connected Component.
+		emptiness_check::remove_component(seen_state_num, step.first);
 		assert(!arc_accepting.empty());
 		arc_accepting.pop();
 		assert(root_component.size() == arc_accepting.size());
@@ -119,7 +115,7 @@ namespace spot
 		seen_state_num[current_state] = nbstate;
 		root_component.push(connected_component(nbstate));
 		arc_accepting.push(current_accepting);
-		tgba_succ_iterator* iter2 = aut_check->succ_iter(current_state);
+		tgba_succ_iterator* iter2 = aut_->succ_iter(current_state);
 		iter2->first();
 		todo.push(pair_state_iter(current_state, iter2 ));
 	      }
@@ -146,7 +142,7 @@ namespace spot
 		    new_condition |= arc_acc;
 		  }
 		comp.condition |= new_condition;
-		if (aut_check->all_accepting_conditions() == comp.condition)
+		if (aut_->all_accepting_conditions() == comp.condition)
 		  {
 		    // A failure SCC was found, the automata is not empty.
 		    root_component.push(comp);
@@ -163,23 +159,22 @@ namespace spot
 
 
   std::ostream&
-  emptiness_check::print_result(std::ostream& os, const spot::tgba* aut,
-				const tgba* restrict) const
+  emptiness_check::print_result(std::ostream& os, const tgba* restrict) const
   {
     os << "Prefix:" << std::endl;
-    const bdd_dict* d = aut->get_dict();
+    const bdd_dict* d = aut_->get_dict();
     for (state_sequence::const_iterator i_se = suffix.begin();
 	 i_se != suffix.end(); ++i_se)
       {
 	os << "  ";
 	if (restrict)
 	  {
-	    os << restrict->format_state(aut->project_state(*i_se, restrict))
+	    os << restrict->format_state(aut_->project_state(*i_se, restrict))
 	       << std::endl;
 	  }
 	else
 	  {
-	    os << aut->format_state((*i_se)) << std::endl;
+	    os << aut_->format_state((*i_se)) << std::endl;
 	  }
       }
     os << "Cycle:" <<std::endl;
@@ -190,26 +185,25 @@ namespace spot
 	if (restrict)
 	  {
 	    os << "    | " << bdd_format_set(d, it->second) <<std::endl ;
-	    os << restrict->format_state(aut->project_state(it->first,
-							    restrict))
+	    os << restrict->format_state(aut_->project_state(it->first,
+							     restrict))
 	       << std::endl;
 	  }
 	else
 	  {
 	    os << "    | " << bdd_format_set(d, it->second) <<std::endl ;
-	    os << aut->format_state(it->first) << std::endl;
+	    os << aut_->format_state(it->first) << std::endl;
 	  }
       }
     return os;
   }
 
-  /// \brief Build a possible prefix and period for a counter example.
   void
-  emptiness_check::counter_example(const spot::tgba* aut_counter)
+  emptiness_check::counter_example()
   {
     std::deque <pair_state_iter> todo_trace;
-    typedef std::map<const spot::state*, const spot::state*,
-                     spot::state_ptr_less_than> path_state;
+    typedef std::map<const state*, const state*,
+                     state_ptr_less_than> path_state;
     path_state path_map;
 
     assert(!root_component.empty());
@@ -250,10 +244,10 @@ namespace spot
 	  }
       }
 
-    state* start_state = aut_counter->get_init_state();
+    state* start_state = aut_->get_init_state();
     if (comp_size != 1)
       {
-	tgba_succ_iterator* i = aut_counter->succ_iter(start_state);
+	tgba_succ_iterator* i = aut_->succ_iter(start_state);
 	todo_trace.push_back(pair_state_iter(start_state, i));
 
 	for (int k = 0; k < comp_size - 1; ++k)
@@ -314,7 +308,7 @@ namespace spot
 			      {
 				todo_trace.
 				  push_back(pair_state_iter(curr_state,
-							    aut_counter->succ_iter(curr_state)));
+							    aut_->succ_iter(curr_state)));
 				path_map[curr_state] = started_from.first;
 			      }
 			  }
@@ -323,7 +317,7 @@ namespace spot
 	      }
 	    todo_trace.
 	      push_back(pair_state_iter(vec_sequence[k].back(),
-					aut_counter->succ_iter(vec_sequence[k].back())));
+					aut_->succ_iter(vec_sequence[k].back())));
 	  }
       }
     else
@@ -335,25 +329,21 @@ namespace spot
 	   it != vec_sequence[n_].end(); ++it)
 	suffix.push_back(*it);
     suffix.unique();
-    emptiness_check::accepting_path(aut_counter,
-				    vec_component[comp_size - 1],
-				    suffix.back(),
-				    vec_component[comp_size - 1].condition);
+    accepting_path(vec_component[comp_size - 1], suffix.back(),
+		   vec_component[comp_size - 1].condition);
   }
 
-  /// \brief complete the path build by accepting_path to get the period.
   void
-  emptiness_check::complete_cycle(const spot::tgba* aut_counter,
-				  const connected_component& comp_path,
+  emptiness_check::complete_cycle(const connected_component& comp_path,
 				  const state* from_state,
 				  const state* to_state)
   {
     if (seen_state_num[from_state] != seen_state_num[to_state])
       {
-	std::map<const spot::state*, state_proposition,
-	         spot::state_ptr_less_than> complete_map;
+	std::map<const state*, state_proposition,
+	         state_ptr_less_than> complete_map;
 	std::deque<pair_state_iter> todo_complete;
-	spot::tgba_succ_iterator* ite = aut_counter->succ_iter(from_state);
+	tgba_succ_iterator* ite = aut_->succ_iter(from_state);
 	todo_complete.push_back(pair_state_iter(from_state, ite));
 	cycle_path tmp_comp;
 	while(!todo_complete.empty())
@@ -388,7 +378,7 @@ namespace spot
 		    else
 		      {
 			todo_complete.push_back(pair_state_iter(curr_state,
-								aut_counter->succ_iter(curr_state)));
+								aut_->succ_iter(curr_state)));
 			complete_map[curr_state] =
 			  state_proposition(started_.first,
 					    iter_s->current_condition());
@@ -399,17 +389,14 @@ namespace spot
       }
   }
 
-  /// \Brief build recursively a path in the accepting SCC to get
-  /// all accepting conditions. This path is the first part of the
-  /// period.
+  // FIXME: Derecursive this function.
   void
-  emptiness_check::accepting_path(const spot::tgba* aut_counter,
-				  const connected_component& comp_path,
-				  const spot::state* start_path, bdd to_accept)
+  emptiness_check::accepting_path(const connected_component& comp_path,
+				  const state* start_path, bdd to_accept)
   {
     seen seen_priority;
     std::stack<triplet> todo_path;
-    tgba_succ_iterator* t_s_i = aut_counter->succ_iter(start_path);
+    tgba_succ_iterator* t_s_i = aut_->succ_iter(start_path);
     t_s_i->first();
     todo_path.push(triplet(pair_state_iter(start_path, t_s_i), bddfalse));
     bdd tmp_acc = bddfalse;
@@ -438,8 +425,7 @@ namespace spot
 		seen::iterator i = seen_priority.find(curr_state);
 		if (i == seen_priority.end())
 		  {
-		    tgba_succ_iterator* c_iter =
-		      aut_counter->succ_iter(curr_state);
+		    tgba_succ_iterator* c_iter = aut_->succ_iter(curr_state);
 		    bdd curr_bdd =
 		      iter_->current_accepting_conditions() | step_.second;
 		    c_iter->first();
@@ -501,8 +487,8 @@ namespace spot
     if (best_acc != to_accept)
       {
 	bdd rec_to_acc = to_accept - best_acc;
-	emptiness_check::accepting_path(aut_counter, comp_path,
-					period.back().first, rec_to_acc);
+	emptiness_check::accepting_path(comp_path, period.back().first,
+					rec_to_acc);
       }
     else
       {
@@ -510,8 +496,7 @@ namespace spot
 	  {
 	    /// The path contains all accepting conditions. Then we
 	    ///complete the cycle in this SCC by calling complete_cycle.
-	    complete_cycle(aut_counter, comp_path, period.back().first,
-			   suffix.back());
+	    complete_cycle(comp_path, period.back().first, suffix.back());
 	  }
       }
   }

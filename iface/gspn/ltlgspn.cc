@@ -107,14 +107,14 @@ main(int argc, char **argv)
 	{
 	case Couvreur:
 	  {
-	    spot::emptiness_check ec;
-	    bool res = ec.tgba_emptiness_check(prod);
+	    spot::emptiness_check ec(prod);
+	    bool res = ec.check();
 	    if (!res)
 	      {
 		if (compute_counter_example)
 		  {
-		    ec.counter_example(prod);
-		    ec.print_result(std::cout, prod, model);
+		    ec.counter_example();
+		    ec.print_result(std::cout, model);
 		  }
 		else
 		  {

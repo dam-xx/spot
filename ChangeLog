@@ -1,5 +1,17 @@
 2003-10-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/emptinesscheck.hh (emptiness_check::emptiness_check):
+	New, take the automaton to work on, and store it ...
+	(emptiness_check::aut_): ... in this new attribute.
+	(emptiness_check::tgba_emptiness_check): Rename as ...
+	(emptiness_check::check): ... this, and remove the automata
+	argument.
+	(emptiness_check::counter_example, emptiness_check::print_result,
+	emptiness_check::remove_component, emptiness_check::accepting_path,
+	emptiness_check::complete_cycle): Remove the automata argument.
+	* src/tgbaalgos/emptinesscheck.cc, src/tgbatest/ltl2tgba.cc,
+	iface/gspn/ltlgspn.cc: Adjust.
+
 	* src/tgbaalgos/emptinesscheck.hh (connected_component::not_null,
 	connected_component::transition_acc,
 	connected_component::nb_transition,
