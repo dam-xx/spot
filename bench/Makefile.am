@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -19,21 +19,4 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-if WITH_INCLUDED_BUDDY
-  MAYBE_BUDDY = buddy
-endif WITH_INCLUDED_BUDDY
-if WITH_INCLUDED_LBTT
-  MAYBE_LBTT = lbtt
-endif WITH_INCLUDED_LBTT
-if NEVER
-  # For Automake a conditional directory
-  # is conditionally built, but unconditionally distributed.
-  # So using NEVER here ensures that `make all' will not
-  # recurse in bench/, but `make dist' will.
-  NEVER_BENCH = bench
-endif
-
-SUBDIRS = $(MAYBE_BUDDY) $(MAYBE_LBTT) $(NEVER_BENCH) doc src wrap iface
-
-ACLOCAL_AMFLAGS = -I m4
-EXTRA_DIST = HACKING
+SUBDIRS = emptchk

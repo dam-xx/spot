@@ -1,0 +1,262 @@
+This directory contains the input files and scripts used to produce
+the measures in our paper "On-the-fly Emptiness Checks for Generalized
+Büchi Automata" (J.-M. Couvreur, A. Duret-Lutz, D. Poitrenaud),
+submitted to CAV'05.
+
+==========
+ CONTENTS
+==========
+
+This directory contains:
+
+* models/cl3serv1.pml
+* models/cl3serv3.pml
+
+    Two simple client/server promela examples.
+
+* models/clserv.ltl
+
+    An LTL formula to verify on these examples.
+
+* models/eeaean2.pml
+
+    A variations of the leader election protocol with extinction from
+    Tel, Introduction to Distributed Algorithms, 1994, Chapter 7. The
+    network in the model consists of three nodes. In Variant 1, the
+    same node wins every time, in Variant 2, each node gets a turn at
+    winning the election.  This script was originally distributed
+    alongside with
+
+    @InProceedings{   schwoon.05.tacas,
+      author        = {Stefan Schwoon and Javier Esparza},
+      title         = {A note on on-the-fly verification algorithms.},
+      booktitle     = {Proceedings of the 11th International Conference
+                       on Tools and Algorithms for the Construction and
+                       Analysis of Systems
+		      (TACAS'05)},
+      year          = {2005},
+      series        = {Lecture Notes in Computer Science},
+      publisher     = {Springer-Verlag},
+      month         = apr
+    }
+
+* models/eeaean.ltl
+
+    Sample properties for the leader election protocols. These come from
+
+    @InProceedings{   geldenhuys.04.tacas,
+      author        = {Jaco Geldenhuys and Antti Valmari},
+      title         = {Tarjan's Algorithm Makes On-the-Fly {LTL} Verification
+		      More Efficient},
+      booktitle     = {Proceedings of the 10th International Conference on
+                       Tools and Algorithms for the Construction and Analysis
+                       of Systems
+		      (TACAS'04)},
+      editor        = {Kurt Jensen and Andreas Podelski},
+      pages         = {205--219},
+      year          = {2004},
+      publisher     = {Springer-Verlag},
+      series        = {Lecture Notes in Computer Science},
+      volume        = {2988},
+      isbn          = {3-540-21299-X}
+    }
+
+* formulae.ltl
+
+    A list of 96 handwritten formulae with their negations.  They come
+    from three sources:
+
+    @InProceedings{   dwyer.98.fmsp,
+      author        = {Matthew B. Dwyer and George S. Avrunin and James C.
+		      Corbett},
+      title         = {Property Specification Patterns for Finite-state
+		      Verification},
+      booktitle     = {Proceedings of the 2nd Workshop on Formal Methods in
+		      Software Practice (FMSP'98)},
+      publisher     = {ACM Press},
+      address       = {New York},
+      editor        = {Mark Ardis},
+      month         = mar,
+      year          = {1998},
+      pages         = {7--15}
+    }
+
+    @InProceedings{   etessami.00.concur,
+      author        = {Kousha Etessami and Gerard J. Holzmann},
+      title         = {Optimizing {B\"u}chi Automata},
+      booktitle     = {Proceedings of the 11th International Conference on
+		      Concurrency Theory (Concur'00)},
+      pages         = {153--167},
+      year          = {2000},
+      editor        = {C. Palamidessi},
+      volume        = {1877},
+      series        = {Lecture Notes in Computer Science},
+      address       = {Pennsylvania, USA},
+      publisher     = {Springer-Verlag}
+    }
+
+    @InProceedings{   somenzi.00.cav,
+      author        = {Fabio Somenzi and Roderick Bloem},
+      title         = {Efficient {B\"u}chi Automata for {LTL} Formul{\ae}},
+      booktitle     = {Proceedings of the 12th International Conference on
+		      Computer Aided Verification (CAV'00)},
+      pages         = {247--263},
+      year          = {2000},
+      volume        = {1855},
+      series        = {Lecture Notes in Computer Science},
+      address       = {Chicago, Illinois, USA},
+      publisher     = {Springer-Verlag}
+    }
+
+
+* pml2tgba.pl
+
+    A Perl script to translate Promela models into TGBA readble by Spot.
+    This requires a working spin in PATH.
+
+* ltl-random.sh
+
+    Use all emptiness-check algorithms to test random graphs against
+    random LTL formulae.
+
+* ltl-human.sh
+
+    Use all emptiness-check algorithms to test random graphs against
+    all the formulae of the file `formulae.ltl'
+
+* pml-clserv.sh
+
+    Check the two configurations of the client/server example against
+    the formula in models/clserv.ltl, without and with fairness
+    assumptions, using all the algorithms of the file `algorihms'.
+    You should have run `make' before attempting to run this script,
+    so the state space are available.
+
+* pml-eeaean.sh
+
+    Check models/eeaean2.pml against each formulae in
+    models/eeaean.ltl, using all the algorithms of the file
+    `algorihms'.  You should have run `make' before attempting to run
+    this script, so the state space are available.
+
+
+=======
+ USAGE
+=======
+
+  1. If that is not done already, configure and compile all Spot library,
+     then come back into this directory.
+
+  2. Run `make' in this directory.  This will call pml2tgba.pl to
+     generate the TGBA input for the two pml-*.sh tests.
+
+  3. Run the tests you are interested in
+
+     - ltl-random.sh
+     - ltl-human.sh
+     - pml-clserv.sh
+     - pml-eeaean.sh
+
+     Beware that the two ltl-*.sh tests are very long (each of them
+     run 13 emptiness-check algorithms against 18000 state-spaces!)
+
+     You can speed up the pml-*.sh tests by removing some algorithms
+     from the `algorithms' file.
+
+==========================
+ INTERPRETING THE RESULTS
+==========================
+
+  Here are the short names for the algorithms used in the outputs.
+
+    Cou99
+    Cou99_shy-
+    Cou99_shy
+  > Cou99_rem
+  > Cou99_rem_shy-
+  > Cou99_rem_shy
+  > CVWY90
+    CVWY90_bsh
+  > GV04
+  > SE05
+    SE05_bsh
+  > Tau03
+  > Tau03_opt
+
+  Only the algorithms marked with a `>' have been shown in the paper.
+  `bsh' stands for `bit-state hashing'.
+
+  `Cou99_rem*' algorithms are using the `rem' field to remove
+  the SCC without recomputing the SCC as described in the paper.
+  The other `Cou99*' algorithms are not.  (Beware that in the paper
+  we showed the `Cou99_rem*' variants and called them `Cou99*'.)
+
+
+  The ltl-*.sh tests output look as follows:
+
+  | density: 0.001
+  | Ratios about empt. check (all tests)
+  |                 CVWY90      5.5      4.4      6.3   25
+  |             CVWY90_bsh      5.7      4.8      6.3   25
+  |                  Cou99      5.5      3.3      4.3   25
+  |              Cou99_rem      5.5      3.0      4.3   25
+  | ...
+				(A)      (B)      (C)   (D)
+  |
+  | Ratios about search space
+  |                 CVWY90      5.5
+  |                  Cou99      2.0
+  |              Cou99_rem      2.0
+  |          Cou99_rem_shy      1.2
+  | ...
+				(E)
+  |
+  | Ratios about acc. run computation
+  |                 CVWY90      2.6
+  |             CVWY90_bsh      2.6
+  |                  Cou99      2.1
+  |              Cou99_rem      2.1
+  | ...
+				(F)
+
+  (A) mean number of distinct states visited
+      expressed as a % of the number of state of the product space
+  (B) mean number of distinct transitions visited
+      expressed as a % of the number of transition of the product space
+  (C) mean of the maximal stack size
+      expressed as a % of the number of state of the product space
+  (D) number of non-empy automata used for these statistics
+  (E) mean number of states in the search space for accepting runs
+      expressed as a % of the number of state of the product space
+  (F) mean number of states visited (possibly several times) while
+      computing the acceptin run
+      expressed as a % of the number of state of the product space
+
+
+  The pml-*.sh tests output look as follows:
+
+  | Cou99               ,        783,       2371, 5,        783,       4742,        237, no accepting run found
+  | Cou99_shy-          ,        783,       2371, 5,        783,       4742,        537, no accepting run found
+  | ...
+                                 (G)         (H) (I)        (K)          (L)        (M)  (N)
+
+  (G) Number of states in the product.
+  (H) Number of transitions in the product.
+  (I) Number of acceptance conditions in the product.
+  (K) Number of distinct states visited by the emptiness-check algorithm.
+  (L) Number of transitions visited by the emptiness-check algorithm.
+  (M) Maximal size of the stack.
+  (N) Whehter an accepting run was found.
+
+
+=================
+ MORE STATISTICS
+=================
+
+  The ltl-*.sh tests use src/tgbatest/randtgba to output statistics,
+  but randtgba is able to output a lot more data than what we have
+  shown above.  Try removing the `-1' option from the script, or toying
+  with randtgba itself.
+
+  Besides randtgba, two other tools that you might find handy we
+  experimenting are src/ltltest/randltl and src/tgbatest/ltl2tgba.

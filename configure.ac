@@ -1,4 +1,4 @@
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -55,11 +55,16 @@ adl_ENABLE_DEBUG
 ad_GCC_OPTIM
 adl_NDEBUG
 
+AM_CONDITIONAL([NEVER], [false])
 AC_CHECK_PROG([DOT], [dot], [dot])
+AC_CHECK_PROG([PERL], [perl], [perl])
 AC_CHECK_PROG([VALGRIND], [valgrind], [valgrind])
 
 AC_CONFIG_FILES([
   Makefile
+  bench/Makefile
+  bench/emptchk/Makefile
+  bench/emptchk/defs
   doc/Doxyfile
   doc/Makefile
   iface/Makefile

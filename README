@@ -101,13 +101,16 @@ src/            Sources for libspot.
    misc/        Miscellaneous support files.
    tgba/        TGBA objects and cousins.
    tgbaalgos/   Algorithms on TGBA.
-      gtec/     Generalized Tarjan Emptiness-Check.
+      gtec/     Couvreur's Emptiness-Check.
    tgbaparse/   Parser for explicit TGBA.
    tgbatest/    Tests for tgba/, tgbaalgos/, and tgbaparse/.
+   evtgba*/     Ignore these for now.
 doc/	        Documentation for libspot.
    spot.html/   HTML reference manual.
    spot.latex/  Sources for the PDF manual. (No distributed, can be rebuilt.)
    spotref.pdf  PDF reference manual.
+bench/          Benchmarks...
+   emptchk/     ... for emptiness-check algorithms. (Paper submitted to CAV'05)
 wrap/	        Wrappers for other languages.
    python/      Python bindings for Spot and BuDDy
       tests/    Tests for these bindings
