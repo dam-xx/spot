@@ -152,11 +152,12 @@ namespace spot
     return i->second;
   }
 
-  void
+  tgba_explicit::state*
   tgba_explicit::set_init_state(const std::string& state)
   {
     tgba_explicit::state* s = add_state(state);
     init_ = s;
+    return s;
   }
 
   tgba_explicit::transition*

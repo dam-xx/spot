@@ -51,7 +51,7 @@ namespace spot
       const state* dest;
     };
 
-    void set_init_state(const std::string& state);
+    state* set_init_state(const std::string& state);
 
     transition*
     create_transition(const std::string& source, const std::string& dest);

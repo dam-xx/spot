@@ -19,9 +19,11 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+#include <sstream>
 #include "emptiness.hh"
 #include "tgba/tgba.hh"
 #include "tgba/bddprint.hh"
+#include "tgba/tgbaexplicit.hh"
 
 namespace spot
 {
@@ -80,7 +82,6 @@ namespace spot
     return os;
   }
 
-
   tgba_run&
   tgba_run::operator=(const tgba_run& run)
   {
@@ -108,4 +109,118 @@ namespace spot
   {
     return os;
   }
+
+  namespace
+  {
+    std::string format_state(const tgba* a, const state* s, int n)
+    {
+      std::ostringstream os;
+      os << a->format_state(s) << " (" << n << ")";
+      return os.str();
+    }
+  }
+
+  tgba* tgba_run_to_tgba(const tgba* a, const tgba_run* run)
+  {
+    tgba_explicit* res = new tgba_explicit(a->get_dict());
+    res->copy_acceptance_conditions_of(a);
+
+    const state* s = a->get_init_state();
+    int number = 1;
+    tgba_explicit::state* source;
+    tgba_explicit::state* dest;
+    const tgba_run::steps* l;
+    bdd seen_acc = bddfalse;
+
+    typedef Sgi::hash_map<const state*, tgba_explicit::state*,
+                          state_ptr_hash, state_ptr_equal> state_map;
+    state_map seen;
+
+    if (run->prefix.empty())
+        l = &run->cycle;
+    else
+        l = &run->prefix;
+
+    tgba_run::steps::const_iterator i = l->begin();
+
+    assert(s->compare(i->s) == 0);
+    source = res->set_init_state(format_state(a, i->s, number));
+    ++number;
+    seen.insert(std::make_pair(i->s, source));
+
+    for (; i != l->end(); )
+      {
+        // expected outgoing transition
+        bdd label = i->label;
+        bdd acc = i->acc;
+
+        // compute the next expected state
+        const state* next;
+        ++i;
+        if (i != l->end())
+          {
+            next = i->s;
+          }
+        else
+          {
+            if (l == &run->prefix)
+              {
+                l = &run->cycle;
+                i = l->begin();
+              }
+            next = l->begin()->s;
+          }
+
+        // browse the actual outgoing transitions
+        tgba_succ_iterator* j = a->succ_iter(s);
+        delete s;
+        for (j->first(); !j->done(); j->next())
+          {
+            if (j->current_condition() != label
+                || j->current_acceptance_conditions() != acc)
+              continue;
+
+            const state* s2 = j->current_state();
+            if (s2->compare(next) != 0)
+              {
+                delete s2;
+                continue;
+              }
+            else
+              {
+                s = s2;
+                break;
+              }
+          }
+        assert(!j->done());
+        delete j;
+
+        state_map::const_iterator its = seen.find(next);
+        if (its == seen.end())
+          {
+            dest = res->add_state(format_state(a, next, number));
+            ++number;
+            seen.insert(std::make_pair(next, dest));
+          }
+        else
+          dest = its->second;
+
+        tgba_explicit::transition* t = res->create_transition(source, dest);
+        res->add_conditions(t, label);
+        res->add_acceptance_conditions(t, acc);
+        source = dest;
+
+        // Sum acceptance conditions.
+        if (l == &run->cycle && i != l->begin())
+            seen_acc |= acc;
+      }
+    delete s;
+
+    assert(seen_acc == a->all_acceptance_conditions());
+
+    res->merge_transitions();
+
+    return res;
+  }
+
 }

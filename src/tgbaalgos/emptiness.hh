@@ -179,12 +179,23 @@ namespace spot
   /// annotation).
   ///
   /// (\a a is used here only to format states and transitions.)
+  ///
+  /// Output the prefix and cycle of the tgba_run \a run, even if it
+  /// does not corresponds to an actual run of the automaton \a a.
+  /// This is unlike replay_tgba_run(), which will ensure the run
+  /// actually exist in the automaton (and will display any transition
+  /// annotation).
   std::ostream& print_tgba_run(std::ostream& os,
-			       const tgba* a,
-			       const tgba_run* run);
+                               const tgba* a,
+                               const tgba_run* run);
+
+  /// \brief Return an explicit_tgba corresponding to \a run (i.e. comparable
+  /// states are merged).
+  ///
+  /// \pre \a run must correspond to an actual run of the automaton \a a.
+  tgba* tgba_run_to_tgba(const tgba* a, const tgba_run* run);
+
   /// @}
-
-
 }
 
 #endif // SPOT_TGBAALGOS_EMPTINESS_HH

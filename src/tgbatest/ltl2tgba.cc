@@ -74,6 +74,8 @@ syntax(char* prog)
             << "  -F    read the formula from the file" << std::endl
 	    << "  -g    graph the accepting run on the automaton (requires -e)"
 	    << std::endl
+	    << "  -G    graph the accepting run seen as an automaton "
+	    << " (requires -e)" << std::endl
             << "  -L    fair-loop approximation (implies -f)" << std::endl
 	    << "  -m    try to reduce accepting runs, in a second pass"
 	    << std::endl
@@ -170,6 +172,7 @@ main(int argc, char** argv)
   bool post_branching = false;
   bool fair_loop_approx = false;
   bool graph_run_opt = false;
+  bool graph_run_tgba_opt = false;
   bool opt_reduce = false;
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* unobservables = 0;
@@ -240,6 +243,10 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-g"))
 	{
 	  graph_run_opt = true;
+	}
+      else if (!strcmp(argv[formula_index], "-G"))
+	{
+	  graph_run_tgba_opt = true;
 	}
       else if (!strcmp(argv[formula_index], "-L"))
 	{
@@ -443,9 +450,10 @@ main(int argc, char** argv)
 	}
     }
 
-  if (graph_run_opt && (echeck_algo == "" || !expect_counter_example))
+  if ((graph_run_opt || graph_run_tgba_opt) &&
+              (echeck_algo == "" || !expect_counter_example))
     {
-      std::cerr << argv[0] << ": error: -g requires -e." << std::endl;
+      std::cerr << argv[0] << ": error: -g and -G require -e." << std::endl;
       exit(1);
     }
 
@@ -690,7 +698,7 @@ main(int argc, char** argv)
             {
               ec = spot::explicit_tau03_search(a);
             }
-
+          break;
 	case Tau03OptSearch:
           ec = spot::explicit_tau03_opt_search(a);
 	  break;
@@ -704,7 +712,7 @@ main(int argc, char** argv)
 	  do
 	    {
 	      spot::emptiness_check_result* res = ec->check();
-	      if (!graph_run_opt)
+	      if (!graph_run_opt && !graph_run_tgba_opt)
 		ec->print_stats(std::cout);
 	      if (expect_counter_example != !!res &&
                       (!bit_state_hashing || !expect_counter_example))
@@ -745,6 +753,12 @@ main(int argc, char** argv)
 			{
 			  spot::tgba_run_dotty_decorator deco(run);
 			  spot::dotty_reachable(std::cout, a, &deco);
+			}
+		      else if (graph_run_tgba_opt)
+			{
+			  spot::tgba* ar = spot::tgba_run_to_tgba(a, run);
+			  spot::dotty_reachable(std::cout, ar);
+			  delete ar;
 			}
 		      else
 			{
