@@ -1,5 +1,5 @@
 AC_PREREQ([2.57])
-AC_INIT([spot], [0.0b])
+AC_INIT([spot], [0.0c])
 AC_CONFIG_AUX_DIR([tools])
 AM_INIT_AUTOMAKE([foreign nostdinc 1.7.3])
 

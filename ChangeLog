@@ -1,5 +1,7 @@
 2003-06-26  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* configure.ac: Bump version to 0.0c.
+
 	* configure.ac: Bump version to 0.0b.
 
 	* INSTALL: New file.
