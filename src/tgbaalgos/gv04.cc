@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -236,7 +236,10 @@ namespace spot
 	return os;
       }
 
-      struct result: public emptiness_check_result
+      struct result:
+	public emptiness_check_result,
+	public acss_statistics,
+	public ars_statistics
       {
 	gv04& data;
 
@@ -245,13 +248,11 @@ namespace spot
 	{
 	}
 
-	virtual tgba_run*
-	accepting_run()
+	void
+	update_lowlinks()
 	{
-	  tgba_run* res = new tgba_run;
-
 	  // Transitively update the lowlinks, so we can use them in
-	  // the BFS bellow.
+	  // to check SCC inclusion
 	  for (int i = 0; i <= data.top; ++i)
 	    {
 	      int l = data.stack[i].lowlink;
@@ -262,6 +263,32 @@ namespace spot
 		    data.stack[j].lowlink = ll;
 		}
 	    }
+	}
+
+	virtual int
+	acss_states() const
+	{
+	  // Gross!
+	  const_cast<result*>(this)->update_lowlinks();
+
+	  int scc = data.stack[data.dftop].lowlink;
+	  int j = data.dftop;
+	  int s = 0;
+	  while (j >= 0 && data.stack[j].lowlink == scc)
+	    {
+	      --j;
+	      ++s;
+	    }
+	  assert(s > 0);
+	  return s;
+	}
+
+	virtual tgba_run*
+	accepting_run()
+	{
+	  tgba_run* res = new tgba_run;
+
+	  update_lowlinks();
 #ifdef TRACE
 	  for (int i = 0; i <= data.top; ++i)
 	    {
@@ -301,15 +328,18 @@ namespace spot
 	  {
 	    const gv04& data;
 	    int scc_root;
+	    result* r;
 
-	    first_bfs(const gv04& data, int scc_root)
-	      : bfs_steps(data.automaton()), data(data), scc_root(scc_root)
+	    first_bfs(result* r, int scc_root)
+	      : bfs_steps(r->data.automaton()), data(r->data),
+		scc_root(scc_root), r(r)
 	    {
 	    }
 
 	    virtual const state*
 	    filter(const state* s)
 	    {
+	      r->inc_ars_states();
 	      // Do not escape the SCC
 	      hash_type::const_iterator j = data.h.find(s);
 	      if (// This state was never visited so far.
@@ -338,8 +368,8 @@ namespace spot
 	  struct second_bfs: first_bfs
 	  {
 	    const state* target;
-	    second_bfs(const gv04& data, int scc_root, const state* target)
-	      : first_bfs(data, scc_root), target(target)
+	    second_bfs(result* r, int scc_root, const state* target)
+	      : first_bfs(r, scc_root), target(target)
 	    {
 	    }
 
@@ -354,13 +384,13 @@ namespace spot
 	  const state* bfs_end = bfs_start;
 	  if (data.accepting != bddfalse)
 	    {
-	      first_bfs b1(data, scc_root);
+	      first_bfs b1(this, scc_root);
 	      bfs_start = b1.search(bfs_start, res->cycle);
 	      assert(bfs_start);
 	    }
 	  if (bfs_start != bfs_end || res->cycle.empty())
 	    {
-	      second_bfs b2(data, scc_root, bfs_end);
+	      second_bfs b2(this, scc_root, bfs_end);
 	      bfs_start = b2.search(bfs_start, res->cycle);
 	      assert(bfs_start == bfs_end);
 	    }

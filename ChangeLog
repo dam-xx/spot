@@ -1,3 +1,8 @@
+2005-01-11  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gv04.cc (result): Implement the acss_statistics,
+	and ars_statistics interfaces.
+
 2005-01-11  Denis Poitrenaud  <Denis.Poitrenaud@lip6.fr>
 
 	* src/ltltest/randltl.cc: Typo.
