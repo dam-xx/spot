@@ -70,6 +70,7 @@ fi
 
 # Check for the availability of headers.
 
+AC_GNU_SOURCE
 AC_HEADER_STDC
 AC_CHECK_HEADERS([libintl.h fcntl.h sys/times.h])
 AC_HEADER_SYS_WAIT
@@ -122,8 +123,6 @@ AC_CHECK_HEADERS(
 
 
 # Checks for typedefs, structures, and compiler characteristics.
-
-AC_GNU_SOURCE
 
 # Check for the availability of the slist header (an extension to the C++
 # Standard Template Library). (In GCC 3.x the header is in the ext/
