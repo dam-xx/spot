@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddop.c,v 1.2 2003/05/05 13:45:04 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/bddop.c,v 1.3 2003/05/07 12:23:19 aduret Exp $
   FILE:  bddop.c
   DESCR: BDD operators
   AUTH:  Jorn Lind
@@ -2350,7 +2350,7 @@ static int fullsatone_rec(int r)
 NAME    {* bdd\_allsat *}
 SECTION {* operator *}
 SHORT   {* finds all satisfying variable assignments *}
-PROTO   {* BDD bdd_satone(BDD r, bddallsathandler handler) *}
+PROTO   {* BDD bdd_allsat(BDD r, bddallsathandler handler) *}
 DESCR   {* Iterates through all legal variable assignments (those
            that make the BDD come true) for the  bdd {\tt r} and
 	   calls the callback handler {\tt handler} for each of them.
