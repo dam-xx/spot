@@ -307,7 +307,9 @@ main(int argc, char** argv)
 					     argv[formula_index] + 2, pel))
 	    return 2;
 	  system->merge_transitions();
-	  std::clog << argv[formula_index] + 2 << " read" << std::endl;
+
+	  if (!paper_opt)
+	    std::clog << argv[formula_index] + 2 << " read" << std::endl;
 	}
       else if (!strcmp(argv[formula_index], "-r"))
 	{
