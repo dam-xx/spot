@@ -96,10 +96,10 @@ flex_set_buffer(const char* buf)
      used by a unary operator (F,G,X), unless this
      letter is followed by a digit in which case we assume
      it's an ATOMIC_PROP (even though F0 could be seen as Ffalse, we
-     don't).
+     don't, because Ffalse is never used in practice).
   */
 <INITIAL>[a-zA-EH-WYZ_][a-zA-Z0-9_]* |
-<INITIAL>[FGX][0-9_][a-zA-Z0-9_]* |
+<INITIAL>[FGX][0-9][a-zA-Z0-9_]* |
   /*
      However if we have just parsed an atomic proposition, then we
      are not expecting another atomic proposition, so we can be stricter

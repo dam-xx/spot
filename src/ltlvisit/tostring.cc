@@ -21,6 +21,7 @@
 
 #include <cassert>
 #include <sstream>
+#include <ctype.h>
 #include "tostring.hh"
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
@@ -30,6 +31,27 @@ namespace spot
 {
   namespace ltl
   {
+
+    static bool
+    is_bare_word(const char* str)
+    {
+      // Bare words cannot be empty, start with the letter of a unary
+      // operator, or be the name of an existing constant.  Also they
+      // should start with an letter.
+      if (!*str
+	  || *str == 'F'
+	  || *str == 'G'
+	  || *str == 'X'
+	  || !(isalpha(*str) || *str == '_')
+	  || !strcasecmp(str, "true")
+	  || !strcasecmp(str, "false"))
+	return false;
+      // The remaining of the word must be alphanumeric.
+      while (*++str)
+	if (!(isalnum(*str) || *str == '_'))
+	  return false;
+      return true;
+    }
 
     class to_string_visitor : public const_visitor
     {
@@ -48,9 +70,7 @@ namespace spot
       visit(const atomic_prop* ap)
       {
 	std::string str = ap->name();
-	if (str[0] == 'F' || str[0] == 'G' || str[0] == 'X'
-	    || !strcasecmp(str.c_str(), "true")
-	    || !strcasecmp(str.c_str(), "false"))
+	if (!is_bare_word(str.c_str()))
 	  {
 	    os_ << '"' << str << '"';
 	  }

@@ -1,4 +1,11 @@
-2004-06-23  Alexandre Duret-Lutz  <adl@gnu.org>
+2004-06-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlvisit/tostring.cc (is_bare_word): New function.
+	(to_string_visitor::visitor(const atomic_prop*)): Use is_bare_word
+	to better check which atomic proposition need to be quoted.
+	* src/ltlparse/ltlscan.ll: Do not allow identifiers starting with F_
+	or G_.
+	* src/ltltest/equals.test, src/ltltest/tostring.test: More tests.
 
 	* src/tgba/tgbatba.cc (tgba_tba_proxy::format_state): Use
 	bdd_format_accset to print the acceptance condition part of the state.

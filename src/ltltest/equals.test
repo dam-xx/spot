@@ -57,3 +57,6 @@ run 1 ./equals 'a & b & (c |(f U g)| e)' \
 
 # Precedence
 run 0 ./equals 'a & b ^ c | d' 'd | c ^ b & a'
+
+# Corner cases parsing
+run 0 ./equals 'FFG__GFF' 'F(F(G("__GFF")))'
