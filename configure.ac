@@ -43,5 +43,6 @@ AC_CONFIG_FILES([
   src/tgbatest/defs
   src/misc/Makefile
   wrap/Makefile
+  wrap/python/Makefile
 ])
 AC_OUTPUT

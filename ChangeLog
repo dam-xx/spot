@@ -1,5 +1,10 @@
 2003-07-31  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* wrap/Makefile.am, wrap/spot.i: Move ...
+	* wrap/python/Makefile.am, wrap/python/spot.i: ... here.
+	* wrap/Makefile.am: New file.
+	* configure.ac: Output wrap/python/Makefile.
+
 	* src/misc/const_sel.hh: Delete.
 	* src/misc/Makefile.am (misc_HEADERS): Remove const_sel.hh.
 
