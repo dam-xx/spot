@@ -15,3 +15,11 @@ dottygspn_rg_LDADD = libspotgspn.la $(LIBGSPNRG_LDFLAGS)
 
 dottygspn_srg_SOURCES = dottygspn.cc
 dottygspn_srg_LDADD = libspotgspn.la $(LIBGSPNSRG_LDFLAGS)
+
+EXTRA_DIST = \
+  examples/DCSwave/DCSWave.def \
+  examples/DCSwave/DCSWave.net \
+  examples/DCSwave/DCSWave.tobs \
+  examples/simple/simple.def \
+  examples/simple/simple.net \
+  examples/simple/simple.tobs

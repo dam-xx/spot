@@ -1,6 +1,15 @@
 2003-07-23  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
-	* iface/gspn/gspn.cc (tgba_gspn_private_::tgba_gspn_private_): 
+	* iface/gspn/examples/DCSwave/DCSWave.def,
+	iface/gspn/examples/DCSwave/DCSWave.net
+	iface/gspn/examples/DCSwave/DCSWave.tobs,
+	iface/gspn/examples/simple/simple.def,
+	iface/gspn/examples/simple/simple.net,
+	iface/gspn/examples/simple/simple.tobs: New files, from 
+	Yann Thierry-Mieg.
+	* iface/gspn/Makefile.am (EXTRA_DIST): New variables.
+
+	* iface/gspn/gspn.cc (tgba_gspn_private_::tgba_gspn_private_):
 	Rethrow caught expections.
 
 2003-07-22  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
