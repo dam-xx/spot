@@ -73,7 +73,7 @@ namespace spot
 
   private:
     const tgba* aut_;
-    std::stack<connected_component> root_component;
+    std::stack<connected_component> root;
     state_sequence suffix;
     cycle_path period;
 

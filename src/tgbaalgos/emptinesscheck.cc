@@ -72,94 +72,138 @@ namespace spot
   bool
   emptiness_check::check()
   {
+    // We use five main data in this algorithm:
+    // * emptiness_check::root, a stack of strongly connected components (SCC),
+    // * emptiness_check::h, a hash of all visited node, with their order,
+    //   (it is called "Hash" in Couvreur's paper)
+    // * arc, a stack of acceptance conditions between each of these SCC,
+    std::stack<bdd> arc;
+    // * num, the number of visited nodes.  Used to set the order of each
+    //   visited node,
+    int num = 1;
+    // * todo, the depth-first search stack.  This holds pairs of the
+    //   form (STATE, ITERATOR) where ITERATOR is a tgba_succ_iterator
+    //   over the successors of STATE.  In our use, ITERATOR should
+    //   always be freed when TODO is popped, but STATE should not because
+    //   it is also used as a key in H.
     std::stack<pair_state_iter> todo;
-    std::stack<bdd> arc_accepting;
-    int nbstate = 1;
-    state* init = aut_->get_init_state();
-    h[init] = 1;
-    root_component.push(connected_component(1));
-    arc_accepting.push(bddfalse);
-    tgba_succ_iterator* iter_ = aut_->succ_iter(init);
-    iter_->first();
-    todo.push(pair_state_iter(init, iter_));
+
+    // Setup depth-first search from the initial state.
+    {
+      state* init = aut_->get_init_state();
+      h[init] = 1;
+      root.push(connected_component(1));
+      arc.push(bddfalse);
+      tgba_succ_iterator* iter = aut_->succ_iter(init);
+      iter->first();
+      todo.push(pair_state_iter(init, iter));
+    }
+
     while (!todo.empty())
       {
-	pair_state_iter step = todo.top();
-	if (step.second->done())
+	assert(root.size() == arc.size());
+
+	// We are looking at the next successor in SUCC.
+	tgba_succ_iterator* succ = todo.top().second;
+
+	// If there is no more successor, backtrack.
+	if (succ->done())
 	  {
+	    // We have explored all successors of state CURR.
+	    const state* curr = todo.top().first;
+
+	    // Backtrack TODO.
 	    todo.pop();
-	    assert(!root_component.empty());
-	    connected_component comp_tmp = root_component.top();
-	    root_component.pop();
-	    hash_type::iterator i_0 = h.find(step.first);
-	    assert(i_0 != h.end());
-	    if (comp_tmp.index == i_0->second)
+
+	    // When backtracking the root of an SCC, we must also
+	    // remove that SCC from the ARC/ROOT stacks.  We must
+	    // discard from H all reachable states from this SCC.
+	    hash_type::iterator i = h.find(curr);
+	    assert(i != h.end());
+	    assert(!root.empty());
+	    if (root.top().index == i->second)
 	      {
-		// The current node is a root of a Strong Connected Component.
-		remove_component(step.first);
-		assert(!arc_accepting.empty());
-		arc_accepting.pop();
+		assert(!arc.empty());
+		arc.pop();
+		root.pop();
+		remove_component(curr);
 	      }
-	    else
-	      {
-		root_component.push(comp_tmp);
-	      }
-	    assert(root_component.size() == arc_accepting.size());
+
+	    delete succ;
+	    // Do not delete CURR: it is a key in H.
+	    continue;
 	  }
-	else
+
+	// We have a successor to look at.  Fetch the values
+	// (destination state, acceptance conditions of the arc)
+	// we are interested in...
+	const state* dest = succ->current_state();
+	bdd acc = succ->current_accepting_conditions();
+	// ... and point the iterator to the next successor, for
+	// the next iteration.
+	succ->next();
+	// We do not need SUCC from now on.
+
+	// Are we going to a new state?
+	hash_type::iterator i = h.find(dest);
+	if (i == h.end())
 	  {
-	    iter_ = step.second;
-	    state* current_state = iter_->current_state();
-	    bdd current_accepting = iter_->current_accepting_conditions();
-	    hash_type::iterator i = h.find(current_state);
-	    iter_->next();
-	    if (i == h.end())
-	      {
-		// New node.
-		nbstate = nbstate + 1;
-		assert(nbstate != 0);
-		h[current_state] = nbstate;
-		root_component.push(connected_component(nbstate));
-		arc_accepting.push(current_accepting);
-		tgba_succ_iterator* iter2 = aut_->succ_iter(current_state);
-		iter2->first();
-		todo.push(pair_state_iter(current_state, iter2));
-	      }
-	    else if (i->second != -1)
-	      {
-		// A node with order != -1 (a seen node not removed).
-		assert(!root_component.empty());
-		connected_component comp = root_component.top();
-		root_component.pop();
-		bdd new_condition = current_accepting;
-		int current_index = i->second;
-		while (comp.index > current_index)
-		  {
-		    // root_component and arc_accepting are popped
-		    // until the head of root_component is less or
-		    // equal to the order of the current state.
-		    assert(!root_component.empty());
-		    comp = root_component.top();
-		    root_component.pop();
-		    new_condition |= comp.condition;
-		    assert(!arc_accepting.empty());
-		    bdd arc_acc = arc_accepting.top();
-		    arc_accepting.pop();
-		    new_condition |= arc_acc;
-		  }
-		comp.condition |= new_condition;
-		if (aut_->all_accepting_conditions() == comp.condition)
-		  {
-		    // A failure SCC was found, the automata is not empty.
-		    root_component.push(comp);
-      		    return false;
-		  }
-		root_component.push(comp);
-		assert(root_component.size() == arc_accepting.size());
-	      }
+	    // Yes.  Number it, stack it, and register its successors
+	    // for later processing.
+	    h[dest] = ++num;
+	    root.push(connected_component(num));
+	    arc.push(acc);
+	    tgba_succ_iterator* iter = aut_->succ_iter(dest);
+	    iter->first();
+	    todo.push(pair_state_iter(dest, iter));
+	    continue;
 	  }
+
+	// We know the state exist.  Since a state can have several
+	// representations (i.e., objects), make sure we delete
+	// anything but the first one seen (the one used as key in
+	// H).
+	if (dest != i->first)
+	  delete dest;
+
+	// If we have reached a dead component.  Ignore it.
+	if (i->second == -1)
+	  continue;
+
+	// Now this is the most interesting case.  We have reached a
+	// state S1 which is already part of a non-dead SCC.  Any such
+	// non-dead SCC has necessarily been crossed by our path to
+	// this state: there is a state S2 in our path which belongs
+	// to this SCC too.  We are going to merge all states between
+	// this S1 and S2 into this SCC.
+	//
+	// This merge is easy to do because the order of the SCC in
+	// ROOT is ascending: we just have to merge all SCCs from the
+	// top of ROOT that have an index greater to the one of
+	// the SCC of S2 (called the "threshold").
+	int threshold = i->second;
+	while (threshold < root.top().index)
+	  {
+	    assert(!root.empty());
+	    assert(!arc.empty());
+	    acc |= root.top().condition;
+	    acc |= arc.top();
+	    root.pop();
+	    arc.pop();
+	  }
+	// Note that we do not always have
+	//  threshold == root.top().index
+	// after this loop, the SCC whose index is threshold might have
+	// been merged with a lower SCC.
+
+	// Accumulate all acceptance conditions into the merged SCC.
+	root.top().condition |= acc;
+
+	if (root.top().condition == aut_->all_accepting_conditions())
+	  // We have found an accepting SCC.
+	  return false;
       }
-    // The automata is empty.
+    // This automaton recognize no word.
     return true;
   }
 
@@ -212,9 +256,9 @@ namespace spot
                      state_ptr_less_than> path_state;
     path_state path_map;
 
-    assert(!root_component.empty());
+    assert(!root.empty());
 
-    int comp_size = root_component.size();
+    int comp_size = root.size();
     typedef std::vector<connected_component> vec_compo;
     vec_compo vec_component(comp_size);
     std::vector<state_sequence> vec_sequence(comp_size);
@@ -226,13 +270,13 @@ namespace spot
 
     for (int j = comp_size - 1; j >= 0; j--)
       {
-	vec_component[j] = root_component.top();
-	root_component.pop();
+	vec_component[j] = root.top();
+	root.pop();
       }
 
     int q_index;
     int tmp_int = 0;
-    // Fill the SCC in the stack root_component.
+    // Fill the SCC in the stack root.
     for (hash_type::iterator iter_map = h.begin();
 	 iter_map != h.end(); ++iter_map)
       {
