@@ -1,5 +1,10 @@
 2003-10-01  Alexandre Duret-Lutz  <aduret@src.lip6.fr>
 
+	* iface/gspn/udcsltl.test, iface/gspn/udcseltl.test,
+	iface/gspn/dcswaveltl.test, iface/gspn/dcswaveeltl.test,
+	iface/gspn/dcswavefm.test: Do not accept $? = 0 when
+	a failure is expected.
+
 	* iface/gspn/udcsltl.test, iface/gspn/udcseltl.test: New files
 	* iface/gspn/Makefile.am (TESTS): Add them.
 	(XFAIL_TESTS): Add udcseltl.test.

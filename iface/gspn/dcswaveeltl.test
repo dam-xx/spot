@@ -2,14 +2,12 @@
 
 . ./defs || exit 1
 
-set -e
-
 cp -R $srcdir/examples/DCSwave .
 chmod +w DCSwave
 
 # G(ATTiIDLj => F(!SCj U SCi)) is true
-../eltlgspn-srg DCSwave/DCSWave '!G(ATTiIDLj => F(!SCj U SCi))' ATTiIDLj SCi SCj > output
+../eltlgspn-srg DCSwave/DCSWave '!G(ATTiIDLj => F(!SCj U SCi))' ATTiIDLj SCi SCj > output || exit 1
 
 # G(F(!SCj U SCi)) is false
-../eltlgspn-srg DCSwave/DCSWave '!G(F(!SCj U SCi))' ATTiIDLj SCi SCj > output \
-  || test $? = 1
+../eltlgspn-srg DCSwave/DCSWave '!G(F(!SCj U SCi))' ATTiIDLj SCi SCj >output
+test $? = 1 || exit 1
