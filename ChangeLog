@@ -1,5 +1,8 @@
 2005-01-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/ndfs_result.hh (construct_prefix): Do not call
+	erase() after splice(), splice() already removes the elements.
+
 	* src/evtgba/evtgbaiter.hh, src/ltlast/formula.hh,
 	src/ltlast/refformula.hh, src/ltlenv/defaultenv.hh,
 	src/misc/bareword.hh, src/tgba/succiter.hh,
@@ -46,7 +49,7 @@
 2004-12-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/reducerun.cc (reduce_run): Do not call erase() after
-	splice(), splice() already remove the elements.
+	splice(), splice() already removes the elements.
 	* src/tgbaalgos/gtec/ce.cc (couvreur99_check_result::accepting_run):
 	Likewise.
 
