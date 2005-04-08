@@ -1,5 +1,7 @@
 2005-04-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* NEWS, configure.ac: Bump version to 0.2.
+
 	* bench/emptchk/README: Mention
 	http://spot.lip6.fr/wiki/EmptinessCheckOptions for the syntax.
 

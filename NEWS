@@ -1,4 +1,15 @@
-New in spot 0.1a:
+New in spot 0.2 (2005-04-08):
+
+  * Emptiness checks:
+    - the new spot::option_map class is used to pass options to
+      emptiness-check algorithms.
+    - the new emptiness_check_instantiator class is used to turn a
+      string such as `algorithm(option1, option2)' into an actual
+      instance of this emptiness-check algorithm with the given
+      options.  All tools use this.
+    - tau03_opt_search implements the "condition heuristic".
+      (Suggested by Heikki Tauriainen.)
+  * Minor bug fixes.
 
 New in spot 0.1 (2005-01-31):
 
