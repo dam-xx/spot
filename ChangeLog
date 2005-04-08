@@ -1,3 +1,7 @@
+2005-04-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* NEWS, configure.ac: Bump version to 0.2a.
+
 2005-04-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* NEWS, configure.ac: Bump version to 0.2.
