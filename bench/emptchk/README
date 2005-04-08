@@ -145,6 +145,7 @@ This directory contains:
 * algorithms
 
     The list of emptiness-check algorithms run by the above tests.
+    (See http://spot.lip6.fr/wiki/EmptinessCheckOptions for the syntax.)
 
 =======
  USAGE
@@ -209,6 +210,8 @@ This directory contains:
   other `Cou99' algorithms are not.  (Beware that in the paper we
   presented the `Cou99(poprem*)' variants and called them `Cou99*'.)
 
+  (See also http://spot.lip6.fr/wiki/EmptinessCheckOptions)
+
 
   The ltl-*.sh tests output look as follows:
 
@@ -267,7 +270,8 @@ This directory contains:
   CVWY90 and SE05 have bit-state hashing implementations.  Edit the
   file `algorithms' and add lines like `CVWY90(bsh=5M)' or
   `SE05(bsh=512K)' to try these.
-  (The `bsh=' argument gives the hash table size in bytes.)
+  (The `bsh=' argument gives the hash table size in bytes; see also
+  http://spot.lip6.fr/wiki/EmptinessCheckOptions)
 
   Besides randtgba, two other tools that you might find handy we
   experimenting are src/ltltest/randltl and src/tgbatest/ltl2tgba.

@@ -1,3 +1,8 @@
+2005-04-08  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* bench/emptchk/README: Mention
+	http://spot.lip6.fr/wiki/EmptinessCheckOptions for the syntax.
+
 2005-04-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaparse/tgbaparse.yy (acc_list): Do not explicitly delete
