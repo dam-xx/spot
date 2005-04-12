@@ -107,10 +107,10 @@ src/            Sources for libspot.
    evtgba*/     Ignore these for now.
 doc/	        Documentation for libspot.
    spot.html/   HTML reference manual.
-   spot.latex/  Sources for the PDF manual. (No distributed, can be rebuilt.)
+   spot.latex/  Sources for the PDF manual.  (Not distributed, can be rebuilt.)
    spotref.pdf  PDF reference manual.
 bench/          Benchmarks...
-   emptchk/     ... for emptiness-check algorithms. (Paper submitted to CAV'05)
+   emptchk/     ... for emptiness-check algorithms.
 wrap/	        Wrappers for other languages.
    python/      Python bindings for Spot and BuDDy
       tests/    Tests for these bindings
@@ -142,4 +142,4 @@ End:
  LocalWords:  Baarir Thierry Mieg CVS Università di Torino devel src libspot ac
  LocalWords:  ltlast ltlenv ltlparse ltlvisit ltltest misc tgba TGBA tgbaalgos
  LocalWords:  gtec Tarjan tgbaparse tgbatest doc html PDF spotref pdf cgi
- LocalWords:  CGI ltl iface BDD
+ LocalWords:  CGI ltl iface BDD Couvreur's evtgba emptchk
