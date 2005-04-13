@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -26,7 +26,7 @@ DOXYGEN = doxygen
 all-local: $(srcdir)/stamp
 
 doc:
-	rm -f $(srcdir)/stamp
+	-rm -f $(srcdir)/stamp
 	$(MAKE) $(srcdir)/stamp
 
 fast-doc:
@@ -36,7 +36,7 @@ fast-doc:
 
 $(srcdir)/stamp: $(srcdir)/Doxyfile.in $(top_srcdir)/configure.ac
 	$(MAKE) Doxyfile
-	rm -rf spot.html spot.latex
+	-rm -rf spot.html spot.latex
 	$(DOXYGEN)
 	touch $@
 
