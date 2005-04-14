@@ -759,8 +759,8 @@ main(int argc, char** argv)
       delete product_to_free;
       delete system;
       delete expl;
-      delete degeneralized;
       delete aut_red;
+      delete degeneralized;
       delete to_free;
       delete echeck_inst;
     }
