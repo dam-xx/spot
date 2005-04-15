@@ -1,0 +1,94 @@
+This directory contains benchmark scripts for LTL-to-Büchi translators.
+They are all based on lbtt.
+
+==========
+ CONTENTS
+==========
+
+* algorithms
+
+  The lbtt configuration of all the algorithms.  More about these below.
+
+* small
+* big
+* known
+
+  Run lbtt on, respectively:
+    small formulae (size 10, 4 propositions)
+    big formulae (size 12..15, 8 propositions)
+    known formulae (96 formulae from formulae.ltl)
+
+  Each script generates 3 files:
+    xxxx.cfg: the configuration file for lbtt
+    xxxx.log: the log of lbtt's execution (also output when the script runs)
+    xxxx.txt: the sumary of the test (also output at the end of the script)
+
+* ltl2baw.in
+* ltl2baw.pl
+
+  ltl2baw.pl is generated from ltl2baw.in by configure.  This perl
+  script converts the intermediate generalized automata computed by
+  ltl2ba into a form usable by lbtt.
+
+* formulae.ltl
+
+  A list of LTL formulae used by the `known' check.
+  See ../emptchk/README for the sources.
+
+* parseout.pl
+
+  This scripts is used to create *.txt files from *.log files.
+
+
+====================
+ ALGORITHMS & TOOLS
+====================
+
+The page http://spot.lip6.fr/wiki/LtlTranslationBenchmark explains
+all the keys used and the different tools involved in the benchmark.
+
+Spot's configure script checks for the tools needed in the
+benchmark, and the script in this directory should omit the tools
+that are not available.
+
+
+=======================
+ Reading the summaries
+=======================
+
+The files small.txt, big.txt, and known.txt contain a summary of the
+results.  Each algorithm is described as two lines formated as
+follows.
+
+   18: FM, gen, +symb_merge, -exprop, LTLopt
+            494 /    975 /  100 /      4.25       98798 /   3935920   (100)
+
+The first line presents the name of the algorithm ("FM, gen,
++symb_merge, -exprop, LTLopt") and its number for lbtt (18).
+The number is useless.  See http://spot.lip6.fr/wiki/LtlTranslationBenchmark
+for the naming conventions.
+
+The second line display 7 values:
+  1. the total number of states of all generated automata (494)
+  2. the total number of transitions of all generated automata (975)
+  3. the total number of acceptance conditions of all generated automata (100)
+  4. the cumulated translation time in seconds (4.25)
+  5. the total number of states in the synchronized products (98798)
+  6. the total number of transitions in the synchronized products (3935920)
+  7. the number of translated automata (100)
+
+Notes:
+
+  * Small translation times are not accurate because most of the translators
+    are run through scripts that translate their input from and their ouput to
+    the format understood by lbtt.  For fast translators, most of the time
+    is spent through these wrappers.  (For instance Spot's ltl2tgba is
+    run through lbtt-translate, and depending on how Spot has been configured
+    w.r.t. to dynamic libraries, ltl2tgba itself is often a shell script that
+    run the real binary with the locally built libraries.)
+
+  * Some tools will appear to have translated fewer automata than the
+    others.  This normally indicates bugs in the translator.  In that
+    case it is harder to compare the results.  (Normalizing the other
+    values accordingly may not be fair: maybe the translator precisely
+    failed to translate the largest automata.)

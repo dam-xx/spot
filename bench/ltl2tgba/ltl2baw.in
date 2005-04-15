@@ -1,5 +1,6 @@
-#!/usr/bin/perl -w
-# Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+#!/usr/bin/env @PERL@
+
+# Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -20,6 +21,7 @@
 # Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
+use warnings;
 
 # Usage:
 # ------
@@ -77,18 +79,18 @@ my $output_formula = 0;
 
 if ($arg =~ '^--ltl2ba=(.*)$')
   {
-    open(LTL2TGBA, "| ./ltl2tgba $1 -X -");
+    open(LTL2TGBA, "| @top_builddir@/src/tgbatest/ltl2tgba $1 -X -");
     shift;
   }
 elsif ($arg =~ '--spot=(.*)$')
   {
     $output_formula = 1;
-    open(LTL2TGBA, "| ./ltl2tgba $1 -F -");
+    open(LTL2TGBA, "| @top_builddir@/src/tgbatest/ltl2tgba $1 -F -");
     shift;
   }
 else
   {
-    open(LTL2TGBA, "| ./ltl2tgba -t -X -");
+    open(LTL2TGBA, "| @top_builddir@/src/tgbatest/ltl2tgba -t -X -");
   }
 
 END {
@@ -97,7 +99,7 @@ END {
 }
 
 my @args = dquote @ARGV;
-open(LTL2BA, "ltl2ba -d @args |") || die "failed to run ltl2ba";
+open(LTL2BA, "@LTL2BA@ -d @args |") || die "failed to run ltl2ba";
 
 my $state = PROLOGUE;
 

@@ -86,7 +86,7 @@ TESTS = \
   emptchkr.test \
   spotlbtt.test
 
-EXTRA_DIST = $(TESTS) ltl2baw.pl
+EXTRA_DIST = $(TESTS)
 
 CLEANFILES = \
   blue_counter \

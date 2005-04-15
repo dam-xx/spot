@@ -1,3 +1,15 @@
+2005-04-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* bench/ltl2tgba/Makefile.am, bench/ltl2tgba/README,
+	bench/ltl2tgba/algorithms, bench/ltl2tgba/big,
+	bench/ltl2tgba/defs.in, bench/ltl2tgba/formulae.ltl,
+	bench/ltl2tgba/known, bench/ltl2tgba/parseout.pl,
+	bench/ltl2tgba/small: New files.
+	* src/tgbatest/ltl2baw.pl: Move ...
+	* bench/ltl2tgba/ltl2baw.in: ... here.
+	* src/tgbatest/Makefile.am: Adjust.
+	* configure.ac: Adjust.
+
 2005-04-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/ltl2tgba.cc (main): Delete the reduced automaton

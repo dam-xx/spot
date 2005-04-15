@@ -57,14 +57,22 @@ adl_NDEBUG
 
 AM_CONDITIONAL([NEVER], [false])
 AC_CHECK_PROG([DOT], [dot], [dot])
+AC_CHECK_PROG([LBT], [lbt], [lbt])
+AC_CHECK_PROG([LTL2BA], [ltl2ba], [ltl2ba])
+AC_CHECK_PROG([MODELLA], [modella], [modella])
+AC_CHECK_PROG([LTL2NBA], [script4lbtt.py], [script4lbtt.py])
 AC_CHECK_PROG([PERL], [perl], [perl])
+AC_CHECK_PROG([SPIN], [spin], [spin])
 AC_CHECK_PROG([VALGRIND], [valgrind], [valgrind])
+AC_CHECK_PROG([WRING2LBTT], [wring2lbtt], [wring2lbtt])
 
 AC_CONFIG_FILES([
   Makefile
   bench/Makefile
   bench/emptchk/Makefile
   bench/emptchk/defs
+  bench/ltl2tgba/Makefile
+  bench/ltl2tgba/defs
   doc/Doxyfile
   doc/Makefile
   iface/Makefile
@@ -95,5 +103,7 @@ AC_CONFIG_FILES([
   wrap/python/cgi/Makefile
   wrap/python/tests/Makefile
 ])
+AC_CONFIG_FILES([bench/ltl2tgba/ltl2baw.pl:bench/ltl2tgba/ltl2baw.in],
+	        [chmod +x bench/ltl2tgba/ltl2baw.pl])
 AC_CONFIG_FILES([wrap/python/tests/run], [chmod +x wrap/python/tests/run])
 AC_OUTPUT
