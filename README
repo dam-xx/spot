@@ -110,7 +110,8 @@ doc/	        Documentation for libspot.
    spot.latex/  Sources for the PDF manual.  (Not distributed, can be rebuilt.)
    spotref.pdf  PDF reference manual.
 bench/          Benchmarks...
-   emptchk/     ... for emptiness-check algorithms.
+   emptchk/     ... for emptiness-check algorithms,
+   ltl2tgba/    ... for LTL-to-Büchi translation algorithms.
 wrap/	        Wrappers for other languages.
    python/      Python bindings for Spot and BuDDy
       tests/    Tests for these bindings

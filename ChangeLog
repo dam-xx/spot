@@ -1,3 +1,9 @@
+2005-04-19  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* bench/ltl2tgba/README: More instructions.
+	* bench/Makefile.am (SUBDIRS): Add ltl2tgba.
+	* README: Mention bench/ltl2tgba.
+
 2005-04-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* bench/ltl2tgba/Makefile.am, bench/ltl2tgba/README,

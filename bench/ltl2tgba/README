@@ -21,7 +21,7 @@ They are all based on lbtt.
   Each script generates 3 files:
     xxxx.cfg: the configuration file for lbtt
     xxxx.log: the log of lbtt's execution (also output when the script runs)
-    xxxx.txt: the sumary of the test (also output at the end of the script)
+    xxxx.txt: the summary of the test (also output at the end of the script)
 
 * ltl2baw.in
 * ltl2baw.pl
@@ -52,6 +52,72 @@ benchmark, and the script in this directory should omit the tools
 that are not available.
 
 
+=====================
+ Running the scripts
+=====================
+
+  1) Install all the third-party translators that you want to check.
+     They must all be in $PATH and work from there.
+
+     Two difficulties comes from Modella and wring2lbtt:
+
+       * Modella 1.5.7 produces automata that are not readable by lbtt 1.1.2.
+         You have to fix the former as follows:
+
+--- modella1.5.7/modella_automa.c	2004-08-30 17:19:47.000000000 +0200
++++ modella1.5.7.fixed/modella_automa.c	2005-04-14 15:07:46.632785000 +0200
+@@ -618,6 +618,7 @@ void print_LBA(LBA* b,FILE* output){
+ 	if(b->R[j]->source==i){
+ 	  fprintf(output,"%d ",b->R[j]->dest);
+ 	  print_form_prefix(b->R[j]->label,output);
++	  fputc('\n',output);
+ 	}
+       fprintf(output,"-1 ");
+       
+
+       * The automata produced by Wring are translated to the syntax
+         understood by lbtt using `wring2lbtt' (by the same author of
+         Modella).  wring2lbtt suffers from the same "lbtt syntax"
+         problem described above, you have to fix this too before it
+         can be used.
+
+         Also wring2lbtt requires a Wring directory in the directory
+         where it is run; that makes it harder to use as a normal tool
+         from $PATH.  I use the following wrapper in my $PATH to work
+         around this.
+
+#!/bin/sh
+cd ~/src/wring2lbtt && ./wring2lbtt "$@"
+
+         This is OK because the filenames supplied by lbtt are absolute.
+
+  2) ./configure Spot, and build it.
+
+     During the configure process you should see lines such as
+
+checking for lbt... lbt
+checking for ltl2ba... ltl2ba
+checking for modella... modella
+checking for script4lbtt.py... script4lbtt.py
+checking for spin... spin
+checking for wring2lbtt... wring2lbtt
+
+     If some tool is not found, the corresponding tests will be disabled.
+     You can also use variables such as LBT, LTL2BA, MODELLA, LTL2NBA,
+     SPIN, and WRING2LBTT to specify the location of any of these scripts
+     if it is not in $PATH.  For instance
+
+        ./configure LTL2NBA=/home/adl/src/ltlnba/script4lbtt.py
+
+  3) Run `make' to build Spot.
+
+  4) cd into bench/ltl2tgba/ and execute any of
+        ./small
+        ./big
+     or ./known
+
+  5) Wait...
+
 =======================
  Reading the summaries
 =======================
@@ -79,13 +145,14 @@ The second line display 7 values:
 
 Notes:
 
-  * Small translation times are not accurate because most of the translators
-    are run through scripts that translate their input from and their ouput to
-    the format understood by lbtt.  For fast translators, most of the time
-    is spent through these wrappers.  (For instance Spot's ltl2tgba is
-    run through lbtt-translate, and depending on how Spot has been configured
-    w.r.t. to dynamic libraries, ltl2tgba itself is often a shell script that
-    run the real binary with the locally built libraries.)
+  * Small translation times are not accurate because most of the
+    translators are run through scripts that translate their input
+    from and their output to the format understood by lbtt.  For fast
+    translators, most of the time is spent through these wrappers.
+    (For instance Spot's ltl2tgba is run through lbtt-translate, and
+    depending on how Spot has been configured w.r.t. to dynamic
+    libraries, ltl2tgba itself is often a shell script that run the
+    real binary with the locally built libraries.)
 
   * Some tools will appear to have translated fewer automata than the
     others.  This normally indicates bugs in the translator.  In that
