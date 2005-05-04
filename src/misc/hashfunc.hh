@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -44,6 +44,20 @@ namespace spot
     key += ~(key << 11);
     key ^=  (key >> 16);
     return key;
+  }
+
+  /// \brief Knuth's Multiplicative hash function.
+  ///
+  /// This function is suitable for hashing values whose
+  /// high order bits do not vary much (ex. addresses of
+  /// memory objects).  Prefer spot::wang32_hash() otherwise.
+  /// http://www.concentric.net/~Ttwang/tech/addrhash.htm
+  inline size_t
+  knuth32_hash(size_t key)
+  {
+    // 2654435761 is the golden ratio of 2^32.  The right shift of 3
+    // bits assumes that all objects are aligned on a 8 byte boundary.
+    return (key >> 3) * 2654435761U;
   }
   /// @}
 }

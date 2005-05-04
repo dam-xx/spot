@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -24,6 +24,7 @@
 
 #  include <string>
 #  include <functional>
+#  include "hashfunc.hh"
 
 // See the G++ FAQ for details about the following.
 #  ifdef __GNUC__
@@ -62,7 +63,8 @@ namespace spot
   {
     size_t operator()(const T* p) const
     {
-      return reinterpret_cast<const char*>(p) - static_cast<const char*>(0);
+      return knuth32_hash(reinterpret_cast<const char*>(p)
+			  - static_cast<const char*>(0));
     }
   };
 

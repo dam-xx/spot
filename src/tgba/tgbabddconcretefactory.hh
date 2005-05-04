@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -86,7 +86,7 @@ namespace spot
     tgba_bdd_core_data data_;	///< Core data for the new automata.
 
     typedef Sgi::hash_map<const ltl::formula*, bdd,
-			  ptr_hash<ltl::formula> > acc_map_;
+			  ltl::formula_ptr_hash> acc_map_;
     acc_map_ acc_;		///< BDD associated to each acceptance condition
   };
 
