@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -102,6 +102,14 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- FM), reduction of formula in FM"
+   Path = "${LBTT_TRANSLATE}"
+   Parameters = "--spot './ltl2tgba -fr4 -F -f -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM), post reduction with direct simulation"
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot './ltl2tgba -R1q -R1t -F -f -t'"
@@ -154,38 +162,6 @@ Algorithm
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spin './ltl2tgba -F -f -N'"
    Enabled = yes
-}
-
-Algorithm
-{
-   Name = "Spot (Couvreur -- FM), fake"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -T'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Spot (Couvreur -- FM), reduction of formula, fake"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -r4 -F -f -T'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Spot (Couvreur -- FM), without symb_merge, fake"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -y -T'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Spot (Couvreur -- FM), fake, LTL simplifications by ltl2ba"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '${srcdir}/ltl2baw.pl --spot=\"-f -T\" -F'"
-   Enabled = no
 }
 
 Algorithm
@@ -243,167 +219,6 @@ Algorithm
    Parameters = "--spot './ltl2tgba -F -f -p -x -t -L -D'"
    Enabled = yes
 }
-
-Algorithm
-{
-   Name = "Spot (Couvreur -- FM exprop + post_branch), fake"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -x -p -T'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Spot (Couvreur -- FM exprop + flapprox), fake"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -x -L -T'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Spot (Couvreur -- FM exprop + post_branch + flapprox), fake"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -x -p -L -T'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Spot (Couvreur -- FM exprop), fake"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -x -T'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Spot (Couvreur -- FM exprop), without symb_merge, fake"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -x -y -T'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Spot (Couvreur -- FM exprop), fake, LTL simplifications by ltl2ba"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '${srcdir}/ltl2baw.pl --spot=\"-f -x -T\" -F'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Spin"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spin spin"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "LBT"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--lbt lbt"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "LTL2BA"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spin ltl2ba"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "LTL2BA, generalized fake"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '${srcdir}/ltl2baw.pl -F'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "LTL2BA without LTL and SCC simplifications"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spin 'ltl2ba -l -c'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "LTL2BA without LTL and SCC simplifications, generalized fake"
-   Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '${srcdir}/ltl2baw.pl -l -c -F'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Wring (GPVW)"
-   Path = "sh"
-   Parameters = "-c 'cd ~/src/wring2lbtt && ./wring2lbtt --0'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Wring (GPVW+)"
-   Path = "sh"
-   Parameters = "-c 'cd ~/src/wring2lbtt && ./wring2lbtt --1'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Wring (LTL2AUT)"
-   Path = "sh"
-   Parameters = "-c 'cd ~/src/wring2lbtt && ./wring2lbtt --2'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Wring (Wring RewRule)"
-   Path = "sh"
-   Parameters = "-c 'cd ~/src/wring2lbtt && ./wring2lbtt --3'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Wring (Wring RewRule+BoolOpt)"
-   Path = "sh"
-   Parameters = "-c 'cd ~/src/wring2lbtt && ./wring2lbtt --4'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Wring (Wring RewRule+BoolOpt+AutSempl)"
-   Path = "sh"
-   Parameters = "-c 'cd ~/src/wring2lbtt && ./wring2lbtt --5'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Wring (Wring BoolOpt)"
-   Path = "sh"
-   Parameters = "-c 'cd ~/src/wring2lbtt && ./wring2lbtt --6'"
-   Enabled = no
-}
-
-Algorithm
-{
-   Name = "Wring (Wring RewRule+BoolOpt), degeneralized"
-   Path = "sh"
-   Parameters = "-c 'cd ~/src/wring2lbtt && ./wring2lbtt -d --4'"
-   Enabled = no
-}
-
 
 GlobalOptions
 {

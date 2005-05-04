@@ -25,6 +25,7 @@
 #include "ltlast/formula.hh"
 #include "tgba/tgbaexplicit.hh"
 #include "ltlvisit/apcollect.hh"
+#include "ltlvisit/reduce.hh"
 
 namespace spot
 {
@@ -95,12 +96,36 @@ namespace spot
   /// are interpreted as events that exclude each other.  The events in the
   /// formula are observable events, and \c unobs can be filled with
   /// additional unobservable events.
+  ///
+  /// \param reduce_ltl If this parameter is set, the LTL formulae representing
+  /// each state of the automaton will be simplified using spot::ltl::reduce()
+  /// before computing the successor.  \a reduce_ltl should specify the type
+  /// of reduction to apply as documented for spot::ltl::reduce().
+  /// This idea is taken from the following paper.
+  /// \verbatim
+  /// @InProceedings{	  thirioux.02.fmics,
+  ///   author	  = {Xavier Thirioux},
+  ///   title     = {Simple and Efficient Translation from {LTL} Formulas to
+  /// 		    {B\"u}chi Automata},
+  ///   booktitle = {Proceedings of the 7th International ERCIM Workshop in
+  /// 		     Formal Methods for Industrial Critical Systems (FMICS'02)},
+  ///   series	  = {Electronic Notes in Theoretical Computer Science},
+  ///   volume	  = {66(2)},
+  ///   publisher = {Elsevier},
+  ///   editor	  = {Rance Cleaveland and Hubert Garavel},
+  ///   year      = {2002},
+  ///   month     = jul,
+  ///   address	  = {M{\'a}laga, Spain}
+  /// }
+  /// \endverbatim
+  ///
   /// \return A spot::tgba_explicit that recognizes the language of \a f.
   tgba_explicit* ltl_to_tgba_fm(const ltl::formula* f, bdd_dict* dict,
 				bool exprop = false, bool symb_merge = true,
 				bool branching_postponement = false,
 				bool fair_loop_approx = false,
-				const ltl::atomic_prop_set* unobs = 0);
+				const ltl::atomic_prop_set* unobs = 0,
+				int reduce_ltl = ltl::Reduce_None);
 }
 
 #endif // SPOT_TGBAALGOS_LTL2TGBA_FM_HH

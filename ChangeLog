@@ -1,3 +1,12 @@
+2005-05-04  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba_fm.hh, src/tgbaalgos/ltl2tgba_fm.cc: Add
+	the reduce_ltl argument.
+	* src/tgbatest/ltl2tgba.cc: Add options -fr1, -fr2, -fr3, and -fr4.
+	* src/tgbatest/spotlbtt.test, bench/ltl2tgba/algorithms: Test -fr4.
+	* bench/ltl2tgba/parseout.pl: Suppress Perl warnings on disabled
+	algorithms.
+
 2005-04-19  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* bench/ltl2tgba/README: More instructions.

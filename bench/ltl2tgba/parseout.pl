@@ -52,7 +52,7 @@ while (<>)
     if (/Pos\. formulae \|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|$/)
     {
         $acc = $1;
-	$time = $2;
+	$time = $2 || 0;
     }
     next unless /Pos\. formulae \|\s*(.*?)\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|/;
     if ($line % 2)

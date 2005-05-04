@@ -637,7 +637,8 @@ namespace spot
   tgba_explicit*
   ltl_to_tgba_fm(const formula* f, bdd_dict* dict,
 		 bool exprop, bool symb_merge, bool branching_postponement,
-		 bool fair_loop_approx, const ltl::atomic_prop_set* unobs)
+		 bool fair_loop_approx, const atomic_prop_set* unobs,
+		 int reduce_ltl)
   {
     possible_fair_loop_checker pflc;
 
@@ -648,6 +649,14 @@ namespace spot
     formula* f1 = unabbreviate_logic(f);
     formula* f2 = negative_normal_form(f1);
     destroy(f1);
+
+    // Simplify the formula, if requested.
+    if (reduce_ltl)
+      {
+	formula* tmp = reduce(f2, reduce_ltl);
+	destroy(f2);
+	f2 = tmp;
+      }
 
     typedef std::set<const formula*, formula_ptr_less_than> set_type;
     set_type formulae_seen;
@@ -675,8 +684,8 @@ namespace spot
     if (unobs)
       {
 	bdd neg_events = bddtrue;
-	std::auto_ptr<ltl::atomic_prop_set> aps(ltl::atomic_prop_collect(f));
-	for (ltl::atomic_prop_set::const_iterator i = aps->begin();
+	std::auto_ptr<atomic_prop_set> aps(atomic_prop_collect(f));
+	for (atomic_prop_set::const_iterator i = aps->begin();
 	     i != aps->end(); ++i)
 	  {
 	    int p = d.register_proposition(*i);
@@ -685,7 +694,7 @@ namespace spot
 	    observable_events = (observable_events & neg) | (neg_events & pos);
 	    neg_events &= neg;
 	  }
-	for (ltl::atomic_prop_set::const_iterator i = unobs->begin();
+	for (atomic_prop_set::const_iterator i = unobs->begin();
 	     i != unobs->end(); ++i)
 	  {
 	    int p = d.register_proposition(*i);
@@ -789,6 +798,17 @@ namespace spot
 		bdd label = bdd_exist(cube, d.next_set);
 		bdd dest_bdd = bdd_existcomp(cube, d.next_set);
 		const formula* dest = d.conj_bdd_to_formula(dest_bdd);
+
+		// Simplify the formula, if requested.
+		if (reduce_ltl)
+		  {
+		    formula* tmp = reduce(dest, reduce_ltl);
+		    destroy(dest);
+		    dest = tmp;
+		    // Ignore the arc if the destination reduces to false.
+		    if (dest == constant::false_instance())
+		      continue;
+		  }
 
 		// If we already know a state with the same
 		// successors, use it in lieu of the current one.

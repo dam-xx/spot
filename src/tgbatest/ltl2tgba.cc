@@ -74,6 +74,10 @@ syntax(char* prog)
 	    << std::endl
             << "  -f    use Couvreur's FM algorithm for translation"
 	    << std::endl
+	    << "  -fr1  use -r1 (see below) at each step of FM" << std::endl
+	    << "  -fr2  use -r2 (see below) at each step of FM" << std::endl
+	    << "  -fr3  use -r3 (see below) at each step of FM" << std::endl
+	    << "  -fr4  use -r4 (see below) at each step of FM" << std::endl
             << "  -F    read the formula from the file" << std::endl
 	    << "  -g    graph the accepting run on the automaton (requires -e)"
 	    << std::endl
@@ -144,6 +148,7 @@ main(int argc, char** argv)
   bool paper_opt = false;
   enum { NoDegen, DegenTBA, DegenSBA } degeneralize_opt = NoDegen;
   bool fm_opt = false;
+  int fm_red = spot::ltl::Reduce_None;
   bool fm_exprop_opt = false;
   bool fm_symb_merge_opt = true;
   bool file_opt = false;
@@ -245,6 +250,26 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-f"))
 	{
 	  fm_opt = true;
+	}
+      else if (!strcmp(argv[formula_index], "-fr1"))
+	{
+	  fm_opt = true;
+	  fm_red |= spot::ltl::Reduce_Basics;
+	}
+      else if (!strcmp(argv[formula_index], "-fr2"))
+	{
+	  fm_opt = true;
+	  fm_red |= spot::ltl::Reduce_Eventuality_And_Universality;
+	}
+      else if (!strcmp(argv[formula_index], "-fr3"))
+	{
+	  fm_opt = true;
+	  fm_red |= spot::ltl::Reduce_Syntactic_Implications;
+	}
+      else if (!strcmp(argv[formula_index], "-fr4"))
+	{
+	  fm_opt = true;
+	  fm_red |= spot::ltl::Reduce_All;
 	}
       else if (!strcmp(argv[formula_index], "-F"))
 	{
@@ -472,7 +497,8 @@ main(int argc, char** argv)
 	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt,
 					       fm_symb_merge_opt,
 					       post_branching,
-					       fair_loop_approx, unobservables);
+					       fair_loop_approx, unobservables,
+					       fm_red);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 	}

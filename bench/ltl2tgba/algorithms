@@ -65,9 +65,25 @@ Algorithm
 
 Algorithm
 {
+   Name = "FM, degen, +symb_merge, +exprop, +INpre, +post, +flapprox"
+   Path = "$LBTT_TRANSLATE"
+   Parameters = "--spot '$LTL2TGBA -fr4 -R1q -R1t -R3 -L -t -x -D -F'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "FM, degen, +symb_merge, +exprop, +pre, +post, +flapprox, +post_branch"
    Path = "$LBTT_TRANSLATE"
    Parameters = "--spot '$LTL2TGBA -r4 -R1q -R1t -R3 -L -f -t -x -D -p -F'"
+   Enabled = yes
+}
+
+Algorithm
+{
+   Name = "FM, degen, +symb_merge, +exprop, +INpre, +post, +flapprox, +post_branch"
+   Path = "$LBTT_TRANSLATE"
+   Parameters = "--spot '$LTL2TGBA -fr4 -R1q -R1t -R3 -L -t -x -D -p -F'"
    Enabled = yes
 }
 
@@ -210,12 +226,27 @@ Algorithm
 
 Algorithm
 {
+   Name = "FM, gen, +symb_merge, +exprop, +INpre, +post, +flapprox"
+   Path = "$LBTT_TRANSLATE"
+   Parameters = "--spot '$LTL2TGBA -fr4 -R1q -R1t -R3 -L -t -x -F'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "FM, gen, +symb_merge, +exprop, +pre, +post, +flapprox, +post_branch"
    Path = "$LBTT_TRANSLATE"
    Parameters = "--spot '$LTL2TGBA -r4 -R1q -R1t -R3 -L -f -t -x  -p -F'"
    Enabled = yes
 }
 
+Algorithm
+{
+   Name = "FM, gen, +symb_merge, +exprop, +INpre, +post, +flapprox, +post_branch"
+   Path = "$LBTT_TRANSLATE"
+   Parameters = "--spot '$LTL2TGBA -fr4 -R1q -R1t -R3 -L -t -x  -p -F'"
+   Enabled = yes
+}
 
 Algorithm
 {
