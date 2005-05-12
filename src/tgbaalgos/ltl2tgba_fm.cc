@@ -540,8 +540,11 @@ namespace spot
     class formula_canonizer
     {
     public:
-      formula_canonizer(translate_dict& d)
-	: v_(d)
+      formula_canonizer(translate_dict& d,
+			bool fair_loop_approx, bdd all_promises)
+	: v_(d),
+	  fair_loop_approx_(fair_loop_approx),
+	  all_promises_(all_promises)
       {
 	// For cosmetics, register 1 initially, so the algorithm will
 	// not register an equivalent formula first.
@@ -570,6 +573,18 @@ namespace spot
 	// Perform the actual translation.
 	f->accept(v_);
 	bdd res = v_.result();
+
+	// Apply the fair-loop approximation if requested.
+	if (fair_loop_approx_)
+	  {
+	    // If the source cannot possibly be part of a fair
+	    // loop, make all possible promises.
+	    if (fair_loop_approx_
+		&& f != constant::true_instance()
+		&& !pflc_.check(f))
+	      res &= all_promises_;
+	  }
+
 	f2b_[clone(f)] = res;
 
 	// Register the reverse mapping if it is not already done.
@@ -608,6 +623,10 @@ namespace spot
       // by looking at the set of successors.
       typedef std::map<const formula*, bdd> formula_to_bdd_map;
       formula_to_bdd_map f2b_;
+
+      possible_fair_loop_checker pflc_;
+      bool fair_loop_approx_;
+      bdd all_promises_;
     };
 
   }
@@ -640,8 +659,6 @@ namespace spot
 		 bool fair_loop_approx, const atomic_prop_set* unobs,
 		 int reduce_ltl)
   {
-    possible_fair_loop_checker pflc;
-
     // Normalize the formula.  We want all the negations on
     // the atomic propositions.  We also suppress logic
     // abbreviations such as <=>, =>, or XOR, since they
@@ -663,9 +680,9 @@ namespace spot
     set_type formulae_to_translate;
 
     translate_dict d(dict);
-    formula_canonizer fc(d);
 
-    // Compute the set of all promises occurring inside the formula.
+    // Compute the set of all promises that can possibly occurre
+    // inside the formula.
     bdd all_promises = bddtrue;
     if (fair_loop_approx || unobs)
       {
@@ -673,6 +690,8 @@ namespace spot
 	f2->accept(pv);
 	all_promises = pv.result();
       }
+
+    formula_canonizer fc(d, fair_loop_approx, all_promises);
 
     // These are used when atomic propositions are interpreted as
     // events.  There are two kinds of events: observable events are
@@ -733,11 +752,6 @@ namespace spot
 	  }
 
 	std::string now = to_string(f);
-
-	// When branching_postponement is used, we must assume that
-	// the source state is in a fair loop.
-	bool pflc_from =
-	  (fair_loop_approx && !branching_postponement) ? pflc.check(f) : true;
 
 	// We used to factor only Next and A variables while computing
 	// prime implicants, with
@@ -815,13 +829,6 @@ namespace spot
 		if (symb_merge)
 		  dest = fc.canonize(dest);
 
-		// If the destination cannot possibly be part of a fair
-		// loop, make all possible promises.
-		if (fair_loop_approx
-		    && !(dest == constant::true_instance()
-			 || (pflc_from && pflc.check(dest))))
-		  label &= all_promises;
-
 		// If we are not postponing the branching, we can
 		// declare the outgoing transitions immediately.
 		// Otherwise, we merge transitions with identical
@@ -882,8 +889,9 @@ namespace spot
 		// There should be only one transition going to 1 (true) ...
 		assert(i->second.size() == 1);
 		prom_map::const_iterator j = i->second.begin();
-		// ... and it is not expected to make any promises.
-		assert(j->first == bddtrue);
+		// ... and it is not expected to make any promises (unless
+		// fair loop approximations are used).
+		assert(fair_loop_approx || j->first == bddtrue);
 		cond_for_true = j->second;
 	      }
 	    tgba_explicit::transition* t =
