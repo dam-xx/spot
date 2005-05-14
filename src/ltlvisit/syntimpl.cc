@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -98,23 +98,24 @@ namespace spot
 	    case binop::Xor:
 	    case binop::Equiv:
 	    case binop::Implies:
-	      universal = recurse_un(f1) & recurse_un(f2);
-	      eventual = recurse_ev(f1) & recurse_ev(f2);
+	      universal = recurse_un(f1) && recurse_un(f2);
+	      eventual = recurse_ev(f1) && recurse_ev(f2);
 	      return;
 	    case binop::U:
 	      universal = recurse_un(f1) & recurse_un(f2);
-	      if ((f1 == constant::true_instance()) ||
-		  (recurse_ev(f1)))
+	      if ((f1 == constant::true_instance())
+		  // Both operand must be purely eventual, unlike in
+		  // the proceedings of Concur'00.  (The revision of
+		  // the paper available at
+		  // http://www1.bell-labs.com/project/TMP/ is fixed.)
+		  || (recurse_ev(f1) && recurse_ev(f2)))
 		eventual = true;
 	      return;
 	    case binop::R:
-	      eventual = recurse_ev(f1) & recurse_ev(f2);
-	      if ((f1 == constant::false_instance()))
-		//||
-		//(recurse_un(f1)))
+	      eventual = recurse_ev(f1) && recurse_ev(f2);
+	      if ((f1 == constant::false_instance())
+		  || (recurse_un(f1) && recurse_un(f2)))
 		universal = true;
-	      if (!universal)
-		universal = recurse_un(f1) & recurse_un(f2);
 	      return;
 	    }
 	  /* Unreachable code.  */
