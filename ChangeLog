@@ -1,3 +1,7 @@
+2005-05-16  Denis Poitrenaud  <dp@src.lip6.fr>
+
+	* src/ltlvisit/syntimpl.cc: Fix a typo.
+
 2005-05-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlvisit/syntimpl.cc: Fix detection of purely eventual formulae.

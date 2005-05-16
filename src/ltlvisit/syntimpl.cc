@@ -102,7 +102,7 @@ namespace spot
 	      eventual = recurse_ev(f1) && recurse_ev(f2);
 	      return;
 	    case binop::U:
-	      universal = recurse_un(f1) & recurse_un(f2);
+	      universal = recurse_un(f1) && recurse_un(f2);
 	      if ((f1 == constant::true_instance())
 		  // Both operand must be purely eventual, unlike in
 		  // the proceedings of Concur'00.  (The revision of
