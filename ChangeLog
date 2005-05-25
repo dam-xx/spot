@@ -1,5 +1,8 @@
 2005-05-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/reductgba_sim_del.cc
+	(parity_game_graph_delayed::nb_set_acc_cond): Simplify.
+
 	* sanity/style.test: Catch misuses of Sgi::.
 	* tgba/tgbareduc.hh, tgbaalgos/reductgba_sim.cc,
 	tgbaalgos/reductgba_sim.hh, tgbaalgos/reductgba_sim_del.cc: Fix them.

@@ -341,16 +341,7 @@ namespace spot
   int
   parity_game_graph_delayed::nb_set_acc_cond()
   {
-    bdd acc, all;
-    acc = all = automata_->all_acceptance_conditions();
-    int count = 0;
-    while (all != bddfalse)
-      {
-	sub_set_acc_cond_.push_back(bdd_satone(all));
-        all -= bdd_satone(all);
-	++count;
-      }
-    return count;
+    return automata_->number_of_acceptance_conditions();
   }
 
   // We build only node which are reachable
