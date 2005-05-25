@@ -31,12 +31,12 @@
 
 namespace spot
 {
-  typedef Sgi::pair<const spot::state*, const spot::state*> state_couple;
-  typedef Sgi::vector<state_couple*> simulation_relation;
+  typedef std::pair<const spot::state*, const spot::state*> state_couple;
+  typedef std::vector<state_couple*> simulation_relation;
 
   /*
-    typedef Sgi::vector<state_couple*> direct_simulation_relation;
-    typedef Sgi::vector<state_couple*> delayed_simulation_relation;
+    typedef std::vector<state_couple*> direct_simulation_relation;
+    typedef std::vector<state_couple*> delayed_simulation_relation;
   */
 
   class direct_simulation_relation: public simulation_relation

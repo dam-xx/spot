@@ -86,9 +86,9 @@ namespace spot
   class spoiler_node;
   class duplicator_node;
 
-  typedef Sgi::vector<spoiler_node*> sn_v;
-  typedef Sgi::vector<duplicator_node*> dn_v;
-  typedef Sgi::vector<const state*> s_v;
+  typedef std::vector<spoiler_node*> sn_v;
+  typedef std::vector<duplicator_node*> dn_v;
+  typedef std::vector<const state*> s_v;
 
   /// \brief Parity game graph which compute a simulation relation.
   class parity_game_graph : public tgba_reachable_iterator_breadth_first
@@ -297,7 +297,7 @@ namespace spot
 
     /// Vector which contain all the sub-set of the set
     /// of acceptance condition.
-    typedef Sgi::vector<bdd> bdd_v;
+    typedef std::vector<bdd> bdd_v;
     bdd_v sub_set_acc_cond_;
 
     /// Return the number of acceptance condition.

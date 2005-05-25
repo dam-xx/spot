@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -35,7 +35,7 @@ namespace spot
 
   static bdd all_acc_cond = bddfalse;
 
-  static Sgi::vector<bool*> bool_v;
+  static std::vector<bool*> bool_v;
 
   //static int nb_node = 0;
 
@@ -505,7 +505,7 @@ namespace spot
     duplicator_node_delayed* dn_n
       = new duplicator_node_delayed(sn, dn, acc, label, nb);
 
-    for (Sgi::vector<duplicator_node*>::iterator i
+    for (std::vector<duplicator_node*>::iterator i
 	       = duplicator_vertice_.begin();
 	     i != duplicator_vertice_.end(); ++i)
       {
@@ -536,7 +536,7 @@ namespace spot
     spoiler_node_delayed* sn_n
       = new spoiler_node_delayed(sn, dn, acc, nb);
 
-    for (Sgi::vector<spoiler_node*>::iterator i
+    for (std::vector<spoiler_node*>::iterator i
 	   = spoiler_vertice_.begin();
 	 i != spoiler_vertice_.end(); ++i)
       {
@@ -564,32 +564,32 @@ namespace spot
 
     if (this->nb_set_acc_cond() > 1)
       {
-	for (Sgi::vector<duplicator_node*>::iterator i
+	for (std::vector<duplicator_node*>::iterator i
 	       = duplicator_vertice_.begin();
 	     i != duplicator_vertice_.end(); ++i)
 	  {
 	    /*
-	    for (Sgi::vector<duplicator_node*>::iterator i2
+	    for (std::vector<duplicator_node*>::iterator i2
 		   = duplicator_vertice_.begin();
 		 i2 != duplicator_vertice_.end(); ++i2)
 	      dynamic_cast<duplicator_node_delayed*>(*i2)->seen_ = false;
-	    for (Sgi::vector<spoiler_node*>::iterator i3
+	    for (std::vector<spoiler_node*>::iterator i3
 		   = spoiler_vertice_.begin();
 		 i3 != spoiler_vertice_.end(); ++i3)
 	      dynamic_cast<spoiler_node_delayed*>(*i3)->seen_ = false;
 	    */
 	    dynamic_cast<duplicator_node_delayed*>(*i)->set_lead_2_acc_all();
 	  }
-	for (Sgi::vector<spoiler_node*>::iterator i
+	for (std::vector<spoiler_node*>::iterator i
 	       = spoiler_vertice_.begin();
 	     i != spoiler_vertice_.end(); ++i)
 	  {
 	    /*
-	    for (Sgi::vector<duplicator_node*>::iterator i2
+	    for (std::vector<duplicator_node*>::iterator i2
 		   = duplicator_vertice_.begin();
 		 i2 != duplicator_vertice_.end(); ++i2)
 	      dynamic_cast<duplicator_node_delayed*>(*i2)->seen_ = false;
-	    for (Sgi::vector<spoiler_node*>::iterator i3
+	    for (std::vector<spoiler_node*>::iterator i3
 		   = spoiler_vertice_.begin();
 		 i3 != spoiler_vertice_.end(); ++i3)
 	      dynamic_cast<spoiler_node_delayed*>(*i3)->seen_ = false;
@@ -606,13 +606,13 @@ namespace spot
       {
 	//std::cout << "lift::change = true" << std::endl;
 	change = false;
-	for (Sgi::vector<duplicator_node*>::iterator i
+	for (std::vector<duplicator_node*>::iterator i
 	       = duplicator_vertice_.begin();
 	     i != duplicator_vertice_.end(); ++i)
 	  {
 	    change |= (*i)->set_win();
 	  }
-	for (Sgi::vector<spoiler_node*>::iterator i
+	for (std::vector<spoiler_node*>::iterator i
 	       = spoiler_vertice_.begin();
 	     i != spoiler_vertice_.end(); ++i)
 	  {
@@ -634,7 +634,7 @@ namespace spot
       return rel;
     */
 
-    for (Sgi::vector<spoiler_node*>::iterator i
+    for (std::vector<spoiler_node*>::iterator i
 	   = spoiler_vertice_.begin();
 	 i != spoiler_vertice_.end(); ++i)
       {

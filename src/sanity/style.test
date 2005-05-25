@@ -146,6 +146,12 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
     grep '[^a-zA-Z0-9_](\*[a-zA-Z0-9_]*)\.' $tmp &&
       diag 'Use "x->y", not "(*x).y"'
 
+    grep 'std::hash' $tmp &&
+      diag 'use Sgi:: for hash and hash_map'
+
+    grep 'Sgi::[^h]' $tmp &&
+      diag 'Sgi:: is for hash and hash_map only'
+
     res=`perl -ne '$/ = undef;
       print "$&\n"
       while /if \((.*)(\s*==\s*0)?\)\s*delete(\[\])?\s+\1;(?!\s+else)/g' $tmp`

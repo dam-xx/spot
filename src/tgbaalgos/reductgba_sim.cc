@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -97,13 +97,13 @@ namespace spot
   spoiler_node::set_win()
   {
     bool change = not_win;
-    for (Sgi::vector<spoiler_node*>::iterator i = lnode_succ->begin();
+    for (std::vector<spoiler_node*>::iterator i = lnode_succ->begin();
 	 i != lnode_succ->end(); ++i)
       {
 	not_win |= (*i)->not_win;
       }
     if (change != not_win)
-      for (Sgi::vector<spoiler_node*>::iterator i = lnode_pred->begin();
+      for (std::vector<spoiler_node*>::iterator i = lnode_pred->begin();
 	   i != lnode_pred->end(); ++i)
 	(*i)->set_win();
 
@@ -195,14 +195,14 @@ namespace spot
     else
       {
 	not_win = true;
-	for (Sgi::vector<spoiler_node*>::iterator i = lnode_succ->begin();
+	for (std::vector<spoiler_node*>::iterator i = lnode_succ->begin();
 	     i != lnode_succ->end(); ++i)
 	  {
 	    not_win &= (*i)->not_win;
 	  }
       }
     if (change != not_win)
-      for (Sgi::vector<spoiler_node*>::iterator i = lnode_pred->begin();
+      for (std::vector<spoiler_node*>::iterator i = lnode_pred->begin();
 	   i != lnode_pred->end(); ++i)
 	(*i)->set_win();
 
@@ -292,8 +292,8 @@ namespace spot
   void
   parity_game_graph::print(std::ostream& os)
   {
-    Sgi::vector<spoiler_node*>::iterator i1;
-    Sgi::vector<duplicator_node*>::iterator i2;
+    std::vector<spoiler_node*>::iterator i1;
+    std::vector<duplicator_node*>::iterator i2;
 
     int n = 0;
 
@@ -359,8 +359,8 @@ namespace spot
 
   parity_game_graph::~parity_game_graph()
   {
-    Sgi::vector<spoiler_node*>::iterator i1;
-    Sgi::vector<duplicator_node*>::iterator i2;
+    std::vector<spoiler_node*>::iterator i1;
+    std::vector<duplicator_node*>::iterator i2;
 
     for (i1 = spoiler_vertice_.begin();
 	 i1 != spoiler_vertice_.end(); ++i1)
@@ -392,18 +392,18 @@ namespace spot
   parity_game_graph_direct::build_graph()
   {
     tgba_succ_iterator* si = 0;
-    typedef Sgi::pair<bdd, bdd> couple_bdd;
+    typedef std::pair<bdd, bdd> couple_bdd;
     couple_bdd *p = 0;
-    Sgi::vector<couple_bdd*>* trans = 0;
+    std::vector<couple_bdd*>* trans = 0;
     bool exist = false;
     spot::state* s = 0;
 
-    for (Sgi::vector<const state*>::iterator i = tgba_state_.begin();
+    for (std::vector<const state*>::iterator i = tgba_state_.begin();
 	 i != tgba_state_.end(); ++i)
       {
 
 	// spoiler node are all state couple (i,j)
-	for (Sgi::vector<const state*>::iterator j = tgba_state_.begin();
+	for (std::vector<const state*>::iterator j = tgba_state_.begin();
 	     j != tgba_state_.end(); ++j)
 	  {
 	    spoiler_node* n1 = new spoiler_node(*i,
@@ -414,8 +414,8 @@ namespace spot
 
 	// duplicator node are all state couple where
 	// the first state i are reachable.
-	trans = new Sgi::vector<couple_bdd*>;
-        for (Sgi::vector<const state*>::iterator j = tgba_state_.begin();
+	trans = new std::vector<couple_bdd*>;
+        for (std::vector<const state*>::iterator j = tgba_state_.begin();
 	     j != tgba_state_.end(); ++j)
 	  {
 	    si = automata_->succ_iter(*j);
@@ -434,7 +434,7 @@ namespace spot
 		    // If an other predecessor of i has the same label p
 		    // to reach i, then we don't compute the duplicator node.
 		    exist = false;
-		    for (Sgi::vector<couple_bdd*>::iterator v
+		    for (std::vector<couple_bdd*>::iterator v
 			   = trans->begin();
 			 v != trans->end(); ++v)
 		      {
@@ -448,7 +448,7 @@ namespace spot
 		      {
 			// We build all the state couple with the label p.
 			trans->push_back(p);
-			for (Sgi::vector<const state*>::iterator s
+			for (std::vector<const state*>::iterator s
 			       = tgba_state_.begin();
 			     s != tgba_state_.end(); ++s)
 			  {
@@ -470,7 +470,7 @@ namespace spot
 	      }
 	    delete si;
 	  }
-	Sgi::vector<couple_bdd*>::iterator i2;
+	std::vector<couple_bdd*>::iterator i2;
 	for (i2 = trans->begin(); i2 != trans->end(); ++i2)
 	  {
 	    delete *i2;
@@ -487,10 +487,10 @@ namespace spot
     spot::state* s = 0;
 
     // for each couple of (spoiler, duplicator)
-    for (Sgi::vector<spoiler_node*>::iterator i
+    for (std::vector<spoiler_node*>::iterator i
 	   = spoiler_vertice_.begin(); i != spoiler_vertice_.end(); ++i)
       {
-	for (Sgi::vector<duplicator_node*>::iterator j
+	for (std::vector<duplicator_node*>::iterator j
 	       = duplicator_vertice_.begin();
 	     j != duplicator_vertice_.end(); ++j)
 	  {
@@ -547,13 +547,13 @@ namespace spot
     while (change)
       {
 	change = false;
-	for (Sgi::vector<duplicator_node*>::iterator i
+	for (std::vector<duplicator_node*>::iterator i
 	       = duplicator_vertice_.begin();
 	     i != duplicator_vertice_.end(); ++i)
 	  {
 	    change |= (*i)->set_win();
 	  }
-	for (Sgi::vector<spoiler_node*>::iterator i
+	for (std::vector<spoiler_node*>::iterator i
 	       = spoiler_vertice_.begin();
 	     i != spoiler_vertice_.end(); ++i)
 	  {
@@ -569,7 +569,7 @@ namespace spot
     state_couple* p = 0;
     seen_map::iterator j;
 
-    for (Sgi::vector<spoiler_node*>::iterator i
+    for (std::vector<spoiler_node*>::iterator i
 	   = spoiler_vertice_.begin();
 	 i != spoiler_vertice_.end(); ++i)
       {
