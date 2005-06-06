@@ -1,3 +1,9 @@
+2005-06-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/reductgba_sim_del.cc
+	(parity_game_graph_delayed::get_relation): Disable for generalized
+	automata, it's wrong.
+
 2005-05-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/reductgba_sim_del.cc

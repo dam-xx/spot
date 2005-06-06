@@ -69,8 +69,7 @@ namespace spot
 							     int opt = -1);
 
   /// Compute a delayed simulation relation on state of tgba \a f.
-  // FIXME: This method is correct but it builds sometime (when there are more
-  // than one acceptance condition) only a part of the simulation relation.
+  /// \bug Does not work for generalized automata.
   delayed_simulation_relation* get_delayed_relation_simulation(const tgba* a,
 							       std::ostream& os,
 							       int opt = -1);

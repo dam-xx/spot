@@ -28,6 +28,7 @@ namespace spot
   /// The one priority is represent by a \a acceptance_condition_visited_
   /// which differ of bddfalse.
   /// This spoiler node are looser for the duplicator.
+  /// FIXME: get rid of these ugly globals
   static int nb_spoiler_loose_;
 
   static int nb_spoiler;
@@ -549,48 +550,7 @@ namespace spot
   void
   parity_game_graph_delayed::lift()
   {
-    // Before the lift we compute each vertices
-    // to know if he belong to a all accepting cycle
-    // of the graph.
-
-    if (this->nb_set_acc_cond() > 1)
-      {
-	for (std::vector<duplicator_node*>::iterator i
-	       = duplicator_vertice_.begin();
-	     i != duplicator_vertice_.end(); ++i)
-	  {
-	    /*
-	    for (std::vector<duplicator_node*>::iterator i2
-		   = duplicator_vertice_.begin();
-		 i2 != duplicator_vertice_.end(); ++i2)
-	      dynamic_cast<duplicator_node_delayed*>(*i2)->seen_ = false;
-	    for (std::vector<spoiler_node*>::iterator i3
-		   = spoiler_vertice_.begin();
-		 i3 != spoiler_vertice_.end(); ++i3)
-	      dynamic_cast<spoiler_node_delayed*>(*i3)->seen_ = false;
-	    */
-	    dynamic_cast<duplicator_node_delayed*>(*i)->set_lead_2_acc_all();
-	  }
-	for (std::vector<spoiler_node*>::iterator i
-	       = spoiler_vertice_.begin();
-	     i != spoiler_vertice_.end(); ++i)
-	  {
-	    /*
-	    for (std::vector<duplicator_node*>::iterator i2
-		   = duplicator_vertice_.begin();
-		 i2 != duplicator_vertice_.end(); ++i2)
-	      dynamic_cast<duplicator_node_delayed*>(*i2)->seen_ = false;
-	    for (std::vector<spoiler_node*>::iterator i3
-		   = spoiler_vertice_.begin();
-		 i3 != spoiler_vertice_.end(); ++i3)
-	      dynamic_cast<spoiler_node_delayed*>(*i3)->seen_ = false;
-	    */
-	    dynamic_cast<spoiler_node_delayed*>(*i)->set_lead_2_acc_all();
-	  }
-      }
-
     // Jurdzinski's algorithm
-    //int iter = 0;
     bool change = true;
 
     while (change)
@@ -620,10 +580,11 @@ namespace spot
     state_couple* p = 0;
     seen_map::iterator j;
 
-    /*
-      if (this->nb_set_acc_cond() > 1)
+    // This does not work for generalized automata.  A tarjan-like
+    // algorithm is required to tell whether a state can lead to an
+    // acceptance cycle.
+    if (this->nb_set_acc_cond() > 1)
       return rel;
-    */
 
     for (std::vector<spoiler_node*>::iterator i
 	   = spoiler_vertice_.begin();
