@@ -1,5 +1,7 @@
 2005-08-31  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/ssp.cc: Typo in comment.
+
 	* lbtt/: Merge lbtt 1.2.0.
 
 2005-06-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>

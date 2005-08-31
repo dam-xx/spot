@@ -1018,7 +1018,7 @@ namespace spot
   }
 
 #if 0
-  // I rewrote couvreur99_check_result today, and it no longer use
+  // I rewrote couvreur99_check_result today, and it no longer uses
   // connected_component_ssp_factory.  So this cannot work anymore.
   // -- adl 2004-12-10.
   couvreur99_check_result*
