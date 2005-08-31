@@ -35,8 +35,8 @@ flags specific to Spot:
 
   --with-included-buddy
   --with-included-lbtt
-    Once you have installed Spot the first time.  Modified versions of
-    LBTT and BuDDy will be installed.  The next time you reconfigure
+    After you have installed Spot the first time, LBTT and a modified
+    version of BuDDy will be installed.  The next time you reconfigure
     Spot, configure will detect that these versions are already
     installed, and will attempt to use these installed versions
     directly (this is in case you had to modify one of these yourself
@@ -125,7 +125,7 @@ Third party software
 --------------------
 
 buddy/   A patched version of BuDDy 2.3 (a BDD library).
-lbtt/    A patched version of lbtt 1.1.2 (an LTL to Büchi automata test bench).
+lbtt/    lbtt 1.2.0 (an LTL to Büchi automata test bench).
 
 
 Build-system stuff
