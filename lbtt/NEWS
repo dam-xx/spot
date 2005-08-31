@@ -1,5 +1,5 @@
-lbtt NEWS -- history of user-visible changes.   02 Aug 2004
-Copyright (C) 2004 Heikki Tauriainen
+lbtt NEWS -- history of user-visible changes.   30 Aug 2005
+Copyright (C) 2005 Heikki Tauriainen
 
    Permission is granted to anyone to make or distribute verbatim copies
    of this document as received, in any medium, provided that the
@@ -10,7 +10,23 @@ Copyright (C) 2004 Heikki Tauriainen
    provided also that they carry prominent notices stating who last
    changed them.
 
-Please send bug reports to <heikki.tauriainen@hut.fi>.
+Please send bug reports to <heikki.tauriainen@tkk.fi>.
+
+Version 1.2.0
+
+* This release adds direct support (contributed by Alexandre Duret-Lutz)
+  for the LTL-to-Büchi translator distributed with the Spot model
+  checking library (available at <http://spot.lip6.fr/>).
+
+  lbtt 1.2.0 also supports reading input formulas from standard input
+  (by using the command-line option `--formulafile=-';  when reading input
+  formulas from an actual file, the filename needs to be different from
+  "-").
+
+Version 1.1.3
+
+* This release fixes build problems with GCC 4 and more job control
+  problems.
 
 Version 1.1.2
 

@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,6 +21,9 @@
 #include <csignal>
 #include <cstdlib>
 #include <ctime>
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
 #include <iostream>
 #include <vector>
 #ifdef HAVE_READLINE
@@ -28,6 +31,11 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif  /* HAVE_READLINE */
+#ifdef HAVE_ISATTY
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif /* HAVE_UNISTD_H */
+#endif /* HAVE_ISATTY */
 #include "LbttAlloc.h"
 #include "Configuration.h"
 #include "DispUtil.h"
@@ -82,12 +90,12 @@ TestRoundInfo round_info;                           /* Data structure for
 						     * round.
 						     */
 
-vector<AlgorithmTestResults,                        /* Test results for each */
-       ALLOC(AlgorithmTestResults) >                /* individual algorithm. */
-  test_results;
+vector<AlgorithmTestResults> test_results;          /* Test results for each
+						     * individual algorithm.
+						     */
 
-vector<TestStatistics, ALLOC(TestStatistics) >      /* Overall test        */
-  final_statistics;                                 /* statistics for each
+vector<TestStatistics> final_statistics;            /* Overall test
+                                                     * statistics for each
 						     * algorithm.
 						     */
 
@@ -167,9 +175,13 @@ static void breakHandler(int)
  *
  *****************************************************************************/
 
+pid_t translator_process = 0; /* Process group for translator process */
+
 static void abortHandler(int signum)
 {
   deallocateTempFilenames();
+  if (translator_process != 0 && kill(translator_process, 0) == 0)
+    kill(-translator_process, SIGTERM);
   struct sigaction s;
   s.sa_handler = SIG_DFL;
   sigemptyset(&s.sa_mask);
@@ -274,16 +286,24 @@ bool testLoop()
 
   /*
    *  If a formula file name was given in the configuration, open the file for
-   *  reading.
+   *  reading.  The special filename "-" refers to the standard input.
    */
 
   try
   {
     if (!global_options.formula_input_filename.empty())
-      openFile(global_options.formula_input_filename.c_str(),
-	       round_info.formula_input_file,
-	       ios::in,
-	       0);
+    {
+      if (global_options.formula_input_filename == "-")
+	round_info.formula_input_stream = &cin;
+      else
+      {
+	openFile(global_options.formula_input_filename.c_str(),
+		 round_info.formula_input_file,
+		 ios::in,
+		 0);
+	round_info.formula_input_stream = &round_info.formula_input_file;
+      }
+    }
   }
   catch (const FileOpenException& e)
   {
@@ -383,8 +403,7 @@ bool testLoop()
 	  round_info.next_round_to_change_statespace
 	    += global_options.statespace_change_interval;
 
-	for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >
-	       ::iterator it = test_results.begin();
+	for (vector<AlgorithmTestResults>::iterator it = test_results.begin();
 	     it != test_results.end();
 	     ++it)
 	  it->emptinessReset();
@@ -437,8 +456,7 @@ bool testLoop()
 
 	round_info.formula_in_file[0] = round_info.formula_in_file[1] = false;
 
-	for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >
-	       ::iterator it = test_results.begin();
+	for (vector<AlgorithmTestResults>::iterator it = test_results.begin();
 	     it != test_results.end();
 	     ++it)
 	  it->fullReset();
@@ -449,8 +467,8 @@ bool testLoop()
 	{
 	  try
 	  {
-	    generateFormulae(round_info.formula_input_file.is_open()
-			     ? &round_info.formula_input_file
+	    generateFormulae(!global_options.formula_input_filename.empty()
+			     ? round_info.formula_input_stream
 			     : 0);
 	  }
 	  catch (const FormulaGenerationException&)
@@ -667,8 +685,7 @@ bool testLoop()
       ::Ltl::LtlFormula::destruct(round_info.formulae[f]);
   }
 
-  for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >
-	 ::iterator it = test_results.begin();
+  for (vector<AlgorithmTestResults>::iterator it = test_results.begin();
        it != test_results.end();
        ++it)
     it->fullReset();
@@ -735,9 +752,18 @@ int main(int argc, char* argv[])
     if (!e.line_info.empty())
       cerr << ":" << configuration.global_options.cfg_filename << ":"
 	   << e.line_info;
-    cerr << ":" << e.what() << endl;
+    cerr << ": " << e.what() << endl;
     exit(2);
   }
+
+#ifdef HAVE_ISATTY
+  if (configuration.global_options.formula_input_filename == "-"
+      && !isatty(STDIN_FILENO))
+  {
+    configuration.global_options.interactive = Configuration::NEVER;
+    configuration.global_options.handle_breaks = false;
+  }
+#endif /* HAVE_ISATTY */
 
   if (configuration.global_options.verbosity >= 3)
     configuration.print(cout);

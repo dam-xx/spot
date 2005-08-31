@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -261,21 +261,18 @@ private:
 
   void collectSubformulae                           /* Builds a stack of the */
     (stack<const LtlFormula*,                       /* subformulae of the    */
-           deque<const LtlFormula*,                 /* formula.              */
-                 ALLOC(const LtlFormula*) > >&
+           deque<const LtlFormula*> >&              /* formula.              */
        result_stack) const;
 
   typedef pair<bool, const LtlFormula*>             /* Shorthand type      */
     FormulaStackElement;                            /* definitions for the */
   typedef stack<FormulaStackElement,                /* propositional       */
-                deque<FormulaStackElement,          /* satisfiability      */
-                      ALLOC(FormulaStackElement) > >/* checking algorithm. */
-    FormulaStack;
+                deque<FormulaStackElement> >        /* satisfiability      */
+    FormulaStack;                                   /* checking algorithm. */
   typedef pair<FormulaStack, Bitset>
     TableauStackElement;
   typedef stack<TableauStackElement,
-                deque<TableauStackElement,
-                      ALLOC(TableauStackElement) > >
+                deque<TableauStackElement> >
     TableauStack;
 
   bool sat_eval                                     /* Helper function for */
@@ -285,9 +282,8 @@ private:
                                                      * formula.
 						     */
 
-  static set<LtlFormula*, ptr_less,                 /* Shared storage for */
-             ALLOC(LtlFormula*) >                   /* LTL formulae.      */
-    formula_storage;
+  static set<LtlFormula*, ptr_less>                 /* Shared storage for */
+    formula_storage;                                /* LTL formulae.      */
 
   static unsigned long int                          /* Upper limit for the */
     eval_proposition_id_limit;                      /* atomic proposition
@@ -1314,8 +1310,7 @@ inline LtlFormula& LtlFormula::insertToStorage(LtlFormula* f)
  *
  * ------------------------------------------------------------------------- */
 {
-  set<LtlFormula*, ptr_less, ALLOC(LtlFormula*) >::iterator inserter
-    = formula_storage.find(f);
+  set<LtlFormula*, ptr_less>::iterator inserter = formula_storage.find(f);
   if (inserter != formula_storage.end())
   {
     delete f;

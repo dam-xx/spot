@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -87,16 +87,16 @@ public:
 						     * `reset'.
 						     */
 
-  const map<unsigned long int, unsigned long int,   /* Get the numbers of   */
-            less<unsigned long int>,                /* different atomic      */
-            ALLOC(unsigned long int) >&             /* propositions          */
-    propositionStatistics() const;                  /* generated since the
+  const map<unsigned long int, unsigned long int>&  /* Get the numbers of    */
+    propositionStatistics() const;                  /* different atomic
+                                                     * propositions
+                                                     * generated since the
 						     * last call to `reset'.
 						     */
 
-  const map<int, unsigned long int, less<int>,      /* Get the numbers of    */
-            ALLOC(unsigned long int) >&             /* different symbols     */
-    symbolStatistics() const;                       /* generated since the
+  const map<int, unsigned long int>&                /* Get the numbers of    */
+    symbolStatistics() const;                       /* different symbols
+                                                     * generated since the
 						     * last call to `reset'.
 						     */
 
@@ -124,21 +124,20 @@ private:
 
   typedef pair<int, int> IntegerPair;
 
-  vector<IntegerPair, ALLOC(IntegerPair) >          /* Operand symbols and */
+  vector<IntegerPair>                               /* Operand symbols and */
     propositional_symbol_priorities;                /* their priorities in
                                                      * random formulae.
                                                      */
 
-  vector<IntegerPair, ALLOC(IntegerPair) >          /* Operators and their  */
-    short_formula_operators;                        /* priorities in random
-                                                     * formulae of size
-                                                     * two.
+  vector<IntegerPair> short_formula_operators;      /* Operators and their
+                                                     * priorities in random
+                                                     * formulae of size two.
                                                      */
 
-  vector<IntegerPair, ALLOC(IntegerPair) >          /* Operators and their  */
-    long_formula_operators;                         /* priorities in random
-                                                     * formulae of size
-                                                     * greater than two.
+  vector<IntegerPair> long_formula_operators;       /* Operators and their
+                                                     * priorities in random
+                                                     * formulae of size greater
+                                                     * than two.
                                                      */
 
   unsigned long int number_of_generated_formulas;   /* Number of generated
@@ -146,14 +145,15 @@ private:
 						     * last call to `reset'.
 						     */
 
-  map<unsigned long int, unsigned long int,         /* Number of different  */
-      less<unsigned long int>,                      /* atomic propositions  */
-      ALLOC(unsigned long int) >                    /* generated since the  */
-    proposition_statistics;                         /* last call to `reset' */
+  map<unsigned long int, unsigned long int>         /* Number of different  */
+    proposition_statistics;                         /* atomic propositions
+                                                     * generated since the
+                                                     * last call to `reset'
+						     */
 
-  map<int, unsigned long int, less<int>,            /* Number of different   */
-      ALLOC(unsigned long int) >                    /* formula symbols       */
-    symbol_statistics;                              /* generated since the
+  map<int, unsigned long int> symbol_statistics;    /* Number of different
+                                                     * formula symbols
+                                                     * generated since the
 						     * last call to `reset'.
 						     */
 };
@@ -289,8 +289,7 @@ inline unsigned long int FormulaRandomizer::numberOfFormulas() const
 }
 
 /* ========================================================================= */
-inline const map<unsigned long int, unsigned long int, less<unsigned long int>,
-                 ALLOC(unsigned long int) >&
+inline const map<unsigned long int, unsigned long int>&
 FormulaRandomizer::propositionStatistics() const
 /* ----------------------------------------------------------------------------
  *
@@ -308,7 +307,7 @@ FormulaRandomizer::propositionStatistics() const
 }
 
 /* ========================================================================= */
-inline const map<int, unsigned long int, less<int>, ALLOC(unsigned long int) >&
+inline const map<int, unsigned long int>&
 FormulaRandomizer::symbolStatistics() const
 /* ----------------------------------------------------------------------------
  *

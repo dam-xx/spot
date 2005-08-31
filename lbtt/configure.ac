@@ -1,8 +1,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.59])
-AC_INIT([lbtt], [1.1.2], [heikki.tauriainen@hut.fi])
-AC_REVISION([Revision: 1.6])
+AC_INIT([lbtt], [1.2.0], [heikki.tauriainen@tkk.fi])
+AC_REVISION([Revision: 1.8])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
@@ -124,52 +124,6 @@ AC_CHECK_HEADERS(
 
 # Checks for typedefs, structures, and compiler characteristics.
 
-# Check for the availability of the slist header (an extension to the C++
-# Standard Template Library). (In GCC 3.x the header is in the ext/
-# subdirectory of the directory containing the standard C++ headers.)
-
-AC_MSG_CHECKING([for slist])
-for slist_header in slist ext/slist no; do
-  if test "${slist_header}" != no; then
-    AC_PREPROC_IFELSE(
-      [AC_LANG_SOURCE([[#include <${slist_header}>]])],
-      [break])
-  fi
-done
-
-# Try to determine the C++ namespace in which the class slist resides.
-# (For example, GCC versions >= 3.1 put slist into the __gnu_cxx namespace.)
-
-if test "${slist_header}" != no; then
-  for slist_namespace in std __gnu_cxx error; do
-    if test "${slist_namespace}" != error; then
-      AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM(
-           [[#include <${slist_header}>]],
-           [[${slist_namespace}::slist<int> s;]])],
-        [break])
-    fi
-  done
-  if test "${slist_namespace}" != error; then
-    AC_MSG_RESULT([header <${slist_header}>, typename ${slist_namespace}::slist])
-    AC_DEFINE(
-      [HAVE_SLIST],
-      [1],
-      [Define to 1 if you have the <slist> or <ext/slist> header file.])
-    AC_DEFINE_UNQUOTED(
-      [SLIST_NAMESPACE],
-      [${slist_namespace}],
-      [Define as the name of the C++ namespace containing slist.])
-    AC_SUBST([INCLUDE_SLIST_HEADER], ["#include <${slist_header}>"])
-  else
-    slist_header=no
-  fi
-fi
-
-if test "${slist_header}" = no; then
-  AC_MSG_RESULT([no])
-fi
-
 AC_LANG(C)
 
 AC_CHECK_TYPES(
@@ -191,7 +145,7 @@ AC_C_INLINE
 # Checks for library functions.
 
 AC_CHECK_FUNCS(
-  [strchr strtod strtol strtoul strerror mkdir mkstemp open read write close popen pclose pipe fork execvp setsid getpid waitpid alarm sigaction sigprocmask sigemptyset sigaddset times sysconf],
+  [strchr strtod strtol strtoul strerror mkdir mkstemp open read write close popen pclose pipe fork execvp getpgrp setpgid tcgetpgrp tcsetpgrp getpid waitpid alarm sigaction sigprocmask sigemptyset sigaddset times sysconf],
   [],
   [AC_MSG_ERROR([missing one of the library functions required for compilation])])
 AC_CHECK_FUNCS([strsignal isatty getopt_long])

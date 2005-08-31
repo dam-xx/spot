@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -288,27 +288,20 @@ void BuchiAutomaton::read(istream& input_stream)
      *  to the interval [0...(number of states - 1)].
      */
 
-    map<long int, size_type, less<long int>, ALLOC(size_type) >
-      state_number_map;
+    map<long int, size_type> state_number_map;
     pair<long int, size_type> state_mapping(0, 0);
 
-    pair<map<long int, size_type, less<long int>, ALLOC(size_type) >
-             ::const_iterator,
-         bool>
-      state_finder;
+    pair<map<long int, size_type>::const_iterator, bool> state_finder;
 
     /*
      *  Also the acceptance set numbers will be mapped to the interval
      *  [0...(number of acceptance sets - 1)].
      */
 
-    map<long int, unsigned long int, less<long int>, ALLOC(unsigned long int) >
-      acceptance_set_map;
+    map<long int, unsigned long int> acceptance_set_map;
     pair<long int, unsigned long int> acceptance_set_mapping(0, 0);
 
-    pair<map<long int, unsigned long int, less<long int>,
-             ALLOC(unsigned long int) >::const_iterator,
-         bool>
+    pair<map<long int, unsigned long int>::const_iterator, bool>
       acceptance_set_finder;
 
     /*

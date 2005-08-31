@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -50,32 +50,28 @@ void printStatTableHeader                           /* Displays a table  */
 void printBuchiAutomatonStats                       /* Displays information */
   (ostream& stream,                                 /* about a Büchi        */
    int indent,                                      /* automaton.           */
-   vector<AlgorithmTestResults,
-          ALLOC(AlgorithmTestResults) >::size_type
+   vector<AlgorithmTestResults>::size_type
      algorithm,
    int result_id);
 
 void printProductAutomatonStats                     /* Displays information */
   (ostream& stream,                                 /* about a product      */
    int indent,                                      /* automaton.           */
-   vector<AlgorithmTestResults,
-          ALLOC(AlgorithmTestResults) >::size_type
+   vector<AlgorithmTestResults>::size_type
      algorithm,
    int result_id);
 
 void printAcceptanceCycleStats                      /* Displays information */
   (ostream& stream,                                 /* about the acceptance */
    int indent,                                      /* cycles of a product  */
-   vector<AlgorithmTestResults,                     /* automaton.           */
-          ALLOC(AlgorithmTestResults) >::size_type
+   vector<AlgorithmTestResults>::size_type          /* automaton.           */
      algorithm,
    int result_id);
 
 void printConsistencyCheckStats                     /* Displays the result */
   (ostream& stream,                                 /* of the consistency  */
    int indent,                                      /* check for a given   */
-   vector<AlgorithmTestResults,                     /* algorithm.          */
-          ALLOC(AlgorithmTestResults) >::size_type
+   vector<AlgorithmTestResults>::size_type          /* algorithm.          */
      algorithm);
 
 void printCrossComparisonStats                      /* Displays information */
@@ -92,18 +88,14 @@ void printBuchiIntersectionCheckStats               /* Displays the results  */
 void printAllStats                                  /* A shorthand for       */
   (ostream& stream,                                 /* showing all the       */
    int indent,                                      /* information displayed */
-   vector<TestStatistics,                           /* by the previous five  */
-          ALLOC(TestStatistics)>::size_type         /* functions.            */
-     algorithm);  
+   vector<TestStatistics>::size_type algorithm);    /* by the previous five
+						     * functions.
+						     */
 
 void printCollectiveCrossComparisonStats            /* Displays a single     */
   (ostream& stream,                                 /* `cell' of the final   */
-   vector<TestStatistics,                           /* result cross-         */
-          ALLOC(TestStatistics) >::size_type        /* comparison table.     */
-     algorithm_y,                                 
-   vector<TestStatistics,
-          ALLOC(TestStatistics) >::size_type
-     algorithm_x,
+   vector<TestStatistics>::size_type algorithm_y,   /* result cross-         */
+   vector<TestStatistics>::size_type algorithm_x,   /* comparison table.     */
    int data_type);
 
 void printCollectiveStats                           /* Displays average test */

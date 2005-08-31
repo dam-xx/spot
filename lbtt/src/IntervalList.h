@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -74,13 +74,15 @@ public:
     unsigned long int operator++(int);              /* Postfix increment. */
 
   private:
-    const list<Interval, ALLOC(Interval) >*         /* The interval list   */
-      interval_list;                                /* associated with the */
-                                                    /* iterator.           */
+    const list<Interval>* interval_list;            /* The interval list
+                                                     * associated with the
+                                                     * iterator.
+						     */
 
-    list<Interval, ALLOC(Interval) >                /* An iterator pointing */
-      ::const_iterator interval;                    /* at the current       */
-                                                    /* interval list.       */
+    list<Interval>::const_iterator interval;        /* An iterator pointing at
+                                                     * the current intrerval  
+                                                     * list.
+						     */
 
     unsigned long int element;                      /* Element currently
 						     * pointed to by the
@@ -143,8 +145,7 @@ public:
 						     * iterators.
 						     */
 
-  typedef list<Interval, ALLOC(Interval) >          /* Size type. */
-    ::size_type size_type;
+  typedef list<Interval>::size_type size_type;      /* Size type. */
 
   size_type size() const;                           /* Tell the number of
 						     * disjoint intervals in
@@ -170,7 +171,7 @@ public:
 						     */
 
 private:
-  list<Interval, ALLOC(Interval) > intervals;       /* List of intervals. */
+  list<Interval> intervals;                         /* List of intervals. */
 
   friend class const_iterator;
 };

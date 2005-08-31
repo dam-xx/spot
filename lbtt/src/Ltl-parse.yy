@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -44,9 +44,9 @@ static LtlFormula* result;                          /* This variable stores the
                                                      * ltl_parse.
                                                      */
 
-static std::set<LtlFormula*, less<LtlFormula*>,     /* Intermediate results. */
-                ALLOC(LtlFormula*) >                /* (This set is used     */
-  intermediate_results;                             /* for keeping track of
+static std::set<LtlFormula*> intermediate_results;  /* Intermediate results.
+                                                     * (This set is used
+                                                     * for keeping track of
 						     * the subformulas of a
 						     * partially constructed
 						     * formula in case the
@@ -426,8 +426,8 @@ LtlFormula* parseFormula(istream& stream)
   }
   catch (...)
   {
-    for (std::set<LtlFormula*, less<LtlFormula*>, ALLOC(LtlFormula*) >
-	   ::const_iterator f = intermediate_results.begin();
+    for (std::set<LtlFormula*>::const_iterator
+	   f = intermediate_results.begin();
 	 f != intermediate_results.end();
 	 ++f)
       LtlFormula::destruct(*f);

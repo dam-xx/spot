@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -55,7 +55,11 @@ public:
 						     * stream for messages.
 						     */
 
-  ifstream formula_input_file;                      /* Stream for reading input
+  istream* formula_input_stream;                    /* Stream for reading input
+						     * formulae.
+						     */
+
+  ifstream formula_input_file;                      /* File for reading input
 						     * formulae.
 						     */
 
@@ -149,9 +153,9 @@ public:
 						     * current round.
 						     */
 
-  vector<class ::Ltl::LtlFormula*,                  /* Formulae used in the  */
-         ALLOC(class ::Ltl::LtlFormula*) >          /* current round:        */
-    formulae;                                       /* formulae[0]:
+  vector<class ::Ltl::LtlFormula*> formulae;        /* Formulae used in the
+                                                     * current round:
+                                                     * formulae[0]:
 						     *   positive formula in
 						     *   negation normal
 						     *   form
@@ -167,7 +171,7 @@ public:
 						     *   generated
 						     */
 
-  vector<bool, ALLOC(bool) > formula_in_file;       /* The values in this
+  vector<bool> formula_in_file;                     /* The values in this
 						     * vector will be set to
 						     * true when the
 						     * corresponding

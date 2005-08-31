@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -67,20 +67,19 @@ void printAlgorithmList                             /* Displays a list of */
 void printCrossComparisonAnalysisResults            /* Analyzes a            */
   (ostream& stream, int indent,                     /* contradiction between */
    bool formula_type,                               /* test results of two   */
-   const vector<string, ALLOC(string) >&            /* implementations.      */
-     input_tokens);
+   const vector<string>& input_tokens);             /* implementations.      */
 
 void printConsistencyAnalysisResults                /* Analyzes a            */
   (ostream& stream, int indent,                     /* contradicition in the */
-   const vector<string, ALLOC(string) >&            /* model checking result */
-     input_tokens);                                 /* consistency check for
+   const vector<string>& input_tokens);             /* model checking result
+                                                     * consistency check for
 						     * an implementation.
 						     */
 
 void printAutomatonAnalysisResults                  /* Analyzes a           */
   (ostream& stream, int indent,                     /* contradiction in the */
-   const vector<string, ALLOC(string) >&            /* Büchi automata       */
-     input_tokens);                                 /* intersection
+   const vector<string>& input_tokens);             /* Büchi automata
+                                                     * intersection
                                                      * emptiness check.
 						     */
 
@@ -92,8 +91,7 @@ void printPath                                      /* Displays information */
 
 void printAcceptingCycle                            /* Displays information */
   (ostream& stream, int indent,                     /* a single automaton   */
-   vector<Configuration::AlgorithmInformation,      /* execution.           */
-          ALLOC(Configuration::AlgorithmInformation) >
+   vector<Configuration::AlgorithmInformation>      /* execution.           */
      ::size_type
      algorithm_id,
    const BuchiAutomaton::Path& aut_prefix,
@@ -106,47 +104,47 @@ void printAcceptingCycle                            /* Displays information */
 void printBuchiAutomaton                            /* Displays information */
   (ostream& stream, int indent,                     /* about a Büchi        */
    bool formula_type,                               /* automaton.           */
-   vector<string, ALLOC(string) >& input_tokens,
+   vector<string>& input_tokens,
    Graph::GraphOutputFormat fmt);
 
 void evaluateFormula                                /* Displays information */
   (ostream& stream, int indent,                     /* about existence of   */
    bool formula_type,                               /* accepting system     */
-   vector<string, ALLOC(string) >& input_tokens);   /* executions.          */
+   vector<string>& input_tokens);                   /* executions.          */
 
 void printFormula                                   /* Displays a formula */
   (ostream& stream, int indent,                     /* used for testing.  */
    bool formula_type,
-   const vector<string, ALLOC(string) >&
-     input_tokens);
+   const vector<string>& input_tokens);
 
 void printCommandHelp                               /* Displays help about */
   (ostream& stream, int indent,                     /* user commands.      */
-   const vector<string, ALLOC(string) >&
-     input_tokens);           
+   const vector<string>& input_tokens);
 
 void printInconsistencies                           /* Lists the system   */
   (ostream& stream, int indent,                     /* states failing the */
-   vector<string, ALLOC(string) >& input_tokens);   /* consistency check
+   vector<string>& input_tokens);                   /* consistency check
                                                      * for an algorihm.
 						     */
 
 void printTestResults                               /* Displays the test   */
   (ostream& stream, int indent,                     /* results of the last */  
-   vector<string, ALLOC(string) >& input_tokens);   /* round performed.    */
+   vector<string>& input_tokens);                   /* round performed.    */
 
 void printStateSpace                                /* Displays information */
   (ostream& stream, int indent,                     /* about a state space. */
-   vector<string, ALLOC(string) >& input_tokens,
+   vector<string>& input_tokens,
    Graph::GraphOutputFormat fmt);
 
 void changeVerbosity                                /* Displays or changes */
-  (const vector<string, ALLOC(string) >&            /* the verbosity of    */
-     input_tokens);                                 /* output.             */
+  (const vector<string>& input_tokens);             /* the verbosity of
+                                                     * output.
+						     */
 
 void changeAlgorithmState                           /* Enables or disables a */
-  (vector<string, ALLOC(string) >& input_tokens,    /* set of algorithms     */
-   bool enable);                                    /* used in the tests.    */
+  (vector<string>& input_tokens, bool enable);      /* set of algorithms
+                                                     * used in the tests.
+						     */
 
 }
 

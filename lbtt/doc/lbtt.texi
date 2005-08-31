@@ -14,13 +14,13 @@
 This file documents how to use the LTL-to-B@"uchi
 translator testbench @command{lbtt}.
 
-Copyright @copyright{} 2004 Heikki Tauriainen
+Copyright @copyright{} 2005 Heikki Tauriainen
 @ifinfo
-@email{heikki.tauriainen@@hut.fi}
+@email{heikki.tauriainen@@tkk.fi}
 @end ifinfo
 @ifnotinfo
 @ifnothtml
-<@email{heikki.tauriainen@@hut.fi}>
+<@email{heikki.tauriainen@@tkk.fi}>
 @end ifnothtml
 @end ifnotinfo
 
@@ -64,12 +64,12 @@ under the above conditions for modified versions.
 @title @command{lbtt}
 
 @subtitle LTL-to-B@"uchi Translator Testbench
-@subtitle @today, @command{lbtt} Versions 1.1.x
-@author Heikki Tauriainen <@email{heikki.tauriainen@@hut.fi}>
+@subtitle @today, @command{lbtt} Versions 1.2.x
+@author Heikki Tauriainen <@email{heikki.tauriainen@@tkk.fi}>
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2004 Heikki Tauriainen
-<@email{heikki.tauriainen@@hut.fi}>
+Copyright @copyright{} 2005 Heikki Tauriainen
+<@email{heikki.tauriainen@@tkk.fi}>
 
 The latest version of this manual can be obtained from@*
 <@url{http://www.tcs.hut.fi/Software/lbtt/}>.
@@ -103,8 +103,8 @@ under the above conditions for modified versions.
 for translating propositional linear temporal logic formulas into
 B@"uchi automata.
 
-This is edition 1.1.0 of the @command{lbtt} documentation. This edition
-applies to @command{lbtt} versions 1.1.x.
+This is edition 1.2.0 of the @command{lbtt} documentation. This edition
+applies to @command{lbtt} versions 1.2.x.
 
 @command{lbtt} is free software, you may change and redistribute it
 under the terms of the GNU General Public License.  @command{lbtt}
@@ -299,7 +299,7 @@ for more information.
 By default, all tests @command{lbtt} makes are based on randomly generated
 input. However, the LTL formulas used as input for the LTL-to-B@"uchi
 translators can be optionally given by the user by telling @command{lbtt} to
-read LTL formulas from a file
+read LTL formulas from a file or from standard input
 (@pxref{--formulafile,,@samp{--formulafile} command line option}).
 
 @cindex state space
@@ -899,7 +899,7 @@ See also the web page@*
 @url{http://www.tcs.hut.fi/Software/lbtt/formulaoptions.php}
 @end ifinfo
 @ifnotinfo
-<@uref{http://www.tcs.hut.fi/Software/lbtt/formulaoptions.php>}
+<@uref{http://www.tcs.hut.fi/Software/lbtt/formulaoptions.php}>
 @end ifnotinfo
 for an interface to a small database for adjusting the operator priorities
 towards certain simple distributions.
@@ -2121,12 +2121,13 @@ file @samp{config} in the current working directory.
 
 @item @anchor{--formulafile}--formulafile=@var{FILE-NAME}
 @vindex --formulafile
-@cindex LTL formula, reading from a file
+@cindex LTL formula, reading from a file or standard input
 @cindex file formats, formula input file for @command{lbtt}
 This option instructs @command{lbtt} to read the LTL formulas used in the tests
-from a file instead of generating them randomly. The file should contain a
-list of formulas, each on its own line in the file. The formulas can be
-specified either in @command{lbtt}'s own prefix notation
+from a file (or standard input) instead of generating them randomly. The
+special filename @samp{-} refers to standard input. Each
+input formula should be followed by a newline. The formulas can be specified
+either in @command{lbtt}'s own prefix notation
 (@pxref{Format for LTL formulas}; also the infix notation used in output
 messages is supported) or in a variety of formats found in
 some LTL-to-B@"uchi translator implementations (Spin, LTL2BA, LTL2AUT,
@@ -2522,8 +2523,8 @@ This option sets the priority for the logical ``exclusive or'' operator.
 
 Note also the @samp{--formulafile=@var{FILE-NAME}} option
 (@pxref{--formulafile,,@samp{--formulafile} option}), which can be used to
-instruct @command{lbtt} to read LTL formulas from a file instead of generating
-them randomly.
+instruct @command{lbtt} to read LTL formulas from a file (or standard input)
+instead of generating them randomly.
 
 
 
@@ -2665,9 +2666,9 @@ Random state space generation parameters.
 
 @item
 Random LTL formula generation parameters (unless reading LTL formulas from
-a file; @pxref{--formulafile,,@samp{--formulafile} command line option}).
-This includes information about all enabled formula operators and their
-priorities. When using the command line option
+an external source; @pxref{--formulafile,,@samp{--formulafile} command line
+option}). This includes information about all enabled formula operators and
+their priorities. When using the command line option
 @samp{--showoperatordistribution}
 (@pxref{--showoperatordistribution,,@samp{--showoperatordistribution} option}),
 @command{lbtt} shows also the expected number of occurrence of each
@@ -4025,6 +4026,25 @@ See
 <@uref{http://spinroot.com/spin/whatispin.html}>
 @end ifnotinfo
 for more information.
+
+@item
+@cindex Spot
+@ifnottex
+Spot @ref{[DP04]}
+@end ifnottex
+@iftex
+Spot [DP04]
+@end iftex
+--- a model checking library that includes a module for translating LTL
+formulas into B@"uchi automata incorporating optimization techniques from
+several different sources. See
+@ifinfo
+@url{http://spot.lip6.fr/}
+@end ifinfo
+@ifnotinfo
+<@uref{http://spot.lip6.fr/}>
+@end ifnotinfo
+for more information.
 @end itemize
 
 To use @command{lbtt} for testing the LTL-to-B@"uchi translators included in
@@ -4056,7 +4076,7 @@ LTL formula operators available for generating random LTL formulas with
 about which operators are supported, and then change the parameters in
 @command{lbtt}'s configuration file accordingly to disable the unsupported
 operators (or instruct @command{lbtt} to read the formulas from an external
-file by invoking @command{lbtt} with the
+source by invoking @command{lbtt} with the
 @ref{--formulafile,,@samp{--formulafile} command line option}).
 
 The @command{lbtt-translate} utility can also be invoked directly from the
@@ -4086,6 +4106,13 @@ generation for linear temporal logic. In @i{Proceedings of the 11th
 International Conference on Computer Aided Verification (CAV'99)}, volume 1633
 of @i{Lecture Notes in Computer Science}, pages 249---260. Springer-Verlag,
 1999.
+
+@item @anchor{[DP04]} [DP04]
+A.@: Duret-Lutz and D.@: Poitrenaud. SPOT: An Extensible Model Checking Library
+Using Transition-Based Generalized B@"uchi Automata. In
+@i{Proceedings of the 12th IEEE/ACM International Symposium on Modeling,
+Analysis, and Simulation of Computer and Telecommunication Systems
+(MASCOTS 2004)}, pages 76--83. IEEE Computer Society Press, 2004.
 
 @item @anchor{[EH00]} [EH00]
 K.@: Etessami and G.@: Holzmann. Optimizing B@"uchi automata. In

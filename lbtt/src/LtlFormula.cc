@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -24,9 +24,8 @@
 namespace Ltl
 {
 
-set<LtlFormula*, LtlFormula::ptr_less,              /* Shared storage for */
-    ALLOC(LtlFormula*) >                            /* LTL formulae.      */
-  LtlFormula::formula_storage;
+set<LtlFormula*, LtlFormula::ptr_less>              /* Shared storage for */
+  LtlFormula::formula_storage;                      /* LTL formulae.      */
 
 unsigned long int                                   /* Upper limit for the */
   LtlFormula::eval_proposition_id_limit;            /* atomic proposition
@@ -140,12 +139,10 @@ public:
 						     */
 
 private:
-  stack<LtlFormula*,
-        deque<LtlFormula*, ALLOC(LtlFormula*) > >
+  stack<LtlFormula*, deque<LtlFormula*> >
     formula_stack;
 
-  stack<bool, deque<bool, ALLOC(bool) > >
-    negation_stack;
+  stack<bool, deque<bool> > negation_stack;
 
   NnfConverter(const NnfConverter&);                /* Prevent copying and   */
   NnfConverter& operator=(const NnfConverter&);     /* assignment of
@@ -196,8 +193,7 @@ class SubformulaCollector
 public:
   SubformulaCollector                               /* Constructor. */
     (stack<const LtlFormula*,
-           deque<const LtlFormula*,
-                 ALLOC(const LtlFormula*) > >&
+           deque<const LtlFormula*> >&
        result_stack);
 
   ~SubformulaCollector();                           /* Destructor. */
@@ -209,8 +205,7 @@ public:
 
 private:
   stack<const LtlFormula*,                          /* Stack of subformulae. */
-        deque<const LtlFormula*,
-              ALLOC(const LtlFormula*) > >&
+        deque<const LtlFormula*> >&
     subformula_stack;
 
   SubformulaCollector(const SubformulaCollector&);  /* Prevent copying and */
@@ -382,9 +377,7 @@ inline void FormulaSizeCounter::operator()(const LtlFormula*, int)
 
 /* ========================================================================= */
 inline SubformulaCollector::SubformulaCollector
-  (stack<const LtlFormula*, deque<const LtlFormula*,
-                                  ALLOC(const LtlFormula*) > >&
-     result_stack) :
+  (stack<const LtlFormula*, deque<const LtlFormula*> >& result_stack) :
   subformula_stack(result_stack)
 /* ----------------------------------------------------------------------------
  *
@@ -766,9 +759,7 @@ unsigned long int LtlFormula::size() const
 
 /* ========================================================================= */
 void LtlFormula::collectSubformulae
-  (stack<const LtlFormula*, deque<const LtlFormula*,
-                                  ALLOC(const LtlFormula*) > >&
-     result_stack) const
+  (stack<const LtlFormula*, deque<const LtlFormula*> >& result_stack) const
 /* ----------------------------------------------------------------------------
  *
  * Description:   Collects the subformulae of a LtlFormula into a stack. After

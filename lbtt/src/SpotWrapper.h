@@ -1,6 +1,8 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Copyright (C) 2003, 2004
  *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
+ *
+ *  Derived from SpinWrapper.h by Alexandre Duret-Lutz <adl@src.lip6.fr>.
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,8 +19,8 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef SPINWRAPPER_H
-#define SPINWRAPPER_H
+#ifndef SPOTWRAPPER_H
+#define SPOTWRAPPER_H
 
 #include <config.h>
 #include <string>
@@ -27,16 +29,16 @@
 
 /******************************************************************************
  *
- * Interface class for Spin.
+ * Interface class for Spot.
  *
  *****************************************************************************/
 
-class SpinWrapper : public ExternalTranslator
+class SpotWrapper : public ExternalTranslator
 {
 public:
-  SpinWrapper();                                    /* Constructor. */
+  SpotWrapper();                                    /* Constructor. */
 
-  ~SpinWrapper();                                   /* Destructor. */
+  ~SpotWrapper();                                   /* Destructor. */
 
   void translateFormula                             /* Translates a formula */
     (const ::Ltl::LtlFormula& formula,              /* into a Büchi         */
@@ -46,7 +48,7 @@ public:
 
   string commandLine                                /* Prepares the command */
     (const string& input_filename,                  /* line for executing   */
-     const string& output_filename);                /* Spin.                */
+     const string& output_filename);                /* Spot.                */
 
   /* `execSuccess' inherited from ExternalTranslator */
 
@@ -57,28 +59,29 @@ public:
 						     */
 
 private:
-  SpinWrapper(const SpinWrapper&);                  /* Prevent copying and */
-  SpinWrapper& operator=(const SpinWrapper&);       /* assignment of
-						     * SpinWrapper objects.
+  SpotWrapper(const SpotWrapper&);                  /* Prevent copying and */
+  SpotWrapper& operator=(const SpotWrapper&);       /* assignment of
+						     * SpotWrapper objects.
 						     */
 
-  static const char SPIN_AND[];                     /* Symbols for */
-  static const char SPIN_OR[];                      /* operators.  */
+  static const char SPOT_AND[];                     /* Symbols for */
+  static const char SPOT_OR[];                      /* operators.  */
+  static const char SPOT_XOR[];
 };
 
 
 
 /******************************************************************************
  *
- * Inline function definitions for class SpinWrapper.
+ * Inline function definitions for class SpotWrapper.
  *
  *****************************************************************************/
 
 /* ========================================================================= */
-inline SpinWrapper::SpinWrapper()
+inline SpotWrapper::SpotWrapper()
 /* ----------------------------------------------------------------------------
  *
- * Description:   Constructor for class SpinWrapper.
+ * Description:   Constructor for class SpotWrapper.
  *
  * Arguments:     None.
  *
@@ -89,10 +92,10 @@ inline SpinWrapper::SpinWrapper()
 }
 
 /* ========================================================================= */
-inline SpinWrapper::~SpinWrapper()
+inline SpotWrapper::~SpotWrapper()
 /* ----------------------------------------------------------------------------
  *
- * Description:   Destructor for class SpinWrapper.
+ * Description:   Destructor for class SpotWrapper.
  *
  * Arguments:     None.
  *
@@ -103,20 +106,38 @@ inline SpinWrapper::~SpinWrapper()
 }
 
 /* ========================================================================= */
-inline string SpinWrapper::commandLine
-  (const string& input_filename, const string& output_filename)
+inline string SpotWrapper::commandLine
+  (const string& input_filename, const string&)
 /* ----------------------------------------------------------------------------
  *
- * Description:   Prepares the command line for Spin.
+ * Description:   Prepares the command line for Spot.
  *
  * Arguments:     input_filename   --  Name of the input file.
- *                output_filename  --  Name of the output file.
+ *                The other argument is only needed for supporting the
+ *                ExternalTranslator interface; the output will be written to
+ *                the filename stored in `command_line_arguments[4]'.
  *
  * Returns:       The command line string.
  *
  * ------------------------------------------------------------------------- */
 {
-  return string(" -F ") + input_filename + " >" + output_filename;
+  return (string(" ") + input_filename
+	  + " >" + string(command_line_arguments[4]));
 }
 
-#endif /* !SPINWRAPPER_H */
+/* ========================================================================= */
+inline void SpotWrapper::parseAutomaton(const string&, const string&)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Dummy function which is needed to support the
+ *                ExternalTranslator interface.
+ *
+ * Arguments:     References to two constant strings.
+ *
+ * Returns:       Nothing.
+ *
+ * ------------------------------------------------------------------------- */
+{
+}
+
+#endif /* !SPOTWRAPPER_H */

@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -86,7 +86,7 @@ void executeUserCommands()
  * ------------------------------------------------------------------------ */
 {
   string input_line;
-  vector<string, ALLOC(string) > input_tokens;
+  vector<string> input_tokens;
   TokenType token;
 
   bool formula_type = true;
@@ -230,9 +230,7 @@ void executeUserCommands()
 	  {
 	    bool all_algorithms_disabled = true;
 
-	    for (vector<Configuration::AlgorithmInformation,
-                        ALLOC(Configuration::AlgorithmInformation) >
-		   ::const_iterator
+	    for (vector<Configuration::AlgorithmInformation>::const_iterator
 		   algorithm = configuration.algorithms.begin();
 		 algorithm != configuration.algorithms.end();
 		 ++algorithm)
@@ -799,9 +797,8 @@ TokenType parseCommand(const string& token)
 
 /* ========================================================================= */
 void verifyArgumentCount
-  (const vector<string, ALLOC(string) >& command,
-   vector<string, ALLOC(string) >::size_type min_arg_count,
-   vector<string, ALLOC(string) >::size_type max_arg_count)
+  (const vector<string>& command, vector<string>::size_type min_arg_count,
+   vector<string>::size_type max_arg_count)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Verifies that the number of arguments given for a user
@@ -824,8 +821,7 @@ void verifyArgumentCount
 }
 
 /* ========================================================================= */
-pair<string, bool> parseRedirection
-  (vector<string, ALLOC(string) >& input_tokens)
+pair<string, bool> parseRedirection(vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Tests whether the last argument to a user command specifies
@@ -888,7 +884,7 @@ pair<string, bool> parseRedirection
 }
 
 /* ========================================================================= */
-bool parseFormulaType(vector<string, ALLOC(string) >& input_tokens)
+bool parseFormulaType(vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Tests whether the first argument of a command specifies a

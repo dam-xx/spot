@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -93,12 +93,13 @@ public:
 						     */
 
 private:
-  vector<StateInfo*, ALLOC(StateInfo*) >            /* States of the */
-    state_list;                                     /* automaton.    */
+  vector<StateInfo*> state_list;                    /* States of the automaton.
+                                                     */
 
-  map<string, StateInfo*, less<string>,             /* Mapping from state   */
-      ALLOC(StateInfo*) >                           /* labels to the states */
-    label_mapping;                                  /* itself.              */
+  map<string, StateInfo*> label_mapping;            /* Mapping from state
+                                                     * labels to the states
+                                                     * itself.
+						     */
 
   StateInfo* current_state;                         /* Pointer to the state
                                                      * introduced most recently
@@ -142,9 +143,9 @@ public:
                                                     /* of the state.
 						     */
 
-  const multimap<Cstr, Cstr*, less<Cstr>,           /* Returns the labels of */
-                 ALLOC(Cstr*) >&                    /* the state's successor */
-    transitions() const;                            /* states, including the
+  const multimap<Cstr, Cstr*>& transitions() const; /* Returns the labels of
+                                                     * the state's successor
+                                                     * states, including the
                                                      * conditions controlling
                                                      * the enabledness of the
                                                      * transition.
@@ -174,8 +175,8 @@ private:
                                                      * accepting state?
 						     */
 
-  multimap<Cstr, Cstr*, less<Cstr>, ALLOC(Cstr*) >  /* Labels of the state's */
-    state_transitions;                              /* successors, including
+  multimap<Cstr, Cstr*> state_transitions;          /* Labels of the state's
+                                                     * successors, including
                                                      * the guard formulae
                                                      * controlling the
                                                      * enabledness of the
@@ -373,9 +374,7 @@ inline bool& NeverClaimAutomaton::StateInfo::accepting()
 }
 
 /* ========================================================================= */
-inline const multimap<NeverClaimAutomaton::Cstr, NeverClaimAutomaton::Cstr*,
-                      less<NeverClaimAutomaton::Cstr>,
-                      ALLOC(NeverClaimAutomaton::Cstr*) >&
+inline const multimap<NeverClaimAutomaton::Cstr, NeverClaimAutomaton::Cstr*>&
 NeverClaimAutomaton::StateInfo::transitions() const
 /* ----------------------------------------------------------------------------
  *

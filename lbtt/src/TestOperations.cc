@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -62,6 +62,8 @@
 #include "TestRoundInfo.h"
 
 
+
+extern pid_t translator_process;
 
 /******************************************************************************
  *
@@ -595,7 +597,7 @@ void generateFormulae(istream* formula_input_stream)
     {
       bool fatal_io_error
 	= (configuration.global_options.formula_input_filename.empty()
-	   || !round_info.formula_input_file.eof());
+	   || !round_info.formula_input_stream->eof());
 
       printText(string("[") + (fatal_io_error
 			       ? "Error reading formula"
@@ -823,8 +825,7 @@ void writeFormulaeToFiles()
 /* ========================================================================= */
 void generateBuchiAutomaton
   (int f,
-   vector<Configuration::AlgorithmInformation,
-          ALLOC(Configuration::AlgorithmInformation) >::size_type algorithm_id)
+   vector<Configuration::AlgorithmInformation>::size_type algorithm_id)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Constructs a BuchiAutomaton by invoking an external program
@@ -867,16 +868,10 @@ void generateBuchiAutomaton
     int stdout_capture_fileno = -1, stderr_capture_fileno = -1;
     int exitcode;
 
-    sigset_t sigint_mask;
-    sigemptyset(&sigint_mask);
-    sigaddset(&sigint_mask, SIGINT);
-
     struct sigaction timeout_sa;
     timeout_sa.sa_handler = timeoutHandler;
     sigemptyset(&timeout_sa.sa_mask);
     timeout_sa.sa_flags = 0;
-
-    pid_t pid = 0;
 
     truncateFile(round_info.automaton_file_name->get(), 10);
     truncateFile(round_info.cout_capture_file->get(), 10);
@@ -932,13 +927,13 @@ void generateBuchiAutomaton
 	  = const_cast<char*>(round_info.automaton_file_name->get());
 
 	times(&timing_information_begin);
-	pid = fork();
-	switch (pid)
+	translator_process = fork();
+	switch (translator_process)
 	{
 	  case 0 : /* child */
 	    close(error_pipe[0]);
 
-	    if (setsid() != -1
+	    if (setpgid(0, 0) != -1
 		&& dup2(stdout_capture_fileno, STDOUT_FILENO) != -1
 		&& dup2(stderr_capture_fileno, STDERR_FILENO) != -1)
 	      execvp(algorithm.parameters[0], algorithm.parameters);
@@ -952,17 +947,32 @@ void generateBuchiAutomaton
 	    exit(0);
 
 	  case -1 : /* fork failed */
-	    pid = 0;
+	    translator_process = 0;
 	    error_number = errno;
 	    close(error_pipe[0]);
 	    close(error_pipe[1]);
 	    break;
 
 	  default : /* parent */
-	    /* Block SIGINT signals while the child process is running. */
+	    setpgid(translator_process, translator_process);
 
 	    if (configuration.global_options.handle_breaks)
-	      sigprocmask(SIG_BLOCK, &sigint_mask, static_cast<sigset_t*>(0));
+	    {
+	      /* If lbtt is currently in the foreground (and has a controlling
+		 terminal), transfer the controlling terminal to the translator
+		 process. */
+
+	      const pid_t foreground_pgrp = tcgetpgrp(STDIN_FILENO);
+	      if (foreground_pgrp != -1 && foreground_pgrp == getpgrp())
+	      {
+		sigset_t mask;
+		sigemptyset(&mask);
+		sigaddset(&mask, SIGTTOU);
+		sigprocmask(SIG_BLOCK, &mask, 0);
+		tcsetpgrp(STDIN_FILENO, translator_process);
+		sigprocmask(SIG_UNBLOCK, &mask, 0);
+	      }
+	    }
 
 	    /* Install handler for timeouts if necessary. */
 
@@ -976,12 +986,11 @@ void generateBuchiAutomaton
 
 	    close(error_pipe[1]);
 
-	    if (waitpid(pid, &exitcode, 0) == -1) /* waitpid failed */
+	    if (waitpid(translator_process, &exitcode, 0) == -1)
+	      /* waitpid failed */
 	    {
 	      error_number = errno;
-	      if (error_number == EINTR /* failure due to timeout */
-		  && configuration.global_options.translator_timeout > 0
-		  && timeout)
+	      if (kill(translator_process, 0) == 0) /* child still running */
 	      {
 		/*
 		 *  Try to terminate the child process three times with SIGTERM
@@ -995,12 +1004,12 @@ void generateBuchiAutomaton
 		for (int attempts_to_terminate = 0; attempts_to_terminate < 4;
 		     ++attempts_to_terminate)
 		{
-		  kill(-pid, sig);
+		  kill(-translator_process, sig);
 		  sleep(delay);
-		  if (waitpid(pid, &exitcode, WNOHANG) != 0)
+		  if (waitpid(translator_process, &exitcode, WNOHANG) != 0)
 		  {
 		    times(&timing_information_end);
-		    pid = 0;
+		    translator_process = 0;
 		    break;
 		  }
 		  if (attempts_to_terminate == 2)
@@ -1010,13 +1019,13 @@ void generateBuchiAutomaton
 		  }
 		}
 	      }
-	      else
-		pid = 0;
+	      else if (errno != EPERM)
+		translator_process = 0;
 	    }
 	    else /* child exited successfully */
 	    {
 	      times(&timing_information_end);
-	      pid = 0;
+	      translator_process = 0;
 
 	      /*  
 	       *  If there is something to be read from error_pipe, then there
@@ -1043,10 +1052,21 @@ void generateBuchiAutomaton
 	    }
 
 	    if (configuration.global_options.handle_breaks)
-	      sigprocmask(SIG_UNBLOCK, &sigint_mask,
-			  static_cast<sigset_t*>(0));
+	    {
+	      /* Put lbtt again in the foreground. */
 
-	    if (pid == 0
+	      if (tcgetpgrp(STDIN_FILENO) != -1)
+	      {
+		sigset_t mask;
+		sigemptyset(&mask);
+		sigaddset(&mask, SIGTTOU);
+		sigprocmask(SIG_BLOCK, &mask, 0);
+		tcsetpgrp(STDIN_FILENO, getpgrp());
+		sigprocmask(SIG_UNBLOCK, &mask, 0);
+	      }
+	    }
+
+	    if (translator_process == 0
 		&& timing_information_begin.tms_utime
 		     != static_cast<clock_t>(-1)
 		&& timing_information_begin.tms_cutime
@@ -1069,15 +1089,15 @@ void generateBuchiAutomaton
       close(stderr_capture_fileno);
 
       /*
-       *  If pid != 0 at this point, then a timeout occurred, but lbtt was
-       *  unable to terminate the child process. The exception handler will
-       *  in this case throw an unexpected exception (see below) so that lbtt
-       *  will terminate (for example, it is not safe to use the temporary
-       *  file names any longer if the (still running) child process happens to
-       *  write to them).
+       *  If translator_process != 0 at this point, then a timeout occurred,
+       *  but lbtt was unable to terminate the child process. The exception
+       *  handler will in this case throw an unexpected exception (see below)
+       *  so that lbtt will terminate (for example, it is not safe to use the
+       *  temporary file names any longer if the (still running) child process
+       *  happens to write to them).
        */
 
-      if (pid != 0)
+      if (translator_process != 0)
       {
 	stdout_capture_fileno = stderr_capture_fileno = -1;
 	throw Exception("could not terminate child process");
@@ -1286,7 +1306,7 @@ void generateBuchiAutomaton
 	round_info.transcript_file.flush();
       }
 
-      if (pid != 0) /* fatal error, lbtt should be terminated */
+      if (translator_process != 0) /* fatal error, lbtt should be terminated */
 	throw Exception
 	        ("fatal internal error while generating Büchi automaton");
 
@@ -1345,9 +1365,7 @@ void generateBuchiAutomaton
 /* ========================================================================= */
 void performEmptinessCheck
   (int f,
-   vector<Configuration::AlgorithmInformation,
-          ALLOC(Configuration::AlgorithmInformation) >::size_type
-     algorithm_id)
+   vector<Configuration::AlgorithmInformation>::size_type algorithm_id)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Performs the emptiness check on a ProductAutomaton, i.e.,
@@ -1473,9 +1491,7 @@ void performEmptinessCheck
 
 /* ========================================================================= */
 void performConsistencyCheck
-  (vector<Configuration::AlgorithmInformation,
-          ALLOC(Configuration::AlgorithmInformation) >::size_type
-     algorithm_id)
+  (vector<Configuration::AlgorithmInformation>::size_type algorithm_id)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Checks the model checking results for consistency for a
@@ -1570,8 +1586,7 @@ void compareResults()
   AutomatonStats* alg_1_stats;
   AutomatonStats* alg_2_stats;
 
-  for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-	 alg_1 = 0;
+  for (vector<AlgorithmTestResults>::size_type alg_1 = 0;
        alg_1 < test_results.size();
        ++alg_1)
   {
@@ -1579,8 +1594,7 @@ void compareResults()
     {
       alg_1_stats = &test_results[alg_1].automaton_stats[counter];
 
-      for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >
-	     ::size_type alg_2 = alg_1 + 1;
+      for (vector<AlgorithmTestResults>::size_type alg_2 = alg_1 + 1;
 	   alg_2 < test_results.size();
 	   ++alg_2)
       {
@@ -1681,13 +1695,11 @@ void performBuchiIntersectionCheck()
 
   ::Graph::BuchiProduct::clearSatisfiabilityCache();
 
-  for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-	 alg_1 = 0;
+  for (vector<AlgorithmTestResults>::size_type alg_1 = 0;
        alg_1 < round_info.number_of_translators;
        ++alg_1)
   {
-    for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-	   alg_2 = 0;
+    for (vector<AlgorithmTestResults>::size_type alg_2 = 0;
 	 alg_2 < round_info.number_of_translators;
 	 ++alg_2)
     {

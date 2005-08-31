@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -41,7 +41,7 @@ void IntervalList::merge(unsigned long int min, unsigned long int max)
   if (min > max)
     return;
 
-  list<Interval, ALLOC(Interval) >::iterator interval;
+  list<Interval>::iterator interval;
   for (interval = intervals.begin();
        interval != intervals.end() && interval->second + 1 < min;
        ++interval)
@@ -68,14 +68,14 @@ void IntervalList::merge(unsigned long int min, unsigned long int max)
   if (interval->second < max)
   {
     interval->second = max;
-    list<Interval, ALLOC(Interval) >::iterator interval2 = interval;
+    list<Interval>::iterator interval2 = interval;
     ++interval2;
     while (interval2 != intervals.end()
 	   && interval2->first <= interval->second + 1)
     {
       if (interval->second < interval2->second)
 	interval->second = interval2->second;
-      list<Interval, ALLOC(Interval) >::iterator interval_to_erase = interval2;
+      list<Interval>::iterator interval_to_erase = interval2;
       ++interval2;
       intervals.erase(interval_to_erase);
     }
@@ -97,7 +97,7 @@ void IntervalList::remove(unsigned long int min, unsigned long int max)
   if (min > max)
     return;
 
-  list<Interval, ALLOC(Interval) >::iterator interval;
+  list<Interval>::iterator interval;
   for (interval = intervals.begin();
        interval != intervals.end() && interval->second < min;
        ++interval)
@@ -126,7 +126,7 @@ void IntervalList::remove(unsigned long int min, unsigned long int max)
     }
     else /* min <= imin <= imax <= max */
     {
-      list<Interval, ALLOC(Interval) >::iterator interval_to_erase = interval;
+      list<Interval>::iterator interval_to_erase = interval;
       ++interval;
       intervals.erase(interval_to_erase);
     }
@@ -148,7 +148,7 @@ bool IntervalList::covers(unsigned long int min, unsigned long int max) const
   if (min > max)
     return true; /* empty interval is always covered */
 
-  list<Interval, ALLOC(Interval) >::const_iterator interval;
+  list<Interval>::const_iterator interval;
   for (interval = intervals.begin();
        interval != intervals.end() && min > interval->second;
        ++interval)
@@ -173,8 +173,7 @@ string IntervalList::toString() const
  * ------------------------------------------------------------------------- */
 {
   string s;
-  for (list<Interval, ALLOC(Interval) >::const_iterator
-	 interval = intervals.begin();
+  for (list<Interval>::const_iterator interval = intervals.begin();
        interval != intervals.end();
        ++interval)
   {

@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -62,9 +62,9 @@ public:
   struct AlgorithmInformation;                      /* See below. */
 
   string algorithmString                            /* Formats the the id  */
-    (vector<AlgorithmInformation,                   /* of an algorithm and */
-            ALLOC(AlgorithmInformation) >::size_type/* the name of the     */
-     algorithm_id) const;                           /* algorithm into a
+    (vector<AlgorithmInformation>::size_type        /* of an algorithm and */
+       algorithm_id) const;                         /* the name of the
+                                                     * algorithm into a
                                                      * string.
 						     */
 
@@ -311,11 +311,12 @@ public:
 						     * LTL formula symbols.
 						     */
 
-    map<int, int, less<int>, ALLOC(int) >           /* Priorities for LTL */
-      symbol_priority;                              /* formula symbols.   */
+    map<int, int> symbol_priority;                  /* Priorities for LTL
+                                                     * formula symbols.
+						     */
 
-    map<int, double, less<int>, ALLOC(double) >     /* Expected numbers of */
-      symbol_distribution;                          /* occurrence for the
+    map<int, double> symbol_distribution;           /* Expected numbers of
+                                                     * occurrence for the
 						     * different formula
 						     * operators.
 						     */
@@ -375,15 +376,15 @@ public:
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-  vector<AlgorithmInformation,                      /* A vector containing   */
-         ALLOC(AlgorithmInformation) > algorithms;  /* information about the
+  vector<AlgorithmInformation> algorithms;          /* A vector containing
+                                                     * information about the
                                                      * algorithms used in
                                                      * the tests.
 						     */
 
-  map<string, unsigned long int, less<string>,      /* Mapping between     */
-      ALLOC(unsigned long int) >                    /* algorithm names and */
-    algorithm_names;                                /* their numeric
+  map<string, unsigned long int> algorithm_names;   /* Mapping between
+                                                     * algorithm names and
+                                                     * their numeric
 						     * identifiers.
 						     */
 
@@ -511,14 +512,13 @@ private:
      OPT_STATESPACEPROPOSITIONS,
      OPT_STATESPACESIZE, OPT_TRUTHPROBABILITY};
 
-  typedef map<pair<int, int>, double,               /* Type definitions for  */
-              less<pair<int, int> >,                /* the result cache used */
-                   ALLOC(double) >                  /* for computing the    */
-    ProbabilityMapElement;                          /* probability           */
-  typedef map<int, ProbabilityMapElement,           /* distribution of LTL   */
-              less<int>,                            /* formula operators.    */
-              ALLOC(ProbabilityMapElement) >
-    ProbabilityMap;
+  typedef map<pair<int, int>, double>               /* Type definitions for  */
+    ProbabilityMapElement;                          /* the result cache used */
+                                                    /* for computing the     */
+  typedef map<int, ProbabilityMapElement>           /* probability           */
+    ProbabilityMap;                                 /* distribution of LTL
+                                                     * formula operators.
+						     */
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 

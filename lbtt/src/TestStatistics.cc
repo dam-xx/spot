@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -50,8 +50,7 @@ void AlgorithmTestResults::emptinessReset()
     automaton_stats[i].emptiness_check_result.clear();
     automaton_stats[i].emptiness_check_performed = false;
 
-    for (vector<AutomatonStats::CrossComparisonStats,
-                ALLOC(AutomatonStats::CrossComparisonStats) >::iterator it
+    for (vector<AutomatonStats::CrossComparisonStats>::iterator it
 	   = automaton_stats[i].cross_comparison_stats.begin();
 	 it != automaton_stats[i].cross_comparison_stats.end();
 	 ++it)
@@ -87,7 +86,7 @@ void AlgorithmTestResults::fullReset()
     automaton_stats[i].number_of_msccs = 0;
     automaton_stats[i].buchi_generation_time = 0.0;
     
-    for (vector<int, ALLOC(int) >::iterator it
+    for (vector<int>::iterator it
 	   = automaton_stats[i].buchi_intersection_check_stats.begin();
 	 it != automaton_stats[i].buchi_intersection_check_stats.end();
 	 ++it)

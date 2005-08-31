@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -61,8 +61,7 @@ string toString(const double d, const int precision, const ios::fmtflags flags)
 
 /* ========================================================================= */
 void sliceString
-  (const string& s, const char* slice_chars,
-   vector<string, ALLOC(string) >& slices)
+  (const string& s, const char* slice_chars, vector<string>& slices)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Slices a string into a vector of strings, using a given set
@@ -415,7 +414,7 @@ int parseInterval
 /* ========================================================================= */
 void parseIntervalList
   (const string& token, IntervalList& intervals, unsigned long int min,
-   unsigned long int max, vector<string, ALLOC(string) >* extra_tokens)
+   unsigned long int max, vector<string>* extra_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Parses a string of number intervals into an IntervalList.
@@ -443,14 +442,13 @@ void parseIntervalList
  *
  * ------------------------------------------------------------------------- */
 {
-  vector<string, ALLOC(string) > interval_strings;
+  vector<string> interval_strings;
   int interval_type;
 
   intervals.clear();
   sliceString(token, ",", interval_strings);
 
-  for (vector<string, ALLOC(string) >::const_iterator
-	 i = interval_strings.begin();
+  for (vector<string>::const_iterator i = interval_strings.begin();
        i != interval_strings.end();
        ++i)
   {

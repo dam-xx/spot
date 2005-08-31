@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -73,8 +73,7 @@ unsigned long int parseAlgorithmId(const string& id)
   }
   catch (const NotANumberException&)
   {
-    map<string, unsigned long int, less<string>, ALLOC(unsigned long int) >
-      ::const_iterator id_finder
+    map<string, unsigned long int>::const_iterator id_finder
       = configuration.algorithm_names.find(unquoted_id);
     if (id_finder == configuration.algorithm_names.end())
       throw CommandErrorException
@@ -113,20 +112,18 @@ void parseAlgorithmIdList(const string& ids, IntervalList& algorithms)
 
   try
   {
-    vector<string, ALLOC(string) > nonnumeric_algorithm_ids;
+    vector<string> nonnumeric_algorithm_ids;
 
     parseIntervalList(id_string, algorithms, 0,
 		      round_info.number_of_translators - 1,
 		      &nonnumeric_algorithm_ids);
 
-    for (vector<string, ALLOC(string) >::iterator
-	   id = nonnumeric_algorithm_ids.begin();
+    for (vector<string>::iterator id = nonnumeric_algorithm_ids.begin();
 	 id != nonnumeric_algorithm_ids.end();
 	 ++id)
     {
       *id = unquoteString(substituteInQuotedString(*id, "\n", ","));
-      map<string, unsigned long int, less<string>, ALLOC(unsigned long int) >
-	::const_iterator
+      map<string, unsigned long int>::const_iterator
 	id_finder = configuration.algorithm_names.find(*id);
       if (id_finder == configuration.algorithm_names.end())
 	throw CommandErrorException
@@ -181,7 +178,7 @@ void printAlgorithmList(ostream& stream, int indent)
 /* ========================================================================= */
 void printCrossComparisonAnalysisResults
   (ostream& stream, int indent, bool formula_type,
-   const vector<string, ALLOC(string) >& input_tokens)
+   const vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `resultanalysis', i.e., analyzes
@@ -494,8 +491,7 @@ void printCrossComparisonAnalysisResults
 
 /* ========================================================================= */
 void printConsistencyAnalysisResults
-  (ostream& stream, int indent,
-   const vector<string, ALLOC(string) >& input_tokens)
+  (ostream& stream, int indent, const vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `consistencyanalysis', i.e.,
@@ -607,11 +603,9 @@ void printConsistencyAnalysisResults
     }
   }
 
-  vector<StateSpace::size_type, ALLOC(StateSpace::size_type) > path;
+  vector<StateSpace::size_type> path;
   StateSpace::Path prefix, cycle;
-  map<StateSpace::size_type, StateSpace::size_type,
-      less<StateSpace::size_type>, ALLOC(StateSpace::size_type) >
-    ordering;
+  map<StateSpace::size_type, StateSpace::size_type> ordering;
   StateSpace::size_type state_count = 0;
   StateSpace::size_type loop_state;
 
@@ -663,8 +657,7 @@ void printConsistencyAnalysisResults
  
 /* ========================================================================= */
 void printAutomatonAnalysisResults
-  (ostream& stream, int indent,
-   const vector<string, ALLOC(string) >& input_tokens)
+  (ostream& stream, int indent, const vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `buchianalysis', i.e., analyzes
@@ -977,9 +970,7 @@ void printPath
 /* ========================================================================= */
 void printAcceptingCycle
   (ostream& stream, int indent,
-   vector<Configuration::AlgorithmInformation,
-          ALLOC(Configuration::AlgorithmInformation) >::size_type
-     algorithm_id,		
+   vector<Configuration::AlgorithmInformation>::size_type algorithm_id,
    const BuchiAutomaton::Path& aut_prefix,
    const BuchiAutomaton::Path& aut_cycle,
    const BuchiAutomaton& automaton, const StateSpace::Path& path_prefix,
@@ -1121,8 +1112,7 @@ void printAcceptingCycle
 /* ========================================================================= */
 void printBuchiAutomaton
   (ostream& stream, int indent, bool formula_type,
-   vector<string, ALLOC(string) >& input_tokens,
-   Graph::GraphOutputFormat fmt)
+   vector<string>& input_tokens, Graph::GraphOutputFormat fmt)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `buchi', i.e., writes information
@@ -1231,8 +1221,8 @@ void printBuchiAutomaton
 
 /* ========================================================================= */
 void evaluateFormula
-  (ostream& stream, int indent, bool formula_type, 
-   vector<string, ALLOC(string) >& input_tokens)
+  (ostream& stream, int indent, bool formula_type,
+   vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `evaluate', i.e., tells whether
@@ -1346,7 +1336,7 @@ void evaluateFormula
 /* ========================================================================= */
 void printFormula
   (ostream& stream, int indent, bool formula_type,
-   const vector<string, ALLOC(string) >& input_tokens)
+   const vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `formula', i.e., displays the
@@ -1401,8 +1391,7 @@ void printFormula
   
 /* ========================================================================= */
 void printCommandHelp
-  (ostream& stream, int indent,
-   const vector<string, ALLOC(string) >& input_tokens)
+  (ostream& stream, int indent, const vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `help', i.e., gives instructions
@@ -1714,7 +1703,7 @@ void printCommandHelp
 
 /* ========================================================================= */
 void printInconsistencies
-  (ostream& stream, int indent, vector<string, ALLOC(string) >& input_tokens)
+  (ostream& stream, int indent, vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `inconsistencies', i.e., lists
@@ -1818,7 +1807,7 @@ void printInconsistencies
 
 /* ========================================================================= */
 void printTestResults
-  (ostream& stream, int indent, vector<string, ALLOC(string) >& input_tokens)
+  (ostream& stream, int indent, vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `results', i.e., displays the
@@ -1877,7 +1866,7 @@ void printTestResults
 
 /* ========================================================================= */
 void printStateSpace
-  (ostream& stream, int indent, vector<string, ALLOC(string) >& input_tokens,
+  (ostream& stream, int indent, vector<string>& input_tokens,
    Graph::GraphOutputFormat fmt)
 /* ----------------------------------------------------------------------------
  *
@@ -1950,7 +1939,7 @@ void printStateSpace
 }
 
 /* ========================================================================= */
-void changeVerbosity(const vector<string, ALLOC(string) >& input_tokens)
+void changeVerbosity(const vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Implements the user command `verbosity', i.e., displays or
@@ -1987,8 +1976,7 @@ void changeVerbosity(const vector<string, ALLOC(string) >& input_tokens)
 }
 
 /* ========================================================================= */
-void changeAlgorithmState
-  (vector<string, ALLOC(string) >& input_tokens, bool enable)
+void changeAlgorithmState(vector<string>& input_tokens, bool enable)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Changes the enabledness of a set of algorithms used in the

@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -25,6 +25,7 @@
 #include "LbtWrapper.h"
 #include "LtlFormula.h"
 #include "SpinWrapper.h"
+#include "SpotWrapper.h"
 #ifdef HAVE_GETOPT_LONG
 #include <getopt.h>
 #define OPTIONSTRUCT struct option
@@ -59,7 +60,7 @@ static TranslatorInterface* translator = 0;
 /******************************************************************************
  *
  * A function for showing warnings to the user.
- * 
+ *
  *****************************************************************************/
 
 void printWarning(const string& msg)
@@ -119,7 +120,7 @@ static void installSignalHandler(int signum)
 
 int main(int argc, char** argv)
 {
-  typedef enum {OPT_HELP = 'h', OPT_LBT, OPT_SPIN, OPT_VERSION = 'V'}
+  typedef enum {OPT_HELP = 'h', OPT_LBT, OPT_SPIN, OPT_SPOT, OPT_VERSION = 'V'}
     OptionType;
 
   static OPTIONSTRUCT command_line_options[] =
@@ -127,6 +128,7 @@ int main(int argc, char** argv)
     {"help",    no_argument, 0, OPT_HELP},
     {"lbt",     no_argument, 0, OPT_LBT},
     {"spin",    no_argument, 0, OPT_SPIN},
+    {"spot",    no_argument, 0, OPT_SPOT},
     {"version", no_argument, 0, OPT_VERSION},
     {0,         0,           0, 0}
   };
@@ -154,6 +156,7 @@ int main(int argc, char** argv)
                 "Translator options:\n"
                 "       --lbt               lbt\n"
                 "       --spin              Spin\n"
+                "       --spot              Spot\n"
                 "The command line for these translators must be given as a "
 	        "single argument\n"
                 "including the name (and location) of an external program to "
@@ -169,6 +172,10 @@ int main(int argc, char** argv)
 
       case OPT_SPIN :
 	translator = new SpinWrapper();
+	break;
+
+      case OPT_SPOT :
+	translator = new SpotWrapper();
 	break;
 
       case OPT_VERSION :

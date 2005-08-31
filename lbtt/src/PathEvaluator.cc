@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -49,9 +49,8 @@ void PathEvaluator::reset()
   current_loop_state = 0;
   path_states.clear();
 
-  for (map<const LtlFormula*, BitArray*, LtlFormula::ptr_less,
-	   ALLOC(BitArray*) >::iterator it
-	 = eval_info.begin();
+  for (map<const LtlFormula*, BitArray*, LtlFormula::ptr_less>::iterator
+	 it = eval_info.begin();
        it != eval_info.end();
        ++it)
     delete it->second;
@@ -131,8 +130,7 @@ bool PathEvaluator::evaluate
   current_formula = &formula;
   current_path = &statespace;
 
-  map<StateSpace::size_type, StateSpace::size_type,
-      less<StateSpace::size_type>, ALLOC(StateSpace::size_type) > ordering;
+  map<StateSpace::size_type, StateSpace::size_type> ordering;
 
   StateSpace::size_type state = statespace.initialState();
   StateSpace::size_type state_count = 0;
@@ -176,9 +174,7 @@ bool PathEvaluator::eval()
  *
  * ------------------------------------------------------------------------- */
 {
-  stack<const LtlFormula*, deque<const LtlFormula*,
-                                 ALLOC(const LtlFormula*) > >
-    subformula_stack;
+  stack<const LtlFormula*, deque<const LtlFormula*> > subformula_stack;
 
   const LtlFormula* f;
   BitArray* val;

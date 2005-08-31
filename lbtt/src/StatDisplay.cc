@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -78,8 +78,7 @@ void printStatTableHeader(ostream& stream, int indent)
 /* ========================================================================= */
 void printBuchiAutomatonStats
   (ostream& stream, int indent,
-   vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-     algorithm,
+   vector<AlgorithmTestResults>::size_type algorithm,
    int result_id)
 /* ----------------------------------------------------------------------------
  *
@@ -173,8 +172,7 @@ void printBuchiAutomatonStats
 /* ========================================================================= */
 void printProductAutomatonStats
   (ostream& stream, int indent,
-   vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-     algorithm,
+   vector<AlgorithmTestResults>::size_type algorithm,
    int result_id)
 /* ----------------------------------------------------------------------------
  *
@@ -264,8 +262,7 @@ void printProductAutomatonStats
 /* ========================================================================= */
 void printAcceptanceCycleStats
   (ostream& stream, int indent,
-   vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-     algorithm,
+   vector<AlgorithmTestResults>::size_type algorithm,
    int result_id)
 /* ----------------------------------------------------------------------------
  *
@@ -350,8 +347,7 @@ void printAcceptanceCycleStats
 /* ========================================================================= */
 void printConsistencyCheckStats
   (ostream& stream, int indent,
-   vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-     algorithm)
+   vector<AlgorithmTestResults>::size_type algorithm)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Displays information about the consistency check result for
@@ -462,8 +458,7 @@ void printCrossComparisonStats
     alg_1_pos_results = &test_results[*alg_1].automaton_stats[0];
     alg_1_neg_results = &test_results[*alg_1].automaton_stats[1];
 
-    for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-	   alg_2 = 0;
+    for (vector<AlgorithmTestResults>::size_type alg_2 = 0;
 	 alg_2 < round_info.number_of_translators;
 	 alg_2++)
     {
@@ -558,8 +553,7 @@ void printBuchiIntersectionCheckStats
     alg_1_pos_results = &test_results[*alg_1].automaton_stats[0];
     alg_1_neg_results = &test_results[*alg_1].automaton_stats[1];
 
-    for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-	   alg_2 = 0;
+    for (vector<AlgorithmTestResults>::size_type alg_2 = 0;
 	 alg_2 < round_info.number_of_translators;
 	 alg_2++)
     {
@@ -631,8 +625,7 @@ void printBuchiIntersectionCheckStats
 /* ========================================================================= */
 void printAllStats
   (ostream& stream, int indent,
-   vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-     algorithm)
+   vector<AlgorithmTestResults>::size_type algorithm)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Displays all test information (Büchi automaton and product
@@ -701,8 +694,8 @@ void printAllStats
 /* ========================================================================= */
 void printCollectiveCrossComparisonStats
   (ostream& stream,
-   vector<TestStatistics, ALLOC(TestStatistics) >::size_type algorithm_y,
-   vector<TestStatistics, ALLOC(TestStatistics) >::size_type algorithm_x,
+   vector<TestStatistics>::size_type algorithm_y,
+   vector<TestStatistics>::size_type algorithm_x,
    int data_type)
 /* ----------------------------------------------------------------------------
  *
@@ -892,13 +885,12 @@ void printCollectiveStats(ostream& stream, int indent)
   if (round_info.num_processed_formulae > 0
       && configuration.global_options.formula_input_filename.empty())
   {
-    const map<unsigned long int, unsigned long int, less<unsigned long int>,
-              ALLOC(unsigned long int) >&
+    const map<unsigned long int, unsigned long int>&
       proposition_statistics
         = configuration.formula_options.formula_generator.
             propositionStatistics();
 
-    const map<int, unsigned long int, less<int>, ALLOC(unsigned long int) >
+    const map<int, unsigned long int>
       symbol_statistics
         = configuration.formula_options.formula_generator.symbolStatistics();
 
@@ -944,9 +936,8 @@ void printCollectiveStats(ostream& stream, int indent)
       number_of_symbols_printed++;
     }
 
-    for (map<unsigned long int, unsigned long int,
-	     less<unsigned long int>, ALLOC(unsigned long int) >
-	   ::const_iterator proposition = proposition_statistics.begin();
+    for (map<unsigned long int, unsigned long int>::const_iterator
+	   proposition = proposition_statistics.begin();
 	 proposition != proposition_statistics.end();
 	 ++proposition)
     {
@@ -993,8 +984,8 @@ void printCollectiveStats(ostream& stream, int indent)
       = "";
     number_of_symbols_printed = 0;
 
-    for (map<int, unsigned long int, less<int>, ALLOC(unsigned long int) >
-	   ::const_iterator op = symbol_statistics.begin();
+    for (map<int, unsigned long int>::const_iterator
+	   op = symbol_statistics.begin();
 	 op != symbol_statistics.end();
 	 ++op)
     {
@@ -1468,8 +1459,7 @@ void printCollectiveStats(ostream& stream, int indent)
     estream << ind + "  Result inconsistency statistics\n"
                + ind + "  " + string(31, '=') + '\n';
 
-    vector<TestStatistics, ALLOC(TestStatistics) >::size_type
-      algorithm_x, algorithm_y;
+    vector<TestStatistics>::size_type algorithm_x, algorithm_y;
 
     for (algorithm_x = 0; algorithm_x < number_of_algorithms;
 	 algorithm_x += 2)

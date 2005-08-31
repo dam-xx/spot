@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -195,10 +195,8 @@ public:
 
   /* default assignment operator */
 
-  typedef set<typename GraphType::size_type,        /* Type definition for */
-              less<typename GraphType::size_type>,  /* a set of node id's. */
-              ALLOC(typename GraphType::size_type) >
-    SccType;
+  typedef set<typename GraphType::size_type>        /* Type definition for */
+    SccType;                                        /* a set of node id's. */
 
   const SccType& operator()() const;                /* Returns the set of node
 						     * identifiers in a
@@ -338,10 +336,10 @@ public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
   typedef map<typename GraphType::size_type,        /* Type definition for a */
-              typename GraphType::size_type,        /* mapping between node  */
-              less<typename GraphType::size_type>,  /* identifiers and the   */
-              ALLOC(typename GraphType::size_type) >/* order in which they   */
-    DfsOrdering;                                    /* were encountered in
+              typename GraphType::size_type>        /* mapping between node  */
+    DfsOrdering;                                    /* identifiers and the
+                                                     * order in which they
+                                                     * were encountered in
 						     * the search for
 						     * strongly connected
 						     * components.
@@ -433,18 +431,19 @@ public:
       typename GraphType::size_type lowlink;   
     };
 
-    deque<NodeStackElement,                         /* Depth-first search  */
-          ALLOC(NodeStackElement) >                 /* backtracking stack. */
-      node_stack;
+    deque<NodeStackElement> node_stack;             /* Depth-first search
+						     * backtracking stack.
+						     */
+
 
     NodeStackElement* current_node;                 /* Pointer to the top
 						     * element of the
 						     * backtracking stack.
 						     */
 
-    deque<typename GraphType::size_type,            /* Stack used for       */
-          ALLOC(typename GraphType::size_type) >    /* collecting the nodes */
-      scc_stack;                                    /* in a strongly
+    deque<typename GraphType::size_type> scc_stack; /* Stack used for
+                                                     * collecting the nodes
+                                                     * in a strongly
 						     * connected component,
 						     * excluding the root
 						     * nodes of the
@@ -998,8 +997,7 @@ void SccCollection<GraphType, NodeVisitor>::iterator::getPath
    * when exiting from this function).
    */
 
-  typename deque<NodeStackElement, ALLOC(NodeStackElement) >::const_iterator
-    n = node_stack.begin();
+  typename deque<NodeStackElement>::const_iterator n = node_stack.begin();
   if (n != node_stack.end())
   {
     for (++n; n != node_stack.end(); ++n)

@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -32,10 +32,10 @@
 namespace DispUtil
 {
 
-stack<StreamFormatting,                             /* Stack for storing the */
-      deque<StreamFormatting,                       /* previous states of an */
-            ALLOC(StreamFormatting) > >             /* output stream.        */
-  stream_formatting_stack;
+stack<StreamFormatting, deque<StreamFormatting> >   /* Stack for storing the */
+  stream_formatting_stack;                          /* previous states of an
+                                                     * output stream.
+						     */
 
 /* ========================================================================= */
 void changeStreamFormatting

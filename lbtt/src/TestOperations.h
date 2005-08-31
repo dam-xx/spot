@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -95,25 +95,25 @@ void writeFormulaeToFiles();                        /* Writes LTL formulas */
 
 void generateBuchiAutomaton                         /* Generates a Büchi     */
   (int f,                                           /* automaton from a LTL  */
-   vector<Configuration::AlgorithmInformation,      /* formula stored in a   */
-     ALLOC(Configuration::AlgorithmInformation) >   /* given file, using a   */
-     ::size_type                                    /* given LTL-to-Büchi    */
-     algorithm_id);                                 /* translation algorithm
+   vector<Configuration::AlgorithmInformation>      /* formula stored in a   */
+     ::size_type                                    /* given file, using a   */
+     algorithm_id);                                 /* given LTL-to-Büchi
+                                                     * translation algorithm
                   				     * for the conversion.
 						     */
 
 void performEmptinessCheck                          /* Performs an emptiness */
   (int f,                                           /* check on a product    */
-   vector<Configuration::AlgorithmInformation,      /* automaton.            */
-     ALLOC(Configuration::AlgorithmInformation) >
+   vector<Configuration::AlgorithmInformation>      /* automaton.            */
      ::size_type
      algorithm_id);
 
 void performConsistencyCheck                        /* Performs a            */
-  (vector<Configuration::AlgorithmInformation,      /* consistency check on  */
-     ALLOC(Configuration::AlgorithmInformation) >   /* the test results      */
-     ::size_type                                    /* for a formula and its */
-     algorithm_id);				    /* negation.             */
+  (vector<Configuration::AlgorithmInformation>      /* consistency check on  */
+     ::size_type                                    /* the test results      */
+     algorithm_id);                                 /* for a formula and its
+                                                     * negation.
+						     */
 
 void compareResults();                              /* Compares the model
                                                      * checking results

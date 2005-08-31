@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -193,16 +193,16 @@ public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 protected:
-  vector<Node*, ALLOC(Node*) > nodes;               /* Nodes of the graph.
+  vector<Node*> nodes;                              /* Nodes of the graph.
                                                      * Derived classes can
                                                      * access this vector
                                                      * directly.
                                                      */
 
 public:
-  typedef typename                                  /* Type definition for   */
-    vector<Node*, ALLOC(Node*) >::size_type         /* the size of the       */
-    size_type;                                      /* graph. The size can
+  typedef typename vector<Node*>::size_type         /* Type definition for   */
+    size_type;                                      /* the size of the
+                                                     * graph. The size can
 						     * be no greater than
 						     * the maximum size of
                                                      * the vector containing
@@ -214,8 +214,9 @@ public:
 						     * edges.
 						     */
 
-  typedef deque<PathElement, ALLOC(PathElement) >   /* Type definition for */
-    Path;                                           /* paths in a graph.   */
+  typedef deque<PathElement> Path;                  /* Type definition for
+                                                     * paths in a graph.
+						     */
 
   typedef pair<size_type, size_type> StateIdPair;   /* Type definition for a
 						     * pair of state
@@ -502,8 +503,7 @@ public:
  *
  *****************************************************************************/
 
-class EdgeList : public list<Graph<EdgeList>::Edge*,
-                             ALLOC(Graph<EdgeList>::Edge*) >
+class EdgeList : public list<Graph<EdgeList>::Edge*>
 {
 public:
   EdgeList();                                       /* Constructor. */
@@ -518,14 +518,12 @@ public:
 						     * the end of the list.
 						     */
 
-  list<Graph<EdgeList>::Edge*,                      /* Functions for finding */
-       ALLOC(Graph<EdgeList>::Edge*) >              /* an element in the     */
-    ::const_iterator                                /* list.                 */
-    find(const Graph<EdgeList>::Edge* edge) const;
-                                                    
-  list<Graph<EdgeList>::Edge*,
-       ALLOC(Graph<EdgeList>::Edge*) >
-    ::iterator
+  list<Graph<EdgeList>::Edge*>::const_iterator      /* Functions for finding */
+    find(const Graph<EdgeList>::Edge* edge) const;  /* an element in the
+                                                     * list.
+						     */
+
+  list<Graph<EdgeList>::Edge*>::iterator
     find(const Graph<EdgeList>::Edge* edge);
 };
 
@@ -540,8 +538,7 @@ public:
 
 #ifdef HAVE_SLIST
 
-class EdgeSlist : public slist<Graph<EdgeSlist>::Edge*,
-		               ALLOC(Graph<EdgeSlist>::Edge*) >
+class EdgeSlist : public slist<Graph<EdgeSlist>::Edge*>
 {
 public:
   EdgeSlist();                                      /* Constructor. */
@@ -557,14 +554,12 @@ public:
 						     * list.
 						     */
 
-  slist<Graph<EdgeSlist>::Edge*,                    /* Functions for finding */
-        ALLOC(Graph<EdgeSlist>::Edge*) >            /* an element in the     */
-    ::const_iterator                                /* list.                 */
-    find(const Graph<EdgeSlist>::Edge* edge) const;
+  slist<Graph<EdgeSlist>::Edge*>::const_iterator    /* Functions for finding */
+    find(const Graph<EdgeSlist>::Edge* edge) const; /* an element in the
+                                                     * list.
+						     */
 
-  slist<Graph<EdgeSlist>::Edge*,
-        ALLOC(Graph<EdgeSlist>::Edge*) >
-    ::iterator
+  slist<Graph<EdgeSlist>::Edge*>::iterator
     find(const Graph<EdgeSlist>::Edge* edge);
 };
 
@@ -578,8 +573,7 @@ public:
  *
  *****************************************************************************/
 
-class EdgeVector : public vector<Graph<EdgeVector>::Edge*,
-                                 ALLOC(Graph<EdgeVector>::Edge*) >
+class EdgeVector : public vector<Graph<EdgeVector>::Edge*>
 {
 public:
   EdgeVector();                                     /* Constructor. */
@@ -595,15 +589,11 @@ public:
 						     * to edges.
 						     */
 
-  vector<Graph<EdgeVector>::Edge*,                  /* Functions for finding */
-         ALLOC(Graph<EdgeVector>::Edge*) >          /* an element in the     */
-    ::const_iterator                                /* container.            */
-    find(const Graph<EdgeVector>::Edge* edge)
-    const;                                          
+  vector<Graph<EdgeVector>::Edge*>::const_iterator  /* Functions for finding */
+    find(const Graph<EdgeVector>::Edge* edge)       /* an element in the     */
+    const;                                          /* container.            */
 
-  vector<Graph<EdgeVector>::Edge*,
-         ALLOC(Graph<EdgeVector>::Edge*) >
-    ::iterator
+  vector<Graph<EdgeVector>::Edge*>::iterator
     find(const Graph<EdgeVector>::Edge* edge);
 };
 
@@ -616,8 +606,7 @@ public:
  *****************************************************************************/
 
 class EdgeSet : public set<Graph<EdgeSet>::Edge*,
-		           Graph<EdgeSet>::Edge::ptr_less,
-		           ALLOC(Graph<EdgeSet>::Edge*) >
+		           Graph<EdgeSet>::Edge::ptr_less>
 {
 };
 
@@ -630,8 +619,7 @@ class EdgeSet : public set<Graph<EdgeSet>::Edge*,
  *****************************************************************************/
 
 class EdgeMultiSet : public multiset<Graph<EdgeMultiSet>::Edge*,
-   		                     Graph<EdgeMultiSet>::Edge::ptr_less,
-                                     ALLOC(Graph<EdgeMultiSet>::Edge*) >
+   		                     Graph<EdgeMultiSet>::Edge::ptr_less>
 {
 };
 
@@ -757,7 +745,7 @@ Graph<EdgeContainer>::Graph(const size_type initial_number_of_nodes) :
 {
   nodes.reserve(initial_number_of_nodes);
 
-  for (typename vector<Node*, ALLOC(Node*) >::iterator node = nodes.begin();
+  for (typename vector<Node*>::iterator node = nodes.begin();
        node != nodes.end();
        ++node)
     *node = new Node();
@@ -779,8 +767,7 @@ Graph<EdgeContainer>::Graph(const Graph<EdgeContainer>& graph)
  * ------------------------------------------------------------------------- */
 {
   nodes.reserve(graph.nodes.size());
-  for (typename vector<Node*, ALLOC(Node*) >::const_iterator
-	 node = graph.nodes.begin();
+  for (typename vector<Node*>::const_iterator node = graph.nodes.begin();
        node != graph.nodes.end(); ++node)
     nodes.push_back(new Node(**node));
 }
@@ -806,8 +793,7 @@ Graph<EdgeContainer>& Graph<EdgeContainer>::operator=
     clear();
 
     nodes.reserve(graph.nodes.size());
-    for (typename vector<Node*, ALLOC(Node*) >::const_iterator
-	   node = graph.nodes.begin();
+    for (typename vector<Node*>::const_iterator node = graph.nodes.begin();
          node != graph.nodes.end();
 	 ++node)
       nodes.push_back(new Node(**node));
@@ -850,8 +836,7 @@ void Graph<EdgeContainer>::clear()
  *
  * ------------------------------------------------------------------------- */
 {
-  for (typename vector<Node*, ALLOC(Node*) >::reverse_iterator
-	 node = nodes.rbegin();
+  for (typename vector<Node*>::reverse_iterator node = nodes.rbegin();
        node != nodes.rend();
        ++node)
     delete *node;
@@ -997,8 +982,7 @@ Graph<EdgeContainer>::stats() const
   result.first = nodes.size();
   result.second = 0;
 
-  for (typename vector<Node*, ALLOC(Node*) >::const_iterator
-	 node = nodes.begin();
+  for (typename vector<Node*>::const_iterator node = nodes.begin();
        node != nodes.end(); ++node)
     result.second += (*node)->edges().size();
 
@@ -1032,7 +1016,7 @@ Graph<EdgeContainer>::subgraphStats(const size_type index) const
   if (index >= s)
     throw NodeIndexException();
 
-  stack<size_type, deque<size_type, ALLOC(size_type) > > unprocessed_nodes;
+  stack<size_type, deque<size_type> > unprocessed_nodes;
   BitArray visited_nodes(s);
   visited_nodes.clear(s);
 
@@ -1764,8 +1748,7 @@ inline void EdgeList::insert(Graph<EdgeList>::Edge* edge)
 }
 
 /* ========================================================================= */
-inline list<Graph<EdgeList>::Edge*, ALLOC(Graph<EdgeList>::Edge*) >
-  ::const_iterator
+inline list<Graph<EdgeList>::Edge*>::const_iterator
 EdgeList::find(const Graph<EdgeList>::Edge* edge) const
 /* ----------------------------------------------------------------------------
  *
@@ -1776,9 +1759,9 @@ EdgeList::find(const Graph<EdgeList>::Edge* edge) const
  *                          between the actual values of the edges (not the
  *                          pointers).
  *
- * Returns:       A list<Graph<EdgeList>::Edge*, ALLOC>::const_iterator
+ * Returns:       A list<Graph<EdgeList>::Edge*>::const_iterator
  *                pointing to the edge in the list or
- *                list<Graph<EdgeList>::Edge*, ALLOC>::end() if the edge is
+ *                list<Graph<EdgeList>::Edge*>::end() if the edge is
  *                not found in the list.
  *
  * ------------------------------------------------------------------------- */
@@ -1793,7 +1776,7 @@ EdgeList::find(const Graph<EdgeList>::Edge* edge) const
 }
 
 /* ========================================================================= */
-inline list<Graph<EdgeList>::Edge*, ALLOC(Graph<EdgeList>::Edge*) >::iterator
+inline list<Graph<EdgeList>::Edge*>::iterator
 EdgeList::find(const Graph<EdgeList>::Edge* edge)
 /* ----------------------------------------------------------------------------
  *
@@ -1804,9 +1787,9 @@ EdgeList::find(const Graph<EdgeList>::Edge* edge)
  *                          between the actual values of the edges (not the
  *                          pointers).
  *
- * Returns:       A list<Graph<EdgeList>::Edge*, ALLOC>::iterator pointing
+ * Returns:       A list<Graph<EdgeList>::Edge*>::iterator pointing
  *                to the edge in the list or
- *                list<Graph<EdgeList>::Edge*, ALLOC>::end() if the edge is
+ *                list<Graph<EdgeList>::Edge*>::end() if the edge is
  *                not found in the list.
  *
  * ------------------------------------------------------------------------- */
@@ -1875,8 +1858,7 @@ inline void EdgeSlist::insert(Graph<EdgeSlist>::Edge* edge)
 }
 
 /* ========================================================================= */
-inline slist<Graph<EdgeSlist>::Edge*, ALLOC(Graph<EdgeSlist>::Edge*) >
-  ::const_iterator
+inline slist<Graph<EdgeSlist>::Edge*>::const_iterator
 EdgeSlist::find(const Graph<EdgeSlist>::Edge* edge) const
 /* ----------------------------------------------------------------------------
  *
@@ -1887,9 +1869,9 @@ EdgeSlist::find(const Graph<EdgeSlist>::Edge* edge) const
  *                          between the actual values of the edges (not the
  *                          pointers).
  *
- * Returns:       A slist<Graph<EdgeSlist>::Edge*, ALLOC>::const_iterator
+ * Returns:       A slist<Graph<EdgeSlist>::Edge*>::const_iterator
  *                pointing to the edge in the list or
- *                slist<Graph<EdgeSlist>::Edge*, ALLOC>::end() if the edge 
+ *                slist<Graph<EdgeSlist>::Edge*>::end() if the edge 
  *                is not found in the list.
  *
  * ------------------------------------------------------------------------- */
@@ -1904,8 +1886,7 @@ EdgeSlist::find(const Graph<EdgeSlist>::Edge* edge) const
 }
 
 /* ========================================================================= */
-inline slist<Graph<EdgeSlist>::Edge*, ALLOC(Graph<EdgeSlist>::Edge*) >
-  ::iterator
+inline slist<Graph<EdgeSlist>::Edge*>::iterator
 EdgeSlist::find(const Graph<EdgeSlist>::Edge* edge)
 /* ----------------------------------------------------------------------------
  *
@@ -1916,9 +1897,9 @@ EdgeSlist::find(const Graph<EdgeSlist>::Edge* edge)
  *                          between the actual values of the edges (not the
  *                          pointers).
  *
- * Returns:       A slist<Graph<EdgeSlist>::Edge*, ALLOC>::iterator
+ * Returns:       A slist<Graph<EdgeSlist>::Edge*>::iterator
  *                pointing to the edge in the list or
- *                slist<Graph<EdgeSlist>::Edge*, ALLOC>::end() if the edge
+ *                slist<Graph<EdgeSlist>::Edge*>::end() if the edge
  *                is not found in the list.
  *
  * ------------------------------------------------------------------------- */
@@ -1987,8 +1968,7 @@ inline void EdgeVector::insert(Graph<EdgeVector>::Edge* edge)
 }
 
 /* ========================================================================= */
-inline vector<Graph<EdgeVector>::Edge*, ALLOC(Graph<EdgeVector>::Edge*) >
-  ::const_iterator
+inline vector<Graph<EdgeVector>::Edge*>::const_iterator
 EdgeVector::find(const Graph<EdgeVector>::Edge* edge) const
 /* ----------------------------------------------------------------------------
  *
@@ -1999,9 +1979,9 @@ EdgeVector::find(const Graph<EdgeVector>::Edge* edge) const
  *                          between the actual values of the edges (not the
  *                          pointers).
  *
- * Returns:       A vector<Graph<EdgeVector>::Edge*, ALLOC>::const_iterator
+ * Returns:       A vector<Graph<EdgeVector>::Edge*>::const_iterator
  *                pointing to the edge in the container or
- *                vector<Graph<EdgeVector>::Edge*, ALLOC>::end() if the
+ *                vector<Graph<EdgeVector>::Edge*>::end() if the
  *                edge is not found in the container.
  *
  * ------------------------------------------------------------------------- */
@@ -2016,8 +1996,7 @@ EdgeVector::find(const Graph<EdgeVector>::Edge* edge) const
 }
 
 /* ========================================================================= */
-inline vector<Graph<EdgeVector>::Edge*, ALLOC(Graph<EdgeVector>::Edge*) >
-  ::iterator
+inline vector<Graph<EdgeVector>::Edge*>::iterator
 EdgeVector::find(const Graph<EdgeVector>::Edge* edge)
 /* ----------------------------------------------------------------------------
  *
@@ -2028,9 +2007,9 @@ EdgeVector::find(const Graph<EdgeVector>::Edge* edge)
  *                          between the actual values of the edges (not the
  *                          pointers).
  *
- * Returns:       A vector<Graph<EdgeVector>::Edge*, ALLOC>::iterator
+ * Returns:       A vector<Graph<EdgeVector>::Edge*>::iterator
  *                pointing to the edge in the container or
- *                vector<Graph<EdgeSlist>::Edge*, ALLOC>::end() if the edge
+ *                vector<Graph<EdgeSlist>::Edge*>::end() if the edge
  *                is not found in the container.
  *
  * ------------------------------------------------------------------------- */

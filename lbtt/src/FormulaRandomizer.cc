@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -92,7 +92,7 @@ LtlFormula* FormulaRandomizer::recGenerate(unsigned long int target_size)
  *
  * ------------------------------------------------------------------------- */
 {
-  vector<IntegerPair, ALLOC(IntegerPair) >::const_iterator symbol_priority;
+  vector<IntegerPair>::const_iterator symbol_priority;
   LtlFormula* formula;
   long int x;
 

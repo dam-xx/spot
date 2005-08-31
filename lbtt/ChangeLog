@@ -1,3 +1,116 @@
+2005-08-30  Heikki Tauriainen  <heikki.tauriainen@tkk.fi>
+
+	* src/main.cc: [HAVE_ISATTY && HAVE_UNISTD_H]: Include the
+	unistd.h header.
+	(testLoop): Add support for reading LTL formulas from standard
+	input using the new variable `round_info.formula_input_stream'.
+	(main) [HAVE_ISATTY]: If formulas are to be read from the
+	standard input which is not a terminal, force lbtt to work in
+	non-interactive mode.
+	* src/TestOperations.cc (generateFormula):
+	Use `round_info.formula_input_stream' instead of
+	`round_info.formula_input_file'.
+	* src/TestRoundInfo.h (TestRoundInfo::formula_input_stream): New
+	variable.
+	* src/Configuration.cc (Configuration::showCommandLineHelp):
+	Update description of the --formulafile command line option.
+	(Configuration::print): Do not display a file name when reading
+	formulas from standard input.
+	
+	* src/SpotWrapper.h, src/SpotWrapper.cc: Merge files from
+	Spot 0.2 (contributed by Alexandre Duret-Lutz); remove #pragma
+	definitions.
+	* src/ExternalTranslator.h, src/Makefile.in, src/translate.cc:
+	Merge changes from Spot 0.2 (contributed by Alexandre Duret-Lutz).
+	
+	* doc/lbtt.texi: Fix typo in URL of the FormulaOptions block
+	generator.  Update version, add documentation and references about
+	support for Spot.  Describe the new semantics of the --formulafile
+	command line option.
+
+	* NEWS, README, configure.ac: Update.
+
+	* Version 1.2.0 released.
+
+2005-08-18  Heikki Tauriainen  <heikki.tauriainen@tkk.fi>
+
+	* NEWS, README: Update to next version.
+
+	* Version 1.1.3 released.
+
+2005-08-18  Heikki Tauriainen  <heikki.tauriainen@tkk.fi>
+
+	* src/TestOperations.cc (generateBuchiAutomaton): Do not
+	block interrupt signals while running a child process; if lbtt
+	is currently in the foreground, transfer the controlling terminal
+	to the child instead.
+	* configure.ac: Add tests for the getpgrp, tcgetpgrp and
+	tcsetpgrp functions.
+
+2005-08-17  Heikki Tauriainen  <heikki.tauriainen@tkk.fi>
+
+	* src/BitArray.h (BitArray::set, BitArray::clear): Do not
+	set/clear more bits than specified.
+
+	* src/main.cc (main): Add a space before error message.
+
+2005-08-16  Heikki Tauriainen  <heikki.tauriainen@tkk.fi>
+
+	* src/main.cc: Include the sys/types.h header.
+	(translator_process): New global variable.
+	(abortHandler): If a translator process is still active when
+	aborting, terminate it.
+	* src/TestOperations.cc: Declare the external translator_process
+	variable.
+	(generateBuchiAutomaton): Replace the pid variable with the
+	translator_process variable.
+	Use setpgid instead of setsid. Always try to terminate the
+	subprocess if waitpid fails (not only in case of timeouts).
+	* configure.ac: Replace test for setsid with test for
+	setpgid.
+
+2005-08-15  Heikki Tauriainen  <heikki.tauriainen@tkk.fi>
+
+	* configure.ac: Update version and e-mail address.
+	Remove test for the slist header.
+
+	* AUTHORS, doc/lbtt.texi: Update e-mail address.
+
+	* src/LbttAlloc.h: Remove definition for the ALLOC macro.
+	Update copyright information.
+	* src/BuchiAutomaton.cc, src/BuchiProduct.cc, src/BuchiProduct.h,
+	src/Configuration.cc, src/Configuration.h, src/DispUtil.cc,
+	src/ExternalTranslator.h, src/FormulaRandomizer.cc,
+	src/FormulaRandomizer.h, src/Graph.h.in, src/IntervalList.cc,
+	src/IntervalList.h, src/Ltl-parse.yy, src/LtlFormula.cc,
+	src/LtlFormula.h, src/main.cc, src/NeverClaimAutomaton.cc,
+	src/NeverClaimAutomaton.h, src/PathEvaluator.cc,
+	src/PathEvaluator.h, src/Product.h, src/SccCollection.h,
+	src/SharedTestData.h, src/StatDisplay.cc, src/StatDisplay.h,
+	src/StateSpace.cc, src/StateSpaceRandomizer.cc,
+	src/StringUtil.cc, src/StringUtil.h, src/TestOperations.cc,
+	src/TestOperations.h, src/TestRoundInfo.h, src/TestStatistics.cc,
+	src/TestStatistics.h, src/UserCommandReader.cc,
+	src/UserCommandReader.h, src/UserCommands.cc,
+	src/UserCommands.h:
+	Remove uses of the ALLOC macro.
+	Update copyright information.
+	* src/BitArray.cc, src/BitArray.h, src/Bitset.h,
+	src/BuchiAutomaton.h, src/Config-lex.ll, src/Config-parse.yy,
+	src/DispUtil.h, src/EdgeContainer.h, src/Exception.h,
+	src/ExternalTranslator.cc, src/FormulaWriter.h, src/LbtWrapper.h,
+	src/NeverClaim-lex.ll, src/NeverClaim-parse.yy,
+	src/PathIterator.cc, src/PathIterator.h, src/Random.h,
+	src/SpinWrapper.cc, src/SpinWrapper.h, src/StateSpace.h,
+	src/StateSpaceProduct.h, src/StateSpaceRandomizer.h,
+	src/TempFsysName.cc, src/TempFsysName.h, src/translate.cc,
+	src/translate.h, src/TranslatorInterface.h:
+	Update copyright information.
+
+	* src/Configuration.cc (Configuration::showCommandLineHelp):
+	Use the PACKAGE_BUGREPORT macro instead of a hard-coded
+	e-mail address.
+
 2004-08-02  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* Version 1.1.2 released.

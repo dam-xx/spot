@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -174,9 +174,7 @@ StateSpace* StateSpaceRandomizer::generateConnectedGraph() const
 
       StateSpace::size_type first_unreachable_state = 1, random_node;
 
-      multimap<long int, StateSpace::size_type, less<long int>,
-	       ALLOC(StateSpace::size_type) >
-	reachable_but_unprocessed;
+      multimap<long int, StateSpace::size_type>	reachable_but_unprocessed;
 
       reachable_but_unprocessed.insert(make_pair(0, 0));
 

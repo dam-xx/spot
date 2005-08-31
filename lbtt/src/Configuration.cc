@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -96,8 +96,7 @@ Configuration::~Configuration()
  *
  * ------------------------------------------------------------------------- */
 {
-  for (vector<AlgorithmInformation, ALLOC(AlgorithmInformation) >
-	 ::const_iterator it = algorithms.begin();
+  for (vector<AlgorithmInformation>::const_iterator it = algorithms.begin();
        it != algorithms.end(); ++it)
   {
     for (vector<string>::size_type p = 0; p <= it->num_parameters; ++p)
@@ -223,7 +222,7 @@ void Configuration::read(int argc, char* argv[])
   config_file_line_number = -1;
 
   typedef pair<const OPTIONSTRUCT*, const char*> Parameter;
-  vector<Parameter, ALLOC(Parameter) > parameters;
+  vector<Parameter> parameters;
 
   /*
    *  Preprocess the command line parameters.  At this point only those special
@@ -351,7 +350,7 @@ void Configuration::read(int argc, char* argv[])
    *  configuration file.
    */
 
-  vector<Parameter, ALLOC(Parameter) >::const_iterator parameter;
+  vector<Parameter>::const_iterator parameter;
 
   try
   {
@@ -655,7 +654,7 @@ void Configuration::read(int argc, char* argv[])
 	  try
 	  {
 	    IntervalList algorithm_ids;
-	    vector<string, ALLOC(string) > nonnumeric_algorithm_ids;
+	    vector<string> nonnumeric_algorithm_ids;
 	    string id_string
 	      = substituteInQuotedString(parameter->second, ",", "\n",
 					 INSIDE_QUOTES);
@@ -664,14 +663,13 @@ void Configuration::read(int argc, char* argv[])
 			      algorithms.size() - 1,
 			      &nonnumeric_algorithm_ids);
 
-	    for (vector<string, ALLOC(string) >::iterator
+	    for (vector<string>::iterator
 		   id = nonnumeric_algorithm_ids.begin();
 		 id != nonnumeric_algorithm_ids.end();
 		 ++id)
 	    {
 	      *id = unquoteString(substituteInQuotedString(*id, "\n", ","));
-	      map<string, unsigned long int, less<string>,
-	          ALLOC(unsigned long int) >::const_iterator id_finder
+	      map<string, unsigned long int>::const_iterator id_finder
 		= algorithm_names.find(*id);
 	      if (id_finder == algorithm_names.end())
 		throw ConfigurationException
@@ -777,8 +775,7 @@ void Configuration::read(int argc, char* argv[])
 
   bool unary_operator_allowed = false;
 
-  for (map<int, int, less<int>, ALLOC(int) >::iterator
-	 it = formula_options.symbol_priority.begin();
+  for (map<int, int>::iterator it = formula_options.symbol_priority.begin();
        it != formula_options.symbol_priority.end(); ++it)
   {
     if (it->second == -1)
@@ -804,7 +801,7 @@ void Configuration::read(int argc, char* argv[])
   int total_long_unary_priority = 0;
   int total_binary_priority = 0;
 
-  for (map<int, int, less<int>, ALLOC(int) >::const_iterator
+  for (map<int, int>::const_iterator
 	 it = formula_options.symbol_priority.begin();
        it != formula_options.symbol_priority.end(); ++it)
   {
@@ -873,7 +870,7 @@ void Configuration::read(int argc, char* argv[])
 	 k <= formula_options.formula_generator.max_size;
 	 k++)
     {
-      for (map<int, int, less<int>, ALLOC(int) >::const_iterator
+      for (map<int, int>::const_iterator
 	     op = formula_options.symbol_priority.begin();
 	   op != formula_options.symbol_priority.end();
 	   ++op)
@@ -984,11 +981,9 @@ void Configuration::print(ostream& stream, int indent) const
 
   estream << '\n' + string(indent + 2, ' ') + "Implementations:\n";
 
-  vector<AlgorithmInformation, ALLOC(AlgorithmInformation) >::size_type
-    algorithm_number = 0;
+  vector<AlgorithmInformation>::size_type algorithm_number = 0;
   
-  for (vector<AlgorithmInformation, ALLOC(AlgorithmInformation) >
-	 ::const_iterator a = algorithms.begin();
+  for (vector<AlgorithmInformation>::const_iterator a = algorithms.begin();
        a != algorithms.end();
        ++a)
   {
@@ -1161,9 +1156,13 @@ void Configuration::print(ostream& stream, int indent) const
 		    number_of_available_variables == 1 ? "" : "s");
   }
   else
-    estream << "Reading LTL formulas from `"
-               + global_options.formula_input_filename
-               + "'.";
+  {
+    estream << "Reading LTL formulas from ";
+    if (global_options.formula_input_filename == "-")
+      estream << "standard input.";
+    else
+      estream << "`" + global_options.formula_input_filename + "'.";
+  }
 
   estream << '\n' + string(indent + 4, ' ');
 
@@ -1222,7 +1221,7 @@ void Configuration::print(ostream& stream, int indent) const
 
     bool first_printed = false;
 
-    for (map<int, int, less<int>, ALLOC(int) >::const_iterator
+    for (map<int, int>::const_iterator
 	   op = formula_options.symbol_priority.begin();
 	 op != formula_options.symbol_priority.end();
 	 ++op)
@@ -1263,7 +1262,7 @@ void Configuration::print(ostream& stream, int indent) const
     int max_operators_per_line
       = (formula_options.symbol_distribution.empty() ? 7 : 6);
 
-    for (map<int, int, less<int>, ALLOC(int) >::const_iterator op
+    for (map<int, int>::const_iterator op
 	   = formula_options.symbol_priority.begin();
 	 op != formula_options.symbol_priority.end();
 	 ++op)
@@ -1340,9 +1339,7 @@ void Configuration::print(ostream& stream, int indent) const
 
 /* ========================================================================= */
 string Configuration::algorithmString
-  (vector<Configuration::AlgorithmInformation,
-          ALLOC(Configuration::AlgorithmInformation) >::size_type
-     algorithm_id) const
+  (vector<Configuration::AlgorithmInformation>::size_type algorithm_id) const
 /* ----------------------------------------------------------------------------
  *
  * Description:   Constructs a string with an algorithm identifer and the name
@@ -1387,7 +1384,8 @@ void Configuration::showCommandLineHelp(const char* program_name)
             "  --enable=IMPLEMENTATION-ID[,IMPLEMENTATION-ID,...]\n"
             "                              Include implementation(s) into "
                                            "tests\n"
-            "  --formulafile=FILE          Read LTL formulas from FILE\n"
+            "  --formulafile=FILE          Read LTL formulas from FILE "
+            "(- = standard input)\n"
             "  --globalmodelcheck          Use global model checking in "
                                            "tests\n"
             "                              (equivalent to "
@@ -1543,7 +1541,7 @@ void Configuration::showCommandLineHelp(const char* program_name)
             "  --truthprobability=PROBABILITY\n"
             "                              Set truth probability of "
                                            "propositions (0.0--1.0)\n\n"
-            "Report bugs to <heikki.tauriainen@hut.fi>.\n";
+            "Report bugs to <" PACKAGE_BUGREPORT ">.\n";
 }
 
 /* ========================================================================= */
@@ -1673,7 +1671,7 @@ void Configuration::registerAlgorithm
 		: string("")),
 	     error);
 
-  vector<string, ALLOC(string) > params;
+  vector<string> params;
   sliceString(unquoteString(substituteInQuotedString(parameters, " \t", "\n\n",
 						     OUTSIDE_QUOTES)),
 	      "\n",
@@ -1702,7 +1700,7 @@ void Configuration::registerAlgorithm
   memcpy(static_cast<void*>(algorithm_information.parameters[0]),
 	 static_cast<const void*>(path.c_str()), path.size() + 1);
 
-  for (vector<string, ALLOC(string) >::size_type p = 0;
+  for (vector<string>::size_type p = 0;
        p < algorithm_information.num_parameters;
        ++p)
   {
@@ -1875,9 +1873,9 @@ void Configuration::readInteractivity(const string& value)
   global_options.interactive = NEVER;
   global_options.handle_breaks = false;
 
-  vector<string, ALLOC(string) > modes;
+  vector<string> modes;
   ::StringUtil::sliceString(value, ",", modes);
-  for (vector<string, ALLOC(string) >::const_iterator mode = modes.begin();
+  for (vector<string>::const_iterator mode = modes.begin();
        mode != modes.end();
        ++mode)
   {

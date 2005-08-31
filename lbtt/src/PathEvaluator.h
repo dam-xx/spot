@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -105,15 +105,15 @@ private:
 						     * the current path.
 						     */
 
-  vector<StateSpace::size_type,                     /* Correspondence        */
-         ALLOC(StateSpace::size_type) >             /* between states of the */
-    path_states;                                    /* path and the states
+  vector<StateSpace::size_type> path_states;        /* Correspondence
+                                                     * between states of the
+                                                     * path and the states
 						     * of the current state
 						     * space.
 						     */
 
   map<const LtlFormula*, BitArray*,                 /* Information about the */
-      LtlFormula::ptr_less, ALLOC(BitArray*) >      /* truth values of the   */
+      LtlFormula::ptr_less>                         /* truth values of the   */
     eval_info;                                      /* subformulae of the
 						     * formula to be
 						     * evaluated.

@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -58,7 +58,7 @@ template<typename T> string toString(const T& t);   /* Template function for
 
 void sliceString                                    /* Breaks a string into */
   (const string& s, const char* slice_chars,        /* `slices', using a    */
-   vector<string, ALLOC(string) >& slices);         /* given set of
+   vector<string>& slices);                         /* given set of
 						     * characters as
                                                      * separators.
 						     */
@@ -114,8 +114,9 @@ void parseIntervalList                              /* Converts a list of   */
    IntervalList& intervals,                         /* the set of unsigned  */
    unsigned long int min,                           /* long integers        */
    unsigned long int max,                           /* corresponding to the */
-   vector<string, ALLOC(string) >* extra_tokens     /* union of the         */
-     = 0);                                          /* intervals.           */
+   vector<string>* extra_tokens = 0);               /* union of the
+                                                     * intervals.
+						     */
 
 void parseTime                                      /* Parses a time string. */
   (const string& time_string,

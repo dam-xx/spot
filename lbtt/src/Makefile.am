@@ -79,6 +79,8 @@ lbtt_translate_SOURCES = \
   NeverClaimAutomaton.cc \
   SpinWrapper.h \
   SpinWrapper.cc \
+  SpotWrapper.h \
+  SpotWrapper.cc \
   StringUtil.h \
   StringUtil.cc \
   TempFsysName.h \
