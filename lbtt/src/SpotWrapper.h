@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  Derived from SpinWrapper.h by Alexandre Duret-Lutz <adl@src.lip6.fr>.
  *
@@ -21,10 +21,6 @@
 
 #ifndef SPOTWRAPPER_H
 #define SPOTWRAPPER_H
-
-#ifdef __GNUC__
-#pragma interface
-#endif /* __GNUC__ */
 
 #include <config.h>
 #include <string>
@@ -144,4 +140,4 @@ inline void SpotWrapper::parseAutomaton(const string&, const string&)
 {
 }
 
-#endif /* !SPINWRAPPER_H */
+#endif /* !SPOTWRAPPER_H */

@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  Derived from SpinWrapper.cc by Alexandre Duret-Lutz <adl@src.lip6.fr>.
  *
@@ -18,10 +18,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
-#ifdef __GNUC__
-#pragma implementation
-#endif /* __GNUC__ */
 
 #include <config.h>
 #ifdef HAVE_SSTREAM

@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -149,20 +149,20 @@ int main(int argc, char** argv)
       case OPT_HELP :
 	cout << string("Usage: ") << command_line_arguments[0]
 	     << " [translator] [command line for translator] [formula "
-		"file] [automaton file]\n"
-		"General options:\n"
-		"  --h, --help              Show this help\n"
-		"  --V, --version           Show version and exit\n\n"
-		"Translator options:\n"
-		"       --lbt               lbt\n"
-		"       --spin              Spin\n"
-		"       --spot              Spot\n"
-		"The command line for these translators must be given as a "
-		"single argument\n"
-		"including the name (and location) of an external program to "
-		"execute, together\n"
-		"with any optional parameters to be passed to the "
-		"program.\n\n";
+	        "file] [automaton file]\n"
+	        "General options:\n"
+                "  -h, --help               Show this help\n"
+                "  -V, --version            Show version and exit\n\n"
+                "Translator options:\n"
+                "       --lbt               lbt\n"
+                "       --spin              Spin\n"
+                "       --spot              Spot\n"
+                "The command line for these translators must be given as a "
+	        "single argument\n"
+                "including the name (and location) of an external program to "
+                "execute, together\n"
+                "with any optional parameters to be passed to the "
+	        "program.\n\n";
 	exit(0);
 	break;
 
