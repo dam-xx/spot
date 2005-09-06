@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -41,6 +41,7 @@ namespace spot
     /// spot::ltl:const_visitor instead.
     struct visitor
     {
+      virtual ~visitor() {}
       virtual void visit(atomic_prop* node) = 0;
       virtual void visit(constant* node) = 0;
       virtual void visit(binop* node) = 0;
@@ -58,6 +59,7 @@ namespace spot
     /// spot::ltl:visitor instead.
     struct const_visitor
     {
+      virtual ~const_visitor() {}
       virtual void visit(const atomic_prop* node) = 0;
       virtual void visit(const constant* node) = 0;
       virtual void visit(const binop* node) = 0;

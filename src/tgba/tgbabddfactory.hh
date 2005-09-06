@@ -33,6 +33,7 @@ namespace spot
   class tgba_bdd_factory
   {
   public:
+    virtual ~tgba_bdd_factory() {}
     /// Get the core data for the new automata.
     virtual const tgba_bdd_core_data& get_core_data() const = 0;
   };

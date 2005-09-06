@@ -40,7 +40,7 @@
 #  else
 #    include <ext/hash_map>
 #    include <ext/hash_set>
-#    if __GNUC_MINOR__ == 0
+#    if __GNUC__ == 3 && __GNUC_MINOR__ == 0
       namespace Sgi = std;               // GCC 3.0
 #    else
       namespace Sgi = ::__gnu_cxx;       // GCC 3.1 and later

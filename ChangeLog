@@ -1,3 +1,13 @@
+2005-09-05  Heikki Tauriainen  <heikki.tauriainen@tkk.fi>
+
+	* src/ltlast/visitor.hh (visitor, const_visitor): Add empty
+	virtual destructors.
+	* src/tgba/tgbabddfactory.hh (tgba_bdd_factory): Likewise.
+	* src/misc/hash.hh: Use the std namespace only with GCC 3.0,
+	not with all compiler versions with minor version 0.
+	* src/tgba/tgbatba.cc (tgba_tba_proxy_succ_iterator): Fix
+	friend declaration of ::spot::tgba_tba_proxy.
+
 2005-09-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/magic.hh: \fixme is not a doxygen command.  Use \bug.
