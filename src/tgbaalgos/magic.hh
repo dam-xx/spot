@@ -94,7 +94,7 @@ namespace spot
   ///  }
   /// \endverbatim
   ///
-  /// \fixme The name is misleading.  Magic-search is the algorithm
+  /// \bug The name is misleading.  Magic-search is the algorithm
   /// from \c godefroid.93.pstv, not \c courcoubetis.92.fmsd.
   emptiness_check* explicit_magic_search(const tgba *a,
                                          option_map o = option_map());
