@@ -615,6 +615,7 @@ namespace spot
     {
       m_source_trans target;
       transition tmp;
+      tmp.source = tmp.dest = 0; // Initialize to please GCC 4.0.
 
       // Register all states from the cycle as target of the BFS.
       for (tgba_run::steps::const_iterator i = run->cycle.begin();

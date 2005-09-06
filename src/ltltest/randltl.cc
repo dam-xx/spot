@@ -169,7 +169,7 @@ main(int argc, char** argv)
 	  while (max_tries_u--)
 	    {
 	      spot::srand(opt_s++);
-	      spot::ltl::formula* f;
+	      spot::ltl::formula* f = 0;
 	      int max_tries_r = 1000;
 	      while (max_tries_r--)
 		{

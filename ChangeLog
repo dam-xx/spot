@@ -1,5 +1,11 @@
 2005-09-05  Heikki Tauriainen  <heikki.tauriainen@tkk.fi>
 
+	* src/tgbaalgos/ndfs_result.hxx (ndfs_result::construct_prefix):
+	Initialize tmp to suppress a GCC 4.0 warning.
+	* src/ltltest/randltl.cc (main): Likewise with another variable.
+
+2005-09-05  Heikki Tauriainen  <heikki.tauriainen@tkk.fi>
+
 	* src/ltlast/visitor.hh (visitor, const_visitor): Add empty
 	virtual destructors.
 	* src/tgba/tgbabddfactory.hh (tgba_bdd_factory): Likewise.
