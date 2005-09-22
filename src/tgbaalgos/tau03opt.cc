@@ -41,6 +41,7 @@
 #endif
 
 #include <cassert>
+#include <vector>
 #include <stack>
 #include "misc/hash.hh"
 #include "tgba/tgba.hh"
@@ -56,8 +57,8 @@ namespace spot
   {
     enum color {WHITE, CYAN, BLUE};
 
-    /// \brief Emptiness checker on spot::tgba automata having at most one
-    /// acceptance condition (i.e. a TBA).
+    /// \brief Emptiness checker on spot::tgba automata having a finite number
+    /// of acceptance conditions (i.e. a TGBA).
     template <typename heap>
     class tau03_opt_search : public emptiness_check, public ec_statistics
     {
@@ -69,9 +70,20 @@ namespace spot
           h(size),
           all_acc(a->all_acceptance_conditions()),
 	  use_condition_stack(o.get("condstack")),
+	  use_ordering(use_condition_stack && o.get("ordering")),
 	  use_weights(o.get("weights", 1)),
 	  use_red_weights(use_weights && o.get("redweights", 1))
       {
+	if (use_ordering)
+	  {
+	    bdd all_conds = all_acc;
+	    while (all_conds != bddfalse)
+	      {
+		bdd acc = bdd_satone(all_conds);
+		cond.push_back(acc);
+		all_conds -= acc;
+	      }
+	  }
       }
 
       virtual ~tau03_opt_search()
@@ -149,6 +161,16 @@ namespace spot
         st.pop_front();
       }
 
+      bdd project_acc(bdd acc) const
+      {
+	bdd result = bddfalse;
+	for (std::vector<bdd>::const_iterator i = cond.begin();
+	     i != cond.end() && (acc & *i) != bddfalse;
+	     ++i)
+	  result |= *i;
+	return result;
+      }
+
       /// \brief weight of the state on top of the blue stack.
       weight current_weight;
 
@@ -167,10 +189,16 @@ namespace spot
 
       /// Whether to use the "condition stack".
       bool use_condition_stack;
+      /// Whether to use an ordering between the acceptance conditions.
+      /// Effective only if using the condition stack.
+      bool use_ordering;
       /// Whether to use weights to abort earlier.
       bool use_weights;
       /// Whether to use weights in the red dfs.
       bool use_red_weights;
+
+      /// Ordering of the acceptance conditions.
+      std::vector<bdd> cond;
 
       bool dfs_blue()
       {
@@ -210,7 +238,7 @@ namespace spot
                       {
                         trace << "  It is cyan and acceptance condition "
                               << "is reached, report cycle" << std::endl;
-                        c_prime.cumulate_acc(c.get_acc() | acc);
+                        c_prime.cumulate_acc(all_acc);
                         push(st_red, s_prime, label, acc);
                         return true;
                       }
@@ -218,11 +246,12 @@ namespace spot
                       {
                         trace << "  It is cyan or blue and";
                         bdd acu = acc | c.get_acc();
-                        if ((c_prime.get_acc() & acu) != acu)
+                        bdd acp = (use_ordering ? project_acc(acu) : acu);
+                        if ((c_prime.get_acc() & acp) != acp)
                           {
                             trace << "  a propagation is needed, "
                                   << "start a red dfs" << std::endl;
-                            c_prime.cumulate_acc(acu);
+                            c_prime.cumulate_acc(acp);
                             push(st_red, s_prime, label, acc);
                             if (dfs_red(acu))
                               return true;
@@ -254,13 +283,14 @@ namespace spot
                                           h.get_color_ref(st_blue.front().s);
                     assert(!c.is_white());
                     bdd acu = f_dest.acc | c.get_acc();
-                    if ((c_prime.get_acc() & acu) != acu)
+                    bdd acp = (use_ordering ? project_acc(acu) : acu);
+                    if ((c_prime.get_acc() & acp) != acp)
                       {
                         trace << "  The arc from "
                               << a_->format_state(st_blue.front().s)
                               << " to the current state implies to "
                               << " start a red dfs" << std::endl;
-                        c_prime.cumulate_acc(acu);
+                        c_prime.cumulate_acc(acp);
                         push(st_red, f_dest.s, f_dest.label, f_dest.acc);
                         if (dfs_red(acu))
                             return true;
@@ -290,6 +320,7 @@ namespace spot
 	typedef std::pair<bdd, unsigned> cond_level;
 	std::stack<cond_level> condition_stack;
 	unsigned depth = 1;
+	condition_stack.push(cond_level(bddfalse, 0));
 
         while (!st_red.empty())
           {
@@ -310,31 +341,40 @@ namespace spot
                   {
                     trace << "  It is white, pop it" << std::endl;
                     delete s_prime;
+                    continue;
                   }
 		else if (c_prime.get_color() == CYAN &&
 			 (all_acc == ((use_red_weights ?
 				       (current_weight - c_prime.get_weight())
 				       : bddfalse)
 				      | c_prime.get_acc()
+				      | acc
 				      | acu)))
 		  {
 		    trace << "  It is cyan and acceptance condition "
 			  << "is reached, report cycle" << std::endl;
-		    c_prime.cumulate_acc(acu);
+		    c_prime.cumulate_acc(all_acc);
 		    push(st_red, s_prime, label, acc);
 		    return true;
 		  }
-		else if ((c_prime.get_acc() & acu) != acu)
+		bdd acp;
+		if (use_ordering)
+		  acp = project_acc(c_prime.get_acc() | acu | acc);
+		else if (use_condition_stack)
+		  acp = acu | acc;
+		else
+		  acp = acu;
+		if ((c_prime.get_acc() & acp) != acp)
 		  {
 		    trace << "  It is cyan or blue and propagation "
 			  << "is needed, go down"
 			  << std::endl;
-		    c_prime.cumulate_acc(acu);
+		    c_prime.cumulate_acc(acp);
 		    push(st_red, s_prime, label, acc);
 		    if (use_condition_stack)
 		      {
 			bdd old = acu;
-			acu = c_prime.get_acc();
+			acu |= acc;
 			condition_stack.push(cond_level(acu - old, depth));
 		      }
 		    ++depth;
@@ -353,14 +393,10 @@ namespace spot
                 h.pop_notify(f.s);
                 pop(st_red);
 		--depth;
-		if (use_condition_stack)
+		if (condition_stack.top().second == depth)
 		  {
-		    while (!condition_stack.empty()
-			   && condition_stack.top().second == depth)
-		      {
-			acu -= condition_stack.top().first;
-			condition_stack.pop();
-		      }
+		    acu -= condition_stack.top().first;
+		    condition_stack.pop();
 		  }
               }
           }

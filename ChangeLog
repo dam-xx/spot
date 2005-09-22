@@ -1,3 +1,25 @@
+2005-09-20  Heikki Tauriainen  <heikki.tauriainen@tkk.fi>
+
+	* src/tgbaalgos/tau03opt.cc: Include <vector>.
+	(tau03_opt_search): Add option "ordering" (off by default).
+	If enabled, initialize an explicit ordering for acceptance
+	conditions into the new member "cond" (a vector of bdds).
+	(project_acc): New helper function for projecting a set of
+	acceptance conditions to a subset that maximizes the number
+	of initial consecutive conditions covered by the set in the
+	condition ordering.
+	(dfs_blue): Implement the ordering heuristic.
+	(dfs_red): Use a sentinel in condition_stack to avoid explicit
+	checks for the stack's emptiness.
+	Consider also the conditions in acc when checking for the
+	completion of an accepting cycle.
+	Fix the implementation of condition heuristic.
+	Implement the ordering heuristic.
+	Simplify the removal of elements from condition_stack (due to
+	the way in which elements are pushed on the stack, there can
+	be at most one element with a given depth in the stack at any
+	one time).
+
 2005-09-05  Heikki Tauriainen  <heikki.tauriainen@tkk.fi>
 
 	* src/tgbaalgos/ndfs_result.hxx (ndfs_result::construct_prefix):
