@@ -77,6 +77,8 @@ const char* default_algos[] = {
   "Tau03",
   "Tau03_opt",
   "Tau03_opt(condstack)",
+  "Tau03_opt(condstack ordering)",
+  "Tau03_opt(condstack ordering !weights)",
   0
 };
 
