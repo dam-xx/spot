@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -34,7 +34,7 @@ namespace spot
   {
     // At some point we'll need to print an acceptance set into LBTT's
     // format.  LBTT expects numbered acceptance sets, so first we'll
-    // number each acceptance condition, and latter when we have to print
+    // number each acceptance condition, and later when we have to print
     // them we'll just have to look up each of them.
     class acceptance_cond_splitter
     {
