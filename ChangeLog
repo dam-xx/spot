@@ -1,3 +1,7 @@
+2005-09-27  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/randtgba.cc: New option -S.
+
 2005-09-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/lbtt.cc: Typo.
