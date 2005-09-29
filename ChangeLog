@@ -1,5 +1,8 @@
 2005-09-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlparse/ltlparse.yy (result): Do not assign to $$, it's useless.
+	Suggested by Akim.
+
 	* src/tgbatest/randtgba.cc: New option -H.
 	* src/tgbaalgos/emptiness_stats.hh (unsigned_statistics_copy): New
 	class.

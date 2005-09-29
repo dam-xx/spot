@@ -115,24 +115,24 @@ using namespace spot::ltl;
 
 %%
 result:       subformula END_OF_INPUT
-	      { result = $$ = $1;
+	      { result = $1;
 		YYACCEPT;
 	      }
 	    | error END_OF_INPUT
 	      { error_list.push_back(parse_error(@1,
 				      "could not parse anything sensible"));
-		result = $$ = 0;
+		result = 0;
 		YYABORT;
 	      }
 	    | subformula error END_OF_INPUT
 	      { error_list.push_back(parse_error(@2,
 				      "ignoring trailing garbage"));
-		result = $$ = $1;
+		result = $1;
 		YYACCEPT;
 	      }
 	    | END_OF_INPUT
               { error_list.push_back(parse_error(@$, "empty input"));
-		result = $$ = 0;
+		result = 0;
 		YYABORT;
 	      }
 
