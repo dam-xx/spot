@@ -134,6 +134,7 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -p S    priorities to use" << std::endl
 	    << "  -S N    skip N formulae before starting to use them"
+	    << std::endl
 	    << "            (useful to replay a specific seed when -u is used)"
 	    << std::endl
 	    << "  -u      generate unique formulae" << std::endl
@@ -145,6 +146,8 @@ syntax(char* prog)
 	    << "            otherwise be skipped (implies -e)" << std::endl
 	    << "  -e N    compare result of all "
 	    << "emptiness checks on N randomly generated graphs" << std::endl
+	    << "  -H      halt on the first statistic difference in algorithms"
+	    << std::endl
 	    << "  -m      try to reduce runs, in a second pass (implies -r)"
             << std::endl
 	    << "  -R N    repeat each emptiness-check and accepting run "
@@ -572,6 +575,8 @@ main(int argc, char** argv)
 
   int exit_code = 0;
 
+  bool stop_on_first_difference = false;
+
   spot::tgba* formula = 0;
   spot::tgba* product = 0;
 
@@ -667,12 +672,11 @@ main(int argc, char** argv)
 	{
 	  opt_dot = true;
 	}
-      else if (!strcmp(argv[argn], "-m"))
+      else if (!strcmp(argv[argn], "-H"))
 	{
-	  opt_reduce = true;
-	  opt_replay = true;
-	  if (!opt_ec)
-	    opt_ec = 1;
+	  if (argc < argn + 1)
+	    syntax(argv[0]);
+	  stop_on_first_difference = true;
 	}
       else if (!strcmp(argv[argn], "-i"))
         {
@@ -692,6 +696,13 @@ main(int argc, char** argv)
           else
             formula_file = &std::cin;
         }
+      else if (!strcmp(argv[argn], "-m"))
+	{
+	  opt_reduce = true;
+	  opt_replay = true;
+	  if (!opt_ec)
+	    opt_ec = 1;
+	}
       else if (!strcmp(argv[argn], "-n"))
 	{
 	  if (argc < argn + 2)
@@ -884,12 +895,9 @@ main(int argc, char** argv)
 	{
 	  do
 	    {
-	      if (opt_ec)
-		{
-		  if (!opt_paper)
-		    std::cout << "seed: " << opt_ec_seed << std::endl;
-		  spot::srand(opt_ec_seed);
-		}
+	      if (opt_ec && !opt_paper)
+		std::cout << "seed: " << opt_ec_seed << std::endl;
+	      spot::srand(opt_ec_seed);
 
 	      spot::tgba* a;
 	      spot::tgba* r = a = spot::random_graph(opt_n, opt_d, apf, dict,
@@ -901,11 +909,13 @@ main(int argc, char** argv)
 
 	      int real_n_acc = a->number_of_acceptance_conditions();
 
+	      if (opt_dot)
+		{
+		  dotty_reachable(std::cout, a);
+		}
 	      if (!opt_ec)
 		{
-		  if (opt_dot)
-		    dotty_reachable(std::cout, a);
-		  else if (!opt_0)
+		  if (!opt_0 && !opt_dot)
 		    tgba_save_reachable(std::cout, a);
 		}
 	      else
@@ -919,6 +929,7 @@ main(int argc, char** argv)
 		  int n_empty = 0;
 		  int n_non_empty = 0;
 		  int n_maybe_empty = 0;
+		  spot::unsigned_statistics_copy ostats_ec, ostats_arc;
 
 		  for (int i = 0; i < n_alg; ++i)
 		    {
@@ -968,6 +979,15 @@ main(int argc, char** argv)
 			      glob_ec_ratio_stats.count(algo, ecs);
 			    }
 			}
+
+		      if (stop_on_first_difference && ecs)
+			if (!ostats_ec.seteq(*ecs))
+			  {
+			    std::cout << "DIFFERING STATS for emptiness check,"
+				      << " halting... ";
+			    opt_ec = n_alg = opt_F = 0;
+			  }
+
 		      if (res)
 			{
 			  if (!opt_paper)
@@ -981,17 +1001,27 @@ main(int argc, char** argv)
 			      for (int count = opt_R;;)
 				{
 				  run = res->accepting_run();
+				  const spot::unsigned_statistics* s
+				    = res->statistics();
 				  if (opt_z && !done)
 				    {
 				      // Count only the first run (the
 				      // other way would be to divide
 				      // the stats by opt_R).
 				      done = true;
-				      const spot::unsigned_statistics* s
-					= res->statistics();
 				      sc_arc.count(algo, s);
 				      arc_ratio_stats.count(algo, s);
 				    }
+				  if (stop_on_first_difference && s)
+				    if (!ostats_arc.seteq(*s))
+				      {
+					std::cout << "DIFFERING STATS for "
+						  << "accepting runs,"
+						  << " halting... ";
+					opt_ec = n_alg = opt_F = 0;
+					break;
+				      }
+
 				  if (count-- <= 0 || !run)
 				    break;
 				  delete run;
