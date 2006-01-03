@@ -1,3 +1,9 @@
+2006-01-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/defs.in (VALGRIND): Use --log-fd instead of
+	--logfile-fd to please newer versions of Valgrind.
+	* src/ltltest/defs.in, src/evtgbatest/defs.in: Likewise.
+
 2005-09-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlparse/ltlparse.yy (result): Do not assign to $$, it's useless.
