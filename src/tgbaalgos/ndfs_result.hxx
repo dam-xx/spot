@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -602,6 +602,7 @@ namespace spot
 		      << a_->format_state(current.dest) << " to "
 		      << a_->format_state(begin) << std::endl;
 	  transition tmp;
+	  tmp.source = tmp.dest = 0; // Initialize to please GCC 4.0.1 (Darwin).
 	  target.insert(std::make_pair(begin, tmp));
 	  min_path<true> s(this, a_, target, h_);
 	  const state* res = s.search(current.dest->clone(), run->cycle);
