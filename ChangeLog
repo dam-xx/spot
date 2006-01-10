@@ -1,3 +1,9 @@
+2006-01-10  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* wrap/python/spot.i: Wrap spot::emptiness_check_instantiator.
+	* wrap/python/cgi/ltl2tgba.in: Offers all 6 emptiness
+	check algorithms, and a text box for options.
+
 2006-01-05  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* src/tgbaalgos/ndfs_result.hxx (ndfs_result::construct_cycle):

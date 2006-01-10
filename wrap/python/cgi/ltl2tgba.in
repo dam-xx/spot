@@ -1,6 +1,6 @@
 #!@PYTHON@
 # -*- mode: python; coding: iso-8859-1 -*-
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -241,10 +241,15 @@ options_accepting_run = [
     ('draw_acc_run', 'draw an accepting run...', 0),
     ('emptiness_check',
      ['... found using this algorithm: ',
-      'couvreur99',
-      'couvreur99_shy',
-      'explicit_magic_search',
-      'explicit_se05'], 'no')
+      'Cou99',
+      'CVWY90',
+      'GV04',
+      'SE05',
+      'Tau03',
+      'Tau03_opt'], 'no'),
+    ('emptiness_check_options',
+     '...with these <a href="http://spot.lip6.fr/wiki/EmptinessCheckOptions">'
+     + 'options</a>:', ''),
     ]
 
 print ("""<FORM action="%s" method="post"><P>
@@ -328,10 +333,11 @@ def add_options(opt_group, opt_column, opt_color, opt_list):
     else:
         prefix = '&nbsp;&nbsp;&nbsp;&nbsp;'
     for opt, desc, arg, in opt_list:
-        if formula:
-            val = int(form.getfirst(opt, 0))
-        else:
-            val = arg
+        if not isinstance(arg, str):
+            if formula:
+                val = int(form.getfirst(opt, 0))
+            else:
+                val = arg
 
         s = '<TD%s>%s' % (opt_color, prefix);
         if isinstance(desc, list):
@@ -341,19 +347,24 @@ def add_options(opt_group, opt_column, opt_color, opt_list):
                 val = n
             for i in desc[1:]:
                 if n == val:
-                    str = ' selected'
+                    chk = ' selected'
                 else:
-                    str = ''
-                s += '<option value="%s"%s>%s' % (n, str, i);
+                    chk = ''
+                s += '<option value="%s"%s>%s' % (n, chk, i);
                 n += 1
             s += '</select>'
             val = desc[val]
+        elif isinstance(arg, str):
+            val = form.getfirst(opt, arg)
+            s += (('%s <INPUT type="text" maxlength="40" '
+                   + 'name="%s" value="%s">') %
+                  (desc, opt, cgi.escape(val, True)))
         else:
             if val:
-                str = ' checked'
+                chk = ' checked'
             else:
-                str = ''
-            s += '<INPUT type="checkbox" name="%s" value="1"%s>%s' % (opt, str,
+                chk = ''
+            s += '<INPUT type="checkbox" name="%s" value="1"%s>%s' % (opt, chk,
                                                                       desc)
 
         column[opt_column].append((s + '</TD>'))
@@ -364,13 +375,13 @@ column[0].append("<TH>Algorithm</TH>")
 trans = form.getfirst("trans", default_translator)
 for opt, desc, color in translators:
     if trans == opt:
-	str = "checked"
+	chk = "checked"
     else:
-	str = ""
-    globals()[opt] = str
+	chk = ""
+    globals()[opt] = chk
     s = \
       '<TD bgcolor="%s"><INPUT type="radio" name="trans" value="%s" %s>%s</TD>'
-    column[0].append(s % (color, opt, str, desc))
+    column[0].append(s % (color, opt, chk, desc))
     add_options('', 0, color, globals()['options_' + opt])
 
 add_options("Search accepting run?", 0, '', options_accepting_run)
@@ -555,41 +566,36 @@ if show_lbtt:
 
 if draw_acc_run or print_acc_run:
     print '<H3>Accepting run</H3>'
-    ec_msg = "Running " + emptiness_check
-    ec_a = automaton
-    if emptiness_check == 'couvreur99':
-        ec = spot.couvreur99_check(automaton)
-    elif emptiness_check == 'couvreur99_shy':
-        ec = spot.couvreur99_check_shy(automaton)
-    elif (emptiness_check == 'explicit_magic_search'
-          or emptiness_check == 'explicit_se05'):
+    err = ""
+    opt = emptiness_check + "(" + emptiness_check_options + ")"
+    eci, err = spot.emptiness_check_instantiator.construct(opt)
+
+    ec_msg = "Running " + opt
+
+    if not eci:
+        print ('<font color="red">Cannot parse "' + opt + '" near "' + err
+               + '".</font>')
+    else:
         ec_a = 0
-        if degen:
-            ec_a = degen
-            ec_msg += ' <b>on degeneralized automaton</b>'
+        n_acc = automaton.number_of_acceptance_conditions()
+        n_max = eci.max_acceptance_conditions()
+        if (n_acc <= n_max):
+            ec_a = automaton
         else:
-            count = automaton.number_of_acceptance_conditions()
-            if (count <= 1):
-                ec_a = automaton
+            if degen:
+                ec_a = degen
+                ec_msg += ' <b>on degeneralized automaton</b>'
             else:
-                ec_a = 0
                 print ('<font color="red">Cannot run ' + emptiness_check
-                       + ' on automata with more than 1 acceptance '
-                       + 'condition.  Please select "draw degeneralized '
+                       + ' on automata with more than ' + n_max + ' acceptance '
+                       + 'conditions.  Please select "draw degeneralized '
                        + 'Büchi automaton" if you want to try this'
                        + ' algorithm on the degeneralized version of the'
                        + ' automaton.</font>')
+
         if ec_a:
-            if emptiness_check == 'explicit_magic_search':
-                ec = spot.explicit_magic_search(ec_a)
-            elif emptiness_check == 'explicit_se05':
-                ec = spot.explicit_se05_search(ec_a)
-        else:
-            ec = 0
-    else:
-        print emptiness_check, "unsupported"
-        sys.stdout.flush()
-        assert 0
+            ec = eci.instantiate(ec_a)
+
     if ec:
         print '%s: ' % ec_msg
         sys.stdout.flush()

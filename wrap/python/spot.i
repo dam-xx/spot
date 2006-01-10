@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006  Laboratoire d'Informatique
+// de Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -94,6 +94,14 @@ using namespace spot::ltl;
 using namespace spot;
 %}
 
+// For spot::emptiness_check_instantiator::construct and any other
+// function that return errors via a "char **err" argument.
+%typemap(in, numinputs=0) char** OUTPUT (char* temp)
+  "$1 = &temp;";
+%typemap(argout, fragment="t_output_helper") char** OUTPUT
+  "$result = t_output_helper($result, SWIG_FromCharPtr(*$1));";
+%apply char** OUTPUT { char** err };
+
 %include "misc/version.hh"
 %include "misc/bddalloc.hh"
 %include "misc/minato.hh"
@@ -138,6 +146,9 @@ using namespace spot;
 %feature("new") spot::emptiness_check_result::accepting_run;
 %feature("new") spot::explicit_magic_search;
 %feature("new") spot::explicit_se05_search;
+
+%feature("new") spot::emptiness_check_instantiator::construct;
+%feature("new") spot::emptiness_check_instantiator::instanciate;
 
 // Help SWIG with namespace lookups.
 #define ltl spot::ltl
