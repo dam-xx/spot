@@ -504,7 +504,7 @@ if show_automaton_png:
 
 if show_degen_png or show_never_claim:
     print '<H3>Degeneralized automaton</H3>'
-    degen = spot.tgba_tba_proxy(automaton)
+    degen = spot.tgba_sba_proxy(automaton)
     dont_run_dot = print_stats(degen)
     if show_degen_png:
         render_automaton(imgprefix + '-d', degen, dont_run_dot)
@@ -566,6 +566,7 @@ if show_lbtt:
 
 if draw_acc_run or print_acc_run:
     print '<H3>Accepting run</H3>'
+    sys.stdout.flush()
     err = ""
     opt = emptiness_check + "(" + emptiness_check_options + ")"
     eci, err = spot.emptiness_check_instantiator.construct(opt)
