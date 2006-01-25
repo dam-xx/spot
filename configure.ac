@@ -1,6 +1,6 @@
-# Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-# département Systèmes Répartis Coopératifs (SRC), Université Pierre
-# et Marie Curie.
+# Copyright (C) 2003, 2004, 2005, 2006  Laboratoire d'Informatique
+# de Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+# Université Pierre et Marie Curie.
 #
 # This file is part of Spot, a model checking library.
 #
@@ -20,7 +20,7 @@
 # 02111-1307, USA.
 
 AC_PREREQ([2.59])
-AC_INIT([spot], [0.2a])
+AC_INIT([spot], [0.3])
 AC_CONFIG_AUX_DIR([tools])
 AM_INIT_AUTOMAKE([1.9 gnits nostdinc tar-ustar])
 

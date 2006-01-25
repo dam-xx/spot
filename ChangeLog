@@ -1,3 +1,7 @@
+2006-01-25  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* NEWS, README, configure.ac: Update for version 0.3.
+
 2006-01-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* wrap/python/cgi/ltl2tgba.in: Fix degeneralisation and output of

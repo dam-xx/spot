@@ -1,5 +1,11 @@
-New in spot 0.2a:
-
+New in spot 0.3 (2005-01-25):
+
+  * lbtt 1.2.0
+  * The CGI script for LTL translation also offers emptiness check algorithms.
+  * tau03_opt_search implements the "ordering heuristic".
+    (Submitted by Heikki Tauriainen.)
+  * A couple of bugs were fixed into the LTL or automata simplifications.
+
 New in spot 0.2 (2005-04-08):
 
   * Emptiness checks:
