@@ -194,9 +194,11 @@ This directory contains:
     Cou99
     Cou99(shy !group)
     Cou99(shy group)
+    Cou99(shy group2)
   > Cou99(poprem)                     # called `Cou99' in the paper
   > Cou99(poprem shy !group)          # called `Cou99 Shy-' in the paper
-  > Cou99(poprem shy group)           # called `Cou99 Shy' in the paper
+    Cou99(poprem shy group)
+  > Cou99(poprem shy group2)          # called `Cou99 Shy' in the paper
   > CVWY90
   > GV04
   > SE05

@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -916,7 +916,7 @@ namespace spot
 			     option_map(),
 			     numbered_state_heap_ssp_factory_semi::instance())
      {
-    }
+     }
 
   protected:
 
@@ -924,7 +924,7 @@ namespace spot
     // children to the list of children of that older state.  We cannot
     // to this by sub-classing numbered_state_heap since TODO is not
     // available.  So we override find_state() instead.
-    virtual int*
+    virtual numbered_state_heap::state_index_p
     find_state(const state* s)
     {
       typedef numbered_state_heap_ssp_semi::hash_type hash_type;
@@ -979,11 +979,22 @@ namespace spot
 		}
 	    }
 	}
+
+      state_index_p res;
       if (i == h.end())
-	return 0;
-      if (i->first != s)
-	delete s;
-      return &i->second;
+	{
+	  res.first = 0;
+	  res.second = 0;
+	}
+      else
+	{
+	  res.first = i->first;
+	  res.second = &i->second;
+
+	  if (s != i->first)
+	    delete s;
+	}
+      return res;
     }
   };
 

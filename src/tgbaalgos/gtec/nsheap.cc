@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -148,19 +148,6 @@ namespace spot
   numbered_state_heap_hash_map::insert(const state* s, int index)
   {
     h[s] = index;
-  }
-
-  int&
-  numbered_state_heap_hash_map::index_and_insert(const state*& s)
-  {
-    std::pair<hash_type::iterator, bool> r
-      = h.insert(hash_type::value_type(s, 0));
-    if (!r.second)
-      {
-	delete s;
-	s = r.first->first;
-      }
-    return r.first->second;
   }
 
   int

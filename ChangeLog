@@ -1,3 +1,23 @@
+2006-02-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_shy::check):
+	Reorganize this function so that syntactically there is only one
+	loop over the successors, and not two.  Call reintroduce the call
+	to couvreur99_check_shy::state_index(), needed by SSP, and
+	suppress that to index_and_insert introduced on 2004-12-29.  Also
+	split the "group" option in two: "group" and "group2".  "group2"
+	is the equivalent of the older "group", while the new "group" is
+	weaker and faster.
+	(couvreur99_check_shy::state_index): Change prototype as needed by
+	the algorithm.
+	* src/tgbaalgos/gtec/gtec.hh: Adjust.
+	* src/tgbaalgos/gtec/nsheap.hh, src/tgbaalgos/gtec/nsheap.cc
+	(index_and_insert): Remove.
+	* iface/gspn/ssp.cc (couvreur99_check_shy_ssp::state_index): Adjust
+	to new prototype.
+	* bench/emptchk/README, bench/emptchk/algorithms: Adjust references
+	to group/group2.
+
 2006-01-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* NEWS, configure.ac: Bump version to 0.3a.

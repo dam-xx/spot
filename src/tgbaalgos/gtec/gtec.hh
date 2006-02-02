@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -222,11 +222,8 @@ namespace spot
     {
       const state* s;
       int n;
-      succ_queue q;
-      todo_item(const state* s, int n)
-	: s(s), n(n)
-      {
-      }
+      succ_queue q;		// Unprocessed successors of S
+      todo_item(const state* s, int n, couvreur99_check_shy* shy);
     };
 
     typedef std::list<todo_item> todo_list;
@@ -237,6 +234,9 @@ namespace spot
     // Whether successors should be grouped for states in the same
     // SCC.
     bool group_;
+    // If the "group2" option is set (it implies "group"), we
+    // reprocess the successor states of SCC that have been merged.
+    bool group2_;
 
     /// \brief find the SCC number of a unprocessed state.
     ///
@@ -246,7 +246,7 @@ namespace spot
     /// to TODO during this step.  (Because TODO must be known,
     /// sub-classing spot::numbered_state_heap is not enough.)  Then
     /// overriding this method is the way to go.
-    virtual int* find_state(const state* s);
+    virtual numbered_state_heap::state_index_p find_state(const state* s);
   };
 
 

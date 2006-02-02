@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -89,12 +89,6 @@ namespace spot
     /// Add a new state \a s with index \a index
     virtual void insert(const state* s, int index) = 0;
 
-    /// \brief Get the index of a state, and insert that state if it is missing.
-    ///
-    /// If a clone of \a s is already in the hash table, \a s will be deleted
-    /// and replaced by the address of the clone used.
-    virtual int& index_and_insert(const state*& s) = 0;
-
     /// The number of stored states.
     virtual int size() const = 0;
 
@@ -120,7 +114,6 @@ namespace spot
     virtual state_index_p find(const state* s);
     virtual state_index index(const state* s) const;
     virtual state_index_p index(const state* s);
-    virtual int& index_and_insert(const state*& s);
 
     virtual void insert(const state* s, int index);
     virtual int size() const;
