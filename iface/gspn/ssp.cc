@@ -980,7 +980,7 @@ namespace spot
 	    }
 	}
 
-      state_index_p res;
+      numbered_state_heap::state_index_p res;
       if (i == h.end())
 	{
 	  res.first = 0;
