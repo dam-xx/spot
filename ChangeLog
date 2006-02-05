@@ -1,3 +1,7 @@
+2006-02-05  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* iface/gspn/ssp.cc: Pacify sanity.test.
+
 2006-02-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/ssp.cc (couvreur99_check_shy_ssp::find_state): Typo.
