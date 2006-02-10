@@ -1,5 +1,9 @@
 2006-02-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/ltlgspn.cc (display_stats): New function.
+	(main): Use it.
+	* iface/gspn/ssp.cc: Add more counters for statistics.
+
 	* iface/gspn/ssp.cc (couvreur99_check_shy_ssp::find_state): Correctly
 	update the emptiness statistics.
 

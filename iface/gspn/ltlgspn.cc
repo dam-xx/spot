@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de Paris 6
+// (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -77,6 +77,16 @@ syntax(char* prog)
             << "  -f  use Couvreur's FM algorithm for translation" << std::endl
 	    << "  -P  do not project example on model" << std::endl;
   exit(2);
+}
+
+
+void
+display_stats(const spot::unsigned_statistics* s)
+{
+  assert(s);
+  spot::unsigned_statistics::stats_map::const_iterator i;
+  for (i = s->stats.begin(); i != s->stats.end(); ++i)
+    std::cout << i->first << " = " << (s->*i->second)() << std::endl;
 }
 
 int
@@ -283,6 +293,7 @@ main(int argc, char **argv)
 			spot::print_tgba_run(std::cout, prod, run);
 		      }
 		    ce->print_stats(std::cout);
+		    display_stats(ec);
 		    delete run;
 		    delete ce;
 		  }
@@ -290,6 +301,7 @@ main(int argc, char **argv)
 		  {
 		    std::cout << "non empty" << std::endl;
 		    ecs->print_stats(std::cout);
+		    display_stats(ec);
 		  }
 		delete res;
 	      }
@@ -297,6 +309,7 @@ main(int argc, char **argv)
 	      {
 		std::cout << "empty" << std::endl;
 		ecs->print_stats(std::cout);
+		display_stats(ec);
 	      }
 	    std::cout << std::endl;
 	    delete ec;

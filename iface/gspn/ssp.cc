@@ -914,11 +914,33 @@ namespace spot
     couvreur99_check_shy_ssp(const tgba* a)
       : couvreur99_check_shy(a,
 			     option_map(),
-			     numbered_state_heap_ssp_factory_semi::instance())
+			     numbered_state_heap_ssp_factory_semi::instance()),
+	inclusion_count_heap(0),
+	inclusion_count_stack(0)
      {
+       stats["inclusion count heap"] =
+	 static_cast<spot::unsigned_statistics::unsigned_fun>
+	 (&couvreur99_check_shy_ssp::get_inclusion_count_heap);
+       stats["inclusion count stack"] =
+	 static_cast<spot::unsigned_statistics::unsigned_fun>
+	 (&couvreur99_check_shy_ssp::get_inclusion_count_stack);
      }
 
+  private:
+    unsigned inclusion_count_heap;
+    unsigned inclusion_count_stack;
+
   protected:
+    unsigned
+    get_inclusion_count_heap() const
+    {
+      return inclusion_count_heap;
+    };
+    unsigned
+    get_inclusion_count_stack() const
+    {
+      return inclusion_count_stack;
+    };
 
     // If a new state includes an older state, we may have to add new
     // children to the list of children of that older state.  We cannot
@@ -950,12 +972,17 @@ namespace spot
 		  if (i->second == -1)
 		    {
 		      if (spot_inclusion(new_state->left(), old_state->left()))
-			break;
+			{
+			  ++inclusion_count_heap;
+			  break;
+			}
 		    }
 		  else
 		    {
 		      if (spot_inclusion(old_state->left(), new_state->left()))
 			{
+			  ++inclusion_count_stack;
+
 			  State* succ_tgba_ = 0;
 			  size_t size_tgba_ = 0;
 			  succ_queue& queue = todo.back().q;
@@ -1000,6 +1027,39 @@ namespace spot
   };
 
 
+  // The only purpose of this class is the inclusion_count counter.
+  class couvreur99_check_shy_semi_ssp : public couvreur99_check_shy
+  {
+  public:
+    couvreur99_check_shy_semi_ssp(const tgba* a)
+      : couvreur99_check_shy(a,
+			     option_map(),
+			     numbered_state_heap_ssp_factory_semi::instance()),
+	inclusion_count(0)
+     {
+       stats["inclusion count"] =
+	 static_cast<spot::unsigned_statistics::unsigned_fun>
+	 (&couvreur99_check_shy_semi_ssp::get_inclusion_count);
+     }
+
+  private:
+    unsigned inclusion_count;
+
+  protected:
+    unsigned
+    get_inclusion_count() const
+    {
+      return inclusion_count;
+    };
+
+    virtual numbered_state_heap::state_index_p
+    find_state(const state* s)
+    {
+      ++inclusion_count;
+      return couvreur99_check_shy::find_state(s);
+    }
+  };
+
 
   couvreur99_check*
   couvreur99_check_ssp_semi(const tgba* ssp_automata)
@@ -1016,10 +1076,7 @@ namespace spot
   {
     assert(dynamic_cast<const tgba_gspn_ssp*>(ssp_automata));
     return
-      new couvreur99_check_shy
-      (ssp_automata,
-       option_map(),
-       numbered_state_heap_ssp_factory_semi::instance());
+      new couvreur99_check_shy_semi_ssp(ssp_automata);
   }
 
   couvreur99_check*
