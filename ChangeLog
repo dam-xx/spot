@@ -1,5 +1,15 @@
 2006-02-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaparse/public.hh (tgba_parse): Take two environments
+	instead of one : one for the atomic propositions, and one
+	for the acceptance conditions.  This way it's easy for
+	the tools in iface/gspn/ to require some atomic proposition
+	to be declared and allow any acceptance conditions (there is nothing
+	to adjust in this files because of the default value of the argument).
+	* src/tgbaparse/tgbaparse.yy: Adjust.
+	* src/tgbatest/ltl2tgba.cc, src/tgbatest/readsave.cc,
+	src/tgbatest/reductgba.cc, src/tgbatest/tgbaread.cc: Adjust calls.
+
 	* src/tgbaparse/tgbaparse.yy (acc_decl): Diagnose acceptance
 	conditions rejected by the environment.
 

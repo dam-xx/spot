@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -306,7 +306,7 @@ main(int argc, char** argv)
 	{
 	  spot::tgba_parse_error_list pel;
 	  system = spot::tgba_parse(argv[formula_index] + 2,
-				     pel, dict, env, debug_opt);
+				    pel, dict, env, env, debug_opt);
 	  if (spot::format_tgba_parse_errors(std::cerr,
 					     argv[formula_index] + 2, pel))
 	    return 2;
@@ -473,7 +473,7 @@ main(int argc, char** argv)
 	{
 	  spot::tgba_parse_error_list pel;
 	  spot::tgba_explicit* e;
-	  to_free = a = e = spot::tgba_parse(input, pel, dict, env, debug_opt);
+	  to_free = a = e = spot::tgba_parse(input, pel, dict, env, env, debug_opt);
 	  if (spot::format_tgba_parse_errors(std::cerr, input, pel))
 	    {
 	      delete to_free;

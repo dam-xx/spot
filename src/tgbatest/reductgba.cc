@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de Paris 6
+// (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -105,7 +105,7 @@ main(int argc, char** argv)
 
 #ifdef REDUCCMP
   spot::tgba_parse_error_list pel;
-  automata = spot::tgba_parse(argv[2], pel, dict, env, false);
+  automata = spot::tgba_parse(argv[2], pel, dict, env, env, false);
   if (spot::format_tgba_parse_errors(std::cerr, argv[2], pel))
     return 2;
 #else

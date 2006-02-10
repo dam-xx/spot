@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -45,7 +45,10 @@ namespace spot
   /// \param error_list A list that will be filled with
   ///        parse errors that occured during parsing.
   /// \param dict The BDD dictionary where to use.
-  /// \param env The environment into which parsing should take place.
+  /// \param env The environment of atomic proposition into which parsing
+  ///        should take place.
+  /// \param envacc The environment of acceptance conditions into which parsing
+  ///        should take place.
   /// \param debug When true, causes the parser to trace its execution.
   /// \return A pointer to the tgba built from \a filename, or
   ///        0 if the file could not be opened.
@@ -60,6 +63,8 @@ namespace spot
 			    tgba_parse_error_list& error_list,
 			    bdd_dict* dict,
 			    ltl::environment& env
+			    = ltl::default_environment::instance(),
+			    ltl::environment& envacc
 			    = ltl::default_environment::instance(),
 			    bool debug = false);
 

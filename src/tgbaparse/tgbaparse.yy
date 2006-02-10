@@ -26,6 +26,7 @@
 
 %parse-param {spot::tgba_parse_error_list& error_list}
 %parse-param {spot::ltl::environment& parse_environment}
+%parse-param {spot::ltl::environment& parse_envacc}
 %parse-param {spot::tgba_explicit*& result}
 %parse-param {formula_cache& fcache}
 %debug
@@ -175,7 +176,7 @@ acc_list:
 	   }
 	 else if (*$2 != "" && *$2 != "false")
 	   {
-	     formula* f = parse_environment.require(*$2);
+	     formula* f = parse_envacc.require(*$2);
 	     if (! result->has_acceptance_condition(f))
 	       {
 		 error_list.push_back(spot::tgba_parse_error(@2,
@@ -195,13 +196,13 @@ acc_list:
 acc_decl:
        | acc_decl strident
        {
-	 formula* f = parse_environment.require(*$2);
+	 formula* f = parse_envacc.require(*$2);
 	 if (! f)
 	   {
 	     std::string s = "acceptance condition `";
 	     s += *$2;
 	     s += "' unknown in environment `";
-	     s += parse_environment.name();
+	     s += parse_envacc.name();
 	     s += "'";
 	     error_list.push_back(spot::tgba_parse_error(@2, s));
 	     YYERROR;
@@ -226,6 +227,7 @@ namespace spot
 	     tgba_parse_error_list& error_list,
 	     bdd_dict* dict,
 	     environment& env,
+	     environment& envacc,
 	     bool debug)
   {
     if (tgbayyopen(name))
@@ -237,7 +239,7 @@ namespace spot
       }
     formula_cache fcache;
     tgba_explicit* result = new tgba_explicit(dict);
-    tgbayy::parser parser(error_list, env, result, fcache);
+    tgbayy::parser parser(error_list, env, envacc, result, fcache);
     parser.set_debug_level(debug);
     parser.parse();
     tgbayyclose();
