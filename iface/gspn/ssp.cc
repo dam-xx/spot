@@ -970,6 +970,7 @@ namespace spot
 				  (succ_tgba_[i],
 				   old_state->right()->clone());
 			      queue.push_back(successor(queue.begin()->acc, s));
+			      inc_depth();
 			    }
 			  if (size_tgba_ != 0)
 			    diff_succ_free(succ_tgba_);

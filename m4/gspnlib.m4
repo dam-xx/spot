@@ -1,6 +1,6 @@
 AC_DEFUN([AX_CHECK_GSPNLIB], [
   AC_ARG_WITH([gspn],
-	      [AC_HELP_STRING([--with-gpsn=/root/of/greatspn],
+	      [AC_HELP_STRING([--with-gspn=/root/of/greatspn],
 			      [build interface with GreadSPN])])
   if test "x${with_gspn-no}" != xno; then
     ax_tmp_LDFLAGS=$LDFLAGS
