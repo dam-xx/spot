@@ -1,5 +1,8 @@
 2006-02-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaparse/tgbaparse.yy (acc_decl): Diagnose acceptance
+	conditions rejected by the environment.
+
 	* iface/gspn/ltlgspn.cc (display_stats): New function.
 	(main): Use it.
 	* iface/gspn/ssp.cc: Add more counters for statistics.

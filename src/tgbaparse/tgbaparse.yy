@@ -1,6 +1,6 @@
-/* Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-** département Systèmes Répartis Coopératifs (SRC), Université Pierre
-** et Marie Curie.
+/* Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+** Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+** Université Pierre et Marie Curie.
 **
 ** This file is part of Spot, a model checking library.
 **
@@ -196,6 +196,16 @@ acc_decl:
        | acc_decl strident
        {
 	 formula* f = parse_environment.require(*$2);
+	 if (! f)
+	   {
+	     std::string s = "acceptance condition `";
+	     s += *$2;
+	     s += "' unknown in environment `";
+	     s += parse_environment.name();
+	     s += "'";
+	     error_list.push_back(spot::tgba_parse_error(@2, s));
+	     YYERROR;
+	   }
 	 result->declare_acceptance_condition(f);
 	 delete $2;
        }
