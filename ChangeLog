@@ -1,3 +1,7 @@
+2006-02-11  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/ltl2tgba.cc: Pacify sanity.test.
+
 2006-02-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaparse/public.hh (tgba_parse): Take two environments
@@ -22,7 +26,7 @@
 
 	* m4/gspnlib.m4: Typo.
 
-2006-02-05  Alexandre Duret-Lutz  <adl@gnu.org>
+2006-02-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/ssp.cc: Pacify sanity.test.
 
@@ -63,13 +67,13 @@
 	* wrap/python/cgi/ltl2tgba.in: Fix degeneralisation and output of
 	accepting runs.
 
-2006-01-10  Alexandre Duret-Lutz  <adl@gnu.org>
+2006-01-10  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* wrap/python/spot.i: Wrap spot::emptiness_check_instantiator.
 	* wrap/python/cgi/ltl2tgba.in: Offers all 6 emptiness
 	check algorithms, and a text box for options.
 
-2006-01-05  Alexandre Duret-Lutz  <adl@gnu.org>
+2006-01-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/ndfs_result.hxx (ndfs_result::construct_cycle):
 	Initialize tmp to suppress a GCC 4.0.1 warning (seen on Darwin).

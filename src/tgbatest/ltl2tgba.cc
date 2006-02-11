@@ -473,7 +473,8 @@ main(int argc, char** argv)
 	{
 	  spot::tgba_parse_error_list pel;
 	  spot::tgba_explicit* e;
-	  to_free = a = e = spot::tgba_parse(input, pel, dict, env, env, debug_opt);
+	  to_free = a = e = spot::tgba_parse(input, pel, dict,
+					     env, env, debug_opt);
 	  if (spot::format_tgba_parse_errors(std::cerr, input, pel))
 	    {
 	      delete to_free;
