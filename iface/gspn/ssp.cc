@@ -25,6 +25,7 @@
 #include <gspnlib.h>
 #include "ssp.hh"
 #include "misc/bddlt.hh"
+#include "misc/hash.hh"
 #include <bdd.h>
 #include "tgbaalgos/gtec/explscc.hh"
 #include "tgbaalgos/gtec/nsheap.hh"
@@ -46,6 +47,8 @@ namespace spot
       delete[] t;
       return tmp;
     }
+
+    static bool doublehash;
   }
 
   // state_gspn_ssp
@@ -238,8 +241,8 @@ namespace spot
     {
       return
 	new state_gspn_ssp(successors_[current_succ_].succ_,
-			     (state_array_[successors_[current_succ_]
-					   .arc->curr_state])->clone());
+			   (state_array_[successors_[current_succ_]
+					 .arc->curr_state])->clone());
     }
 
     virtual bdd
@@ -339,8 +342,8 @@ namespace spot
 
   tgba_succ_iterator*
   tgba_gspn_ssp::succ_iter(const state* state_,
-			     const state* global_state,
-			     const tgba* global_automaton) const
+			   const state* global_state,
+			   const tgba* global_automaton) const
   {
     const state_gspn_ssp* s = dynamic_cast<const state_gspn_ssp*>(state_);
     assert(s);
@@ -380,8 +383,9 @@ namespace spot
 	    props_[nb_arc_props].arc->curr_acc_conds = size_bdd;
 	    ++size_bdd;
 
-            state_array = (state**) realloc(state_array,
-					    (size_states + 1) * sizeof(state*));
+            state_array =
+	      (state**) realloc(state_array,
+				(size_states + 1) * sizeof(state*));
 	    state_array[size_states] = i->current_state();
 	    props_[nb_arc_props].arc->curr_state = size_states;
             ++size_states;
@@ -434,24 +438,24 @@ namespace spot
 	    ++nb_arc_props;
 	  }
       }
-     Succ_* succ_tgba_ = 0;
-     size_t size_tgba_ = 0;
-     int j, conj;
+    Succ_* succ_tgba_ = 0;
+    size_t size_tgba_ = 0;
+    int j, conj;
 
-     succ(s->left(), props_, nb_arc_props, &succ_tgba_, &size_tgba_);
+    succ(s->left(), props_, nb_arc_props, &succ_tgba_, &size_tgba_);
 
-     for (j = 0; j < nb_arc_props; j++)
-       {
-	 for (conj = 0; conj < props_[j].nb_conj; conj++)
-	   free(props_[j].prop[conj]);
-	 free(props_[j].prop);
-       }
+    for (j = 0; j < nb_arc_props; j++)
+      {
+	for (conj = 0; conj < props_[j].nb_conj; conj++)
+	  free(props_[j].prop[conj]);
+	free(props_[j].prop);
+      }
 
-     delete i;
-     return new tgba_succ_iterator_gspn_ssp(succ_tgba_, size_tgba_,
-					    bdd_array, state_array,
-					    size_states, props_,
-					    nb_arc_props);
+    delete i;
+    return new tgba_succ_iterator_gspn_ssp(succ_tgba_, size_tgba_,
+					   bdd_array, state_array,
+					   size_states, props_,
+					   nb_arc_props);
   }
 
   bdd
@@ -534,9 +538,11 @@ namespace spot
 					 bdd_dict* dict,
 					 const
 					 ltl::declarative_environment& env,
-					 bool inclusion)
+					 bool inclusion,
+					 bool doublehash_)
     : dict_(dict), env_(env)
   {
+    doublehash = doublehash_;
     if (inclusion)
       inclusion_version();
 
@@ -635,6 +641,14 @@ namespace spot
 
   //////////////////////////////////////////////////////////////////////
 
+  namespace
+  {
+    inline void*
+    container_(const State s)
+    {
+      return doublehash ? container(s) : 0;
+    }
+  }
 
   class numbered_state_heap_ssp_semi : public numbered_state_heap
   {
@@ -656,42 +670,66 @@ namespace spot
     virtual numbered_state_heap::state_index
     find(const state* s) const
     {
-      state_index res;
-
-      hash_type::const_iterator i;
-      for (i = h.begin(); i != h.end(); ++i)
+      const void* cont =
+	container_(dynamic_cast<const state_gspn_ssp*>(s)->left());
+      contained_map::const_iterator i = contained.find(cont);
+      if (i != contained.end())
 	{
-	  const state_gspn_ssp* old_state =
-	    dynamic_cast<const state_gspn_ssp*>(i->first);
-	  const state_gspn_ssp* new_state =
-	    dynamic_cast<const state_gspn_ssp*>(s);
-	  assert(old_state);
-	  assert(new_state);
+	  const state_list& l = i->second;
 
-	  if ((old_state->right())->compare(new_state->right()) == 0)
+	  state_list::const_iterator j;
+	  for (j = l.begin(); j != l.end(); ++j)
 	    {
-	      if (old_state->left() == new_state->left())
-		break;
+	      const state_gspn_ssp* old_state =
+		dynamic_cast<const state_gspn_ssp*>(*j);
+	      const state_gspn_ssp* new_state =
+		dynamic_cast<const state_gspn_ssp*>(s);
+	      assert(old_state);
+	      assert(new_state);
 
-	      if (old_state->left()
-		  && new_state->left()
-		  && spot_inclusion(new_state->left(), old_state->left()))
-		break;
+	      if ((old_state->right())->compare(new_state->right()) == 0)
+		{
+		  if (old_state->left() == new_state->left())
+		    break;
+
+		  if (old_state->left()
+		      && new_state->left()
+		      && spot_inclusion(new_state->left(), old_state->left()))
+		    break;
+		}
+	    }
+	  if (j != l.end())
+	    {
+	      if (s != *j)
+		{
+		  delete s;
+		  s = *j;
+		}
+	    }
+	  else
+	    {
+	      s = 0;
 	    }
 	}
+      else
+	{
+	  s = 0;
+	}
 
-      if (i == h.end())
+      state_index res;
+
+      if (s == 0)
 	{
 	  res.first = 0;
 	  res.second = 0;
 	}
       else
 	{
+	  hash_type::const_iterator i = h.find(s);
+	  assert(i != h.end());
+	  assert(s == i->first);
 	  res.first = i->first;
 	  res.second = i->second;
-
-	  if (s != i->first)
-	    delete s;
 	}
       return res;
     }
@@ -699,42 +737,66 @@ namespace spot
     virtual numbered_state_heap::state_index_p
     find(const state* s)
     {
-      state_index_p res;
-
-      hash_type::iterator i;
-      for (i = h.begin(); i != h.end(); ++i)
+      const void* cont =
+	container_(dynamic_cast<const state_gspn_ssp*>(s)->left());
+      contained_map::const_iterator i = contained.find(cont);
+      if (i != contained.end())
 	{
-	  const state_gspn_ssp* old_state =
-	    dynamic_cast<const state_gspn_ssp*>(i->first);
-	  const state_gspn_ssp* new_state =
-	    dynamic_cast<const state_gspn_ssp*>(s);
-	  assert(old_state);
-	  assert(new_state);
+	  const state_list& l = i->second;
 
-	  if ((old_state->right())->compare(new_state->right()) == 0)
+	  state_list::const_iterator j;
+	  for (j = l.begin(); j != l.end(); ++j)
 	    {
-	      if (old_state->left() == new_state->left())
-		break;
+	      const state_gspn_ssp* old_state =
+		dynamic_cast<const state_gspn_ssp*>(*j);
+	      const state_gspn_ssp* new_state =
+		dynamic_cast<const state_gspn_ssp*>(s);
+	      assert(old_state);
+	      assert(new_state);
 
-	      if (old_state->left()
-		  && new_state->left()
-		  && spot_inclusion(new_state->left(), old_state->left()))
-		break;
+	      if ((old_state->right())->compare(new_state->right()) == 0)
+		{
+		  if (old_state->left() == new_state->left())
+		    break;
+
+		  if (old_state->left()
+		      && new_state->left()
+		      && spot_inclusion(new_state->left(), old_state->left()))
+		    break;
+		}
+	    }
+	  if (j != l.end())
+	    {
+	      if (s != *j)
+		{
+		  delete s;
+		  s = *j;
+		}
+	    }
+	  else
+	    {
+	      s = 0;
 	    }
 	}
+      else
+	{
+	  s = 0;
+	}
 
-      if (i == h.end())
+      state_index_p res;
+
+      if (s == 0)
 	{
 	  res.first = 0;
 	  res.second = 0;
 	}
       else
 	{
+	  hash_type::iterator i = h.find(s);
+	  assert(i != h.end());
+	  assert(s == i->first);
 	  res.first = i->first;
 	  res.second = &i->second;
-
-	  if (s != i->first)
-	    delete s;
 	}
       return res;
     }
@@ -781,23 +843,17 @@ namespace spot
       return res;
     }
 
-    virtual int&
-    index_and_insert(const state*& s)
-    {
-      std::pair<hash_type::iterator, bool> r
-	= h.insert(hash_type::value_type(s, 0));
-      if (!r.second)
-	{
-	  delete s;
-	  s = r.first->first;
-	}
-      return r.first->second;
-    }
-
     virtual void
     insert(const state* s, int index)
     {
       h[s] = index;
+
+      State sg = dynamic_cast<const state_gspn_ssp*>(s)->left();
+      if (sg)
+	{
+	  const void* cont = container_(sg);
+	  contained[cont].push_front(s);
+	}
     }
 
     virtual int
@@ -813,8 +869,14 @@ namespace spot
 			  state_ptr_hash, state_ptr_equal> hash_type;
     hash_type h;		///< Map of visited states.
 
+    typedef std::list<const state*> state_list;
+    typedef Sgi::hash_map<const void*, state_list,
+			  ptr_hash<void> > contained_map;
+    contained_map contained;
+
     friend class numbered_state_heap_ssp_const_iterator;
     friend class couvreur99_check_shy_ssp;
+    friend class couvreur99_check_shy_semi_ssp;
   };
 
 
@@ -823,8 +885,8 @@ namespace spot
   {
   public:
     numbered_state_heap_ssp_const_iterator
-      (const numbered_state_heap_ssp_semi::hash_type& h)
-	: numbered_state_heap_const_iterator(), h(h)
+    (const numbered_state_heap_ssp_semi::hash_type& h)
+      : numbered_state_heap_const_iterator(), h(h)
     {
     }
 
@@ -917,14 +979,17 @@ namespace spot
 			     numbered_state_heap_ssp_factory_semi::instance()),
 	inclusion_count_heap(0),
 	inclusion_count_stack(0)
-     {
-       stats["inclusion count heap"] =
-	 static_cast<spot::unsigned_statistics::unsigned_fun>
-	 (&couvreur99_check_shy_ssp::get_inclusion_count_heap);
-       stats["inclusion count stack"] =
-	 static_cast<spot::unsigned_statistics::unsigned_fun>
-	 (&couvreur99_check_shy_ssp::get_inclusion_count_stack);
-     }
+    {
+      stats["inclusion count heap"] =
+	static_cast<spot::unsigned_statistics::unsigned_fun>
+	(&couvreur99_check_shy_ssp::get_inclusion_count_heap);
+      stats["inclusion count stack"] =
+	static_cast<spot::unsigned_statistics::unsigned_fun>
+	(&couvreur99_check_shy_ssp::get_inclusion_count_stack);
+      stats["contained map size"] =
+	static_cast<spot::unsigned_statistics::unsigned_fun>
+	(&couvreur99_check_shy_ssp::get_contained_map_size);
+    }
 
   private:
     unsigned inclusion_count_heap;
@@ -941,6 +1006,12 @@ namespace spot
     {
       return inclusion_count_stack;
     };
+    unsigned
+    get_contained_map_size() const
+    {
+      return
+	dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->contained.size();
+    }
 
     // If a new state includes an older state, we may have to add new
     // children to the list of children of that older state.  We cannot
@@ -951,76 +1022,113 @@ namespace spot
     {
       typedef numbered_state_heap_ssp_semi::hash_type hash_type;
       hash_type& h = dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->h;
+      typedef numbered_state_heap_ssp_semi::contained_map contained_map;
+      typedef numbered_state_heap_ssp_semi::state_list state_list;
+      const contained_map& contained =
+	dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->contained;
 
-      hash_type::iterator i;
-      for (i = h.begin(); i != h.end(); ++i)
+      const void* cont =
+	container_(dynamic_cast<const state_gspn_ssp*>(s)->left());
+      contained_map::const_iterator i = contained.find(cont);
+      if (i != contained.end())
 	{
-	  const state_gspn_ssp* old_state =
-	    dynamic_cast<const state_gspn_ssp*>(i->first);
-	  const state_gspn_ssp* new_state =
-	    dynamic_cast<const state_gspn_ssp*>(s);
-	  assert(old_state);
-	  assert(new_state);
+	  const state_list& l = i->second;
+	  state_list::const_iterator j;
 
-	  if ((old_state->right())->compare(new_state->right()) == 0)
+	  for (j = l.begin(); j != l.end(); ++j)
 	    {
-	      if (old_state->left() == new_state->left())
-		break;
+	      const state_gspn_ssp* old_state =
+		dynamic_cast<const state_gspn_ssp*>(*j);
+	      const state_gspn_ssp* new_state =
+		dynamic_cast<const state_gspn_ssp*>(s);
+	      assert(old_state);
+	      assert(new_state);
 
-	      if (old_state->left() && new_state->left())
+	      if ((old_state->right())->compare(new_state->right()) == 0)
 		{
-		  if (i->second == -1)
+		  if (old_state->left() == new_state->left())
+		    break;
+
+		  if (old_state->left() && new_state->left())
 		    {
-		      if (spot_inclusion(new_state->left(), old_state->left()))
+		      hash_type::const_iterator i = h.find(*j);
+		      assert(i != h.end());
+		      if (i->second == -1)
 			{
-			  ++inclusion_count_heap;
-			  break;
-			}
-		    }
-		  else
-		    {
-		      if (spot_inclusion(old_state->left(), new_state->left()))
-			{
-			  ++inclusion_count_stack;
-
-			  State* succ_tgba_ = 0;
-			  size_t size_tgba_ = 0;
-			  succ_queue& queue = todo.back().q;
-
-			  Diff_succ(old_state->left(), new_state->left(),
-				    &succ_tgba_, &size_tgba_);
-
-			  for (size_t i = 0; i < size_tgba_; i++)
+			  if (spot_inclusion(new_state->left(),
+					     old_state->left()))
 			    {
-			      state_gspn_ssp* s =
-				new state_gspn_ssp
-				  (succ_tgba_[i],
-				   old_state->right()->clone());
-			      queue.push_back(successor(queue.begin()->acc, s));
-			      inc_depth();
+			      ++inclusion_count_heap;
+			      break;
 			    }
-			  if (size_tgba_ != 0)
-			    diff_succ_free(succ_tgba_);
-			  break;
+			}
+		      else
+			{
+			  if (spot_inclusion(old_state->left(),
+					     new_state->left()))
+			    {
+			      ++inclusion_count_stack;
+
+			      State* succ_tgba_ = 0;
+			      size_t size_tgba_ = 0;
+			      succ_queue& queue = todo.back().q;
+
+			      Diff_succ(old_state->left(), new_state->left(),
+					&succ_tgba_, &size_tgba_);
+
+			      for (size_t i = 0; i < size_tgba_; i++)
+				{
+				  state_gspn_ssp* s =
+				    new state_gspn_ssp
+				    (succ_tgba_[i],
+				     old_state->right()->clone());
+				  queue.push_back(successor(queue.begin()->acc,
+							    s));
+				  inc_depth();
+				}
+			      if (size_tgba_ != 0)
+				diff_succ_free(succ_tgba_);
+			      break;
+			    }
 			}
 		    }
 		}
 	    }
+
+	  if (j != l.end())
+	    {
+	      if (s != *j)
+		{
+		  delete s;
+		  s = *j;
+		}
+	    }
+	  else
+	    {
+	      s = 0;
+	    }
+	}
+      else
+	{
+	  s = 0;
 	}
 
+      // s points to the resulting state, or to 0 if we didn't find
+      // the state in the list.
+
       numbered_state_heap::state_index_p res;
-      if (i == h.end())
+      if (s == 0)
 	{
 	  res.first = 0;
 	  res.second = 0;
 	}
       else
 	{
-	  res.first = i->first;
-	  res.second = &i->second;
-
-	  if (s != i->first)
-	    delete s;
+	  hash_type::iterator k = h.find(s);
+	  assert(k != h.end());
+	  assert(s == k->first);
+	  res.first = k->first;
+	  res.second = &k->second;
 	}
       return res;
     }
@@ -1036,11 +1144,14 @@ namespace spot
 			     option_map(),
 			     numbered_state_heap_ssp_factory_semi::instance()),
 	inclusion_count(0)
-     {
-       stats["inclusion count"] =
-	 static_cast<spot::unsigned_statistics::unsigned_fun>
-	 (&couvreur99_check_shy_semi_ssp::get_inclusion_count);
-     }
+    {
+      stats["find_state count"] =
+	static_cast<spot::unsigned_statistics::unsigned_fun>
+	(&couvreur99_check_shy_semi_ssp::get_inclusion_count);
+      stats["contained map size"] =
+	static_cast<spot::unsigned_statistics::unsigned_fun>
+	(&couvreur99_check_shy_semi_ssp::get_contained_map_size);
+    }
 
   private:
     unsigned inclusion_count;
@@ -1051,6 +1162,12 @@ namespace spot
     {
       return inclusion_count;
     };
+    unsigned
+    get_contained_map_size() const
+    {
+      return
+	dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->contained.size();
+    }
 
     virtual numbered_state_heap::state_index_p
     find_state(const state* s)

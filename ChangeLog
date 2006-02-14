@@ -1,3 +1,12 @@
+2006-02-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+	    Soheib Baarir  <Souheib.Baarir@lip6.fr>
+
+	* iface/gspn/ssp.cc (couvreur99_check_shy_ssp::find_state,
+	numbered_state_heap_ssp_semi): Implement a double hash_map using
+	greatspn's new container() function.
+	* iface/gspn/ssp.hh (gspn_ssp_interface): Add a doublehash option.
+	* iface/gspn/ltlgspn.cc: Add option -1 to disable this optimization.
+
 2006-02-11  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/ltl2tgba.cc: Pacify sanity.test.

@@ -50,6 +50,10 @@ syntax(char* prog)
 	    << " [OPTIONS...] model formula automata props..."   << std::endl
 #endif
 	    << std::endl
+#ifdef SSP
+	    << "  -1  do not use a double hash (for inclusion check)"
+	    << std::endl
+#endif
 	    << "  -c  compute an example" << std::endl
 	    << "      (instead of just checking for emptiness)" << std::endl
 	    << std::endl
@@ -99,12 +103,22 @@ main(int argc, char **argv)
       enum { Lacim, Fm } trans = Lacim;
       bool compute_counter_example = false;
       bool proj = true;
+#ifdef SSP
+      bool doublehash = true;
+#endif
       std::string dead = "true";
 
       spot::ltl::declarative_environment env;
 
       while (formula_index < argc && *argv[formula_index] == '-')
 	{
+#ifdef SSP
+	  if (!strcmp(argv[formula_index], "-1"))
+	    {
+	      doublehash = false;
+	    }
+	  else
+#endif
 	  if (!strcmp(argv[formula_index], "-c"))
 	    {
 	      compute_counter_example = true;
@@ -187,7 +201,7 @@ main(int argc, char **argv)
 
 #if SSP
       bool inclusion = (check != Couvreur && check != Couvreur2);
-      spot::gspn_ssp_interface gspn(2, argv, dict, env, inclusion);
+      spot::gspn_ssp_interface gspn(2, argv, dict, env, inclusion, doublehash);
 
       spot::tgba_parse_error_list pel1;
       spot::tgba_explicit* control = spot::tgba_parse(argv[formula_index + 2],

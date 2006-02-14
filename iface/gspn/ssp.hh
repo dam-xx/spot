@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -40,7 +40,8 @@ namespace spot
   public:
     gspn_ssp_interface(int argc, char **argv,
 		       bdd_dict* dict, const ltl::declarative_environment& env,
-		       bool inclusion = false);
+		       bool inclusion = false,
+		       bool doublehash = true);
     ~gspn_ssp_interface();
     tgba* automaton(const tgba* operand) const;
   private:
