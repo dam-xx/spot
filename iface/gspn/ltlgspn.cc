@@ -73,6 +73,8 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -e5 use d. incl. Couvreur's emptiness-check's shy variant"
 	    << std::endl
+	    << "  -e6 like -e5, but without inclusion checks in the "
+	    << "search stack" << std::endl
 #endif
 	    << "  -m  degeneralize and perform a magic-search" << std::endl
 	    << std::endl
@@ -105,6 +107,7 @@ main(int argc, char **argv)
       bool proj = true;
 #ifdef SSP
       bool doublehash = true;
+      bool stack_inclusion = true;
 #endif
       std::string dead = "true";
 
@@ -154,6 +157,11 @@ main(int argc, char **argv)
 	  else if (!strcmp(argv[formula_index], "-e5"))
 	    {
 	      check = Couvreur5;
+	    }
+	  else if (!strcmp(argv[formula_index], "-e6"))
+	    {
+	      check = Couvreur5;
+	      stack_inclusion = false;
 	    }
 #endif
 	  else if (!strcmp(argv[formula_index], "-m"))
@@ -260,7 +268,7 @@ main(int argc, char **argv)
 		ec = spot::couvreur99_check_ssp_shy_semi(prod);
 		break;
 	      case Couvreur5:
-		ec = spot::couvreur99_check_ssp_shy(prod);
+		ec = spot::couvreur99_check_ssp_shy(prod, stack_inclusion);
 		break;
 #endif
 	      default:

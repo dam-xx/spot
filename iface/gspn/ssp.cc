@@ -973,12 +973,13 @@ namespace spot
   class couvreur99_check_shy_ssp : public couvreur99_check_shy
   {
   public:
-    couvreur99_check_shy_ssp(const tgba* a)
+    couvreur99_check_shy_ssp(const tgba* a, bool stack_inclusion)
       : couvreur99_check_shy(a,
 			     option_map(),
 			     numbered_state_heap_ssp_factory_semi::instance()),
 	inclusion_count_heap(0),
-	inclusion_count_stack(0)
+	inclusion_count_stack(0),
+	stack_inclusion(stack_inclusion)
     {
       stats["inclusion count heap"] =
 	static_cast<spot::unsigned_statistics::unsigned_fun>
@@ -994,6 +995,7 @@ namespace spot
   private:
     unsigned inclusion_count_heap;
     unsigned inclusion_count_stack;
+    bool stack_inclusion;
 
   protected:
     unsigned
@@ -1064,8 +1066,9 @@ namespace spot
 			}
 		      else
 			{
-			  if (spot_inclusion(old_state->left(),
-					     new_state->left()))
+			  if (stack_inclusion
+			      && spot_inclusion(old_state->left(),
+						new_state->left()))
 			    {
 			      ++inclusion_count_stack;
 
@@ -1197,10 +1200,10 @@ namespace spot
   }
 
   couvreur99_check*
-  couvreur99_check_ssp_shy(const tgba* ssp_automata)
+  couvreur99_check_ssp_shy(const tgba* ssp_automata, bool stack_inclusion)
   {
     assert(dynamic_cast<const tgba_gspn_ssp*>(ssp_automata));
-    return new couvreur99_check_shy_ssp(ssp_automata);
+    return new couvreur99_check_shy_ssp(ssp_automata, stack_inclusion);
   }
 
 #if 0
