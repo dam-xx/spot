@@ -1,3 +1,8 @@
+2006-02-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/gtec.cc, src/tgbaalgos/gtec/gtec.hh:
+	Count the number of removed components.
+
 2006-02-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 	    Soheib Baarir  <Souheib.Baarir@lip6.fr>
 

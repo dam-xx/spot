@@ -32,10 +32,14 @@ namespace spot
   couvreur99_check::couvreur99_check(const tgba* a,
 				     option_map o,
 				     const numbered_state_heap_factory* nshf)
-    : emptiness_check(a, o)
+    : emptiness_check(a, o),
+      removed_components(0)
   {
     poprem_ = o.get("poprem", 1);
     ecs_ = new couvreur99_check_status(a, nshf);
+    stats["removed components"] =
+	static_cast<spot::unsigned_statistics::unsigned_fun>
+	(&couvreur99_check::get_removed_components);
   }
 
   couvreur99_check::~couvreur99_check()
@@ -43,9 +47,16 @@ namespace spot
     delete ecs_;
   }
 
+  unsigned
+  couvreur99_check::get_removed_components() const
+  {
+    return removed_components;
+  }
+
   void
   couvreur99_check::remove_component(const state* from)
   {
+    ++removed_components;
     // If rem has been updated, removing states is very easy.
     if (poprem_)
       {

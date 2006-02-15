@@ -180,6 +180,9 @@ namespace spot
 
     /// Whether to store the state to be removed.
     bool poprem_;
+    /// Number of dead SCC removed by the algorithm.
+    unsigned removed_components;
+    unsigned get_removed_components() const;
   };
 
   /// \brief A version of spot::couvreur99_check that tries to visit
@@ -231,8 +234,7 @@ namespace spot
 
     void clear_todo();
 
-    // Whether successors should be grouped for states in the same
-    // SCC.
+    /// Whether successors should be grouped for states in the same SCC.
     bool group_;
     // If the "group2" option is set (it implies "group"), we
     // reprocess the successor states of SCC that have been merged.
