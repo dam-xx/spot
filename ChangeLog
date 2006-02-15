@@ -1,5 +1,8 @@
 2006-02-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/gtec/gtec.cc: Add a third level hash, to split
+	each container into lists of states with identical formula states.
+
 	* iface/gspn/ltlgspn.cc, src/tgbaalgos/gtec/gtec.cc,
 	src/tgbaalgos/gtec/gtec.hh: New option (-e6) to disable
 	inclusion check in the stack.

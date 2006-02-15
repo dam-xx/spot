@@ -670,40 +670,45 @@ namespace spot
     virtual numbered_state_heap::state_index
     find(const state* s) const
     {
-      const void* cont =
-	container_(dynamic_cast<const state_gspn_ssp*>(s)->left());
+      const state_gspn_ssp* s_ = dynamic_cast<const state_gspn_ssp*>(s);
+      const void* cont = container_(s_->left());
       contained_map::const_iterator i = contained.find(cont);
       if (i != contained.end())
 	{
-	  const state_list& l = i->second;
-
-	  state_list::const_iterator j;
-	  for (j = l.begin(); j != l.end(); ++j)
+	  f_map::const_iterator k = i->second.find(s_->right());
+	  if (k != i->second.end())
 	    {
-	      const state_gspn_ssp* old_state =
-		dynamic_cast<const state_gspn_ssp*>(*j);
-	      const state_gspn_ssp* new_state =
-		dynamic_cast<const state_gspn_ssp*>(s);
-	      assert(old_state);
-	      assert(new_state);
+	      const state_list& l = k->second;
 
-	      if ((old_state->right())->compare(new_state->right()) == 0)
+	      state_list::const_iterator j;
+	      for (j = l.begin(); j != l.end(); ++j)
 		{
+		  const state_gspn_ssp* old_state =
+		    dynamic_cast<const state_gspn_ssp*>(*j);
+		  const state_gspn_ssp* new_state =
+		    dynamic_cast<const state_gspn_ssp*>(s);
+		  assert(old_state);
+		  assert(new_state);
+
 		  if (old_state->left() == new_state->left())
 		    break;
 
 		  if (old_state->left()
 		      && new_state->left()
 		      && spot_inclusion(new_state->left(), old_state->left()))
-		    break;
+			break;
 		}
-	    }
-	  if (j != l.end())
-	    {
-	      if (s != *j)
+	      if (j != l.end())
 		{
-		  delete s;
-		  s = *j;
+		  if (s != *j)
+		    {
+		      delete s;
+		      s = *j;
+		    }
+		}
+	      else
+		{
+		  s = 0;
 		}
 	    }
 	  else
@@ -737,40 +742,45 @@ namespace spot
     virtual numbered_state_heap::state_index_p
     find(const state* s)
     {
-      const void* cont =
-	container_(dynamic_cast<const state_gspn_ssp*>(s)->left());
+      const state_gspn_ssp* s_ = dynamic_cast<const state_gspn_ssp*>(s);
+      const void* cont = container_(s_->left());
       contained_map::const_iterator i = contained.find(cont);
       if (i != contained.end())
 	{
-	  const state_list& l = i->second;
-
-	  state_list::const_iterator j;
-	  for (j = l.begin(); j != l.end(); ++j)
+	  f_map::const_iterator k = i->second.find(s_->right());
+	  if (k != i->second.end())
 	    {
-	      const state_gspn_ssp* old_state =
-		dynamic_cast<const state_gspn_ssp*>(*j);
-	      const state_gspn_ssp* new_state =
-		dynamic_cast<const state_gspn_ssp*>(s);
-	      assert(old_state);
-	      assert(new_state);
+	      const state_list& l = k->second;
 
-	      if ((old_state->right())->compare(new_state->right()) == 0)
+	      state_list::const_iterator j;
+	      for (j = l.begin(); j != l.end(); ++j)
 		{
+		  const state_gspn_ssp* old_state =
+		    dynamic_cast<const state_gspn_ssp*>(*j);
+		  const state_gspn_ssp* new_state =
+		    dynamic_cast<const state_gspn_ssp*>(s);
+		  assert(old_state);
+		  assert(new_state);
+
 		  if (old_state->left() == new_state->left())
 		    break;
 
 		  if (old_state->left()
 		      && new_state->left()
 		      && spot_inclusion(new_state->left(), old_state->left()))
-		    break;
+			break;
 		}
-	    }
-	  if (j != l.end())
-	    {
-	      if (s != *j)
+	      if (j != l.end())
 		{
-		  delete s;
-		  s = *j;
+		  if (s != *j)
+		    {
+		      delete s;
+		      s = *j;
+		    }
+		}
+	      else
+		{
+		  s = 0;
 		}
 	    }
 	  else
@@ -848,11 +858,12 @@ namespace spot
     {
       h[s] = index;
 
-      State sg = dynamic_cast<const state_gspn_ssp*>(s)->left();
+      const state_gspn_ssp* s_ = dynamic_cast<const state_gspn_ssp*>(s);
+      State sg = s_->left();
       if (sg)
 	{
 	  const void* cont = container_(sg);
-	  contained[cont].push_front(s);
+	  contained[cont][s_->right()].push_front(s);
 	}
     }
 
@@ -870,7 +881,9 @@ namespace spot
     hash_type h;		///< Map of visited states.
 
     typedef std::list<const state*> state_list;
-    typedef Sgi::hash_map<const void*, state_list,
+    typedef Sgi::hash_map<const state*, state_list,
+			  state_ptr_hash, state_ptr_equal> f_map;
+    typedef Sgi::hash_map<const void*, f_map,
 			  ptr_hash<void> > contained_map;
     contained_map contained;
 
@@ -1025,29 +1038,31 @@ namespace spot
       typedef numbered_state_heap_ssp_semi::hash_type hash_type;
       hash_type& h = dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->h;
       typedef numbered_state_heap_ssp_semi::contained_map contained_map;
+      typedef numbered_state_heap_ssp_semi::f_map f_map;
       typedef numbered_state_heap_ssp_semi::state_list state_list;
       const contained_map& contained =
 	dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->contained;
 
-      const void* cont =
-	container_(dynamic_cast<const state_gspn_ssp*>(s)->left());
+      const state_gspn_ssp* s_ = dynamic_cast<const state_gspn_ssp*>(s);
+      const void* cont = container_(s_->left());
       contained_map::const_iterator i = contained.find(cont);
       if (i != contained.end())
 	{
-	  const state_list& l = i->second;
-	  state_list::const_iterator j;
-
-	  for (j = l.begin(); j != l.end(); ++j)
+	  f_map::const_iterator k = i->second.find(s_->right());
+	  if (k != i->second.end())
 	    {
-	      const state_gspn_ssp* old_state =
-		dynamic_cast<const state_gspn_ssp*>(*j);
-	      const state_gspn_ssp* new_state =
-		dynamic_cast<const state_gspn_ssp*>(s);
-	      assert(old_state);
-	      assert(new_state);
+	      const state_list& l = k->second;
+	      state_list::const_iterator j;
 
-	      if ((old_state->right())->compare(new_state->right()) == 0)
+	      for (j = l.begin(); j != l.end(); ++j)
 		{
+		  const state_gspn_ssp* old_state =
+		    dynamic_cast<const state_gspn_ssp*>(*j);
+		  const state_gspn_ssp* new_state =
+		    dynamic_cast<const state_gspn_ssp*>(s);
+		  assert(old_state);
+		  assert(new_state);
+
 		  if (old_state->left() == new_state->left())
 		    break;
 
@@ -1096,21 +1111,24 @@ namespace spot
 			}
 		    }
 		}
-	    }
-
-	  if (j != l.end())
-	    {
-	      if (s != *j)
+	      if (j != l.end())
 		{
-		  delete s;
-		  s = *j;
+		  if (s != *j)
+		    {
+		      delete s;
+		      s = *j;
+		    }
+		}
+	      else
+		{
+		  s = 0;
 		}
 	    }
 	  else
 	    {
 	      s = 0;
 	    }
-	}
+   	}
       else
 	{
 	  s = 0;
