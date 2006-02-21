@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -26,6 +26,8 @@
 
 namespace spot
 {
+  class proviso;
+
   /// \brief Iterate over the successors of a state.
   /// \ingroup tgba_essentials
   ///
@@ -95,6 +97,21 @@ namespace spot
     virtual bdd current_acceptance_conditions() const = 0;
 
     //@}
+
+    /// \name Optional support for partial order
+    //@{
+
+    /// \brief Return the proviso associated to this set of successor.
+    ///
+    /// If a tgba is able to compute stubborn sets and return them via
+    /// the tgba::succ method, it should also provide a proviso via this
+    /// method.  The proviso is an abstract object that represent the
+    /// transition that were ignored.  Emptiness check algorithms use
+    /// this to cope with the <i>ignoring problem</i>.
+    ///
+    /// Proviso returned by this method should be freed by
+    /// tgba::release_proviso.
+    virtual proviso* get_proviso() const;
   };
 }
 

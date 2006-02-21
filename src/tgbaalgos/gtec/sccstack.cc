@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,10 +23,11 @@
 
 namespace spot
 {
-  scc_stack::connected_component::connected_component(int i)
+  scc_stack::connected_component::connected_component(int i, proviso* p)
   {
     index = i;
     condition = bddfalse;
+    ignored = p;
   }
 
   scc_stack::connected_component&
@@ -49,9 +50,9 @@ namespace spot
   }
 
   void
-  scc_stack::push(int index)
+  scc_stack::push(int index, proviso* p)
   {
-    s.push_front(connected_component(index));
+    s.push_front(connected_component(index, p));
   }
 
   std::list<const state*>&

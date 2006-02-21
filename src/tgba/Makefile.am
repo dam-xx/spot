@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -29,6 +29,7 @@ tgba_HEADERS = \
   bddprint.hh \
   formula2bdd.hh \
   public.hh \
+  proviso.hh \
   state.hh \
   statebdd.hh \
   succiter.hh \
@@ -49,7 +50,9 @@ libtgba_la_SOURCES = \
   bdddict.cc \
   bddprint.cc \
   formula2bdd.cc \
+  proviso.cc \
   statebdd.cc \
+  succiter.cc \
   succiterconcrete.cc \
   tgba.cc \
   tgbabddconcrete.cc \

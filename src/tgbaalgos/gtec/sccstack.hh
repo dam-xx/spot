@@ -1,6 +1,6 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2004, 2005, 2006 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -28,6 +28,8 @@
 
 namespace spot
 {
+  class proviso;
+
   // A stack of Strongly-Connected Components, as needed by the
   // Tarjan-Couvreur algorithm.
   class scc_stack
@@ -36,7 +38,7 @@ namespace spot
     struct connected_component
     {
     public:
-      connected_component(int index = -1);
+      connected_component(int index = -1, proviso* p = 0);
 
       /// Index of the SCC.
       int index;
@@ -44,11 +46,12 @@ namespace spot
       /// transitions which connect the states of the connected component.
       bdd condition;
 
+      proviso* ignored;
       std::list<const state*> rem;
     };
 
-    /// Stack a new SCC with index \a index.
-    void push(int index);
+    /// Stack a new SCC with index \a index and proviso \a p.
+    void push(int index, proviso* p);
 
     /// Access the top SCC.
     connected_component& top();

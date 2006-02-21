@@ -226,7 +226,8 @@ namespace spot
       const state* s;
       int n;
       succ_queue q;		// Unprocessed successors of S
-      todo_item(const state* s, int n, couvreur99_check_shy* shy);
+      todo_item(const state* s, int n,
+		tgba_succ_iterator* iter, couvreur99_check_shy* shy);
     };
 
     typedef std::list<todo_item> todo_list;

@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -28,6 +28,8 @@
 
 namespace spot
 {
+  class proviso;
+
   /// \defgroup tgba TGBA (Transition-based Generalized Büchi Automata)
   ///
   /// Spot is centered around the spot::tgba type.  This type and its
@@ -201,6 +203,9 @@ namespace spot
     /// set should be augmented with the neg_acceptance_conditions() of
     /// the other operand.
     virtual bdd neg_acceptance_conditions() const = 0;
+
+    /// \brief Free a proviso returned by tgba_succ_iter::get_proviso
+    virtual void release_proviso(proviso*) const;
 
   protected:
     /// Do the actual computation of tgba::support_conditions().

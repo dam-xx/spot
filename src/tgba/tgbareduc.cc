@@ -1,6 +1,6 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2004, 2005, 2006 Laboratoire d'Informatique de Paris 6
+// (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -502,7 +502,7 @@ namespace spot
       h_->insert(init, 1);
       si_[init] = 1;
       state_scc_.push(init);
-      root_.push(1);
+      root_.push(1, 0);
       arc.push(bddfalse);
       tgba_succ_iterator* iter = this->succ_iter(init);
       iter->first();
@@ -547,7 +547,7 @@ namespace spot
 	    h_->insert(dest, ++num);
 	    si_[dest] = num;
 	    state_scc_.push(dest);
-	    root_.push(num);
+	    root_.push(num, 0);
 	    arc.push(acc);
 	    tgba_succ_iterator* iter = this->succ_iter(dest);
 	    iter->first();

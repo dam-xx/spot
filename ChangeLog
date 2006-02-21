@@ -1,3 +1,19 @@
+2006-02-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgba/proviso.hh, src/tgba/proviso.cc, src/tgba/succiter.cc:
+	New files.
+	* src/tgba/succiter.hh (tgba_succ_iterator::get_proviso): New
+	method.
+	* src/tgba/tgba.hh (tgba::release_proviso): New method.
+	* srctgba/tgbareduc.cc: Adjust calls to
+	scc_stack::connected_component::::push.
+	* src/tgbaalgos/gtec/gtec.hh, src/tgbaalgos/gtec/gtec.cc: Adapt to
+	honor provisos (not yet tested, since no tgba implementation
+	currently provide genuine provisos)
+	* src/tgbaalgos/gtec/sccstack.hh, src/tgbaalgos/gtec/sccstack.cc
+	(scc_stack::connected_component): Store a proviso and adjust
+	related functions.
+
 2006-02-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gtec/gtec.cc: Add a third level hash, to split

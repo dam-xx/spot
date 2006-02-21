@@ -21,6 +21,7 @@
 
 #include "gtec.hh"
 #include "ce.hh"
+#include "tgba/proviso.hh"
 
 namespace spot
 {
@@ -57,6 +58,7 @@ namespace spot
   couvreur99_check::remove_component(const state* from)
   {
     ++removed_components;
+
     // If rem has been updated, removing states is very easy.
     if (poprem_)
       {
@@ -144,9 +146,9 @@ namespace spot
     {
       state* init = ecs_->aut->get_init_state();
       ecs_->h->insert(init, 1);
-      ecs_->root.push(1);
-      arc.push(bddfalse);
       tgba_succ_iterator* iter = ecs_->aut->succ_iter(init);
+      ecs_->root.push(1, iter->get_proviso());
+      arc.push(bddfalse);
       iter->first();
       todo.push(pair_state_iter(init, iter));
       inc_depth();
@@ -165,7 +167,23 @@ namespace spot
 	    // We have explored all successors of state CURR.
 	    const state* curr = todo.top().first;
 
-	    // Backtrack TODO.
+	    // Wait!  Maybe we do not really want to backtrack yet.
+	    // If we have been using stubborn sets its possible there
+	    // are transitions that we have always ignored in this
+	    // component.  We want to visit some of these until we
+	    // have ignored nobody.  (When stubborn sets are not used,
+	    // empty() will always return true.)
+	    if (!ecs_->root.top().ignored->empty())
+	      {
+		tgba_succ_iterator* iter = ecs_->root.top().ignored->oneset();
+		ecs_->aut->release_proviso(ecs_->root.top().ignored);
+		ecs_->root.top().ignored = iter->get_proviso();
+		todo.top().second = iter;
+		delete succ;
+		continue;
+	      }
+
+	    // Now really backtrack TODO.
 	    todo.pop();
 	    dec_depth();
 
@@ -188,6 +206,7 @@ namespace spot
 		assert(!arc.empty());
 		arc.pop();
 		remove_component(curr);
+		ecs_->aut->release_proviso(ecs_->root.top().ignored);
 		ecs_->root.pop();
 	      }
 
@@ -214,9 +233,9 @@ namespace spot
 	    // Yes.  Number it, stack it, and register its successors
 	    // for later processing.
 	    ecs_->h->insert(dest, ++num);
-	    ecs_->root.push(num);
-	    arc.push(acc);
 	    tgba_succ_iterator* iter = ecs_->aut->succ_iter(dest);
+	    ecs_->root.push(num, iter->get_proviso());
+	    arc.push(acc);
 	    iter->first();
 	    todo.push(pair_state_iter(dest, iter));
 	    inc_depth();
@@ -240,6 +259,7 @@ namespace spot
 	// the SCC of S2 (called the "threshold").
 	int threshold = *spi.second;
 	std::list<const state*> rem;
+	proviso* p = 0;
 	while (threshold < ecs_->root.top().index)
 	  {
 	    assert(!ecs_->root.empty());
@@ -247,6 +267,16 @@ namespace spot
 	    acc |= ecs_->root.top().condition;
 	    acc |= arc.top();
 	    rem.splice(rem.end(), ecs_->root.rem());
+	    if (!p)
+	      {
+		p = ecs_->root.top().ignored;
+	      }
+	    else
+	      {
+		proviso* p2 = ecs_->root.top().ignored;
+		p->intersect(p2);
+		ecs_->aut->release_proviso(p2);
+	      }
 	    ecs_->root.pop();
 	    arc.pop();
 	  }
@@ -258,6 +288,11 @@ namespace spot
 	// Accumulate all acceptance conditions into the merged SCC.
 	ecs_->root.top().condition |= acc;
 	ecs_->root.rem().splice(ecs_->root.rem().end(), rem);
+	if (p)
+	  {
+	    ecs_->root.top().ignored->intersect(p);
+	    ecs_->aut->release_proviso(p);
+	  }
 
 	if (ecs_->root.top().condition
 	    == ecs_->aut->all_acceptance_conditions())
@@ -300,10 +335,10 @@ namespace spot
   //////////////////////////////////////////////////////////////////////
 
   couvreur99_check_shy::todo_item::todo_item(const state* s, int n,
+					     tgba_succ_iterator* iter,
 					     couvreur99_check_shy* shy)
 	: s(s), n(n)
   {
-    tgba_succ_iterator* iter = shy->ecs_->aut->succ_iter(s);
     for (iter->first(); !iter->done(); iter->next(), shy->inc_transitions())
       {
 	q.push_back(successor(iter->current_acceptance_conditions(),
@@ -326,8 +361,9 @@ namespace spot
     // Setup depth-first search from the initial state.
     const state* i = ecs_->aut->get_init_state();
     ecs_->h->insert(i, ++num);
-    ecs_->root.push(num);
-    todo.push_back(todo_item(i, num, this));
+    tgba_succ_iterator* iter = ecs_->aut->succ_iter(i);
+    ecs_->root.push(num, iter->get_proviso());
+    todo.push_back(todo_item(i, num, iter, this));
     inc_depth(1);
   }
 
@@ -376,6 +412,23 @@ namespace spot
 	// If there is no more successor, backtrack.
 	if (queue.empty())
 	  {
+	    // Wait!  Maybe we do not really want to backtrack yet.
+	    // If we have been using stubborn sets its possible there
+	    // are transitions that we have always ignored in this
+	    // component.  We want to visit some of these until we
+	    // have ignored nobody.  (When stubborn sets are not used,
+	    // empty() will always return true.)
+	    if (!ecs_->root.top().ignored->empty())
+	      {
+		tgba_succ_iterator* iter = ecs_->root.top().ignored->oneset();
+		ecs_->aut->release_proviso(ecs_->root.top().ignored);
+		ecs_->root.top().ignored = iter->get_proviso();
+		todo.back() = todo_item(todo.back().s, todo.back().n,
+					iter, this);
+		pos = todo.back().q.begin();
+		continue;
+	      }
+
 
 	    // We have explored all successors of state CURR.
 	    const state* curr = todo.back().s;
@@ -387,10 +440,10 @@ namespace spot
 
 	    if (todo.empty())
 	      {
-		// This automaton recognizes no word.
-		set_states(ecs_->states());
-		assert(poprem_ || depth() == 0);
-		return 0;
+	    	 // This automaton recognizes no word.
+	    	 set_states(ecs_->states());
+	    	 assert(poprem_ || depth() == 0);
+	    	 return 0;
 	      }
 
 	    pos = todo.back().q.begin();
@@ -400,10 +453,10 @@ namespace spot
 	    // the SCC again.
 	    if (poprem_)
 	      {
-		numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
-		assert(spi.first);
-		ecs_->root.rem().push_front(spi.first);
-		inc_depth();
+	    	 numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
+	    	 assert(spi.first);
+	    	 ecs_->root.rem().push_front(spi.first);
+	    	 inc_depth();
 	      }
 
 	    // When backtracking the root of an SCC, we must also
@@ -412,10 +465,11 @@ namespace spot
 	    assert(!ecs_->root.empty());
 	    if (ecs_->root.top().index == index)
 	      {
-		assert(!arc.empty());
-		arc.pop();
-		remove_component(curr);
-		ecs_->root.pop();
+	    	 assert(!arc.empty());
+	    	 arc.pop();
+	    	 remove_component(curr);
+	    	 ecs_->aut->release_proviso(ecs_->root.top().ignored);
+	    	 ecs_->root.pop();
 	      }
 	    continue;
 	  }
@@ -448,9 +502,10 @@ namespace spot
 	    queue.erase(old);
 	    dec_depth();
 	    ecs_->h->insert(succ.s, ++num);
-	    ecs_->root.push(num);
+	    tgba_succ_iterator* iter = ecs_->aut->succ_iter(succ.s);
+	    ecs_->root.push(num, iter->get_proviso());
 	    arc.push(succ.acc);
-	    todo.push_back(todo_item(succ.s, num, this));
+	    todo.push_back(todo_item(succ.s, num, iter, this));
 	    pos = todo.back().q.begin();
 	    inc_depth();
 	    continue;
@@ -480,6 +535,7 @@ namespace spot
 	int threshold = *i;
 	std::list<const state*> rem;
 	bdd acc = succ.acc;
+	proviso* p = 0;
 	while (threshold < ecs_->root.top().index)
 	  {
 	    assert(!ecs_->root.empty());
@@ -487,6 +543,16 @@ namespace spot
 	    acc |= ecs_->root.top().condition;
 	    acc |= arc.top();
 	    rem.splice(rem.end(), ecs_->root.rem());
+	    if (!p)
+	      {
+		p = ecs_->root.top().ignored;
+	      }
+	    else
+	      {
+		proviso* p2 = ecs_->root.top().ignored;
+		p->intersect(p2);
+		ecs_->aut->release_proviso(p2);
+	      }
 	    ecs_->root.pop();
 	    arc.pop();
 	  }
@@ -499,6 +565,11 @@ namespace spot
 	// merged SCC.
 	ecs_->root.top().condition |= acc;
 	ecs_->root.rem().splice(ecs_->root.rem().end(), rem);
+	if (p)
+	  {
+	    ecs_->root.top().ignored->intersect(p);
+	    ecs_->aut->release_proviso(p);
+	  }
 
 	// Have we found all acceptance conditions?
 	if (ecs_->root.top().condition
