@@ -1,6 +1,6 @@
-// Copyright (C) 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2006 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -19,46 +19,14 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include "proviso.hh"
+#ifndef SPOT_SAUT_HH
+# define SPOT_SAUT_HH
+
+#include "tgba/bdddict.hh"
 
 namespace spot
 {
-
-  proviso::~proviso()
-  {
-  }
-
-  dummy_proviso*
-  dummy_proviso::instance()
-  {
-    static dummy_proviso p;
-    return &p;
-  }
-
-  dummy_proviso::dummy_proviso()
-  {
-  }
-
-  bool
-  dummy_proviso::empty() const
-  {
-    return true;
-  }
-
-  void
-  dummy_proviso::intersect(const proviso* p)
-  {
-    assert(p == dummy_proviso::instance());
-  }
-
-  tgba_succ_iterator*
-  dummy_proviso::oneset()
-  {
-    assert(!"should not be called");
-    return 0;
-  }
-
-  dummy_proviso::~dummy_proviso()
-  {
-  }
+  class saut;
 }
+
+#endif // SPOT_SAUT_HH

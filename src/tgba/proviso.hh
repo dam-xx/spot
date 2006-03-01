@@ -32,6 +32,7 @@ namespace spot
     virtual bool empty() const = 0;
     virtual void intersect(const proviso*) = 0;
     virtual tgba_succ_iterator* oneset() = 0;
+    virtual ~proviso();
   };
 
   class dummy_proviso : public proviso

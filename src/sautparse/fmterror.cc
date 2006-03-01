@@ -19,46 +19,26 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include "proviso.hh"
+#include <ostream>
+#include "public.hh"
 
 namespace spot
 {
-
-  proviso::~proviso()
-  {
-  }
-
-  dummy_proviso*
-  dummy_proviso::instance()
-  {
-    static dummy_proviso p;
-    return &p;
-  }
-
-  dummy_proviso::dummy_proviso()
-  {
-  }
-
   bool
-  dummy_proviso::empty() const
+  format_saut_parse_errors(std::ostream& os,
+			   const std::string& filename,
+			   saut_parse_error_list& error_list)
   {
-    return true;
-  }
-
-  void
-  dummy_proviso::intersect(const proviso* p)
-  {
-    assert(p == dummy_proviso::instance());
-  }
-
-  tgba_succ_iterator*
-  dummy_proviso::oneset()
-  {
-    assert(!"should not be called");
-    return 0;
-  }
-
-  dummy_proviso::~dummy_proviso()
-  {
+    bool printed = false;
+    spot::saut_parse_error_list::iterator it;
+    for (it = error_list.begin(); it != error_list.end(); ++it)
+      {
+	if (filename != "-")
+	  os << filename << ":";
+	os << it->first << ": ";
+	os << it->second << std::endl;
+	printed = true;
+      }
+    return printed;
   }
 }
