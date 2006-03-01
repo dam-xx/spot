@@ -6,7 +6,8 @@
 	* src/saut/saut.hh, src/sautparse/Makefile.am,
 	src/sautparse/fmterror.cc, src/sautparse/public.hh,
 	src/sautparse/sautparse.yy, src/sautparse/sautscan.ll,
-	src/sauttest/Makefile.am, src/sauttest/parse.cc: New files.
+	src/sautparse/parsedecl.hh, src/sauttest/Makefile.am,
+	src/sauttest/parse.cc: New files.
 
 2006-02-21  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
