@@ -26,7 +26,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse \
           tgba tgbaalgos tgbaparse \
 	  evtgba evtgbaalgos evtgbaparse \
-	  sautparse \
+	  saut sautparse \
 	  . \
 	  ltltest tgbatest evtgbatest sauttest sanity
 
@@ -45,6 +45,7 @@ libspot_la_LIBADD =  \
   evtgba/libevtgba.la \
   evtgbaalgos/libevtgbaalgos.la \
   evtgbaparse/libevtgbaparse.la \
+  saut/libsaut.la \
   sautparse/libsautparse.la
 
 # Dummy C++ source to cause C++ linking.

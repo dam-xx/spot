@@ -1,0 +1,83 @@
+// Copyright (C) 2006 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
+//
+// This file is part of Spot, a model checking library.
+//
+// Spot is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// Spot is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+// or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+// License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Spot; see the file COPYING.  If not, write to the Free
+// Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+// 02111-1307, USA.
+
+#include "saut.hh"
+#include <iostream>
+
+namespace spot
+{
+  saut::node*
+  saut::declare_node(const std::string& name)
+  {
+    std::pair<node_map::iterator, bool> p =
+      nodes.insert(std::pair<std::string, node>(name, node()));
+
+    if (p.second)
+      {
+	p.first->second.name = &p.first->first;
+	std::cerr << "aut " << this << " declares "
+		  << &p.first->second << " = node `" << name << "'"
+		  << std::endl;
+      }
+    return &p.first->second;
+  }
+
+  saut::action*
+  saut::declare_action(const std::string& name)
+  {
+    std::pair<action_map::iterator, bool> p = actions.insert(name);
+
+    if (p.second)
+      {
+	std::cerr << "aut " << this << " declares "
+		  << &(*p.first) << " = action `" << name << "'"
+		  << std::endl;
+      }
+    return &(*p.first);
+  }
+
+  void
+  saut::declare_nodes(const ident_list* idlist)
+  {
+    for (ident_list::const_iterator i = idlist->begin();
+	 i != idlist->end(); ++i)
+      declare_node(**i);
+  }
+
+  saut::transition*
+  saut::declare_transition(const std::string& src,
+			   const std::string& act,
+			   const std::string& dst)
+  {
+    node* srcn = declare_node(src);
+    action* actn = declare_action(act);
+    node* dstn = declare_node(dst);
+    srcn->tr.push_back(transition(srcn, actn, dstn));
+
+    std::cerr << "aut " << this << " declares "
+	      << &srcn->tr.back() << " = transition ("
+	      << srcn << ", " << actn << ", " << dstn << ")"
+	      << std::endl;
+    return &srcn->tr.back();
+  }
+
+
+}

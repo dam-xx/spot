@@ -22,11 +22,56 @@
 #ifndef SPOT_SAUT_HH
 # define SPOT_SAUT_HH
 
+#include <list>
+#include <string>
+#include <map>
+#include <set>
 #include "tgba/bdddict.hh"
 
 namespace spot
 {
-  class saut;
+
+  class saut
+  {
+    typedef std::string node_name;
+    typedef std::string action_name;
+    typedef const action_name action;
+
+    struct node;
+
+    struct transition
+    {
+      node* src;
+      action* act;
+      node* dst;
+      transition(node* src, action* act, node* dst)
+	: src(src), act(act), dst(dst) {}
+    };
+
+    typedef std::list<transition> transitions_list;
+
+    struct node
+    {
+      const node_name* name;
+      transitions_list tr;
+    };
+
+    typedef std::map<node_name, node> node_map;
+    node_map nodes;
+
+    typedef std::set<action_name> action_map;
+    action_map actions;
+
+    typedef std::list<std::string*> ident_list;
+
+  public:
+    node* declare_node(const std::string& name);
+    void declare_nodes(const ident_list* idlist);
+    action* declare_action(const std::string& name);
+    transition* declare_transition(const std::string& src,
+				   const std::string& act,
+				   const std::string& dst);
+  };
 }
 
 #endif // SPOT_SAUT_HH

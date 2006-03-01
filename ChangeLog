@@ -1,4 +1,13 @@
-2006-03-01  Alexandre Duret-Lutz  <adl@gnu.org>
+2006-03-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/saut/Makefile.am, src/saut/saut.cc: New files.
+	* src/saut/saut.hh: More methods.
+	* src/sautparse/sautparse.yy: Declare transitions and nodes as they
+	are read.
+	* src/sautparse/sautscan.ll: Fix include.
+	* src/Makefile.am (libspot_la_LIBADD): Add saut/libsaut.la.
+	(SUBDIRS): Add saut.
+	* configure.ac: Build src/saut/Makefile.
 
 	* src/tgba/proviso.cc, src/tgba/proviso.hh (proviso::~proviso): New.
 	* configure.ac: Build src/sautparse/Makefile and src/sauttest/Makefile.

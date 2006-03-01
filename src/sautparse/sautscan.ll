@@ -26,7 +26,7 @@
 
 %{
 #include <string>
-#include "sautparse.hh"
+#include "sautparse/sautparse.hh"
 
 #define YY_USER_ACTION \
   yylloc->columns(yyleng);

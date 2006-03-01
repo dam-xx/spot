@@ -1,0 +1,9 @@
+.deps
+Makefile
+Makefile.in
+defs
+explicit
+.libs
+*.ps
+*.dot
+parse

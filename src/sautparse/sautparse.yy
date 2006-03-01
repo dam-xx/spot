@@ -22,17 +22,33 @@
 
 %{
 #include <string>
+#include <list>
 #include "public.hh"
+#include "saut/saut.hh"
+
+namespace
+{
+  struct context_t
+  {
+    spot::saut* aut;
+    std::map<std::string, spot::saut*> auts;
+  };
+
+  void free_idlist(std::list<std::string*>*);
+}
+
 %}
 
 
 %parse-param {spot::saut_parse_error_list& error_list}
+%parse-param {context_t& context}
 %debug
 %error-verbose
 %union
 {
   int token;
   std::string* str;
+  std::list<std::string*>* idlist;
 }
 
 %{
@@ -62,6 +78,8 @@ using namespace spot::ltl;
 %token SEMICOLON ";"
 %token COMA ","
 %token DOT "."
+%type <idlist> idtuple idepstuple
+%type <str> ideps
 
 %%
 
@@ -78,8 +96,20 @@ commands: command
 definition: assignment
 
 assignment: IDENT structure
+        {
+	  if (context.aut)
+            {
+	       spot::saut*& a = context.auts[*$1];
+	       delete $1;
+	       if (a)
+	         delete a;
+	       a = context.aut;
+	       context.aut = 0;
+            }
+        }
 
-structure: "=Automaton" "(" automatondefs ")"
+
+structure: "=Automaton" "(" { context.aut = new spot::saut; } automatondefs ")"
 	| "=Table" "(" tabledefs ")"
 	;
 
@@ -88,6 +118,7 @@ automatondefs: automatondef
 	;
 
 automatondef: "Nodes" "(" idtuple ")"
+	{ context.aut->declare_nodes($3); free_idlist($3); }
 	| "Transitions" "(" transitions ")"
 	| "AtomicPropositions" "(" atomicpropositions ")"
 	;
@@ -97,6 +128,10 @@ transitions: transition
 	;
 
 transition: IDENT "-" IDENT "->" IDENT
+	{
+	  context.aut->declare_transition(*$1, *$3, *$5);
+	  delete $1; delete $3; delete $5;
+        }
 
 atomicpropositions: ap_statement
 	| atomicpropositions "," ap_statement
@@ -121,17 +156,21 @@ tabledefsbody: tabledefbody
 tabledefsheader: "(" idtuple ")"
 
 idtuple: IDENT
+	{ $$ = new std::list<std::string*>; $$->push_back($1); }
 	| idtuple "," IDENT
+	{ $$ = $1; $$->push_back($3); }
 	;
 
 tabledefbody: "(" idepstuple ")"
 
 idepstuple: ideps
+	{ $$ = new std::list<std::string*>; $$->push_back($1); }
 	| idepstuple "," ideps
+	{ $$ = $1; $$->push_back($3); }
 	;
 
-ideps: IDENT
-	| "."
+ideps: IDENT    { $$ = $1; }
+	| "."   { $$ = 0; }
 	;
 
 command: "Check" "(" IDENT ")"
@@ -144,8 +183,21 @@ yy::parser::error(const location_type& location, const std::string& message)
   error_list.push_back(spot::saut_parse_error(location, message));
 }
 
+namespace
+{
+   void
+   free_idlist(std::list<std::string*>* idlist)
+   {
+     for (std::list<std::string*>::iterator i = idlist->begin();
+          i != idlist->end(); ++i)
+       free(*i);
+     free(idlist);
+   }
+}
+
 namespace spot
 {
+
   saut*
   saut_parse(const std::string& name,
              saut_parse_error_list& error_list,
@@ -160,7 +212,8 @@ namespace spot
                             std::string("Cannot open file ") + name));
         return 0;
       }
-    sautyy::parser parser(error_list);
+    context_t context;
+    sautyy::parser parser(error_list, context);
     parser.set_debug_level(debug);
     parser.parse();
     sautyyclose();
