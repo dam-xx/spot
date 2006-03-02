@@ -22,19 +22,27 @@
 
 %{
 #include <string>
+#include <sstream>
 #include <list>
 #include "public.hh"
 #include "saut/saut.hh"
+#include "saut/sync.hh"
 
 namespace
 {
+  typedef std::map<std::string, spot::saut*> aut_map;
+  typedef std::map<const spot::saut*, std::string> aut_names;
+  typedef std::map<std::string, spot::sync*> sync_map;
   struct context_t
   {
     spot::saut* aut;
-    std::map<std::string, spot::saut*> auts;
+    spot::sync* syn;
+    aut_map auts;
+    aut_names names;
+    sync_map syns;
   };
 
-  void free_idlist(std::list<std::string*>*);
+  void free_idlist(std::list<const std::string*>*);
 }
 
 %}
@@ -48,7 +56,8 @@ namespace
 {
   int token;
   std::string* str;
-  std::list<std::string*>* idlist;
+  std::list<const std::string*>* idlist;
+  spot::sync::saut_list* autlist;
 }
 
 %{
@@ -80,6 +89,7 @@ using namespace spot::ltl;
 %token DOT "."
 %type <idlist> idtuple idepstuple
 %type <str> ideps
+%type <autlist> auttuple
 
 %%
 
@@ -100,11 +110,21 @@ assignment: IDENT structure
 	  if (context.aut)
             {
 	       spot::saut*& a = context.auts[*$1];
+	       context.names[context.aut] = *$1;
 	       delete $1;
 	       if (a)
 	         delete a;
 	       a = context.aut;
 	       context.aut = 0;
+            }
+	  else if (context.syn)
+            {
+	       spot::sync*& a = context.syns[*$1];
+	       delete $1;
+	       if (a)
+	         delete a;
+	       a = context.syn;
+	       context.syn = 0;
             }
         }
 
@@ -153,20 +173,99 @@ tabledefsbody: tabledefbody
 	| tabledefsbody "," tabledefbody
 	;
 
-tabledefsheader: "(" idtuple ")"
+tabledefsheader: "(" auttuple ")"
+	{
+	  context.syn = new spot::sync(*$2);
+	  delete $2;
+        }
+
+auttuple: IDENT
+	{
+	  aut_map::const_iterator it = context.auts.find(*$1);
+	  if (it == context.auts.end())
+	    {
+               error_list.push_back(spot::saut_parse_error(@1,
+	                            *$1 + ": unknown automaton"));
+               YYABORT;
+            }
+	  delete $1;
+          $$ = new spot::sync::saut_list;
+          $$->push_back(it->second);
+        }
+	| auttuple "," IDENT
+        {
+	  aut_map::const_iterator it = context.auts.find(*$3);
+	  if (it == context.auts.end())
+	    {
+               error_list.push_back(spot::saut_parse_error(@3,
+	                            *$3 + ": unknown automaton"));
+               YYABORT;
+            }
+          delete $3;
+          $$ = $1;
+          $$->push_back(it->second);
+        }
+	;
 
 idtuple: IDENT
-	{ $$ = new std::list<std::string*>; $$->push_back($1); }
+	{ $$ = new std::list<const std::string*>; $$->push_back($1); }
 	| idtuple "," IDENT
 	{ $$ = $1; $$->push_back($3); }
 	;
 
 tabledefbody: "(" idepstuple ")"
+	{
+	  if ($2->size() != context.syn->size())
+	    {
+	      assert($2->size() < context.syn->size());
+              error_list.push_back(spot::saut_parse_error(@$,
+                                   "not enough actions or too many automata"));
+            }
+          else if (context.syn->declare_rule(*$2))
+	    {
+              error_list.push_back(spot::saut_parse_error(@2,
+                                   "invalid tuple"));
+            }
+          free_idlist($2);
+        }
 
 idepstuple: ideps
-	{ $$ = new std::list<std::string*>; $$->push_back($1); }
+	{ $$ = new std::list<const std::string*>;
+	  if ($1 && !context.syn->known_action(0, *$1))
+            {
+              error_list.push_back(spot::saut_parse_error(@1,
+                                   *$1 + ": unknown action in automaton `"
+				   + context.names[context.syn->aut(0)] + "'"));
+              delete $1;
+  	      $$->push_back(0);
+            }
+	  else
+	    {
+  	      $$->push_back($1);
+	    }
+        }
 	| idepstuple "," ideps
-	{ $$ = $1; $$->push_back($3); }
+	{ $$ = $1;
+          unsigned n = $$->size();
+	  if (n >= context.syn->size())
+	    {
+	      error_list.push_back(spot::saut_parse_error(@3, *$3 +
+                                 ": too many actions or not enough automata"));
+            }
+	  else if ($3 && !context.syn->known_action(n, *$3))
+            {
+	      std::ostringstream o;
+	      o << *$3 << ": unknown action for automaton `"
+	        << context.names[context.syn->aut(n)] << "'";
+              error_list.push_back(spot::saut_parse_error(@3, o.str()));
+              delete $3;
+  	      $$->push_back(0);
+            }
+	  else
+	    {
+  	      $$->push_back($3);
+	    }
+        }
 	;
 
 ideps: IDENT    { $$ = $1; }
@@ -186,12 +285,12 @@ yy::parser::error(const location_type& location, const std::string& message)
 namespace
 {
    void
-   free_idlist(std::list<std::string*>* idlist)
+   free_idlist(std::list<const std::string*>* idlist)
    {
-     for (std::list<std::string*>::iterator i = idlist->begin();
+     for (std::list<const std::string*>::iterator i = idlist->begin();
           i != idlist->end(); ++i)
-       free(*i);
-     free(idlist);
+       delete *i;
+     delete idlist;
    }
 }
 

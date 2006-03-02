@@ -1,3 +1,12 @@
+2006-03-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/saut/sync.hh, src/saut/sync.cc: New files.
+	* src/saut/Makefile.am: Adjust.
+	* src/saut/saut.hh, src/saut/saut.cc (known_action, set_initial):
+	New methods.
+	* src/sautparse/sautparse.yy: Declare synchronization rules as they
+	are parsed.
+
 2006-03-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/saut/Makefile.am, src/saut/saut.cc: New files.

@@ -24,6 +24,25 @@
 
 namespace spot
 {
+  saut::saut()
+    : initial(0)
+  {
+  }
+
+  void
+  saut::set_initial(const node* n)
+  {
+    initial = n;
+    std::cerr << "aut " << this << " uses " << n << " as initial state"
+	      << std::endl;
+  }
+
+  void
+  saut::set_initial(const std::string& name)
+  {
+    set_initial(declare_node(name));
+  }
+
   saut::node*
   saut::declare_node(const std::string& name)
   {
@@ -36,6 +55,9 @@ namespace spot
 	std::cerr << "aut " << this << " declares "
 		  << &p.first->second << " = node `" << name << "'"
 		  << std::endl;
+
+	if (!initial)
+	  set_initial(&p.first->second);
       }
     return &p.first->second;
   }
@@ -43,15 +65,17 @@ namespace spot
   saut::action*
   saut::declare_action(const std::string& name)
   {
-    std::pair<action_map::iterator, bool> p = actions.insert(name);
+    std::pair<action_map::iterator, bool> p =
+      actions.insert(std::pair<std::string, action>(name, action()));
 
     if (p.second)
       {
+	p.first->second.name = &p.first->first;
 	std::cerr << "aut " << this << " declares "
-		  << &(*p.first) << " = action `" << name << "'"
+		  << &p.first->second << " = action `" << name << "'"
 		  << std::endl;
       }
-    return &(*p.first);
+    return &p.first->second;
   }
 
   void
@@ -70,14 +94,26 @@ namespace spot
     node* srcn = declare_node(src);
     action* actn = declare_action(act);
     node* dstn = declare_node(dst);
-    srcn->tr.push_back(transition(srcn, actn, dstn));
+
+    srcn->out.push_back(transition(srcn, actn, dstn));
+    transition* p = &srcn->out.back();
+    dstn->in.push_back(p);
+    actn->tia.push_back(p);
 
     std::cerr << "aut " << this << " declares "
-	      << &srcn->tr.back() << " = transition ("
+	      << p << " = transition ("
 	      << srcn << ", " << actn << ", " << dstn << ")"
 	      << std::endl;
-    return &srcn->tr.back();
+    return p;
   }
 
+  const saut::action*
+  saut::known_action(const action_name& name) const
+  {
+    action_map::const_iterator i = actions.find(name);
+    if (i == actions.end())
+      return 0;
+    return &i->second;
+  }
 
 }

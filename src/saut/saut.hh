@@ -33,11 +33,12 @@ namespace spot
 
   class saut
   {
+  public:
     typedef std::string node_name;
     typedef std::string action_name;
-    typedef const action_name action;
 
     struct node;
+    struct action;
 
     struct transition
     {
@@ -49,28 +50,43 @@ namespace spot
     };
 
     typedef std::list<transition> transitions_list;
+    typedef std::list<transition*> transitionsp_list;
 
     struct node
     {
       const node_name* name;
-      transitions_list tr;
+      transitions_list out;
+      transitionsp_list in;
+    };
+
+    struct action
+    {
+      const action_name* name;
+      transitionsp_list tia;
     };
 
     typedef std::map<node_name, node> node_map;
+    typedef std::map<action_name, action> action_map;
+    typedef std::list<const std::string*> ident_list;
+
+  private:
     node_map nodes;
-
-    typedef std::set<action_name> action_map;
     action_map actions;
-
-    typedef std::list<std::string*> ident_list;
-
+    const node* initial;
   public:
+    saut();
+    void set_initial(const node* n);
+    void set_initial(const std::string& name);
+
     node* declare_node(const std::string& name);
     void declare_nodes(const ident_list* idlist);
     action* declare_action(const std::string& name);
     transition* declare_transition(const std::string& src,
 				   const std::string& act,
 				   const std::string& dst);
+    const action* known_action(const action_name& name) const;
+
+
   };
 }
 

@@ -25,8 +25,10 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 sautdir = $(pkgincludedir)/saut
 
 saut_HEADERS = \
-  saut.hh
+  saut.hh \
+  sync.hh
 
 noinst_LTLIBRARIES = libsaut.la
 libsaut_la_SOURCES = \
-  saut.cc
+  saut.cc \
+  sync.cc
