@@ -27,6 +27,7 @@
 #include "public.hh"
 #include "saut/saut.hh"
 #include "saut/sync.hh"
+#include "tgbaalgos/dotty.hh"
 
 namespace
 {
@@ -50,6 +51,7 @@ namespace
 
 %parse-param {spot::saut_parse_error_list& error_list}
 %parse-param {context_t& context}
+%parse-param {spot::bdd_dict* dict}
 %debug
 %error-verbose
 %union
@@ -82,6 +84,7 @@ using namespace spot::ltl;
 %token TRANSITIONS "Transitions"
 %token ATOMICPROPOSITIONS "AtomicPropositions"
 %token CHECK "Check"
+%token DISPLAY "Display"
 %token DASH "-"
 %token ARROW "->"
 %token SEMICOLON ";"
@@ -175,7 +178,7 @@ tabledefsbody: tabledefbody
 
 tabledefsheader: "(" auttuple ")"
 	{
-	  context.syn = new spot::sync(*$2);
+	  context.syn = new spot::sync(*$2, dict);
 	  delete $2;
         }
 
@@ -273,6 +276,19 @@ ideps: IDENT    { $$ = $1; }
 	;
 
 command: "Check" "(" IDENT ")"
+	| "Display" "(" IDENT ")"
+	{
+          sync_map::const_iterator i = context.syns.find(*$3);
+	  if (i == context.syns.end())
+            {
+	      error_list.push_back(spot::saut_parse_error(@3, *$3 +
+                                 ": unknown table"));
+            }
+          else
+	    {
+   	      spot::dotty_reachable(std::cout, i->second);
+            }
+	}
 
 %%
 
@@ -300,7 +316,7 @@ namespace spot
   saut*
   saut_parse(const std::string& name,
              saut_parse_error_list& error_list,
-             bdd_dict*,
+             bdd_dict* d,
              environment&,
              bool debug)
   {
@@ -312,7 +328,7 @@ namespace spot
         return 0;
       }
     context_t context;
-    sautyy::parser parser(error_list, context);
+    sautyy::parser parser(error_list, context, d);
     parser.set_debug_level(debug);
     parser.parse();
     sautyyclose();

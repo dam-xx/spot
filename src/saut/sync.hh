@@ -22,31 +22,57 @@
 #ifndef SPOT_SYNC_HH
 # define SPOT_SYNC_HH
 
+#include "tgba/tgba.hh"
+#include "misc/hash.hh"
 #include <list>
 #include <string>
 #include <vector>
 #include <map>
-#include <set>
 #include "saut.hh"
 
 namespace spot
 {
-  class sync
+  class sync_state;
+  class sync_state_heap;
+
+  class sync : public tgba
   {
   public:
+    typedef std::vector<const saut::node*> vnodes;
     typedef std::list<const saut*> saut_list;
     typedef std::vector<const saut*> autvec;
+    typedef std::vector<size_t> autkvec;
     typedef std::list<const saut::action_name*> action_list;
+    typedef std::vector<const saut::action*> action_vect;
+    typedef Sgi::hash_multimap<size_t, action_vect> action_map;
   private:
     autvec auts;
+    autkvec autsk;
+    unsigned autssize;
+    sync_state_heap* heap;
+    bdd_dict* dict;
+    action_map actions;
   public:
-    sync(saut_list& sautlist);
+    sync(saut_list& sautlist, bdd_dict* dict);
     bool known_action(unsigned aut_num, const saut::action_name& act) const;
 
     unsigned size() const { return auts.size(); }
     const saut* aut(unsigned n) const { return auts[n]; }
 
     bool declare_rule(action_list& l);
+
+    virtual state* get_init_state() const;
+    virtual bdd_dict* get_dict() const;
+    std::string format_state(const vnodes& nodes) const;
+    virtual std::string format_state(const state* s) const;
+    virtual bdd all_acceptance_conditions() const;
+    virtual bdd neg_acceptance_conditions() const;
+    virtual bdd compute_support_conditions(const state*) const;
+    virtual bdd compute_support_variables(const state*) const;
+    virtual tgba_succ_iterator* succ_iter(const state* l,
+					  const state*, const tgba*) const;
+
+    friend class sync_transitions;
   };
 }
 

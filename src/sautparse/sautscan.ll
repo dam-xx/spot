@@ -59,6 +59,7 @@ Nodes				return NODES;
 Transitions			return TRANSITIONS;
 AtomicPropositions		return ATOMICPROPOSITIONS;
 Check				return CHECK;
+Display				return DISPLAY;
 
 [A-Za-z_][A-Za-z0-9_?!.:]*	{
 				  yylval->str = new std::string(yytext, yyleng);

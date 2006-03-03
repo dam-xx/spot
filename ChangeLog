@@ -1,3 +1,14 @@
+2006-03-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/saut/saut.hh, src/saut/saut.cc (get_initial): New method.
+	* src/saut/sync.hh, src/saut/sync.cc: Provide all the machinery to
+	make "sync" a subclass of tgba, although there is still no atomic
+	propositions.
+	* src/sautparse/sautparse.yy, src/sautparse/sautparse.ll: Add
+	command "Display" to output the synchronized automaton as dot.
+	* sauttest/parse.cc: Create the bdd_dict that any subclass of
+	tgba requires.
+
 2006-03-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/saut/sync.hh, src/saut/sync.cc: New files.

@@ -86,7 +86,7 @@ namespace spot
 				   const std::string& dst);
     const action* known_action(const action_name& name) const;
 
-
+    const node* get_initial() const;
   };
 }
 

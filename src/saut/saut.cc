@@ -116,4 +116,10 @@ namespace spot
     return &i->second;
   }
 
+  const saut::node*
+  saut::get_initial() const
+  {
+    return initial;
+  }
+
 }
