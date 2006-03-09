@@ -28,12 +28,14 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include "saut.hh"
 
 namespace spot
 {
   class sync_state;
   class sync_state_heap;
+  class sync_transition;
 
   class sync : public tgba
   {
@@ -45,6 +47,9 @@ namespace spot
     typedef std::list<const saut::action_name*> action_list;
     typedef std::vector<const saut::action*> action_vect;
     typedef Sgi::hash_multimap<size_t, action_vect> action_map;
+    typedef std::list<const action_vect*> action_vect_list;
+    typedef std::map<const saut::action*, action_vect_list> action_back_map;
+    typedef std::vector<action_back_map> action_back_vector;
   private:
     autvec auts;
     autkvec autsk;
@@ -52,8 +57,10 @@ namespace spot
     sync_state_heap* heap;
     bdd_dict* dict;
     action_map actions;
+    action_back_vector actions_back;
+    bool stubborn;
   public:
-    sync(saut_list& sautlist, bdd_dict* dict);
+    sync(saut_list& sautlist, bdd_dict* dict, bool stubborn = false);
     bool known_action(unsigned aut_num, const saut::action_name& act) const;
 
     unsigned size() const { return auts.size(); }
@@ -72,7 +79,19 @@ namespace spot
     virtual tgba_succ_iterator* succ_iter(const state* l,
 					  const state*, const tgba*) const;
 
+
+    // Check whether transition T is active, and if so return size().
+    // If the transition T is inactive, return the number of an automaton
+    // for which it isn't.
+    unsigned is_active(const sync_state* q, const sync_transition* t) const;
+
+    typedef std::list<sync_transition*> stlist;
+    stlist E1UE2(const sync_transition* t) const;
+    stlist E3(const sync_transition* t, unsigned i) const;
+
     friend class sync_transitions;
+    friend class sync_part;
+    friend class sync_transition_set_iterator;
   };
 }
 

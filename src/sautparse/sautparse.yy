@@ -178,7 +178,7 @@ tabledefsbody: tabledefbody
 
 tabledefsheader: "(" auttuple ")"
 	{
-	  context.syn = new spot::sync(*$2, dict);
+	  context.syn = new spot::sync(*$2, dict, true);
 	  delete $2;
         }
 

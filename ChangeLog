@@ -1,3 +1,10 @@
+2006-03-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/saut/sync.hh, src/saut/sync.cc: Check point of current work
+	on stubborn sets, not yet fully debugged, let alone leak-free.
+	* src/sautparse/sautparse.yy (Display): Enable stubborn set
+	construction.
+
 2006-03-03  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/saut/saut.hh, src/saut/saut.cc (get_initial): New method.
