@@ -23,6 +23,7 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
+#include <sstream>
 #include "misc/hash.hh"
 #include "misc/hashfunc.hh"
 #include "misc/modgray.hh"
@@ -39,6 +40,16 @@ namespace spot
     transitionv trv;
     size_t h;
     sync_transition(unsigned n) : trv(n) {};
+
+    size_t
+    recompute_hash(const sync& syn) const
+    {
+      size_t hk = 0;
+      for (unsigned j = 0; j < syn.size(); ++j)
+	if (trv[j])
+	  hk ^= knuth32_hash(syn.autsk[j] ^ PTR_TO_INT(trv[j]));
+      return hk;
+    }
   };
 
   struct sync_transition_hash
@@ -210,7 +221,6 @@ namespace spot
     const sync_state_*
     insert(sync::vnodes nodes)
     {
-      assert(nodes.size() == 2);
       std::pair<heap_t::iterator, bool> p =
 	heap.insert(sync_state_(nodes));
       if (p.second)
@@ -284,6 +294,14 @@ namespace spot
       }
     std::cerr << ") with heap " << heap << std::endl;
   }
+
+  void
+  sync::set_stubborn(bool val)
+  {
+    stubborn = val;
+    std::cerr << "sync " << this << " set_stubborn(" << val << ")" << std::endl;
+  }
+
 
   bool
   sync::known_action(unsigned aut_num, const saut::action_name& act) const
@@ -440,8 +458,8 @@ namespace spot
     virtual void
     a_next(int n)
     {
-      if (pos[n] != nodes[n]->out.end())
-	hk ^= knuth32_hash(syn.autsk[n] ^ PTR_TO_INT(pos[n]->act));
+      assert (pos[n] != nodes[n]->out.end());
+      hk ^= knuth32_hash(syn.autsk[n] ^ PTR_TO_INT(pos[n]->act));
       ++(pos[n]);
       if (pos[n] != nodes[n]->out.end())
 	hk ^= knuth32_hash(syn.autsk[n] ^ PTR_TO_INT(pos[n]->act));
@@ -531,14 +549,47 @@ namespace spot
     {
       sync_transition* res = new sync_transition(size);
       size_t h = 0;
+      std::cerr << "current_transition " << res << " = [";
       for (unsigned n = 0; n < size; ++n)
 	{
-	  const saut::transition* t = &*pos[n];
+	  const saut::transition* t;
+	  if (pos[n] != nodes[n]->out.end())
+	    t = &*pos[n];
+	  else
+	    t = 0;
 	  res->trv[n] = t;
-	  h ^= knuth32_hash(PTR_TO_INT(syn.autsk[n] + t));
+	  if (t)
+	    {
+	      std::cerr << "(" << t->src << ", "
+			<< t->act << ", " << t->dst << ")";
+	      h ^= knuth32_hash(syn.autsk[n] ^ PTR_TO_INT(t));
+	    }
+	  else
+	    {
+	      std::cerr << "(.)";
+	    }
 	}
       res->h = h;
+      std::cerr << "] #" << h << std::endl;;
+      assert(h == res->recompute_hash(syn));
       return res;
+    }
+
+    std::string
+    current_annotation() const
+    {
+      std::ostringstream os;
+      for (unsigned n = 0;;)
+	{
+	  if (pos[n] != nodes[n]->out.end())
+	    os << *pos[n]->act->name;
+	  else
+	    os << ".";
+	  if (++n == size)
+	    break;
+	  os << ",";
+	}
+      return os.str();
     }
   };
 
@@ -555,6 +606,8 @@ namespace spot
 				 const sync::vnodes& n)
       : syn(syn), set(set.s), n(n)
     {
+      std::cerr << "sync_transition_set_iterator " << this << " size "
+		<< this->set.size() << std::endl;
     }
 
     virtual void
@@ -572,7 +625,7 @@ namespace spot
     virtual bool
     done() const
     {
-      return pos != set.end();
+      return pos == set.end();
     }
 
     virtual state*
@@ -597,6 +650,23 @@ namespace spot
     current_acceptance_conditions() const
     {
       return bddfalse;
+    }
+
+    std::string
+    current_annotation() const
+    {
+      std::ostringstream os;
+      for (unsigned n = 0;;)
+	{
+	  if ((*pos)->trv[n])
+	    os << *(*pos)->trv[n]->act->name;
+	  else
+	    os << ".";
+	  if (++n == syn.size())
+	    break;
+	  os << ",";
+	}
+      return os.str();
     }
   };
 
@@ -689,6 +759,7 @@ namespace spot
 	      t->trv[n] = *pos[n];
 	    else
 	      t->trv[n] = 0;
+	  assert(hk == t->recompute_hash(syn));
 	  *i++ = t;
 	  next();
 	}
@@ -713,6 +784,7 @@ namespace spot
 		  t->trv[n] = *pos[n];
 		else
 		  t->trv[n] = 0;
+	      assert(hk == t->recompute_hash(syn));
 	      *i++ = t;
 	      next();
 	    }
@@ -770,6 +842,9 @@ namespace spot
   sync::E3(const sync_transition* t, unsigned i) const
   {
     stlist res;
+    std::cerr << t << "/" << i << " = (" << t->trv[i]->src << ", "
+	      << t->trv[i]->act << ", " << t->trv[i]->dst << ")"
+	      << std::endl;
     const saut::node* q_i = t->trv[i]->src;
     for (saut::transitionsp_list::const_iterator p = q_i->in.begin();
 	 p != q_i->in.end(); ++p)
@@ -804,14 +879,19 @@ namespace spot
     while (!todo.empty())
       {
 	const sync_transition* t = todo.pick_one();
+	std::cerr << "picking transition " << t
+		  << " from " << &todo << std::endl;
 	unsigned which = syn->is_active(q, t);
 	sync::stlist toadd;
 	if (which < size)
 	  {
+	    std::cerr << "transition " << t << " is inactive (" << which << ")"
+		      << std::endl;
 	    toadd = syn->E3(t, which);
 	  }
 	else
 	  {
+	    std::cerr << "transition " << t << " is active" << std::endl;
 	    toadd = syn->E1UE2(t);
 	    actives.insert(t);
 	  }
@@ -857,6 +937,19 @@ namespace spot
 	return j;
       }
   }
+
+  std::string
+  sync::transition_annotation(const tgba_succ_iterator* t) const
+  {
+    const sync_transitions* tr = dynamic_cast<const sync_transitions*>(t);
+    if (tr)
+      return tr->current_annotation();
+    const sync_transition_set_iterator* trs =
+      dynamic_cast<const sync_transition_set_iterator*>(t);
+    assert(trs);
+    return trs->current_annotation();
+  }
+
 
 
 }

@@ -171,6 +171,7 @@ ap_props: IDENT
 	;
 
 tabledefs: tabledefsheader ";" tabledefsbody
+	| tabledefsheader ";" tabledefsbody ";" tabledefsoptions
 
 tabledefsbody: tabledefbody
 	| tabledefsbody "," tabledefbody
@@ -178,7 +179,7 @@ tabledefsbody: tabledefbody
 
 tabledefsheader: "(" auttuple ")"
 	{
-	  context.syn = new spot::sync(*$2, dict, true);
+	  context.syn = new spot::sync(*$2, dict);
 	  delete $2;
         }
 
@@ -231,6 +232,21 @@ tabledefbody: "(" idepstuple ")"
             }
           free_idlist($2);
         }
+
+tabledefsoptions :
+	| tabledefsoptions IDENT
+	{
+	  if (*$2 == "stubborn")
+	    {
+	      context.syn->set_stubborn();
+            }
+	  else
+            {
+              error_list.push_back(spot::saut_parse_error(@2,
+                                   *$2 + ": unknown table option"));
+	    }
+        }
+
 
 idepstuple: ideps
 	{ $$ = new std::list<const std::string*>;

@@ -67,6 +67,7 @@ namespace spot
     const saut* aut(unsigned n) const { return auts[n]; }
 
     bool declare_rule(action_list& l);
+    void set_stubborn(bool val = true);
 
     virtual state* get_init_state() const;
     virtual bdd_dict* get_dict() const;
@@ -79,6 +80,8 @@ namespace spot
     virtual tgba_succ_iterator* succ_iter(const state* l,
 					  const state*, const tgba*) const;
 
+    virtual std::string
+    transition_annotation(const tgba_succ_iterator* t) const;
 
     // Check whether transition T is active, and if so return size().
     // If the transition T is inactive, return the number of an automaton
@@ -92,6 +95,7 @@ namespace spot
     friend class sync_transitions;
     friend class sync_part;
     friend class sync_transition_set_iterator;
+    friend class sync_transition;
   };
 }
 

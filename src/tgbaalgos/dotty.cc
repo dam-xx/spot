@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -71,6 +71,10 @@ namespace spot
 	  + "\n"
 	  + bdd_format_accset(automata_->get_dict(),
 			      si->current_acceptance_conditions());
+
+	std::string annon = automata_->transition_annotation(si);
+	if (!annon.empty())
+	  label = annon + "\n" + label;
 
 	os_ << "  " << in << " -> " << out << " "
 	    << dd_->link_decl(automata_, in_s, in, out_s, out, si,

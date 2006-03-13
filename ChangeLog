@@ -1,3 +1,13 @@
+2006-03-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/saut/sync.cc, src/saut/sync.hh: More debugging, display
+	actions as transitions annotations, and allow stubborn sets to be
+	turned on and off.
+	* src/sautparse/sautparse.yy: Support the "stubborn" option on tables.
+	* src/sautparse/sautscan.ll: Allow digit identifiers.
+	* src/tgbaalgos/dotty.cc: Display transitions annotations where
+	available.
+
 2006-03-09  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/saut/sync.hh, src/saut/sync.cc: Check point of current work
