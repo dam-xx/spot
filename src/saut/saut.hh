@@ -57,6 +57,7 @@ namespace spot
       const node_name* name;
       transitions_list out;
       transitionsp_list in;
+      bdd props;
     };
 
     struct action
@@ -73,8 +74,11 @@ namespace spot
     node_map nodes;
     action_map actions;
     const node* initial;
+    bdd allnegprops;
+    bdd_dict* dict;
   public:
-    saut();
+    saut(bdd_dict* dict);
+    bdd_dict* get_dict() const;
     void set_initial(const node* n);
     void set_initial(const std::string& name);
 
@@ -85,6 +89,11 @@ namespace spot
 				   const std::string& act,
 				   const std::string& dst);
     const action* known_action(const action_name& name) const;
+    const node* known_node(const std::string& name) const;
+    void declare_propositions(const std::string& name, bdd props);
+    void declare_propositions(const ident_list* idlist, bdd props);
+
+    void finish();
 
     const node* get_initial() const;
   };

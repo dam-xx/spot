@@ -60,7 +60,7 @@ namespace spot
     action_back_vector actions_back;
     bool stubborn;
   public:
-    sync(saut_list& sautlist, bdd_dict* dict, bool stubborn = false);
+    sync(saut_list& sautlist, bool stubborn = false);
     bool known_action(unsigned aut_num, const saut::action_name& act) const;
 
     unsigned size() const { return auts.size(); }

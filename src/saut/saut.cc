@@ -24,8 +24,8 @@
 
 namespace spot
 {
-  saut::saut()
-    : initial(0)
+  saut::saut(bdd_dict* dict)
+    : initial(0), allnegprops(bddtrue), dict(dict)
   {
   }
 
@@ -56,10 +56,20 @@ namespace spot
 		  << &p.first->second << " = node `" << name << "'"
 		  << std::endl;
 
+	p.first->second.props = bddtrue;
 	if (!initial)
 	  set_initial(&p.first->second);
       }
     return &p.first->second;
+  }
+
+  const saut::node*
+  saut::known_node(const std::string& name) const
+  {
+    node_map::const_iterator ir = nodes.find(name);
+    if (ir == nodes.end())
+      return 0;
+    return &ir->second;
   }
 
   saut::action*
@@ -107,6 +117,23 @@ namespace spot
     return p;
   }
 
+  void
+  saut::declare_propositions(const std::string& str, bdd props)
+  {
+    node* n = declare_node(str);
+    n->props &= props;
+    allnegprops -= props;
+  }
+
+  void
+  saut::declare_propositions(const ident_list* idlist,
+			     bdd props)
+  {
+    for (ident_list::const_iterator i = idlist->begin();
+	 i != idlist->end(); ++i)
+      declare_propositions(**i, props);
+  }
+
   const saut::action*
   saut::known_action(const action_name& name) const
   {
@@ -120,6 +147,19 @@ namespace spot
   saut::get_initial() const
   {
     return initial;
+  }
+
+  void
+  saut::finish()
+  {
+    for (node_map::iterator i = nodes.begin(); i != nodes.end(); ++i)
+      i->second.props &= bdd_exist(allnegprops, i->second.props);
+  }
+
+  bdd_dict*
+  saut::get_dict() const
+  {
+    return dict;
   }
 
 }

@@ -51,6 +51,7 @@ ws	 " "|\t
 ";"				return SEMICOLON;
 ","				return COMA;
 "."				return DOT;
+"|="				return VERIFIES;
 
 :={ws}*Automaton		return AUTOMATON;
 :={ws}*Table			return TABLE;

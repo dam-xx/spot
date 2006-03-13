@@ -272,20 +272,21 @@ namespace spot
   };
 
 
-  sync::sync(saut_list& sautlist, bdd_dict* dict, bool stubborn)
+  sync::sync(saut_list& sautlist, bool stubborn)
     : auts(sautlist.begin(), sautlist.end()),
       autsk(auts.size()),
       autssize(auts.size()),
       heap(new sync_state_heap),
-      dict(dict),
       actions_back(auts.size()),
       stubborn(stubborn)
   {
     assert(!sautlist.empty());
+    dict = sautlist.front()->get_dict();
 
     std::cerr << "sync " << this << " created for (";
     for (unsigned n = 0;;)
       {
+	assert(auts[n]->get_dict() == dict);
 	autsk[n] = knuth32_hash(PTR_TO_INT(auts[n] + n));
 	std::cerr << auts[n];
 	if (++n == autssize)
@@ -535,7 +536,13 @@ namespace spot
     virtual bdd
     current_condition() const
     {
-      return bddtrue;
+      bdd c = bddtrue;
+      for (unsigned n = 0; n < size; ++n)
+	if (pos[n] != nodes[n]->out.end())
+	  c &= pos[n]->dst->props;
+	else
+	  c &= nodes[n]->props;
+      return c;
     }
 
     virtual bdd
@@ -643,7 +650,13 @@ namespace spot
     virtual bdd
     current_condition() const
     {
-      return bddtrue;
+      bdd c = bddtrue;
+      for (unsigned i = 0; i < syn.size(); ++i)
+	if ((*pos)->trv[i])
+	  c &= (*pos)->trv[i]->dst->props;
+	else
+	  c &= n[i]->props;
+      return c;
     }
 
     virtual bdd

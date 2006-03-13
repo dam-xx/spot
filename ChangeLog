@@ -1,5 +1,13 @@
 2006-03-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/sautparse/sautparse.yy, src/sautparse/sautscan.ll: Support
+	declarations of atomic propositions.
+	* src/saut/saut.cc, src/saut/saut.hh: Hold a dictionary, and
+	add methods to declare atomic propositions.
+	* src/saut/sync.cc, saut/sync.hh: Adjust to inherit the
+	dictionary from the operands automata.  Compute current_condition()
+	in the iterators.
+
 	* src/saut/sync.cc, src/saut/sync.hh: More debugging, display
 	actions as transitions annotations, and allow stubborn sets to be
 	turned on and off.

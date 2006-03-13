@@ -41,6 +41,7 @@ namespace
     aut_map auts;
     aut_names names;
     sync_map syns;
+    spot::ltl::environment* env;
   };
 
   void free_idlist(std::list<const std::string*>*);
@@ -60,6 +61,7 @@ namespace
   std::string* str;
   std::list<const std::string*>* idlist;
   spot::sync::saut_list* autlist;
+  bdd* prop;
 }
 
 %{
@@ -90,9 +92,11 @@ using namespace spot::ltl;
 %token SEMICOLON ";"
 %token COMA ","
 %token DOT "."
-%type <idlist> idtuple idepstuple
-%type <str> ideps
+%token VERIFIES "|="
+%type <idlist> idtuple idepstuple ap_states
+%type <str> ideps ap_state
 %type <autlist> auttuple
+%type <prop> ap_prop ap_props
 
 %%
 
@@ -117,6 +121,7 @@ assignment: IDENT structure
 	       delete $1;
 	       if (a)
 	         delete a;
+	       context.aut->finish();
 	       a = context.aut;
 	       context.aut = 0;
             }
@@ -132,7 +137,7 @@ assignment: IDENT structure
         }
 
 
-structure: "=Automaton" "(" { context.aut = new spot::saut; } automatondefs ")"
+structure: "=Automaton" "(" { context.aut = new spot::saut(dict); } automatondefs ")"
 	| "=Table" "(" tabledefs ")"
 	;
 
@@ -161,14 +166,48 @@ atomicpropositions: ap_statement
 	;
 
 ap_statement: ap_states "|=" ap_props
+	{ context.aut->declare_propositions($1, *$3); delete $3; }
 
-ap_states: IDENT
-	| ap_states IDENT
+ap_states: ap_state
+	{ $$ = new std::list<const std::string*>; $$->push_back($1); }
+	| ap_states ap_state
+	{ $$->push_back($2); }
 	;
 
-ap_props: IDENT
-	| ap_props IDENT
+ap_state: IDENT
+	{
+	   if (!context.aut->known_node(*$1))
+	      error_list.push_back(spot::saut_parse_error(@1,
+                                   *$1 + ": unknown node"));
+        }
+
+ap_props: ap_prop
+	{ $$ = $1; }
+	| ap_props ap_prop
+	{ *$1 &= *$2; delete $2; }
 	;
+
+ap_prop: IDENT
+        {
+	  $$ = new bdd;
+	  spot::ltl::formula* f = context.env->require(*$1);
+	  if (!f)
+	    {
+	      std::string s = "acceptance condition `";
+	      s += *$1;
+	      s += "' unknown in environment `";
+	      s += context.env->name();
+	      s += "'";
+	      error_list.push_back(spot::saut_parse_error(@1, s));
+	      *$$ = bddfalse;
+	    }
+	  else
+	    {
+	      int p =
+	        context.aut->get_dict()->register_proposition(f, context.aut);
+	      *$$ = bdd_ithvar(p);
+	    }
+	}
 
 tabledefs: tabledefsheader ";" tabledefsbody
 	| tabledefsheader ";" tabledefsbody ";" tabledefsoptions
@@ -179,7 +218,7 @@ tabledefsbody: tabledefbody
 
 tabledefsheader: "(" auttuple ")"
 	{
-	  context.syn = new spot::sync(*$2, dict);
+	  context.syn = new spot::sync(*$2);
 	  delete $2;
         }
 
@@ -294,16 +333,24 @@ ideps: IDENT    { $$ = $1; }
 command: "Check" "(" IDENT ")"
 	| "Display" "(" IDENT ")"
 	{
-          sync_map::const_iterator i = context.syns.find(*$3);
-	  if (i == context.syns.end())
-            {
-	      error_list.push_back(spot::saut_parse_error(@3, *$3 +
-                                 ": unknown table"));
-            }
-          else
+	  if (error_list.empty())
 	    {
-   	      spot::dotty_reachable(std::cout, i->second);
+	      sync_map::const_iterator i = context.syns.find(*$3);
+	      if (i == context.syns.end())
+		{
+		  error_list.push_back(spot::saut_parse_error(@3, *$3 +
+				     ": unknown table"));
+		}
+	      else
+		{
+		  spot::dotty_reachable(std::cout, i->second);
+		}
             }
+	  else
+	    {
+               error_list.push_back(spot::saut_parse_error(@$,
+	                            "ignored due to previous errors"));
+	    }
 	}
 
 %%
@@ -333,7 +380,7 @@ namespace spot
   saut_parse(const std::string& name,
              saut_parse_error_list& error_list,
              bdd_dict* d,
-             environment&,
+             environment& env,
              bool debug)
   {
     if (sautyyopen(name))
@@ -344,6 +391,7 @@ namespace spot
         return 0;
       }
     context_t context;
+    context.env = &env;
     sautyy::parser parser(error_list, context, d);
     parser.set_debug_level(debug);
     parser.parse();
