@@ -1,5 +1,14 @@
 2006-03-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/saut/saut.cc, src/saut/saut.hh: Keep two bdd per nodes: the
+	condition and the list of positive variables in this condition.
+	The latter makes it easier to compute deltas between nodes.
+	* src/saut/sync.cc, saut/sync.hh: Compute deltas between nodes,
+	and compare these with the set "aphi" of observed propositions
+	when computing stubborn sets.
+	* src/sautparse/sautparse.yy, src/sautparse/sautscan.ll: Allow
+	a formula to be passed to "Display" to specify "aphi".
+
 	* src/sautparse/sautparse.yy, src/sautparse/sautscan.ll: Support
 	declarations of atomic propositions.
 	* src/saut/saut.cc, src/saut/saut.hh: Hold a dictionary, and

@@ -59,6 +59,7 @@ namespace spot
     action_map actions;
     action_back_vector actions_back;
     bool stubborn;
+    bdd aphi;
   public:
     sync(saut_list& sautlist, bool stubborn = false);
     bool known_action(unsigned aut_num, const saut::action_name& act) const;
@@ -68,6 +69,8 @@ namespace spot
 
     bool declare_rule(action_list& l);
     void set_stubborn(bool val = true);
+    void set_aphi(bdd aphi);
+    void set_aphi(ltl::formula* f);
 
     virtual state* get_init_state() const;
     virtual bdd_dict* get_dict() const;

@@ -28,6 +28,7 @@
 #include "saut/saut.hh"
 #include "saut/sync.hh"
 #include "tgbaalgos/dotty.hh"
+#include "ltlparse/public.hh"
 
 namespace
 {
@@ -93,6 +94,7 @@ using namespace spot::ltl;
 %token COMA ","
 %token DOT "."
 %token VERIFIES "|="
+%token <str> QSTRING "quoted string"
 %type <idlist> idtuple idepstuple ap_states
 %type <str> ideps ap_state
 %type <autlist> auttuple
@@ -330,7 +332,48 @@ ideps: IDENT    { $$ = $1; }
 	| "."   { $$ = 0; }
 	;
 
-command: "Check" "(" IDENT ")"
+command: "Check" "(" IDENT "," QSTRING ")"
+        | "Display" "(" IDENT "," QSTRING ")"
+	{
+	  if (error_list.empty())
+	    {
+	      sync_map::const_iterator i = context.syns.find(*$3);
+	      if (i == context.syns.end())
+		{
+		  error_list.push_back(spot::saut_parse_error(@3, *$3 +
+				     ": unknown table"));
+		}
+	      else
+		{
+		  spot::ltl::parse_error_list pel;
+		  formula* f = spot::ltl::parse(*$5, pel, *context.env);
+		  for (parse_error_list::iterator j = pel.begin();
+		       j != pel.end(); ++j)
+		    {
+		      // Adjust the diagnostic to the current position.
+		      location here = @1;
+		      here.begin.line += j->first.begin.line;
+		      here.begin.column += j->first.begin.column;
+		      here.end.line =
+			here.begin.line + j->first.begin.line;
+		      here.end.column =
+			here.begin.column + j->first.begin.column;
+		      error_list.push_back(spot::saut_parse_error(here,
+								  j->second));
+		    }
+		  if (f)
+                    {
+		      i->second->set_aphi(f);
+		      spot::dotty_reachable(std::cout, i->second);
+		    }
+		}
+            }
+	  else
+	    {
+               error_list.push_back(spot::saut_parse_error(@$,
+	                            "ignored due to previous errors"));
+	    }
+        }
 	| "Display" "(" IDENT ")"
 	{
 	  if (error_list.empty())

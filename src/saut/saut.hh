@@ -57,7 +57,8 @@ namespace spot
       const node_name* name;
       transitions_list out;
       transitionsp_list in;
-      bdd props;
+      bdd prop_list;
+      bdd prop_cond;
     };
 
     struct action

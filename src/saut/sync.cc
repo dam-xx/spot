@@ -27,6 +27,8 @@
 #include "misc/hash.hh"
 #include "misc/hashfunc.hh"
 #include "misc/modgray.hh"
+#include "ltlvisit/postfix.hh"
+#include "ltlast/atomic_prop.hh"
 
 
 #define PTR_TO_INT(p) \
@@ -278,7 +280,8 @@ namespace spot
       autssize(auts.size()),
       heap(new sync_state_heap),
       actions_back(auts.size()),
-      stubborn(stubborn)
+      stubborn(stubborn),
+      aphi(bddtrue)
   {
     assert(!sautlist.empty());
     dict = sautlist.front()->get_dict();
@@ -303,6 +306,11 @@ namespace spot
     std::cerr << "sync " << this << " set_stubborn(" << val << ")" << std::endl;
   }
 
+  void
+  sync::set_aphi(bdd aphi)
+  {
+    this->aphi = aphi;
+  }
 
   bool
   sync::known_action(unsigned aut_num, const saut::action_name& act) const
@@ -539,10 +547,24 @@ namespace spot
       bdd c = bddtrue;
       for (unsigned n = 0; n < size; ++n)
 	if (pos[n] != nodes[n]->out.end())
-	  c &= pos[n]->dst->props;
+	  c &= pos[n]->dst->prop_cond;
 	else
-	  c &= nodes[n]->props;
+	  c &= nodes[n]->prop_cond;
       return c;
+    }
+
+    bdd
+    current_delta() const
+    {
+      bdd src = bddtrue;
+      bdd dst = bddtrue;
+      for (unsigned n = 0; n < size; ++n)
+	if (pos[n] != nodes[n]->out.end())
+	  {
+	    src &= pos[n]->src->prop_cond;
+	    dst &= pos[n]->src->prop_cond;
+	  }
+      return bdd_exist(src, dst) & bdd_exist(dst, src);
     }
 
     virtual bdd
@@ -653,9 +675,9 @@ namespace spot
       bdd c = bddtrue;
       for (unsigned i = 0; i < syn.size(); ++i)
 	if ((*pos)->trv[i])
-	  c &= (*pos)->trv[i]->dst->props;
+	  c &= (*pos)->trv[i]->dst->prop_cond;
 	else
-	  c &= n[i]->props;
+	  c &= n[i]->prop_cond;
       return c;
     }
 
@@ -876,12 +898,27 @@ namespace spot
     return res;
   }
 
+  bdd
+  delta(const sync_transition* t, unsigned size)
+  {
+    bdd src = bddtrue;
+    bdd dst = bddtrue;
+    for (unsigned n = 0; n < size; ++n)
+      if (t->trv[n])
+	{
+	  src &= t->trv[n]->src->prop_list;
+	  dst &= t->trv[n]->dst->prop_list;
+	}
+
+    return bdd_exist(src, dst) & bdd_exist(dst, src);
+  }
+
 
   sync_transition_set
   stubborn_set_trans(const sync* syn,
 		     const sync_state* q,
 		     const sync_transition* n,
-		     bdd)
+		     bdd aphi)
   {
     unsigned size = syn->size();
     sync_transition_set done;
@@ -913,7 +950,9 @@ namespace spot
 	  {
 	    if (done.insert_or_delete(*i) == *i)
 	      {
-		// FIXME: aphi here.
+		bdd d = delta(*i, size);
+		if (bdd_exist(d, aphi) != d)
+		  return sync_transition_set();
 		todo.insert(*i);
 		done.insert(*i);
 	      }
@@ -931,6 +970,7 @@ namespace spot
     i->first();
     if (!stubborn || i->done())
       {
+      nostubborn:
 	std::cerr << "sync " << this << " creates succ " << i
 		  << " for state " << s_ << " (" << format_state(n)
 		  << ")" << std::endl;
@@ -938,8 +978,21 @@ namespace spot
       }
     else
       {
+	// Try to pick an non-observed transition.
+	while (!i->done())
+	  {
+	    bdd delta = i->current_delta();
+	    if (bdd_exist(delta, aphi) == delta)
+	      break;
+	    i->next();
+	  }
+	if (i->done())
+	  goto nostubborn;
+
 	sync_transition* t = i->current_transition();
-	sync_transition_set set = stubborn_set_trans(this, s_, t, bddfalse);
+	sync_transition_set set = stubborn_set_trans(this, s_, t, aphi);
+	if (set.empty())
+	  goto nostubborn;
 	sync_transition_set_iterator* j =
 	  new sync_transition_set_iterator(*this, set, s_->s->nodes);
 	delete i;
@@ -949,6 +1002,36 @@ namespace spot
 		  << ")" << std::endl;
 	return j;
       }
+  }
+
+  namespace
+  {
+    struct bdd_prop_collector : public ltl::postfix_visitor
+    {
+      bdd_prop_collector(bdd_dict* d)
+	: ltl::postfix_visitor(), d(d), result(bddtrue)
+      {
+      }
+
+      virtual ~bdd_prop_collector() {}
+
+      virtual void doit(spot::ltl::atomic_prop* ap)
+      {
+	result &= bdd_ithvar(d->var_map[ap]);
+      }
+
+      bdd_dict* d;
+      bdd result;
+    };
+  }
+
+
+  void
+  sync::set_aphi(ltl::formula* f)
+  {
+    bdd_prop_collector v(dict);
+    const_cast<ltl::formula*>(f)->accept(v);
+    set_aphi(v.result);
   }
 
   std::string

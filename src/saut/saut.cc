@@ -56,7 +56,8 @@ namespace spot
 		  << &p.first->second << " = node `" << name << "'"
 		  << std::endl;
 
-	p.first->second.props = bddtrue;
+	p.first->second.prop_list = bddtrue;
+	p.first->second.prop_cond = bddtrue;
 	if (!initial)
 	  set_initial(&p.first->second);
       }
@@ -121,7 +122,7 @@ namespace spot
   saut::declare_propositions(const std::string& str, bdd props)
   {
     node* n = declare_node(str);
-    n->props &= props;
+    n->prop_list &= props;
     allnegprops -= props;
   }
 
@@ -153,7 +154,8 @@ namespace spot
   saut::finish()
   {
     for (node_map::iterator i = nodes.begin(); i != nodes.end(); ++i)
-      i->second.props &= bdd_exist(allnegprops, i->second.props);
+      i->second.prop_cond =
+	i->second.prop_list & bdd_exist(allnegprops, i->second.prop_list);
   }
 
   bdd_dict*

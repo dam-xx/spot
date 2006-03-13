@@ -69,7 +69,25 @@ Display				return DISPLAY;
 
 {eol}				yylloc->lines(yyleng); yylloc->step();
 {ws}+				yylloc->step();
+
+
+\"				{
+				  yylval->str = new std::string;
+				  BEGIN(STATE_STRING);
+				}
+
 .				return *yytext;
+
+  /* Handle \" and \\ in strings.  */
+<STATE_STRING>{
+  \"                    	{
+                        	  BEGIN(INITIAL);
+				  return QSTRING;
+                        	}
+  \\["\\]               	yylval->str->append(1, yytext[1]);
+  [^"\\]+               	yylval->str->append(yytext, yyleng);
+}
+
 
 %{
   /* Dummy use of yyunput to shut up a gcc warning.  */
