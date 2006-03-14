@@ -1,5 +1,8 @@
 2006-03-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/saut/saut.cc (sync::neg_acceptance_conditions): Correctly
+	return bddtrue.
+
 	* src/saut/saut.cc, src/saut/saut.hh, src/saut/sync.cc,
 	src/saut/sync.hh, src/sautparse/sautparse.yy,
 	src/sauttest/parse.cc: Add destructors, calls to delete, and

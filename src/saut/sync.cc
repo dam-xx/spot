@@ -433,7 +433,7 @@ namespace spot
   bdd
   sync::neg_acceptance_conditions() const
   {
-    return bddfalse;
+    return bddtrue;
   }
 
   bdd
