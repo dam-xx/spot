@@ -29,6 +29,7 @@
 #include "saut/sync.hh"
 #include "tgbaalgos/dotty.hh"
 #include "ltlparse/public.hh"
+#include "ltlvisit/destroy.hh"
 
 namespace
 {
@@ -63,6 +64,7 @@ namespace
   std::list<const std::string*>* idlist;
   spot::sync::saut_list* autlist;
   bdd* prop;
+  spot::ltl::formula* f;
 }
 
 %{
@@ -99,6 +101,7 @@ using namespace spot::ltl;
 %type <str> ideps ap_state
 %type <autlist> auttuple
 %type <prop> ap_prop ap_props
+%type <f> ltlformula
 
 %%
 
@@ -332,10 +335,10 @@ ideps: IDENT    { $$ = $1; }
 	| "."   { $$ = 0; }
 	;
 
-command: "Check" "(" IDENT "," QSTRING ")"
-        | "Display" "(" IDENT "," QSTRING ")"
+command: "Check" "(" IDENT "," ltlformula "," QSTRING ")"
+        | "Display" "(" IDENT "," ltlformula ")"
 	{
-	  if (error_list.empty())
+	  if (error_list.empty() || !$5)
 	    {
 	      sync_map::const_iterator i = context.syns.find(*$3);
 	      if (i == context.syns.end())
@@ -345,27 +348,9 @@ command: "Check" "(" IDENT "," QSTRING ")"
 		}
 	      else
 		{
-		  spot::ltl::parse_error_list pel;
-		  formula* f = spot::ltl::parse(*$5, pel, *context.env);
-		  for (parse_error_list::iterator j = pel.begin();
-		       j != pel.end(); ++j)
-		    {
-		      // Adjust the diagnostic to the current position.
-		      location here = @1;
-		      here.begin.line += j->first.begin.line;
-		      here.begin.column += j->first.begin.column;
-		      here.end.line =
-			here.begin.line + j->first.begin.line;
-		      here.end.column =
-			here.begin.column + j->first.begin.column;
-		      error_list.push_back(spot::saut_parse_error(here,
-								  j->second));
-		    }
-		  if (f)
-                    {
-		      i->second->set_aphi(f);
-		      spot::dotty_reachable(std::cout, i->second);
-		    }
+                   i->second->set_aphi($5);
+		   spot::ltl::destroy($5);
+		   spot::dotty_reachable(std::cout, i->second);
 		}
             }
 	  else
@@ -393,6 +378,26 @@ command: "Check" "(" IDENT "," QSTRING ")"
 	    {
                error_list.push_back(spot::saut_parse_error(@$,
 	                            "ignored due to previous errors"));
+	    }
+	}
+
+ltlformula: QSTRING
+	{
+	  spot::ltl::parse_error_list pel;
+	  $$ = spot::ltl::parse(*$1, pel, *context.env);
+	  for (parse_error_list::iterator j = pel.begin();
+	       j != pel.end(); ++j)
+	    {
+	      // Adjust the diagnostic to the current position.
+	      location here = @1;
+	      here.begin.line += j->first.begin.line;
+	      here.begin.column += j->first.begin.column;
+	      here.end.line =
+		here.begin.line + j->first.end.line - j->first.begin.line;
+	      here.end.column =
+		here.begin.column + j->first.end.column - j->first.begin.column;
+	      error_list.push_back(spot::saut_parse_error(here,
+							  j->second));
 	    }
 	}
 

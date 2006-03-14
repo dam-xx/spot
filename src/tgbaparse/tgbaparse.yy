@@ -114,13 +114,15 @@ line: strident ',' strident ',' condition ',' acc_list ';'
 		      i != pel.end(); ++i)
 		   {
 		     // Adjust the diagnostic to the current position.
-		     location here = @1;
+		     location here = @5;
 		     here.begin.line += i->first.begin.line;
 		     here.begin.column += i->first.begin.column;
 		     here.end.line =
-		       here.begin.line + i->first.begin.line;
+		       here.begin.line + i->first.end.line
+		       - i->first.begin.line;
 		     here.end.column =
-		       here.begin.column + i->first.begin.column;
+		       here.begin.column + i->first.end.column
+		       - i->first.begin.column;
 		     error_list.push_back(spot::tgba_parse_error(here,
 								 i->second));
 		   }

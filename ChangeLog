@@ -1,3 +1,10 @@
+2006-03-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/sautparse/sautparse.yy (ltlformula): Factorize the parsing
+	of LTL formulae, fix its error locations.
+	* src/tgbaparse/tgbaparse.yy (line): Fix error locations of
+	LTL formulae.
+
 2006-03-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/saut/saut.cc, src/saut/saut.hh: Keep two bdd per nodes: the
