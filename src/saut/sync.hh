@@ -62,6 +62,7 @@ namespace spot
     bdd aphi;
   public:
     sync(saut_list& sautlist, bool stubborn = false);
+    virtual ~sync();
     bool known_action(unsigned aut_num, const saut::action_name& act) const;
 
     unsigned size() const { return auts.size(); }

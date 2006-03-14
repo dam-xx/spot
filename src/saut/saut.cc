@@ -29,6 +29,11 @@ namespace spot
   {
   }
 
+  saut::~saut()
+  {
+   dict-> unregister_all_my_variables(this);
+  }
+
   void
   saut::set_initial(const node* n)
   {

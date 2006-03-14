@@ -140,6 +140,21 @@ namespace spot
       s = res;
     }
 
+    void
+    free_not_in(const sync_transition_set& other)
+    {
+      for (trset::iterator i = s.begin(); i != s.end(); ++i)
+	if (! other.has(*i))
+	  delete *i;
+    }
+
+    void
+    free_all()
+    {
+      for (trset::iterator i = s.begin(); i != s.end(); ++i)
+	delete *i;
+    }
+
     const sync_transition*
     pick_one()
     {
@@ -298,6 +313,12 @@ namespace spot
       }
     std::cerr << ") with heap " << heap << std::endl;
   }
+
+  sync::~sync()
+  {
+    delete heap;
+  }
+
 
   void
   sync::set_stubborn(bool val)
@@ -639,6 +660,13 @@ namespace spot
 		<< this->set.size() << std::endl;
     }
 
+    ~sync_transition_set_iterator()
+    {
+      for (sync_transition_set::trset::iterator i = set.begin();
+	   i != set.end(); ++i)
+	delete *i;
+    }
+
     virtual void
     first()
     {
@@ -952,12 +980,17 @@ namespace spot
 	      {
 		bdd d = delta(*i, size);
 		if (bdd_exist(d, aphi) != d)
-		  return sync_transition_set();
+		  {
+		    done.free_all();
+		    while (++i != toadd.end())
+		      delete *i;
+		    return sync_transition_set();
+		  }
 		todo.insert(*i);
-		done.insert(*i);
 	      }
 	  }
       }
+    done.free_not_in(actives);
     return actives;
   }
 
@@ -978,7 +1011,7 @@ namespace spot
       }
     else
       {
-	// Try to pick an non-observed transition.
+	// Try to pick a non-observed transition.
 	while (!i->done())
 	  {
 	    bdd delta = i->current_delta();
@@ -992,7 +1025,10 @@ namespace spot
 	sync_transition* t = i->current_transition();
 	sync_transition_set set = stubborn_set_trans(this, s_, t, aphi);
 	if (set.empty())
-	  goto nostubborn;
+	  {
+	    std::cerr << "sync " << this << " no stubborn set" << std::endl;
+	    goto nostubborn;
+	  }
 	sync_transition_set_iterator* j =
 	  new sync_transition_set_iterator(*this, set, s_->s->nodes);
 	delete i;

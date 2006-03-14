@@ -79,6 +79,7 @@ namespace spot
     bdd_dict* dict;
   public:
     saut(bdd_dict* dict);
+    ~saut();
     bdd_dict* get_dict() const;
     void set_initial(const node* n);
     void set_initial(const std::string& name);

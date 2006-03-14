@@ -1,5 +1,14 @@
 2006-03-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/saut/saut.cc, src/saut/saut.hh, src/saut/sync.cc,
+	src/saut/sync.hh, src/sautparse/sautparse.yy,
+	src/sauttest/parse.cc: Add destructors, calls to delete, and
+	whatever is needed to release memory once we no longer need it...
+	* src/sautparse/public.hh (saut_parse_result): New struct.
+	(saut_parse): Return a saut_parse_result.
+	* src/sautparse/result.cc: New file.
+	* src/sautparse/Makefile.am (libsautparse_la_SOURCES): Add it.
+
 	* src/sautparse/sautparse.yy (command) <Check>: Check a synchronized
 	automaton against an LTL formula, using the given emptiness check
 	algorithm.

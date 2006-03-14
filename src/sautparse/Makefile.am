@@ -58,4 +58,5 @@ libsautparse_la_SOURCES = \
   fmterror.cc \
   $(FROM_SAUTPARSE_YY) \
   sautscan.ll \
-  parsedecl.hh
+  parsedecl.hh \
+  result.cc

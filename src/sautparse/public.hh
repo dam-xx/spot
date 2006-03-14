@@ -29,11 +29,22 @@
 # include <list>
 # include <utility>
 # include <iosfwd>
+# include <map>
+# include "saut/sync.hh"
 
 namespace spot
 {
   /// \addtogroup saut_io
   /// @{
+
+  struct saut_parse_result
+  {
+    typedef std::map<std::string, spot::saut*> aut_map;
+    typedef std::map<std::string, spot::sync*> sync_map;
+    aut_map auts;
+    sync_map syns;
+    ~saut_parse_result();
+  };
 
   /// \brief A parse diagnostic with its location.
   typedef std::pair<yy::location, std::string> saut_parse_error;
@@ -48,7 +59,7 @@ namespace spot
   /// \param env The environment of atomic proposition into which parsing
   ///        should take place.
   /// \param debug When true, causes the parser to trace its execution.
-  /// \return A pointer to the saut built from \a filename, or
+  /// \return A newly allocated saut_parse_result structure, or
   ///        0 if the file could not be opened.
   ///
   /// Note that the parser usually tries to recover from errors.  It can
@@ -57,12 +68,12 @@ namespace spot
   /// was parsed succesfully, check \a error_list for emptiness.
   ///
   /// \warning This function is not reentrant.
-  saut* saut_parse(const std::string& filename,
-		   saut_parse_error_list& error_list,
-		   bdd_dict* dict,
-		   ltl::environment& env
-		   = ltl::default_environment::instance(),
-		   bool debug = false);
+  saut_parse_result* saut_parse(const std::string& filename,
+				saut_parse_error_list& error_list,
+				bdd_dict* dict,
+				ltl::environment& env
+				= ltl::default_environment::instance(),
+				bool debug = false);
 
   /// \brief Format diagnostics produced by spot::saut_parse.
   /// \param os Where diagnostics should be output.

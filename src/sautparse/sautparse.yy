@@ -21,9 +21,9 @@
 */
 
 %{
-#include <string>
 #include <sstream>
-#include <list>
+#include <map>
+#include <string>
 #include "public.hh"
 #include "saut/saut.hh"
 #include "saut/sync.hh"
@@ -36,16 +36,13 @@
 
 namespace
 {
-  typedef std::map<std::string, spot::saut*> aut_map;
   typedef std::map<const spot::saut*, std::string> aut_names;
-  typedef std::map<std::string, spot::sync*> sync_map;
   struct context_t
   {
+    spot::saut_parse_result* res;
     spot::saut* aut;
     spot::sync* syn;
-    aut_map auts;
     aut_names names;
-    sync_map syns;
     spot::ltl::environment* env;
   };
 
@@ -110,6 +107,14 @@ using namespace spot::ltl;
 %type <table> tableid
 %type <ec> emptinesscheck
 
+%destructor { delete $$; } IDENT QSTRING ideps ap_state
+                           IDENT_or_QSTRING emptinesscheck
+%destructor { spot::ltl::destroy($$); } ltlformula
+%destructor { free_idlist($$); } idtuple idepstuple ap_states
+%destructor { for (spot::sync::saut_list::iterator i = $$->begin();
+		   i != $$->end(); ++i)
+                     delete *i;
+             } auttuple
 %%
 
 system: definitions commands
@@ -128,7 +133,7 @@ assignment: IDENT structure
         {
 	  if (context.aut)
             {
-	       spot::saut*& a = context.auts[*$1];
+	       spot::saut*& a = context.res->auts[*$1];
 	       context.names[context.aut] = *$1;
 	       delete $1;
 	       if (a)
@@ -139,7 +144,7 @@ assignment: IDENT structure
             }
 	  else if (context.syn)
             {
-	       spot::sync*& a = context.syns[*$1];
+	       spot::sync*& a = context.res->syns[*$1];
 	       delete $1;
 	       if (a)
 	         delete a;
@@ -178,7 +183,11 @@ atomicpropositions: ap_statement
 	;
 
 ap_statement: ap_states "|=" ap_props
-	{ context.aut->declare_propositions($1, *$3); delete $3; }
+        {
+	  context.aut->declare_propositions($1, *$3);
+          free_idlist($1);
+          delete $3;
+	}
 
 ap_states: ap_state
 	{ $$ = new std::list<const std::string*>; $$->push_back($1); }
@@ -217,8 +226,10 @@ ap_prop: IDENT
 	    {
 	      int p =
 	        context.aut->get_dict()->register_proposition(f, context.aut);
+	      spot::ltl::destroy(f);
 	      *$$ = bdd_ithvar(p);
 	    }
+	  delete $1;
 	}
 
 tabledefs: tabledefsheader ";" tabledefsbody
@@ -236,8 +247,9 @@ tabledefsheader: "(" auttuple ")"
 
 auttuple: IDENT
 	{
-	  aut_map::const_iterator it = context.auts.find(*$1);
-	  if (it == context.auts.end())
+	  spot::saut_parse_result::aut_map::const_iterator it
+	    = context.res->auts.find(*$1);
+	  if (it == context.res->auts.end())
 	    {
                error_list.push_back(spot::saut_parse_error(@1,
 	                            *$1 + ": unknown automaton"));
@@ -249,8 +261,9 @@ auttuple: IDENT
         }
 	| auttuple "," IDENT
         {
-	  aut_map::const_iterator it = context.auts.find(*$3);
-	  if (it == context.auts.end())
+	  spot::saut_parse_result::aut_map::const_iterator it
+	    = context.res->auts.find(*$3);
+	  if (it == context.res->auts.end())
 	    {
                error_list.push_back(spot::saut_parse_error(@3,
 	                            *$3 + ": unknown automaton"));
@@ -296,6 +309,7 @@ tabledefsoptions :
               error_list.push_back(spot::saut_parse_error(@2,
                                    *$2 + ": unknown table option"));
 	    }
+	  delete $2;
         }
 
 
@@ -435,14 +449,16 @@ emptinesscheck: IDENT_or_QSTRING
 		  std::string("failed to parse emptiness check option near `")
                   + err + "'"));
 	    }
+	  delete $1;
  	}
 
 IDENT_or_QSTRING: IDENT | QSTRING
 
 tableid: IDENT
 	{
-           sync_map::const_iterator i = context.syns.find(*$1);
-	   if (i == context.syns.end())
+           spot::saut_parse_result::sync_map::const_iterator i
+	     = context.res->syns.find(*$1);
+	   if (i == context.res->syns.end())
 	     {
 	        error_list.push_back(spot::saut_parse_error(@1, *$1 +
                                      ": unknown table"));
@@ -452,6 +468,7 @@ tableid: IDENT
 	     {
 	       $$ = i->second;
              }
+	  delete $1;
 	}
 
 ltlformula: QSTRING
@@ -472,6 +489,7 @@ ltlformula: QSTRING
 	      error_list.push_back(spot::saut_parse_error(here,
 							  j->second));
 	    }
+	  delete $1;
 	}
 
 %%
@@ -497,13 +515,14 @@ namespace
 namespace spot
 {
 
-  saut*
+  saut_parse_result*
   saut_parse(const std::string& name,
              saut_parse_error_list& error_list,
              bdd_dict* d,
              environment& env,
              bool debug)
   {
+    saut_parse_result* res = new saut_parse_result;
     if (sautyyopen(name))
       {
         error_list.push_back
@@ -513,10 +532,11 @@ namespace spot
       }
     context_t context;
     context.env = &env;
+    context.res = res;
     sautyy::parser parser(error_list, context, d);
     parser.set_debug_level(debug);
     parser.parse();
     sautyyclose();
-    return 0;
+    return res;
   }
 }
