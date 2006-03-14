@@ -1,5 +1,9 @@
 2006-03-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/sautparse/sautparse.yy (command) <Check>: Check a synchronized
+	automaton against an LTL formula, using the given emptiness check
+	algorithm.
+
 	* src/sautparse/sautparse.yy (ltlformula): Factorize the parsing
 	of LTL formulae, fix its error locations.
 	* src/tgbaparse/tgbaparse.yy (line): Fix error locations of

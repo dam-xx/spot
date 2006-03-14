@@ -30,6 +30,9 @@
 #include "tgbaalgos/dotty.hh"
 #include "ltlparse/public.hh"
 #include "ltlvisit/destroy.hh"
+#include "tgbaalgos/emptiness.hh"
+#include "tgbaalgos/ltl2tgba_fm.hh"
+#include "tgba/tgbaproduct.hh"
 
 namespace
 {
@@ -65,6 +68,8 @@ namespace
   spot::sync::saut_list* autlist;
   bdd* prop;
   spot::ltl::formula* f;
+  spot::sync* table;
+  spot::emptiness_check_instantiator* ec;
 }
 
 %{
@@ -98,10 +103,12 @@ using namespace spot::ltl;
 %token VERIFIES "|="
 %token <str> QSTRING "quoted string"
 %type <idlist> idtuple idepstuple ap_states
-%type <str> ideps ap_state
+%type <str> ideps ap_state IDENT_or_QSTRING
 %type <autlist> auttuple
 %type <prop> ap_prop ap_props
 %type <f> ltlformula
+%type <table> tableid
+%type <ec> emptinesscheck
 
 %%
 
@@ -335,50 +342,116 @@ ideps: IDENT    { $$ = $1; }
 	| "."   { $$ = 0; }
 	;
 
-command: "Check" "(" IDENT "," ltlformula "," QSTRING ")"
-        | "Display" "(" IDENT "," ltlformula ")"
+command: "Check" "(" tableid "," ltlformula "," emptinesscheck ")"
 	{
-	  if (error_list.empty() || !$5)
+	  if (error_list.empty() && $3 && $5 && $7)
 	    {
-	      sync_map::const_iterator i = context.syns.find(*$3);
-	      if (i == context.syns.end())
+	      $3->set_aphi($5);
+	      spot::tgba_explicit* f =
+		spot::ltl_to_tgba_fm($5, dict, true, true,
+				     false, false, 0,
+				     spot::ltl::Reduce_All);
+	      spot::tgba_product* p = new spot::tgba_product($3, f);
+	      spot::emptiness_check* ec = $7->instantiate(p);
+	      spot::emptiness_check_result* res = ec->check();
+
+	      const spot::ec_statistics* ecs =
+		dynamic_cast<const spot::ec_statistics*>(ec);
+	      if (ecs)
+		std::cout << ecs->states() << " unique states visited, "
+			  << ecs->transitions() << " transitions visited, max "
+			  << ecs->max_depth() << " items in stack."
+			  << std::endl << std::endl;
+
+	      if (!res)
 		{
-		  error_list.push_back(spot::saut_parse_error(@3, *$3 +
-				     ": unknown table"));
+		  std::cout << "No accepting run found." << std::endl;
 		}
 	      else
 		{
-                   i->second->set_aphi($5);
-		   spot::ltl::destroy($5);
-		   spot::dotty_reachable(std::cout, i->second);
+		  std::cout << "An accepting run exists." << std::endl;
+
+		  spot::tgba_run* cex = res->accepting_run();
+		  if (cex)
+		    {
+		      std::cout << std::endl;
+		      spot::print_tgba_run(std::cout, p, cex);
+		      delete cex;
+		    }
 		}
+	      delete res;
+	      delete ec;
+	      delete p;
+	      delete f;
+	    }
+	  else
+	    {
+              error_list.push_back(spot::saut_parse_error(@$,
+	                           "ignored due to previous errors"));
+	    }
+	  if ($5)
+	    spot::ltl::destroy($5);
+	  if ($7)
+	    delete $7;
+        }
+        | "Display" "(" tableid "," ltlformula ")"
+	{
+	  if (error_list.empty() && $3 && $5)
+	    {
+	      $3->set_aphi($5);
+	      spot::ltl::destroy($5);
+	      spot::dotty_reachable(std::cout, $3);
             }
 	  else
 	    {
-               error_list.push_back(spot::saut_parse_error(@$,
-	                            "ignored due to previous errors"));
+	      error_list.push_back(spot::saut_parse_error(@$,
+	                           "ignored due to previous errors"));
 	    }
         }
-	| "Display" "(" IDENT ")"
+	| "Display" "(" tableid ")"
 	{
-	  if (error_list.empty())
+	  if (error_list.empty() && $3)
 	    {
-	      sync_map::const_iterator i = context.syns.find(*$3);
-	      if (i == context.syns.end())
-		{
-		  error_list.push_back(spot::saut_parse_error(@3, *$3 +
-				     ": unknown table"));
-		}
-	      else
-		{
-		  spot::dotty_reachable(std::cout, i->second);
-		}
+	      spot::dotty_reachable(std::cout, $3);
             }
 	  else
 	    {
-               error_list.push_back(spot::saut_parse_error(@$,
-	                            "ignored due to previous errors"));
+	      error_list.push_back(spot::saut_parse_error(@$,
+	                           "ignored due to previous errors"));
 	    }
+	}
+
+emptinesscheck: IDENT_or_QSTRING
+	{
+	  const char* err = 0;
+	  $$ = spot::emptiness_check_instantiator::construct($1->c_str(), &err);
+	  if (!$$)
+	    {
+	      if (err == $1->c_str())
+		error_list.push_back(spot::saut_parse_error(@$,
+                                     "unkown emptiness check algorithm"));
+	      else
+		error_list.push_back(spot::saut_parse_error(@$,
+		  std::string("failed to parse emptiness check option near `")
+                  + err + "'"));
+	    }
+ 	}
+
+IDENT_or_QSTRING: IDENT | QSTRING
+
+tableid: IDENT
+	{
+           sync_map::const_iterator i = context.syns.find(*$1);
+	   if (i == context.syns.end())
+	     {
+	        error_list.push_back(spot::saut_parse_error(@1, *$1 +
+                                     ": unknown table"));
+                $$ = 0;
+	     }
+	   else
+	     {
+	       $$ = i->second;
+             }
 	}
 
 ltlformula: QSTRING
@@ -391,7 +464,7 @@ ltlformula: QSTRING
 	      // Adjust the diagnostic to the current position.
 	      location here = @1;
 	      here.begin.line += j->first.begin.line;
-	      here.begin.column += j->first.begin.column;
+	      here.begin.column += 1 + j->first.begin.column;
 	      here.end.line =
 		here.begin.line + j->first.end.line - j->first.begin.line;
 	      here.end.column =

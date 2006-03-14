@@ -116,7 +116,7 @@ line: strident ',' strident ',' condition ',' acc_list ';'
 		     // Adjust the diagnostic to the current position.
 		     location here = @5;
 		     here.begin.line += i->first.begin.line;
-		     here.begin.column += i->first.begin.column;
+		     here.begin.column += 1 + i->first.begin.column;
 		     here.end.line =
 		       here.begin.line + i->first.end.line
 		       - i->first.begin.line;
