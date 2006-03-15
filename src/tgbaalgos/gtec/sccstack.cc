@@ -92,7 +92,6 @@ namespace spot
   {
     for (stack_type::iterator i = s.begin(); i != s.end(); ++i)
       {
-	std::cerr << "releasing proviso " << i->ignored << std::endl;
 	a->release_proviso(i->ignored);
 	i->ignored = 0;
       }

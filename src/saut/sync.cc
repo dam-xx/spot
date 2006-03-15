@@ -19,8 +19,16 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include "sync.hh"
+//#define TRACE
+
 #include <iostream>
+#ifdef TRACE
+#define trace std::cerr
+#else
+#define trace while (0) std::cerr
+#endif
+
+#include "sync.hh"
 #include <iterator>
 #include <algorithm>
 #include <sstream>
@@ -112,10 +120,10 @@ namespace spot
     const sync_transition*
     insert(const sync_transition* t)
     {
-      std::cerr << "Inserting transition " << t << " (#" << t->h << ") in "
+      trace << "Inserting transition " << t << " (#" << t->h << ") in "
 		<< &s;
       std::pair<trset::iterator, bool> res = s.insert(t);
-      std::cerr << " => " << *res.first  << std::endl;
+      trace << " => " << *res.first  << std::endl;
       return *res.first;
     }
 
@@ -125,7 +133,7 @@ namespace spot
       const sync_transition* u = insert(t);
       if (u != t)
 	{
-	  std::cerr << "Deleting transition " << t << std::endl;
+	  trace << "Deleting transition " << t << std::endl;
 	  delete t;
 	}
       return u;
@@ -249,18 +257,20 @@ namespace spot
     {
       std::pair<heap_t::iterator, bool> p =
 	heap.insert(sync_state_(nodes));
+#if TRACE
       if (p.second)
 	{
-	  std::cerr << "heap " << this << " inserts " << &*p.first << " =";
+	  trace << "heap " << this << " inserts " << &*p.first << " =";
 	  for (sync::vnodes::const_iterator i = nodes.begin();
 	       i != nodes.end(); ++i)
-	    std::cerr << " " << *i;
-	  std::cerr << std::endl;
+	    trace << " " << *i;
+	  trace << std::endl;
 	}
       else
 	{
-	  std::cerr << "heap " << this << " caches " << &*p.first << std::endl;
+	  trace << "heap " << this << " caches " << &*p.first << std::endl;
 	}
+#endif
       return &*p.first;
     }
   };
@@ -310,17 +320,17 @@ namespace spot
     assert(!sautlist.empty());
     dict = sautlist.front()->get_dict();
 
-    std::cerr << "sync " << this << " created for (";
+    trace << "sync " << this << " created for (";
     for (unsigned n = 0;;)
       {
 	assert(auts[n]->get_dict() == dict);
 	autsk[n] = knuth32_hash(PTR_TO_INT(auts[n] + n));
-	std::cerr << auts[n];
+	trace << auts[n];
 	if (++n == autssize)
 	  break;
-	std::cerr << ", ";
+	trace << ", ";
       }
-    std::cerr << ") with heap " << heap << std::endl;
+    trace << ") with heap " << heap << std::endl;
   }
 
   sync::~sync()
@@ -333,7 +343,7 @@ namespace spot
   sync::set_stubborn(bool val)
   {
     stubborn = val;
-    std::cerr << "sync " << this << " set_stubborn(" << val << ")" << std::endl;
+    trace << "sync " << this << " set_stubborn(" << val << ")" << std::endl;
   }
 
   bool
@@ -360,7 +370,7 @@ namespace spot
   {
     assert(l.size() == autssize);
 
-    std::cerr << "sync " << this << " declares rule (";
+    trace << "sync " << this << " declares rule (";
     action_list::const_iterator i = l.begin();
     unsigned j = 0;
     bool not_epsilon = false;
@@ -382,16 +392,16 @@ namespace spot
 	  {
 	    a = 0;
 	  }
-	std::cerr << a;
+	trace << a;
 	if (++j >= autssize)
 	  break;
 	++i;
-	std::cerr << ", ";
+	trace << ", ";
       }
-    std::cerr << ")";
+    trace << ")";
     if (not_epsilon)
       {
-	std::cerr << " as #" << hk;
+	trace << " as #" << hk;
 
 	const action_vect* p =
 	  &(actions.insert(action_map::value_type(hk, v)))->second;
@@ -399,7 +409,7 @@ namespace spot
 	for (unsigned j = 0; j < autssize; ++j)
 	  actions_back[j][v[j]].push_front(p);
       }
-    std::cerr << std::endl;
+    trace << std::endl;
     return !not_epsilon;
   }
 
@@ -541,10 +551,10 @@ namespace spot
     {
       while (!loopless_modular_mixed_radix_gray_code::done())
 	{
-	  std::cerr << "succ " << this << " considering transition #"
-		    << hk; // << ":";
+	  trace << "succ " << this << " considering transition #"
+		<< hk; // << ":";
 	  // for (unsigned n = 0; n < size; ++n)
-	  // std::cerr << " " << pos[n]->act;
+	  // trace << " " << pos[n]->act;
 	  typedef sync::action_map::const_iterator it;
 	  std::pair<it, it> p = syn.actions.equal_range(hk);
 	  for (it i = p.first; i != p.second; ++i)
@@ -556,11 +566,11 @@ namespace spot
 		  break;
 	      if (n == size)
 		{
-		  std::cerr << " -- GOOD" << std::endl;
+		  trace << " -- GOOD" << std::endl;
 		  return;
 		}
 	    }
-	  std::cerr << " -- IGNORED" << std::endl;
+	  trace << " -- IGNORED" << std::endl;
 	  loopless_modular_mixed_radix_gray_code::next();
 	}
     }
@@ -614,7 +624,7 @@ namespace spot
     {
       sync_transition* res = new sync_transition(size);
       size_t h = 0;
-      std::cerr << "current_transition " << res << " = [";
+      trace << "current_transition " << res << " = [";
       for (unsigned n = 0; n < size; ++n)
 	{
 	  const saut::transition* t;
@@ -625,17 +635,17 @@ namespace spot
 	  res->trv[n] = t;
 	  if (t)
 	    {
-	      std::cerr << "(" << t->src << ", "
+	      trace << "(" << t->src << ", "
 			<< t->act << ", " << t->dst << ")";
 	      h ^= knuth32_hash(syn.autsk[n] ^ PTR_TO_INT(t));
 	    }
 	  else
 	    {
-	      std::cerr << "(.)";
+	      trace << "(.)";
 	    }
 	}
       res->h = h;
-      std::cerr << "] #" << h << std::endl;;
+      trace << "] #" << h << std::endl;;
       assert(h == res->recompute_hash(syn));
       return res;
     }
@@ -673,16 +683,16 @@ namespace spot
 				 const sync::vnodes& n)
       : syn(syn), set(set.s), n(n)
     {
-      std::cerr << "sync_transition_set_iterator " << this << " size "
-		<< this->set.size() << std::endl;
+      trace << "sync_transition_set_iterator " << this << " size "
+	    << this->set.size() << std::endl;
 
       for (i->first(); !i->done(); i->next())
 	{
 	  sync_transition* t = i->current_transition();
 	  if (!set.has(t))
 	    {
-	      std::cerr << "sync_transition_set_iterator " << this
-			<< " transition #" << t->h << " ignored" << std::endl;
+	      trace << "sync_transition_set_iterator " << this
+		    << " transition #" << t->h << " ignored" << std::endl;
 	      const sync_transition* u = ignored.insert(t);
 	      assert(u == t);
 	      (void)u;
@@ -700,8 +710,8 @@ namespace spot
 				 const sync::vnodes& n)
       : syn(syn), set(set.s), ignored(ign),  n(n)
     {
-      std::cerr << "sync_transition_set_iterator " << this << " size "
-		<< this->set.size() << std::endl;
+      trace << "sync_transition_set_iterator " << this << " size "
+	    << this->set.size() << std::endl;
     }
 
     ~sync_transition_set_iterator()
@@ -955,9 +965,9 @@ namespace spot
   sync::E3(const sync_transition* t, unsigned i) const
   {
     stlist res;
-    std::cerr << t << "/" << i << " = (" << t->trv[i]->src << ", "
-	      << t->trv[i]->act << ", " << t->trv[i]->dst << ")"
-	      << std::endl;
+    trace << t << "/" << i << " = (" << t->trv[i]->src << ", "
+	  << t->trv[i]->act << ", " << t->trv[i]->dst << ")"
+	  << std::endl;
     const saut::node* q_i = t->trv[i]->src;
     for (saut::transitionsp_list::const_iterator p = q_i->in.begin();
 	 p != q_i->in.end(); ++p)
@@ -1007,19 +1017,19 @@ namespace spot
     while (!todo.empty())
       {
 	const sync_transition* t = todo.pick_one();
-	std::cerr << "picking transition " << t
-		  << " from " << &todo << std::endl;
+	trace << "picking transition " << t
+	      << " from " << &todo << std::endl;
 	unsigned which = syn->is_active(q, t);
 	sync::stlist toadd;
 	if (which < size)
 	  {
-	    std::cerr << "transition " << t << " is inactive (" << which << ")"
-		      << std::endl;
+	    trace << "transition " << t << " is inactive (" << which << ")"
+		  << std::endl;
 	    toadd = syn->E3(t, which);
 	  }
 	else
 	  {
-	    std::cerr << "transition " << t << " is active" << std::endl;
+	    trace << "transition " << t << " is active" << std::endl;
 	    toadd = syn->E1UE2(t);
 	    actives.insert(t);
 	  }
@@ -1054,9 +1064,9 @@ namespace spot
     if (!stubborn || i->done())
       {
       nostubborn:
-	std::cerr << "sync " << this << " creates succ " << i
-		  << " for state " << s_ << " (" << format_state(n)
-		  << ")" << std::endl;
+	trace << "sync " << this << " creates succ " << i
+	      << " for state " << s_ << " (" << format_state(n)
+	      << ")" << std::endl;
 	return i;
       }
     else
@@ -1076,16 +1086,16 @@ namespace spot
 	sync_transition_set set = stubborn_set_trans(this, s_, t);
 	if (set.empty())
 	  {
-	    std::cerr << "sync " << this << " no stubborn set" << std::endl;
+	    trace << "sync " << this << " no stubborn set" << std::endl;
 	    goto nostubborn;
 	  }
 	sync_transition_set_iterator* j =
 	  new sync_transition_set_iterator(*this, set, i, n);
 	delete i;
 
-	std::cerr << "sync " << this << " creates stubborn_succ " << j
-		  << " for state " << s_ << " (" << format_state(n)
-		  << ")" << std::endl;
+	trace << "sync " << this << " creates stubborn_succ " << j
+	      << " for state " << s_ << " (" << format_state(n)
+	      << ")" << std::endl;
 	return j;
       }
   }
@@ -1124,10 +1134,10 @@ namespace spot
 	sync_transition_set_iterator* j =
 	  new sync_transition_set_iterator(*aut, set, *this, q->s->nodes);
 
-	std::cerr << "sync_transition_set::oneset " << this
-		  << " creates stubborn_succ " << j << " for state "
-		  << q << " (" << aut->format_state(q->s->nodes) << ")"
-		  << std::endl;
+	trace << "sync_transition_set::oneset " << this
+	      << " creates stubborn_succ " << j << " for state "
+	      << q << " (" << aut->format_state(q->s->nodes) << ")"
+	      << std::endl;
 	return j;
       }
     else
@@ -1136,10 +1146,10 @@ namespace spot
 	  new sync_transition_set_iterator(*aut, *this, sync_transition_set(),
 					   q->s->nodes);
 
-	std::cerr << "sync_transition_set::oneset " << this
-		  << " creates ignored_succ " << j << " for state "
-		  << q << " (" << aut->format_state(q->s->nodes) << ")"
-		  << std::endl;
+	trace << "sync_transition_set::oneset " << this
+	      << " creates ignored_succ " << j << " for state "
+	      << q << " (" << aut->format_state(q->s->nodes) << ")"
+	      << std::endl;
 	return j;
       }
   }

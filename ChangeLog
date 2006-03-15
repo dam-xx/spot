@@ -1,5 +1,9 @@
 2006-03-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/saut/saut.cc, src/saut/sync.cc, src/tgba/tgbaproduct.cc,
+	src/tgbaalgos/gtec/sccstack.cc: Disable all traces using the
+	TRACE/trace idiom already in use in emptiness checks.
+
 	* src/tgba/proviso.cc, src/tgba/proviso.hh (proviso::oneset):
 	Take the local and global state and automaton as argument, its
 	needed to compute stubborn sets.

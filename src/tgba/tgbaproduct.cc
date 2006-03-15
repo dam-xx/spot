@@ -19,6 +19,15 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+//#define TRACE
+
+#include <iostream>
+#ifdef TRACE
+#define trace std::cerr
+#else
+#define trace while (0) std::cerr
+#endif
+
 #include "tgbaproduct.hh"
 #include <string>
 #include <cassert>
@@ -196,7 +205,7 @@ namespace spot
       const tgba_succ_iterator_product_proviso* p_
 	= dynamic_cast<const tgba_succ_iterator_product_proviso*>(p);
       assert(p_);
-      std::cerr << "proviso " << this << " intersect " << p_ << std::endl;
+      trace << "proviso " << this << " intersect " << p_ << std::endl;
     }
 
     tgba_succ_iterator*
@@ -246,8 +255,8 @@ namespace spot
     proviso* l = left_->get_proviso();
     proviso* r = right_->get_proviso();
     proviso* p = new tgba_succ_iterator_product_proviso(l, r);
-    std::cerr << "proviso " << p << " = ("
-	      << l << ", " << r << ")" << std::endl;
+    trace << "proviso " << p << " = ("
+	  << l << ", " << r << ")" << std::endl;
     return p;
   }
 
@@ -394,8 +403,8 @@ namespace spot
   {
     tgba_succ_iterator_product_proviso* p =
       dynamic_cast<tgba_succ_iterator_product_proviso*>(p_);
-    std::cerr << "releasing proviso " << p_ << " = ("
-              << p->left << ", " << p->right << ")" << std::endl;
+    trace << "releasing proviso " << p_ << " = ("
+          << p->left << ", " << p->right << ")" << std::endl;
     left_->release_proviso(p->left);
     right_->release_proviso(p->right);
     delete p;

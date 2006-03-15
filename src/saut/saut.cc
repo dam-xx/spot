@@ -19,8 +19,16 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include "saut.hh"
+//#define TRACE
+
 #include <iostream>
+#ifdef TRACE
+#define trace std::cerr
+#else
+#define trace while (0) std::cerr
+#endif
+
+#include "saut.hh"
 
 namespace spot
 {
@@ -38,8 +46,8 @@ namespace spot
   saut::set_initial(const node* n)
   {
     initial = n;
-    std::cerr << "aut " << this << " uses " << n << " as initial state"
-	      << std::endl;
+    trace << "aut " << this << " uses " << n << " as initial state"
+	  << std::endl;
   }
 
   void
@@ -57,9 +65,9 @@ namespace spot
     if (p.second)
       {
 	p.first->second.name = &p.first->first;
-	std::cerr << "aut " << this << " declares "
-		  << &p.first->second << " = node `" << name << "'"
-		  << std::endl;
+	trace << "aut " << this << " declares "
+	      << &p.first->second << " = node `" << name << "'"
+	      << std::endl;
 
 	p.first->second.prop_list = bddtrue;
 	p.first->second.prop_cond = bddtrue;
@@ -87,9 +95,9 @@ namespace spot
     if (p.second)
       {
 	p.first->second.name = &p.first->first;
-	std::cerr << "aut " << this << " declares "
-		  << &p.first->second << " = action `" << name << "'"
-		  << std::endl;
+	trace << "aut " << this << " declares "
+	      << &p.first->second << " = action `" << name << "'"
+	      << std::endl;
       }
     return &p.first->second;
   }
@@ -116,10 +124,10 @@ namespace spot
     dstn->in.push_back(p);
     actn->tia.push_back(p);
 
-    std::cerr << "aut " << this << " declares "
-	      << p << " = transition ("
-	      << srcn << ", " << actn << ", " << dstn << ")"
-	      << std::endl;
+    trace << "aut " << this << " declares "
+	  << p << " = transition ("
+	  << srcn << ", " << actn << ", " << dstn << ")"
+	  << std::endl;
     return p;
   }
 
