@@ -385,6 +385,9 @@ command: "Check" "(" tableid "," ltlformula "," emptinesscheck ")"
 		{
 		  std::cout << "An accepting run exists." << std::endl;
 
+		  // Disable stubborn sets when computing counterexamples.
+		  bool save_stubborn = $3->get_stubborn();
+		  $3->set_stubborn(false);
 		  spot::tgba_run* cex = res->accepting_run();
 		  if (cex)
 		    {
@@ -392,6 +395,7 @@ command: "Check" "(" tableid "," ltlformula "," emptinesscheck ")"
 		      spot::print_tgba_run(std::cout, p, cex);
 		      delete cex;
 		    }
+		  $3->set_stubborn(save_stubborn);
 		}
 	      delete res;
 	      delete ec;

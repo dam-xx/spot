@@ -1,3 +1,22 @@
+2006-03-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgba/proviso.cc, src/tgba/proviso.hh (proviso::oneset):
+	Take the local and global state and automaton as argument, its
+	needed to compute stubborn sets.
+	* src/saut/sync.cc, src/saut/sync.hh: Implement the proviso
+	interface.
+	* src/tgba/tgbaproduct.cc, src/tgba/tgbaproduct.hh: Implement
+	the proviso interface too.  This works only if at most one of the
+	arguments has a non dummy proviso.
+	* src/sautparse/sautparse.yy: Disable stubborn sets before
+	generating counterexamples.
+	* src/tgbaalgos/gtec/ce.cc: Add an assert that was useful to debug
+	the above.
+	* src/tgbaalgos/gtec/sccstack.cc, src/tgbaalgos/gtec/sccstack.hh:
+	New method to release the provisos on the stack.
+	* src/tgbaalgos/gtec/gtec.cc: Adjust calls to proviso::oneset,
+	and call root.release_provisos.
+
 2006-03-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/saut/saut.cc (sync::neg_acceptance_conditions): Correctly

@@ -26,12 +26,18 @@
 
 namespace spot
 {
+  class tgba;
+  class state;
+
   class proviso
   {
   public:
     virtual bool empty() const = 0;
     virtual void intersect(const proviso*) = 0;
-    virtual tgba_succ_iterator* oneset() = 0;
+    virtual tgba_succ_iterator* oneset(const state* local_state,
+				       const tgba* local_automaton,
+				       const state* global_state = 0,
+				       const tgba* global_automaton = 0) = 0;
     virtual ~proviso();
   };
 
@@ -41,7 +47,10 @@ namespace spot
     static dummy_proviso* instance();
     virtual bool empty() const;
     virtual void intersect(const proviso*);
-    virtual tgba_succ_iterator* oneset();
+    virtual tgba_succ_iterator* oneset(const state* local_state,
+				       const tgba* local_automaton,
+				       const state* global_state = 0,
+				       const tgba* global_automaton = 0);
     virtual ~dummy_proviso();
   private:
     dummy_proviso();

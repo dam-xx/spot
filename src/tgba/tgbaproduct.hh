@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -94,6 +94,8 @@ namespace spot
     bdd current_condition() const;
     bdd current_acceptance_conditions() const;
 
+    proviso* get_proviso() const;
+
   private:
     //@{
     /// Internal routines to advance to the next successor.
@@ -141,6 +143,8 @@ namespace spot
     virtual bdd all_acceptance_conditions() const;
     virtual bdd neg_acceptance_conditions() const;
 
+    virtual void release_proviso(proviso* p) const;
+
   protected:
     virtual bdd compute_support_conditions(const state* state) const;
     virtual bdd compute_support_variables(const state* state) const;
@@ -156,6 +160,7 @@ namespace spot
     // Disallow copy.
     tgba_product(const tgba_product&);
     tgba_product& tgba_product::operator=(const tgba_product&);
+    friend struct tgba_succ_iterator_product_proviso;
   };
 
 }

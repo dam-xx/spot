@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -134,6 +134,8 @@ namespace spot
 	// This initial state is outside the cycle.  Compute the prefix.
         cycle_entry_point = shpath.search(prefix_start, run_->prefix);
       }
+
+    assert(cycle_entry_point);
 
     // Locate cycle_entry_point on the cycle.
     tgba_run::steps::iterator cycle_ep_it;

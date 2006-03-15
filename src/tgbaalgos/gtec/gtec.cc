@@ -175,9 +175,11 @@ namespace spot
 	    // empty() will always return true.)
 	    if (!ecs_->root.top().ignored->empty())
 	      {
-		tgba_succ_iterator* iter = ecs_->root.top().ignored->oneset();
+		tgba_succ_iterator* iter
+		  = ecs_->root.top().ignored->oneset(curr, ecs_->aut);
+		iter->first();
 		ecs_->aut->release_proviso(ecs_->root.top().ignored);
-		ecs_->root.top().ignored = iter->get_proviso();
+		 ecs_->root.top().ignored = iter->get_proviso();
 		todo.top().second = iter;
 		delete succ;
 		continue;
@@ -305,6 +307,7 @@ namespace spot
 		todo.pop();
 		dec_depth();
 	      }
+	    ecs_->root.release_provisos(ecs_->aut);
 	    // Use this state to start the computation of an accepting
 	    // cycle.
 	    ecs_->cycle_seed = spi.first;
@@ -393,6 +396,7 @@ namespace spot
 	todo.pop_back();
       }
     dec_depth(ecs_->root.clear_rem());
+    ecs_->root.release_provisos(ecs_->aut);
     assert(depth() == 0);
   }
 
@@ -420,7 +424,9 @@ namespace spot
 	    // empty() will always return true.)
 	    if (!ecs_->root.top().ignored->empty())
 	      {
-		tgba_succ_iterator* iter = ecs_->root.top().ignored->oneset();
+		tgba_succ_iterator* iter
+		  = ecs_->root.top().ignored->oneset(todo.back().s, ecs_->aut);
+		iter->first();
 		ecs_->aut->release_proviso(ecs_->root.top().ignored);
 		ecs_->root.top().ignored = iter->get_proviso();
 		todo.back() = todo_item(todo.back().s, todo.back().n,
@@ -428,7 +434,6 @@ namespace spot
 		pos = todo.back().q.begin();
 		continue;
 	      }
-
 
 	    // We have explored all successors of state CURR.
 	    const state* curr = todo.back().s;

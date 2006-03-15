@@ -52,7 +52,7 @@ namespace spot
   }
 
   tgba_succ_iterator*
-  dummy_proviso::oneset()
+  dummy_proviso::oneset(const state*, const tgba*, const state*, const tgba*)
   {
     assert(!"should not be called");
     return 0;

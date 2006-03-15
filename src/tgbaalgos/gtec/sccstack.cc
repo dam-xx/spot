@@ -20,6 +20,7 @@
 // 02111-1307, USA.
 
 #include "sccstack.hh"
+#include "tgba/tgba.hh"
 
 namespace spot
 {
@@ -84,6 +85,17 @@ namespace spot
 	i->rem.clear();
       }
     return n;
+  }
+
+  void
+  scc_stack::release_provisos(const tgba* a)
+  {
+    for (stack_type::iterator i = s.begin(); i != s.end(); ++i)
+      {
+	std::cerr << "releasing proviso " << i->ignored << std::endl;
+	a->release_proviso(i->ignored);
+	i->ignored = 0;
+      }
   }
 
 

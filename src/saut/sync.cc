@@ -29,6 +29,7 @@
 #include "misc/modgray.hh"
 #include "ltlvisit/postfix.hh"
 #include "ltlast/atomic_prop.hh"
+#include "tgba/proviso.hh"
 
 
 #define PTR_TO_INT(p) \
@@ -97,7 +98,7 @@ namespace spot
     }
   };
 
-  struct sync_transition_set
+  struct sync_transition_set : public proviso
   {
     typedef std::set<const sync_transition*, sync_transition_cmp> trset;
     trset s;
@@ -130,9 +131,11 @@ namespace spot
       return u;
     }
 
-    void
-    intersection_update(const sync_transition_set* other)
+    virtual void
+    intersect(const proviso* o)
     {
+      const sync_transition_set* other
+	= dynamic_cast<const sync_transition_set*>(o);
       trset res;
       set_intersection(s.begin(), s.end(),
 		       other->s.begin(), other->s.end(),
@@ -164,8 +167,14 @@ namespace spot
       return t;
     }
 
-    bool
-    empty()
+    virtual tgba_succ_iterator*
+    oneset(const state* local_state,
+	   const tgba* local_automaton,
+	   const state* global_state = 0,
+	   const tgba* global_automaton = 0);
+
+    virtual bool
+    empty() const
     {
       return s.empty();
     }
@@ -325,6 +334,12 @@ namespace spot
   {
     stubborn = val;
     std::cerr << "sync " << this << " set_stubborn(" << val << ")" << std::endl;
+  }
+
+  bool
+  sync::get_stubborn() const
+  {
+    return stubborn;
   }
 
   void
@@ -647,14 +662,43 @@ namespace spot
   {
     const sync& syn;
     sync_transition_set::trset set;
+    sync_transition_set ignored;
     sync_transition_set::trset::const_iterator pos;
     const sync::vnodes& n;
 
   public:
     sync_transition_set_iterator(const sync& syn,
-				 sync_transition_set set,
+				 const sync_transition_set& set,
+				 sync_transitions* i,
 				 const sync::vnodes& n)
       : syn(syn), set(set.s), n(n)
+    {
+      std::cerr << "sync_transition_set_iterator " << this << " size "
+		<< this->set.size() << std::endl;
+
+      for (i->first(); !i->done(); i->next())
+	{
+	  sync_transition* t = i->current_transition();
+	  if (!set.has(t))
+	    {
+	      std::cerr << "sync_transition_set_iterator " << this
+			<< " transition #" << t->h << " ignored" << std::endl;
+	      const sync_transition* u = ignored.insert(t);
+	      assert(u == t);
+	      (void)u;
+	    }
+	  else
+	    {
+	      delete t;
+	    }
+	}
+    }
+
+    sync_transition_set_iterator(const sync& syn,
+				 const sync_transition_set& set,
+				 const sync_transition_set& ign,
+				 const sync::vnodes& n)
+      : syn(syn), set(set.s), ignored(ign),  n(n)
     {
       std::cerr << "sync_transition_set_iterator " << this << " size "
 		<< this->set.size() << std::endl;
@@ -713,6 +757,12 @@ namespace spot
     current_acceptance_conditions() const
     {
       return bddfalse;
+    }
+
+    virtual proviso*
+    get_proviso() const
+    {
+      return new sync_transition_set(ignored);
     }
 
     std::string
@@ -945,10 +995,10 @@ namespace spot
   sync_transition_set
   stubborn_set_trans(const sync* syn,
 		     const sync_state* q,
-		     const sync_transition* n,
-		     bdd aphi)
+		     const sync_transition* n)
   {
     unsigned size = syn->size();
+    bdd aphi = syn->get_aphi();
     sync_transition_set done;
     sync_transition_set actives;
     sync_transition_set todo;
@@ -1023,19 +1073,73 @@ namespace spot
 	  goto nostubborn;
 
 	sync_transition* t = i->current_transition();
-	sync_transition_set set = stubborn_set_trans(this, s_, t, aphi);
+	sync_transition_set set = stubborn_set_trans(this, s_, t);
 	if (set.empty())
 	  {
 	    std::cerr << "sync " << this << " no stubborn set" << std::endl;
 	    goto nostubborn;
 	  }
 	sync_transition_set_iterator* j =
-	  new sync_transition_set_iterator(*this, set, s_->s->nodes);
+	  new sync_transition_set_iterator(*this, set, i, n);
 	delete i;
 
 	std::cerr << "sync " << this << " creates stubborn_succ " << j
 		  << " for state " << s_ << " (" << format_state(n)
 		  << ")" << std::endl;
+	return j;
+      }
+  }
+
+  tgba_succ_iterator*
+  sync_transition_set::oneset(const state* q_,
+			      const tgba* a,
+			      const state*,
+			      const tgba*)
+  {
+    const sync* aut = dynamic_cast<const sync*>(a);
+    assert(aut);
+    const sync_state* q = dynamic_cast<const sync_state*>(q_);
+    assert(q);
+
+    unsigned size = aut->size();
+    bdd aphi = aut->get_aphi();
+    assert(!s.empty());
+    trset::const_iterator i = s.begin();
+    for (; i != s.end(); ++i)
+      {
+	bdd d = delta(*i, size);
+	if (bdd_exist(d, aphi) == d)
+	  break;
+      }
+    if (i == s.end())
+      // FIXME: Ne devrait-on pas retourner TOUTES les transitions restantes ?
+      i = s.begin();
+
+    const sync_transition* t = *i;
+    sync_transition_set set = stubborn_set_trans(aut, q, t);
+
+    if (!set.empty())
+      {
+	s.erase(i);
+	sync_transition_set_iterator* j =
+	  new sync_transition_set_iterator(*aut, set, *this, q->s->nodes);
+
+	std::cerr << "sync_transition_set::oneset " << this
+		  << " creates stubborn_succ " << j << " for state "
+		  << q << " (" << aut->format_state(q->s->nodes) << ")"
+		  << std::endl;
+	return j;
+      }
+    else
+      {
+	sync_transition_set_iterator* j =
+	  new sync_transition_set_iterator(*aut, *this, sync_transition_set(),
+					   q->s->nodes);
+
+	std::cerr << "sync_transition_set::oneset " << this
+		  << " creates ignored_succ " << j << " for state "
+		  << q << " (" << aut->format_state(q->s->nodes) << ")"
+		  << std::endl;
 	return j;
       }
   }
@@ -1070,6 +1174,13 @@ namespace spot
     set_aphi(v.result);
   }
 
+  bdd
+  sync::get_aphi() const
+  {
+    return aphi;
+  }
+
+
   std::string
   sync::transition_annotation(const tgba_succ_iterator* t) const
   {
@@ -1080,6 +1191,14 @@ namespace spot
       dynamic_cast<const sync_transition_set_iterator*>(t);
     assert(trs);
     return trs->current_annotation();
+  }
+
+  void
+  sync::release_proviso(proviso* p) const
+  {
+    sync_transition_set* s = dynamic_cast<sync_transition_set*>(p);
+    s->free_all();
+    delete s;
   }
 
 

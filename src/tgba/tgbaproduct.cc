@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,6 +23,7 @@
 #include <string>
 #include <cassert>
 #include "misc/hashfunc.hh"
+#include "proviso.hh"
 
 namespace spot
 {
@@ -168,6 +169,89 @@ namespace spot
 	    | (right_->current_acceptance_conditions() & left_neg_));
   }
 
+  struct tgba_succ_iterator_product_proviso : public proviso
+  {
+    tgba_succ_iterator_product_proviso(proviso* left,
+				       proviso* right)
+      : left(left), right(right)
+    {
+      assert(left);
+      assert(right);
+      assert(left == dummy_proviso::instance()
+	     || right == dummy_proviso::instance());
+    }
+
+    proviso* left;
+    proviso* right;
+
+    bool
+    empty() const
+    {
+      return left->empty() && right->empty();
+    }
+
+    void
+    intersect(const proviso* p)
+    {
+      const tgba_succ_iterator_product_proviso* p_
+	= dynamic_cast<const tgba_succ_iterator_product_proviso*>(p);
+      assert(p_);
+      std::cerr << "proviso " << this << " intersect " << p_ << std::endl;
+    }
+
+    tgba_succ_iterator*
+    oneset(const state* local_state,
+	   const tgba* local_automaton,
+	   const state* global_state = 0,
+	   const tgba* global_automaton = 0)
+    {
+      const state_product* ls
+	= dynamic_cast<const state_product*>(local_state);
+      assert(ls);
+      const tgba_product* la
+	= dynamic_cast<const tgba_product*>(local_automaton);
+      assert(la);
+
+      // If global_automaton is not specified, LA is the root of a
+      // product tree.
+      if (!global_automaton)
+	{
+	  global_automaton = la;
+	  global_state = ls;
+	}
+
+      tgba_succ_iterator* li =
+	(left == dummy_proviso::instance())
+	? la->left_->succ_iter(ls->left(), global_state,
+			       global_automaton)
+	: left->oneset(ls->left(), la->left_,
+		       global_state, global_automaton);
+
+      tgba_succ_iterator* ri =
+	(right == dummy_proviso::instance())
+	? la->right_->succ_iter(ls->right(), global_state,
+				global_automaton)
+	: right->oneset(ls->right(), la->right_,
+			global_state, global_automaton);
+
+      return new tgba_succ_iterator_product(li, ri,
+					    la->left_acc_complement_,
+					    la->right_acc_complement_);
+    }
+  };
+
+  proviso*
+  tgba_succ_iterator_product::get_proviso() const
+  {
+    proviso* l = left_->get_proviso();
+    proviso* r = right_->get_proviso();
+    proviso* p = new tgba_succ_iterator_product_proviso(l, r);
+    std::cerr << "proviso " << p << " = ("
+	      << l << ", " << r << ")" << std::endl;
+    return p;
+  }
+
+
   ////////////////////////////////////////////////////////////
   // tgba_product
 
@@ -303,6 +387,18 @@ namespace spot
     if (right == "")
       return left;
     return "<" + left + ", " + right + ">";
+  }
+
+  void
+  tgba_product::release_proviso(proviso* p_) const
+  {
+    tgba_succ_iterator_product_proviso* p =
+      dynamic_cast<tgba_succ_iterator_product_proviso*>(p_);
+    std::cerr << "releasing proviso " << p_ << " = ("
+              << p->left << ", " << p->right << ")" << std::endl;
+    left_->release_proviso(p->left);
+    right_->release_proviso(p->right);
+    delete p;
   }
 
 }

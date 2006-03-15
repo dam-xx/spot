@@ -70,8 +70,10 @@ namespace spot
 
     bool declare_rule(action_list& l);
     void set_stubborn(bool val = true);
+    bool get_stubborn() const;
     void set_aphi(bdd aphi);
     void set_aphi(ltl::formula* f);
+    bdd get_aphi() const;
 
     virtual state* get_init_state() const;
     virtual bdd_dict* get_dict() const;
@@ -86,6 +88,8 @@ namespace spot
 
     virtual std::string
     transition_annotation(const tgba_succ_iterator* t) const;
+
+    virtual void release_proviso(proviso*) const;
 
     // Check whether transition T is active, and if so return size().
     // If the transition T is inactive, return the number of an automaton

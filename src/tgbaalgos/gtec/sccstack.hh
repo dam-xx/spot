@@ -29,6 +29,7 @@
 namespace spot
 {
   class proviso;
+  class tgba;
 
   // A stack of Strongly-Connected Components, as needed by the
   // Tarjan-Couvreur algorithm.
@@ -78,6 +79,9 @@ namespace spot
 
     typedef std::list<connected_component> stack_type;
     stack_type s;
+
+    /// Release all the provisos on the stack.
+    void release_provisos(const tgba* a);
   };
 }
 
