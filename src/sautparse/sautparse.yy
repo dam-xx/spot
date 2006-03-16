@@ -360,7 +360,14 @@ command: "Check" "(" tableid "," ltlformula "," emptinesscheck ")"
 	{
 	  if (error_list.empty() && $3 && $5 && $7)
 	    {
-	      $3->set_aphi($5);
+	      std::string err = $3->set_aphi($5);
+	      if (!err.empty())
+	        {
+                  error_list.push_back(spot::saut_parse_error(@5,
+		       std::string("unknown atomic proposition(s) in system: ")
+		       + err));
+		  goto check_err;
+                }
 	      spot::tgba_explicit* f =
 		spot::ltl_to_tgba_fm($5, dict, true, true,
 				     false, false, 0,
@@ -404,6 +411,7 @@ command: "Check" "(" tableid "," ltlformula "," emptinesscheck ")"
 	    }
 	  else
 	    {
+	    check_err:
               error_list.push_back(spot::saut_parse_error(@$,
 	                           "ignored due to previous errors"));
 	    }
@@ -416,12 +424,19 @@ command: "Check" "(" tableid "," ltlformula "," emptinesscheck ")"
 	{
 	  if (error_list.empty() && $3 && $5)
 	    {
-	      $3->set_aphi($5);
+	      std::string err = $3->set_aphi($5);
+	      if (!err.empty())
+                 error_list.push_back(spot::saut_parse_error(@5,
+		   std::string("unknown atomic proposition(s) in system: ")
+		   + err));
 	      spot::ltl::destroy($5);
+	      if (!err.empty())
+	        goto display_err;
 	      spot::dotty_reachable(std::cout, $3);
             }
 	  else
 	    {
+	    display_err:
 	      error_list.push_back(spot::saut_parse_error(@$,
 	                           "ignored due to previous errors"));
 	    }

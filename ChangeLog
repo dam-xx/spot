@@ -1,3 +1,11 @@
+2006-03-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/sautparse/sautparse.yy (Check, Display): Diagnose propositions
+	that are used in formulae but not in the system.
+	* src/saut/saut.cc, src/saut/saut.hh (known_proposition): New method.
+	* src/saut/sync.cc, src/saut/sync.hh (known_proposition): New method.
+	(set_aphi): Return unknown propositions.
+
 2006-03-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/saut/saut.cc, src/saut/sync.cc, src/tgba/tgbaproduct.cc,

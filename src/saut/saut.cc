@@ -29,6 +29,7 @@
 #endif
 
 #include "saut.hh"
+#include "ltlast/atomic_prop.hh"
 
 namespace spot
 {
@@ -146,6 +147,15 @@ namespace spot
     for (ident_list::const_iterator i = idlist->begin();
 	 i != idlist->end(); ++i)
       declare_propositions(**i, props);
+  }
+
+  bool
+  saut::known_proposition(const ltl::atomic_prop* ap) const
+  {
+    bdd_dict::fv_map::const_iterator i = dict->var_map.find(ap);
+    if (i == dict->var_map.end())
+      return false;
+    return (allnegprops & bdd_ithvar(i->second)) == bddfalse;
   }
 
   const saut::action*

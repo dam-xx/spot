@@ -335,6 +335,7 @@ namespace spot
 
   sync::~sync()
   {
+    dict->unregister_all_my_variables(this);
     delete heap;
   }
 
@@ -1158,8 +1159,8 @@ namespace spot
   {
     struct bdd_prop_collector : public ltl::postfix_visitor
     {
-      bdd_prop_collector(bdd_dict* d)
-	: ltl::postfix_visitor(), d(d), result(bddtrue)
+      bdd_prop_collector(const sync& s)
+	: ltl::postfix_visitor(), result(bddtrue), s(s)
       {
       }
 
@@ -1167,21 +1168,49 @@ namespace spot
 
       virtual void doit(spot::ltl::atomic_prop* ap)
       {
-	result &= bdd_ithvar(d->var_map[ap]);
+	result &= bdd_ithvar(s.get_dict()->register_proposition(ap, &s));
+	if (!s.known_proposition(ap))
+	  unknown.push_back(ap->name());
       }
 
-      bdd_dict* d;
       bdd result;
+      const sync& s;
+      std::list<std::string> unknown;
     };
   }
 
 
-  void
+  std::string
   sync::set_aphi(ltl::formula* f)
   {
-    bdd_prop_collector v(dict);
+    bdd_prop_collector v(*this);
     const_cast<ltl::formula*>(f)->accept(v);
     set_aphi(v.result);
+    if (v.unknown.empty())
+      return "";
+    std::ostringstream res;
+    std::list<std::string>::const_iterator i;
+    bool onecoma = false;
+    for (i = v.unknown.begin();;)
+      {
+	res << "`" << *i << "'";
+	++i;
+	if (i == v.unknown.end())
+	  break;
+	if (&*i == &*v.unknown.rbegin())
+	  {
+	    if (onecoma)
+	      res << ", and ";
+	    else
+	      res << " and ";
+	  }
+	else
+	  {
+	    res << ", ";
+	    onecoma = true;
+	  }
+      }
+    return res.str();
   }
 
   bdd
@@ -1190,6 +1219,15 @@ namespace spot
     return aphi;
   }
 
+  bool
+  sync::known_proposition(const ltl::atomic_prop* ap) const
+  {
+    for (autvec::const_iterator i = auts.begin();
+	 i != auts.end(); ++i)
+      if ((*i)->known_proposition(ap))
+	return true;
+    return false;
+  }
 
   std::string
   sync::transition_annotation(const tgba_succ_iterator* t) const

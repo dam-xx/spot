@@ -94,6 +94,7 @@ namespace spot
     const node* known_node(const std::string& name) const;
     void declare_propositions(const std::string& name, bdd props);
     void declare_propositions(const ident_list* idlist, bdd props);
+    bool known_proposition(const ltl::atomic_prop* ap) const;
 
     void finish();
 

@@ -72,8 +72,10 @@ namespace spot
     void set_stubborn(bool val = true);
     bool get_stubborn() const;
     void set_aphi(bdd aphi);
-    void set_aphi(ltl::formula* f);
+    std::string set_aphi(ltl::formula* f);
     bdd get_aphi() const;
+
+    bool known_proposition(const ltl::atomic_prop* ap) const;
 
     virtual state* get_init_state() const;
     virtual bdd_dict* get_dict() const;
