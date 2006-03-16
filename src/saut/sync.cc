@@ -83,13 +83,13 @@ namespace spot
 
   struct sync_transition_cmp
   {
-    int
+    bool
     operator()(const sync_transition* a, const sync_transition* b) const
     {
       if (a->h < b->h)
-	return -1;
+	return true;
       if (a->h > b->h)
-	return 1;
+	return false;
       sync_transition::transitionv::const_iterator i = a->trv.begin();
       sync_transition::transitionv::const_iterator j = b->trv.begin();
 
@@ -97,12 +97,12 @@ namespace spot
 	{
 	  assert(j != b->trv.end());
 	  if (*i < *j)
-	    return -1;
+	    return true;
 	  if (*i > *j)
-	    return 1;
+	    return false;
 	}
       assert(j == b->trv.end());
-      return 0;
+      return false;
     }
   };
 

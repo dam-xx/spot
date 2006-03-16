@@ -1,5 +1,8 @@
 2006-03-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/saut/sync.cc (sync_transition_cmp::operator()): Fix the
+	definition to behave like "<", not strcmp().
+
 	* src/sautparse/sautparse.yy (Check, Display): Diagnose propositions
 	that are used in formulae but not in the system.
 	* src/saut/saut.cc, src/saut/saut.hh (known_proposition): New method.
