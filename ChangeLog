@@ -1,5 +1,10 @@
 2006-03-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/saut/sync.cc: Fix a memory leak when copying ignored
+	transition sets.
+	* src/sautparse/sautparse.yy (saut_parse): Don't leak memory if
+	file does not exist.
+
 	* src/saut/sync.cc (sync_transition_cmp::operator()): Fix the
 	definition to behave like "<", not strcmp().
 

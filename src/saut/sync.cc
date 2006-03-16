@@ -110,6 +110,19 @@ namespace spot
   {
     typedef std::set<const sync_transition*, sync_transition_cmp> trset;
     trset s;
+
+    sync_transition_set()
+      : proviso()
+    {
+    }
+
+    sync_transition_set(const sync_transition_set& o, int)
+      : proviso()
+    {
+      for (trset::iterator i = o.s.begin(); i != o.s.end(); ++i)
+	insert(new sync_transition(**i));
+    }
+
     bool
     has(const sync_transition* t) const
     {
@@ -720,6 +733,7 @@ namespace spot
       for (sync_transition_set::trset::iterator i = set.begin();
 	   i != set.end(); ++i)
 	delete *i;
+      ignored.free_all();
     }
 
     virtual void
@@ -773,7 +787,7 @@ namespace spot
     virtual proviso*
     get_proviso() const
     {
-      return new sync_transition_set(ignored);
+      return new sync_transition_set(ignored, 1);
     }
 
     std::string

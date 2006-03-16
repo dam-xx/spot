@@ -541,7 +541,6 @@ namespace spot
              environment& env,
              bool debug)
   {
-    saut_parse_result* res = new saut_parse_result;
     if (sautyyopen(name))
       {
         error_list.push_back
@@ -549,6 +548,7 @@ namespace spot
                             std::string("Cannot open file ") + name));
         return 0;
       }
+    saut_parse_result* res = new saut_parse_result;
     context_t context;
     context.env = &env;
     context.res = res;
