@@ -994,6 +994,8 @@ namespace spot
 	inclusion_count_stack(0),
 	stack_inclusion(stack_inclusion)
     {
+      onepass_ = true;
+
       stats["inclusion count heap"] =
 	static_cast<spot::unsigned_statistics::unsigned_fun>
 	(&couvreur99_check_shy_ssp::get_inclusion_count_heap);
@@ -1046,6 +1048,7 @@ namespace spot
       const state_gspn_ssp* s_ = dynamic_cast<const state_gspn_ssp*>(s);
       const void* cont = container_(s_->left());
       contained_map::const_iterator i = contained.find(cont);
+
       if (i != contained.end())
 	{
 	  f_map::const_iterator k = i->second.find(s_->right());
@@ -1094,13 +1097,19 @@ namespace spot
 			      Diff_succ(old_state->left(), new_state->left(),
 					&succ_tgba_, &size_tgba_);
 
+			      succ_queue::iterator old;
+			      if (pos == queue.end())
+				old = queue.begin();
+			      else
+				old = pos;
+
 			      for (size_t i = 0; i < size_tgba_; i++)
 				{
 				  state_gspn_ssp* s =
 				    new state_gspn_ssp
 				    (succ_tgba_[i],
 				     old_state->right()->clone());
-				  queue.push_back(successor(queue.begin()->acc,
+				  queue.push_back(successor(old->acc,
 							    s));
 				  inc_depth();
 				}
@@ -1166,6 +1175,8 @@ namespace spot
 			     numbered_state_heap_ssp_factory_semi::instance()),
 	inclusion_count(0)
     {
+      onepass_ = true;
+
       stats["find_state count"] =
 	static_cast<spot::unsigned_statistics::unsigned_fun>
 	(&couvreur99_check_shy_semi_ssp::get_inclusion_count);

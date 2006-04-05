@@ -1,3 +1,13 @@
+2006-04-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/gtec.cc, src/tgbaalgos/gtec/gtec.hh:
+	(couvreur99_check_shy_ssp): Add a onepass_ attribute to
+	disable the "shyness", and do not increment pos before calling
+	find_state since gspn's implementation uses it.
+	* iface/gspn/ssp.cc: Enable "onepass_" for all "shy" variants,
+	and also fix find_state for the case where onepass_ is
+	disabled (but I do not yet know why the latter fix isn't enough).
+
 2006-02-15  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gtec/gtec.cc: Add a third level hash, to split

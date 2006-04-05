@@ -221,6 +221,9 @@ namespace spot
     //   (ACCEPTANCE_CONDITIONS, STATE) pairs.
     typedef std::list<successor> succ_queue;
 
+    // Position in the loop seeking known successors.
+    succ_queue::iterator pos;
+
     struct todo_item
     {
       const state* s;
@@ -239,6 +242,10 @@ namespace spot
     // If the "group2" option is set (it implies "group"), we
     // reprocess the successor states of SCC that have been merged.
     bool group2_;
+    // If the onepass option is true, do only one pass.  This cancels
+    // all the "shyness" of the algorithm, but we need the framework
+    // of the implementation when working with GreatSPN.
+    bool onepass_;
 
     /// \brief find the SCC number of a unprocessed state.
     ///

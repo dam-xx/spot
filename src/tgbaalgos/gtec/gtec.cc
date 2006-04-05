@@ -322,6 +322,7 @@ namespace spot
     group_ = o.get("group", 1);
     group2_ = o.get("group2", 0);
     group_ |= group2_;
+    onepass_ = o.get("onepass", 0);
 
     // Setup depth-first search from the initial state.
     const state* i = ecs_->aut->get_init_state();
@@ -364,7 +365,7 @@ namespace spot
   couvreur99_check_shy::check()
   {
     // Position in the loop seeking known successors.
-    succ_queue::iterator pos = todo.back().q.begin();
+    pos = todo.back().q.begin();
 
     for (;;)
       {
@@ -429,13 +430,18 @@ namespace spot
 	// which state we are considering.  Otherwise just pick the
 	// first one.
 	succ_queue::iterator old;
+	if (onepass_)
+	  pos = queue.end();
 	if (pos == queue.end())
 	  old = queue.begin();
 	else
-	  old = pos++;
+	  old = pos;
 	successor succ = *old;
-
+	// Beware: the implementation of find_state in ifage/gspn/ssp.cc
+	// uses POS and modify QUEUE.
 	numbered_state_heap::state_index_p sip = find_state(succ.s);
+	if (pos != queue.end())
+	  ++pos;
 	int* i = sip.second;
 
 	if (!i)
