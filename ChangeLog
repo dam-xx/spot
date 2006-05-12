@@ -1,3 +1,7 @@
+2006-05-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/sautparse/sautscan.ll: Ignore `#...' comments.
+
 2006-03-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/saut/sync.cc: Fix a memory leak when copying ignored

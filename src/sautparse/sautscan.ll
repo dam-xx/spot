@@ -67,7 +67,7 @@ Display				return DISPLAY;
 				  return IDENT;
 				}
 
-{eol}				yylloc->lines(yyleng); yylloc->step();
+(#.*)?{eol}			yylloc->lines(yyleng); yylloc->step();
 {ws}+				yylloc->step();
 
 
