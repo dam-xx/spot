@@ -37,7 +37,10 @@
 #include "misc/modgray.hh"
 #include "ltlvisit/postfix.hh"
 #include "ltlast/atomic_prop.hh"
+#include "ltlenv/defaultenv.hh"
+#include "ltlvisit/destroy.hh"
 #include "tgba/proviso.hh"
+#include "tgba/bddprint.hh"
 
 
 #define PTR_TO_INT(p) \
@@ -270,7 +273,7 @@ namespace spot
     {
       std::pair<heap_t::iterator, bool> p =
 	heap.insert(sync_state_(nodes));
-#if TRACE
+#ifdef TRACE
       if (p.second)
 	{
 	  trace << "heap " << this << " inserts " << &*p.first << " =";
@@ -328,7 +331,10 @@ namespace spot
       heap(new sync_state_heap),
       actions_back(auts.size()),
       stubborn(stubborn),
-      aphi(bddtrue)
+      aphi(bddtrue),
+      allacc(bddfalse),
+      allweak(bddfalse),
+      allacc_neg(bddtrue)
   {
     assert(!sautlist.empty());
     dict = sautlist.front()->get_dict();
@@ -379,7 +385,66 @@ namespace spot
     return auts[aut_num]->known_action(act);
   }
 
-  bool
+  void
+  sync::set_fairness(action_vect* v, action_vect::Fairness f)
+  {
+    v->f = f;
+
+    if (f == action_vect::Weak)
+      {
+	std::ostringstream os;
+	os << "W" << actweak.size() + 1;
+	ltl::formula* fl =
+	  ltl::default_environment::instance().require(os.str());
+	int b = dict->register_acceptance_variable(fl, this);
+	ltl::destroy(fl);
+	actweak[v] = b;
+
+	v->acc = b;
+
+	trace << "actvect " << v << " is weak with BDD " << b << std::endl;
+
+	bdd bb = bdd_nithvar(b);
+	allacc = (allacc & bb) | (allacc_neg & bdd_ithvar(b));
+	allweak = (allweak & bb) | (allacc_neg & bdd_ithvar(b));
+	allacc_neg &= bb;
+      }
+    else if (f == action_vect::Strong)
+      {
+	std::ostringstream os, os2;
+	os << "L" << actstrong.size() + 1;
+	os2 << "U" << actstrong.size() + 1;
+	ltl::formula* fl1 =
+	  ltl::default_environment::instance().require(os.str());
+	ltl::formula* fl2 =
+	  ltl::default_environment::instance().require(os2.str());
+	int l = dict->register_acceptance_variable(fl1, this);
+	int u = dict->register_acceptance_variable(fl2, this);
+	ltl::destroy(fl1);
+	ltl::destroy(fl2);
+	actstrong[v] = std::pair<int, int>(l, u);
+
+	v->acc = u;
+
+	trace << "actvect " << v << " is string with BDD " << l
+	      << "," << u << std::endl;
+
+	bdd ll = bdd_nithvar(l);
+	allacc = (allacc & ll) | (allacc_neg & bdd_ithvar(l));
+	allacc_neg &= ll;
+	allweak &= ll;
+	bdd uu = bdd_nithvar(u);
+	allacc = (allacc & uu) | (allacc_neg & bdd_ithvar(u));
+	allacc_neg &= uu;
+	allweak &= uu;
+      }
+    else
+      {
+	assert(0);
+      }
+  }
+
+  spot::sync::action_vect*
   sync::declare_rule(action_list& l)
   {
     assert(l.size() == autssize);
@@ -388,7 +453,8 @@ namespace spot
     action_list::const_iterator i = l.begin();
     unsigned j = 0;
     bool not_epsilon = false;
-    action_vect v(autssize);
+    action_vect::actvect v(autssize);
+    action_vect* res = 0;
     size_t hk = 0;
     for (;;)
       {
@@ -417,14 +483,13 @@ namespace spot
       {
 	trace << " as #" << hk;
 
-	const action_vect* p =
-	  &(actions.insert(action_map::value_type(hk, v)))->second;
+	res = &(actions.insert(action_map::value_type(hk, v)))->second;
 
 	for (unsigned j = 0; j < autssize; ++j)
-	  actions_back[j][v[j]].push_front(p);
+	  actions_back[j][v[j]].push_front(res);
       }
     trace << std::endl;
-    return !not_epsilon;
+    return res;
   }
 
   state*
@@ -497,13 +562,16 @@ namespace spot
     size_t hk;
     const sync::vnodes& nodes;
     const sync& syn;
+    bdd weak;
+    int curacc;
 
-    sync_transitions(const sync::vnodes& nodes, const sync& syn)
+    sync_transitions(const sync::vnodes& nodes, const sync& syn, bdd weak)
       : loopless_modular_mixed_radix_gray_code(nodes.size()),
 	size(nodes.size()),
 	pos(nodes.size()),
 	nodes(nodes),
-	syn(syn)
+	syn(syn),
+	weak(weak)
     {
       hk = 0;
       for (unsigned n = 0; n < size; ++n)
@@ -581,6 +649,7 @@ namespace spot
 	      if (n == size)
 		{
 		  trace << " -- GOOD" << std::endl;
+		  curacc = i->second.acc;
 		  return;
 		}
 	    }
@@ -630,7 +699,13 @@ namespace spot
     virtual bdd
     current_acceptance_conditions() const
     {
-      return bddfalse;
+      bdd we = weak;
+      if (curacc >= 0)
+	{
+	  bdd w = bdd_ithvar(curacc);
+	  we |= (bdd_exist(syn.allacc_neg, w) & w);
+	}
+      return we;
     }
 
     sync_transition*
@@ -689,13 +764,15 @@ namespace spot
     sync_transition_set ignored;
     sync_transition_set::trset::const_iterator pos;
     const sync::vnodes& n;
+    bdd weak;
 
   public:
     sync_transition_set_iterator(const sync& syn,
 				 const sync_transition_set& set,
 				 sync_transitions* i,
-				 const sync::vnodes& n)
-      : syn(syn), set(set.s), n(n)
+				 const sync::vnodes& n,
+				 bdd weak)
+      : syn(syn), set(set.s), n(n), weak(weak)
     {
       trace << "sync_transition_set_iterator " << this << " size "
 	    << this->set.size() << std::endl;
@@ -722,7 +799,7 @@ namespace spot
 				 const sync_transition_set& set,
 				 const sync_transition_set& ign,
 				 const sync::vnodes& n)
-      : syn(syn), set(set.s), ignored(ign),  n(n)
+      : syn(syn), set(set.s), ignored(ign), n(n)
     {
       trace << "sync_transition_set_iterator " << this << " size "
 	    << this->set.size() << std::endl;
@@ -781,7 +858,7 @@ namespace spot
     virtual bdd
     current_acceptance_conditions() const
     {
-      return bddfalse;
+      return weak;
     }
 
     virtual proviso*
@@ -808,7 +885,6 @@ namespace spot
     }
   };
 
-
   unsigned
   sync::is_active(const sync_state* q, const sync_transition* t) const
   {
@@ -820,6 +896,25 @@ namespace spot
 	  return i;
       }
     return n;
+  }
+
+  bool
+  sync::is_active(const sync_state* q, const action_vect* v) const
+  {
+    unsigned n = size();
+    for (unsigned i = 0; i < n; ++i)
+      {
+	if (!(*v)[i])
+	  continue;
+	const saut::transitions_list& out = (*q)[i]->out;
+	saut::transitions_list::const_iterator j;
+	for (j = out.begin(); j != out.end(); ++j)
+	  if (j->act == (*v)[i])
+	    break;
+	if (j == out.end())
+	  return false;
+      }
+    return true;
   }
 
   struct sync_part : public loopless_modular_mixed_radix_gray_code
@@ -962,7 +1057,9 @@ namespace spot
 		 c != con.end(); ++c)
 	      {
 		action_back_map::const_iterator j = actions_back[i].find(*c);
-		assert (j != actions_back[i].end());
+		// This action may not be used by any synchronization rule.
+		if (j == actions_back[i].end())
+		  continue;
 		const action_vect_list& l = j->second;
 		for (action_vect_list::const_iterator k = l.begin();
 		     k != l.end(); ++k)
@@ -1069,12 +1166,36 @@ namespace spot
     return actives;
   }
 
+
   tgba_succ_iterator*
   sync::succ_iter(const state* s, const state*, const tgba*) const
   {
     const sync_state* s_ = dynamic_cast<const sync_state*>(s);
+
+    bdd weak = bddfalse;
+    for (action_weak_map::const_iterator i = actweak.begin();
+	 i != actweak.end(); ++i)
+      {
+	if (is_active(s_, i->first))
+	  {
+	    bdd w = bdd_ithvar(i->second);
+	    weak |= bdd_exist(allacc_neg, w) & w;
+	  }
+      }
+    weak = allweak - weak;
+
+    for (action_strong_map::const_iterator i = actstrong.begin();
+	 i != actstrong.end(); ++i)
+      {
+	if (is_active(s_, i->first))
+	  {
+	    bdd w = bdd_ithvar(i->second.first);
+	    weak |= bdd_exist(allacc_neg, w) & w;
+	  }
+      }
+
     const vnodes& n = s_->s->nodes;
-    sync_transitions* i = new sync_transitions(n, *this);
+    sync_transitions* i = new sync_transitions(n, *this, weak);
     i->first();
     if (!stubborn || i->done())
       {
@@ -1105,7 +1226,7 @@ namespace spot
 	    goto nostubborn;
 	  }
 	sync_transition_set_iterator* j =
-	  new sync_transition_set_iterator(*this, set, i, n);
+	  new sync_transition_set_iterator(*this, set, i, n, weak);
 	delete i;
 
 	trace << "sync " << this << " creates stubborn_succ " << j

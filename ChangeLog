@@ -1,5 +1,14 @@
 2006-05-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/saut/sync.cc, src/saut/sync.hh, src/sautparse/sautparse.yy,
+	src/sautparse/sautscan.ll: Allow weak and strong fairness to be
+	specified on transitions.  The associated acceptance conditions
+	are then output while generating the TGBA, but it doesn't yet if
+	stubborn sets are enabled.  Besides, the "Un" and Ln" strong
+	fairness conditions are still interpreted as Büchi acceptance
+	condition instead of Streett acceptance conditions by the
+	emptiness check.
+
 	* src/misc/bddalloc.cc (bdd_allocator::bdd_allocator): Count the
 	number of BDD variable after they have been allocated.  Otherwise
 	the first bdd_dict() created was leaking BDD variable #1.

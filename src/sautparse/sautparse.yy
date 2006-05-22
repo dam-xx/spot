@@ -67,6 +67,7 @@ namespace
   spot::ltl::formula* f;
   spot::sync* table;
   spot::emptiness_check_instantiator* ec;
+  spot::sync::action_vect* actvec;
 }
 
 %{
@@ -92,6 +93,8 @@ using namespace spot::ltl;
 %token ATOMICPROPOSITIONS "AtomicPropositions"
 %token CHECK "Check"
 %token DISPLAY "Display"
+%token WEAK ":Weak"
+%token STRONG ":Strong"
 %token DASH "-"
 %token ARROW "->"
 %token SEMICOLON ";"
@@ -106,6 +109,7 @@ using namespace spot::ltl;
 %type <f> ltlformula
 %type <table> tableid
 %type <ec> emptinesscheck
+%type <actvec> tabledefbody
 
 %destructor { delete $$; } IDENT QSTRING ideps ap_state
                            IDENT_or_QSTRING emptinesscheck
@@ -235,8 +239,8 @@ ap_prop: IDENT
 tabledefs: tabledefsheader ";" tabledefsbody
 	| tabledefsheader ";" tabledefsbody ";" tabledefsoptions
 
-tabledefsbody: tabledefbody
-	| tabledefsbody "," tabledefbody
+tabledefsbody: tabledefbodyopt
+	| tabledefsbody "," tabledefbodyopt
 	;
 
 tabledefsheader: "(" auttuple ")"
@@ -281,15 +285,23 @@ idtuple: IDENT
 	{ $$ = $1; $$->push_back($3); }
 	;
 
+tabledefbodyopt: tabledefbody
+        | tabledefbody WEAK
+	{ context.syn->set_fairness($1, spot::sync::action_vect::Weak); }
+        | tabledefbody STRONG
+	{ context.syn->set_fairness($1, spot::sync::action_vect::Strong); }
+        ;
+
 tabledefbody: "(" idepstuple ")"
 	{
+	  $$ = 0;
 	  if ($2->size() != context.syn->size())
 	    {
 	      assert($2->size() < context.syn->size());
               error_list.push_back(spot::saut_parse_error(@$,
                                    "not enough actions or too many automata"));
             }
-          else if (context.syn->declare_rule(*$2))
+          else if (!($$ = context.syn->declare_rule(*$2)))
 	    {
               error_list.push_back(spot::saut_parse_error(@2,
                                    "invalid tuple"));

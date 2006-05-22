@@ -56,6 +56,9 @@ ws	 " "|\t
 :={ws}*Automaton		return AUTOMATON;
 :={ws}*Table			return TABLE;
 
+:{ws}*Weak			return WEAK;
+:{ws}*Strong			return STRONG;
+
 Nodes				return NODES;
 Transitions			return TRANSITIONS;
 AtomicPropositions		return ATOMICPROPOSITIONS;
@@ -67,7 +70,7 @@ Display				return DISPLAY;
 				  return IDENT;
 				}
 
-(#.*)?{eol}			yylloc->lines(yyleng); yylloc->step();
+(#.*)?{eol}			yylloc->lines(); yylloc->step();
 {ws}+				yylloc->step();
 
 

@@ -45,11 +45,23 @@ namespace spot
     typedef std::vector<const saut*> autvec;
     typedef std::vector<size_t> autkvec;
     typedef std::list<const saut::action_name*> action_list;
-    typedef std::vector<const saut::action*> action_vect;
+    struct action_vect
+    {
+      typedef std::vector<const saut::action*> actvect;
+      actvect v;
+      enum Fairness { None, Weak, Strong } f;
+      int acc;
+      action_vect(const actvect& v) : v(v), f(None), acc(-1) {};
+      const saut::action*& operator[](unsigned n)       { return v[n]; }
+      const saut::action*  operator[](unsigned n) const { return v[n]; }
+    };
     typedef Sgi::hash_multimap<size_t, action_vect> action_map;
     typedef std::list<const action_vect*> action_vect_list;
     typedef std::map<const saut::action*, action_vect_list> action_back_map;
     typedef std::vector<action_back_map> action_back_vector;
+    typedef std::map<const sync::action_vect*, int> action_weak_map;
+    typedef std::map<const sync::action_vect*,
+		     std::pair<int, int> > action_strong_map;
   private:
     autvec auts;
     autkvec autsk;
@@ -60,6 +72,11 @@ namespace spot
     action_back_vector actions_back;
     bool stubborn;
     bdd aphi;
+    action_weak_map actweak;
+    action_strong_map actstrong;
+    bdd allacc;
+    bdd allweak;
+    bdd allacc_neg;
   public:
     sync(saut_list& sautlist, bool stubborn = false);
     virtual ~sync();
@@ -68,7 +85,7 @@ namespace spot
     unsigned size() const { return auts.size(); }
     const saut* aut(unsigned n) const { return auts[n]; }
 
-    bool declare_rule(action_list& l);
+    action_vect* declare_rule(action_list& l);
     void set_stubborn(bool val = true);
     bool get_stubborn() const;
     void set_aphi(bdd aphi);
@@ -76,6 +93,9 @@ namespace spot
     bdd get_aphi() const;
 
     bool known_proposition(const ltl::atomic_prop* ap) const;
+
+    void
+    set_fairness(action_vect* v, action_vect::Fairness f);
 
     virtual state* get_init_state() const;
     virtual bdd_dict* get_dict() const;
@@ -97,6 +117,8 @@ namespace spot
     // If the transition T is inactive, return the number of an automaton
     // for which it isn't.
     unsigned is_active(const sync_state* q, const sync_transition* t) const;
+
+    bool is_active(const sync_state* q, const action_vect* v) const;
 
     typedef std::list<sync_transition*> stlist;
     stlist E1UE2(const sync_transition* t) const;
