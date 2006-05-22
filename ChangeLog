@@ -1,3 +1,9 @@
+2006-05-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/misc/bddalloc.cc (bdd_allocator::bdd_allocator): Count the
+	number of BDD variable after they have been allocated.  Otherwise
+	the first bdd_dict() created was leaking BDD variable #1.
+
 2006-05-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/sautparse/sautscan.ll: Ignore `#...' comments.
