@@ -206,6 +206,7 @@ namespace spot
 	= dynamic_cast<const tgba_succ_iterator_product_proviso*>(p);
       assert(p_);
       trace << "proviso " << this << " intersect " << p_ << std::endl;
+      // FIXME: write me!
     }
 
     tgba_succ_iterator*

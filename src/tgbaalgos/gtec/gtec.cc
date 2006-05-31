@@ -30,6 +30,24 @@ namespace spot
     typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
   }
 
+  bool
+  couvreur99_check::found_acc() const
+  {
+    bdd curcond = ecs_->root.top().condition;
+    for (streett_acceptance_conditions::acc_list::const_iterator i
+	   = streett_acc.begin(); i != streett_acc.end(); ++i)
+      {
+	// Büchi
+	if (i->l == bddtrue)
+	  return (curcond == i->u);
+	// Streett
+	if (((i->l & curcond) != bddfalse)
+	    && ((i->u & curcond) == bddfalse))
+	    return false;
+      }
+    return true;
+  }
+
   couvreur99_check::couvreur99_check(const tgba* a,
 				     option_map o,
 				     const numbered_state_heap_factory* nshf)
@@ -41,6 +59,19 @@ namespace spot
     stats["removed components"] =
 	static_cast<spot::unsigned_statistics::unsigned_fun>
 	(&couvreur99_check::get_removed_components);
+
+    const streett_acceptance_conditions* st =
+      dynamic_cast<const streett_acceptance_conditions*>(a);
+    if (st)
+      {
+	streett_acc = st->get_streett_acceptance_conditions();
+      }
+    else
+      {
+	streett_acc.push_back(streett_pair
+			     (bddtrue,
+			      ecs_->aut->all_acceptance_conditions()));
+      }
   }
 
   couvreur99_check::~couvreur99_check()
@@ -55,7 +86,7 @@ namespace spot
   }
 
   void
-  couvreur99_check::remove_component(const state* from)
+  couvreur99_check::remove_component(const state* from, bool del)
   {
     ++removed_components;
 
@@ -69,8 +100,15 @@ namespace spot
 	  {
 	    numbered_state_heap::state_index_p spi = ecs_->h->index(*i);
 	    assert(spi.first == *i);
-	    assert(*spi.second != -1);
-	    *spi.second = -1;
+	    assert(*spi.second > -1);
+	    if (!del)
+	      {
+		*spi.second = -1;
+	      }
+	    else
+	      {
+		*spi.second = -2;
+	      }
 	  }
 	// ecs_->root.rem().clear();
 	return;
@@ -87,8 +125,8 @@ namespace spot
     // point in calling remove_component.)
     numbered_state_heap::state_index_p spi = ecs_->h->index(from);
     assert(spi.first == from);
-    assert(*spi.second != -1);
-    *spi.second = -1;
+    assert(*spi.second > -1);
+    *spi.second = (del ? -2 : -1);
     tgba_succ_iterator* i = ecs_->aut->succ_iter(from);
 
     for (;;)
@@ -109,9 +147,9 @@ namespace spot
 	    if (!spi.first)
 	      continue;
 
-	    if (*spi.second != -1)
+	    if (*spi.second > -1)
 	      {
-		*spi.second = -1;
+		*spi.second = (del ? -2 : -1);
 		to_remove.push(ecs_->aut->succ_iter(spi.first));
 	      }
 	  }
@@ -296,8 +334,7 @@ namespace spot
 	    ecs_->aut->release_proviso(p);
 	  }
 
-	if (ecs_->root.top().condition
-	    == ecs_->aut->all_acceptance_conditions())
+	if (found_acc())
 	  {
 	    // We have found an accepting SCC.
 	    // Release all iterators in TODO.
@@ -339,13 +376,16 @@ namespace spot
 
   couvreur99_check_shy::todo_item::todo_item(const state* s, int n,
 					     tgba_succ_iterator* iter,
-					     couvreur99_check_shy* shy)
+					     couvreur99_check_shy* shy,
+					     bdd avoid)
 	: s(s), n(n)
   {
     for (iter->first(); !iter->done(); iter->next(), shy->inc_transitions())
       {
-	q.push_back(successor(iter->current_acceptance_conditions(),
-			      iter->current_state()));
+	bdd acc = iter->current_acceptance_conditions();
+	(((acc & avoid) == bddfalse) ? q : qf)
+	  .push_back(successor(iter->current_acceptance_conditions(),
+			       iter->current_state()));
 	shy->inc_depth();
       }
     delete iter;
@@ -363,10 +403,13 @@ namespace spot
 
     // Setup depth-first search from the initial state.
     const state* i = ecs_->aut->get_init_state();
-    ecs_->h->insert(i, ++num);
+    ecs_->h->insert(i, num);
+    min.push_back(num);
+    avoid.push_back(std::pair<int, bdd>(num, bddfalse));
+
     tgba_succ_iterator* iter = ecs_->aut->succ_iter(i);
     ecs_->root.push(num, iter->get_proviso());
-    todo.push_back(todo_item(i, num, iter, this));
+    todo.push_back(todo_item(i, num, iter, this, bddfalse));
     inc_depth(1);
   }
 
@@ -381,18 +424,34 @@ namespace spot
     // unless they are used as keys in H.
     while (!todo.empty())
       {
-	succ_queue& queue = todo.back().q;
-	for (succ_queue::iterator q = queue.begin();
-	     q != queue.end(); ++q)
-	  {
-	    // Delete the state if it is a clone of a
-	    // state in the heap...
-	    numbered_state_heap::state_index_p spi = ecs_->h->index(q->s);
-	    // ... or if it is an unknown state.
-	    if (spi.first == 0)
-	      delete q->s;
-	  }
-	dec_depth(todo.back().q.size() + 1);
+	{
+	  succ_queue& queue = todo.back().q;
+	  for (succ_queue::iterator q = queue.begin();
+	       q != queue.end(); ++q)
+	    {
+	      // Delete the state if it is a clone of a
+	      // state in the heap...
+	      numbered_state_heap::state_index_p spi = ecs_->h->index(q->s);
+	      // ... or if it is an unknown state.
+	      if (spi.first == 0)
+		delete q->s;
+	    }
+	  dec_depth(todo.back().q.size() + 1);
+	}
+	{
+	  succ_queue& queue = todo.back().qf;
+	  for (succ_queue::iterator q = queue.begin();
+	       q != queue.end(); ++q)
+	    {
+	      // Delete the state if it is a clone of a
+	      // state in the heap...
+	      numbered_state_heap::state_index_p spi = ecs_->h->index(q->s);
+	      // ... or if it is an unknown state.
+	      if (spi.first == 0)
+		delete q->s;
+	    }
+	  dec_depth(todo.back().q.size() + 1);
+	}
 	todo.pop_back();
       }
     dec_depth(ecs_->root.clear_rem());
@@ -413,6 +472,12 @@ namespace spot
 	// Get the successors of the current state.
 	succ_queue& queue = todo.back().q;
 
+	if (queue.empty() && !todo.back().qf.empty())
+	  {
+	    queue.splice(queue.begin(), todo.back().qf);
+	    min.push_back(num);
+	  }
+
 	// If there is no more successor, backtrack.
 	if (queue.empty())
 	  {
@@ -430,7 +495,7 @@ namespace spot
 		ecs_->aut->release_proviso(ecs_->root.top().ignored);
 		ecs_->root.top().ignored = iter->get_proviso();
 		todo.back() = todo_item(todo.back().s, todo.back().n,
-					iter, this);
+					iter, this, bddfalse);
 		pos = todo.back().q.begin();
 		continue;
 	      }
@@ -438,6 +503,9 @@ namespace spot
 	    // We have explored all successors of state CURR.
 	    const state* curr = todo.back().s;
 	    int index = todo.back().n;
+
+	    if (index == min.back())
+	      min.pop_back();
 
 	    // Backtrack TODO.
 	    todo.pop_back();
@@ -471,10 +539,40 @@ namespace spot
 	    if (ecs_->root.top().index == index)
 	      {
 	    	 assert(!arc.empty());
+		 bdd la = arc.top();
+		 bdd acc = ecs_->root.top().condition;
+		 bdd old_avoid = avoid.back().second;
+		 if (avoid.back().first == index)
+		   avoid.pop_back();
+		 bdd new_avoid = old_avoid;
 	    	 arc.pop();
-	    	 remove_component(curr);
+		 for (streett_acceptance_conditions::acc_list::const_iterator
+			i = streett_acc.begin(); i != streett_acc.end(); ++i)
+		   if (((i->u & acc) == bddfalse)
+		       && ((i->l & acc) != bddfalse))
+		     new_avoid |= i->l;
+
 	    	 ecs_->aut->release_proviso(ecs_->root.top().ignored);
 	    	 ecs_->root.pop();
+
+		 if (new_avoid != old_avoid)
+		   {
+		     avoid.push_back(std::pair<int, bdd>(index, new_avoid));
+
+		     remove_component(curr, false);
+		     num = index + 1;
+		     tgba_succ_iterator* iter = ecs_->aut->succ_iter(curr);
+		     ecs_->root.push(num, iter->get_proviso());
+		     arc.push(la);
+		     todo.push_back(todo_item(curr, num, iter, this,
+					      new_avoid));
+		     pos = todo.back().q.begin();
+		     inc_depth();
+		   }
+		 else
+		   {
+		     remove_component(curr);
+		   }
 	      }
 	    continue;
 	  }
@@ -497,7 +595,7 @@ namespace spot
 	numbered_state_heap::state_index_p sip = find_state(succ.s);
 	int* i = sip.second;
 
-	if (!i)
+	if (!i || *i == -2)
 	  {
 	    // It's a new state.
 	    // If we are seeking known states, just skip it.
@@ -510,7 +608,8 @@ namespace spot
 	    tgba_succ_iterator* iter = ecs_->aut->succ_iter(succ.s);
 	    ecs_->root.push(num, iter->get_proviso());
 	    arc.push(succ.acc);
-	    todo.push_back(todo_item(succ.s, num, iter, this));
+	    todo.push_back(todo_item(succ.s, num, iter, this,
+				     avoid.back().second));
 	    pos = todo.back().q.begin();
 	    inc_depth();
 	    continue;
@@ -521,6 +620,10 @@ namespace spot
 
 	// Skip dead states.
 	if (*i == -1)
+	  continue;
+
+	// ignore "avoided" transitions
+	if (*i <= min.back())
 	  continue;
 
 	// Now this is the most interesting case.  We have
@@ -577,8 +680,7 @@ namespace spot
 	  }
 
 	// Have we found all acceptance conditions?
-	if (ecs_->root.top().condition
-	    == ecs_->aut->all_acceptance_conditions())
+	if (found_acc())
 	  {
 	    // Use this state to start the computation of an accepting
 	    // cycle.

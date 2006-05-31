@@ -23,6 +23,7 @@
 # define SPOT_SYNC_HH
 
 #include "tgba/tgba.hh"
+#include "tgba/streett.hh"
 #include "misc/hash.hh"
 #include <list>
 #include <string>
@@ -37,7 +38,7 @@ namespace spot
   class sync_state_heap;
   class sync_transition;
 
-  class sync : public tgba
+  class sync : public tgba, public streett_acceptance_conditions_stored
   {
   public:
     typedef std::vector<const saut::node*> vnodes;

@@ -24,6 +24,7 @@
 
 #include <stack>
 #include "status.hh"
+#include "tgba/streett.hh"
 #include "tgbaalgos/emptiness.hh"
 #include "tgbaalgos/emptiness_stats.hh"
 
@@ -176,13 +177,16 @@ namespace spot
     /// This function remove all accessible state from a given
     /// state. In other words, it removes the strongly connected
     /// component that contains this state.
-    void remove_component(const state* start_delete);
+    void remove_component(const state* start_delete, bool del = false);
 
     /// Whether to store the state to be removed.
     bool poprem_;
     /// Number of dead SCC removed by the algorithm.
     unsigned removed_components;
     unsigned get_removed_components() const;
+    bool found_acc() const;
+
+    streett_acceptance_conditions::acc_list streett_acc;
   };
 
   /// \brief A version of spot::couvreur99_check that tries to visit
@@ -226,12 +230,19 @@ namespace spot
       const state* s;
       int n;
       succ_queue q;		// Unprocessed successors of S
+      succ_queue qf;		// Unprocessed successors of S
       todo_item(const state* s, int n,
-		tgba_succ_iterator* iter, couvreur99_check_shy* shy);
+		tgba_succ_iterator* iter, couvreur99_check_shy* shy,
+		bdd avoid);
     };
 
     typedef std::list<todo_item> todo_list;
     todo_list todo;
+
+    typedef std::list<int> min_list;
+    min_list min;
+    typedef std::list<std::pair<int, bdd> > avoid_list;
+    avoid_list avoid;
 
     void clear_todo();
 

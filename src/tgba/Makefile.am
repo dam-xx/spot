@@ -34,6 +34,7 @@ tgba_HEADERS = \
   statebdd.hh \
   succiter.hh \
   succiterconcrete.hh \
+  streett.hh \
   tgba.hh \
   tgbabddconcrete.hh \
   tgbabddconcretefactory.hh \
@@ -52,6 +53,7 @@ libtgba_la_SOURCES = \
   formula2bdd.cc \
   proviso.cc \
   statebdd.cc \
+  streett.cc \
   succiter.cc \
   succiterconcrete.cc \
   tgba.cc \

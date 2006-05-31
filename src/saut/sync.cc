@@ -437,6 +437,8 @@ namespace spot
 	allacc = (allacc & uu) | (allacc_neg & bdd_ithvar(u));
 	allacc_neg &= uu;
 	allweak &= uu;
+
+	streett_acc.push_back(streett_pair(ll, uu));
       }
     else
       {
@@ -531,13 +533,13 @@ namespace spot
   bdd
   sync::all_acceptance_conditions() const
   {
-    return bddfalse;
+    return allacc;
   }
 
   bdd
   sync::neg_acceptance_conditions() const
   {
-    return bddtrue;
+    return allacc_neg;
   }
 
   bdd
@@ -1380,8 +1382,11 @@ namespace spot
   sync::release_proviso(proviso* p) const
   {
     sync_transition_set* s = dynamic_cast<sync_transition_set*>(p);
-    s->free_all();
-    delete s;
+    if (s)
+      {
+	s->free_all();
+	delete s;
+      }
   }
 
 
