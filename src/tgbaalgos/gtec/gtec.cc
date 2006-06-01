@@ -436,7 +436,6 @@ namespace spot
 	      if (spi.first == 0)
 		delete q->s;
 	    }
-	  dec_depth(todo.back().q.size() + 1);
 	}
 	{
 	  succ_queue& queue = todo.back().qf;
@@ -450,8 +449,8 @@ namespace spot
 	      if (spi.first == 0)
 		delete q->s;
 	    }
-	  dec_depth(todo.back().q.size() + 1);
 	}
+	dec_depth(todo.back().q.size() + todo.back().qf.size() + 1);
 	todo.pop_back();
       }
     dec_depth(ecs_->root.clear_rem());
@@ -526,10 +525,10 @@ namespace spot
 	    // the SCC again.
 	    if (poprem_)
 	      {
-	    	 numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
-	    	 assert(spi.first);
-	    	 ecs_->root.rem().push_front(spi.first);
-	    	 inc_depth();
+		numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
+		assert(spi.first);
+		ecs_->root.rem().push_front(spi.first);
+		inc_depth();
 	      }
 
 	    // When backtracking the root of an SCC, we must also
@@ -538,41 +537,42 @@ namespace spot
 	    assert(!ecs_->root.empty());
 	    if (ecs_->root.top().index == index)
 	      {
-	    	 assert(!arc.empty());
-		 bdd la = arc.top();
-		 bdd acc = ecs_->root.top().condition;
-		 bdd old_avoid = avoid.back().second;
-		 if (avoid.back().first == index)
-		   avoid.pop_back();
-		 bdd new_avoid = old_avoid;
-	    	 arc.pop();
-		 for (streett_acceptance_conditions::acc_list::const_iterator
-			i = streett_acc.begin(); i != streett_acc.end(); ++i)
-		   if (((i->u & acc) == bddfalse)
-		       && ((i->l & acc) != bddfalse))
-		     new_avoid |= i->l;
+		assert(!arc.empty());
+		bdd la = arc.top();
+		bdd acc = ecs_->root.top().condition;
+		bdd old_avoid = avoid.back().second;
+		if (avoid.back().first == index)
+		  avoid.pop_back();
+		bdd new_avoid = old_avoid;
+		arc.pop();
+		for (streett_acceptance_conditions::acc_list::const_iterator
+		       i = streett_acc.begin(); i != streett_acc.end(); ++i)
+		  if (((i->u & acc) == bddfalse)
+		      && ((i->l & acc) != bddfalse))
+		    new_avoid |= i->l;
 
-	    	 ecs_->aut->release_proviso(ecs_->root.top().ignored);
-	    	 ecs_->root.pop();
+		ecs_->aut->release_proviso(ecs_->root.top().ignored);
 
-		 if (new_avoid != old_avoid)
-		   {
-		     avoid.push_back(std::pair<int, bdd>(index, new_avoid));
+		if (new_avoid != old_avoid)
+		  {
+		    avoid.push_back(std::pair<int, bdd>(index, new_avoid));
 
-		     remove_component(curr, false);
-		     num = index + 1;
-		     tgba_succ_iterator* iter = ecs_->aut->succ_iter(curr);
-		     ecs_->root.push(num, iter->get_proviso());
-		     arc.push(la);
-		     todo.push_back(todo_item(curr, num, iter, this,
-					      new_avoid));
-		     pos = todo.back().q.begin();
-		     inc_depth();
-		   }
-		 else
-		   {
-		     remove_component(curr);
-		   }
+		    remove_component(curr, false);
+		    num = index + 1;
+		    tgba_succ_iterator* iter = ecs_->aut->succ_iter(curr);
+		    ecs_->root.push(num, iter->get_proviso());
+		    ecs_->root.pop();
+		    arc.push(la);
+		    todo.push_back(todo_item(curr, num, iter, this,
+					     new_avoid));
+		    pos = todo.back().q.begin();
+		    inc_depth();
+		  }
+		else
+		  {
+		    remove_component(curr);
+		    ecs_->root.pop();
+		  }
 	      }
 	    continue;
 	  }
