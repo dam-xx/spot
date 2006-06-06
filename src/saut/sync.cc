@@ -408,6 +408,8 @@ namespace spot
 	allacc = (allacc & bb) | (allacc_neg & bdd_ithvar(b));
 	allweak = (allweak & bb) | (allacc_neg & bdd_ithvar(b));
 	allacc_neg &= bb;
+
+	streett_acc.push_back(streett_pair(bddtrue, !bb));
       }
     else if (f == action_vect::Strong)
       {
@@ -438,7 +440,7 @@ namespace spot
 	allacc_neg &= uu;
 	allweak &= uu;
 
-	streett_acc.push_back(streett_pair(ll, uu));
+	streett_acc.push_back(streett_pair(!ll, !uu));
       }
     else
       {

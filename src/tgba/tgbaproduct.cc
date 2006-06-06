@@ -411,4 +411,42 @@ namespace spot
     delete p;
   }
 
+
+  streett_product::streett_product(const tgba* left, const tgba* right)
+    : tgba_product(left, right)
+  {
+    const streett_acceptance_conditions* l =
+      dynamic_cast<const streett_acceptance_conditions*>(left);
+    if (l)
+      {
+	streett_acc = l->get_streett_acceptance_conditions();
+      }
+    else
+      {
+        bdd all = left->all_acceptance_conditions();
+        while (all != bddfalse)
+          {
+	    bdd one = bdd_satone(all);
+            all -= one;
+	    streett_acc.push_back(streett_pair(bddtrue, one));
+          }
+      }
+
+    const streett_acceptance_conditions* r =
+      dynamic_cast<const streett_acceptance_conditions*>(right);
+    if (r)
+      {
+	streett_acc = r->get_streett_acceptance_conditions();
+      }
+    else
+      {
+        bdd all = right->all_acceptance_conditions();
+        while (all != bddfalse)
+          {
+	    bdd one = bdd_satone(all);
+            all -= one;
+	    streett_acc.push_back(streett_pair(bddtrue, one));
+          }
+      }
+  }
 }

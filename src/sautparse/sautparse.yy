@@ -384,7 +384,7 @@ command: "Check" "(" tableid "," ltlformula "," emptinesscheck ")"
 		spot::ltl_to_tgba_fm($5, dict, true, true,
 				     false, false, 0,
 				     spot::ltl::Reduce_All);
-	      spot::tgba_product* p = new spot::tgba_product($3, f);
+	      spot::streett_product* p = new spot::streett_product($3, f);
 	      spot::emptiness_check* ec = $7->instantiate(p);
 	      spot::emptiness_check_result* res = ec->check();
 

@@ -22,6 +22,7 @@
 #include "gtec.hh"
 #include "ce.hh"
 #include "tgba/proviso.hh"
+#include "tgba/bddprint.hh"
 
 namespace spot
 {
@@ -33,18 +34,22 @@ namespace spot
   bool
   couvreur99_check::found_acc() const
   {
+    bdd acc = bddtrue;
     bdd curcond = ecs_->root.top().condition;
     for (streett_acceptance_conditions::acc_list::const_iterator i
 	   = streett_acc.begin(); i != streett_acc.end(); ++i)
       {
 	// Büchi
-	if (i->l == bddtrue)
-	  return (curcond == i->u);
+	if (i->l == bddfalse)
+	  return ((ecs_->cycle_acc = curcond) == i->u);
 	// Streett
-	if (((i->l & curcond) != bddfalse)
-	    && ((i->u & curcond) == bddfalse))
+	if ((i->l & curcond) == bddfalse)
+	  acc &= !i->l & !i->u;
+	else
+	  if ((i->u & curcond) == bddfalse)
 	    return false;
       }
+    ecs_->cycle_acc = ecs_->aut->all_acceptance_conditions() & acc;
     return true;
   }
 
@@ -69,7 +74,7 @@ namespace spot
     else
       {
 	streett_acc.push_back(streett_pair
-			     (bddtrue,
+			     (bddfalse,
 			      ecs_->aut->all_acceptance_conditions()));
       }
   }
@@ -405,7 +410,7 @@ namespace spot
     const state* i = ecs_->aut->get_init_state();
     ecs_->h->insert(i, num);
     min.push_back(num);
-    avoid.push_back(std::pair<int, bdd>(num, bddfalse));
+    avoid.push_back(std::pair<int, bdd>(num, bddtrue));
 
     tgba_succ_iterator* iter = ecs_->aut->succ_iter(i);
     ecs_->root.push(num, iter->get_proviso());
@@ -547,9 +552,13 @@ namespace spot
 		arc.pop();
 		for (streett_acceptance_conditions::acc_list::const_iterator
 		       i = streett_acc.begin(); i != streett_acc.end(); ++i)
-		  if (((i->u & acc) == bddfalse)
-		      && ((i->l & acc) != bddfalse))
-		    new_avoid |= i->l;
+		  {
+		    if (((i->u & acc) == bddfalse)
+			&& ((i->l & acc) != bddfalse))
+		      {
+			new_avoid &= !i->l;
+		      }
+		  }
 
 		ecs_->aut->release_proviso(ecs_->root.top().ignored);
 
@@ -557,11 +566,11 @@ namespace spot
 		  {
 		    avoid.push_back(std::pair<int, bdd>(index, new_avoid));
 
-		    remove_component(curr, false);
+		    remove_component(curr, true);
+		    ecs_->root.pop();
 		    num = index + 1;
 		    tgba_succ_iterator* iter = ecs_->aut->succ_iter(curr);
 		    ecs_->root.push(num, iter->get_proviso());
-		    ecs_->root.pop();
 		    arc.push(la);
 		    todo.push_back(todo_item(curr, num, iter, this,
 					     new_avoid));
@@ -604,11 +613,12 @@ namespace spot
 	    // Otherwise, number it and stack it so we recurse.
 	    queue.erase(old);
 	    dec_depth();
-	    ecs_->h->insert(succ.s, ++num);
-	    tgba_succ_iterator* iter = ecs_->aut->succ_iter(succ.s);
+	    const state* s = i ? sip.first : succ.s;
+	    ecs_->h->insert(s, ++num);
+	    tgba_succ_iterator* iter = ecs_->aut->succ_iter(s);
 	    ecs_->root.push(num, iter->get_proviso());
 	    arc.push(succ.acc);
-	    todo.push_back(todo_item(succ.s, num, iter, this,
+	    todo.push_back(todo_item(s, num, iter, this,
 				     avoid.back().second));
 	    pos = todo.back().q.begin();
 	    inc_depth();

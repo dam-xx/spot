@@ -24,6 +24,7 @@
 
 #include "tgba.hh"
 #include "statebdd.hh"
+#include "streett.hh"
 
 namespace spot
 {
@@ -149,7 +150,6 @@ namespace spot
     virtual bdd compute_support_conditions(const state* state) const;
     virtual bdd compute_support_variables(const state* state) const;
 
-  private:
     bdd_dict* dict_;
     const tgba* left_;
     const tgba* right_;
@@ -157,11 +157,20 @@ namespace spot
     bdd right_acc_complement_;
     bdd all_acceptance_conditions_;
     bdd neg_acceptance_conditions_;
+  private:
     // Disallow copy.
     tgba_product(const tgba_product&);
     tgba_product& tgba_product::operator=(const tgba_product&);
     friend struct tgba_succ_iterator_product_proviso;
   };
+
+  class streett_product : public tgba_product,
+			  public streett_acceptance_conditions_stored
+  {
+  public:
+    streett_product(const tgba* left, const tgba* right);
+  };
+
 
 }
 

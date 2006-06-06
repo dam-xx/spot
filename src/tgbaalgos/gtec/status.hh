@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -45,6 +45,7 @@ namespace spot
     scc_stack root;
     numbered_state_heap* h;	///< Heap of visited states.
     const state* cycle_seed;
+    bdd cycle_acc;
 
     /// Output statistics about this object.
     void print_stats(std::ostream& os) const;

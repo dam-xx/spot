@@ -57,7 +57,7 @@ namespace spot
 	    return 0;
 	  }
 	// ... as well as dead states.
-	if (*sip.second == -1)
+	if (*sip.second < 0)
 	  return 0;
 	return sip.first;
       }
@@ -155,7 +155,7 @@ namespace spot
   void
   couvreur99_check_result::accepting_cycle()
   {
-    bdd acc_to_traverse = ecs_->aut->all_acceptance_conditions();
+    bdd acc_to_traverse = ecs_->cycle_acc;
     // Compute an accepting cycle using successive BFS that are
     // restarted from the point reached after we have discovered a
     // transition with a new acceptance conditions.
@@ -234,7 +234,7 @@ namespace spot
   {
     ecs_->print_stats(os);
     // FIXME: This is bogusly assuming run_ exists.  (Even if we
-    // created it, the user might have delete it.)
+    // created it, the user might have deleted it.)
     os << run_->prefix.size() << " states in run_->prefix" << std::endl;
     os << run_->cycle.size() << " states in run_->cycle" << std::endl;
   }

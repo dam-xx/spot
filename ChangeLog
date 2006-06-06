@@ -1,3 +1,17 @@
+2006-06-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/sautparse/sautparse.yy, src/tgba/tgbaproduct.cc,
+	src/tgba/tgbaproduct.hh: Declare and use a streett_product that
+	propagates the streett_acceptance_conditions interface.
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check::found_acc): Store
+	the remaining acceptance conditions...
+	* src/tgbaalgos/gtec/status.hh (couvreur99_check_status::cycle_acc):
+	...here, and...
+	* src/tgbaalgos/gtec/ce.cc (couvreur99_check_result::accepting_cycle):
+	... use it.
+	* src/tgbaalgos/gtec/gtec.cc, src/saut/sync.cc: More fixes in
+	streett acceptance conditions.
+
 2006-06-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gtec/gtec.cc: Thinkos in previous patch.
