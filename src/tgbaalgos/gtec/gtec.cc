@@ -388,7 +388,7 @@ namespace spot
     for (iter->first(); !iter->done(); iter->next(), shy->inc_transitions())
       {
 	bdd acc = iter->current_acceptance_conditions();
-	(((acc & avoid) == bddfalse) ? q : qf)
+	((acc - avoid == acc) ? q : qf)
 	  .push_back(successor(iter->current_acceptance_conditions(),
 			       iter->current_state()));
 	shy->inc_depth();
@@ -410,7 +410,7 @@ namespace spot
     const state* i = ecs_->aut->get_init_state();
     ecs_->h->insert(i, num);
     min.push_back(num);
-    avoid.push_back(std::pair<int, bdd>(num, bddtrue));
+    avoid.push_back(std::pair<int, bdd>(num, bddfalse));
 
     tgba_succ_iterator* iter = ecs_->aut->succ_iter(i);
     ecs_->root.push(num, iter->get_proviso());
@@ -556,7 +556,7 @@ namespace spot
 		    if (((i->u & acc) == bddfalse)
 			&& ((i->l & acc) != bddfalse))
 		      {
-			new_avoid &= !i->l;
+			new_avoid |= i->l;
 		      }
 		  }
 
@@ -568,6 +568,7 @@ namespace spot
 
 		    remove_component(curr, true);
 		    ecs_->root.pop();
+		    ecs_->h->insert(curr, index);
 		    num = index + 1;
 		    tgba_succ_iterator* iter = ecs_->aut->succ_iter(curr);
 		    ecs_->root.push(num, iter->get_proviso());

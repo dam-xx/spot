@@ -1,3 +1,8 @@
+2006-06-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_shy::check): Fix
+	handling of avoided Streett acceptance conditions.
+
 2006-06-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/sautparse/sautparse.yy, src/tgba/tgbaproduct.cc,
