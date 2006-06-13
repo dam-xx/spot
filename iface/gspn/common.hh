@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -31,11 +31,11 @@
 namespace spot
 {
 
-  /// An exeption used to forward GSPN errors.
-  class gspn_exeption
+  /// An exception used to forward GSPN errors.
+  class gspn_exception
   {
   public:
-    gspn_exeption(const std::string& where, int err)
+    gspn_exception(const std::string& where, int err)
       : err_(err), where_(where)
     {
     }
@@ -57,7 +57,7 @@ namespace spot
     std::string where_;
   };
 
-  std::ostream& operator<<(std::ostream& os, const gspn_exeption& e);
+  std::ostream& operator<<(std::ostream& os, const gspn_exception& e);
 }
 
 #endif // SPOT_IFACE_GSPN_COMMON_HH

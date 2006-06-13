@@ -385,7 +385,7 @@ main(int argc, char **argv)
       delete a_f;
       delete dict;
     }
-  catch (spot::gspn_exeption e)
+  catch (spot::gspn_exception e)
     {
       std::cerr << e << std::endl;
       throw;

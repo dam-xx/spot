@@ -144,7 +144,7 @@ namespace spot
 	      AtomicProp index;
 	      int err = prop_index(i->first.c_str(), &index);
 	      if (err)
-		throw gspn_exeption("prop_index(" + i->first + ")", err);
+		throw gspn_exception("prop_index(" + i->first + ")", err);
 
 	      prop_dict[var] = index;
 
@@ -489,7 +489,7 @@ namespace spot
       {
 	int err = print_state(gs, &str);
 	if (err)
-	  throw gspn_exeption("print_state()", err);
+	  throw gspn_exception("print_state()", err);
 	// Strip trailing \n...
 	unsigned len = strlen(str);
 	while (str[--len] == '\n')
@@ -548,14 +548,14 @@ namespace spot
 
     int res = initialize(argc, argv);
     if (res)
-      throw gspn_exeption("initialize()", res);
+      throw gspn_exception("initialize()", res);
   }
 
   gspn_ssp_interface::~gspn_ssp_interface()
   {
     int res = finalize();
     if (res)
-      throw gspn_exeption("finalize()", res);
+      throw gspn_exception("finalize()", res);
   }
 
   tgba*
