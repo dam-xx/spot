@@ -74,7 +74,7 @@ namespace spot
     else
       {
 	streett_acc.push_back(streett_pair
-			     (bddfalse,
+			     (bddtrue,
 			      ecs_->aut->all_acceptance_conditions()));
       }
   }
@@ -209,6 +209,7 @@ namespace spot
 	  {
 	    // We have explored all successors of state CURR.
 	    const state* curr = todo.top().first;
+	    numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
 
 	    // Wait!  Maybe we do not really want to backtrack yet.
 	    // If we have been using stubborn sets its possible there
@@ -216,7 +217,8 @@ namespace spot
 	    // component.  We want to visit some of these until we
 	    // have ignored nobody.  (When stubborn sets are not used,
 	    // empty() will always return true.)
-	    if (!ecs_->root.top().ignored->empty())
+	    if (ecs_->root.top().index == *spi.second
+		&& !ecs_->root.top().ignored->empty())
 	      {
 		tgba_succ_iterator* iter
 		  = ecs_->root.top().ignored->oneset(curr, ecs_->aut);
@@ -235,7 +237,6 @@ namespace spot
 	    // If poprem is used, fill rem with any component removed,
 	    // so that remove_component() does not have to traverse
 	    // the SCC again.
-	    numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
 	    assert(spi.first);
 	    if (poprem_)
 	      {
@@ -409,7 +410,7 @@ namespace spot
     // Setup depth-first search from the initial state.
     const state* i = ecs_->aut->get_init_state();
     ecs_->h->insert(i, num);
-    min.push_back(num);
+    min.push_back(num - 1);
     avoid.push_back(std::pair<int, bdd>(num, bddfalse));
 
     tgba_succ_iterator* iter = ecs_->aut->succ_iter(i);
@@ -485,28 +486,28 @@ namespace spot
 	// If there is no more successor, backtrack.
 	if (queue.empty())
 	  {
+	    // We have explored all successors of state CURR.
+	    const state* curr = todo.back().s;
+	    int index = todo.back().n;
+
 	    // Wait!  Maybe we do not really want to backtrack yet.
 	    // If we have been using stubborn sets its possible there
 	    // are transitions that we have always ignored in this
 	    // component.  We want to visit some of these until we
 	    // have ignored nobody.  (When stubborn sets are not used,
 	    // empty() will always return true.)
-	    if (!ecs_->root.top().ignored->empty())
+	    if (ecs_->root.top().index == index
+		&& !ecs_->root.top().ignored->empty())
 	      {
 		tgba_succ_iterator* iter
-		  = ecs_->root.top().ignored->oneset(todo.back().s, ecs_->aut);
+		  = ecs_->root.top().ignored->oneset(curr, ecs_->aut);
 		iter->first();
 		ecs_->aut->release_proviso(ecs_->root.top().ignored);
 		ecs_->root.top().ignored = iter->get_proviso();
-		todo.back() = todo_item(todo.back().s, todo.back().n,
-					iter, this, bddfalse);
+		todo.back() = todo_item(curr, index, iter, this, bddfalse);
 		pos = todo.back().q.begin();
 		continue;
 	      }
-
-	    // We have explored all successors of state CURR.
-	    const state* curr = todo.back().s;
-	    int index = todo.back().n;
 
 	    if (index == min.back())
 	      min.pop_back();
