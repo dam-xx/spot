@@ -40,7 +40,7 @@ namespace spot
 	   = streett_acc.begin(); i != streett_acc.end(); ++i)
       {
 	// Büchi
-	if (i->l == bddfalse)
+	if (i->l == bddtrue)
 	  return ((ecs_->cycle_acc = curcond) == i->u);
 	// Streett
 	if ((i->l & curcond) == bddfalse)

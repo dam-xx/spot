@@ -1,3 +1,8 @@
+2006-06-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check::found_acc):
+	Typo in check for Büchi acceptance conditions.
+
 2006-06-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_shy::check): Fix
