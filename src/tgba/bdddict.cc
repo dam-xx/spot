@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -231,7 +231,7 @@ namespace spot
 		free_annonymous_list_of_type::iterator i;
 		for (i = free_annonymous_list_of.begin();
 		     i != free_annonymous_list_of.end(); ++i)
-		  i->second.remove(var, n);
+		  i->second.release_n(var, n);
 	      }
 	  }
       }

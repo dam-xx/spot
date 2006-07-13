@@ -1,3 +1,11 @@
+2006-07-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgba/bdddict.cc (bdd_dict::unregister_variable): Correctly
+	call release_n(), not remove() to repopulated the freelist of
+	anonymous BDD variables.  New code I'm working on triggered an
+	assertion inside remove(), but I'm surprised this bug hadn't
+	manifested before !
+
 2006-06-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/common.hh, iface/gspn/common.cc, iface/gspn/gspn.cc,
