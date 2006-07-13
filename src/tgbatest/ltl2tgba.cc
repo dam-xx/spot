@@ -65,6 +65,8 @@ syntax(char* prog)
 	    << "  -A    same as -a, but as a set" << std::endl
 	    << "  -b    display the automaton in the format of spot"
             << std::endl
+	    << "  -c    enable language containment checks (implies -f)"
+	    << std::endl
 	    << "  -d    turn on traces during parsing" << std::endl
 	    << "  -D    degeneralize the automaton as a TBA" << std::endl
 	    << "  -DS   degeneralize the automaton as an SBA" << std::endl
@@ -169,6 +171,7 @@ main(int argc, char** argv)
   bool graph_run_opt = false;
   bool graph_run_tgba_opt = false;
   bool opt_reduce = false;
+  bool containment = false;
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* unobservables = 0;
   spot::tgba_explicit* system = 0;
@@ -198,6 +201,11 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-b"))
 	{
 	  output = 7;
+	}
+      else if (!strcmp(argv[formula_index], "-c"))
+	{
+	  containment = true;
+	  fm_opt = true;
 	}
       else if (!strcmp(argv[formula_index], "-d"))
 	{
@@ -499,7 +507,7 @@ main(int argc, char** argv)
 					       fm_symb_merge_opt,
 					       post_branching,
 					       fair_loop_approx, unobservables,
-					       fm_red);
+					       fm_red, containment);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 	}

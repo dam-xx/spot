@@ -1,5 +1,13 @@
 2006-07-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaalgos/ltl2tgba_fm.hh, src/tgbaalgos/ltl2tgba_fm.cc
+	(ltl_to_tgba_fm): Add a new option "containment_checks" to enable
+	some language containment checks (via emptiness checks) during the
+	translation.  This first attempt currently only use containment
+	checks to merge states bisimulating each other.
+	* src/tgbatest/ltl2tgba.cc: Bind this to option "-c".
+	* src/tgbatest/spotlbtt.test: Check it.
+
 	* src/tgba/bdddict.cc (bdd_dict::unregister_variable): Correctly
 	call release_n(), not remove() to repopulated the freelist of
 	anonymous BDD variables.  New code I'm working on triggered an

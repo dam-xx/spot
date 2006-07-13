@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -125,7 +125,8 @@ namespace spot
 				bool branching_postponement = false,
 				bool fair_loop_approx = false,
 				const ltl::atomic_prop_set* unobs = 0,
-				int reduce_ltl = ltl::Reduce_None);
+				int reduce_ltl = ltl::Reduce_None,
+				bool containment_checks = false);
 }
 
 #endif // SPOT_TGBAALGOS_LTL2TGBA_FM_HH
