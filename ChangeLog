@@ -1,10 +1,19 @@
 2006-07-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgba/bdddict.cc, src/tgba/bdddict.hh (free_annonymous_list_of):
+	Rename as ...
+	(free_anonymous_list_of): ... this, and correct their update on
+	release.  Also correct yesterday's the correction (ahem!).
+	(dump): Improve verbosity.
+	* src/misc/freelist.cc (free_list::remove, free_list::insert): Fix
+	longstanding thinkos.
+	(free_list::free_count): New function.
+
 	Merge this fix from proviso-branch:
 	2006-05-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 	* src/misc/bddalloc.cc (bdd_allocator::bdd_allocator): Count the
-  	number of BDD variable after they have been allocated.  Otherwise
-  	the first bdd_dict() created was leaking BDD variable #1.
+	number of BDD variable after they have been allocated.  Otherwise
+	the first bdd_dict() created was leaking BDD variable #1.
 
 	* src/tgba/tgbabddconcrete.hh, src/tgba/tgbaexplicit.hh,
 	src/tgba/tgbaproduct.hh, src/tgba/tgbareduc.hh, src/tgba/tgbatba.hh:

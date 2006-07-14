@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -172,13 +172,13 @@ namespace spot
     // SWIG does not grok the following definition, no idea why.
     // It's not important for the Python interface anyway.
 #ifndef SWIG
-    class annon_free_list : public spot::free_list
+    class anon_free_list : public spot::free_list
     {
     public:
       // WARNING: We need a default constructor so this can be used in
       // a hash; but we should ensure that no object in the hash is
       // constructed with d==0.
-      annon_free_list(bdd_dict* d = 0);
+      anon_free_list(bdd_dict* d = 0);
       virtual int extend(int n);
     private:
       bdd_dict* dict_;
@@ -186,8 +186,8 @@ namespace spot
 #endif
 
     /// List of unused anonymous variable number for each automaton.
-    typedef std::map<const void*, annon_free_list> free_annonymous_list_of_type;
-    free_annonymous_list_of_type free_annonymous_list_of;
+    typedef std::map<const void*, anon_free_list> free_anonymous_list_of_type;
+    free_anonymous_list_of_type free_anonymous_list_of;
 
   private:
     // Disallow copy.
