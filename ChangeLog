@@ -1,5 +1,11 @@
 2006-07-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	Merge this fix from proviso-branch:
+	2006-05-22  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+	* src/misc/bddalloc.cc (bdd_allocator::bdd_allocator): Count the
+  	number of BDD variable after they have been allocated.  Otherwise
+  	the first bdd_dict() created was leaking BDD variable #1.
+
 	* src/tgba/tgbabddconcrete.hh, src/tgba/tgbaexplicit.hh,
 	src/tgba/tgbaproduct.hh, src/tgba/tgbareduc.hh, src/tgba/tgbatba.hh:
 	Remove superfluous class qualifiers worrying gcc 4.1.2.
