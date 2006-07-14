@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -114,7 +114,7 @@ namespace spot
   private:
     // Disallow copy.
     tgba_explicit(const tgba_explicit& other);
-    tgba_explicit& tgba_explicit::operator=(const tgba_explicit& other);
+    tgba_explicit& operator=(const tgba_explicit& other);
   };
 
 

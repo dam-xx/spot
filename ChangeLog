@@ -1,3 +1,9 @@
+2006-07-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgba/tgbabddconcrete.hh, src/tgba/tgbaexplicit.hh,
+	src/tgba/tgbaproduct.hh, src/tgba/tgbareduc.hh, src/tgba/tgbatba.hh:
+	Remove superfluous class qualifiers worrying gcc 4.1.2.
+
 2006-07-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/ltl2tgba_fm.hh, src/tgbaalgos/ltl2tgba_fm.cc

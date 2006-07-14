@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -84,7 +84,7 @@ namespace spot
     bdd the_acceptance_cond_;
     // Disallow copy.
     tgba_tba_proxy(const tgba_tba_proxy&);
-    tgba_tba_proxy& tgba_tba_proxy::operator=(const tgba_tba_proxy&);
+    tgba_tba_proxy& operator=(const tgba_tba_proxy&);
   };
 
   /// \brief Degeneralize a spot::tgba on the fly, producing an SBA.
