@@ -183,6 +183,7 @@ namespace spot
     /// Number of dead SCC removed by the algorithm.
     unsigned removed_components;
     unsigned get_removed_components() const;
+    unsigned get_vmsize() const;
   };
 
   /// \brief A version of spot::couvreur99_check that tries to visit

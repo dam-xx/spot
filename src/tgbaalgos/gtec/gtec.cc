@@ -21,6 +21,7 @@
 
 #include "gtec.hh"
 #include "ce.hh"
+#include "misc/memusage.hh"
 
 namespace spot
 {
@@ -40,6 +41,9 @@ namespace spot
     stats["removed components"] =
 	static_cast<spot::unsigned_statistics::unsigned_fun>
 	(&couvreur99_check::get_removed_components);
+    stats["vmsize"] =
+	static_cast<spot::unsigned_statistics::unsigned_fun>
+	(&couvreur99_check::get_vmsize);
   }
 
   couvreur99_check::~couvreur99_check()
@@ -51,6 +55,15 @@ namespace spot
   couvreur99_check::get_removed_components() const
   {
     return removed_components;
+  }
+
+  unsigned
+  couvreur99_check::get_vmsize() const
+  {
+    int size = memusage();
+    if (size > 0)
+      return size;
+    return 0;
   }
 
   void

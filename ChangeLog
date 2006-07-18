@@ -1,3 +1,10 @@
+2006-07-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/misc/memusage.cc, src/misc/memusage.hh: New files.
+	* src/misc/Makefile.am: Add them.
+	* src/tgbaalgos/gtec/gtec.cc,
+	src/tgbaalgos/gtec/gtec.hh: Add a "vmsize" statistic.
+
 2006-07-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgba/bdddict.cc, src/tgba/bdddict.hh (free_annonymous_list_of):
