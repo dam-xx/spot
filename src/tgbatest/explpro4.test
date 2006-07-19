@@ -1,7 +1,7 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
-# Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
-# Université Pierre et Marie Curie.
+# Copyright (C) 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
+# département Systèmes Répartis Coopératifs (SRC), Université Pierre
+# et Marie Curie.
 #
 # This file is part of Spot, a model checking library.
 #
@@ -26,25 +26,24 @@
 set -e
 
 cat >input1 <<EOF
-acc = p1 p2;
-s1, s2, "!a", p1;
-s1, s3, "!b", p2;
+acc = p1;
+s1, s1, "a", p1;
+s1, s1, "!a", ;
 EOF
 
 cat >input2 <<EOF
-acc = p2 p3;
-s1, s2, "b", p2;
-s1, s3, "a", p3;
+acc= p1;
+s1, s1, "a", ;
+s1, s1, "!a", p1;
 EOF
 
 cat >expected <<'EOF'
-acc = "p2$1" "p3" "p2" "p1";
-"s1 * s1", "s2 * s2", "b & !a", "p2$1" "p1";
-"s1 * s1", "s3 * s3", "a & !b", "p3" "p2";
+acc = "p1$1" "p1";
+"s1 * s1", "s1 * s1", "a", "p1";
+"s1 * s1", "s1 * s1", "!a", "p1$1";
 EOF
 
 run 0 ./explprod input1 input2 > stdout
-
 cat stdout
 diff stdout expected
 rm input1 input2 stdout expected

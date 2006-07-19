@@ -20,10 +20,14 @@
 // 02111-1307, USA.
 
 #include <ostream>
+#include <sstream>
 #include <cassert>
 #include <ltlvisit/clone.hh>
 #include <ltlvisit/destroy.hh>
 #include <ltlvisit/tostring.hh>
+#include <ltlvisit/tostring.hh>
+#include <ltlast/atomic_prop.hh>
+#include <ltlenv/defaultenv.hh>
 #include "bdddict.hh"
 
 namespace spot
@@ -137,6 +141,24 @@ namespace spot
 
     register_acceptance_variables(bdd_high(f), for_me);
     register_acceptance_variables(bdd_low(f), for_me);
+  }
+
+
+  int
+  bdd_dict::register_clone_acc(int var, const void* for_me)
+  {
+    vf_map::iterator i = acc_formula_map.find(var);
+    assert(i != acc_formula_map.end());
+    std::ostringstream s;
+    // FIXME: We could be smarter and reuse unused "$n" numbers.
+    s << ltl::to_string(i->second) << "$"
+      << ++clone_counts[var];
+    ltl::formula* f =
+      ltl::atomic_prop::instance(s.str(),
+				 ltl::default_environment::instance());
+    int res = register_acceptance_variable(f, for_me);
+    ltl::destroy(f);
+    return res;
   }
 
 

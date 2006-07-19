@@ -80,7 +80,8 @@ namespace spot
   public:
     tgba_succ_iterator_product(tgba_succ_iterator* left,
 			       tgba_succ_iterator* right,
-			       bdd left_neg, bdd right_neg);
+			       bdd left_neg, bdd right_neg,
+			       bddPair* right_common_acc);
 
     virtual ~tgba_succ_iterator_product();
 
@@ -107,6 +108,7 @@ namespace spot
     bdd current_cond_;
     bdd left_neg_;
     bdd right_neg_;
+    bddPair* right_common_acc_;
     friend class tgba_product;
   };
 
@@ -153,6 +155,7 @@ namespace spot
     bdd right_acc_complement_;
     bdd all_acceptance_conditions_;
     bdd neg_acceptance_conditions_;
+    bddPair* right_common_acc_;
     // Disallow copy.
     tgba_product(const tgba_product&);
     tgba_product& operator=(const tgba_product&);

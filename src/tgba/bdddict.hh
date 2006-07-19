@@ -54,6 +54,10 @@ namespace spot
     fv_map acc_map;		///< Maps acceptance conditions to BDD variables
     vf_map acc_formula_map;	///< Maps BDD variables to acceptance conditions
 
+    /// Clone counts.
+    typedef std::map<int, int> cc_map;
+    cc_map clone_counts;
+
     /// \brief Map Next variables to Now variables.
     ///
     /// Use with BuDDy's bdd_replace() function.
@@ -108,6 +112,13 @@ namespace spot
     /// \return The variable number.  Use bdd_ithvar() or bdd_nithvar()
     ///   to convert this to a BDD.
     int register_acceptance_variable(const ltl::formula* f, const void* for_me);
+
+    /// \brief Clone an acceptance variable VAR for FOR_ME.
+    ///
+    /// This is used in products TGBAs when both operands share the
+    /// same acceptance variables but they need to be distinguished in
+    /// the result.
+    int register_clone_acc(int var, const void* for_me);
 
     /// \brief Register BDD variables as acceptance variables.
     ///
