@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -27,6 +27,7 @@
 #include "ltlvisit/dump.hh"
 #include "ltlvisit/nenoform.hh"
 #include "ltlvisit/destroy.hh"
+#include "ltlvisit/contain.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlvisit/reduce.hh"
 #include "ltlvisit/tostring.hh"
@@ -93,6 +94,20 @@ main(int argc, char** argv)
   spot::ltl::formula* tmp;
   tmp = f1;
   f1 = spot::ltl::reduce(f1);
+  spot::ltl::destroy(tmp);
+  spot::ltl::dump(std::cout, f1);
+#endif
+#ifdef REDUC_TAU
+  spot::ltl::formula* tmp;
+  tmp = f1;
+  f1 = spot::ltl::reduce_tau03(f1, false);
+  spot::ltl::destroy(tmp);
+  spot::ltl::dump(std::cout, f1);
+#endif
+#ifdef REDUC_TAUSTR
+  spot::ltl::formula* tmp;
+  tmp = f1;
+  f1 = spot::ltl::reduce_tau03(f1, true);
   spot::ltl::destroy(tmp);
   spot::ltl::dump(std::cout, f1);
 #endif

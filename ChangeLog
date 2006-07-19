@@ -1,5 +1,16 @@
 2006-07-19  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/ltlvisit/contain.hh, src/ltlvisit/contain.cc (reduce_tau03):
+	New function, performing LTL reduction a la tauriainen.03.a83.
+	* src/ltltest/equals.cc, src/ltltest/reduc.cc: Add support for
+	the new reduction.
+	* src/ltltest/reduc.test: Cut the test in half, and additionally
+	test the new reduction.
+	* src/ltltest/reduccmp.test: Run on the new reduction.
+	* src/ltltest/Makefile.am: Adjust.
+	* src/tgbatest/ltl2tgba.cc: Add new options to apply the reduction.
+	* src/tgbatest/spotlbtt.test: Use them.
+
 	* src/tgba/tgbaproduct.cc: Fix computation of common acceptance
 	conditions.
 

@@ -26,6 +26,7 @@
 #include <string>
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/reduce.hh"
+#include "ltlvisit/contain.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/apcollect.hh"
 #include "ltlast/allnodes.hh"
@@ -100,7 +101,10 @@ syntax(char* prog)
 	    << "and universality" << std::endl
 	    << "  -r3   reduce formula using implication between "
 	    << "sub-formulae" << std::endl
-	    << "  -r4   reduce formula using all rules" << std::endl
+	    << "  -r4   reduce formula using all above rules" << std::endl
+	    << "  -r5   reduce formula using tau03" << std::endl
+	    << "  -r6   reduce formula using tau03+" << std::endl
+	    << "  -r7   reduce formula using tau03+ and -r4" << std::endl
 	    << "  -rd   display the reduce formula" << std::endl
 	    << "  -R    same as -r, but as a set" << std::endl
 	    << "  -R1q  merge states using direct simulation "
@@ -163,6 +167,8 @@ main(int argc, char** argv)
   bool from_file = false;
   int reduc_aut = spot::Reduce_None;
   int redopt = spot::ltl::Reduce_None;
+  bool redtau = false;
+  bool stronger = false;
   bool display_reduce_form = false;
   bool display_rel_sim = false;
   bool display_parity_game = false;
@@ -343,6 +349,19 @@ main(int argc, char** argv)
 	{
 	  redopt |= spot::ltl::Reduce_All;
 	}
+      else if (!strcmp(argv[formula_index], "-r5"))
+	{
+	  redtau = true;
+	}
+      else if (!strcmp(argv[formula_index], "-r6"))
+	{
+	  redtau = stronger = true;
+	}
+      else if (!strcmp(argv[formula_index], "-r7"))
+	{
+	  redopt |= spot::ltl::Reduce_All;
+	  redtau = stronger = true;
+	}
       else if (!strcmp(argv[formula_index], "-R"))
 	{
 	  output = 3;
@@ -496,6 +515,14 @@ main(int argc, char** argv)
 	  if (redopt != spot::ltl::Reduce_None)
 	    {
 	      spot::ltl::formula* t = spot::ltl::reduce(f, redopt);
+	      spot::ltl::destroy(f);
+	      f = t;
+	      if (display_reduce_form && !redtau)
+		std::cout << spot::ltl::to_string(f) << std::endl;
+	    }
+	  if (redtau)
+	    {
+	      spot::ltl::formula* t = spot::ltl::reduce_tau03(f, stronger);
 	      spot::ltl::destroy(f);
 	      f = t;
 	      if (display_reduce_form)

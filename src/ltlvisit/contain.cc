@@ -22,10 +22,16 @@
 #include "contain.hh"
 #include "destroy.hh"
 #include "clone.hh"
+#include "tunabbrev.hh"
 #include "ltlast/unop.hh"
+#include "ltlast/binop.hh"
+#include "ltlast/multop.hh"
+#include "ltlast/constant.hh"
 #include "tgba/tgbaproduct.hh"
 #include "tgbaalgos/gtec/gtec.hh"
-
+#include "tgbaalgos/save.hh"
+#include "tostring.hh"
+#include <iostream>
 namespace spot
 {
   namespace ltl
@@ -61,6 +67,32 @@ namespace spot
       const record_* rng = register_formula_(ng);
       destroy(ng);
       bool res = rl->incompatible.find(rng) != rl->incompatible.end();
+      return res;
+    }
+
+    // Check whether L(!l) is a subset of L(g).
+    bool
+    language_containment_checker::neg_contained(const formula* l,
+						const formula* g)
+    {
+      const formula* nl = unop::instance(unop::Not, clone(l));
+      const record_* rnl = register_formula_(nl);
+      const formula* ng = unop::instance(unop::Not, clone(g));
+      const record_* rng = register_formula_(ng);
+      destroy(nl);
+      destroy(ng);
+      bool res = rnl->incompatible.find(rng) != rnl->incompatible.end();
+      return res;
+    }
+
+    // Check whether L(l) is a subset of L(!g).
+    bool
+    language_containment_checker::contained_neg(const formula* l,
+						const formula* g)
+    {
+      const record_* rl = register_formula_(l);
+      const record_* rg = register_formula_(g);
+      bool res = rl->incompatible.find(rg) != rl->incompatible.end();
       return res;
     }
 
@@ -104,6 +136,218 @@ namespace spot
 	  delete p;
 	}
       return &r;
+    }
+
+
+    namespace {
+      struct reduce_tau03_visitor : public clone_visitor {
+	bool stronger;
+	language_containment_checker* lcc;
+
+	reduce_tau03_visitor(bool stronger,
+			     language_containment_checker* lcc)
+	  : stronger(stronger), lcc(lcc)
+	{
+	}
+
+	void
+	visit(unop* uo)
+	{
+	  formula* a = recurse(uo->child());
+	  switch (uo->op())
+	    {
+	    case unop::X:
+	      // if X(a) = a, then keep only a !
+	      if (stronger && lcc->equal(a, uo))
+		{
+		  result_ = a;
+		  break;
+		}
+	    default:
+	      result_ = unop::instance(uo->op(), a);
+	    }
+	}
+
+	void
+	visit(binop* bo)
+	{
+	  formula* a = recurse(bo->first());
+	  formula* b = recurse(bo->second());
+	  switch (bo->op())
+	    {
+	    case binop::U:
+	      // if (a U b) = b, then keep b !
+	      if (stronger && lcc->equal(bo, b))
+		{
+		  destroy(a);
+		  result_ = b;
+		}
+	      // if a => b,  then a U b = b.
+	      else if ((!stronger) && lcc->contained(a, b))
+		{
+		  destroy(a);
+		  result_ = b;
+		}
+	      // if !a => b, then  a U b = Fb
+	      else if (lcc->neg_contained(a, b))
+		{
+		  destroy(a);
+		  result_ = unop::instance(unop::F, b);
+		}
+	      else
+		{
+		  result_ = binop::instance(binop::U, a, b);
+		}
+	      break;
+	    case binop::R:
+	      // if (a R b) = b, then keep b !
+	      if (stronger && lcc->equal(bo, b))
+		{
+		  destroy(a);
+		  result_ = b;
+		}
+	      // if b => a,  then a R b = b.
+	      else if ((!stronger) && lcc->contained(b, a))
+		{
+		  destroy(a);
+		  result_ = b;
+		}
+	      // if a => !b, then  a R b = Gb
+	      else if (lcc->contained_neg(a, b))
+		{
+		  destroy(a);
+		  result_ = unop::instance(unop::G, b);
+		}
+	      else
+		{
+		  result_ = binop::instance(binop::R, a, b);
+		}
+	      break;
+	    default:
+	      result_ = binop::instance(bo->op(), a, b);
+	    }
+	}
+
+	void
+	visit(multop* mo)
+	{
+	  multop::vec* res = new multop::vec;
+	  unsigned mos = mo->size();
+	  for (unsigned i = 0; i < mos; ++i)
+	    res->push_back(recurse(mo->nth(i)));
+	  result_ = 0;
+	  bool changed = false;
+
+	  switch (mo->op())
+	    {
+	    case multop::Or:
+	      for (unsigned i = 0; i < mos; ++i)
+		{
+		  if (!(*res)[i])
+		    continue;
+		  for (unsigned j = i + 1; j < mos; ++j)
+		    {
+		      if (!(*res)[j])
+			continue;
+		      // if !i => j, then i|j = true
+		      if (lcc->neg_contained((*res)[i], (*res)[j]))
+			{
+			  result_ = constant::true_instance();
+			  goto constant_;
+			}
+		      // if i => j, then i|j = j
+		      else if (lcc->contained((*res)[i], (*res)[j]))
+			{
+			  destroy((*res)[i]);
+			  (*res)[i] = 0;
+			  changed = true;
+			  break;
+			}
+		      // if j => i, then i|j = i
+		      else if (lcc->contained((*res)[i], (*res)[j]))
+			{
+			  destroy((*res)[j]);
+			  (*res)[j] = 0;
+			  changed = true;
+			}
+		    }
+		}
+	      break;
+	    case multop::And:
+	      for (unsigned i = 0; i < mos; ++i)
+		{
+		  if (!(*res)[i])
+		    continue;
+		  for (unsigned j = i + 1; j < mos; ++j)
+		    {
+		      if (!(*res)[j])
+			continue;
+		      // if i => !j, then i&j = false
+		      if (lcc->contained_neg((*res)[i], (*res)[j]))
+			{
+			  result_ = constant::false_instance();
+			  goto constant_;
+			}
+		      // if i => j, then i&j = i
+		      else if (lcc->contained((*res)[i], (*res)[j]))
+			{
+			  destroy((*res)[j]);
+			  (*res)[j] = 0;
+			  changed = true;
+			}
+		      // if j => i, then i&j = j
+		      else if (lcc->contained((*res)[i], (*res)[j]))
+			{
+			  destroy((*res)[i]);
+			  (*res)[i] = 0;
+			  changed = true;
+			  break;
+			}
+		    }
+		}
+	      break;
+	    }
+	  if (changed)
+	    {
+	      multop::vec* nres = new multop::vec;
+	      for (unsigned i = 0; i < mos; ++i)
+		if ((*res)[i])
+		  nres->push_back((*res)[i]);
+	      delete res;
+	      res = nres;
+	    }
+	  result_ = multop::instance(mo->op(), res);
+	  return;
+	constant_:
+	  for (unsigned i = 0; i < mos; ++i)
+	    if ((*res)[i])
+	      destroy((*res)[i]);
+	}
+
+	formula*
+	recurse(formula* f)
+	{
+	  reduce_tau03_visitor v(stronger, lcc);
+	  const_cast<formula*>(f)->accept(v);
+	  return v.result();
+	}
+      };
+    }
+
+    formula*
+    reduce_tau03(const formula* f, bool stronger)
+    {
+      bdd_dict b;
+      reduce_tau03_visitor v(stronger,
+			     new language_containment_checker(&b,
+							      true, true,
+							      false, false));
+      // reduce_tau03_visitor does not handle Xor, Implies, and Equiv.
+      f = unabbreviate_ltl(f);
+      const_cast<formula*>(f)->accept(v);
+      destroy(f);
+      delete v.lcc;
+      return v.result();
     }
   }
 }

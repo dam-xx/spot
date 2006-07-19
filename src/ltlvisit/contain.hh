@@ -54,6 +54,10 @@ namespace spot
 
       /// Check whether L(l) is a subset of L(g).
       bool contained(const formula* l, const formula* g);
+      /// Check whether L(!l) is a subset of L(g).
+      bool neg_contained(const formula* l, const formula* g);
+      /// Check whether L(l) is a subset of L(!g).
+      bool contained_neg(const formula* l, const formula* g);
 
       /// Check whether L(l) = L(g).
       bool equal(const formula* l, const formula* g);
@@ -70,6 +74,32 @@ namespace spot
       /* Translation Maps */
       trans_map translated_;
     };
+
+    /// \brief Reduce a formula using language containment relationships.
+    ///
+    /// The method is taken from table 4.1 in
+    /// \verbatim
+    ///@TechReport{	  tauriainen.03.a83,
+    ///  author	= {Heikki Tauriainen},
+    ///  title = {On Translating Linear Temporal Logic into Alternating and
+    ///		  Nondeterministic Automata},
+    ///  institution	= {Helsinki University of Technology, Laboratory for
+    ///		           Theoretical Computer Science},
+    ///  address	= {Espoo, Finland},
+    ///  month		= dec,
+    ///  number	        = {A83},
+    ///  pages		= {132},
+    ///  type		= {Research Report},
+    ///  year		= {2003},
+    ///  note		= {Reprint of Licentiate's thesis}
+    ///}
+    ///
+    /// (The "dagged" cells in the tables are not handled here.)
+    ///
+    /// If \a stronger is set, additional rules are used to further
+    /// reduce some U, R, and X usages.
+    /// \endverbatim
+    formula* reduce_tau03(const formula* f, bool stronger = false);
   }
 }
 

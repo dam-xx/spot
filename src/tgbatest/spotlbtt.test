@@ -110,9 +110,17 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- FM), reduction7 of formula (pre reduction)"
+   Path = "${LBTT_TRANSLATE}"
+   Parameters = "--spot './ltl2tgba -r7 -F -f -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM) containments + reduction of formula (pre reduction)"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -r4 -F -f -c -t'"
+   Parameters = "--spot './ltl2tgba -r7 -F -f -c -t'"
    Enabled = yes
 }
 
