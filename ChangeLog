@@ -1,3 +1,10 @@
+2006-07-19  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (language_containment_checker): Move ...
+	* src/ltlvisit/contain.cc, src/ltlvisit/contain.hh
+	(spot::ltl::language_containment_checker): ... in these new files.
+	* src/ltlvisit/Makefile.am: Adjust.
+
 2006-07-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/misc/memusage.cc, src/misc/memusage.hh: New files.

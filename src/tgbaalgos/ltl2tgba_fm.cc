@@ -34,8 +34,7 @@
 #include <cassert>
 #include <memory>
 #include "ltl2tgba_fm.hh"
-#include "tgba/tgbaproduct.hh"
-#include "tgbaalgos/gtec/gtec.hh"
+#include "ltlvisit/contain.hh"
 
 namespace spot
 {
@@ -536,108 +535,6 @@ namespace spot
     private:
       typedef Sgi::hash_map<const formula*, bool, formula_ptr_hash> pfl_map;
       pfl_map pfl_;
-    };
-
-    // Keep a map of the TGBA translation of all subformulae and their
-    // negations, for easy language containment check.
-    class language_containment_checker
-    {
-      struct record_
-      {
-	const tgba* translation;
-	typedef std::set<const record_*> incomp_map;
-	incomp_map incompatible;
-      };
-      typedef Sgi::hash_map<const formula*,
-			    record_, formula_ptr_hash> trans_map;
-    public:
-      language_containment_checker(bdd_dict* dict, bool exprop,
-				   bool symb_merge,
-				   bool branching_postponement,
-				   bool fair_loop_approx)
-	: dict_(dict), exprop_(exprop), symb_merge_(symb_merge),
-	  branching_postponement_(branching_postponement),
-	  fair_loop_approx_(fair_loop_approx)
-      {
-      }
-
-      ~language_containment_checker()
-      {
-
-	while (!translated_.empty())
-	  {
-	    trans_map::iterator i = translated_.begin();
-	    delete i->second.translation;
-	    const formula* f = i->first;
-	    translated_.erase(i);
-	    destroy(f);
-	  }
-      }
-
-      // Check whether L(l) is a subset of L(g).
-      bool
-      contained(const formula* l, const formula* g)
-      {
-	const record_* rl = register_formula_(l);
-	const formula* ng = unop::instance(unop::Not, clone(g));
-	const record_* rng = register_formula_(ng);
-	destroy(ng);
-	bool res = rl->incompatible.find(rng) != rl->incompatible.end();
-	return res;
-      }
-
-      // Check whether L(l) = L(g).
-      bool
-      equal(const formula* l, const formula* g)
-      {
-	return contained(l,g) && contained(g,l);
-      }
-
-    protected:
-      const record_*
-      register_formula_(const formula* f)
-      {
-	trans_map::iterator i = translated_.find(f);
-	if (i != translated_.end())
-	  return &i->second;
-
-	const tgba_explicit* e = ltl_to_tgba_fm(f, dict_, exprop_, symb_merge_,
-						branching_postponement_,
-						fair_loop_approx_);
-	record_& r = translated_[clone(f)];
-	r.translation = e;
-
-	// Check the emptiness of the product of this formula with any
-	// other registered formula.
-	for (i = translated_.begin(); i != translated_.end(); ++i)
-	  {
-	    if (f == i->first)
-	      continue;
-	    const tgba* p = new tgba_product(e, i->second.translation);
-	    emptiness_check* ec = couvreur99(p);
-	    emptiness_check_result* ecr = ec->check();
-	    if (!ecr)
-	      {
-		r.incompatible.insert(&i->second);
-		i->second.incompatible.insert(&r);
-	      }
-	    else
-	      delete ecr;
-	    delete ec;
-	    delete p;
-	  }
-	return &r;
-      }
-
-    private:
-      /* Translation options */
-      bdd_dict* dict_;
-      bool exprop_;
-      bool symb_merge_;
-      bool branching_postponement_;
-      bool fair_loop_approx_;
-      /* Translation Maps */
-      trans_map translated_;
     };
 
     class formula_canonizer
