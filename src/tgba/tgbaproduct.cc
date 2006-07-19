@@ -182,14 +182,18 @@ namespace spot
     bdd rna = right_->neg_acceptance_conditions();
 
     right_common_acc_ = bdd_newpair();
-    bdd common = bdd_exist(lna, bdd_exist(lna, rna));
-    while (common != bddtrue)
+
+    bdd tmp = lna;
+    while (tmp != bddtrue)
       {
-	assert(bdd_high(common) == bddfalse);
-	int var = bdd_var(common);
-	int varclone = dict_->register_clone_acc(var, this);
-	bdd_setpair(right_common_acc_, var, varclone);
-	common = bdd_low(common);
+	assert(bdd_high(tmp) == bddfalse);
+	int var = bdd_var(tmp);
+	if ((bdd_nithvar(var) & rna) == rna)
+	  {
+	    int varclone = dict_->register_clone_acc(var, this);
+	    bdd_setpair(right_common_acc_, var, varclone);
+	  }
+	tmp = bdd_low(tmp);
       }
 
     bdd lac = left_->all_acceptance_conditions();
