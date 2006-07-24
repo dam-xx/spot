@@ -1,3 +1,8 @@
+2006-07-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlvisit/contain.hh, src/ltlvisit/contain.cc: Adjust to only
+	check containment on demand.
+
 2006-07-19  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlvisit/contain.hh, src/ltlvisit/contain.cc (reduce_tau03):

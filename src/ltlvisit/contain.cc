@@ -58,16 +58,42 @@ namespace spot
 	}
     }
 
+    bool
+    language_containment_checker::incompatible_(record_* l, record_* g)
+    {
+      record_::incomp_map::const_iterator i = l->incompatible.find(g);
+      if (i != l->incompatible.end())
+	return i->second;
+
+      const tgba* p = new tgba_product(l->translation, g->translation);
+      emptiness_check* ec = couvreur99(p);
+      emptiness_check_result* ecr = ec->check();
+      if (!ecr)
+	{
+	  l->incompatible[g] = true;
+	  g->incompatible[l] = true;
+	}
+      else
+	{
+	  l->incompatible[g] = false;
+	  g->incompatible[l] = false;
+	  delete ecr;
+	}
+      delete ec;
+      delete p;
+      return !ecr;
+    }
+
+
     // Check whether L(l) is a subset of L(g).
     bool
     language_containment_checker::contained(const formula* l, const formula* g)
     {
-      const record_* rl = register_formula_(l);
+      record_* rl = register_formula_(l);
       const formula* ng = unop::instance(unop::Not, clone(g));
-      const record_* rng = register_formula_(ng);
+      record_* rng = register_formula_(ng);
       destroy(ng);
-      bool res = rl->incompatible.find(rng) != rl->incompatible.end();
-      return res;
+      return incompatible_(rl, rng);
     }
 
     // Check whether L(!l) is a subset of L(g).
@@ -76,13 +102,12 @@ namespace spot
 						const formula* g)
     {
       const formula* nl = unop::instance(unop::Not, clone(l));
-      const record_* rnl = register_formula_(nl);
+      record_* rnl = register_formula_(nl);
       const formula* ng = unop::instance(unop::Not, clone(g));
-      const record_* rng = register_formula_(ng);
+      record_* rng = register_formula_(ng);
       destroy(nl);
       destroy(ng);
-      bool res = rnl->incompatible.find(rng) != rnl->incompatible.end();
-      return res;
+      return incompatible_(rnl, rng);
     }
 
     // Check whether L(l) is a subset of L(!g).
@@ -90,10 +115,9 @@ namespace spot
     language_containment_checker::contained_neg(const formula* l,
 						const formula* g)
     {
-      const record_* rl = register_formula_(l);
-      const record_* rg = register_formula_(g);
-      bool res = rl->incompatible.find(rg) != rl->incompatible.end();
-      return res;
+      record_* rl = register_formula_(l);
+      record_* rg = register_formula_(g);
+      return incompatible_(rl, rg);
     }
 
     // Check whether L(l) = L(g).
@@ -103,7 +127,7 @@ namespace spot
       return contained(l,g) && contained(g,l);
     }
 
-    const language_containment_checker::record_*
+    language_containment_checker::record_*
     language_containment_checker::register_formula_(const formula* f)
     {
       trans_map::iterator i = translated_.find(f);
@@ -115,26 +139,6 @@ namespace spot
 					      fair_loop_approx_);
       record_& r = translated_[clone(f)];
       r.translation = e;
-
-      // Check the emptiness of the product of this formula with any
-      // other registered formula.
-      for (i = translated_.begin(); i != translated_.end(); ++i)
-	{
-	  if (f == i->first)
-	    continue;
-	  const tgba* p = new tgba_product(e, i->second.translation);
-	  emptiness_check* ec = couvreur99(p);
-	  emptiness_check_result* ecr = ec->check();
-	  if (!ecr)
-	    {
-	      r.incompatible.insert(&i->second);
-	      i->second.incompatible.insert(&r);
-	    }
-	  else
-	    delete ecr;
-	  delete ec;
-	  delete p;
-	}
       return &r;
     }
 

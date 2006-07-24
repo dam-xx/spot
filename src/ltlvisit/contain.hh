@@ -25,7 +25,7 @@
 #include "ltlast/formula.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"
 #include "misc/hash.hh"
-#include <set>
+#include <map>
 
 namespace spot
 {
@@ -37,7 +37,7 @@ namespace spot
       struct record_
       {
 	const tgba* translation;
-	typedef std::set<const record_*> incomp_map;
+	typedef std::map<const record_*, bool> incomp_map;
 	incomp_map incompatible;
       };
       typedef Sgi::hash_map<const formula*,
@@ -63,7 +63,9 @@ namespace spot
       bool equal(const formula* l, const formula* g);
 
     protected:
-      const record_* register_formula_(const formula* f);
+      bool incompatible_(record_* l, record_* g);
+
+      record_* register_formula_(const formula* f);
 
       /* Translation options */
       bdd_dict* dict_;
