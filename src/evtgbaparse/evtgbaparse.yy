@@ -25,6 +25,7 @@
 #include "evtgba/symbol.hh"
 %}
 
+%name-prefix="evtgbayy"
 %parse-param {spot::evtgba_parse_error_list &error_list}
 %parse-param {spot::evtgba_explicit* &result}
 %debug
@@ -120,7 +121,8 @@ init_decl:
 %%
 
 void
-yy::parser::error(const location_type& location, const std::string& message)
+evtgbayy::parser::error(const location_type& location, 
+			const std::string& message)
 {
   error_list.push_back(spot::evtgba_parse_error(location, message));
 }
@@ -135,7 +137,7 @@ namespace spot
     if (evtgbayyopen(name))
       {
 	error_list.push_back
-	  (evtgba_parse_error(yy::location(),
+	  (evtgba_parse_error(evtgbayy::location(),
 			      std::string("Cannot open file ") + name));
 	return 0;
       }

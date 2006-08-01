@@ -23,7 +23,10 @@
 # define SPOT_TGBAPARSE_PUBLIC_HH
 
 # include "tgba/tgbaexplicit.hh"
-# include "ltlparse/location.hh"
+  /* Unfortunately Bison 2.3 uses the same guards in all parsers :( */
+# undef BISON_LOCATION_HH
+# undef BISON_POSITION_HH
+# include "tgbaparse/location.hh"
 # include "ltlenv/defaultenv.hh"
 # include <string>
 # include <list>
@@ -36,7 +39,7 @@ namespace spot
   /// @{
 
   /// \brief A parse diagnostic with its location.
-  typedef std::pair<yy::location, std::string> tgba_parse_error;
+  typedef std::pair<tgbayy::location, std::string> tgba_parse_error;
   /// \brief A list of parser diagnostics, as filled by parse.
   typedef std::list<tgba_parse_error> tgba_parse_error_list;
 

@@ -27,7 +27,8 @@
 #include "location.hh"
 
 # define YY_DECL \
-  int tgbayylex (yystype *yylval, yy::location *yylloc)
+  int tgbayylex (tgbayy::parser::semantic_type *yylval, \
+		 tgbayy::location *yylloc)
 YY_DECL;
 
 namespace spot
@@ -42,11 +43,11 @@ namespace spot
 // skeleton does not support anything close to %name-prefix at the
 // moment.  All parser are named yy::Parser which makes it somewhat
 // difficult to define multiple parsers.
-namespace tgbayy
-{
-  using namespace yy;
-}
-#define yy tgbayy
+// namespace tgbayy
+// {
+//   using namespace yy;
+// }
+// #define yy tgbayy
 
 
 

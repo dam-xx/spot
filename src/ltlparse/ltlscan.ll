@@ -42,6 +42,8 @@
 static const char* to_parse = 0;
 static size_t to_parse_size = 0;
 
+typedef ltlyy::parser::token token;
+
 void
 flex_set_buffer(const char* buf)
 {
@@ -59,36 +61,36 @@ flex_set_buffer(const char* buf)
   yylloc->step();
 %}
 
-"("				BEGIN(0); return PAR_OPEN;
-")"				BEGIN(not_prop); return PAR_CLOSE;
+"("				BEGIN(0); return token::PAR_OPEN;
+")"				BEGIN(not_prop); return token::PAR_CLOSE;
 
   /* Must go before the other operators, because the F of FALSE
      should not be mistaken with a unary F. */
-"1"|[tT][rR][uU][eE]		BEGIN(0); return CONST_TRUE;
-"0"|[fF][aA][lL][sS][eE]	BEGIN(0); return CONST_FALSE;
+"1"|[tT][rR][uU][eE]		BEGIN(0); return token::CONST_TRUE;
+"0"|[fF][aA][lL][sS][eE]	BEGIN(0); return token::CONST_FALSE;
 
 
 
-"!"				BEGIN(0); return OP_NOT;
+"!"				BEGIN(0); return token::OP_NOT;
 
   /* & and | come from Spin.  && and || from LTL2BA.
      /\, \/, and xor are from LBTT.
   */
-"||"|"|"|"+"|"\\/"		BEGIN(0); return OP_OR;
-"&&"|"&"|"."|"*"|"/\\"		BEGIN(0); return OP_AND;
-"^"|"xor"			BEGIN(0); return OP_XOR;
-"=>"|"->"			BEGIN(0); return OP_IMPLIES;
-"<=>"|"<->"			BEGIN(0); return OP_EQUIV;
+"||"|"|"|"+"|"\\/"		BEGIN(0); return token::OP_OR;
+"&&"|"&"|"."|"*"|"/\\"		BEGIN(0); return token::OP_AND;
+"^"|"xor"			BEGIN(0); return token::OP_XOR;
+"=>"|"->"			BEGIN(0); return token::OP_IMPLIES;
+"<=>"|"<->"			BEGIN(0); return token::OP_EQUIV;
 
   /* <>, [], and () are used in Spin.  */
-"F"|"<>"			BEGIN(0); return OP_F;
-"G"|"[]"			BEGIN(0); return OP_G;
-"U"				BEGIN(0); return OP_U;
-"R"|"V"				BEGIN(0); return OP_R;
-"X"|"()"			BEGIN(0); return OP_X;
+"F"|"<>"			BEGIN(0); return token::OP_F;
+"G"|"[]"			BEGIN(0); return token::OP_G;
+"U"				BEGIN(0); return token::OP_U;
+"R"|"V"				BEGIN(0); return token::OP_R;
+"X"|"()"			BEGIN(0); return token::OP_X;
 
-"=0"				return OP_POST_NEG;
-"=1"				return OP_POST_POS;
+"=0"				return token::OP_POST_NEG;
+"=1"				return token::OP_POST_POS;
 
 [ \t\n]+			/* discard whitespace */ yylloc->step ();
 
@@ -118,7 +120,7 @@ flex_set_buffer(const char* buf)
 <not_prop>[a-zA-EH-QSTWYZ_][a-zA-EH-WYZ0-9_][a-zA-Z0-9_]* {
 			  yylval->str = new std::string(yytext, yyleng);
 			  BEGIN(not_prop);
-			  return ATOMIC_PROP;
+			  return token::ATOMIC_PROP;
 			}
 
   /* Atomic propositions can also be enclosed in double quotes.  */
@@ -126,12 +128,12 @@ flex_set_buffer(const char* buf)
 			  yylval->str = new std::string(yytext + 1,
 			                                yyleng - 2);
 			  BEGIN(not_prop);
-			  return ATOMIC_PROP;
+			  return token::ATOMIC_PROP;
 			}
 
 .			return *yytext;
 
-<<EOF>>			return END_OF_INPUT;
+<<EOF>>			return token::END_OF_INPUT;
 
 %{
   /* Dummy use of yyunput to shut up a gcc warning.  */

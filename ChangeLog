@@ -1,3 +1,14 @@
+2006-08-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/evtgbatest/evtgbaparse.yy, src/evtgbaparse/evtgbascan.ll,
+	src/evtgbaparse/parsedecl.hh, src/evtgbaparse/public.hh,
+	src/ltlparse/fmterror.cc, src/ltlparse/ltlparse.yy,
+	src/ltlparse/ltlscan.ll, src/ltlparse/parsedecl.hh,
+	src/ltlparse/public.hh, src/tgbaparse/parsedecl.hh,
+	src/tgbaparse/public.hh, src/tgbaparse/tgbaparse.yy,
+	src/tgbaparse/tgbascan.ll: Adjust for Bison 2.3.  Use %name-prefix
+	instead of the "#define yy ... " kludge.
+
 2006-07-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlvisit/contain.hh, src/ltlvisit/contain.cc: Adjust to only
