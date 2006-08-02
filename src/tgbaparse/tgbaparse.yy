@@ -22,8 +22,15 @@
 %{
 #include <string>
 #include "public.hh"
+
+/* Cache parsed formulae.  Labels on arcs are frequently identical and
+   it would be a waste of time to parse them to formula* over and
+   over, and to register all their atomic_propositions in the
+   bdd_dict.  Keep the bdd result around so we can reuse it.  */
+typedef std::map<std::string, bdd> formula_cache;
 %}
 
+%name-prefix="tgbayy"
 %parse-param {spot::tgba_parse_error_list& error_list}
 %parse-param {spot::ltl::environment& parse_environment}
 %parse-param {spot::ltl::environment& parse_envacc}
@@ -42,11 +49,14 @@
 %{
 #include "ltlast/constant.hh"
 #include "ltlvisit/destroy.hh"
+  /* Unfortunately Bison 2.3 uses the same guards in all parsers :( */
+#undef BISON_POSITION_HH
+#undef BISON_LOCATION_HH
 #include "ltlparse/public.hh"
 #include <map>
 
 /* tgbaparse.hh and parsedecl.hh include each other recursively.
-   We mut ensure that YYSTYPE is declared (by the above %union)
+   We must ensure that YYSTYPE is declared (by the above %union)
    before parsedecl.hh uses it. */
 #include "parsedecl.hh"
 using namespace spot::ltl;
@@ -57,12 +67,6 @@ using namespace spot::ltl;
 #define yylex tgbayylex
 
 typedef std::pair<bool, spot::ltl::formula*> pair;
-
-/* Cache parsed formulae.  Labels on arcs are frequently identical and
-   it would be a waste of time to parse them to formula* over and
-   over, and to register all their atomic_propositions in the
-   bdd_dict.  Keep the bdd result around so we can reuse it.  */
-typedef std::map<std::string, bdd> formula_cache;
 %}
 
 %token <str> STRING UNTERMINATED_STRING
@@ -217,7 +221,8 @@ acc_decl:
 %%
 
 void
-yy::parser::error(const location_type& location, const std::string& message)
+tgbayy::parser::error(const location_type& location, 
+		      const std::string& message)
 {
   error_list.push_back(spot::tgba_parse_error(location, message));
 }
@@ -235,7 +240,7 @@ namespace spot
     if (tgbayyopen(name))
       {
 	error_list.push_back
-	  (tgba_parse_error(yy::location(),
+	  (tgba_parse_error(tgbayy::location(),
 			    std::string("Cannot open file ") + name));
 	return 0;
       }

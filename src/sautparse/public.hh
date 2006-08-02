@@ -23,7 +23,9 @@
 # define SPOT_SAUTPARSE_PUBLIC_HH
 
 # include "ltlenv/defaultenv.hh"
-# include "ltlparse/location.hh"
+# undef BISON_LOCATION_HH
+# undef BISON_POSITION_HH
+# include "sautparse/location.hh"
 # include "saut/saut.hh"
 # include <string>
 # include <list>
@@ -47,7 +49,7 @@ namespace spot
   };
 
   /// \brief A parse diagnostic with its location.
-  typedef std::pair<yy::location, std::string> saut_parse_error;
+  typedef std::pair<sautyy::location, std::string> saut_parse_error;
   /// \brief A list of parser diagnostics, as filled by parse.
   typedef std::list<saut_parse_error> saut_parse_error_list;
 

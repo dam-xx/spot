@@ -27,6 +27,7 @@
 
 %}
 
+%name-prefix="ltlyy"
 %parse-param {spot::ltl::parse_error_list &error_list}
 %parse-param {spot::ltl::environment &parse_environment}
 %parse-param {spot::ltl::formula* &result}
@@ -262,7 +263,7 @@ subformula: ATOMIC_PROP
 %%
 
 void
-yy::parser::error(const location_type& location, const std::string& message)
+ltlyy::parser::error(const location_type& location, const std::string& message)
 {
   error_list.push_back(parse_error(location, message));
 }
@@ -279,7 +280,7 @@ namespace spot
     {
       formula* result = 0;
       flex_set_buffer(ltl_string.c_str());
-      yy::parser parser(error_list, env, result);
+      ltlyy::parser parser(error_list, env, result);
       parser.set_debug_level(debug);
       parser.parse();
       return result;

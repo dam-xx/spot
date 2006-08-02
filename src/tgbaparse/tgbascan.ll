@@ -33,6 +33,8 @@
 
 #define YY_NEVER_INTERACTIVE 1
 
+typedef tgbayy::parser::token token;
+
 %}
 
 eol      \n|\r|\n\r|\r\n
@@ -43,11 +45,11 @@ eol      \n|\r|\n\r|\r\n
   yylloc->step ();
 %}
 
-acc[ \t]*=		return ACC_DEF;
+acc[ \t]*=		return token::ACC_DEF;
 
 [a-zA-Z][a-zA-Z0-9_]*   {
 			  yylval->str = new std::string(yytext, yyleng);
-	                  return IDENT;
+	                  return token::IDENT;
 		        }
 
 			/* discard whitespace */
@@ -65,13 +67,13 @@ acc[ \t]*=		return ACC_DEF;
 <STATE_STRING>{
   \"                    {
                           BEGIN(INITIAL);
-			  return STRING;
+			  return token::STRING;
                         }
   \\["\\]               yylval->str->append(1, yytext[1]);
   [^"\\]+               yylval->str->append(yytext, yyleng);
   <<EOF>>		{
   			  BEGIN(INITIAL);
-			  return UNTERMINATED_STRING;
+			  return token::UNTERMINATED_STRING;
 			}
 }
 

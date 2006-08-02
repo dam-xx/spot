@@ -37,7 +37,7 @@ namespace spot
       for (it = error_list.begin(); it != error_list.end(); ++it)
 	{
 	  os << ">>> " << ltl_string << std::endl;
-	  yy::location& l = it->first;
+	  ltlyy::location& l = it->first;
 
 	  unsigned n = 0;
 	  for (; n < 4 + l.begin.column; ++n)

@@ -23,7 +23,7 @@
 # define SPOT_LTLPARSE_PUBLIC_HH
 
 # include "ltlast/formula.hh"
-# include "location.hh"
+# include "ltlparse/location.hh"
 # include "ltlenv/defaultenv.hh"
 # include <string>
 # include <list>
@@ -38,7 +38,7 @@ namespace spot
     /// @{
 
     /// \brief A parse diagnostic with its location.
-    typedef std::pair<yy::location, std::string> parse_error;
+    typedef std::pair<ltlyy::location, std::string> parse_error;
     /// \brief A list of parser diagnostics, as filled by parse.
     typedef std::list<parse_error> parse_error_list;
 

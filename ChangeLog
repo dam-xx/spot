@@ -1,3 +1,26 @@
+2006-08-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/sautparse/parsedecl.hh, src/sautparse/public.hh,
+	src/sautparse/sautparse.yy, src/sautparse/sautscan.ll:
+	Adjust for Bison 2.3.  Adjust for Bison 2.3.
+
+	Merges from HEAD:
+
+	2006-08-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+	* src/evtgbatest/evtgbaparse.yy, src/evtgbaparse/evtgbascan.ll,
+	src/evtgbaparse/parsedecl.hh, src/evtgbaparse/public.hh,
+	src/ltlparse/fmterror.cc, src/ltlparse/ltlparse.yy,
+	src/ltlparse/ltlscan.ll, src/ltlparse/parsedecl.hh,
+	src/ltlparse/public.hh, src/tgbaparse/parsedecl.hh,
+	src/tgbaparse/public.hh, src/tgbaparse/tgbaparse.yy,
+	src/tgbaparse/tgbascan.ll: Adjust for Bison 2.3.  Use %name-prefix
+	instead of the "#define yy ... " kludge.
+
+	2006-07-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+	* src/tgba/tgbabddconcrete.hh, src/tgba/tgbaexplicit.hh,
+	src/tgba/tgbaproduct.hh, src/tgba/tgbareduc.hh, src/tgba/tgbatba.hh:
+	Remove superfluous class qualifiers worrying gcc 4.1.2.
+
 2006-06-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check::couvreur99_check):

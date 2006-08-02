@@ -39,6 +39,7 @@ namespace spot
   public:
     typedef std::list<streett_pair> acc_list;
     virtual const acc_list& get_streett_acceptance_conditions() const = 0;
+    virtual ~streett_acceptance_conditions() {};
   };
 
   class streett_acceptance_conditions_stored

@@ -28,6 +28,8 @@
 #include "saut/saut.hh"
 #include "saut/sync.hh"
 #include "tgbaalgos/dotty.hh"
+#undef BISON_LOCATION_HH
+#undef BISON_POSITION_HH
 #include "ltlparse/public.hh"
 #include "ltlvisit/destroy.hh"
 #include "tgbaalgos/emptiness.hh"
@@ -51,7 +53,7 @@ namespace
 
 %}
 
-
+%name-prefix="sautyy"
 %parse-param {spot::saut_parse_error_list& error_list}
 %parse-param {context_t& context}
 %parse-param {spot::bdd_dict* dict}
@@ -526,7 +528,8 @@ ltlformula: QSTRING
 %%
 
 void
-yy::parser::error(const location_type& location, const std::string& message)
+sautyy::parser::error(const location_type& location,
+		      const std::string& message)
 {
   error_list.push_back(spot::saut_parse_error(location, message));
 }
@@ -556,7 +559,7 @@ namespace spot
     if (sautyyopen(name))
       {
         error_list.push_back
-          (saut_parse_error(yy::location(),
+          (saut_parse_error(sautyy::location(),
                             std::string("Cannot open file ") + name));
         return 0;
       }

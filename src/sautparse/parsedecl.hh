@@ -27,7 +27,8 @@
 #include "location.hh"
 
 # define YY_DECL \
-  int sautyylex (yystype *yylval, yy::location *yylloc)
+  int sautyylex (sautyy::parser::semantic_type *yylval, \
+		 sautyy::location *yylloc)
 YY_DECL;
 
 namespace spot
@@ -35,19 +36,5 @@ namespace spot
   int sautyyopen(const std::string& name);
   void sautyyclose();
 }
-
-
-// Gross kludge to compile yy::Parser in another namespace (sautyy::)
-// but still use yy::Location.  The reason is that Bison's C++
-// skeleton does not support anything close to %name-prefix at the
-// moment.  All parser are named yy::Parser which makes it somewhat
-// difficult to define multiple parsers.
-namespace sautyy
-{
-  using namespace yy;
-}
-#define yy sautyy
-
-
 
 #endif // SPOT_SAUTPARSE_PARSEDECL_HH

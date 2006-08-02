@@ -26,13 +26,14 @@
 
 %{
 #include <string>
-#include "sautparse/sautparse.hh"
+#include "sautparse/parsedecl.hh"
 
 #define YY_USER_ACTION \
   yylloc->columns(yyleng);
 
 #define YY_NEVER_INTERACTIVE 1
 
+typedef sautyy::parser::token token;
 %}
 
 eol      \n|\r|\n\r|\r\n
@@ -44,30 +45,30 @@ ws	 " "|\t
   yylloc->step ();
 %}
 
-"("				return LPAREN;
-")"				return RPAREN;
-"-"				return DASH;
-"->"				return ARROW;
-";"				return SEMICOLON;
-","				return COMA;
-"."				return DOT;
-"|="				return VERIFIES;
+"("				return token::LPAREN;
+")"				return token::RPAREN;
+"-"				return token::DASH;
+"->"				return token::ARROW;
+";"				return token::SEMICOLON;
+","				return token::COMA;
+"."				return token::DOT;
+"|="				return token::VERIFIES;
 
-:={ws}*Automaton		return AUTOMATON;
-:={ws}*Table			return TABLE;
+:={ws}*Automaton		return token::AUTOMATON;
+:={ws}*Table			return token::TABLE;
 
-:{ws}*Weak			return WEAK;
-:{ws}*Strong			return STRONG;
+:{ws}*Weak			return token::WEAK;
+:{ws}*Strong			return token::STRONG;
 
-Nodes				return NODES;
-Transitions			return TRANSITIONS;
-AtomicPropositions		return ATOMICPROPOSITIONS;
-Check				return CHECK;
-Display				return DISPLAY;
+Nodes				return token::NODES;
+Transitions			return token::TRANSITIONS;
+AtomicPropositions		return token::ATOMICPROPOSITIONS;
+Check				return token::CHECK;
+Display				return token::DISPLAY;
 
 [A-Za-z0-9_?!.:]+		{
 				  yylval->str = new std::string(yytext, yyleng);
-				  return IDENT;
+				  return token::IDENT;
 				}
 
 (#.*)?{eol}			yylloc->lines(); yylloc->step();
@@ -85,7 +86,7 @@ Display				return DISPLAY;
 <STATE_STRING>{
   \"                    	{
                         	  BEGIN(INITIAL);
-				  return QSTRING;
+				  return token::QSTRING;
                         	}
   \\["\\]               	yylval->str->append(1, yytext[1]);
   [^"\\]+               	yylval->str->append(yytext, yyleng);
