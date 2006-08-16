@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -44,6 +44,10 @@ namespace spot
 	Reduce_Syntactic_Implications = 2,
 	/// Etessami & Holzmann eventuality and universality reductions.
 	Reduce_Eventuality_And_Universality = 4,
+	/// Tauriainen containment checks.
+	Reduce_Containment_Checks = 8,
+	/// Tauriainen containment checks (stronger version).
+	Reduce_Containment_Checks_Stronger = 16,
 	/// All reductions.
 	Reduce_All = -1U
       };

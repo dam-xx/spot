@@ -43,9 +43,6 @@ syntax(char* prog)
 int
 main(int argc, char** argv)
 {
-  bool tau03 = false;
-  bool stronger = false;
-
   if (argc < 3)
     syntax(argv[0]);
 
@@ -61,11 +58,10 @@ main(int argc, char** argv)
     case 2:
       o = spot::ltl::Reduce_Eventuality_And_Universality;
       break;
-    case 9:
-      tau03 = stronger = true;
-      /* fall through */
     case 3:
-      o = spot::ltl::Reduce_All;
+      o = spot::ltl::Reduce_Basics
+	| spot::ltl::Reduce_Syntactic_Implications
+	| spot::ltl::Reduce_Eventuality_And_Universality;
       break;
     case 4:
       o = spot::ltl::Reduce_Basics | spot::ltl::Reduce_Syntactic_Implications;
@@ -78,11 +74,14 @@ main(int argc, char** argv)
       o = (spot::ltl::Reduce_Syntactic_Implications
 	   | spot::ltl::Reduce_Eventuality_And_Universality);
       break;
-    case 8:
-      stronger = true;
-      /* fall through */
     case 7:
-      tau03 = true;
+      o = spot::ltl::Reduce_Containment_Checks;
+      break;
+    case 8:
+      o = spot::ltl::Reduce_Containment_Checks_Stronger;
+      break;
+    case 9:
+      o = spot::ltl::Reduce_All;
       break;
     default:
       return 2;
@@ -126,13 +125,6 @@ main(int argc, char** argv)
   f1 = spot::ltl::unabbreviate_logic(f1);
   spot::ltl::destroy(ftmp1);
   spot::ltl::destroy(ftmp2);
-
-  if (tau03)
-    {
-      ftmp1 = f1;
-      f1 = spot::ltl::reduce_tau03(f1, stronger);
-      spot::ltl::destroy(ftmp1);
-    }
 
   int length_f1_after = spot::ltl::length(f1);
   std::string f1s_after = spot::ltl::to_string(f1);

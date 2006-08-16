@@ -124,7 +124,7 @@ namespace spot
     bool
     language_containment_checker::equal(const formula* l, const formula* g)
     {
-      return contained(l,g) && contained(g,l);
+      return contained(l, g) && contained(g, l);
     }
 
     language_containment_checker::record_*
@@ -143,7 +143,8 @@ namespace spot
     }
 
 
-    namespace {
+    namespace
+    {
       struct reduce_tau03_visitor : public clone_visitor {
 	bool stronger;
 	language_containment_checker* lcc;

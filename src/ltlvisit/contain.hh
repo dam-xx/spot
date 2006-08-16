@@ -101,7 +101,7 @@ namespace spot
     /// If \a stronger is set, additional rules are used to further
     /// reduce some U, R, and X usages.
     /// \endverbatim
-    formula* reduce_tau03(const formula* f, bool stronger = false);
+    formula* reduce_tau03(const formula* f, bool stronger = true);
   }
 }
 

@@ -25,7 +25,6 @@
 #include <fstream>
 #include <string>
 #include "ltlvisit/destroy.hh"
-#include "ltlvisit/reduce.hh"
 #include "ltlvisit/contain.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/apcollect.hh"
@@ -81,6 +80,9 @@ syntax(char* prog)
 	    << "  -fr2  use -r2 (see below) at each step of FM" << std::endl
 	    << "  -fr3  use -r3 (see below) at each step of FM" << std::endl
 	    << "  -fr4  use -r4 (see below) at each step of FM" << std::endl
+	    << "  -fr5  use -r5 (see below) at each step of FM" << std::endl
+	    << "  -fr6  use -r6 (see below) at each step of FM" << std::endl
+	    << "  -fr7  use -r7 (see below) at each step of FM" << std::endl
             << "  -F    read the formula from the file" << std::endl
 	    << "  -g    graph the accepting run on the automaton (requires -e)"
 	    << std::endl
@@ -167,8 +169,6 @@ main(int argc, char** argv)
   bool from_file = false;
   int reduc_aut = spot::Reduce_None;
   int redopt = spot::ltl::Reduce_None;
-  bool redtau = false;
-  bool stronger = false;
   bool display_reduce_form = false;
   bool display_rel_sim = false;
   bool display_parity_game = false;
@@ -283,6 +283,23 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-fr4"))
 	{
 	  fm_opt = true;
+ 	  fm_red |= spot::ltl::Reduce_Basics
+	    | spot::ltl::Reduce_Eventuality_And_Universality
+	    | spot::ltl::Reduce_Syntactic_Implications;
+	}
+      else if (!strcmp(argv[formula_index], "-fr5"))
+	{
+	  fm_opt = true;
+	  fm_red |= spot::ltl::Reduce_Containment_Checks;
+	}
+      else if (!strcmp(argv[formula_index], "-fr6"))
+	{
+	  fm_opt = true;
+	  fm_red |= spot::ltl::Reduce_Containment_Checks_Stronger;
+	}
+      else if (!strcmp(argv[formula_index], "-fr7"))
+	{
+	  fm_opt = true;
 	  fm_red |= spot::ltl::Reduce_All;
 	}
       else if (!strcmp(argv[formula_index], "-F"))
@@ -347,20 +364,21 @@ main(int argc, char** argv)
 	}
       else if (!strcmp(argv[formula_index], "-r4"))
 	{
-	  redopt |= spot::ltl::Reduce_All;
+ 	  redopt |= spot::ltl::Reduce_Basics
+	    | spot::ltl::Reduce_Eventuality_And_Universality
+	    | spot::ltl::Reduce_Syntactic_Implications;
 	}
       else if (!strcmp(argv[formula_index], "-r5"))
 	{
-	  redtau = true;
+	  redopt |= spot::ltl::Reduce_Containment_Checks;
 	}
       else if (!strcmp(argv[formula_index], "-r6"))
 	{
-	  redtau = stronger = true;
+	  redopt |= spot::ltl::Reduce_Containment_Checks_Stronger;
 	}
       else if (!strcmp(argv[formula_index], "-r7"))
 	{
 	  redopt |= spot::ltl::Reduce_All;
-	  redtau = stronger = true;
 	}
       else if (!strcmp(argv[formula_index], "-R"))
 	{
@@ -515,14 +533,6 @@ main(int argc, char** argv)
 	  if (redopt != spot::ltl::Reduce_None)
 	    {
 	      spot::ltl::formula* t = spot::ltl::reduce(f, redopt);
-	      spot::ltl::destroy(f);
-	      f = t;
-	      if (display_reduce_form && !redtau)
-		std::cout << spot::ltl::to_string(f) << std::endl;
-	    }
-	  if (redtau)
-	    {
-	      spot::ltl::formula* t = spot::ltl::reduce_tau03(f, stronger);
 	      spot::ltl::destroy(f);
 	      f = t;
 	      if (display_reduce_form)

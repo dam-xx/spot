@@ -1,3 +1,20 @@
+2006-08-16  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/evtgbaparse/public.hh: Work around Bison 2.3 unique guards.
+	* src/ltlvisit/reduce.hh, src/ltlvisit/reduce.hh:
+	Add Reduce_Containment_Checks and Reduce_Containment_Checks_Stronger
+	flags, and call reduce_tau03.
+	* src/ltlvisit/contain.hh (reduce_tau03): Make "stronger" the
+	default.
+	* src/ltlvisit/contain.cc: Style.
+	* src/ltltest/reduc.cc: Simplify using the reduce() interface
+	instead of reduce_tau03.
+	* src/tgbatest/ltl2tgba.cc: Likewise.  Add -fr5, -fr6, and -fr7
+	options.
+	* src/tgbatest/spotlbtt.test: Remove cases using "-c", since its
+	current implementation is not always correct (and apparently
+	reduces less than -fr7).
+
 2006-08-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/evtgbatest/evtgbaparse.yy, src/evtgbaparse/evtgbascan.ll,

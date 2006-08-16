@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -29,6 +29,7 @@
 #include "simpfg.hh"
 #include "nenoform.hh"
 #include "ltlvisit/destroy.hh"
+#include "contain.hh"
 
 namespace spot
 {
@@ -331,6 +332,17 @@ namespace spot
 	      f2 = f1;
 	    }
 	}
+
+
+      if (opt & (Reduce_Containment_Checks
+		 | Reduce_Containment_Checks_Stronger))
+	{
+	  formula* f1 = reduce_tau03(f2,
+				     opt & Reduce_Containment_Checks_Stronger);
+	  destroy(f2);
+	  f2 = f1;
+	}
+
       return f2;
     }
   }
