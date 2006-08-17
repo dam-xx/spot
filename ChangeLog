@@ -1,4 +1,8 @@
-2006-08-16  Alexandre Duret-Lutz  <adl@gnu.org>
+2006-08-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlparse/public.hh: Work around Bison 2.3 unique guards.
+
+2006-08-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/evtgbaparse/public.hh: Work around Bison 2.3 unique guards.
 	* src/ltlvisit/reduce.hh, src/ltlvisit/reduce.hh:
