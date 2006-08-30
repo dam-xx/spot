@@ -152,6 +152,7 @@ line: strident ',' strident ',' condition ',' acc_list ';'
 string: STRING
        | UNTERMINATED_STRING
        {
+	 $$ = $1;
 	 error_list.push_back(spot::tgba_parse_error(@1,
 						     "unterminated string"));
        }
@@ -219,7 +220,7 @@ acc_decl:
 %%
 
 void
-tgbayy::parser::error(const location_type& location, 
+tgbayy::parser::error(const location_type& location,
 		      const std::string& message)
 {
   error_list.push_back(spot::tgba_parse_error(location, message));
