@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -25,7 +25,9 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 tgbaparsedir = $(pkgincludedir)/tgbaparse
 
 tgbaparse_HEADERS = \
-  public.hh
+  public.hh \
+  location.hh \
+  position.hh
 
 noinst_LTLIBRARIES = libtgbaparse.la
 
