@@ -198,11 +198,12 @@ ap_statement: ap_states "|=" ap_props
 ap_states: ap_state
 	{ $$ = new std::list<const std::string*>; $$->push_back($1); }
 	| ap_states ap_state
-	{ $$->push_back($2); }
+	{ $$ = $1; $$->push_back($2); }
 	;
 
 ap_state: IDENT
 	{
+	   $$ = $1;
 	   if (!context.aut->known_node(*$1))
 	      error_list.push_back(spot::saut_parse_error(@1,
                                    *$1 + ": unknown node"));

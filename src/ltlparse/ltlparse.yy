@@ -1,6 +1,6 @@
-/* Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-** département Systèmes Répartis Coopératifs (SRC), Université Pierre
-** et Marie Curie.
+/* Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+** Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+** Université Pierre et Marie Curie.
 **
 ** This file is part of Spot, a model checking library.
 **
@@ -103,14 +103,14 @@ using namespace spot::ltl;
 
 %nonassoc OP_POST_NEG OP_POST_POS
 
-%type <ltl> result subformula
+%type <ltl> subformula
 
 /* At the time of writing (2004-01-05) there is a bug in CVS Bison: if
    you give a token (such a ATOMIC_PROP) a name (such as "atomic
    proposition"), then the %destructor should refer to that name.
    References to ATOMIC_PROP are silently ignored.  */
 %destructor { delete $$; } "atomic proposition"
-%destructor { spot::ltl::destroy($$); } result subformula
+%destructor { spot::ltl::destroy($$); } subformula
 
 %printer { debug_stream() << *$$; } "atomic proposition"
 

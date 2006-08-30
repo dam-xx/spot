@@ -1,4 +1,4 @@
-/* Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2004, 2005, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -85,6 +85,7 @@ line: strident ',' strident ',' strident ',' acc_list ';'
 string: STRING
        | UNTERMINATED_STRING
        {
+	 $$ = $1;
 	 error_list.push_back(spot::evtgba_parse_error(@1,
 						     "unterminated string"));
        }
@@ -97,7 +98,8 @@ acc_list:
        }
        | acc_list strident
        {
-	 $1->insert(spot::rsymbol(*$2));
+	 $$ = $1;
+	 $$->insert(spot::rsymbol(*$2));
 	 delete $2;
        }
        ;
@@ -121,7 +123,7 @@ init_decl:
 %%
 
 void
-evtgbayy::parser::error(const location_type& location, 
+evtgbayy::parser::error(const location_type& location,
 			const std::string& message)
 {
   error_list.push_back(spot::evtgba_parse_error(location, message));

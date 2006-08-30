@@ -1,10 +1,16 @@
-2006-08-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+2006-08-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* evtgbaparse/evtgbaparse.yy, ltlparse/ltlparse.yy,
+	tgbaparse/tgbaparse.yy, src/sautparse/sautparse.yy:
+	Fix Bison warnings about unset $$.
 
 	* src/tgbaparse/Makefile.am (tgbaparse_HEADERS): Also
 	install location.hh and position.hh, since we no longer share
 	those of ltlvisit.
 	* src/evtgbaparse/Makefile.am (evtgbaparse_HEADERS): Likewise.
 	* src/sautparse/Makefile.am (sautparse_HEADERS): Likewise.
+
+2006-08-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/sautparse/parsedecl.hh, src/sautparse/public.hh,
 	src/sautparse/sautparse.yy, src/sautparse/sautscan.ll:
