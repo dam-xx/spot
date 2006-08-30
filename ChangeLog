@@ -1,5 +1,7 @@
 2006-08-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* HACKING: We need Bison 2.3.
+
 	* evtgbaparse/evtgbaparse.yy, ltlparse/ltlparse.yy,
 	tgbaparse/tgbaparse.yy: Fix Bison warnings about unset $$.
 
