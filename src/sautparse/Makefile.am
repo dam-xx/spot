@@ -25,7 +25,9 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 sautparsedir = $(pkgincludedir)/sautparse
 
 sautparse_HEADERS = \
-  public.hh
+  public.hh \
+  location.hh \
+  position.hh
 
 noinst_LTLIBRARIES = libsautparse.la
 

@@ -1,5 +1,11 @@
 2006-08-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* src/tgbaparse/Makefile.am (tgbaparse_HEADERS): Also
+	install location.hh and position.hh, since we no longer share
+	those of ltlvisit.
+	* src/evtgbaparse/Makefile.am (evtgbaparse_HEADERS): Likewise.
+	* src/sautparse/Makefile.am (sautparse_HEADERS): Likewise.
+
 	* src/sautparse/parsedecl.hh, src/sautparse/public.hh,
 	src/sautparse/sautparse.yy, src/sautparse/sautscan.ll:
 	Adjust for Bison 2.3.  Adjust for Bison 2.3.
