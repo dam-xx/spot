@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2005, 2006, 2007 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -573,11 +573,494 @@ namespace spot
     return ecs_->h->find(s);
   }
 
+
+  namespace {
+    class couvreur99_check_parallel;
+    typedef couvreur99_check_parallel** check_tab;
+
+    struct checkpool {
+      check_tab ct;
+      pthread_t* pt;
+      int size;
+      pthread_cond_t finisher_cond;
+      pthread_mutex_t finisher_mutex;
+      int finisher;
+    };
+
+    class couvreur99_check_parallel : public couvreur99_check_shy
+    {
+    public:
+      couvreur99_check_parallel
+      (int me, checkpool& pool, const tgba* a,
+       option_map o = option_map(),
+       const numbered_state_heap_factory* nshf
+       = numbered_state_heap_hash_map_factory::instance())
+	: couvreur99_check_shy(a, o, nshf), me_(me), pool_(pool)
+      {
+	pthread_mutex_init(&buffer_mutex, NULL);
+      }
+
+      virtual ~couvreur99_check_parallel()
+      {
+	pthread_mutex_destroy(&buffer_mutex);
+      }
+
+      void
+      remove_component(const state* from)
+      {
+	++removed_components;
+	// If rem has been updated, removing states is very easy.
+	if (poprem_)
+	  {
+	    assert(!ecs_->root.rem().empty());
+	    dec_depth(ecs_->root.rem().size());
+	    std::list<const state*>::iterator i;
+	    broadcast(ecs_->root.rem());
+	    for (i = ecs_->root.rem().begin();
+		 i != ecs_->root.rem().end(); ++i)
+	      {
+		numbered_state_heap::state_index_p spi = ecs_->h->index(*i);
+		assert(spi.first == *i);
+		assert(*spi.second != -1);
+		*spi.second = -1;
+	      }
+	    // ecs_->root.rem().clear();
+	    return;
+	  }
+
+	// Remove from H all states which are reachable from state FROM.
+
+	// Stack of iterators towards states to remove.
+	std::stack<tgba_succ_iterator*> to_remove;
+
+	// Remove FROM itself, and prepare to remove its successors.
+	// (FROM should be in H, otherwise it means all reachable
+	// states from FROM have already been removed and there is no
+	// point in calling remove_component.)
+	numbered_state_heap::state_index_p spi = ecs_->h->index(from);
+	assert(spi.first == from);
+	assert(*spi.second != -1);
+	*spi.second = -1;
+	tgba_succ_iterator* i = ecs_->aut->succ_iter(from);
+
+	for (;;)
+	  {
+	    // Remove each destination of this iterator.
+	    for (i->first(); !i->done(); i->next())
+	      {
+		inc_transitions();
+
+		state* s = i->current_state();
+		numbered_state_heap::state_index_p spi = ecs_->h->index(s);
+
+		// This state is not necessary in H, because if we were
+		// doing inclusion checking during the emptiness-check
+		// (redefining find()), the index `s' can be included in a
+		// larger state and will not be found by index().  We can
+		// safely ignore such states.
+		if (!spi.first)
+		  continue;
+
+		if (*spi.second != -1)
+		  {
+		    *spi.second = -1;
+		    to_remove.push(ecs_->aut->succ_iter(spi.first));
+		  }
+	      }
+	    delete i;
+	    if (to_remove.empty())
+	      break;
+	    i = to_remove.top();
+	    to_remove.pop();
+	  }
+      }
+
+      virtual emptiness_check_result* check()
+      {
+	// Position in the loop seeking known successors.
+	pos = todo.back().q.begin();
+
+	for (;;)
+	  {
+	    check_finished();
+	    process_buffer();
+
+	    assert(ecs_->root.size() == 1 + arc.size());
+
+	    // Get the successors of the current state.
+	    succ_queue& queue = todo.back().q;
+
+	    std::cout << "Hello" << std::endl;
+
+	    // If there is no more successor, backtrack.
+	    if (queue.empty())
+	      {
+
+		std::cout << "Empty" << std::endl;
+		// We have explored all successors of state CURR.
+		const state* curr = todo.back().s;
+		int index = todo.back().n;
+
+		// Backtrack TODO.
+		todo.pop_back();
+		dec_depth();
+
+		if (todo.empty())
+		  {
+		    // This automaton recognizes no word.
+		    set_states(ecs_->states());
+		    assert(poprem_ || depth() == 0);
+		    return 0;
+		  }
+
+		pos = todo.back().q.begin();
+
+		// If poprem is used, fill rem with any component removed,
+		// so that remove_component() does not have to traverse
+		// the SCC again.
+		if (poprem_)
+		  {
+		    numbered_state_heap::state_index_p spi = ecs_->h->index(curr);
+		    assert(spi.first);
+		    ecs_->root.rem().push_front(spi.first);
+		    inc_depth();
+		  }
+
+		// When backtracking the root of an SCC, we must also
+		// remove that SCC from the ARC/ROOT stacks.  We must
+		// discard from H all reachable states from this SCC.
+		assert(!ecs_->root.empty());
+		if (ecs_->root.top().index == index)
+		  {
+		    assert(!arc.empty());
+		    arc.pop();
+		    remove_component(curr);
+		    ecs_->root.pop();
+		  }
+		continue;
+	      }
+
+	    std::cout << "Not empty" << std::endl;
+	    // We always make a first pass over the successors of a state
+	    // to check whether it contains some state we have already seen.
+	    // This way we hope to merge the most SCCs before stacking new
+	    // states.
+	    //
+	    // So are we checking for known states ?  If yes, POS tells us
+	    // which state we are considering.  Otherwise just pick the
+	    // first one.
+	    succ_queue::iterator old;
+
+	    if (onepass_)
+	      pos = queue.end();
+
+	    if (pos == queue.end())
+	      old = queue.begin();
+	    else
+	      old = pos;
+
+	    // Pick a random successor.
+	    if (old != queue.end())
+	      {
+		int n = rand() % queue.size();
+		std::cout << "Avant " << n << std::endl;
+		while (n--)
+		  ++old;
+		std::cout << "Apres" << std::endl;
+	      }
+
+	    successor succ = *old;
+	    // Beware: the implementation of find_state in ifage/gspn/ssp.cc
+	    // uses POS and modify QUEUE.
+	    numbered_state_heap::state_index_p sip = find_state(succ.s);
+	    if (pos != queue.end())
+	      ++pos;
+	    int* i = sip.second;
+
+	    if (!i)
+	      {
+		// It's a new state.
+		// If we are seeking known states, just skip it.
+		if (pos != queue.end())
+		  continue;
+		// Otherwise, number it and stack it so we recurse.
+		queue.erase(old);
+		dec_depth();
+		ecs_->h->insert(succ.s, ++num);
+		ecs_->root.push(num);
+		arc.push(succ.acc);
+		todo.push_back(todo_item(succ.s, num, this));
+		pos = todo.back().q.begin();
+		inc_depth();
+		continue;
+	      }
+
+	    queue.erase(old);
+	    dec_depth();
+
+	    // Skip dead states.
+	    if (*i == -1)
+	      continue;
+
+	    // Now this is the most interesting case.  We have
+	    // reached a state S1 which is already part of a
+	    // non-dead SCC.  Any such non-dead SCC has
+	    // necessarily been crossed by our path to this
+	    // state: there is a state S2 in our path which
+	    // belongs to this SCC too.  We are going to merge
+	    // all states between this S1 and S2 into this
+	    // SCC.
+	    //
+	    // This merge is easy to do because the order of
+	    // the SCC in ROOT is ascending: we just have to
+	    // merge all SCCs from the top of ROOT that have
+	    // an index greater to the one of the SCC of S2
+	    // (called the "threshold").
+	    int threshold = *i;
+	    std::list<const state*> rem;
+	    bdd acc = succ.acc;
+	    while (threshold < ecs_->root.top().index)
+	      {
+		assert(!ecs_->root.empty());
+		assert(!arc.empty());
+		acc |= ecs_->root.top().condition;
+		acc |= arc.top();
+		rem.splice(rem.end(), ecs_->root.rem());
+		ecs_->root.pop();
+		arc.pop();
+	      }
+	    // Note that we do not always have
+	    //   threshold == ecs_->root.top().index
+	    // after this loop, the SCC whose index is threshold
+	    // might have been merged with a lower SCC.
+
+	    // Accumulate all acceptance conditions into the
+	    // merged SCC.
+	    ecs_->root.top().condition |= acc;
+	    ecs_->root.rem().splice(ecs_->root.rem().end(), rem);
+
+	    // Have we found all acceptance conditions?
+	    if (ecs_->root.top().condition
+		== ecs_->aut->all_acceptance_conditions())
+	      {
+		// Use this state to start the computation of an accepting
+		// cycle.
+		ecs_->cycle_seed = sip.first;
+
+		// We have found an accepting SCC.  Clean up TODO.
+		clear_todo();
+		set_states(ecs_->states());
+		return new couvreur99_check_result(ecs_, options());
+	      }
+	    // Group the pending successors of formed SCC if requested.
+	    if (group_)
+	      {
+		assert(todo.back().s);
+		while (ecs_->root.top().index < todo.back().n)
+		  {
+		    todo_list::reverse_iterator prev = todo.rbegin();
+		    todo_list::reverse_iterator last = prev++;
+		    // If group2 is used we insert the last->q in front
+		    // of prev->q so that the states in prev->q are checked
+		    // for existence again after we have done with the states
+		    // of last->q.  Otherwise we just append to the end.
+		    prev->q.splice(group2_ ? prev->q.begin() : prev->q.end(),
+				   last->q);
+
+		    if (poprem_)
+		      {
+			numbered_state_heap::state_index_p spi =
+			  ecs_->h->index(todo.back().s);
+			assert(spi.first);
+			ecs_->root.rem().push_front(spi.first);
+			// Don't change the stack depth, since
+			// we are just moving the state from TODO to REM.
+		      }
+		    else
+		      {
+			dec_depth();
+		      }
+		    todo.pop_back();
+		  }
+		pos = todo.back().q.begin();
+	      }
+	  }
+      }
+
+      emptiness_check_result* result() const
+      {
+	return res_;
+      }
+
+      static void* run(void* obj)
+      {
+	std::cout << "Running !" << std::endl;
+
+	couvreur99_check_parallel* o =
+	  static_cast<couvreur99_check_parallel*>(obj);
+	o->res_ = o->check();
+
+	pthread_mutex_lock(&o->pool_.finisher_mutex);
+	o->pool_.finisher = o->me_;
+	pthread_mutex_unlock(&o->pool_.finisher_mutex);
+	pthread_cond_signal(&o->pool_.finisher_cond);
+	return NULL;
+      }
+
+      std::set<const state*> buffer;
+      pthread_mutex_t buffer_mutex;
+
+    private:
+      int me_;
+      checkpool& pool_;
+      emptiness_check_result* res_;
+
+      void check_finished() const
+      {
+	std::cout << "Check finished" << std::endl;
+	if (pool_.finisher >= 0)
+	  {
+	    std::cout << "suicide (" << me_ << ")" << std::endl;
+	    pthread_exit(NULL);
+	  }
+      }
+
+      void broadcast(const std::list<const state*>& data)
+      {
+	std::cout << "Broadcast" << std::endl;
+	for (int i = 0; i < pool_.size; ++i)
+	  {
+	    if (i == me_)
+	      continue;
+
+	    pthread_mutex_lock(&pool_.ct[i]->buffer_mutex);
+	    for (std::list<const state*>::const_iterator j = data.begin();
+		 j != data.end(); ++j)
+	      pool_.ct[i]->buffer.insert(*j);
+	    pthread_mutex_unlock(&pool_.ct[i]->buffer_mutex);
+	  }
+      }
+
+      void process_buffer()
+      {
+	std::cout << "A" << std::endl;
+
+	pthread_mutex_lock(&buffer_mutex);
+
+	std::cout << "B" << std::endl;
+
+	if (buffer.empty())
+	  {
+	    pthread_mutex_unlock(&buffer_mutex);
+	    std::cout << "C" << std::endl;
+	    return;
+	  }
+
+	    std::cout << "D" << std::endl;
+	for (std::set<const state*>::const_iterator i = buffer.begin();
+	     i != buffer.end(); ++i)
+	  {
+	     numbered_state_heap::state_index_p sip = find_state(*i);
+	     int* j = sip.second;
+
+	     if (!j)
+	       {
+		 // It's a new state.
+		 ecs_->h->insert((*i)->clone(), -1);
+	       }
+	     else
+	       {
+		 // It's a known state.
+		 *j = -1;
+	       }
+	  }
+	buffer.clear();
+	pthread_mutex_unlock(&buffer_mutex);
+      }
+
+
+
+    };
+
+
+    class couvreur99_check_parallel_proxy: public emptiness_check
+    {
+    private:
+      const numbered_state_heap_factory* nshf_;
+      checkpool pool_;
+    public:
+      couvreur99_check_parallel_proxy
+      (const tgba* a,
+       option_map o = option_map(),
+       const numbered_state_heap_factory* nshf
+       = numbered_state_heap_hash_map_factory::instance())
+	: emptiness_check(a, o), nshf_(nshf)
+      {
+	pool_.size = o.get("parallel", 2);
+	pool_.finisher = -1;
+	pool_.ct = 0;
+      }
+
+      ~couvreur99_check_parallel_proxy()
+      {
+	if (pool_.ct)
+	  {
+	    assert(pool_.finisher >= 0);
+	    delete pool_.ct[pool_.finisher];
+	  }
+      }
+
+      emptiness_check_result* check ()
+      {
+	pool_.ct = new couvreur99_check_parallel*[pool_.size];
+	pool_.pt = new pthread_t[pool_.size];
+	pthread_cond_init(&pool_.finisher_cond, NULL);
+	pthread_mutex_init(&pool_.finisher_mutex, NULL);
+
+	pthread_mutex_lock(&pool_.finisher_mutex);
+
+	for (int i = 0; i < pool_.size; ++i)
+	  pool_.ct[i] = new couvreur99_check_parallel(i, pool_,
+						      automaton(), options(),
+						      nshf_);
+	for (int i = 0; i < pool_.size; ++i)
+	  pthread_create(&pool_.pt[i], NULL, couvreur99_check_parallel::run,
+			 pool_.ct[i]);
+
+	pthread_cond_wait(&pool_.finisher_cond, &pool_.finisher_mutex);
+
+	std::cout << pool_.finisher << " returned: " << std::endl;
+	emptiness_check_result* res = pool_.ct[pool_.finisher]->result();
+
+	pthread_cond_destroy(&pool_.finisher_cond);
+	pthread_mutex_destroy(&pool_.finisher_mutex);
+
+ 	for (int i = 0; i < pool_.size; ++i)
+ 	  {
+	    pthread_join(pool_.pt[i], NULL);
+	  }
+ 	for (int i = 0; i < pool_.size; ++i)
+ 	  {
+	    if (i != pool_.finisher)
+	      delete pool_.ct[i];
+ 	  }
+ 	delete pool_.ct;
+ 	delete pool_.pt;
+
+	return res;
+      }
+
+    };
+  }
+
+
   emptiness_check*
   couvreur99(const tgba* a,
 	     option_map o,
 	     const numbered_state_heap_factory* nshf)
   {
+    if (o.get("parallel"))
+      return new couvreur99_check_parallel_proxy(a, o, nshf);
     if (o.get("shy"))
       return new couvreur99_check_shy(a, o, nshf);
     return  new couvreur99_check(a, o, nshf);

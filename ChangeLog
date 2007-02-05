@@ -1,3 +1,14 @@
+2007-02-05  Alexandre Duret-Lutz  <adl@gnu.org>
+	    Denis Poitrenaud  <dp@src.lip6.fr>
+
+	First try a multithreading Couvreur: a failure, because
+	Buddy isn't thread safe.
+
+	* src/tgbaalgos/gtec/Makefile.am (LDFLAGS): -lpthread.
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_parallel,
+	checkpool, couvreur99_check_parallel_proxy): New classes.
+	(couvreur99): Support the parallel option.
+
 2006-08-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* HACKING: We need Bison 2.3.
