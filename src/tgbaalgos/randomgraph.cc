@@ -1,6 +1,6 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2004, 2005, 2007 Laboratoire d'Informatique de Paris 6
+// (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -127,17 +127,21 @@ namespace spot
     // (the index into states[]), not the tgba_explicit::state*
     // directly, because the later would yield different graph
     // depending on the memory layout.
-    typedef std::set<int> node_set;
+    typedef std::set<tgba_explicit::state*> node_set;
     node_set nodes_to_process;
     node_set unreachable_nodes;
 
-    states[0] = res->add_state(st(0));
-    nodes_to_process.insert(0);
+    {
+      tgba_explicit::state* init = res->add_state(st(0));
+      states[0] = init;
+      nodes_to_process.insert(init);
+    }
 
     for (int i = 1; i < n; ++i)
       {
-	states[i] = res->add_state(st(i));
-	unreachable_nodes.insert(i);
+	tgba_explicit::state* s = res->add_state(st(i));
+	states[i] = s;
+	unreachable_nodes.insert(s);
       }
 
     // We want to connect each node to a number of successors between
@@ -146,7 +150,7 @@ namespace spot
 
     while (!nodes_to_process.empty())
       {
-	tgba_explicit::state* src = states[*nodes_to_process.begin()];
+	tgba_explicit::state* src = *nodes_to_process.begin();
 	nodes_to_process.erase(nodes_to_process.begin());
 
 	// Choose a random number of successors (at least one), using
@@ -170,8 +174,7 @@ namespace spot
 		std::advance(i, index);
 
 		// Link it from src.
-		random_labels(res, src, states[*i], props, props_n, t, accs, a);
-
+		random_labels(res, src, *i, props, props_n, t, accs, a);
 		nodes_to_process.insert(*i);
 		unreachable_nodes.erase(i);
 		break;
@@ -189,15 +192,16 @@ namespace spot
 
 		random_labels(res, src, dest, props, props_n, t, accs, a);
 
-		node_set::iterator j = unreachable_nodes.find(index);
+		node_set::iterator j = unreachable_nodes.find(dest);
 		if (j != unreachable_nodes.end())
 		  {
-		    nodes_to_process.insert(index);
+		    nodes_to_process.insert(dest);
 		    unreachable_nodes.erase(j);
 		    saw_unreachable = true;
 		  }
 	      }
 	  }
+
 	// The node must have at least one successor.
 	assert(!src->empty());
       }
