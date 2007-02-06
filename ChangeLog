@@ -1,3 +1,9 @@
+2007-02-06  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgbaalgos/randomgraph.cc (random_graph): Fix the
+	generation of the graph.  Some states had no successors or
+	duplicate transitions because of that bug.
+
 2006-08-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* HACKING: We need Bison 2.3.
