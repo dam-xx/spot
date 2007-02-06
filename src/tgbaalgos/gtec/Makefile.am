@@ -1,4 +1,4 @@
-## Copyright (C) 2004, 2007  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -21,7 +21,6 @@
 
 AM_CPPFLAGS = -I$(srcdir)/../.. $(BUDDY_CPPFLAGS)
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
-AM_LDFLAGS = -lpthread
 
 gtecdir = $(pkgincludedir)/tgbaalgos/gtec
 

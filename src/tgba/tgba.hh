@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005, 2007  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -201,6 +201,16 @@ namespace spot
     /// set should be augmented with the neg_acceptance_conditions() of
     /// the other operand.
     virtual bdd neg_acceptance_conditions() const = 0;
+
+    /// \brief Deserialize a state.
+    ///
+    /// Create state from its serialized data, read from file descriptor
+    /// \a fd.
+    /// \return the state on success, 0 if read returned EAGAIN.
+    virtual state* deserialize_state(int) const
+    {
+      assert(!"deserialize_state() not implemented");
+    };
 
   protected:
     /// Do the actual computation of tgba::support_conditions().

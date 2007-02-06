@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2007  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -25,6 +25,8 @@
 #include "tgbaexplicit.hh"
 #include "tgba/formula2bdd.hh"
 #include <cassert>
+#include <cstdio>
+#include <cerrno>
 
 namespace spot
 {
@@ -108,6 +110,18 @@ namespace spot
     return new state_explicit(*this);
   }
 
+  bool
+  state_explicit::serialize(int fd) const
+  {
+    int ret = write(fd, state_, sizeof state_);
+    if (ret == sizeof state_)
+      return false;
+    if (ret == -1 && errno == EAGAIN)
+      return true;
+    perror("failed to write state");
+    abort();
+  }
+
   ////////////////////////////////////////
   // tgba_explicit
 
@@ -151,6 +165,23 @@ namespace spot
       }
     return i->second;
   }
+
+  spot::state*
+  tgba_explicit::deserialize_state(int fd) const
+  {
+    tgba_explicit::state* s;
+    int ret = read(fd, &s, sizeof s);
+    if (ret == sizeof s)
+      return new state_explicit(s);
+    if (ret == -1 && errno == EAGAIN)
+      return 0;
+    if (ret == 0) // closed pipe, handled as empty.
+      return 0;
+
+    perror("failed to read state");
+    abort();
+  }
+
 
   tgba_explicit::state*
   tgba_explicit::set_init_state(const std::string& state)

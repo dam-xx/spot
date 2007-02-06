@@ -1,3 +1,15 @@
+2007-02-06  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgbaalgos/gtec/Makefile.am (LDFLAGS): Remove -lpthread.
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_parallel,
+	checkpool, couvreur99_check_parallel_proxy): Rewrite using pipe()
+	and fork().
+	* src/tgba/state.hh (state::serialize): New method.
+	* src/tgba/tgba.hh (tgba::deserialize): New method.
+	* src/tgba/tgbaexplicit.hh, src/tgba/tgbaexplicit.cc
+	(state_explicit::serialize, tgba_explicit::deserialize_state):
+	Implement these.
+
 2007-02-05  Alexandre Duret-Lutz  <adl@gnu.org>
 	    Denis Poitrenaud  <dp@src.lip6.fr>
 

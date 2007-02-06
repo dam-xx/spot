@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2007 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -67,6 +67,16 @@ namespace spot
     /// formulas.  That probably doesn't matter, since the hash value
     /// is meant to be used in a \c hash_map, but it had to be noted.
     virtual size_t hash() const = 0;
+
+    /// \brief Serialize a state
+    ///
+    /// Save the data of the state on file descriptor \a fd.
+    ///
+    /// \return false on success, true if write returned EAGAIN.
+    virtual bool serialize(int) const
+    {
+      assert(!"serialize() not implemented.");
+    }
 
     /// Duplicate a state.
     virtual state* clone() const = 0;

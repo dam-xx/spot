@@ -22,6 +22,14 @@
 #include "gtec.hh"
 #include "ce.hh"
 #include "misc/memusage.hh"
+#include <iostream>
+#include <set>
+#include <cstdlib>
+#include <cassert>
+#include <cstdio>
+#include <errno.h>
+#include <fcntl.h>		/* fcntl, O_NONBLOCK */
+#include <sys/wait.h>
 
 namespace spot
 {
@@ -579,12 +587,8 @@ namespace spot
     typedef couvreur99_check_parallel** check_tab;
 
     struct checkpool {
-      check_tab ct;
-      pthread_t* pt;
-      int size;
-      pthread_cond_t finisher_cond;
-      pthread_mutex_t finisher_mutex;
-      int finisher;
+  int* pipes;
+  int size;
     };
 
     class couvreur99_check_parallel : public couvreur99_check_shy
@@ -597,12 +601,10 @@ namespace spot
        = numbered_state_heap_hash_map_factory::instance())
 	: couvreur99_check_shy(a, o, nshf), me_(me), pool_(pool)
       {
-	pthread_mutex_init(&buffer_mutex, NULL);
       }
 
       virtual ~couvreur99_check_parallel()
       {
-	pthread_mutex_destroy(&buffer_mutex);
       }
 
       void
@@ -615,7 +617,8 @@ namespace spot
 	    assert(!ecs_->root.rem().empty());
 	    dec_depth(ecs_->root.rem().size());
 	    std::list<const state*>::iterator i;
-	    broadcast(ecs_->root.rem());
+	    if (pool_.size > 1)
+	      broadcast(ecs_->root.rem());
 	    for (i = ecs_->root.rem().begin();
 		 i != ecs_->root.rem().end(); ++i)
 	      {
@@ -682,21 +685,17 @@ namespace spot
 
 	for (;;)
 	  {
-	    check_finished();
-	    process_buffer();
+	    if (pool_.size > 1)
+	      process_buffer();
 
 	    assert(ecs_->root.size() == 1 + arc.size());
 
 	    // Get the successors of the current state.
 	    succ_queue& queue = todo.back().q;
 
-	    std::cout << "Hello" << std::endl;
-
 	    // If there is no more successor, backtrack.
 	    if (queue.empty())
 	      {
-
-		std::cout << "Empty" << std::endl;
 		// We have explored all successors of state CURR.
 		const state* curr = todo.back().s;
 		int index = todo.back().n;
@@ -740,7 +739,6 @@ namespace spot
 		continue;
 	      }
 
-	    std::cout << "Not empty" << std::endl;
 	    // We always make a first pass over the successors of a state
 	    // to check whether it contains some state we have already seen.
 	    // This way we hope to merge the most SCCs before stacking new
@@ -760,13 +758,14 @@ namespace spot
 	      old = pos;
 
 	    // Pick a random successor.
-	    if (old != queue.end())
+	    if (pos == queue.end())
 	      {
 		int n = rand() % queue.size();
-		std::cout << "Avant " << n << std::endl;
 		while (n--)
-		  ++old;
-		std::cout << "Apres" << std::endl;
+		  {
+		    ++old;
+		    assert(old != queue.end());
+		  }
 	      }
 
 	    successor succ = *old;
@@ -887,99 +886,63 @@ namespace spot
 	  }
       }
 
-      emptiness_check_result* result() const
-      {
-	return res_;
-      }
-
-      static void* run(void* obj)
-      {
-	std::cout << "Running !" << std::endl;
-
-	couvreur99_check_parallel* o =
-	  static_cast<couvreur99_check_parallel*>(obj);
-	o->res_ = o->check();
-
-	pthread_mutex_lock(&o->pool_.finisher_mutex);
-	o->pool_.finisher = o->me_;
-	pthread_mutex_unlock(&o->pool_.finisher_mutex);
-	pthread_cond_signal(&o->pool_.finisher_cond);
-	return NULL;
-      }
-
-      std::set<const state*> buffer;
-      pthread_mutex_t buffer_mutex;
-
     private:
       int me_;
       checkpool& pool_;
-      emptiness_check_result* res_;
 
-      void check_finished() const
+      void
+      broadcast(const std::list<const state*>& data)
       {
-	std::cout << "Check finished" << std::endl;
-	if (pool_.finisher >= 0)
-	  {
-	    std::cout << "suicide (" << me_ << ")" << std::endl;
-	    pthread_exit(NULL);
-	  }
-      }
+	// std::cout << getpid() << ": broadcast" << std::endl;
 
-      void broadcast(const std::list<const state*>& data)
-      {
-	std::cout << "Broadcast" << std::endl;
+	int cpt = data.size();
+	// std::set<int>::const_iterator i = data.be
 	for (int i = 0; i < pool_.size; ++i)
 	  {
 	    if (i == me_)
 	      continue;
 
-	    pthread_mutex_lock(&pool_.ct[i]->buffer_mutex);
+	    // FIXME: calling serialize once for the whole list would be faster
 	    for (std::list<const state*>::const_iterator j = data.begin();
 		 j != data.end(); ++j)
-	      pool_.ct[i]->buffer.insert(*j);
-	    pthread_mutex_unlock(&pool_.ct[i]->buffer_mutex);
+	      {
+		while ((*j)->serialize(pool_.pipes[i * 2 + 1]))
+		  process_buffer();
+	      }
 	  }
+	std::cout << getpid() << ": sent " << cpt << " items" << std::endl;
       }
 
-      void process_buffer()
+      void
+      process_buffer()
       {
-	std::cout << "A" << std::endl;
+	int cpt = 0;
+	spot::state* s;
 
-	pthread_mutex_lock(&buffer_mutex);
+	// std::cout << getpid() << ": pbuffer" << std::endl;
 
-	std::cout << "B" << std::endl;
-
-	if (buffer.empty())
+	while ((s = automaton()->deserialize_state(pool_.pipes[me_ * 2])))
 	  {
-	    pthread_mutex_unlock(&buffer_mutex);
-	    std::cout << "C" << std::endl;
-	    return;
+	    numbered_state_heap::state_index_p sip = find_state(s);
+	    int* j = sip.second;
+
+	    if (!j)
+	      {
+		// It's a new state.
+		ecs_->h->insert(s, -1);
+	      }
+	    else
+	      {
+		// It's a known state (find_state has already delete it).
+		*j = -1;
+	      }
+	    ++cpt;
 	  }
 
-	    std::cout << "D" << std::endl;
-	for (std::set<const state*>::const_iterator i = buffer.begin();
-	     i != buffer.end(); ++i)
-	  {
-	     numbered_state_heap::state_index_p sip = find_state(*i);
-	     int* j = sip.second;
-
-	     if (!j)
-	       {
-		 // It's a new state.
-		 ecs_->h->insert((*i)->clone(), -1);
-	       }
-	     else
-	       {
-		 // It's a known state.
-		 *j = -1;
-	       }
-	  }
-	buffer.clear();
-	pthread_mutex_unlock(&buffer_mutex);
+	if (cpt)
+	  std::cout << getpid() << ": received "
+		    << cpt << " items" << std::endl;
       }
-
-
-
     };
 
 
@@ -997,57 +960,142 @@ namespace spot
 	: emptiness_check(a, o), nshf_(nshf)
       {
 	pool_.size = o.get("parallel", 2);
-	pool_.finisher = -1;
-	pool_.ct = 0;
       }
 
       ~couvreur99_check_parallel_proxy()
       {
-	if (pool_.ct)
-	  {
-	    assert(pool_.finisher >= 0);
-	    delete pool_.ct[pool_.finisher];
-	  }
       }
 
       emptiness_check_result* check ()
       {
-	pool_.ct = new couvreur99_check_parallel*[pool_.size];
-	pool_.pt = new pthread_t[pool_.size];
-	pthread_cond_init(&pool_.finisher_cond, NULL);
-	pthread_mutex_init(&pool_.finisher_mutex, NULL);
+	pool_.pipes = new int[2 * pool_.size];
 
-	pthread_mutex_lock(&pool_.finisher_mutex);
-
+	// Create pool.size pipes.
 	for (int i = 0; i < pool_.size; ++i)
-	  pool_.ct[i] = new couvreur99_check_parallel(i, pool_,
-						      automaton(), options(),
-						      nshf_);
-	for (int i = 0; i < pool_.size; ++i)
-	  pthread_create(&pool_.pt[i], NULL, couvreur99_check_parallel::run,
-			 pool_.ct[i]);
+	  {
+	    if (pipe(pool_.pipes + 2 * i) != 0)
+	      {
+		perror("failed to create pipe");
+		abort();
+	      }
 
-	pthread_cond_wait(&pool_.finisher_cond, &pool_.finisher_mutex);
-
-	std::cout << pool_.finisher << " returned: " << std::endl;
-	emptiness_check_result* res = pool_.ct[pool_.finisher]->result();
-
-	pthread_cond_destroy(&pool_.finisher_cond);
-	pthread_mutex_destroy(&pool_.finisher_mutex);
-
- 	for (int i = 0; i < pool_.size; ++i)
- 	  {
-	    pthread_join(pool_.pt[i], NULL);
+	    // Make the write end non-blocking.
+	    int fd_flags = fcntl(pool_.pipes[i * 2 + 1], F_GETFL);
+	    if (fd_flags == -1)
+	      {
+		perror("failed to read descriptor flags");
+		abort();
+	      }
+	    if (fcntl(pool_.pipes[i * 2 + 1], F_SETFL, fd_flags | O_NONBLOCK)
+		== -1)
+	      {
+		perror("failed to write descriptor flags");
+		abort();
+	      }
 	  }
- 	for (int i = 0; i < pool_.size; ++i)
- 	  {
-	    if (i != pool_.finisher)
-	      delete pool_.ct[i];
- 	  }
- 	delete pool_.ct;
- 	delete pool_.pt;
 
-	return res;
+	std::cout << std::flush;
+	std::cerr << std::flush;
+	std::clog << std::flush;
+	// Create pool_.size children.
+	int i;
+	for (i = 0; i < pool_.size; ++i)
+	  {
+	    int pid = fork();
+	    if (pid == -1)
+	      {
+		perror("failed to fork");
+		abort();
+	      }
+	    if (pid == 0)
+	      break;
+	    std::cout << "FATHER: forking as PID " << pid << std::endl;
+	  }
+
+
+	if (i < pool_.size) // This is the ith child: run the emptiness.
+	  {
+	    std::cout << getpid() << ": " << i << "th child alive"<< std::endl;
+	    srand(getpid());
+	    // Close unused FDs.
+	    for (int j = 0; j < pool_.size; ++j)
+	      {
+		if (j != i)
+		  close(pool_.pipes[j * 2]); // read end for the jth child
+		else
+		  close(pool_.pipes[j * 2 + 1]); // write end for the ith child.
+	      }
+
+	    // Make this child's pipe's read end non-blocking.
+	    int fd_flags = fcntl(pool_.pipes[i * 2], F_GETFL);
+	    if (fd_flags == -1)
+	      {
+		perror("failed to read descriptor flags");
+		abort();
+	      }
+	    if (fcntl(pool_.pipes[i * 2], F_SETFL, fd_flags | O_NONBLOCK) == -1)
+	      {
+		perror("failed to write descriptor flags");
+		abort();
+	      }
+
+	    emptiness_check* ch =
+	      new couvreur99_check_parallel(i, pool_,
+					    automaton(), options(),
+					    nshf_);
+	    std::cout << getpid() << ": " << i
+		      << "th child running" << std::endl;
+	    emptiness_check_result* res = ch->check();
+	    if (res)
+	      std::cout << getpid() << ": not empty" << std::endl;
+	    else
+	      std::cout << getpid() << ": empty" << std::endl;
+	    exit(res != 0);
+	  }
+
+	// This is the father process.
+	// We don't need these pipes, they were for children.
+	for (int j = 0; j < pool_.size; ++j)
+	  {
+	    close(pool_.pipes[j * 2]);
+	    close(pool_.pipes[j * 2 + 1]);
+	  }
+	delete[] pool_.pipes;
+
+	std::cout << "FATHER: all children running" << std::endl;
+
+	int res = 0;
+	for (int n = pool_.size; n > 0; --n)
+	  {
+	    std::cout << "FATHER: waiting for " << n
+		      << " children to finish" << std::endl;
+	    int stat;
+	    int child = wait(&stat);
+	    if (child == -1)
+	      {
+		perror("failed to wait for children");
+		abort();
+	      }
+	    if (WIFSIGNALED(stat))
+	      std::cout << "FATHER: child with PID " << child << " signaled "
+			<< WTERMSIG(stat) << std::endl;
+	    else
+	      {
+		std::cout << "FATHER: child with PID " << child
+			  << " terminated " << WEXITSTATUS(stat) << std::endl;
+		if (n == pool_.size)
+		  res = WEXITSTATUS(stat); // 0: empty, 1: not empty
+		else
+		  // All successful children should agree.
+		  assert(res == WEXITSTATUS(stat));
+	      }
+	  }
+	std::cout << "FATHER: everybody's dead" << std::endl;
+
+	if (res)
+	  return new emptiness_check_result(automaton(), options());
+	else
+	  return 0;
       }
 
     };
