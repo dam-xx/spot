@@ -1,3 +1,8 @@
+2007-02-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_parallel): Print
+	some statistics.
+
 2007-02-06  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* src/tgbaalgos/randomgraph.cc (random_graph): Fix the

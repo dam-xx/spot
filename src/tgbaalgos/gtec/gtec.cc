@@ -587,8 +587,8 @@ namespace spot
     typedef couvreur99_check_parallel** check_tab;
 
     struct checkpool {
-  int* pipes;
-  int size;
+      int* pipes;
+      int size;
     };
 
     class couvreur99_check_parallel : public couvreur99_check_shy
@@ -1043,13 +1043,22 @@ namespace spot
 	      new couvreur99_check_parallel(i, pool_,
 					    automaton(), options(),
 					    nshf_);
-	    std::cout << getpid() << ": " << i
-		      << "th child running" << std::endl;
+	    std::cout << getpid() << ": child " << i
+		      << " running" << std::endl;
 	    emptiness_check_result* res = ch->check();
 	    if (res)
 	      std::cout << getpid() << ": not empty" << std::endl;
 	    else
 	      std::cout << getpid() << ": empty" << std::endl;
+
+
+	    spot::unsigned_statistics::stats_map::const_iterator i;
+	    spot::unsigned_statistics* s =
+	      dynamic_cast<spot::unsigned_statistics*>(ch);
+	    assert(s != 0);
+	    for (i = s->stats.begin(); i != s->stats.end(); ++i)
+	      std::cout << i->first << " = " << (s->*i->second)() << std::endl;
+
 	    exit(res != 0);
 	  }
 
