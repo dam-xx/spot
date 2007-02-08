@@ -22,6 +22,7 @@
 #include "gtec.hh"
 #include "ce.hh"
 #include "misc/memusage.hh"
+#include "tgbaalgos/statepipe.hh"
 #include <iostream>
 #include <set>
 #include <cstdlib>
@@ -587,7 +588,7 @@ namespace spot
     typedef couvreur99_check_parallel** check_tab;
 
     struct checkpool {
-      int* pipes;
+      state_pipe* pipes;
       int size;
     };
 
@@ -599,8 +600,27 @@ namespace spot
        option_map o = option_map(),
        const numbered_state_heap_factory* nshf
        = numbered_state_heap_hash_map_factory::instance())
-	: couvreur99_check_shy(a, o, nshf), me_(me), pool_(pool)
+	: couvreur99_check_shy(a, o, nshf), me_(me), pool_(pool),
+	  items_sent_(0), items_received_(0)
       {
+	stats["items received"] =
+	  static_cast<spot::unsigned_statistics::unsigned_fun>
+	  (&couvreur99_check_parallel::get_items_received);
+	stats["items sent"] =
+	  static_cast<spot::unsigned_statistics::unsigned_fun>
+	  (&couvreur99_check_parallel::get_items_sent);
+      }
+
+      unsigned
+      get_items_received() const
+      {
+	return items_received_;
+      }
+
+      unsigned
+      get_items_sent() const
+      {
+	return items_sent_;
       }
 
       virtual ~couvreur99_check_parallel()
@@ -895,8 +915,6 @@ namespace spot
       {
 	// std::cout << getpid() << ": broadcast" << std::endl;
 
-	int cpt = data.size();
-	// std::set<int>::const_iterator i = data.be
 	for (int i = 0; i < pool_.size; ++i)
 	  {
 	    if (i == me_)
@@ -906,11 +924,11 @@ namespace spot
 	    for (std::list<const state*>::const_iterator j = data.begin();
 		 j != data.end(); ++j)
 	      {
-		while ((*j)->serialize(pool_.pipes[i * 2 + 1]))
+		while (pool_.pipes[i].write_state(*j))
 		  process_buffer();
 	      }
 	  }
-	std::cout << getpid() << ": sent " << cpt << " items" << std::endl;
+	items_sent_ += data.size();
       }
 
       void
@@ -921,7 +939,7 @@ namespace spot
 
 	// std::cout << getpid() << ": pbuffer" << std::endl;
 
-	while ((s = automaton()->deserialize_state(pool_.pipes[me_ * 2])))
+	while ((s = pool_.pipes[me_].read_state(automaton())))
 	  {
 	    numbered_state_heap::state_index_p sip = find_state(s);
 	    int* j = sip.second;
@@ -939,10 +957,11 @@ namespace spot
 	    ++cpt;
 	  }
 
-	if (cpt)
-	  std::cout << getpid() << ": received "
-		    << cpt << " items" << std::endl;
+	items_received_ += cpt;
       }
+    private:
+      unsigned items_sent_;
+      unsigned items_received_;
     };
 
 
@@ -968,31 +987,7 @@ namespace spot
 
       emptiness_check_result* check ()
       {
-	pool_.pipes = new int[2 * pool_.size];
-
-	// Create pool.size pipes.
-	for (int i = 0; i < pool_.size; ++i)
-	  {
-	    if (pipe(pool_.pipes + 2 * i) != 0)
-	      {
-		perror("failed to create pipe");
-		abort();
-	      }
-
-	    // Make the write end non-blocking.
-	    int fd_flags = fcntl(pool_.pipes[i * 2 + 1], F_GETFL);
-	    if (fd_flags == -1)
-	      {
-		perror("failed to read descriptor flags");
-		abort();
-	      }
-	    if (fcntl(pool_.pipes[i * 2 + 1], F_SETFL, fd_flags | O_NONBLOCK)
-		== -1)
-	      {
-		perror("failed to write descriptor flags");
-		abort();
-	      }
-	  }
+	pool_.pipes = new state_pipe[pool_.size];
 
 	std::cout << std::flush;
 	std::cerr << std::flush;
@@ -1021,22 +1016,9 @@ namespace spot
 	    for (int j = 0; j < pool_.size; ++j)
 	      {
 		if (j != i)
-		  close(pool_.pipes[j * 2]); // read end for the jth child
+		  pool_.pipes[j].close_read_end();
 		else
-		  close(pool_.pipes[j * 2 + 1]); // write end for the ith child.
-	      }
-
-	    // Make this child's pipe's read end non-blocking.
-	    int fd_flags = fcntl(pool_.pipes[i * 2], F_GETFL);
-	    if (fd_flags == -1)
-	      {
-		perror("failed to read descriptor flags");
-		abort();
-	      }
-	    if (fcntl(pool_.pipes[i * 2], F_SETFL, fd_flags | O_NONBLOCK) == -1)
-	      {
-		perror("failed to write descriptor flags");
-		abort();
+		  pool_.pipes[j].close_write_end();
 	      }
 
 	    emptiness_check* ch =
@@ -1064,11 +1046,6 @@ namespace spot
 
 	// This is the father process.
 	// We don't need these pipes, they were for children.
-	for (int j = 0; j < pool_.size; ++j)
-	  {
-	    close(pool_.pipes[j * 2]);
-	    close(pool_.pipes[j * 2 + 1]);
-	  }
 	delete[] pool_.pipes;
 
 	std::cout << "FATHER: all children running" << std::endl;

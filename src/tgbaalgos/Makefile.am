@@ -1,6 +1,6 @@
-## Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-## département Systèmes Répartis Coopératifs (SRC), Université Pierre
-## et Marie Curie.
+## Copyright (C) 2003, 2004, 2005, 2007 Laboratoire d'Informatique de
+## Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+## Université Pierre et Marie Curie.
 ##
 ## This file is part of Spot, a model checking library.
 ##
@@ -48,6 +48,7 @@ tgbaalgos_HEADERS = \
   rundotdec.hh \
   save.hh \
   se05.hh \
+  statepipe.hh \
   stats.hh \
   tau03.hh \
   tau03opt.hh \
@@ -77,6 +78,7 @@ libtgbaalgos_la_SOURCES = \
   rundotdec.cc \
   save.cc \
   se05.cc \
+  statepipe.cc \
   stats.cc \
   tau03.cc \
   tau03opt.cc \

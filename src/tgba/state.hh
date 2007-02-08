@@ -70,11 +70,16 @@ namespace spot
 
     /// \brief Serialize a state
     ///
-    /// Save the data of the state on file descriptor \a fd.
+    /// Write a representation of the state to \a buffer.
+    /// \a n should be the size available in the buffer.
     ///
-    /// \return false on success, true if write returned EAGAIN.
-    virtual bool serialize(int) const
+    /// \return the number of bytes used to represent the state.  If
+    /// the return value is larger than \a n, this method should be
+    /// called again with a larger buffer.
+    virtual size_t serialize(char* buffer, size_t n) const
     {
+      (void)buffer;
+      (void)n;
       assert(!"serialize() not implemented.");
     }
 

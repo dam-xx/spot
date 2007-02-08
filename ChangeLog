@@ -1,4 +1,22 @@
+2007-02-08  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgbaalgos/statepipe.cc, src/tgbaalgos/statepipe.hh: New files.
+	* src/tgbaalgos/Makefile: Add them.
+	* src/state.hh (state::serialize): Change the interface to write
+	in a buffer.
+	* src/tgba.hh (tgba::deserialize_state): Ditto.
+	* src/tgba/tgbaexplicit.hh, tgba/tgbaexplicit.cc
+	(state_explicit::serialize, tgba_explicit::deserialize_state): Adjust.
+	* src/tgba/tgbaproduct.cc (tgba_product::deserialize_state),
+	src/tgba/tgbaproduct.hh (state_product::serialize): New methods.
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_parallel,
+	couvreur99_check_proxy)): Adjust to use above interfaces.
+
 2007-02-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgba/tgbaproduct.hh, src/tgba/tgbaproduct.cc
+	(state_product::serialize, tgba_product::deserialize_state):
+	New methods.
 
 	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_parallel): Print
 	some statistics.

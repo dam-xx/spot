@@ -25,8 +25,7 @@
 #include "tgbaexplicit.hh"
 #include "tgba/formula2bdd.hh"
 #include <cassert>
-#include <cstdio>
-#include <cerrno>
+#include <cstring>
 
 namespace spot
 {
@@ -110,16 +109,12 @@ namespace spot
     return new state_explicit(*this);
   }
 
-  bool
-  state_explicit::serialize(int fd) const
+  size_t
+  state_explicit::serialize(char* buffer, size_t n) const
   {
-    int ret = write(fd, state_, sizeof state_);
-    if (ret == sizeof state_)
-      return false;
-    if (ret == -1 && errno == EAGAIN)
-      return true;
-    perror("failed to write state");
-    abort();
+    if (n >= sizeof state_)
+      memcpy(buffer, &state_, sizeof state_);
+    return sizeof state_;
   }
 
   ////////////////////////////////////////
@@ -166,20 +161,20 @@ namespace spot
     return i->second;
   }
 
-  spot::state*
-  tgba_explicit::deserialize_state(int fd) const
+  size_t
+  tgba_explicit::deserialize_state(const char* buffer, size_t n,
+				   spot::state** s) const
   {
-    tgba_explicit::state* s;
-    int ret = read(fd, &s, sizeof s);
-    if (ret == sizeof s)
-      return new state_explicit(s);
-    if (ret == -1 && errno == EAGAIN)
-      return 0;
-    if (ret == 0) // closed pipe, handled as empty.
-      return 0;
+    tgba_explicit::state* s_;
+    if (n < sizeof s_)
+      {
+	*s = 0;
+	return 0;
+      }
 
-    perror("failed to read state");
-    abort();
+    memcpy(&s_, buffer, sizeof s_);
+    *s = new state_explicit(s_);
+    return sizeof s_;
   }
 
 

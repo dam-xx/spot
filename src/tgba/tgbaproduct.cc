@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2006, 2007 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -303,6 +303,31 @@ namespace spot
       return res;
     return right_->project_state(s2->right(), t);
   }
+
+
+
+  size_t
+  tgba_product::deserialize_state(const char* buffer,
+				  size_t n, state** s) const
+  {
+    state* sl;
+    state* sr;
+    int nl = left_->deserialize_state(buffer, n, &sl);
+    if (!sl)
+      {
+	*s = 0;
+	return 0;
+      }
+    nl += right_->deserialize_state(buffer + nl, n - nl, &sr);
+    if (!sr)
+      {
+	delete sl;
+	*s = 0;
+	return 0;
+      }
+    *s = new state_product(sl, sr);
+    return nl;
+  };
 
   bdd
   tgba_product::all_acceptance_conditions() const

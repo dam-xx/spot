@@ -1,5 +1,5 @@
-// Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de Paris
-// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Copyright (C) 2003, 2004, 2006, 2007 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
@@ -62,6 +62,16 @@ namespace spot
     right() const
     {
       return right_;
+    }
+
+    virtual size_t
+    serialize(char* buffer, size_t n) const
+    {
+      size_t nl = left_->serialize(buffer, n);
+      if (nl > n)
+	// Buffer's too short.  Compute minimum size.
+	return nl + right_->serialize(buffer, 0);
+      return nl + right_->serialize(buffer + nl, n - nl);
     }
 
     virtual int compare(const state* other) const;
@@ -139,6 +149,9 @@ namespace spot
     transition_annotation(const tgba_succ_iterator* t) const;
 
     virtual state* project_state(const state* s, const tgba* t) const;
+
+    virtual size_t deserialize_state(const char* buffer,
+				     size_t n, state** s) const;
 
     virtual bdd all_acceptance_conditions() const;
     virtual bdd neg_acceptance_conditions() const;

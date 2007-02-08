@@ -93,7 +93,8 @@ namespace spot
     virtual bdd all_acceptance_conditions() const;
     virtual bdd neg_acceptance_conditions() const;
 
-    virtual spot::state* deserialize_state(int fd) const;
+    virtual size_t deserialize_state(const char* buffer,
+				     size_t n, spot::state** s) const;
 
   protected:
     virtual bdd compute_support_conditions(const spot::state* state) const;
@@ -133,7 +134,7 @@ namespace spot
     virtual int compare(const spot::state* other) const;
     virtual size_t hash() const;
     virtual state_explicit* clone() const;
-    virtual bool serialize(int fd) const;
+    virtual size_t serialize(char* buffer, size_t n) const;
 
     virtual ~state_explicit()
     {

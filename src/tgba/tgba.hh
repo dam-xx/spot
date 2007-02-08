@@ -204,11 +204,17 @@ namespace spot
 
     /// \brief Deserialize a state.
     ///
-    /// Create state from its serialized data, read from file descriptor
-    /// \a fd.
-    /// \return the state on success, 0 if read returned EAGAIN.
-    virtual state* deserialize_state(int) const
+    /// Create state from its serialized data, read from \a buffer.
+    /// \a n is the size of the buffer.  \a *s will hold the newly
+    /// created state (or 0 if it couldn't be deserialized).
+    /// \return the number of bytes read from the buffer to create \a s
+    /// is <tt>*s != 0</tt>.
+    virtual size_t deserialize_state(const char* buffer, size_t n,
+				     state** s) const
     {
+      (void)buffer;
+      (void)n;
+      (void)s;
       assert(!"deserialize_state() not implemented");
     };
 
