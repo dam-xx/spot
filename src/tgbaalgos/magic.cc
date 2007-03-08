@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005, 2007  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -28,7 +28,6 @@
 #define trace while (0) std::cerr
 #endif
 
-#include <cassert>
 #include <list>
 #include "misc/hash.hh"
 #include "tgba/tgba.hh"
@@ -36,6 +35,12 @@
 #include "emptiness_stats.hh"
 #include "magic.hh"
 #include "ndfs_result.hxx"
+#include "tgbaalgos/statepipe.hh"
+#include <cstdlib>
+#include <cassert>
+#include <cstdio>
+#include <errno.h>
+#include <sys/wait.h>
 
 namespace spot
 {
@@ -421,7 +426,471 @@ namespace spot
         emptiness_check_result* computer;
         magic_search_& ms;
       };
+
+    }; // magic_search_
+
+    struct checkpool {
+      state_pipe* pipes;
+      int size;
     };
+
+    /// \brief Emptiness checker on spot::tgba automata having at most one
+    /// acceptance condition (i.e. a TBA).
+    template <typename heap>
+    class magic_search_parallel_ : public emptiness_check, public ec_statistics
+    {
+    public:
+      /// \brief Initialize the Magic Search algorithm on the automaton \a a
+      ///
+      /// \pre The automaton \a a must have at most one acceptance
+      /// condition (i.e. it is a TBA).
+      magic_search_parallel_(int me, checkpool& pool,
+			     const tgba *a, size_t size,
+			     option_map o = option_map())
+        : emptiness_check(a, o),
+          h(size),
+          all_cond(a->all_acceptance_conditions()),
+	  me_(me),
+	  pool_(pool),
+	  items_sent_(0), items_received_(0)
+
+      {
+        assert(a->number_of_acceptance_conditions() <= 1);
+	stats["items received"] =
+	  static_cast<spot::unsigned_statistics::unsigned_fun>
+	  (&magic_search_parallel_::get_items_received);
+	stats["items sent"] =
+	  static_cast<spot::unsigned_statistics::unsigned_fun>
+	  (&magic_search_parallel_::get_items_sent);
+      }
+
+      unsigned
+      get_items_received() const
+      {
+	return items_received_;
+      }
+
+      unsigned
+      get_items_sent() const
+      {
+	return items_sent_;
+      }
+
+
+      virtual ~magic_search_parallel_()
+      {
+        // Release all iterators on the stacks.
+        while (!st_blue.empty())
+          {
+            h.pop_notify(st_blue.front().s);
+            delete st_blue.front().it;
+            st_blue.pop_front();
+          }
+        while (!st_red.empty())
+          {
+            h.pop_notify(st_red.front().s);
+            delete st_red.front().it;
+            st_red.pop_front();
+          }
+      }
+
+      /// \brief Perform a Magic Search.
+      ///
+      /// \return non null pointer iff the algorithm has found a
+      /// new accepting path.
+      ///
+      /// check() can be called several times (until it returns a null
+      /// pointer) to enumerate all the visited accepting paths. The method
+      /// visits only a finite set of accepting paths.
+      virtual emptiness_check_result* check()
+      {
+        if (st_red.empty())
+          {
+            assert(st_blue.empty());
+            const state* s0 = a_->get_init_state();
+            inc_states();
+            h.add_new_state(s0, BLUE);
+            push(st_blue, s0, bddfalse, bddfalse);
+            if (dfs_blue())
+              return new magic_search_result(*this, options());
+          }
+        else
+          {
+            h.pop_notify(st_red.front().s);
+            pop(st_red);
+            if (!st_red.empty() && dfs_red())
+              return new magic_search_result(*this, options());
+            else
+              if (dfs_blue())
+                return new magic_search_result(*this, options());
+          }
+        return 0;
+      }
+
+      virtual std::ostream& print_stats(std::ostream &os) const
+      {
+        os << states() << " distinct nodes visited" << std::endl;
+        os << transitions() << " transitions explored" << std::endl;
+        os << max_depth() << " nodes for the maximal stack depth" << std::endl;
+        if (!st_red.empty())
+          {
+            assert(!st_blue.empty());
+            os << st_blue.size() + st_red.size() - 1
+               << " nodes for the counter example" << std::endl;
+          }
+        return os;
+      }
+
+      virtual bool safe() const
+      {
+	return heap::Safe;
+      }
+
+      const heap& get_heap() const
+      {
+	return h;
+      }
+
+      const stack_type& get_st_blue() const
+      {
+	return st_blue;
+      }
+
+      const stack_type& get_st_red() const
+      {
+	return st_red;
+      }
+    private:
+
+      void push(stack_type& st, const state* s,
+                        const bdd& label, const bdd& acc)
+      {
+        inc_depth();
+        tgba_succ_iterator* i = a_->succ_iter(s);
+        i->first();
+        st.push_front(stack_item(s, i, label, acc));
+      }
+
+      void pop(stack_type& st)
+      {
+        dec_depth();
+        delete st.front().it;
+        st.pop_front();
+      }
+
+      /// \brief Stack of the blue dfs.
+      stack_type st_blue;
+
+      /// \brief Stack of the red dfs.
+      stack_type st_red;
+
+      /// \brief Map where each visited state is colored
+      /// by the last dfs visiting it.
+      heap h;
+
+      /// State targeted by the red dfs.
+      const state* target;
+
+      /// The unique acceptance condition of the automaton \a a.
+      bdd all_cond;
+
+      bool dfs_blue()
+      {
+        while (!st_blue.empty())
+          {
+	    if (pool_.size > 1)
+	      process_buffer();
+
+            stack_item& f = st_blue.front();
+            trace << "DFS_BLUE treats: " << a_->format_state(f.s) << std::endl;
+            if (!f.it->done())
+              {
+                const state *s_prime = f.it->current_state();
+                trace << "  Visit the successor: "
+                      << a_->format_state(s_prime) << std::endl;
+                bdd label = f.it->current_condition();
+                bdd acc = f.it->current_acceptance_conditions();
+                // Go down the edge (f.s, <label, acc>, s_prime)
+                f.it->next();
+                inc_transitions();
+                typename heap::color_ref c = h.get_color_ref(s_prime);
+                if (c.is_white())
+                  {
+                    trace << "  It is white, go down" << std::endl;
+                    inc_states();
+                    h.add_new_state(s_prime, BLUE);
+                    push(st_blue, s_prime, label, acc);
+                  }
+                else
+                  {
+                    if (acc == all_cond && c.get_color() != RED)
+                      {
+                        // the test 'c.get_color() != RED' is added to limit
+                        // the number of runs reported by successive
+                        // calls to the check method. Without this
+                        // functionnality, the test can be ommited.
+                        trace << "  It is blue and the arc is "
+                              << "accepting, start a red dfs" << std::endl;
+                        target = f.s;
+                        c.set_color(RED);
+                        push(st_red, s_prime, label, acc);
+                        if (dfs_red())
+                          return true;
+			else
+			  broadcast(s_prime);
+                      }
+                    else
+                      {
+                        trace << "  It is blue or red, pop it" << std::endl;
+                        h.pop_notify(s_prime);
+                      }
+                  }
+              }
+            else
+            // Backtrack the edge
+            //        (predecessor of f.s in st_blue, <f.label, f.acc>, f.s)
+              {
+                trace << "  All the successors have been visited" << std::endl;
+                stack_item f_dest(f);
+                pop(st_blue);
+                typename heap::color_ref c = h.get_color_ref(f_dest.s);
+                assert(!c.is_white());
+                if (!st_blue.empty() &&
+                           f_dest.acc == all_cond && c.get_color() != RED)
+                  {
+                    // the test 'c.get_color() != RED' is added to limit
+                    // the number of runs reported by successive
+                    // calls to the check method. Without this
+                    // functionnality, the test can be ommited.
+                    trace << "  It is blue and the arc from "
+                          << a_->format_state(st_blue.front().s)
+                          << " to it is accepting, start a red dfs"
+                          << std::endl;
+                    target = st_blue.front().s;
+                    c.set_color(RED);
+                    push(st_red, f_dest.s, f_dest.label, f_dest.acc);
+                    if (dfs_red())
+                      return true;
+		    else
+		      broadcast(f_dest.s);
+                  }
+                else
+                  {
+                    trace << "  Pop it" << std::endl;
+                    h.pop_notify(f_dest.s);
+                  }
+              }
+          }
+        return false;
+      }
+
+      bool dfs_red()
+      {
+        assert(!st_red.empty());
+        if (target->compare(st_red.front().s) == 0)
+          return true;
+
+        while (!st_red.empty())
+          {
+	    if (pool_.size > 1)
+	      process_buffer();
+
+            stack_item& f = st_red.front();
+            trace << "DFS_RED treats: " << a_->format_state(f.s) << std::endl;
+            if (!f.it->done())
+              {
+                const state *s_prime = f.it->current_state();
+                trace << "  Visit the successor: "
+                      << a_->format_state(s_prime) << std::endl;
+                bdd label = f.it->current_condition();
+                bdd acc = f.it->current_acceptance_conditions();
+                // Go down the edge (f.s, <label, acc>, s_prime)
+                f.it->next();
+                inc_transitions();
+                typename heap::color_ref c = h.get_color_ref(s_prime);
+                if (c.is_white())
+                  {
+                    // If the red dfs find a white here, it must have crossed
+                    // the blue stack and the target must be reached soon.
+                    // Notice that this property holds only for explicit search.
+                    // Collisions in bit-state hashing search can also lead
+                    // to the visit of white state. Anyway, it is not necessary
+                    // to visit white states either if a cycle can be missed
+                    // with bit-state hashing search.
+                    trace << "  It is white, pop it" << std::endl;
+                    delete s_prime;
+                  }
+                else if (c.get_color() == BLUE)
+                  {
+                    trace << "  It is blue, go down" << std::endl;
+                    c.set_color(RED);
+                    push(st_red, s_prime, label, acc);
+                    if (target->compare(s_prime) == 0)
+                      return true;
+                  }
+                else
+                  {
+                    trace << "  It is red, pop it" << std::endl;
+                    h.pop_notify(s_prime);
+                  }
+              }
+            else // Backtrack
+              {
+                trace << "  All the successors have been visited, pop it"
+                      << std::endl;
+                h.pop_notify(f.s);
+                pop(st_red);
+              }
+          }
+        return false;
+      }
+
+      class result_from_stack: public emptiness_check_result,
+        public acss_statistics
+      {
+      public:
+        result_from_stack(magic_search_parallel_& ms)
+          : emptiness_check_result(ms.automaton()), ms_(ms)
+        {
+        }
+
+        virtual tgba_run* accepting_run()
+        {
+          assert(!ms_.st_blue.empty());
+          assert(!ms_.st_red.empty());
+
+          tgba_run* run = new tgba_run;
+
+          typename stack_type::const_reverse_iterator i, j, end;
+          tgba_run::steps* l;
+
+          l = &run->prefix;
+
+          i = ms_.st_blue.rbegin();
+          end = ms_.st_blue.rend(); --end;
+          j = i; ++j;
+          for (; i != end; ++i, ++j)
+            {
+              tgba_run::step s = { i->s->clone(), j->label, j->acc };
+              l->push_back(s);
+            }
+
+          l = &run->cycle;
+
+          j = ms_.st_red.rbegin();
+          tgba_run::step s = { i->s->clone(), j->label, j->acc };
+          l->push_back(s);
+
+          i = j; ++j;
+          end = ms_.st_red.rend(); --end;
+          for (; i != end; ++i, ++j)
+            {
+              tgba_run::step s = { i->s->clone(), j->label, j->acc };
+              l->push_back(s);
+            }
+
+          return run;
+        }
+
+        unsigned acss_states() const
+        {
+          return 0;
+        }
+      private:
+        magic_search_parallel_& ms_;
+      };
+
+#     define FROM_STACK "ar:from_stack"
+
+      class magic_search_result: public emptiness_check_result
+      {
+      public:
+        magic_search_result(magic_search_parallel_& m,
+			    option_map o = option_map())
+          : emptiness_check_result(m.automaton(), o), ms(m)
+        {
+          if (options()[FROM_STACK])
+            computer = new result_from_stack(ms);
+          else
+            computer = new ndfs_result<magic_search_parallel_<heap>, heap>(ms);
+        }
+
+        virtual void options_updated(const option_map& old)
+        {
+          if (old[FROM_STACK] && !options()[FROM_STACK])
+            {
+              delete computer;
+              computer = new ndfs_result<magic_search_parallel_<heap>,
+		                         heap>(ms);
+            }
+          else if (!old[FROM_STACK] && options()[FROM_STACK])
+            {
+              delete computer;
+              computer = new result_from_stack(ms);
+            }
+        }
+
+        virtual ~magic_search_result()
+        {
+          delete computer;
+        }
+
+        virtual tgba_run* accepting_run()
+        {
+          return computer->accepting_run();
+        }
+
+        virtual const unsigned_statistics* statistics() const
+        {
+          return computer->statistics();
+        }
+
+      private:
+        emptiness_check_result* computer;
+        magic_search_parallel_& ms;
+      };
+
+      void
+      broadcast(const state* data)
+      {
+	// std::cout << getpid() << ": broadcast" << std::endl;
+
+	for (int i = 0; i < pool_.size; ++i)
+	  {
+	    if (i == me_)
+	      continue;
+
+	    // FIXME: calling serialize once for the whole list would be faster
+	    while (pool_.pipes[i].write_state(data))
+	      process_buffer();
+	  }
+	++items_sent_;
+      }
+
+      void
+      process_buffer()
+      {
+	int cpt = 0;
+	const spot::state* s;
+
+	while ((s = pool_.pipes[me_].read_state(automaton())))
+	  {
+	    typename heap::color_ref c = h.get_color_ref(s);
+	    if (c.is_white())
+	      h.add_new_state(s, RED);
+	    else
+	      c.set_color(RED);
+	    ++cpt;
+	  }
+
+	items_received_ += cpt;
+      }
+
+      int me_;
+      checkpool& pool_;
+      unsigned items_sent_;
+      unsigned items_received_;
+    }; // magic_search_parallel_
 
     class explicit_magic_search_heap
     {
@@ -580,6 +1049,131 @@ namespace spot
       unsigned char* h;
     };
 
+
+    class magic_search_parallel_proxy: public emptiness_check
+    {
+    private:
+      checkpool pool_;
+    public:
+      magic_search_parallel_proxy(const tgba* a, option_map o = option_map())
+	: emptiness_check(a, o)
+      {
+	pool_.size = o.get("parallel", 2);
+      }
+
+      ~magic_search_parallel_proxy()
+      {
+      }
+
+      emptiness_check_result* check ()
+      {
+	pool_.pipes = new state_pipe[pool_.size];
+
+	size_t size = options().get("bsh");
+
+	std::cout << std::flush;
+	std::cerr << std::flush;
+	std::clog << std::flush;
+	// Create pool_.size children.
+	int i;
+	for (i = 0; i < pool_.size; ++i)
+	  {
+	    int pid = fork();
+	    if (pid == -1)
+	      {
+		perror("failed to fork");
+		abort();
+	      }
+	    if (pid == 0)
+	      break;
+	    std::cout << "FATHER: forking as PID " << pid << std::endl;
+	  }
+
+
+	if (i < pool_.size) // This is the ith child: run the emptiness.
+	  {
+	    std::cout << getpid() << ": " << i << "th child alive"<< std::endl;
+	    srand(getpid());
+	    // Close unused FDs.
+	    for (int j = 0; j < pool_.size; ++j)
+	      {
+		if (j != i)
+		  pool_.pipes[j].close_read_end();
+		else
+		  pool_.pipes[j].close_write_end();
+	      }
+
+	    emptiness_check* ch;
+
+
+	      if (size)
+		ch =
+		  new magic_search_parallel_<bsh_magic_search_heap>
+		  (i, pool_, automaton(), size, options());
+ 	      else
+		ch = new magic_search_parallel_<explicit_magic_search_heap>
+		  (i, pool_, automaton(), 0, options());
+	    std::cout << getpid() << ": child " << i
+		      << " running" << std::endl;
+	    emptiness_check_result* res = ch->check();
+	    if (res)
+	      std::cout << getpid() << ": not empty" << std::endl;
+	    else
+	      std::cout << getpid() << ": empty" << std::endl;
+
+
+	    spot::unsigned_statistics::stats_map::const_iterator i;
+	    spot::unsigned_statistics* s =
+	      dynamic_cast<spot::unsigned_statistics*>(ch);
+	    assert(s != 0);
+	    for (i = s->stats.begin(); i != s->stats.end(); ++i)
+	      std::cout << i->first << " = " << (s->*i->second)() << std::endl;
+
+	    exit(res != 0);
+	  }
+
+	// This is the father process.
+	// We don't need these pipes, they were for children.
+	delete[] pool_.pipes;
+
+	std::cout << "FATHER: all children running" << std::endl;
+
+	int res = 0;
+	for (int n = pool_.size; n > 0; --n)
+	  {
+	    std::cout << "FATHER: waiting for " << n
+		      << " children to finish" << std::endl;
+	    int stat;
+	    int child = wait(&stat);
+	    if (child == -1)
+	      {
+		perror("failed to wait for children");
+		abort();
+	      }
+	    if (WIFSIGNALED(stat))
+	      std::cout << "FATHER: child with PID " << child << " signaled "
+			<< WTERMSIG(stat) << std::endl;
+	    else
+	      {
+		std::cout << "FATHER: child with PID " << child
+			  << " terminated " << WEXITSTATUS(stat) << std::endl;
+		if (n == pool_.size)
+		  res = WEXITSTATUS(stat); // 0: empty, 1: not empty
+		else
+		  // All successful children should agree.
+		  assert(res == WEXITSTATUS(stat));
+	      }
+	  }
+	std::cout << "FATHER: everybody's dead" << std::endl;
+
+	if (res)
+	  return new emptiness_check_result(automaton(), options());
+	else
+	  return 0;
+      }
+
+    };
+
   } // anonymous
 
   emptiness_check* explicit_magic_search(const tgba *a, option_map o)
@@ -596,10 +1190,17 @@ namespace spot
   emptiness_check*
   magic_search(const tgba *a, option_map o)
   {
-    size_t size = o.get("bsh");
-    if (size)
-      return bit_state_hashing_magic_search(a, size, o);
-    return explicit_magic_search(a, o);
+    if (o.get("parallel"))
+      {
+	return new magic_search_parallel_proxy(a, o);
+      }
+    else
+      {
+	size_t size = o.get("bsh");
+	if (size)
+	  return bit_state_hashing_magic_search(a, size, o);
+	return explicit_magic_search(a, o);
+      }
   }
 
 }

@@ -29,7 +29,6 @@
 #include <cassert>
 #include <cstdio>
 #include <errno.h>
-#include <fcntl.h>		/* fcntl, O_NONBLOCK */
 #include <sys/wait.h>
 
 namespace spot

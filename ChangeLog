@@ -1,3 +1,10 @@
+2007-03-08  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgbaalgos/magic.cc (checkpool, magic_search_parallel_,
+	magic_search_parallel_proxy): New classes.
+	(magic_search): Honor the "parallel" option.
+	* src/tgbaalgos/gtec/gtec.cc: Do not include fcntl.h.
+
 2007-02-08  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* src/tgbaalgos/statepipe.cc, src/tgbaalgos/statepipe.hh: New files.
