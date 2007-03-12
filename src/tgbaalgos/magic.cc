@@ -46,7 +46,7 @@ namespace spot
 {
   namespace
   {
-    enum color {WHITE, BLUE, RED};
+    enum color {WHITE, BLUE, RED, ORANGE};
 
     /// \brief Emptiness checker on spot::tgba automata having at most one
     /// acceptance condition (i.e. a TBA).
@@ -434,11 +434,65 @@ namespace spot
       int size;
     };
 
+
+
+
     /// \brief Emptiness checker on spot::tgba automata having at most one
     /// acceptance condition (i.e. a TBA).
     template <typename heap>
     class magic_search_parallel_ : public emptiness_check, public ec_statistics
     {
+      struct successor {
+	bdd acc;
+	bdd label;
+	const spot::state* s;
+	successor(bdd acc, bdd label, const spot::state* s):
+	  acc(acc), label(label), s(s) {}
+      };
+
+      typedef std::list<successor> succ_queue;
+
+      struct stack_item_random
+      {
+
+	stack_item_random(const state* s, magic_search_parallel_* msp,
+			  bdd l, bdd a)
+	  : s(s), label(l), acc(a)
+	{
+	  tgba_succ_iterator* iter = msp->automaton()->succ_iter(s);
+	  for (iter->first(); !iter->done(); iter->next(),
+		 msp->inc_transitions())
+	    {
+	      q.push_back(successor(iter->current_acceptance_conditions(),
+				    iter->current_condition(),
+				    iter->current_state()));
+	      msp->inc_depth();
+	    }
+	  delete iter;
+
+	}
+
+ 	void clean()
+ 	{
+ 	  typename succ_queue::iterator i;
+ 	  for (i = q.begin(); i != q.end(); ++i)
+ 	    delete i->s;
+ 	}
+
+	/// The visited state.
+	const state* s;
+	/// Unprocessed successors of S
+	succ_queue q;
+
+	/// The label of the transition traversed to reach \a s
+	/// (false for the first one).
+	bdd label;
+	/// The acceptance set of the transition traversed to reach \a s
+	/// (false for the first one).
+	bdd acc;
+      };
+
+      typedef std::list<stack_item_random> stack_type_random;
     public:
       /// \brief Initialize the Magic Search algorithm on the automaton \a a
       ///
@@ -452,16 +506,32 @@ namespace spot
           all_cond(a->all_acceptance_conditions()),
 	  me_(me),
 	  pool_(pool),
-	  items_sent_(0), items_received_(0)
+	  orange_hits_(0),
+	  items_nw_(0), items_red_(0), items_sent_(0), items_received_(0)
 
       {
         assert(a->number_of_acceptance_conditions() <= 1);
+	stats["orange hits"] =
+	  static_cast<spot::unsigned_statistics::unsigned_fun>
+	  (&magic_search_parallel_::get_orange_hits);
 	stats["items received"] =
 	  static_cast<spot::unsigned_statistics::unsigned_fun>
 	  (&magic_search_parallel_::get_items_received);
 	stats["items sent"] =
 	  static_cast<spot::unsigned_statistics::unsigned_fun>
 	  (&magic_search_parallel_::get_items_sent);
+	stats["items already red"] =
+	  static_cast<spot::unsigned_statistics::unsigned_fun>
+	  (&magic_search_parallel_::get_items_red);
+	stats["items non white"] =
+	  static_cast<spot::unsigned_statistics::unsigned_fun>
+	  (&magic_search_parallel_::get_items_nw);
+      }
+
+      unsigned
+      get_orange_hits() const
+      {
+	return orange_hits_;
       }
 
       unsigned
@@ -476,6 +546,18 @@ namespace spot
 	return items_sent_;
       }
 
+      unsigned
+      get_items_red() const
+      {
+	return items_red_;
+      }
+
+      unsigned
+      get_items_nw() const
+      {
+	return items_nw_;
+      }
+
 
       virtual ~magic_search_parallel_()
       {
@@ -483,13 +565,13 @@ namespace spot
         while (!st_blue.empty())
           {
             h.pop_notify(st_blue.front().s);
-            delete st_blue.front().it;
+	    st_blue.front().clean();
             st_blue.pop_front();
           }
         while (!st_red.empty())
           {
             h.pop_notify(st_red.front().s);
-            delete st_red.front().it;
+	    st_red.front().clean();
             st_red.pop_front();
           }
       }
@@ -512,17 +594,17 @@ namespace spot
             h.add_new_state(s0, BLUE);
             push(st_blue, s0, bddfalse, bddfalse);
             if (dfs_blue())
-              return new magic_search_result(*this, options());
+              return new emptiness_check_result(automaton(), options());
           }
         else
           {
             h.pop_notify(st_red.front().s);
             pop(st_red);
             if (!st_red.empty() && dfs_red())
-              return new magic_search_result(*this, options());
+              return new emptiness_check_result(automaton(), options());
             else
               if (dfs_blue())
-                return new magic_search_result(*this, options());
+                return new emptiness_check_result(automaton(), options());
           }
         return 0;
       }
@@ -551,38 +633,35 @@ namespace spot
 	return h;
       }
 
-      const stack_type& get_st_blue() const
+      const stack_type_random& get_st_blue() const
       {
 	return st_blue;
       }
 
-      const stack_type& get_st_red() const
+      const stack_type_random& get_st_red() const
       {
 	return st_red;
       }
     private:
 
-      void push(stack_type& st, const state* s,
-                        const bdd& label, const bdd& acc)
+      void push(stack_type_random& st, const state* s,
+		const bdd& label, const bdd& acc)
       {
         inc_depth();
-        tgba_succ_iterator* i = a_->succ_iter(s);
-        i->first();
-        st.push_front(stack_item(s, i, label, acc));
+        st.push_front(stack_item_random(s, this, label, acc));
       }
 
-      void pop(stack_type& st)
+      void pop(stack_type_random& st)
       {
         dec_depth();
-        delete st.front().it;
         st.pop_front();
       }
 
       /// \brief Stack of the blue dfs.
-      stack_type st_blue;
+      stack_type_random st_blue;
 
       /// \brief Stack of the red dfs.
-      stack_type st_red;
+      stack_type_random st_red;
 
       /// \brief Map where each visited state is colored
       /// by the last dfs visiting it.
@@ -601,18 +680,28 @@ namespace spot
 	    if (pool_.size > 1)
 	      process_buffer();
 
-            stack_item& f = st_blue.front();
+            stack_item_random& f = st_blue.front();
             trace << "DFS_BLUE treats: " << a_->format_state(f.s) << std::endl;
-            if (!f.it->done())
+            if (!f.q.empty())
               {
-                const state *s_prime = f.it->current_state();
+		typename succ_queue::iterator next = f.q.begin();
+
+		int n = rand() % f.q.size();
+		while (n--)
+		  {
+		    ++next;
+		    assert(next != f.q.end());
+		  }
+		successor succ = *next;
+		f.q.erase(next);
+		dec_depth();
+
+                const state *s_prime = succ.s;
                 trace << "  Visit the successor: "
                       << a_->format_state(s_prime) << std::endl;
-                bdd label = f.it->current_condition();
-                bdd acc = f.it->current_acceptance_conditions();
+                bdd label = succ.label;
+                bdd acc = succ.acc;
                 // Go down the edge (f.s, <label, acc>, s_prime)
-                f.it->next();
-                inc_transitions();
                 typename heap::color_ref c = h.get_color_ref(s_prime);
                 if (c.is_white())
                   {
@@ -623,7 +712,9 @@ namespace spot
                   }
                 else
                   {
-                    if (acc == all_cond && c.get_color() != RED)
+                    if (acc == all_cond &&
+			c.get_color() != RED &&
+			c.get_color() != ORANGE )
                       {
                         // the test 'c.get_color() != RED' is added to limit
                         // the number of runs reported by successive
@@ -641,6 +732,8 @@ namespace spot
                       }
                     else
                       {
+			if (c.get_color() == ORANGE)
+			  ++orange_hits_;
                         trace << "  It is blue or red, pop it" << std::endl;
                         h.pop_notify(s_prime);
                       }
@@ -651,12 +744,14 @@ namespace spot
             //        (predecessor of f.s in st_blue, <f.label, f.acc>, f.s)
               {
                 trace << "  All the successors have been visited" << std::endl;
-                stack_item f_dest(f);
+                stack_item_random f_dest(f);
                 pop(st_blue);
                 typename heap::color_ref c = h.get_color_ref(f_dest.s);
                 assert(!c.is_white());
                 if (!st_blue.empty() &&
-                           f_dest.acc == all_cond && c.get_color() != RED)
+		    f_dest.acc == all_cond &&
+		    c.get_color() != RED &&
+		    c.get_color() != ORANGE)
                   {
                     // the test 'c.get_color() != RED' is added to limit
                     // the number of runs reported by successive
@@ -695,18 +790,29 @@ namespace spot
 	    if (pool_.size > 1)
 	      process_buffer();
 
-            stack_item& f = st_red.front();
+            stack_item_random& f = st_red.front();
             trace << "DFS_RED treats: " << a_->format_state(f.s) << std::endl;
-            if (!f.it->done())
+            if (!f.q.empty())
               {
-                const state *s_prime = f.it->current_state();
+		typename succ_queue::iterator next = f.q.begin();
+
+		int n = rand() % f.q.size();
+		while (n--)
+		  {
+		    ++next;
+		    assert(next != f.q.end());
+		  }
+		successor succ = *next;
+		f.q.erase(next);
+		dec_depth();
+
+                const state *s_prime = succ.s;
                 trace << "  Visit the successor: "
                       << a_->format_state(s_prime) << std::endl;
-                bdd label = f.it->current_condition();
-                bdd acc = f.it->current_acceptance_conditions();
-                // Go down the edge (f.s, <label, acc>, s_prime)
-                f.it->next();
-                inc_transitions();
+                bdd label = succ.label;
+                bdd acc = succ.acc;
+
+		// Go down the edge (f.s, <label, acc>, s_prime)
                 typename heap::color_ref c = h.get_color_ref(s_prime);
                 if (c.is_white())
                   {
@@ -730,6 +836,8 @@ namespace spot
                   }
                 else
                   {
+		    if (c.get_color() == ORANGE)
+		      ++orange_hits_;
                     trace << "  It is red, pop it" << std::endl;
                     h.pop_notify(s_prime);
                   }
@@ -871,23 +979,36 @@ namespace spot
       process_buffer()
       {
 	int cpt = 0;
+	int redcpt = 0;
+	int nwcpt = 0;
 	const spot::state* s;
 
 	while ((s = pool_.pipes[me_].read_state(automaton())))
 	  {
 	    typename heap::color_ref c = h.get_color_ref(s);
 	    if (c.is_white())
-	      h.add_new_state(s, RED);
+	      h.add_new_state(s, ORANGE);
 	    else
-	      c.set_color(RED);
+	      {
+		++nwcpt;
+		if (c.get_color() == RED)
+		  ++redcpt;
+		else
+		  c.set_color(ORANGE);
+	      }
 	    ++cpt;
 	  }
 
+	items_red_ += redcpt;
+	items_nw_ += nwcpt;
 	items_received_ += cpt;
       }
 
       int me_;
       checkpool& pool_;
+      unsigned orange_hits_;
+      unsigned items_nw_;
+      unsigned items_red_;
       unsigned items_sent_;
       unsigned items_received_;
     }; // magic_search_parallel_

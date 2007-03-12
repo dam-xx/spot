@@ -1,3 +1,9 @@
+2007-03-12  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgbaalgos/magic.cc (magic_search_parallel_): Rewrite the
+	stack a la "shy" to be able to pick random successors.  More stats.
+	* src/tgbaalgos/statepipe.cc (write_state): Fix pointer uses.
+
 2007-03-08  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* src/tgbaalgos/magic.cc (checkpool, magic_search_parallel_,

@@ -110,6 +110,7 @@ namespace spot {
     if (!in_next_size_read_)
       {
 	int ret = read(fd_[0], &in_next_size_, sizeof in_next_size_);
+
 	if (ret == -1 && errno == EAGAIN)
 	  return 0;
 	if (ret == 0) // Pipe close, suiciding.
@@ -119,10 +120,11 @@ namespace spot {
 	    perror("read() failed");
 	    abort();
 	  }
+
 	in_next_size_read_ = true;
       }
 
-    if (in_next_size_ < in_buf_size_)
+    if (in_next_size_ > in_buf_size_)
       {
 	in_buf_ =
 	  static_cast<char*>(realloc(in_buf_,
@@ -134,7 +136,7 @@ namespace spot {
 	  }
       }
 
-    ssize_t ret = read(fd_[0], &in_buf_, in_next_size_);
+    ssize_t ret = read(fd_[0], in_buf_, in_next_size_);
     if (ret == -1 && errno == EAGAIN)
       return 0;
     if (ret < 0 || static_cast<size_t>(ret) != in_next_size_)
