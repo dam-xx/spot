@@ -1,3 +1,8 @@
+2007-03-13  Alexandre DURET-LUTZ  <adl@gnu.org>
+
+	* src/tgba/tgbatba.hh, src/tgba/tgbatba.cc (tgba_tba_proxy,
+	state_tba_proxy): Adjust to support serialization.
+
 2007-03-12  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* src/tgbaalgos/magic.cc (magic_search_parallel_): Rewrite the

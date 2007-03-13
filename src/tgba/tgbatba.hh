@@ -22,7 +22,7 @@
 #ifndef SPOT_TGBA_TGBATBA_HH
 # define SPOT_TGBA_TGBATBA_HH
 
-#include <list>
+#include <vector>
 #include "tgba.hh"
 #include "misc/bddlt.hh"
 
@@ -73,7 +73,10 @@ namespace spot
     virtual bdd all_acceptance_conditions() const;
     virtual bdd neg_acceptance_conditions() const;
 
-    typedef std::list<bdd> cycle_list;
+    virtual size_t deserialize_state(const char* buffer, size_t n,
+				     spot::state** s) const;
+
+    typedef std::vector<bdd> cycle_list;
   protected:
     virtual bdd compute_support_conditions(const state* state) const;
     virtual bdd compute_support_variables(const state* state) const;

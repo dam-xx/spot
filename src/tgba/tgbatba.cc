@@ -36,9 +36,8 @@ namespace spot
     /// to the position in the cycle_acc_ list).
     class state_tba_proxy: public state
     {
-      typedef tgba_tba_proxy::cycle_list::const_iterator iterator;
     public:
-      state_tba_proxy(state* s, iterator acc)
+      state_tba_proxy(state* s, int acc)
 	:	s_(s), acc_(acc)
       {
       }
@@ -47,7 +46,7 @@ namespace spot
       state_tba_proxy(const state_tba_proxy& o)
 	: state(),
 	  s_(o.real_state()->clone()),
-	  acc_(o.acceptance_iterator())
+	  acc_(o.acceptance_num())
       {
       }
 
@@ -63,14 +62,8 @@ namespace spot
 	return s_;
       }
 
-      bdd
-      acceptance_cond() const
-      {
-	return *acc_;
-      }
-
-      iterator
-      acceptance_iterator() const
+      int
+      acceptance_num() const
       {
 	return acc_;
       }
@@ -83,13 +76,13 @@ namespace spot
 	int res = s_->compare(o->real_state());
 	if (res != 0)
 	  return res;
-	return acc_->id() - o->acceptance_cond().id();
+	return acc_ - o->acceptance_num();
       }
 
       virtual size_t
       hash() const
       {
-	return wang32_hash(s_->hash()) ^ wang32_hash(acc_->id());
+	return wang32_hash(s_->hash()) ^ wang32_hash(acc_);
       }
 
       virtual
@@ -98,9 +91,18 @@ namespace spot
 	return new state_tba_proxy(*this);
       }
 
+      size_t
+      serialize(char* buffer, size_t n) const
+      {
+	int sub = s_->serialize(buffer, n);
+	if (n >= sub + sizeof acc_)
+	  memcpy(buffer + sub, &acc_, sizeof acc_);
+	return sub + sizeof acc_;
+      }
+
     private:
       state* s_;
-      iterator acc_;
+      int acc_;
     };
 
 
@@ -109,10 +111,9 @@ namespace spot
     class tgba_tba_proxy_succ_iterator: public tgba_succ_iterator
     {
       typedef tgba_tba_proxy::cycle_list list;
-      typedef tgba_tba_proxy::cycle_list::const_iterator iterator;
     public:
       tgba_tba_proxy_succ_iterator(tgba_succ_iterator* it,
-				   iterator expected,
+				   int expected,
 				   const list& cycle,
 				   bdd the_acceptance_cond)
 	: it_(it), expected_(expected), cycle_(cycle),
@@ -184,7 +185,7 @@ namespace spot
 	// so do not check acc for this.
 	// bddtrue is also used by tgba_tba_proxy if the automata do not
 	// use acceptance conditions.  In that cases, all state are accepting.
-	if (*expected_ != bddtrue)
+	if (cycle_[expected_] != bddtrue)
 	  {
 	    // A transition in the *EXPECTED acceptance set should be
 	    // directed to the next acceptance set.  If the current
@@ -204,9 +205,10 @@ namespace spot
 	    // }
 
 	    next_ = expected_;
-	    while (next_ != cycle_.end() && (acc & *next_) == *next_)
+	    while (next_ != cycle_.size() 
+		   && (acc & cycle_[next_]) == cycle_[next_])
 	      ++next_;
-	    if (next_ != cycle_.end())
+	    if (next_ != cycle_.size())
 	      {
 		accepting_ = false;
 		return;
@@ -215,14 +217,14 @@ namespace spot
 	// The transition is accepting.
 	accepting_ = true;
 	// Skip as much acceptance conditions as we can on our cycle.
-	next_ = cycle_.begin();
-	while (next_ != expected_ && (acc & *next_) == *next_)
+	next_ = 0;
+	while (next_ != expected_ && (acc & cycle_[next_]) == cycle_[next_])
 	  ++next_;
       }
 
       tgba_succ_iterator* it_;
-      const iterator expected_;
-      iterator next_;
+      const unsigned expected_;
+      unsigned next_;
       bool accepting_;
       const list& cycle_;
       const bdd the_acceptance_cond_;
@@ -242,7 +244,7 @@ namespace spot
 
     if (a->number_of_acceptance_conditions() == 0)
       {
-	acc_cycle_.push_front(bddtrue);
+	acc_cycle_.push_back(bddtrue);
       }
     else
       {
@@ -252,7 +254,7 @@ namespace spot
 	  {
 	    bdd next = bdd_satone(all);
 	    all -= next;
-	    acc_cycle_.push_front(next);
+	    acc_cycle_.push_back(next);
 	  }
       }
   }
@@ -265,7 +267,7 @@ namespace spot
   state*
   tgba_tba_proxy::get_init_state() const
   {
-    return new state_tba_proxy(a_->get_init_state(), acc_cycle_.begin());
+    return new state_tba_proxy(a_->get_init_state(), 0);
   }
 
   tgba_succ_iterator*
@@ -280,7 +282,7 @@ namespace spot
     tgba_succ_iterator* it = a_->succ_iter(s->real_state(),
 					   global_state, global_automaton);
 
-    return new tgba_tba_proxy_succ_iterator(it, s->acceptance_iterator(),
+    return new tgba_tba_proxy_succ_iterator(it, s->acceptance_num(),
 					    acc_cycle_, the_acceptance_cond_);
   }
 
@@ -295,7 +297,8 @@ namespace spot
   {
     const state_tba_proxy* s = dynamic_cast<const state_tba_proxy*>(state);
     assert(s);
-    std::string a = bdd_format_accset(get_dict(), s->acceptance_cond());
+    std::string a = bdd_format_accset(get_dict(), 
+				      acc_cycle_[s->acceptance_num()]);
     if (a != "")
       a = " " + a;
     return a_->format_state(s->real_state()) + a;
@@ -351,6 +354,24 @@ namespace spot
     return a_->transition_annotation(i->it_);
   }
 
+  size_t
+  tgba_tba_proxy::deserialize_state(const char* buffer, size_t n,
+				    spot::state** s) const
+  {
+    spot::state* subs;
+    int acc;
+    int sub = a_->deserialize_state(buffer, n, &subs);
+    if (subs == 0 || n < sub + sizeof acc)
+      {
+	*s = 0;
+	return 0;
+      }
+
+    memcpy(&acc, buffer, sizeof acc);
+    *s = new state_tba_proxy(subs, acc);
+    return sub + sizeof acc;
+  }
+
   ////////////////////////////////////////////////////////////////////////
   // tgba_sba_proxy
 
@@ -367,7 +388,7 @@ namespace spot
     const state_tba_proxy* s =
       dynamic_cast<const state_tba_proxy*>(state);
     assert(s);
-    return bddtrue == s->acceptance_cond();
+    return bddtrue == acc_cycle_[s->acceptance_num()];
   }
 
 }
