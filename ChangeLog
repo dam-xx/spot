@@ -1,3 +1,9 @@
+2007-04-17  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/misc/bddalloc.cc (bdd_allocator::initialize): Call
+	bdd_isrunning() and don't run bdd_init() if it has already been
+	called.
+
 2007-02-06  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* src/tgbaalgos/randomgraph.cc (random_graph): Fix the

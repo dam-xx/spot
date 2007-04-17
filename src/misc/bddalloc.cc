@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2006, 2007 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -40,6 +40,9 @@ namespace spot
     if (initialized)
       return;
     initialized = true;
+    // Buddy might have been initialized by a third-party library.
+    if (bdd_isrunning())
+      return;
     // The values passed to bdd_init should depends on the problem
     // the library is solving.  It would be nice to allow users
     // to tune this.  By the meantime, we take the typical values
