@@ -1,4 +1,4 @@
-// Copyright (C) 2006 Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2006, 2007 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -181,8 +181,8 @@ namespace spot
 	  switch (bo->op())
 	    {
 	    case binop::U:
-	      // if (a U b) = b, then keep b !
-	      if (stronger && lcc->equal(bo, b))
+	      // if (a U b) => b, then keep b !
+	      if (stronger && lcc->contained(bo, b))
 		{
 		  destroy(a);
 		  result_ = b;
@@ -205,8 +205,8 @@ namespace spot
 		}
 	      break;
 	    case binop::R:
-	      // if (a R b) = b, then keep b !
-	      if (stronger && lcc->equal(bo, b))
+	      // if (a R b) => b, then keep b !
+	      if (stronger && lcc->contained(b, bo))
 		{
 		  destroy(a);
 		  result_ = b;
