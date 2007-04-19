@@ -30,8 +30,6 @@
 #include "tgba/tgbaproduct.hh"
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/save.hh"
-#include "tostring.hh"
-#include <iostream>
 namespace spot
 {
   namespace ltl
@@ -269,7 +267,7 @@ namespace spot
 			  break;
 			}
 		      // if j => i, then i|j = i
-		      else if (lcc->contained((*res)[i], (*res)[j]))
+		      else if (lcc->contained((*res)[j], (*res)[i]))
 			{
 			  destroy((*res)[j]);
 			  (*res)[j] = 0;
@@ -301,7 +299,7 @@ namespace spot
 			  changed = true;
 			}
 		      // if j => i, then i&j = j
-		      else if (lcc->contained((*res)[i], (*res)[j]))
+		      else if (lcc->contained((*res)[j], (*res)[i]))
 			{
 			  destroy((*res)[i]);
 			  (*res)[i] = 0;

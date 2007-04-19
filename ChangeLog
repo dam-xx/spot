@@ -1,5 +1,12 @@
 2007-04-19  Alexandre Duret-Lutz  <adl@gnu.org>
 
+	* src/ltltest/reduc.cc (main): More cases to test.
+	* src/ltlvisit/basicreduce.cc (basic_reduce_visitor::visit):
+	Simplify the formula again after FX->XF and GX->XG permutations.
+	This is so that formulae like GFXXa become GFa and not just GFXa.
+	* src/ltlvisit/contain.cc (reduce_tau03_visitor): Fix a typo
+	in the rules for i|j or i&j, resulting in missing simplifications.
+
 	* src/ltlvisit/contain.cc (reduce_tau03_visitor): Simplify the
 	rules for "a U b" and "a R b", an implication check is enough.
 

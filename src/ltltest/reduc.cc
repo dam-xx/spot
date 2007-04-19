@@ -1,6 +1,6 @@
-// Copyright (C) 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2004, 2006, 2007 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -82,6 +82,28 @@ main(int argc, char** argv)
       break;
     case 9:
       o = spot::ltl::Reduce_All;
+      break;
+    case 10:
+      o = (spot::ltl::Reduce_Basics
+	   | spot::ltl::Reduce_Containment_Checks_Stronger);
+      break;
+    case 11:
+      o = (spot::ltl::Reduce_Syntactic_Implications
+	   | spot::ltl::Reduce_Containment_Checks_Stronger);
+      break;
+    case 12:
+      o = (spot::ltl::Reduce_Basics
+	   | spot::ltl::Reduce_Syntactic_Implications
+	   | spot::ltl::Reduce_Containment_Checks_Stronger);
+      break;
+    case 13:
+      o = (spot::ltl::Reduce_Eventuality_And_Universality
+	   | spot::ltl::Reduce_Containment_Checks_Stronger);
+      break;
+    case 14:
+      o = (spot::ltl::Reduce_Basics
+	   | spot::ltl::Reduce_Eventuality_And_Universality
+	   | spot::ltl::Reduce_Containment_Checks_Stronger);
       break;
     default:
       return 2;
