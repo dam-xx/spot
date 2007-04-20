@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+# Copyright (C) 2003, 2004, 2005, 2006, 2007 Laboratoire d'Informatique de
 # Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 # Université Pierre et Marie Curie.
 #
@@ -113,7 +113,7 @@ Algorithm
    Name = "Spot (Couvreur -- FM), reduction of formula in FM"
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot './ltl2tgba -fr4 -F -f -t'"
-   Enabled = yes
+   Enabled = no
 }
 
 Algorithm
@@ -121,7 +121,7 @@ Algorithm
    Name = "Spot (Couvreur -- FM) reduction7 of formula in FM"
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot './ltl2tgba -fr7 -F -f -t'"
-   Enabled = yes
+   Enabled = no
 }
 
 
