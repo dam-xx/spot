@@ -1,3 +1,10 @@
+2007-04-29  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/ltlvisit/reduce.cc (reduce): Repeat the reduction as
+	long as the formula changes, it makes more sense when
+	combining algorithm.  E.g. basic reductions can help language
+	containment and vice-versa.
+
 2007-04-20  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* src/tgbatest/spotlbtt.test: Disable formula rewriting during
