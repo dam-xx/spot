@@ -1,3 +1,10 @@
+2007-04-30  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgbatest/ltl2tgba.cc (main): Fix handing of -R1q -R1t -R2q -R2t.
+	Add support for -r8/-fr8.
+
+	* src/tgbatest/spotlbtt.test: Also check -R1q -R1t -R2q -R2t.
+
 2007-04-29  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* src/ltlvisit/reduce.cc (reduce): Repeat the reduction as

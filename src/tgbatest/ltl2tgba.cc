@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2005, 2006, 2007 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -83,6 +83,7 @@ syntax(char* prog)
 	    << "  -fr5  use -r5 (see below) at each step of FM" << std::endl
 	    << "  -fr6  use -r6 (see below) at each step of FM" << std::endl
 	    << "  -fr7  use -r7 (see below) at each step of FM" << std::endl
+	    << "  -fr8  use -r8 (see below) at each step of FM" << std::endl
             << "  -F    read the formula from the file" << std::endl
 	    << "  -g    graph the accepting run on the automaton (requires -e)"
 	    << std::endl
@@ -106,7 +107,8 @@ syntax(char* prog)
 	    << "  -r4   reduce formula using all above rules" << std::endl
 	    << "  -r5   reduce formula using tau03" << std::endl
 	    << "  -r6   reduce formula using tau03+" << std::endl
-	    << "  -r7   reduce formula using tau03+ and -r4" << std::endl
+	    << "  -r7   reduce formula using tau03+ and -r1" << std::endl
+	    << "  -r8   reduce formula using tau03+ and -r4" << std::endl
 	    << "  -rd   display the reduce formula" << std::endl
 	    << "  -R    same as -r, but as a set" << std::endl
 	    << "  -R1q  merge states using direct simulation "
@@ -580,16 +582,22 @@ main(int argc, char** argv)
 
 	      if (reduc_aut & (spot::Reduce_quotient_Dir_Sim |
 			       spot::Reduce_transition_Dir_Sim))
-		rel_dir =
-		  spot::get_direct_relation_simulation(a,
-						       std::cout,
-						       display_parity_game);
-	      else if (reduc_aut & (spot::Reduce_quotient_Del_Sim |
+		{
+		  rel_dir =
+		    spot::get_direct_relation_simulation(a,
+							 std::cout,
+							 display_parity_game);
+		  assert(rel_dir);
+		}
+	      if (reduc_aut & (spot::Reduce_quotient_Del_Sim |
 				    spot::Reduce_transition_Del_Sim))
-		rel_del =
-		  spot::get_delayed_relation_simulation(a,
-							std::cout,
-							display_parity_game);
+		{
+		  rel_del =
+		    spot::get_delayed_relation_simulation(a,
+							  std::cout,
+							  display_parity_game);
+		  assert(rel_del);
+		}
 
 	      if (display_rel_sim)
 		{
