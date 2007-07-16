@@ -1,27 +1,34 @@
-2007-06-20  Alexandre Duret-Lutz  <adl@gnu.org>
+2007-07-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* iface/gspn/ssp.cc (tgba_gspn_ssp_private_::~tgba_gspn_ssp_private_):
+	Fix the declaration for GCC 4.1.2.
+	* iface/gspn/gspn.cc (tgba_gspn_private_::~tgba_gspn_private_):
+	Likewise.
+
+2007-06-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/spotlbtt.test: Do not check -R1q -R1t -R2q -R2t.
 
-2007-04-30  Alexandre Duret-Lutz  <adl@gnu.org>
+2007-04-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/ltl2tgba.cc (main): Fix handling of -R1q -R1t -R2q -R2t.
 	Add support for -r8/-fr8.
 
 	* src/tgbatest/spotlbtt.test: Also check -R1q -R1t -R2q -R2t.
 
-2007-04-29  Alexandre Duret-Lutz  <adl@gnu.org>
+2007-04-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltlvisit/reduce.cc (reduce): Repeat the reduction as
 	long as the formula changes, it makes more sense when
 	combining algorithm.  E.g. basic reductions can help language
 	containment and vice-versa.
 
-2007-04-20  Alexandre Duret-Lutz  <adl@gnu.org>
+2007-04-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbatest/spotlbtt.test: Disable formula rewriting during
 	construction.
 
-2007-04-19  Alexandre Duret-Lutz  <adl@gnu.org>
+2007-04-19  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/ltltest/reduc.cc (main): More cases to test.
 	* src/ltlvisit/basicreduce.cc (basic_reduce_visitor::visit):
@@ -33,13 +40,13 @@
 	* src/ltlvisit/contain.cc (reduce_tau03_visitor): Simplify the
 	rules for "a U b" and "a R b", an implication check is enough.
 
-2007-04-17  Alexandre Duret-Lutz  <adl@gnu.org>
+2007-04-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/misc/bddalloc.cc (bdd_allocator::initialize): Call
 	bdd_isrunning() and don't run bdd_init() if it has already been
 	called.
 
-2007-02-06  Alexandre Duret-Lutz  <adl@gnu.org>
+2007-02-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/randomgraph.cc (random_graph): Fix the
 	generation of the graph.  Some states had no successors or
@@ -1852,7 +1859,7 @@
 	tgba_explicit_succ_iterator::current_accepting_conditions): Assert
 	the iteration is not finished.
 
-2004-10-12  Alexandre Duret-Lutz  <adl@gnu.org>
+2004-10-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* wrap/python/tests/run.in: Typo.  From Akim Demaille.
 
@@ -4330,7 +4337,7 @@
 	* wrap/python/Makefile.am (spot_wrap.cxx, spot.py): Lookup
 	spot.i in $(srcdir).
 
-2003-07-31  Alexandre Duret-Lutz  <adl@gnu.org>
+2003-07-31  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac: Output wrap/python/tests/Makefile
 	and wrap/python/tests/run.

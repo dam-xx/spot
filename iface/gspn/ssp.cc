@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2005, 2006, 2007 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -162,7 +162,7 @@ namespace spot
 	}
     }
 
-    tgba_gspn_ssp_private_::~tgba_gspn_ssp_private_()
+    ~tgba_gspn_ssp_private_()
     {
       dict->unregister_all_my_variables(this);
       delete[] all_props;

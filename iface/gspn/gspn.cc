@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2006, 2007 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -172,7 +172,7 @@ namespace spot
 	  }
       }
 
-      tgba_gspn_private_::~tgba_gspn_private_()
+      ~tgba_gspn_private_()
       {
 	dict->unregister_all_my_variables(this);
 	delete last_state_conds_input;
