@@ -1,5 +1,9 @@
 2007-07-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
+	* iface/gspn/ltlgspn.cc: New option -L.
+	* iface/gspn/ssp.cc, iface/gspn/ssp.hh (gspn_ssp_interface)
+	support for a new option "pushfront".
+
 	* NEWS, configure.in: Bump version to 0.4a.
 
 2007-07-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>

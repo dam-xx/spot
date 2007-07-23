@@ -49,6 +49,7 @@ namespace spot
     }
 
     static bool doublehash;
+    static bool pushfront;
   }
 
   // state_gspn_ssp
@@ -539,10 +540,12 @@ namespace spot
 					 const
 					 ltl::declarative_environment& env,
 					 bool inclusion,
-					 bool doublehash_)
+					 bool doublehash_,
+					 bool pushfront_)
     : dict_(dict), env_(env)
   {
     doublehash = doublehash_;
+    pushfront = pushfront_;
     if (inclusion)
       inclusion_version();
 
@@ -863,7 +866,10 @@ namespace spot
       if (sg)
 	{
 	  const void* cont = container_(sg);
-	  contained[cont][s_->right()].push_front(s);
+	  if (pushfront)
+	    contained[cont][s_->right()].push_front(s);
+	  else
+	    contained[cont][s_->right()].push_back(s);
 	}
     }
 

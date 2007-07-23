@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de Paris 6
+// Copyright (C) 2003, 2004, 2006, 2007 Laboratoire d'Informatique de Paris 6
 // (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -52,6 +52,8 @@ syntax(char* prog)
 	    << std::endl
 #ifdef SSP
 	    << "  -1  do not use a double hash (for inclusion check)"
+	    << std::endl
+	    << "  -L  use LIFO ordering for inclusion check"
 	    << std::endl
 #endif
 	    << "  -c  compute an example" << std::endl
@@ -108,6 +110,7 @@ main(int argc, char **argv)
 #ifdef SSP
       bool doublehash = true;
       bool stack_inclusion = true;
+      bool pushfront = false;
 #endif
       std::string dead = "true";
 
@@ -119,6 +122,10 @@ main(int argc, char **argv)
 	  if (!strcmp(argv[formula_index], "-1"))
 	    {
 	      doublehash = false;
+	    }
+	  else if (!strcmp(argv[formula_index], "-L"))
+	    {
+	      pushfront = true;
 	    }
 	  else
 #endif
@@ -209,7 +216,8 @@ main(int argc, char **argv)
 
 #if SSP
       bool inclusion = (check != Couvreur && check != Couvreur2);
-      spot::gspn_ssp_interface gspn(2, argv, dict, env, inclusion, doublehash);
+      spot::gspn_ssp_interface gspn(2, argv, dict, env, inclusion,
+				    doublehash, pushfront);
 
       spot::tgba_parse_error_list pel1;
       spot::tgba_explicit* control = spot::tgba_parse(argv[formula_index + 2],
