@@ -128,8 +128,10 @@ syntax(char* prog)
 	    << "  -S    convert to explicit automata, and number states "
 	    << "in BFS order" << std::endl
 	    << "  -t    display reachable states in LBTT's format" << std::endl
-            << "  -U[PROPS]  consider atomic properties PROPS as exclusive "
-	    << "events (implies -f)" << std::endl
+            << "  -U[PROPS]  consider atomic properties of the formula as "
+	    << "exclusive events, and" << std::endl
+	    << "        PROPS as unobservables events (implies -f)"
+	    << std::endl
 	    << "  -v    display the BDD variables used by the automaton"
 	    << std::endl
             << "  -x    try to produce a more deterministic automata "
@@ -847,6 +849,14 @@ main(int argc, char** argv)
   else
     {
       exit_code = 1;
+    }
+
+  if (unobservables)
+    {
+      for (spot::ltl::atomic_prop_set::iterator i =
+	     unobservables->begin(); i != unobservables->end(); ++i)
+	spot::ltl::destroy(*i);
+      delete unobservables;
     }
 
   assert(spot::ltl::atomic_prop::instance_count() == 0);

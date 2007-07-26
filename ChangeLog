@@ -1,3 +1,8 @@
+2007-07-26  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgbatest/ltl2tgba.cc (main): Correctly destroy unobservable
+	events.
+
 2007-07-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* iface/gspn/ltlgspn.cc: New option -L.
