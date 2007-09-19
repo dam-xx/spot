@@ -25,6 +25,7 @@
 
 namespace spot
 {
+
   bool bdd_allocator::initialized = false;
 
   bdd_allocator::bdd_allocator()
@@ -49,6 +50,10 @@ namespace spot
     // for large examples advocated by the BuDDy manual.
     bdd_init(1000000, 10000);
     bdd_setvarnum(2);
+    // Disable the default GC handler.  (Note that this will only be
+    // done if Buddy is initialized by Spot.  Otherwise we prefer not
+    // to overwrite a handler that might have been set by the user.)
+    bdd_gbc_hook(0);
   }
 
   void

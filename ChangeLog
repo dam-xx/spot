@@ -1,3 +1,9 @@
+2007-09-19  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/misc/bddalloc.cc (bdd_allocator::initialize):
+	Disable the default GC handler.  Reported by
+	Kristin Yvonne Rozier <kyrozier@cs.rice.edu>.
+
 2007-07-26  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* src/tgbatest/ltl2tgba.cc (main): Correctly destroy unobservable
