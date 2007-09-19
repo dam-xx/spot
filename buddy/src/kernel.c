@@ -28,7 +28,7 @@
 ========================================================================*/
 
 /*************************************************************************
-  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.c,v 1.5 2003/05/22 15:07:27 aduret Exp $
+  $Header: /Volumes/CVS/repository/spot/spot/buddy/src/kernel.c,v 1.6 2007/09/19 18:58:20 adl Exp $
   FILE:  kernel.c
   DESCR: implements the bdd kernel functions.
   AUTH:  Jorn Lind
@@ -991,9 +991,9 @@ void bdd_default_gbchandler(int pre, bddGbcStat *s)
 {
    if (!pre)
    {
-      printf("Garbage collection #%d: %d nodes / %d free",
+      fprintf(stderr, "Garbage collection #%d: %d nodes / %d free",
 	     s->num, s->nodes, s->freenodes);
-      printf(" / %.1fs / %.1fs total\n",
+      fprintf(stderr, " / %.1fs / %.1fs total\n",
 	     (float)s->time/(float)(CLOCKS_PER_SEC),
 	     (float)s->sumtime/(float)CLOCKS_PER_SEC);
    }
