@@ -63,7 +63,7 @@ AC_CHECK_PROG([MODELLA], [modella], [modella])
 AC_CHECK_PROG([LTL2NBA], [script4lbtt.py], [script4lbtt.py])
 AC_CHECK_PROG([PERL], [perl], [perl])
 AC_CHECK_PROG([SPIN], [spin], [spin])
-AC_CHECK_PROG([VALGRIND], [valgrind], [valgrind])
+AX_CHECK_VALGRIND
 AC_CHECK_PROG([WRING2LBTT], [wring2lbtt], [wring2lbtt])
 
 AC_CONFIG_FILES([

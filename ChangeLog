@@ -1,3 +1,8 @@
+2007-11-22  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* m4/valgrind.m4: New file.
+	* configure.ac: Use it.
+
 2007-10-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* wrap/python/cgi/ltl2tgba.in: Adjust to newer versions of swig.
