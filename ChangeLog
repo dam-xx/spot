@@ -1,7 +1,3 @@
-2007-11-23  Alexandre Duret-Lutz  <adl@gnu.org>
-
-	Dummy changelog to test commit hooks.
-
 2007-11-22  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* m4/valgrind.m4: New file.
