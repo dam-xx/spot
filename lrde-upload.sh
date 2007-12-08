@@ -10,6 +10,6 @@ rm -rf /lrde/dload/spot/spot-snapshot.tmp
 cp -pR doc/spot.html /lrde/dload/spot/spot-snapshot.tmp
 chmod a+rX /lrde/dload/spot/spot-snapshot.tmp
 mv -f spot-*.tar.gz /lrde/dload/spot/spot-snapshot.tar.gz
-chmod a+rX /lrde/dload/spot/spot-snapshot.tar.gz
+chmod -R a+rX /lrde/dload/spot/spot-snapshot.tar.gz
 rm -rf /lrde/dload/spot/spot-snapshot.html
 mv -f /lrde/dload/spot/spot-snapshot.tmp /lrde/dload/spot/spot-snapshot.html
