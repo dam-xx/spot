@@ -1,4 +1,4 @@
-/* Copyright (C) 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2006, 2007  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -36,7 +36,7 @@
 #include "tgbaalgos/ltl2tgba_fm.hh"
 #include "tgba/tgbaproduct.hh"
 
-namespace
+namespace sautyy
 {
   typedef std::map<const spot::saut*, std::string> aut_names;
   struct context_t
@@ -535,7 +535,7 @@ sautyy::parser::error(const location_type& location,
   error_list.push_back(spot::saut_parse_error(location, message));
 }
 
-namespace
+namespace sautyy
 {
    void
    free_idlist(std::list<const std::string*>* idlist)
@@ -565,7 +565,7 @@ namespace spot
         return 0;
       }
     saut_parse_result* res = new saut_parse_result;
-    context_t context;
+    sautyy::context_t context;
     context.env = &env;
     context.res = res;
     sautyy::parser parser(error_list, context, d);
