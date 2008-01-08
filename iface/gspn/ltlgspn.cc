@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2006, 2007 Laboratoire d'Informatique de Paris 6
-// (LIP6), département Systèmes Répartis Coopératifs (SRC),
-// Université Pierre et Marie Curie.
+// Copyright (C) 2003, 2004, 2006, 2007, 2008 Laboratoire
+// d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
+// Coopératifs (SRC), Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -73,6 +73,7 @@ syntax(char* prog)
 	    << "  -e4 use semi-d. incl. Couvreur's emptiness-check's "
 	    << "shy variant"
 	    << std::endl
+	    << "  -e45 mix of -e4 and -e5 " << std::endl
 	    << "  -e5 use d. incl. Couvreur's emptiness-check's shy variant"
 	    << std::endl
 	    << "  -e6 like -e5, but without inclusion checks in the "
@@ -80,6 +81,9 @@ syntax(char* prog)
 #endif
 	    << "  -m  degeneralize and perform a magic-search" << std::endl
 	    << std::endl
+#ifdef SSP
+            << "  -n  do not perform any decomposition" << std::endl
+#endif
             << "  -l  use Couvreur's LaCIM algorithm for translation (default)"
 	    << std::endl
             << "  -f  use Couvreur's FM algorithm for translation" << std::endl
@@ -111,6 +115,8 @@ main(int argc, char **argv)
       bool doublehash = true;
       bool stack_inclusion = true;
       bool pushfront = false;
+      bool double_inclusion = false;
+      bool no_decomp = false;
 #endif
       std::string dead = "true";
 
@@ -161,6 +167,11 @@ main(int argc, char **argv)
 	    {
 	      check = Couvreur4;
 	    }
+	  else if (!strcmp(argv[formula_index], "-e45"))
+	    {
+	      check = Couvreur5;
+	      double_inclusion = true;
+	    }
 	  else if (!strcmp(argv[formula_index], "-e5"))
 	    {
 	      check = Couvreur5;
@@ -175,6 +186,12 @@ main(int argc, char **argv)
 	    {
 	      check = Magic;
 	    }
+#ifdef SSP
+	  else if (!strcmp(argv[formula_index], "-n"))
+	    {
+	      no_decomp = true;
+	    }
+#endif
 	  else if (!strcmp(argv[formula_index], "-l"))
 	    {
 	      trans = Lacim;
@@ -276,7 +293,9 @@ main(int argc, char **argv)
 		ec = spot::couvreur99_check_ssp_shy_semi(prod);
 		break;
 	      case Couvreur5:
-		ec = spot::couvreur99_check_ssp_shy(prod, stack_inclusion);
+		ec = spot::couvreur99_check_ssp_shy(prod, stack_inclusion,
+						    double_inclusion,
+						    no_decomp);
 		break;
 #endif
 	      default:
@@ -389,6 +408,7 @@ main(int argc, char **argv)
 #else
       delete model;
       delete control;
+      delete ca;
 #endif
       delete a_f;
       delete dict;

@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2007 Laboratoire d'Informatique de
-// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
-// Université Pierre et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Laboratoire
+// d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
+// Coopératifs (SRC), Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -240,10 +240,11 @@ namespace spot
     virtual state*
     current_state() const
     {
-      return
+      state_gspn_ssp* s =
 	new state_gspn_ssp(successors_[current_succ_].succ_,
 			   (state_array_[successors_[current_succ_]
 					 .arc->curr_state])->clone());
+      return s;
     }
 
     virtual bdd
@@ -992,13 +993,16 @@ namespace spot
   class couvreur99_check_shy_ssp : public couvreur99_check_shy
   {
   public:
-    couvreur99_check_shy_ssp(const tgba* a, bool stack_inclusion)
+    couvreur99_check_shy_ssp(const tgba* a, bool stack_inclusion,
+			     bool double_inclusion, bool no_decomp)
       : couvreur99_check_shy(a,
 			     option_map(),
 			     numbered_state_heap_ssp_factory_semi::instance()),
 	inclusion_count_heap(0),
 	inclusion_count_stack(0),
-	stack_inclusion(stack_inclusion)
+	stack_inclusion(stack_inclusion),
+	double_inclusion(double_inclusion),
+	no_decomp(no_decomp)
     {
       onepass_ = true;
 
@@ -1017,6 +1021,8 @@ namespace spot
     unsigned inclusion_count_heap;
     unsigned inclusion_count_stack;
     bool stack_inclusion;
+    bool double_inclusion;
+    bool no_decomp;
 
   protected:
     unsigned
@@ -1063,6 +1069,7 @@ namespace spot
 	      const state_list& l = k->second;
 	      state_list::const_iterator j;
 
+	      // Make a first pass looking for identical states.
 	      for (j = l.begin(); j != l.end(); ++j)
 		{
 		  const state_gspn_ssp* old_state =
@@ -1073,7 +1080,18 @@ namespace spot
 		  assert(new_state);
 
 		  if (old_state->left() == new_state->left())
-		    break;
+		    goto found_match;
+		}
+
+	      // Now, check for inclusions.
+	      for (j = l.begin(); j != l.end(); ++j)
+		{
+		  const state_gspn_ssp* old_state =
+		    dynamic_cast<const state_gspn_ssp*>(*j);
+		  const state_gspn_ssp* new_state =
+		    dynamic_cast<const state_gspn_ssp*>(s);
+		  assert(old_state);
+		  assert(new_state);
 
 		  if (old_state->left() && new_state->left())
 		    {
@@ -1091,41 +1109,82 @@ namespace spot
 		      else
 			{
 			  if (stack_inclusion
+			      && double_inclusion
+			      && spot_inclusion(new_state->left(),
+						old_state->left()))
+			    break;
+			  if (stack_inclusion
 			      && spot_inclusion(old_state->left(),
 						new_state->left()))
 			    {
 			      ++inclusion_count_stack;
 
-			      State* succ_tgba_ = 0;
-			      size_t size_tgba_ = 0;
 			      succ_queue& queue = todo.back().q;
-
-			      Diff_succ(old_state->left(), new_state->left(),
-					&succ_tgba_, &size_tgba_);
-
 			      succ_queue::iterator old;
 			      if (pos == queue.end())
 				old = queue.begin();
 			      else
-				old = pos;
-
-			      for (size_t i = 0; i < size_tgba_; i++)
 				{
-				  state_gspn_ssp* s =
-				    new state_gspn_ssp
-				    (succ_tgba_[i],
-				     old_state->right()->clone());
-				  queue.push_back(successor(old->acc,
-							    s));
-				  inc_depth();
+				  old = pos;
+				  // Should not happen, because onepass_ == 1
+				  assert(0);
 				}
-			      if (size_tgba_ != 0)
-				diff_succ_free(succ_tgba_);
+
+			      if (no_decomp)
+				{
+				  queue.push_back  // why not push_front?
+				    (successor(old->acc,
+					       old_state->clone()));
+
+				  assert(pos == queue.end());
+
+				  inc_depth();
+
+				  // If we had not done the first loop
+				  // over the container to check for
+				  // equal states, we would have to do
+				  // one here to make sure that state
+				  // s is not equal to another known
+				  // state.  (We risk some intricate
+				  // memory corruption if we don't
+				  // delete "clone states" at this
+				  // point.)
+
+				  // Since we have that first loop and
+				  // we therefore know that state s is
+				  // genuinely new, position j so that
+				  // we won't delete it.
+				  j = l.end();
+				}
+			      else
+				{
+				  State* succ_tgba_ = 0;
+				  size_t size_tgba_ = 0;
+
+				  Diff_succ(old_state->left(),
+					    new_state->left(),
+					    &succ_tgba_, &size_tgba_);
+
+				  for (size_t i = 0; i < size_tgba_; i++)
+				    {
+				      state_gspn_ssp* s =
+					new state_gspn_ssp
+					(succ_tgba_[i],
+					 old_state->right()->clone());
+				      // why not push_front?
+				      queue.push_back(successor(old->acc, s));
+				      inc_depth();
+				    }
+				  if (size_tgba_ != 0)
+				    diff_succ_free(succ_tgba_);
+				}
+
 			      break;
 			    }
 			}
 		    }
 		}
+	    found_match:
 	      if (j != l.end())
 		{
 		  if (s != *j)
@@ -1166,6 +1225,7 @@ namespace spot
 	  res.first = k->first;
 	  res.second = &k->second;
 	}
+
       return res;
     }
   };
@@ -1235,10 +1295,12 @@ namespace spot
   }
 
   couvreur99_check*
-  couvreur99_check_ssp_shy(const tgba* ssp_automata, bool stack_inclusion)
+  couvreur99_check_ssp_shy(const tgba* ssp_automata, bool stack_inclusion,
+			   bool double_inclusion, bool no_decomp)
   {
     assert(dynamic_cast<const tgba_gspn_ssp*>(ssp_automata));
-    return new couvreur99_check_shy_ssp(ssp_automata, stack_inclusion);
+    return new couvreur99_check_shy_ssp(ssp_automata, stack_inclusion,
+					double_inclusion, no_decomp);
   }
 
 #if 0

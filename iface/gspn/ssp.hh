@@ -56,7 +56,9 @@ namespace spot
   couvreur99_check* couvreur99_check_ssp_semi(const tgba* ssp_automata);
   couvreur99_check* couvreur99_check_ssp_shy_semi(const tgba* ssp_automata);
   couvreur99_check* couvreur99_check_ssp_shy(const tgba* ssp_automata,
-					     bool stack_inclusion = true);
+					     bool stack_inclusion = true,
+					     bool double_inclusion = false,
+					     bool no_decomp = false);
 
   /// @}
 

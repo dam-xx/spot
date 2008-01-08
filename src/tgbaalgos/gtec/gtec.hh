@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2005, 2006, 2008 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -237,6 +237,9 @@ namespace spot
     todo_list todo;
 
     void clear_todo();
+
+    /// Dump the queue for debugging.
+    void dump_queue(std::ostream& os = std::cerr);
 
     /// Whether successors should be grouped for states in the same SCC.
     bool group_;

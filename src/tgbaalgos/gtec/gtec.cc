@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2005, 2006, 2008 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -18,6 +18,15 @@
 // along with Spot; see the file COPYING.  If not, write to the Free
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
+
+// #define TRACE
+
+#include <iostream>
+#ifdef TRACE
+#define trace std::cerr
+#else
+#define trace while (0) std::cerr
+#endif
 
 #include "gtec.hh"
 #include "ce.hh"
@@ -374,6 +383,27 @@ namespace spot
     assert(depth() == 0);
   }
 
+  void
+  couvreur99_check_shy::dump_queue(std::ostream& os)
+  {
+    os << "--- TODO ---" << std::endl;
+    unsigned pos = 0;
+    for (todo_list::const_iterator ti = todo.begin(); ti != todo.end(); ++ti)
+      {
+	++pos;
+	os << "#" << pos << " s:" << ti->s << " n:" << ti->n
+	   << " q:{";
+	for (succ_queue::const_iterator qi = ti->q.begin(); qi != ti->q.end();)
+	  {
+	    os << qi->s;
+	    ++qi;
+	    if (qi != ti->q.end())
+	      os << ", ";
+	  }
+	os << "}" << std::endl;;
+      }
+  }
+
   emptiness_check_result*
   couvreur99_check_shy::check()
   {
@@ -382,6 +412,10 @@ namespace spot
 
     for (;;)
       {
+#ifdef TRACE
+	dump_queue();
+#endif
+
 	assert(ecs_->root.size() == 1 + arc.size());
 
 	// Get the successors of the current state.
@@ -390,6 +424,7 @@ namespace spot
 	// If there is no more successor, backtrack.
 	if (queue.empty())
 	  {
+	    trace << "backtrack" << std::endl;
 
 	    // We have explored all successors of state CURR.
 	    const state* curr = todo.back().s;
@@ -451,11 +486,13 @@ namespace spot
 	  old = pos;
 	successor succ = *old;
 	// Beware: the implementation of find_state in ifage/gspn/ssp.cc
-	// uses POS and modify QUEUE.
+	// uses POS and modifies QUEUE.
 	numbered_state_heap::state_index_p sip = find_state(succ.s);
 	if (pos != queue.end())
 	  ++pos;
 	int* i = sip.second;
+
+	trace << "picked state " << succ.s << std::endl;
 
 	if (!i)
 	  {
@@ -463,6 +500,9 @@ namespace spot
 	    // If we are seeking known states, just skip it.
 	    if (pos != queue.end())
 	      continue;
+
+	    trace << "new state" << std::endl;
+
 	    // Otherwise, number it and stack it so we recurse.
 	    queue.erase(old);
 	    dec_depth();
@@ -480,7 +520,12 @@ namespace spot
 
 	// Skip dead states.
 	if (*i == -1)
-	  continue;
+	  {
+	    trace << "dead state" << std::endl;
+	    continue;
+	  }
+
+	trace << "merging..." << std::endl;
 
 	// Now this is the most interesting case.  We have
 	// reached a state S1 which is already part of a
@@ -542,7 +587,7 @@ namespace spot
 		todo_list::reverse_iterator last = prev++;
 		// If group2 is used we insert the last->q in front
 		// of prev->q so that the states in prev->q are checked
-		// for existence again after we have done with the states
+		// for existence again after we have processed the states
 		// of last->q.  Otherwise we just append to the end.
 		prev->q.splice(group2_ ? prev->q.begin() : prev->q.end(),
 			       last->q);

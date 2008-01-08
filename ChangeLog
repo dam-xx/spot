@@ -1,3 +1,18 @@
+2008-01-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	This is something Soheib and I worked on back in July, but a
+	intricate memory corruption bug prevented me to check the patch
+	in.  It took me two days to realize why find_state() must do a
+	double loop over the candidates to check for equality before
+	checking for inclusion(s).
+
+	* iface/gspn/ltlgspn.cc: New options, -e45 and -n.
+	* iface/gspn/ssp.cc, iface/gspn/ssp.hh: Handle these.
+	* src/tgbaalgos/gtec/gtec.cc (TRACE): Add some debugging traces.
+	(couvreur99_check_shy::dump_queue): New function.
+	* src/tgbaalgos/gtec/gtec.hh (couvreur99_check_shy::dump_queue):
+	New function.
+
 2007-11-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Keep libtool's files under CVS so that we don't use the broken
