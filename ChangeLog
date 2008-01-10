@@ -1,3 +1,8 @@
+2008-01-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbaalgos/reductgba_sim.cc (reduc_tgba_sim): Add two
+	assert().  This patch has been lying in my tree since 2007-04-30.
+
 2008-01-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	This is something Soheib and I worked on back in July, but a
