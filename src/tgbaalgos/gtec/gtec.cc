@@ -400,7 +400,7 @@ namespace spot
 	    if (qi != ti->q.end())
 	      os << ", ";
 	  }
-	os << "}" << std::endl;;
+	os << "}" << std::endl;
       }
   }
 

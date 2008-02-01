@@ -1,3 +1,8 @@
+2008-02-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_shy::dump_queue):
+	Remove superfluous semicolon.
+
 2008-01-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgbaalgos/reductgba_sim.cc (reduc_tgba_sim): Add two
