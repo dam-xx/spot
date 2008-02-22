@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 #define CONFIGURATION_H
 
 #include <config.h>
+#include <cstdio>
 #include <iostream>
 #include <map>
 #include <set>
@@ -34,8 +35,6 @@
 #include "StringUtil.h"
 
 using namespace std;
-
-
 
 /******************************************************************************
  *
@@ -63,10 +62,17 @@ public:
   struct AlgorithmInformation;                      /* See below. */
 
   string algorithmString                            /* Formats the the id  */
-    (vector<AlgorithmInformation,                   /* of an algorithm and */
-            ALLOC(AlgorithmInformation) >::size_type/* the name of the     */
-     algorithm_id) const;                           /* algorithm into a
+    (vector<AlgorithmInformation>::size_type        /* of an algorithm and */
+       algorithm_id) const;                         /* the name of the
+                                                     * algorithm into a
                                                      * string.
+						     */
+
+  bool isInternalAlgorithm(unsigned long int id)    /* Tests whether a given */
+    const;					    /* algorithm identifier
+						     * refers to lbtt's
+						     * internal model
+						     * checking algorithm.
 						     */
 
   static void showCommandLineHelp                   /* Prints the list of    */
@@ -74,10 +80,11 @@ public:
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-  enum InteractionMode {NEVER, ALWAYS, ONERROR};    /* Enumeration constants
-                                                     * affecting the behaviour
-                                                     * of the program as
-                                                     * regards user control.
+  enum InteractionMode {NEVER, ALWAYS, ONERROR,     /* Enumeration constants */
+                        ONBREAK};                   /* affecting the
+                                                     * behavior of the
+						     * program as regards
+						     * user control.
 						     */
 
   enum FormulaMode {NORMAL, NNF};                   /* Enumeration constants
@@ -109,18 +116,22 @@ public:
                                                      * parameters).
 						     */
   {
-    string* name;                                   /* Name of the algorithm.
+    string name;                                    /* Name of the algorithm.
                                                      */
 
-    string* path_to_program;                        /* Path to the executable
+    char** parameters;                              /* Command-line parameters
                                                      * required for running
-                                                     * the algorithm.
-						     */
-
-    string* extra_parameters;                       /* Additional command-line
-                                                     * parameters required for
-                                                     * running the executable.
+                                                     * the executable.  See
+						     * the documentation for
+						     * the registerAlgorithm
+						     * function (in
+						     * Configuration.cc) for
+						     * more information.
                                                      */
+
+    vector<string>::size_type num_parameters;       /* Number of command-line
+						     * parameters.
+						     */
 
     bool enabled;                                   /* Determines whether the
 						     * algorithm is enabled
@@ -168,6 +179,12 @@ public:
                                                      *   wait for user
                                                      *   commands.
                                                      */
+
+    bool handle_breaks;                             /* If true, pause testing
+						     * also on interrupt
+						     * signals instead of
+						     * simply aborting.
+						     */
 
     unsigned long int number_of_rounds;             /* Number of test rounds.
 						     */
@@ -278,6 +295,10 @@ public:
 						     * formula generation
 						     * algorithms.
 						     */
+
+    unsigned int translator_timeout;                /* Timeout (in seconds) for
+						     * translators.
+						     */
   };
 
   struct FormulaConfiguration                       /* A structure for storing
@@ -290,11 +311,12 @@ public:
 						     * LTL formula symbols.
 						     */
 
-    map<int, int, less<int>, ALLOC(int) >           /* Priorities for LTL */
-      symbol_priority;                              /* formula symbols.   */
+    map<int, int> symbol_priority;                  /* Priorities for LTL
+                                                     * formula symbols.
+						     */
 
-    map<int, double, less<int>, ALLOC(double) >     /* Expected numbers of */
-      symbol_distribution;                          /* occurrence for the
+    map<int, double> symbol_distribution;           /* Expected numbers of
+                                                     * occurrence for the
 						     * different formula
 						     * operators.
 						     */
@@ -354,10 +376,16 @@ public:
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-  vector<AlgorithmInformation,                      /* A vector containing   */
-         ALLOC(AlgorithmInformation) > algorithms;  /* information about the
+  vector<AlgorithmInformation> algorithms;          /* A vector containing
+                                                     * information about the
                                                      * algorithms used in
                                                      * the tests.
+						     */
+
+  map<string, unsigned long int> algorithm_names;   /* Mapping between
+                                                     * algorithm names and
+                                                     * their numeric
+						     * identifiers.
 						     */
 
   GlobalConfiguration global_options;               /* General configuration
@@ -374,15 +402,6 @@ public:
     statespace_generator;                           /* random state space
                                                      * generation
 						     * algorithms.
-						     */
-
-  typedef pair<int, int> IntPair;
-
-  set<IntPair, less<IntPair>, ALLOC(IntPair) >      /* Configuration options */
-    locked_options;                                 /* the values of which
-						     * should not be
-						     * initialized from the
-						     * configuration file.
 						     */
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -419,6 +438,9 @@ public:
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+private:
+  /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
   struct IntegerRange                               /* Data structure for
 						     * representing integer-
 						     * valued ranges of certain
@@ -426,11 +448,11 @@ public:
 						     * options.
 						     */
   {
-    long int min;                                   /* Lower bound. */
+    unsigned long int min;                          /* Lower bound. */
 
-    long int max;                                   /* Upper bound. */
+    unsigned long int max;                          /* Upper bound. */
 
-    char* error_message;                            /* Error message to be
+    const char* error_message;                      /* Error message to be
 						     * displayed if the value
 						     * is not within the
 						     * specified range.
@@ -439,31 +461,30 @@ public:
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-  /*
-   *  Ranges for certain integer-valued configuration options.
-   */
+  /* Ranges for certain integer-valued configuration options. */
 
   static const struct IntegerRange
-    VERBOSITY_RANGE, ROUND_COUNT_RANGE, GENERATION_RANGE, PRIORITY_RANGE,
-    PROPOSITION_COUNT_RANGE, FORMULA_SIZE_RANGE, FORMULA_MAX_SIZE_RANGE,
-    STATESPACE_SIZE_RANGE, STATESPACE_MAX_SIZE_RANGE;
+    DEFAULT_RANGE, VERBOSITY_RANGE,
+    ROUND_COUNT_RANGE, RANDOM_SEED_RANGE,
+    ATOMIC_PRIORITY_RANGE, OPERATOR_PRIORITY_RANGE;
 
-private:
-  enum CommandLineOptionType                        /* Command line options. */
-    {OPT_COMPARISONTEST = 10000, OPT_CONFIGFILE,
+  /* Command line options. */
+
+  enum CommandLineOptionType
+    {OPT_HELP = 'h', OPT_VERSION = 'V',
+
+     OPT_COMPARISONTEST = 10000, OPT_CONFIGFILE,
      OPT_CONSISTENCYTEST, OPT_DISABLE, OPT_ENABLE,
-     OPT_FORMULACHANGEINTERVAL, OPT_FORMULAFILE,
-     OPT_FORMULARANDOMSEED, OPT_HELP = 'h',
-     OPT_GLOBALPRODUCT = 20000, OPT_INTERACTIVE, 
+     OPT_FORMULACHANGEINTERVAL,
+     OPT_FORMULAFILE, OPT_FORMULARANDOMSEED,
+     OPT_GLOBALPRODUCT, OPT_INTERACTIVE,
      OPT_INTERSECTIONTEST, OPT_LOGFILE,
-     OPT_MODELCHECK, OPT_NOCOMPARISONTEST,
-     OPT_NOCONSISTENCYTEST, OPT_NOINTERSECTIONTEST,
-     OPT_NOPAUSE, OPT_PAUSE, OPT_PAUSEONERROR,
-     OPT_PROFILE, OPT_QUIET, OPT_ROUNDS,
-     OPT_SHOWCONFIG, OPT_SHOWOPERATORDISTRIBUTION,
-     OPT_SKIP, OPT_STATESPACECHANGEINTERVAL,
-     OPT_STATESPACERANDOMSEED, OPT_VERBOSITY,
-     OPT_VERSION,
+     OPT_MODELCHECK, OPT_PROFILE, OPT_QUIET,
+     OPT_ROUNDS, OPT_SHOWCONFIG,
+     OPT_SHOWOPERATORDISTRIBUTION, OPT_SKIP,
+     OPT_STATESPACECHANGEINTERVAL,
+     OPT_STATESPACERANDOMSEED,
+     OPT_TRANSLATORTIMEOUT, OPT_VERBOSITY,
 
      OPT_LOCALPRODUCT,
 
@@ -476,7 +497,6 @@ private:
      OPT_FORMULAPROPOSITIONS, OPT_FORMULASIZE,
      OPT_GENERATENNF, OPT_GLOBALLYPRIORITY,
      OPT_IMPLICATIONPRIORITY, OPT_NEXTPRIORITY,
-     OPT_NOABBREVIATEDOPERATORS,
      OPT_NOGENERATENNF, OPT_NOOUTPUTNNF,
      OPT_NOTPRIORITY, OPT_ORPRIORITY,
      OPT_OUTPUTNNF, OPT_PROPOSITIONPRIORITY,
@@ -492,16 +512,17 @@ private:
      OPT_STATESPACEPROPOSITIONS,
      OPT_STATESPACESIZE, OPT_TRUTHPROBABILITY};
 
-  typedef map<pair<int, int>, double,               /* Type definitions for  */
-              less<pair<int, int> >,                /* the result cache used */
-                   ALLOC(double) >                  /* for computing the    */
-    ProbabilityMapElement;                          /* probability           */
-  typedef map<int, ProbabilityMapElement,           /* distribution of LTL   */
-              less<int>,                            /* formula operators.    */
-              ALLOC(ProbabilityMapElement) >
-    ProbabilityMap;
+  typedef map<pair<int, int>, double>               /* Type definitions for  */
+    ProbabilityMapElement;                          /* the result cache used */
+                                                    /* for computing the     */
+  typedef map<int, ProbabilityMapElement>           /* probability           */
+    ProbabilityMap;                                 /* distribution of LTL
+                                                     * formula operators.
+						     */
 
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+  friend int yyparse();
 
   Configuration(const Configuration& cfg);          /* Prevent copying and */
   Configuration& operator=                          /* assignment of       */
@@ -514,10 +535,59 @@ private:
                                                      * to default values.
 						     */
 
-  long int parseCommandLineInteger                  /* Converts an integer */
-    (const string& option, const string& value)     /* to a string with    */
-    const;                                          /* some additional
-						     * validity checks.
+  void registerAlgorithm                            /* Adds a new algorithm  */
+    (const string& name, const string& path,        /* to the configuration. */
+     const string& parameters, bool enabled,
+     const int block_begin_line);
+
+  template<typename T>                              /* Reads an integer,   */
+  void readInteger                                  /* checks that it is   */
+    (T& target, const string& value,                /* within given bounds */
+     const IntegerRange& range = DEFAULT_RANGE);    /* and stores it into
+						     * an unsigned integer
+						     * type variable.
+						     */
+
+  void readProbability                              /* Reads a probability */
+    (double& target, const string& value);          /* and stores it into
+						     * a given variable of
+						     * type double.
+						     */
+
+  void readSize(int valtype, const string& value);  /* Initializes formula or
+						     * state space size
+						     * ranges from a given
+						     * string.
+						     */
+
+  void readTruthValue                               /* Interprets a symbolic */
+    (bool& target, const string& value);            /* truth value.          */
+
+  void readInteractivity(const string& value);      /* Interprets a symbolic
+						     * interactivity mode.
+						     */
+
+  void readProductType(const string& value);        /* Interprets a symbolic
+						     * model checking mode.
+						     */
+
+  void readFormulaMode                              /* Interprets a symbolic */
+    (FormulaMode& target, const string& mode);      /* formula mode.
+						     */
+
+  void readStateSpaceMode(const string& mode);      /* Initializes
+						     * `global_options.
+						     *    statespace_generation
+						     *      _mode' from a
+						     * symbolic mode
+						     * identifier.
+						     */
+
+  void readTranslatorTimeout(const string& value);  /* Initializes
+						     * `global_options.
+						     *    translator_timeout'
+						     * from a symbolic time
+						     * specification.
 						     */
 
   double operatorProbability                        /* Computes the         */
@@ -529,6 +599,97 @@ private:
 						     * formula of size `n'.
 						     */
 };
+
+
+
+/******************************************************************************
+ *
+ * Declarations for functions and variables provided by the parser.
+ *
+ *****************************************************************************/
+
+extern int config_file_line_number;                 /* Number of the current
+						     * line in the
+						     * configuration file.
+						     */
+
+extern int parseConfiguration                       /* Parser interface. */
+  (FILE*, Configuration&);
+
+
+
+/******************************************************************************
+ *
+ * Inline function definitions for class Configuration.
+ *
+ *****************************************************************************/
+
+/* ========================================================================= */
+inline bool Configuration::isInternalAlgorithm(unsigned long int id) const
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Tests whether a given algorithm identifier refers to lbtt's
+ *                internal model checking algorithm.
+ *
+ * Argument:      id  --  Identifier to test.
+ *
+ * Returns:       True if `id' is the identifier of lbtt's internal model
+ *                checking algorithm.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  return ((global_options.statespace_generation_mode & Configuration::PATH)
+	  && id == algorithms.size() - 1);
+}
+
+
+
+/******************************************************************************
+ *
+ * Template function definitions for class Configuration.
+ *
+ *****************************************************************************/
+
+/* ========================================================================= */
+template<typename T>
+void Configuration::readInteger
+  (T& target, const string& value, const IntegerRange& range)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Reads an integer and stores it into `target'.
+ *
+ * Arguments:     target  --  A reference to an unsigned integer type variable
+ *                            for storing the result.
+ *                value   --  The integer as a string.
+ *                range   --  A reference to a constant IntegerRange object
+ *                            giving the bounds for the value.
+ *
+ * Returns:       Nothing; the result is stored into `target'.  The function
+ *                throws a ConfigurationException if `value' is not a valid
+ *                integer within the bounds specified by `range'.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  string error;
+  unsigned long int val;
+
+  try
+  {
+    val = ::StringUtil::parseNumber(value);
+  }
+  catch (const ::StringUtil::NotANumberException&)
+  {
+    error = "`" + value + "' is not a valid nonnegative integer";
+  }
+
+  if (error.empty() && (val < range.min || val > range.max))
+    error = range.error_message;
+
+  if (!error.empty())
+    throw ConfigurationException(config_file_line_number, error);
+
+  target = val;
+}
 
 
 

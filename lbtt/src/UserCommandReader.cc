@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,10 +17,6 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifdef __GNUC__
-#pragma implementation
-#endif /* __GNUC__ */
-
 #include <config.h>
 #include <csignal>
 #include <cstdio>
@@ -32,7 +28,6 @@
 #include <strstream>
 #endif /* HAVE_SSTREAM */
 #include "DispUtil.h"
-#include "ProductAutomaton.h"
 #include "SharedTestData.h"
 #include "StatDisplay.h"
 #include "StringUtil.h"
@@ -49,6 +44,13 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif /* HAVE_READLINE */
+
+#ifdef HAVE_ISATTY
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif /* HAVE_UNISTD_H */
+#endif /* HAVE_ISATTY */
+
 
 
 /******************************************************************************
@@ -84,7 +86,7 @@ void executeUserCommands()
  * ------------------------------------------------------------------------ */
 {
   string input_line;
-  vector<string, ALLOC(string) > input_tokens;
+  vector<string> input_tokens;
   TokenType token;
 
   bool formula_type = true;
@@ -115,9 +117,6 @@ void executeUserCommands()
   {
 #endif  /* HAVE_READLINE */
 
-  ProductAutomaton* product_automaton = 0;
-  pair<unsigned long int, bool> last_computed_product_automaton;
-
   signal(SIGPIPE, SIG_IGN);
 
   while (1)
@@ -131,47 +130,86 @@ void executeUserCommands()
 	input_line = line;
       else
       {
-	round_info.cout << '\n';
-	round_info.cout.flush();
-      }
 #else
       round_info.cout << prompt;
       round_info.cout.flush();
       getline(cin, input_line, '\n');
       if (cin.eof())
       {
-	round_info.cout << '\n';
-	round_info.cout.flush();
 	cin.clear();
+#endif /* HAVE_READLINE */
+#ifdef HAVE_ISATTY
+	/*
+	 *  If standard input is not bound to a terminal, act on EOF as if the
+	 *  `continue' command had been issued. Otherwise act as if an empty
+	 *  line was given as input.
+	 */
+	if (!isatty(STDIN_FILENO))
+	  input_line = "continue";
+	else
+	{
+	  round_info.cout << '\n';
+	  round_info.cout.flush();
+	}
+#else
+	input_line = "continue";
+	round_info.cout << input_line << '\n';
+	round_info.cout.flush();
+#endif /* HAVE_ISATTY */
+      }
+
+#ifdef HAVE_ISATTY
+      if (!isatty(STDIN_FILENO))
+      {
+	round_info.cout << input_line << '\n';
+	round_info.cout.flush();
+      }
+#endif /* HAVE_ISATTY */
+
+#ifdef HAVE_READLINE
+      if (line != static_cast<char*>(0)    /* line may be 0 on EOF */
+	  && input_line.find_first_not_of(" \t") != string::npos)
+      {
+	add_history(line);
+	free(line);
       }
 #endif  /* HAVE_READLINE */
 
+      /*
+       *  If the input line contains an unescaped pipe symbol ('|') outside
+       *  quotes, extract an external command from the line.
+       */
+
       external_command = "";
-      string::size_type pipe_pos = input_line.find_first_of('|');
-      if (pipe_pos != string::npos)
+      string::size_type pos
+	= findInQuotedString(input_line, "|", OUTSIDE_QUOTES);
+
+      if (pos != string::npos)
       {
 	string::size_type nonspace_pos
-	  = input_line.find_first_not_of(" \t", pipe_pos + 1);
+	  = input_line.find_first_not_of(" \t", pos + 1);
 	if (nonspace_pos != string::npos)
 	{
 	  external_command = input_line.substr(nonspace_pos);
-	  input_line = input_line.substr(0, pipe_pos);
+	  input_line = input_line.substr(0, pos);
 	}
       }
 
-      sliceString(input_line, " \t", input_tokens);
+      sliceString(substituteInQuotedString(input_line, " \t", "\n\n",
+					   OUTSIDE_QUOTES),
+		  "\n",
+		  input_tokens);
 
       user_break = false;
+
+      if (!input_tokens.empty() || !external_command.empty())
+      {
+	round_info.cout << '\n';
+	round_info.cout.flush();
+      }
       
       if (!input_tokens.empty())
       {
-#ifdef HAVE_READLINE
-	add_history(line);
-	free(line);
-#endif  /* HAVE_READLINE */
-        round_info.cout << '\n';
-	round_info.cout.flush();
-
         token = parseCommand(input_tokens[0]);
 
         if (token == CONTINUE || token == SKIP)
@@ -192,9 +230,7 @@ void executeUserCommands()
 	  {
 	    bool all_algorithms_disabled = true;
 
-	    for (vector<Configuration::AlgorithmInformation,
-                        ALLOC(Configuration::AlgorithmInformation) >
-		   ::const_iterator
+	    for (vector<Configuration::AlgorithmInformation>::const_iterator
 		   algorithm = configuration.algorithms.begin();
 		 algorithm != configuration.algorithms.end();
 		 ++algorithm)
@@ -379,8 +415,7 @@ void executeUserCommands()
           case BUCHIANALYZE :
             verifyArgumentCount(input_tokens, 2, 2);
             printAutomatonAnalysisResults(*output_stream, indent,
-					  parseNumber(input_tokens[1]),
-					  parseNumber(input_tokens[2]));
+					  input_tokens);
             if (output_file != 0)
               round_info.cout << "  Büchi automaton intersection emptiness "
 		                 "check analysis";
@@ -403,8 +438,8 @@ void executeUserCommands()
             break;
 
           case FORMULA :
-            verifyArgumentCount(input_tokens, 0, 0);
-            printFormula(*output_stream, indent, formula_type);
+            verifyArgumentCount(input_tokens, 0, 1);
+            printFormula(*output_stream, indent, formula_type, input_tokens);
             if (output_file != 0)
               round_info.cout << string("  ") + (formula_type
 						 ? "Formula"
@@ -431,8 +466,7 @@ void executeUserCommands()
           case RESULTANALYZE :
             verifyArgumentCount(input_tokens, 2, 3);
             printCrossComparisonAnalysisResults
-	      (*output_stream, indent, formula_type, input_tokens,
-	       product_automaton, last_computed_product_automaton);
+	      (*output_stream, indent, formula_type, input_tokens);
             if (output_file != 0)
               round_info.cout << "  Model checking result cross-comparison "
                                  "analysis";
@@ -474,8 +508,8 @@ void executeUserCommands()
             break;
 
           default :
-            throw CommandErrorException("Unknown command (`"
-                                        + input_tokens[0] + "').");
+            throw CommandErrorException("Unknown command (`" + input_tokens[0]
+					+ "').");
         }
 
 	if (output_string != 0)
@@ -486,21 +520,17 @@ void executeUserCommands()
 	  FILE* output_pipe = popen(external_command.c_str(), "w");
 	  if (output_pipe == NULL)
 	    throw ExecFailedException(external_command);
-	  int status = fputs(outstring.c_str(), output_pipe);
-	  if (status != EOF)
-	    fflush(output_pipe);
+	  fputs(outstring.c_str(), output_pipe);
 	  pclose(output_pipe);
-	  round_info.cout << '\n';
-	  round_info.cout.flush();
-	  if (status == EOF)
-	    throw IOException("Error writing to pipe.");
 	}
-	else if (output_file != 0)
+	else
 	{
-	  round_info.cout << string(redirection_info.second
-				    ? " appended"
-				    : " written")
-	                     + " to `" + redirection_info.first + "'.\n\n";
+	  if (output_file != 0)
+	    round_info.cout << string(redirection_info.second
+				      ? " appended"
+				      : " written")
+	                       + " to `" + redirection_info.first + "'.\n";
+	  round_info.cout << '\n';
 	  round_info.cout.flush();
 	}
       }
@@ -533,16 +563,6 @@ void executeUserCommands()
     }
   }
 
-  if (product_automaton != 0)
-  {
-    ::DispUtil::printText
-      ("<cleaning up memory allocated for product automaton>", 4, 2);
-
-    delete product_automaton;
-
-    ::DispUtil::printText(" ok\n", 4);
-  }
-
 #ifdef HAVE_READLINE
   }
   catch (...)
@@ -555,7 +575,7 @@ void executeUserCommands()
 #endif  /* HAVE_READLINE */
 
   signal(SIGPIPE, SIG_DFL);
-}      
+}
 
 /* ========================================================================= */
 TokenType parseCommand(const string& token)
@@ -570,19 +590,6 @@ TokenType parseCommand(const string& token)
  *
  * ------------------------------------------------------------------------- */
 {
-
-/*
- * gcc versions prior to version 3 do not conform to the C++ standard in their
- * support for the string::compare functions. Use a macro to fix this if
- * necessary.
- */
-
-#ifdef __GNUC__
-#if __GNUC__ < 3
-#define compare(start,end,str,dummy) compare(str,start,end)
-#endif
-#endif
-
   TokenType token_type = UNKNOWN;
   string::size_type len = token.length();
   bool ambiguous = false;
@@ -679,8 +686,19 @@ TokenType parseCommand(const string& token)
       break;
 
     case 'i' :
-      if (token.compare(1, len - 1, "nconsistencies", len - 1) == 0)
-        token_type = INCONSISTENCIES;
+      if (len < 2)
+	ambiguous = true;
+      else if (token[1] == 'm')
+      {
+	if (token.compare(2, len - 2, "plementations", len - 2) == 0)
+	  token_type = ALGORITHMS;
+      }
+      else if (token[1] == 'n')
+      {
+	if (token.compare(2, len - 2, "consistencies", len - 2) == 0)
+	  token_type = INCONSISTENCIES;
+      }
+
       break;
 
     case 'q' :
@@ -760,6 +778,11 @@ TokenType parseCommand(const string& token)
       }
       break;
 
+    case 't' :
+      if (token.compare(1, len - 1, "ranslators", len - 1) == 0)
+	token_type = ALGORITHMS;
+      break;
+
     case 'v' :
       if (token.compare(1, len - 1, "erbosity", len - 1) == 0)
         token_type = VERBOSITY;
@@ -770,19 +793,12 @@ TokenType parseCommand(const string& token)
     throw CommandErrorException("Ambiguous command.");
 
   return token_type;
-
-#ifdef __GNUC__
-#if __GNUC__ < 3
-#undef compare
-#endif
-#endif
 }
 
 /* ========================================================================= */
 void verifyArgumentCount
-  (const vector<string, ALLOC(string) >& command,
-   vector<string, ALLOC(string) >::size_type min_arg_count,
-   vector<string, ALLOC(string) >::size_type max_arg_count)
+  (const vector<string>& command, vector<string>::size_type min_arg_count,
+   vector<string>::size_type max_arg_count)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Verifies that the number of arguments given for a user
@@ -805,8 +821,7 @@ void verifyArgumentCount
 }
 
 /* ========================================================================= */
-pair<string, bool> parseRedirection
-  (vector<string, ALLOC(string) >& input_tokens)
+pair<string, bool> parseRedirection(vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Tests whether the last argument to a user command specifies
@@ -840,13 +855,13 @@ pair<string, bool> parseRedirection
 	  if (token.length() > 2)
           {
 	    append = true;
-	    filename = token.substr(2);
+	    filename = unquoteString(token.substr(2));
 	    input_tokens.pop_back();
 	  }
 	}
         else
 	{
-          filename = token.substr(1);
+          filename = unquoteString(token.substr(1));
 	  input_tokens.pop_back();
 	}
       }
@@ -855,10 +870,9 @@ pair<string, bool> parseRedirection
     {
       string& token = *(input_tokens.rbegin() + 1);
 
-      if (token[0] == '>' && (token.length() == 1
-                              || (token.length() == 2 && token[1] == '>')))
+      if (token == ">" || token == ">>")
       {
-        filename = input_tokens.back();
+        filename = unquoteString(input_tokens.back());
         append = (token.length() == 2);
         input_tokens.pop_back();
         input_tokens.pop_back();
@@ -870,7 +884,7 @@ pair<string, bool> parseRedirection
 }
 
 /* ========================================================================= */
-bool parseFormulaType(vector<string, ALLOC(string) >& input_tokens)
+bool parseFormulaType(vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Tests whether the first argument of a command specifies a
@@ -894,8 +908,7 @@ bool parseFormulaType(vector<string, ALLOC(string) >& input_tokens)
   {
     formula_type = (input_tokens[1] != "-");
 
-    if (input_tokens[1].length() == 1
-        && (input_tokens[1][0] == '+' || input_tokens[1][0] == '-'))
+    if (input_tokens[1] == "+" || input_tokens[1] == "-")
       input_tokens.erase(input_tokens.begin());
   }
 

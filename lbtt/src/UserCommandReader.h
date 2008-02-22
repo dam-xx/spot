@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -65,22 +65,19 @@ TokenType parseCommand(const string& token);        /* Translates a command
 						     */
 
 void verifyArgumentCount                            /* Checks that the      */
-  (const vector<string, ALLOC(string) >&            /* number of arguments  */
-     arguments,                                     /* for a command is     */
-   vector<string, ALLOC(string) >::size_type        /* within given limits. */
-     min_arg_count,       
-   vector<string, ALLOC(string) >::size_type
-     max_arg_count);
+  (const vector<string>& arguments,                 /* number of arguments  */
+   vector<string>::size_type min_arg_count,         /* for a command is     */
+   vector<string>::size_type max_arg_count);        /* within given limits. */
 
 pair<string, bool> parseRedirection                 /* Checks whether an  */
-  (vector<string, ALLOC(string) >& input_tokens);   /* user command given
+  (vector<string>& input_tokens);                   /* user command given
                                                      * will require
                                                      * redirecting its
 						     * output to a file.
 						     */
 
 bool parseFormulaType                               /* Checks whether an     */
-  (vector<string, ALLOC(string) >& input_tokens);   /* user command
+  (vector<string>& input_tokens);                   /* user command
 						     * specified a positive
 						     * or a negative
 						     * formula.

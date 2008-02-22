@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License

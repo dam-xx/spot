@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,10 +19,6 @@
 
 #ifndef DISPUTIL_H
 #define DISPUTIL_H
-
-#ifdef __GNUC__
-#pragma interface
-#endif /* __GNUC__ */
 
 #include <config.h>
 #include <iostream>
@@ -62,6 +58,16 @@ void printTextBlock                                 /* Writes an indented */
 						     * a stream.
 						     */
 
+ bool printText                                     /* "Verbosity-aware"     */
+   (const char* text,                               /* functions for writing */
+    const int verbosity_threshold,                  /* text to standard      */
+    const int indent);                              /* output.               */
+
+ bool printText
+   (const string& text,
+    const int verbosity_threshold,
+    const int indent);
+
 
 
 /******************************************************************************
@@ -82,16 +88,6 @@ struct StreamFormatting
 						   * e.g. the justification
 						   * of output.
 						   */
-
-  bool printText                                  /* "Verbosity-aware"     */
-    (const char* text,                            /* functions for writing */
-     const int verbosity_threshold,               /* text to standard      */
-     const int indent);                           /* output.               */
-
-  bool printText
-    (const string& text,
-     const int verbosity_threshold,
-     const int indent);
 };
 
 

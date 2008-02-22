@@ -180,11 +180,11 @@ int main(int argc, char** argv)
 
       case OPT_VERSION :
 	cout << "lbtt-translate " PACKAGE_VERSION "\n"
-		"lbtt-translate is free software; you may change and "
-		"redistribute it under the\n"
-		"terms of the GNU General Public License. lbtt-translate "
-		"comes with NO WARRANTY.\n"
-		"See the file COPYING for details.\n";
+	        "lbtt-translate is free software; you may change and "
+	        "redistribute it under the\n"
+	        "terms of the GNU General Public License. lbtt-translate "
+	        "comes with NO WARRANTY.\n"
+	        "See the file COPYING for details.\n";
 	exit(0);
 	break;
 

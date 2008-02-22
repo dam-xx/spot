@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -393,8 +393,8 @@ public:
   typedef ProductEdgeCollection EdgeContainerType;  /* required for making */
 						    /* Product<Operations> */
   struct PathElement;				    /* suitable for        */
-  typedef deque<PathElement, ALLOC(PathElement) >   /* instantiating the   */
-    Path;					    /* SccCollection
+  typedef deque<PathElement> Path;                  /* instantiating the
+                                                     * SccCollection
 						     * template (see
 						     * SccCollection.h).
 						     */
@@ -419,9 +419,7 @@ private:
           Graph<GraphEdgeContainer>::Path >& cycle, /* segment of the cycle */
      size_type source_state_id, Edge transition,    /* in a witness for the */
      const size_type root_id,                       /* nonemptiness of the  */
-     const map<size_type, PathElement,              /* product.             */
-               less<size_type>,
-               ALLOC(PathElement) >&
+     const map<size_type, PathElement>&             /* product.             */
        predecessor) const;
 
   Operations operations;                            /* Operations for
@@ -524,8 +522,8 @@ public:
 						     */
 
 private:
-  const Graph<GraphEdgeContainer>::Edge* edge_1;    /* Components of the */
-  const Graph<GraphEdgeContainer>::Edge* edge_2;    /* transition.       */
+  GraphEdgeContainer::const_iterator edge_1;        /* Components of the */
+  GraphEdgeContainer::const_iterator edge_2;        /* transition.       */
 };
 
 
@@ -655,9 +653,10 @@ protected:
 						     * acceptance sets.
 						     */
 
-  typedef deque<AcceptanceStackElement,             /* Stack formed from */
-                ALLOC(AcceptanceStackElement) >     /* the above         */
-    AcceptanceStack;                                /* associations.     */
+  typedef deque<AcceptanceStackElement>             /* Stack formed from */
+    AcceptanceStack;                                /* the above
+                                                     * associations.
+						     */
 
   AcceptanceStack acceptance_stack;                 /* Stack for storing the
 						     * dfs numbers of roots
@@ -877,9 +876,9 @@ private:
 						     * reachable.
 						     */
 
-  set<size_type, less<size_type>,                   /* Set of states from    */
-      ALLOC(size_type) >                            /* which an accepting    */
-    reachability_info;                              /* component is known to
+  set<size_type> reachability_info;                 /* Set of states from
+                                                     * which an accepting
+                                                     * component is known to
 						     * be reachable in the
 						     * product.
 						     */
@@ -928,9 +927,9 @@ public:
 
   ~AcceptingComponentFinder();                      /* Destructor. */
 
-  typedef set<size_type, less<size_type>,           /* Type definition for  */
-              ALLOC(size_type) >                    /* the set of product   */
-    SccType;                                        /* state identifiers in
+  typedef set<size_type> SccType;                   /* Type definition for
+                                                     * the set of product
+                                                     * state identifiers in
 						     * an accepting
 						     * strongly connected
 						     * component.
@@ -1369,10 +1368,9 @@ void Product<Operations>::findWitness
       unsigned long int number_of_collected_acceptance_sets
 	= collected_acceptance_sets.count(number_of_acceptance_sets);
 
-      deque<size_type, ALLOC(size_type) > search_queue;
-      set<size_type, less<size_type>, ALLOC(size_type) > visited;
-      map<size_type, PathElement, less<size_type>, ALLOC(PathElement) >
-	shortest_path_predecessor;
+      deque<size_type> search_queue;
+      set<size_type> visited;
+      map<size_type, PathElement> shortest_path_predecessor;
 
       size_type bfs_root = search_start_state;
 
@@ -1475,8 +1473,7 @@ void Product<Operations>::addCycleSegment
   (pair<Graph<GraphEdgeContainer>::Path, Graph<GraphEdgeContainer>::Path>&
      cycle,
    size_type source_state_id, Edge transition, const size_type root_id,
-   const map<size_type, PathElement, less<size_type>, ALLOC(PathElement) >&
-     predecessor) const
+   const map<size_type, PathElement>& predecessor) const
 /* ----------------------------------------------------------------------------
  *
  * Description:   Helper function for constructing a segment of an accepting
@@ -1598,7 +1595,7 @@ template <class Operations>
 inline Product<Operations>::ProductEdge::ProductEdge
   (const GraphEdgeContainer::const_iterator& e1,
    const GraphEdgeContainer::const_iterator& e2)
-  : edge_1(*e1), edge_2(*e2)
+  : edge_1(e1), edge_2(e2)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Constructor for class Product<Operations>::ProductEdge.
@@ -1643,7 +1640,7 @@ Product<Operations>::ProductEdge::firstComponent() const
  *
  * ------------------------------------------------------------------------- */
 {
-  return *edge_1;
+  return **edge_1;
 }
 
 /* ========================================================================= */
@@ -1662,7 +1659,7 @@ Product<Operations>::ProductEdge::secondComponent() const
  *
  * ------------------------------------------------------------------------- */
 {
-  return *edge_2;
+  return **edge_2;
 }
 
 /* ========================================================================= */
@@ -1679,7 +1676,7 @@ Product<Operations>::ProductEdge::targetNode() const
  *
  * ------------------------------------------------------------------------- */
 {
-  return product->stateId(edge_1->targetNode(), edge_2->targetNode());
+  return product->stateId((*edge_1)->targetNode(), (*edge_2)->targetNode());
 }
 
 

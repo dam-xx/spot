@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -142,18 +142,16 @@ private:
 						     * automata.
 						     */
 
-  typedef map< ::Ltl::LtlFormula*, bool,            /* Type definition for   */
-              less< ::Ltl::LtlFormula*>,            /* storing information   */
-              ALLOC(bool) >                         /* about the             */
-    SatisfiabilityMapping;                          /* satisfiability of the
+  typedef map< ::Ltl::LtlFormula*, bool>            /* Type definition for   */
+    SatisfiabilityMapping;                          /* storing information
+                                                     * about the
+                                                     * satisfiability of the
 						     * guards of product
 						     * transitions.
 						     */
 
   static map< ::Ltl::LtlFormula*,                   /* Result cache for      */
-             SatisfiabilityMapping,                 /* satisfiability tests. */
-             less< ::Ltl::LtlFormula*>,
-             ALLOC(SatisfiabilityMapping) >
+             SatisfiabilityMapping>                 /* satisfiability tests. */
     sat_cache;
 };
 

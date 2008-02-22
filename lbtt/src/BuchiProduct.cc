@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -28,8 +28,7 @@ namespace Graph
  *
  *****************************************************************************/
 
-map< ::Ltl::LtlFormula*, BuchiProduct::SatisfiabilityMapping,
-    less< ::Ltl::LtlFormula*>, ALLOC(BuchiProduct::SatisfiabilityMapping) >
+map< ::Ltl::LtlFormula*, BuchiProduct::SatisfiabilityMapping>
   BuchiProduct::sat_cache;
 
 
@@ -73,8 +72,7 @@ bool BuchiProduct::synchronizable
     guard_1 = swap_guard;
   }
 
-  map<LtlFormula*, SatisfiabilityMapping, less<LtlFormula*>,
-      ALLOC(SatisfiabilityMapping) >::iterator
+  map<LtlFormula*, SatisfiabilityMapping>::iterator
     sat_cache_element = sat_cache.find(guard_1);
 
   if (sat_cache_element == sat_cache.end())

@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -16,10 +16,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
-#ifdef __GNUC__
-#pragma implementation
-#endif /* __GNUC__ */
 
 #include <config.h>
 #include <map>
@@ -148,8 +144,7 @@ void StateSpace::clear()
   initial_state = 0;
 
 #ifdef HAVE_OBSTACK_H
-  for (vector<Node*, ALLOC(Node*) >::iterator state = nodes.begin();
-       state != nodes.end();
+  for (vector<Node*>::iterator state = nodes.begin(); state != nodes.end();
        ++state)
     static_cast<State*>(*state)->~State();
 

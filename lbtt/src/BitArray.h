@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,10 +19,6 @@
 
 #ifndef BITARRAY_H
 #define BITARRAY_H
-
-#ifdef __GNUC__
-#pragma interface
-#endif /* __GNUC__ */
 
 #include <config.h>
 #include <cstring>
@@ -363,7 +359,10 @@ inline void BitArray::set(const unsigned long int bit_count)
  *
  * ------------------------------------------------------------------------- */
 {
-  memset(static_cast<void*>(bits), 0xFF, (bit_count + 7) >> 3);  
+  unsigned long int bsize = bit_count >> 3;
+  memset(static_cast<void*>(bits), 0xFF, bsize);
+  if ((bit_count & 0x07) != 0)
+    bits[bsize] |= (1 << (bit_count & 7)) - 1;
 }
 
 /* ========================================================================= */
@@ -394,7 +393,10 @@ inline void BitArray::clear(const unsigned long int bit_count)
  *
  * ------------------------------------------------------------------------- */
 {
-  memset(static_cast<void*>(bits), 0, (bit_count + 7) >> 3);
+  unsigned long int bsize = bit_count >> 3;
+  memset(static_cast<void*>(bits), 0, bsize);
+  if ((bit_count & 0x07) != 0)
+    bits[bsize] &= ~((1 << (bit_count & 7)) - 1);
 }
 
 /* ========================================================================= */

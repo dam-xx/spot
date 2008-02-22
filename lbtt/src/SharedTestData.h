@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -42,14 +42,14 @@ extern TestRoundInfo round_info;                    /* Data structure for
 						     * round.
 						     */
 
-extern vector<AlgorithmTestResults,                 /* Test results for each */
-              ALLOC(AlgorithmTestResults) >         /* implementation.       */
-  test_results;
+extern vector<AlgorithmTestResults> test_results;   /* Test results for each
+                                                     * implementation.
+						     */
 
-extern vector<TestStatistics,                       /* Overall test        */
-              ALLOC(TestStatistics) >               /* statistics for each */
-  final_statistics;                                 /* implementation.     */
-
+extern vector<TestStatistics> final_statistics;     /* Overall test
+                                                     * statistics for each
+                                                     * implementation.
+						     */
 }
 
 #endif /* !SHAREDTESTDATA_H */

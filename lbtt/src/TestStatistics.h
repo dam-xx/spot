@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -23,16 +23,16 @@
 #include <config.h>
 #include <utility>
 #include <vector>
+#include "EdgeContainer.h"
+#include "Graph.h"
 #include "LbttAlloc.h"
 #include "BuchiAutomaton.h"
 #include "Configuration.h"
-#include "ProductAutomaton.h"
 #include "StateSpace.h"
 
 using namespace std;
 using Graph::BuchiAutomaton;
 using Graph::StateSpace;
-using Graph::ProductAutomaton;
 
 /******************************************************************************
  *
@@ -43,9 +43,8 @@ using Graph::ProductAutomaton;
 struct AutomatonStats
 {
   explicit AutomatonStats                           /* Constructor. */
-    (vector<Configuration::AlgorithmInformation,
-            ALLOC(Configuration::AlgorithmInformation) >
-     ::size_type number_of_algorithms,
+    (vector<Configuration::AlgorithmInformation>
+       ::size_type number_of_algorithms,
      StateSpace::size_type max_statespace_size);
 
   /* default copy constructor */
@@ -107,7 +106,7 @@ struct AutomatonStats
                                                      * Büchi automaton.
 						     */
 
-  ProductAutomaton::size_type                       /* Number of stats in a */
+  ::Graph::Graph<GraphEdgeContainer>::size_type     /* Number of stats in a */
     number_of_product_states;                       /* product automaton.   */
 
   unsigned long int number_of_product_transitions;  /* Number of transitions in
@@ -127,9 +126,9 @@ struct AutomatonStats
   typedef pair<bool, unsigned long int>
     CrossComparisonStats;
 
-  vector<CrossComparisonStats,                      /* Emptiness check       */
-         ALLOC(CrossComparisonStats) >              /* cross-comparison      */
-    cross_comparison_stats;                         /* results. The `first'
+  vector<CrossComparisonStats>                      /* Emptiness check       */
+    cross_comparison_stats;                         /* cross-comparison
+                                                     * results. The `first'
                                                      * element of the pair
                                                      * tells whether a cross-
                                                      * comparison with a given
@@ -142,8 +141,8 @@ struct AutomatonStats
                                                      * differ.
 						     */
 
-  vector<int, ALLOC(int) >                          /* Büchi automaton       */
-    buchi_intersection_check_stats;                 /* intersection
+  vector<int> buchi_intersection_check_stats;       /* Büchi automaton
+                                                     * intersection
                                                      * emptiness check
 						     * results. The elements
 						     * of the vector tell
@@ -173,8 +172,7 @@ struct AutomatonStats
 struct AlgorithmTestResults
 {
   explicit AlgorithmTestResults                     /* Constructor. */
-    (vector<Configuration::AlgorithmInformation,
-            ALLOC(Configuration::AlgorithmInformation) >
+    (vector<Configuration::AlgorithmInformation>
        ::size_type
        number_of_algorithms,
      StateSpace::size_type max_statespace_size);
@@ -214,8 +212,8 @@ struct AlgorithmTestResults
                                                      * check.
 						     */
 
-  vector<AutomatonStats, ALLOC(AutomatonStats) >    /* A two-element vector */
-    automaton_stats;                                /* storing test results
+  vector<AutomatonStats> automaton_stats;           /* A two-element vector
+                                                     * storing test results
                                                      * for an algorithm.
 						     */
 };
@@ -232,8 +230,7 @@ struct AlgorithmTestResults
 struct TestStatistics
 {
   explicit TestStatistics                           /* Constructor. */
-    (vector<TestStatistics,
-            ALLOC(TestStatistics) >::size_type
+    (vector<TestStatistics>::size_type
        number_of_algorithms);
 
   /* default copy constructor */
@@ -270,29 +267,21 @@ struct TestStatistics
                                                      * checks performed.
 						     */
 
-  unsigned long int                                 /* Total number of   */
-    total_number_of_buchi_states[2];                /* states in all the
-                                                     * generated Büchi
-                                                     * automata.
+  BIGUINT total_number_of_buchi_states[2];          /* Total number of states
+                                                     * in all the generated
+                                                     * Büchi automata.
 						     */
 
-  unsigned long int                                 /* Total number of     */
-    total_number_of_buchi_transitions[2];           /* transitions in all
+  BIGUINT total_number_of_buchi_transitions[2];     /* Total number of
+                                                     * transitions in all
                                                      * the generated Büchi
                                                      * automata.
 						     */
 
-  unsigned long int                                 /* Total number of sets */
-    total_number_of_acceptance_sets[2];             /* of accepting states
-						     * in all the generated
-						     * Büchi automata.
-						     */
-
-  unsigned long int                                 /* Total number of      */
-    total_number_of_msccs[2];                       /* maximal strongly
-						     * connected components
-                                                     * in the generated
-                                                     * Büchi automata.
+  BIGUINT total_number_of_acceptance_sets[2];       /* Total number of sets of
+                                                     * accepting states in all
+						     * the generated Büchi
+						     * automata.
 						     */
 
   double total_buchi_generation_time[2];            /* Total time used when
@@ -300,36 +289,37 @@ struct TestStatistics
                                                      * automata.
 						     */
 
-  unsigned long int                                 /* Total number of   */
-    total_number_of_product_states[2];              /* states in all the 
+  BIGUINT total_number_of_product_states[2];        /* Total number of states
+                                                     * in all the generated
+                                                     * product automata.
+						     */
+
+  BIGUINT total_number_of_product_transitions[2];   /* Total number of
+                                                     * transitions in all the
                                                      * generated product
                                                      * automata.
 						     */
 
-  unsigned long int                                 /* Total number of      */
-    total_number_of_product_transitions[2];         /* transitions in all the
-                                                     * generated product
-                                                     * automata.
+  vector<unsigned long int>                         /* Number of failed */
+    cross_comparison_mismatches;                    /* result cross-
+                                                     * comparisons.
 						     */
 
-  vector<unsigned long int,                         /* Number of failed */
-         ALLOC(unsigned long int) >                 /* result cross-    */
-    cross_comparison_mismatches;                    /* comparisons.     */
-
-  vector<unsigned long int,                         /* Number of failed     */
-         ALLOC(unsigned long int) >                 /* result cross-        */
-    initial_cross_comparison_mismatches;            /* comparisons in the
+  vector<unsigned long int>                         /* Number of failed     */
+    initial_cross_comparison_mismatches;            /* result cross-
+                                                     * comparisons in the
 						     * initial state of the
 						     * state space.
 						     */
 
-  vector<unsigned long int,                         /* Number of result  */
-         ALLOC(unsigned long int) >                 /* cross-comparisons */
-    cross_comparisons_performed;                    /* performed.        */
+  vector<unsigned long int>                         /* Number of result  */
+    cross_comparisons_performed;                    /* cross-comparisons
+                                                     * performed.
+						     */
 
-  vector<unsigned long int,                         /* Number of failed     */
-         ALLOC(unsigned long int) >                 /* Büchi automaton      */
-    buchi_intersection_check_failures;              /* emptiness checks
+  vector<unsigned long int>                         /* Number of failed     */
+    buchi_intersection_check_failures;              /* Büchi automaton
+                                                     * emptiness checks
 						     * against the automata
 						     * constructed from the
 						     * negated formula
@@ -337,9 +327,9 @@ struct TestStatistics
 						     * algorithms.
 						     */
 
-  vector<unsigned long int,                         /* Number of Büchi       */
-         ALLOC(unsigned long int) >                 /* automaton emptiness   */
-    buchi_intersection_checks_performed;            /* checks performed
+  vector<unsigned long int>                         /* Number of Büchi       */
+    buchi_intersection_checks_performed;            /* automaton emptiness
+                                                     * checks performed
 						     * against the automata
 						     * constructed from the
 						     * negated formula using
@@ -357,9 +347,7 @@ struct TestStatistics
 
 /* ========================================================================= */
 inline AutomatonStats::AutomatonStats
-  (vector<Configuration::AlgorithmInformation,
-          ALLOC(Configuration::AlgorithmInformation) >::size_type
-     number_of_algorithms,
+  (vector<Configuration::AlgorithmInformation>::size_type number_of_algorithms,
    StateSpace::size_type max_statespace_size) :
   buchi_automaton(0), number_of_buchi_states(0),
   number_of_buchi_transitions(0), number_of_acceptance_sets(0),
@@ -481,9 +469,7 @@ AutomatonStats::buchiIntersectionCheckPerformed(unsigned long int algorithm)
 
 /* ========================================================================= */
 inline AlgorithmTestResults::AlgorithmTestResults
-  (vector<Configuration::AlgorithmInformation,
-          ALLOC(Configuration::AlgorithmInformation) >::size_type
-     number_of_algorithms,
+  (vector<Configuration::AlgorithmInformation>::size_type number_of_algorithms,
    StateSpace::size_type max_statespace_size) :
   consistency_check_result(-1), consistency_check_comparisons(0),
   failed_consistency_check_comparisons(0),
@@ -528,8 +514,7 @@ inline AlgorithmTestResults::~AlgorithmTestResults()
 
 /* ========================================================================= */
 inline TestStatistics::TestStatistics
-  (vector<TestStatistics, ALLOC(TestStatistics) >::size_type
-     number_of_algorithms) :
+  (vector<TestStatistics>::size_type number_of_algorithms) :
   consistency_check_failures(0), consistency_checks_performed(0),
   cross_comparison_mismatches(number_of_algorithms, 0),
   initial_cross_comparison_mismatches(number_of_algorithms, 0),
@@ -556,7 +541,6 @@ inline TestStatistics::TestStatistics
     total_number_of_buchi_states[i] = 0;
     total_number_of_buchi_transitions[i] = 0;
     total_number_of_acceptance_sets[i] = 0;
-    total_number_of_msccs[i] = 0;
     total_number_of_product_states[i] = 0;
     total_number_of_product_transitions[i] = 0;
     total_buchi_generation_time[i] = 0.0;

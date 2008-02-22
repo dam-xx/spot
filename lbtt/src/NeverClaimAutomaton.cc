@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -16,10 +16,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
-#ifdef __GNUC__
-#pragma implementation
-#endif /* __GNUC__ */
 
 #include <config.h>
 #include <cstdio>
@@ -66,8 +62,7 @@ void NeverClaimAutomaton::clear()
  *
  * ------------------------------------------------------------------------- */
 {
-  for (vector<StateInfo*, ALLOC(StateInfo*) >::iterator
-	 state = state_list.begin();
+  for (vector<StateInfo*>::iterator state = state_list.begin();
        state != state_list.end();
        ++state)
     delete (*state);
@@ -158,8 +153,7 @@ void NeverClaimAutomaton::write(const char* output_filename)
      *         `-1'.
      */
 
-    for (vector<StateInfo*, ALLOC(StateInfo*) >::const_iterator
-	   state = state_list.begin();
+    for (vector<StateInfo*>::const_iterator state = state_list.begin();
          state != state_list.end();
 	 ++state)
     {
@@ -167,7 +161,7 @@ void NeverClaimAutomaton::write(const char* output_filename)
                          + ((*state)->initial() ? "1" : "0") + ' '
                          + ((*state)->accepting() ? "0 " : "") + "-1\n";
 
-      for (multimap<Cstr, Cstr*, less<Cstr>, ALLOC(Cstr*) >::const_iterator
+      for (multimap<Cstr, Cstr*>::const_iterator
              transition = (*state)->transitions().begin();
            transition != (*state)->transitions().end(); ++transition)
       {
@@ -272,7 +266,7 @@ NeverClaimAutomaton::StateInfo::~StateInfo()
  *
  * ------------------------------------------------------------------------- */
 {
-  for (multimap<Cstr, Cstr*, less<Cstr>, ALLOC(Cstr*) >::const_iterator
+  for (multimap<Cstr, Cstr*>::const_iterator
          transition = state_transitions.begin();
        transition != state_transitions.end(); 
        ++transition)
@@ -312,7 +306,7 @@ ParseErrorException::ParseErrorException
   else
   {
     string space_string(msg.substr(0, error_pos));
-    for (string::size_type c = 0; c < msg.length(); c++)
+    for (string::size_type c = 0; c < space_string.length(); c++)
       if (space_string[c] != ' ' && space_string[c] != '\t')
 	space_string[c] = ' ';
 

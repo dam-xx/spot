@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -54,11 +54,11 @@ public:
 
   bool evaluate                                     /* Tests whether an      */
     (const LtlFormula& formula,                     /* LtlFormula holds in a */
-     const StateSpace& statespace,                  /* state space.          */
-     const vector<StateSpace::size_type,          
-                  ALLOC(StateSpace::size_type) >&
-       states_on_path,
-     StateSpace::size_type loop_state);
+     const StateSpace::Path& prefix,                /* path described by a   */
+     const StateSpace::Path& cycle,                 /* prefix and a cycle of */
+     const StateSpace& statespace);                 /* states from a state
+						     * space.
+						     */
 
   bool evaluate                                     /* Same as above. */
     (const LtlFormula& formula,
@@ -105,15 +105,15 @@ private:
 						     * the current path.
 						     */
 
-  vector<StateSpace::size_type,                     /* Correspondence        */
-         ALLOC(StateSpace::size_type) >             /* between states of the */
-    path_states;                                    /* path and the states
+  vector<StateSpace::size_type> path_states;        /* Correspondence
+                                                     * between states of the
+                                                     * path and the states
 						     * of the current state
 						     * space.
 						     */
 
   map<const LtlFormula*, BitArray*,                 /* Information about the */
-      LtlFormula::ptr_less, ALLOC(BitArray*) >      /* truth values of the   */
+      LtlFormula::ptr_less>                         /* truth values of the   */
     eval_info;                                      /* subformulae of the
 						     * formula to be
 						     * evaluated.

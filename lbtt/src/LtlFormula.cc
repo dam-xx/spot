@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,10 +17,6 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifdef __GNUC__
-#pragma implementation
-#endif /* __GNUC__ */
-
 #include <config.h>
 #include "FormulaWriter.h"
 #include "LtlFormula.h"
@@ -28,10 +24,8 @@
 namespace Ltl
 {
 
-map<LtlFormula*, unsigned long int,                 /* Shared storage for */
-    LtlFormula::ptr_less,                           /* LTL formulae.      */
-    ALLOC(unsigned long int) >
-  LtlFormula::formula_storage;
+set<LtlFormula*, LtlFormula::ptr_less>              /* Shared storage for */
+  LtlFormula::formula_storage;                      /* LTL formulae.      */
 
 unsigned long int                                   /* Upper limit for the */
   LtlFormula::eval_proposition_id_limit;            /* atomic proposition
@@ -41,8 +35,6 @@ unsigned long int                                   /* Upper limit for the */
 						     * formula in a given
 						     * truth assignment).
 						     */
-
-
 
 /******************************************************************************
  *
@@ -147,12 +139,10 @@ public:
 						     */
 
 private:
-  stack<LtlFormula*,
-        deque<LtlFormula*, ALLOC(LtlFormula*) > >
+  stack<LtlFormula*, deque<LtlFormula*> >
     formula_stack;
 
-  stack<bool, deque<bool, ALLOC(bool) > >
-    negation_stack;
+  stack<bool, deque<bool> > negation_stack;
 
   NnfConverter(const NnfConverter&);                /* Prevent copying and   */
   NnfConverter& operator=(const NnfConverter&);     /* assignment of
@@ -203,8 +193,7 @@ class SubformulaCollector
 public:
   SubformulaCollector                               /* Constructor. */
     (stack<const LtlFormula*,
-           deque<const LtlFormula*,
-                 ALLOC(const LtlFormula*) > >&
+           deque<const LtlFormula*> >&
        result_stack);
 
   ~SubformulaCollector();                           /* Destructor. */
@@ -216,8 +205,7 @@ public:
 
 private:
   stack<const LtlFormula*,                          /* Stack of subformulae. */
-        deque<const LtlFormula*,
-              ALLOC(const LtlFormula*) > >&
+        deque<const LtlFormula*> >&
     subformula_stack;
 
   SubformulaCollector(const SubformulaCollector&);  /* Prevent copying and */
@@ -389,9 +377,7 @@ inline void FormulaSizeCounter::operator()(const LtlFormula*, int)
 
 /* ========================================================================= */
 inline SubformulaCollector::SubformulaCollector
-  (stack<const LtlFormula*, deque<const LtlFormula*,
-                                  ALLOC(const LtlFormula*) > >&
-     result_stack) :
+  (stack<const LtlFormula*, deque<const LtlFormula*> >& result_stack) :
   subformula_stack(result_stack)
 /* ----------------------------------------------------------------------------
  *
@@ -773,9 +759,7 @@ unsigned long int LtlFormula::size() const
 
 /* ========================================================================= */
 void LtlFormula::collectSubformulae
-  (stack<const LtlFormula*, deque<const LtlFormula*,
-                                  ALLOC(const LtlFormula*) > >&
-     result_stack) const
+  (stack<const LtlFormula*, deque<const LtlFormula*> >& result_stack) const
 /* ----------------------------------------------------------------------------
  *
  * Description:   Collects the subformulae of a LtlFormula into a stack. After
@@ -877,193 +861,6 @@ Bitset LtlFormula::findPropositionalModel(long int max_atom) const
   }
 
   return model;
-}
-
-/* ========================================================================= */
-LtlFormula* LtlFormula::read(Exceptional_istream& stream)
-/* ----------------------------------------------------------------------------
- *
- * Description:   Recursively constructs an LtlFormula by parsing input from an
- *                exception-aware input stream.
- *
- * Argument:      stream  --  A reference to an exception-aware input stream.
- *
- * Returns:       The constructed LtlFormula.
- *
- * ------------------------------------------------------------------------- */
-{
-  string token;
-  LtlFormula* formula;
-
-  try
-  {
-    stream >> token;
-  }
-  catch (const IOException&)
-  {
-    if (static_cast<istream&>(stream).eof())
-      throw ParseErrorException("error parsing LTL formula (unexpected end of "
-				"input)");
-    else
-      throw ParseErrorException("error parsing LTL formula (I/O error)");
-  }
-
-  if (token[0] == 'p')
-  {
-    if (token.length() == 1)
-      throw ParseErrorException("error parsing LTL formula (unrecognized "
-				"token: `" + token + "')");
-
-    long int id;
-    char* endptr;
-
-    id = strtol(token.c_str() + 1, &endptr, 10);
-
-    if (*endptr != '\0' || id < 0 || id == LONG_MIN || id == LONG_MAX)
-      throw ParseErrorException("error parsing LTL formula (unrecognized "
-				"token: `" + token + "')");
-
-    formula = &Atom::construct(id);
-  }
-  else
-  {
-    if (token.length() > 1)
-      throw ParseErrorException("error parsing LTL formula (unrecognized "
-				"token: `" + token + "')");
-
-    switch (token[0])
-    {
-      case LTL_TRUE :
-	formula = &True::construct();
-	break;
-
-      case LTL_FALSE :
-	formula = &False::construct();
-	break;
-
-      case LTL_NEGATION :
-      case LTL_NEXT :
-      case LTL_FINALLY :
-      case LTL_GLOBALLY :
-	{
-	  LtlFormula* g = read(stream);
-
-	  try
-	  {
-	    switch (token[0])
-	    {
-	      case LTL_NEGATION :
-		formula = &Not::construct(g);
-		break;
-
-	      case LTL_NEXT :
-		formula = &Next::construct(g);
-		break;
-
-	      case LTL_FINALLY :
-		formula = &Finally::construct(g);
-		break;
-
-	      default : /* LTL_GLOBALLY */
-		formula = &Globally::construct(g);
-		break;
-	    }
-	  }
-	  catch (...)
-	  {
-	    LtlFormula::destruct(g);
-	    throw;
-	  }
-
-	  break;
-	}
-
-      case LTL_CONJUNCTION :
-      case LTL_DISJUNCTION :
-      case LTL_IMPLICATION :
-      case LTL_EQUIVALENCE :
-      case LTL_XOR :
-      case LTL_UNTIL :
-      case LTL_V :
-      case LTL_WEAK_UNTIL :
-      case LTL_STRONG_RELEASE :
-      case LTL_BEFORE :
-	{
-	  LtlFormula* g = read(stream);
-	  LtlFormula* h;
-
-	  try
-	  {
-	    h = read(stream);
-	  }
-	  catch (...)
-	  {
-	    LtlFormula::destruct(g);
-	    throw;
-	  }
-
-	  try
-	  {
-	    switch (token[0])
-	    {
-	      case LTL_CONJUNCTION :
-		formula = &And::construct(g, h);
-		break;
-
-	      case LTL_DISJUNCTION :
-		formula = &Or::construct(g, h);
-		break;
-
-	      case LTL_IMPLICATION :
-		formula = &Imply::construct(g, h);
-		break;
-
-	      case LTL_EQUIVALENCE :
-		formula = &Equiv::construct(g, h);
-		break;
-
-	      case LTL_XOR :
-		formula = &Xor::construct(g, h);
-		break;
-		
-	      case LTL_UNTIL :
-		formula = &Until::construct(g, h);
-		break;
-
-	      case LTL_V :
-		formula = &V::construct(g, h);
-		break;
-
-	      case LTL_WEAK_UNTIL :
-		formula = &WeakUntil::construct(g, h);
-		break;
-
-	      case LTL_STRONG_RELEASE :
-		formula = &StrongRelease::construct(g, h);
-		break;
-
-	      default : /* LTL_BEFORE */
-		formula = &Before::construct(g, h);
-		break;
-	    }
-	  }
-	  catch (...)
-	  {
-	    LtlFormula::destruct(g);
-	    LtlFormula::destruct(h);
-	    throw;
-	  }
-
-	  break;
-	}
-
-      default :
-	throw ParseErrorException("error parsing LTL formula (unrecognized "
-				  "token: `" + token + "')");
-    }
-  }
-
-  return formula;
 }
 
 /* ========================================================================= */

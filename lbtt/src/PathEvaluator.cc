@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -16,10 +16,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
-#ifdef __GNUC__
-#pragma implementation
-#endif /* __GNUC__ */
 
 #include <config.h>
 #include <deque>
@@ -53,9 +49,8 @@ void PathEvaluator::reset()
   current_loop_state = 0;
   path_states.clear();
 
-  for (map<const LtlFormula*, BitArray*, LtlFormula::ptr_less,
-	   ALLOC(BitArray*) >::iterator it
-	 = eval_info.begin();
+  for (map<const LtlFormula*, BitArray*, LtlFormula::ptr_less>::iterator
+	 it = eval_info.begin();
        it != eval_info.end();
        ++it)
     delete it->second;
@@ -65,26 +60,25 @@ void PathEvaluator::reset()
 
 /* ========================================================================= */
 bool PathEvaluator::evaluate
-  (const LtlFormula& formula, const StateSpace& statespace,
-   const vector<StateSpace::size_type, ALLOC(StateSpace::size_type) >&
-     states_on_path,
-   StateSpace::size_type loop_state)
+  (const LtlFormula& formula, const StateSpace::Path& prefix,
+   const StateSpace::Path& cycle, const StateSpace& statespace)
 /* ----------------------------------------------------------------------------
  *
- * Description:   Evaluates an LTL formula in a state space in which the states
- *                are connected into a non-branching sequence that ends in a
- *                loop.
+ * Description:   Evaluates an LTL formula in a path formed from a prefix and
+ *                an infinitely repeating cycle of states in a state space.
  *
- * Arguments:     formula         --  Formula to be evaluated.
- *                statespace      --  State space from which the path is
- *                                    extracted.
- *                states_on_path  --  Mapping between states in the path and
- *                                    the states in `statespace' such that
- *                                    `statespace[states_on_path[i]]'
- *                                    corresponds to the ith state of the path.
- *                loop_state      --  Number of the state in the path to which
- *                                    the ``last'' state of the path is
- *                                    connected.
+ * Arguments:     formula     --  Formula to be evaluated.
+ *                prefix      --  A StateSpace::Path object corresponding to
+ *                                the prefix of the path.  Only the state
+ *                                identifiers in the path elements are used;
+ *                                the function will not require `prefix' to
+ *                                actually represent a path in `statespace'.
+ *                cycle       --  A StateSpace::Path object corresponding to
+ *                                the infinitely repeating cycle.  Only the
+ *                                state identifiers in the path elements are
+ *                                relevant.
+ *                statespace  --  State space to which the state identifiers in
+ *                                `path' and `cycle' refer.
  *
  * Returns:       `true' if and only if the LTL formula holds in the path.
  *
@@ -92,13 +86,21 @@ bool PathEvaluator::evaluate
 {
   reset();
 
-  if (states_on_path.empty() || loop_state >= states_on_path.size())
+  if (cycle.empty())
     return false;
 
   current_formula = &formula;
   current_path = &statespace;
-  current_loop_state = loop_state;
-  path_states = states_on_path;
+  current_loop_state = prefix.size();
+  path_states.reserve(prefix.size() + cycle.size());
+  for (StateSpace::Path::const_iterator state = prefix.begin();
+       state != prefix.end();
+       ++state)
+    path_states.push_back(state->node());
+  for (StateSpace::Path::const_iterator state = cycle.begin();
+       state != cycle.end();
+       ++state)
+    path_states.push_back(state->node());
 
   return eval();
 }
@@ -128,8 +130,7 @@ bool PathEvaluator::evaluate
   current_formula = &formula;
   current_path = &statespace;
 
-  map<StateSpace::size_type, StateSpace::size_type,
-      less<StateSpace::size_type>, ALLOC(StateSpace::size_type) > ordering;
+  map<StateSpace::size_type, StateSpace::size_type> ordering;
 
   StateSpace::size_type state = statespace.initialState();
   StateSpace::size_type state_count = 0;
@@ -173,9 +174,7 @@ bool PathEvaluator::eval()
  *
  * ------------------------------------------------------------------------- */
 {
-  stack<const LtlFormula*, deque<const LtlFormula*,
-                                 ALLOC(const LtlFormula*) > >
-    subformula_stack;
+  stack<const LtlFormula*, deque<const LtlFormula*> > subformula_stack;
 
   const LtlFormula* f;
   BitArray* val;

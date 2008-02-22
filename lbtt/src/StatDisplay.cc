@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,14 +17,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifdef __GNUC__
-#pragma implementation
-#endif /* __GNUC__ */
-
 #include <config.h>
 #include <string>
 #include "DispUtil.h"
 #include "Exception.h"
+#include "IntervalList.h"
 #include "SharedTestData.h"
 #include "StatDisplay.h"
 #include "StringUtil.h"
@@ -38,10 +35,50 @@ using namespace ::SharedTestData;
 using namespace ::StringUtil;
 
 /* ========================================================================= */
+void printStatTableHeader(ostream& stream, int indent)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Displays a table header for test statistics (used in
+ *                verbosity mode 2).
+ *
+ * Arguments:     stream  --  A reference to the output stream to which the
+ *                            header should be written.
+ *                indent  --  Number of spaces to leave on the left of the
+ *                            output.
+ *
+ * Returns:       Nothing.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  Exceptional_ostream estream(&stream, ios::failbit | ios::badbit);
+
+  int num_dashes = 39;
+  estream << string(indent, ' ') + " # F   Elapsed     Büchi     Büchi Acc.";
+  if (configuration.global_options.do_cons_test
+      || configuration.global_options.do_comp_test)
+  {
+    num_dashes += 31;
+    estream << "     Product     Product   Acc.";
+    if (configuration.global_options.do_cons_test)
+    {
+      num_dashes += 3;
+      estream << " CC";
+    }
+  }
+  estream << '\n' + string(indent + 10, ' ')
+             + "time    states    trans. sets";
+  if (configuration.global_options.do_cons_test
+      || configuration.global_options.do_comp_test)
+    estream << "      states      trans. cycles";
+  estream << "\n" + string(indent, ' ') + string(num_dashes, '-') + '\n';
+  estream.flush();
+}
+
+
+/* ========================================================================= */
 void printBuchiAutomatonStats
   (ostream& stream, int indent,
-   vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-     algorithm,
+   vector<AlgorithmTestResults>::size_type algorithm,
    int result_id)
 /* ----------------------------------------------------------------------------
  *
@@ -52,7 +89,7 @@ void printBuchiAutomatonStats
  * Arguments:     stream     --  A reference to the output stream to which the
  *                               information should be written.
  *                indent     --  Number of spaces to leave on the left of the
- *                               output.
+ *                               output in verbosity modes >= 3.
  *                algorithm  --  Identifier of the algorithm used for
  *                               generating the automaton.
  *                result_id  --  Selects between the automata constructed from
@@ -67,43 +104,75 @@ void printBuchiAutomatonStats
   const AutomatonStats& automaton_stats = 
     test_results[algorithm].automaton_stats[result_id];
 
-  estream << string(indent, ' ');
-
-  if (!automaton_stats.buchiAutomatonComputed())
-    estream << "not computed";
+  if (configuration.global_options.verbosity <= 2)
+  {
+    if (!automaton_stats.buchiAutomatonComputed())
+      estream << "      N/A       N/A       N/A  N/A";
+    else
+    {
+      if (automaton_stats.buchi_generation_time >= 0.0)
+      {
+	changeStreamFormatting(stream, 9, 2, ios::fixed | ios::right);
+	estream << automaton_stats.buchi_generation_time;
+	restoreStreamFormatting(stream);
+      }
+      else
+	estream << "      N/A";
+      estream << ' ';
+      changeStreamFormatting(stream, 9, 0, ios::right);
+      estream << automaton_stats.number_of_buchi_states;
+      restoreStreamFormatting(stream);
+      estream << ' ';
+      changeStreamFormatting(stream, 9, 0, ios::right);
+      estream << automaton_stats.number_of_buchi_transitions;
+      restoreStreamFormatting(stream);
+      estream << ' ';
+      changeStreamFormatting(stream, 4, 0, ios::right);
+      estream << automaton_stats.number_of_acceptance_sets;
+      restoreStreamFormatting(stream);
+    }
+    estream << ' ';
+  }
   else
   {
-    estream << "number of states:" + string(6, ' ')
-               + toString(automaton_stats.number_of_buchi_states)
-               + '\n' + string(indent, ' ') + "number of transitions: "
-               + toString(automaton_stats.number_of_buchi_transitions)
-               + '\n' + string(indent, ' ') + "acceptance sets:"
-               + string(7, ' ')
-               + toString(automaton_stats.number_of_acceptance_sets)
-               + '\n' + string(indent, ' ') + "computation time:"
-               + string(6, ' ');
-    
-    if (automaton_stats.buchi_generation_time != -1.0)
-    {
-      changeStreamFormatting(stream, 9, 2, ios::fixed | ios::left);
-      estream << automaton_stats.buchi_generation_time;
-      restoreStreamFormatting(stream);
+    estream << string(indent, ' ');
 
-      estream << " seconds (user time)";
-    }
+    if (!automaton_stats.buchiAutomatonComputed())
+      estream << "not computed";
     else
-      estream << "N/A";
+    {
+      estream << "number of states:" + string(6, ' ')
+                 + toString(automaton_stats.number_of_buchi_states)
+	         + '\n' + string(indent, ' ') + "number of transitions: "
+                 + toString(automaton_stats.number_of_buchi_transitions)
+                 + '\n' + string(indent, ' ') + "acceptance sets:"
+                 + string(7, ' ')
+                 + toString(automaton_stats.number_of_acceptance_sets)
+                 + '\n' + string(indent, ' ') + "computation time:"
+                 + string(6, ' ');
+    
+      if (automaton_stats.buchi_generation_time != -1.0)
+      {
+	changeStreamFormatting(stream, 9, 2, ios::fixed | ios::left);
+	estream << automaton_stats.buchi_generation_time;
+	restoreStreamFormatting(stream);
+
+	estream << " seconds (user time)";
+      }
+      else
+	estream << "N/A";
+    }
+
+    estream << '\n';
   }
 
-  estream << '\n';
   estream.flush();
 }
 
 /* ========================================================================= */
 void printProductAutomatonStats
   (ostream& stream, int indent,
-   vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-     algorithm,
+   vector<AlgorithmTestResults>::size_type algorithm,
    int result_id)
 /* ----------------------------------------------------------------------------
  *
@@ -114,7 +183,7 @@ void printProductAutomatonStats
  * Arguments:     stream     --  A reference to the output stream to which the
  *                               information should be written.
  *                indent     --  Number of spaces to leave on the left of the
- *                               output.
+ *                               output in verbosity modes >= 3.
  *                algorithm  --  Identifier of the algorithm used for
  *                               generating the product automaton.
  *                result_id  --  Selects between the automata constructed from
@@ -129,51 +198,71 @@ void printProductAutomatonStats
   const AutomatonStats& automaton_stats =
     test_results[algorithm].automaton_stats[result_id];
 
-  estream << string(indent, ' ');
-
-  if (!automaton_stats.productAutomatonComputed())
-    estream << "not computed";
+  if (configuration.global_options.verbosity <= 2)
+  {
+    if (!automaton_stats.productAutomatonComputed())
+      estream << "        N/A         N/A";
+    else
+    {
+      changeStreamFormatting(stream, 11, 0, ios::right);
+      estream << automaton_stats.number_of_product_states;
+      restoreStreamFormatting(stream);
+      estream << ' ';
+      changeStreamFormatting(stream, 11, 0, ios::right);
+      estream << automaton_stats.number_of_product_transitions;
+      restoreStreamFormatting(stream);
+    }
+    estream << ' ';
+  }
   else
   {
-    estream << "number of states:" + string(6, ' ');
+    estream << string(indent, ' ');
 
-    changeStreamFormatting(stream, 9, 0, ios::left);
-    estream << automaton_stats.number_of_product_states;
-    restoreStreamFormatting(stream);
-
-    estream << " [";
-
-    if (automaton_stats.number_of_product_states != 0)
+    if (!automaton_stats.productAutomatonComputed())
+      estream << "not computed";
+    else
     {
-      changeStreamFormatting(stream, 0, 2, ios::fixed);
-      estream << static_cast<double>
-                   (automaton_stats.number_of_product_states)
-                 / static_cast<double>(automaton_stats.number_of_buchi_states)
-                 / static_cast<double>(round_info.statespace->size())
-                 * 100.0;
+      estream << "number of states:" + string(6, ' ');
+
+      changeStreamFormatting(stream, 9, 0, ios::left);
+      estream << automaton_stats.number_of_product_states;
       restoreStreamFormatting(stream);
 
-      estream << "% of worst case ("
-              << automaton_stats.number_of_buchi_states
-                 * round_info.statespace->size()
-              << ')';
-    }
-    else
-      estream << "empty automaton";
+      estream << " [";
 
-    estream << "]\n" + string(indent, ' ') + "number of transitions: "
-               + toString(automaton_stats.number_of_product_transitions);
+      if (automaton_stats.number_of_product_states != 0)
+      {
+	changeStreamFormatting(stream, 0, 2, ios::fixed);
+	estream << static_cast<double>
+                     (automaton_stats.number_of_product_states)
+                   / static_cast<double>
+                       (automaton_stats.number_of_buchi_states)
+                   / static_cast<double>(round_info.statespace->size())
+	           * 100.0;
+	restoreStreamFormatting(stream);
+
+	estream << "% of worst case ("
+		<< automaton_stats.number_of_buchi_states
+	             * round_info.statespace->size()
+		<< ')';
+      }
+      else
+	estream << "empty automaton";
+
+      estream << "]\n" + string(indent, ' ') + "number of transitions: "
+                 + toString(automaton_stats.number_of_product_transitions);
+    }
+
+    estream << '\n';
   }
 
-  estream << '\n';
   estream.flush();
 }
 
 /* ========================================================================= */
 void printAcceptanceCycleStats
   (ostream& stream, int indent,
-   vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-     algorithm,
+   vector<AlgorithmTestResults>::size_type algorithm,
    int result_id)
 /* ----------------------------------------------------------------------------
  *
@@ -185,7 +274,7 @@ void printAcceptanceCycleStats
  * Arguments:     stream     --  A reference to the output stream to which the
  *                               information should be written.
  *                indent     --  Number of spaces to leave on the left of the
- *                               output.
+ *                               output in verbosity mode >= 3.
  *                algorithm  --  Identifier of the algorithm used for
  *                               computing the Büchi automaton whose accepting
  *                               cycles are to be considered.
@@ -201,49 +290,64 @@ void printAcceptanceCycleStats
   const AutomatonStats& automaton_stats =
     test_results[algorithm].automaton_stats[result_id];
 
-  estream << string(indent, ' ');
-
-  if (!automaton_stats.emptiness_check_performed)
-    estream << "not computed";
-  else if (configuration.global_options.product_mode == Configuration::LOCAL)
+  if (configuration.global_options.verbosity <= 2)
   {
-    estream << string("cycle ");
-
-    if (automaton_stats.emptiness_check_result[0])
-      estream << "reachable    ";
+    if (!automaton_stats.emptiness_check_performed)
+      estream << "   N/A";
     else
-      estream << "not reachable";
-
-    estream << "    (from the initial state)";
+    {
+      changeStreamFormatting(stream, 6, 0, ios::right);
+      estream << automaton_stats.emptiness_check_result.count();
+      restoreStreamFormatting(stream);
+    }
+    estream << ' ';
   }
   else
   {
-    estream << "cycle reachable from   ";
+    estream << string(indent, ' ');
 
-    changeStreamFormatting(stream, 9, 0, ios::left);
-    estream << automaton_stats.emptiness_check_result.count();
-    restoreStreamFormatting(stream);
+    if (!automaton_stats.emptiness_check_performed)
+      estream << "not computed";
+    else if (configuration.global_options.product_mode == Configuration::LOCAL)
+    {
+      estream << string("cycle ");
 
-    estream << " states\n" + string(indent, ' ')
-               + "not reachable from     ";
+      if (automaton_stats.emptiness_check_result[0])
+	estream << "reachable    ";
+      else
+	estream << "not reachable";
 
-    changeStreamFormatting(stream, 9, 0, ios::left);
-    estream << (round_info.real_emptiness_check_size
-		- automaton_stats.emptiness_check_result.count());
-    restoreStreamFormatting(stream);
+      estream << "    (from the initial state)";
+    }
+    else
+    {
+      estream << "cycle reachable from   ";
 
-    estream << " states";
+      changeStreamFormatting(stream, 9, 0, ios::left);
+      estream << automaton_stats.emptiness_check_result.count();
+      restoreStreamFormatting(stream);
+
+      estream << " states\n" + string(indent, ' ')
+                 + "not reachable from     ";
+
+      changeStreamFormatting(stream, 9, 0, ios::left);
+      estream << (round_info.real_emptiness_check_size
+		    - automaton_stats.emptiness_check_result.count());
+      restoreStreamFormatting(stream);
+
+      estream << " states";
+    }
+
+    estream << '\n';
   }
 
-  estream << '\n';
   estream.flush();
 }
 
 /* ========================================================================= */
 void printConsistencyCheckStats
   (ostream& stream, int indent,
-   vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-     algorithm)
+   vector<AlgorithmTestResults>::size_type algorithm)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Displays information about the consistency check result for
@@ -253,7 +357,7 @@ void printConsistencyCheckStats
  * Arguments:     stream     --  A reference to an output stream to which the
  *                               information should be written.
  *                indent     --  Number of spaces to leave on the left of the
- *                               output.
+ *                               output in verbosity mode >= 3.
  *                algorithm  --  Identifier of the algorithm whose consistency
  *                               check result should be displayed.
  *
@@ -264,99 +368,112 @@ void printConsistencyCheckStats
   Exceptional_ostream estream(&stream, ios::failbit | ios::badbit);
   const AlgorithmTestResults& test_result = test_results[algorithm];
 
-  estream << string(indent, ' ');
+  if (configuration.global_options.verbosity <= 2)
+  {
+    switch (test_result.consistency_check_result)
+    {
+      case -1 :
+	estream << "NA";
+	break;
 
-  if (test_result.consistency_check_result == -1)
-    estream << "not performed";
+      case 0 :
+	estream << " F";
+	break;
+
+      default:
+	estream << " P";
+	break;
+    }
+  }
   else
   {
-    estream << "result:" + string(18, ' ');
+    estream << string(indent, ' ');
 
-    if (test_result.consistency_check_result == 0)
-    {
-      estream << "failed    ["
-	         + toString(test_result.failed_consistency_check_comparisons)
-                 + " (";
-
-      changeStreamFormatting(stream, 0, 2, ios::fixed);
-      estream << ((test_result.consistency_check_comparisons == 0)
-                  ? 0.0
-                  : static_cast<double>
-                      (test_result.failed_consistency_check_comparisons)
-                    / test_result.consistency_check_comparisons * 100.0);
-      restoreStreamFormatting(stream);
-
-      estream << "%) of "
-	         + toString(test_result.consistency_check_comparisons)
-                 + " test cases]";
-    }
+    if (test_result.consistency_check_result == -1)
+      estream << "not performed";
     else
-      estream << "passed";
+    {
+      estream << "result:" + string(18, ' ');
+
+      if (test_result.consistency_check_result == 0)
+      {
+	estream << "failed    ["
+	           + toString(test_result.failed_consistency_check_comparisons)
+                   + " (";
+
+	changeStreamFormatting(stream, 0, 2, ios::fixed);
+	estream << ((test_result.consistency_check_comparisons == 0)
+		    ? 0.0
+		    : static_cast<double>
+                        (test_result.failed_consistency_check_comparisons)
+                      / test_result.consistency_check_comparisons * 100.0);
+	restoreStreamFormatting(stream);
+
+	estream << "%) of "
+	           + toString(test_result.consistency_check_comparisons)
+                   + " test cases]";
+      }
+      else
+	estream << "passed";
+    }
+
+    estream << '\n';
   }
 
-  estream << '\n';
   estream.flush();
 }
 
 /* ========================================================================= */
 void printCrossComparisonStats
-  (ostream& stream, int indent,
-   vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-     algorithm)
+  (ostream& stream, int indent, const IntervalList& algorithms)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Displays information about the model checking result cross-
  *                comparison check, extracting the information from a vector of
  *                TestStatistics structures stored in the UserInterface object.
  *
- * Arguments:     stream     --  A reference to an output stream to which the
- *                               information should be written.
- *                indent     --  Number of spaces to leave on the left of the
- *                               output.
- *                algorithm  --  If less than the number of algorithms, show
- *                               only the results for the algorithm with this
- *                               identifier.
+ * Arguments:     stream      --  A reference to an output stream to which the
+ *                                information should be written.
+ *                indent      --  Number of spaces to leave on the left of the
+ *                                output.
+ *                algorithms  --  A reference to a constant IntervalList
+ *                                storing the numeric identifiers of the
+ *                                algorithms for which the statistics should
+ *                                be shown.
  *
  * Returns:       Nothing.
  *
  * ------------------------------------------------------------------------- */
 {
   Exceptional_ostream estream(&stream, ios::failbit | ios::badbit);
-  bool no_errors_to_report = true;
-
-  if (algorithm < configuration.algorithms.size()
-      && !configuration.algorithms[algorithm].enabled)
-  {
-    estream << string(indent, ' ') + "not performed\n\n";
-    estream.flush();
-    return;
-  }
-
-  estream << string(indent, ' ') + "result:";
+  bool no_errors_to_report = true, nothing_to_report = true;
 
   const AutomatonStats* alg_1_pos_results;
   const AutomatonStats* alg_1_neg_results;
 
-  for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type 
-	 alg_1 = 0;
-       alg_1 < test_results.size();
-       alg_1++)
+  for (IntervalList::const_iterator alg_1 = algorithms.begin();
+       alg_1 != algorithms.end();
+       ++alg_1)
   {
-    alg_1_pos_results = &test_results[alg_1].automaton_stats[0];
-    alg_1_neg_results = &test_results[alg_1].automaton_stats[1];
+    alg_1_pos_results = &test_results[*alg_1].automaton_stats[0];
+    alg_1_neg_results = &test_results[*alg_1].automaton_stats[1];
 
-    for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-	   alg_2 = alg_1 + 1;
-	 alg_2 < test_results.size();
+    for (vector<AlgorithmTestResults>::size_type alg_2 = 0;
+	 alg_2 < round_info.number_of_translators;
 	 alg_2++)
     {
-      if ((algorithm >= configuration.algorithms.size()
-	   || alg_1 == algorithm 
-	   || alg_2 == algorithm)
-	  && configuration.algorithms[alg_1].enabled
+      if (*alg_1 != alg_2
+	  && (alg_2 > *alg_1 || !algorithms.covers(alg_2))
+	  && configuration.algorithms[*alg_1].enabled
 	  && configuration.algorithms[alg_2].enabled)
       {
 	bool pos_test, neg_test;
+
+	if (nothing_to_report)
+        {
+	  nothing_to_report = false;
+	  estream << string(indent, ' ') + "result:";
+	}
 
 	for (int counter = 0; counter < 2; counter++)
 	{
@@ -385,88 +502,74 @@ void printCrossComparisonStats
 	    else
 	      estream << "-) ";
 
-	    estream << ' ';
-	    if (alg_1 == round_info.number_of_translators)
-	      estream << "lbtt";
-	    else
-	      estream << configuration.algorithmString(alg_1);
-	    estream << ", ";
-	    if (alg_2 == round_info.number_of_translators)
-	      estream << "lbtt";
-	    else
-	      estream << configuration.algorithmString(alg_2);
+	    estream << " " + configuration.algorithmString(*alg_1) + ", "
+                       + configuration.algorithmString(alg_2);
 	  }
 	}
       }
     }
   }
 
-  if (no_errors_to_report)
+  if (nothing_to_report)
+    estream << string(indent, ' ') + "not performed";
+  else if (no_errors_to_report)
     estream << string(20, ' ') + "no failures detected";
-
   estream << "\n\n";
   estream.flush();
 }
 
 /* ========================================================================= */
 void printBuchiIntersectionCheckStats
-  (ostream& stream, int indent,
-   vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-     algorithm)
+  (ostream& stream, int indent, const IntervalList& algorithms)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Displays information about the Büchi automaton intersection
  *                emptiness check results, extracting the information from a
  *                TestStatistics structure stored in the UserInterface object.
  *
- * Arguments:     stream     --  A reference to an output stream to which the
- *                               information should be written.
- *                indent     --  Number of spaces to leave on the left of the
- *                               output.
- *                algorithm  --  If less than the number of algorithms, show
- *                               only the results for the algorithm with this
- *                               identifier.
+ * Arguments:     stream      --  A reference to an output stream to which the
+ *                                information should be written.
+ *                indent      --  Number of spaces to leave on the left of the
+ *                                output.
+ *                algorithms  --  A reference to a constant IntervalList
+ *                                storing the numeric identifiers of the
+ *                                algorithms for which the statistics should
+ *                                be shown.
  *
  * Returns:       Nothing.
  *
  * ------------------------------------------------------------------------- */
 {
   Exceptional_ostream estream(&stream, ios::failbit | ios::badbit);
-  bool no_errors_to_report = true;
-
-  if (algorithm < round_info.number_of_translators
-      && !configuration.algorithms[algorithm].enabled)
-  {
-    estream << string(indent, ' ') + "not performed\n\n";
-    estream.flush();
-    return;
-  }
-
-  estream << string(indent, ' ') + "result:";
+  bool no_errors_to_report = true, nothing_to_report = true;
 
   const AutomatonStats* alg_1_pos_results;
   const AutomatonStats* alg_1_neg_results;
 
-  for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type 
-	 alg_1 = 0;
-       alg_1 < round_info.number_of_translators;
-       alg_1++)
+  for (IntervalList::const_iterator alg_1 = algorithms.begin();
+       alg_1 != algorithms.end();
+       ++alg_1)
   {
-    alg_1_pos_results = &test_results[alg_1].automaton_stats[0];
-    alg_1_neg_results = &test_results[alg_1].automaton_stats[1];
+    alg_1_pos_results = &test_results[*alg_1].automaton_stats[0];
+    alg_1_neg_results = &test_results[*alg_1].automaton_stats[1];
 
-    for (vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-	   alg_2 = alg_1;
+    for (vector<AlgorithmTestResults>::size_type alg_2 = 0;
 	 alg_2 < round_info.number_of_translators;
 	 alg_2++)
     {
-      if ((algorithm >= round_info.number_of_translators
-	   || alg_1 == algorithm 
-	   || alg_2 == algorithm)
-	  && configuration.algorithms[alg_1].enabled
-	  && configuration.algorithms[alg_2].enabled)
+      if (configuration.algorithms[*alg_1].enabled
+	  && configuration.algorithms[alg_2].enabled
+	  && (alg_2 >= *alg_1 || !algorithms.covers(alg_2))
+	  && !configuration.isInternalAlgorithm(*alg_1)
+	  && !configuration.isInternalAlgorithm(alg_2))
       {
 	bool pos_test, neg_test;
+
+	if (nothing_to_report)
+        {
+	  nothing_to_report = false;
+	  estream << string(indent, ' ') + "result:";
+	}
 
 	for (int counter = -1; counter < 1; counter++)
 	{
@@ -482,7 +585,7 @@ void printBuchiIntersectionCheckStats
 
 	    estream << string(counter == -1 ? "N/A   " : "failed") + ' ';
 
-	    if (alg_1 != alg_2)
+	    if (*alg_1 != alg_2)
 	    {
 	      estream << '(';
 	      if (pos_test)
@@ -493,9 +596,9 @@ void printBuchiIntersectionCheckStats
 	    else
 	      estream << "    ";
 	      
-	    estream << ' ' + configuration.algorithmString(alg_1);
+	    estream << ' ' + configuration.algorithmString(*alg_1);
 
-	    if (alg_1 != alg_2)
+	    if (*alg_1 != alg_2)
 	    {
 	      estream << ", (";
 	      if (pos_test)
@@ -511,18 +614,18 @@ void printBuchiIntersectionCheckStats
     }
   }
 
-  if (no_errors_to_report)
+  if (nothing_to_report)
+    estream << string(indent, ' ') + "not performed";
+  else if (no_errors_to_report)
     estream << string(20, ' ') + "no failures detected";
-
-  estream << "\n\n";
+  estream << "\n";
   estream.flush();
 }
  
 /* ========================================================================= */
 void printAllStats
   (ostream& stream, int indent,
-   vector<AlgorithmTestResults, ALLOC(AlgorithmTestResults) >::size_type
-     algorithm)
+   vector<AlgorithmTestResults>::size_type algorithm)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Displays all test information (Büchi automaton and product
@@ -541,30 +644,46 @@ void printAllStats
 {
   Exceptional_ostream estream(&stream, ios::failbit | ios::badbit);
 
-  estream << string(indent, ' ') + configuration.algorithmString(algorithm)
-             + '\n';
-  estream.flush();
+  if (configuration.global_options.verbosity >= 3)
+    estream << string(indent, ' ') + configuration.algorithmString(algorithm)
+               + '\n';
 
   for (int counter = 0; counter < 2; counter++)
   {
-    estream << string(indent + 2, ' ')
-               + (counter == 0 ? "Positive" : "Negated") + " formula:\n"
-	       + string(indent + 4, ' ') + "Büchi automaton:\n";
+    if (configuration.global_options.verbosity <= 2)
+    {
+      if (counter == 1)
+	estream << '\n';
+      estream << string(indent, ' ');
+      changeStreamFormatting(stream, 2, 0, ios::right);
+      estream << algorithm << ' ';
+      restoreStreamFormatting(stream);
+      estream << (counter == 0 ? '+' : '-') << ' ';
+    }
+    else
+    {
+      estream << string(indent + 2, ' ')
+	         + (counter == 0 ? "Positive" : "Negated") + " formula:\n"
+	         + string(indent + 4, ' ') + "Büchi automaton:\n";
+    }
     printBuchiAutomatonStats(stream, indent + 6, algorithm, counter);
 
     if (configuration.global_options.do_comp_test
 	|| configuration.global_options.do_cons_test)
     {
-      estream << string(indent + 4, ' ') + "Product automaton:\n";
+      if (configuration.global_options.verbosity >= 3)
+	estream << string(indent + 4, ' ') + "Product automaton:\n";
       printProductAutomatonStats(stream, indent + 6, algorithm, counter);
-      estream << string(indent + 4, ' ') + "Accepting cycles:\n";
+      if (configuration.global_options.verbosity >= 3)
+	estream << string(indent + 4, ' ') + "Accepting cycles:\n";
       printAcceptanceCycleStats(stream, indent + 6, algorithm, counter);
     }
   }
 
   if (configuration.global_options.do_cons_test)
   {
-    estream << string(indent + 2, ' ') + "Result consistency check:\n";
+    if (configuration.global_options.verbosity >= 3)
+      estream << string(indent + 2, ' ') + "Result consistency check:\n";
     printConsistencyCheckStats(stream, indent + 4, algorithm);
   }
 
@@ -575,8 +694,8 @@ void printAllStats
 /* ========================================================================= */
 void printCollectiveCrossComparisonStats
   (ostream& stream,
-   vector<TestStatistics, ALLOC(TestStatistics) >::size_type algorithm_y,
-   vector<TestStatistics, ALLOC(TestStatistics) >::size_type algorithm_x,
+   vector<TestStatistics>::size_type algorithm_y,
+   vector<TestStatistics>::size_type algorithm_x,
    int data_type)
 /* ----------------------------------------------------------------------------
  *
@@ -630,10 +749,8 @@ void printCollectiveCrossComparisonStats
 	break;
 
       default :
-	if (configuration.global_options.statespace_generation_mode
-	      & Configuration::PATH
-	    && (algorithm_x == round_info.number_of_translators
-		|| algorithm_y == round_info.number_of_translators))
+	if (configuration.isInternalAlgorithm(algorithm_x)
+	    || configuration.isInternalAlgorithm(algorithm_y))
 	{
 	  estream << string(21, ' ');
 	  return;
@@ -768,13 +885,12 @@ void printCollectiveStats(ostream& stream, int indent)
   if (round_info.num_processed_formulae > 0
       && configuration.global_options.formula_input_filename.empty())
   {
-    const map<unsigned long int, unsigned long int, less<unsigned long int>,
-              ALLOC(unsigned long int) >&
+    const map<unsigned long int, unsigned long int>&
       proposition_statistics
         = configuration.formula_options.formula_generator.
             propositionStatistics();
 
-    const map<int, unsigned long int, less<int>, ALLOC(unsigned long int) >
+    const map<int, unsigned long int>
       symbol_statistics
         = configuration.formula_options.formula_generator.symbolStatistics();
 
@@ -820,9 +936,8 @@ void printCollectiveStats(ostream& stream, int indent)
       number_of_symbols_printed++;
     }
 
-    for (map<unsigned long int, unsigned long int,
-	     less<unsigned long int>, ALLOC(unsigned long int) >
-	   ::const_iterator proposition = proposition_statistics.begin();
+    for (map<unsigned long int, unsigned long int>::const_iterator
+	   proposition = proposition_statistics.begin();
 	 proposition != proposition_statistics.end();
 	 ++proposition)
     {
@@ -869,8 +984,8 @@ void printCollectiveStats(ostream& stream, int indent)
       = "";
     number_of_symbols_printed = 0;
 
-    for (map<int, unsigned long int, less<int>, ALLOC(unsigned long int) >
-	   ::const_iterator op = symbol_statistics.begin();
+    for (map<int, unsigned long int>::const_iterator
+	   op = symbol_statistics.begin();
 	 op != symbol_statistics.end();
 	 ++op)
     {
@@ -912,6 +1027,8 @@ void printCollectiveStats(ostream& stream, int indent)
 
     if (number_of_symbols_printed % 5 != 0)
     {
+      if (number_of_symbols_printed > 5)
+	estream << '\n';
       estream << ind + "       operator  " + symbol_name_string + '\n'
                  + ind + "              #  " + symbol_number_string + '\n'
 	         + ind + "      #/formula  " + symbol_distribution_string
@@ -953,8 +1070,11 @@ void printCollectiveStats(ostream& stream, int indent)
          algorithm < round_info.number_of_translators;
          ++algorithm)
     {
+      if (configuration.isInternalAlgorithm(algorithm))
+	continue;
+
       estream << '\n' + string((i > 0 ? 4 : 2) + indent, ' ')
-                 + *(configuration.algorithms[algorithm].name) + '\n';
+                 + configuration.algorithms[algorithm].name + '\n';
 
       switch (i)
       {
@@ -967,14 +1087,14 @@ void printCollectiveStats(ostream& stream, int indent)
           unsigned long int failures_to_compute_automaton;
           unsigned long int automaton_count;
           unsigned long int number_of_successful_instances;
-          unsigned long int total_number_of_states;
-          unsigned long int total_number_of_transitions;
+          BIGUINT total_number_of_states;
+          BIGUINT total_number_of_transitions;
 
           const TestStatistics& stats = final_statistics[algorithm];
 
           estream << string(2 + indent,  ' ')
-                     + string(configuration.algorithms[algorithm].name
-                                ->length(), '=');
+	             + string(configuration.algorithms[algorithm].name.
+                                length(), '=');
 
 	  for (int k = 0; k < 2; k++)
           {
@@ -1119,7 +1239,7 @@ void printCollectiveStats(ostream& stream, int indent)
 
 	    if (k == 0)
 	    {
-	      unsigned long int total_number_of_acceptance_sets;
+	      BIGUINT total_number_of_acceptance_sets;
 	      double buchi_generation_time;
 
 	      estream << '\n' + string(22 + indent, ' ')
@@ -1339,8 +1459,7 @@ void printCollectiveStats(ostream& stream, int indent)
     estream << ind + "  Result inconsistency statistics\n"
                + ind + "  " + string(31, '=') + '\n';
 
-    vector<TestStatistics, ALLOC(TestStatistics) >::size_type
-      algorithm_x, algorithm_y;
+    vector<TestStatistics>::size_type algorithm_x, algorithm_y;
 
     for (algorithm_x = 0; algorithm_x < number_of_algorithms;
 	 algorithm_x += 2)
@@ -1352,7 +1471,7 @@ void printCollectiveStats(ostream& stream, int indent)
 	if (algorithm_x + i < number_of_algorithms)
         {
 	  algorithm_name =
-	    (*(configuration.algorithms[algorithm_x + i].name)).substr(0, 20);
+	    configuration.algorithms[algorithm_x + i].name.substr(0, 20);
 	  estream << "| " + algorithm_name
 	             + string(21 - algorithm_name.length(), ' ');
 	}
@@ -1362,6 +1481,9 @@ void printCollectiveStats(ostream& stream, int indent)
       for (algorithm_y = 0; algorithm_y < number_of_algorithms;
            algorithm_y++)
       {
+	if (configuration.isInternalAlgorithm(algorithm_y))
+	  continue;
+
 	estream << "\n    " + ind + string(26, '-');
 
 	for (int i = 0; i < 2; ++i)
@@ -1372,7 +1494,7 @@ void printCollectiveStats(ostream& stream, int indent)
 	estream << '+';
 
 	algorithm_name
-	  = (*(configuration.algorithms[algorithm_y].name)).substr(0, 20);
+	  = configuration.algorithms[algorithm_y].name.substr(0, 20);
 
 	bool algorithm_name_printed = false;
 	legend = 1;

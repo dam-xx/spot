@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -23,13 +23,17 @@
 #include <config.h>
 #include <deque>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 #include <utility>
 #include "LbttAlloc.h"
 #include "BuchiAutomaton.h"
 #include "Configuration.h"
-#include "ProductAutomaton.h"
+#include "EdgeContainer.h"
+#include "Graph.h"
+#include "IntervalList.h"
+#include "Product.h"
 #include "StateSpace.h"
 
 using namespace std;
@@ -45,119 +49,102 @@ extern Configuration configuration;
 namespace UserCommands
 {
 
-void computeProductAutomaton                        /* Computes a product */
-  (ProductAutomaton*& product_automaton,            /* automaton.         */
-   const BuchiAutomaton& buchi_automaton,
-   pair<unsigned long int, bool>& last_automaton,
-   const pair<unsigned long int, bool>&
-     new_automaton);
+unsigned long int parseAlgorithmId                  /* Parses an      */
+  (const string& id);                               /* implementation
+						     * identifier.
+						     */
+
+void parseAlgorithmId                               /* Parses a list of */
+  (const string& ids, IntervalList& algorithms);    /* implementation
+						     * identifiers.
+						     */
 
 void printAlgorithmList                             /* Displays a list of */
   (ostream& stream, int indent);                    /* algorithms used in
                                                      * the tests.    
 						     */
 
-void synchronizePrefixAndCycle                      /* Synchronizes a prefix */
-  (deque<Graph::Graph<GraphEdgeContainer>           /* with a cycle in a     */
-           ::size_type,                             /* sequence of graph     */
-         ALLOC(Graph::Graph<GraphEdgeContainer>     /* state identifiers.    */
-                 ::size_type) >&
-     prefix,
-   deque<Graph::Graph<GraphEdgeContainer>
-           ::size_type,
-         ALLOC(Graph::Graph<GraphEdgeContainer>
-	         ::size_type) >&
-     cycle);
-
 void printCrossComparisonAnalysisResults            /* Analyzes a            */
   (ostream& stream, int indent,                     /* contradiction between */
    bool formula_type,                               /* test results of two   */
-   const vector<string, ALLOC(string) >&            /* implementations.      */
-     input_tokens,
-   ProductAutomaton*& product_automaton,
-   pair<unsigned long int, bool>&
-     last_product_automaton);
+   const vector<string>& input_tokens);             /* implementations.      */
 
 void printConsistencyAnalysisResults                /* Analyzes a            */
   (ostream& stream, int indent,                     /* contradicition in the */
-   const vector<string, ALLOC(string) >&            /* model checking result */
-     input_tokens);                                 /* consistency check for
+   const vector<string>& input_tokens);             /* model checking result
+                                                     * consistency check for
 						     * an implementation.
 						     */
 
 void printAutomatonAnalysisResults                  /* Analyzes a           */
   (ostream& stream, int indent,                     /* contradiction in the */
-   unsigned long int algorithm1,                    /* Büchi automata       */
-   unsigned long int algorithm2);                   /* intersection
+   const vector<string>& input_tokens);             /* Büchi automata
+                                                     * intersection
                                                      * emptiness check.
 						     */
 
 void printPath                                      /* Displays information */
   (ostream& stream, int indent,                     /* about a single       */
-   const deque<StateSpace::size_type,               /* system execution.    */
-               ALLOC(StateSpace::size_type) >&
-     prefix,
-   const deque<StateSpace::size_type,
-               ALLOC(StateSpace::size_type) >&
-     cycle,
+   const StateSpace::Path& prefix,                  /* system execution.    */
+   const StateSpace::Path& cycle,
    const StateSpace& path);
 
 void printAcceptingCycle                            /* Displays information */
   (ostream& stream, int indent,                     /* a single automaton   */
-   vector<Configuration::AlgorithmInformation,      /* execution.           */
-          ALLOC(Configuration::AlgorithmInformation) >
+   vector<Configuration::AlgorithmInformation>      /* execution.           */
      ::size_type
      algorithm_id,
-   const deque<StateSpace::size_type,
-               ALLOC(StateSpace::size_type) >&
-     prefix,
-   const deque<StateSpace::size_type,
-               ALLOC(StateSpace::size_type) >&
-     cycle,
-   const BuchiAutomaton& automaton);
+   const BuchiAutomaton::Path& aut_prefix,
+   const BuchiAutomaton::Path& aut_cycle,
+   const BuchiAutomaton& automaton,
+   const StateSpace::Path& path_prefix,
+   const StateSpace::Path& path_cycle,
+   const StateSpace& statespace);
 
 void printBuchiAutomaton                            /* Displays information */
   (ostream& stream, int indent,                     /* about a Büchi        */
    bool formula_type,                               /* automaton.           */
-   vector<string, ALLOC(string) >& input_tokens,
+   vector<string>& input_tokens,
    Graph::GraphOutputFormat fmt);
 
 void evaluateFormula                                /* Displays information */
   (ostream& stream, int indent,                     /* about existence of   */
    bool formula_type,                               /* accepting system     */
-   vector<string, ALLOC(string) >& input_tokens);   /* executions.          */
+   vector<string>& input_tokens);                   /* executions.          */
 
 void printFormula                                   /* Displays a formula */
   (ostream& stream, int indent,                     /* used for testing.  */
-   bool formula_type);
+   bool formula_type,
+   const vector<string>& input_tokens);
 
 void printCommandHelp                               /* Displays help about */
   (ostream& stream, int indent,                     /* user commands.      */
-   const vector<string, ALLOC(string) >&
-     input_tokens);           
+   const vector<string>& input_tokens);
 
 void printInconsistencies                           /* Lists the system   */
   (ostream& stream, int indent,                     /* states failing the */
-   vector<string, ALLOC(string) >& input_tokens);   /* consistency check
+   vector<string>& input_tokens);                   /* consistency check
                                                      * for an algorihm.
 						     */
 
 void printTestResults                               /* Displays the test   */
   (ostream& stream, int indent,                     /* results of the last */  
-   vector<string, ALLOC(string) >& input_tokens);   /* round performed.    */
+   vector<string>& input_tokens);                   /* round performed.    */
 
 void printStateSpace                                /* Displays information */
   (ostream& stream, int indent,                     /* about a state space. */
-   vector<string, ALLOC(string) >& input_tokens,
+   vector<string>& input_tokens,
    Graph::GraphOutputFormat fmt);
 
 void changeVerbosity                                /* Displays or changes */
-  (const vector<string, ALLOC(string) >&            /* the verbosity of    */
-     input_tokens);                                 /* output.             */
+  (const vector<string>& input_tokens);             /* the verbosity of
+                                                     * output.
+						     */
 
 void changeAlgorithmState                           /* Enables or disables a */
-  (vector<string, ALLOC(string) >& input_tokens,    /* set of algorithms     */
-   bool enable);                                    /* used in the tests.    */
+  (vector<string>& input_tokens, bool enable);      /* set of algorithms
+                                                     * used in the tests.
+						     */
 
 }
 

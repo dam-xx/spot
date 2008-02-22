@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -23,6 +23,7 @@
 #include <config.h>
 #include <string>
 #include <exception>
+#include <istream>
 #include <iostream>
 
 using namespace std;
@@ -298,6 +299,16 @@ public:
   
   template<class T>                                 /* Operator for reading */
   Exceptional_istream &operator>>(T &t);            /* from the stream.     */
+
+  Exceptional_istream& get(istream::char_type& C);  /* Reads a character from
+						     * the stream.
+						     */
+
+  Exceptional_istream& read                         /* Reads a given number */
+    (istream::char_type* buffer, streamsize count); /* of characters from
+                                                     * the stream into a
+						     * buffer.
+						     */
 
   operator istream&();                              /* Casts the exception-
 						     * aware input stream into
@@ -990,6 +1001,47 @@ inline Exceptional_istream::~Exceptional_istream()
  *
  * ------------------------------------------------------------------------- */
 {
+}
+
+/* ========================================================================= */
+inline Exceptional_istream& Exceptional_istream::get(istream::char_type& c)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Reads a character from the input stream.
+ *
+ * Argument:      c  --  A reference to a character to extract.
+ *
+ * Returns:       A reference to the stream.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  stream->get(c);
+  if (stream->rdstate() & exception_mask)
+    throw IOException("error reading from stream");
+
+  return *this;
+}
+
+/* ========================================================================= */
+inline Exceptional_istream& Exceptional_istream::read
+  (istream::char_type* buffer, streamsize count)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Reads a given number of characters from the stream into a
+ *                buffer.
+ *
+ * Arguments:     buffer  --  A pointer to the buffer.
+ *                count   --  Number of characters to read.
+ *
+ * Returns:       A reference to the stream.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  stream->read(buffer, count);
+  if (stream->rdstate() & exception_mask)
+    throw IOException("error reading from stream");
+
+  return *this;
 }
 
 /* ========================================================================= */

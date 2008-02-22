@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
- *  Heikki Tauriainen <Heikki.Tauriainen@hut.fi>
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -28,9 +28,9 @@
 #include "LbttAlloc.h"
 #include "Exception.h"
 #include "LtlFormula.h"
-#include "ProductAutomaton.h"
 #include "PathIterator.h"
 #include "StateSpace.h"
+#include "TempFsysName.h"
 
 using namespace std;
 
@@ -55,7 +55,11 @@ public:
 						     * stream for messages.
 						     */
 
-  ifstream formula_input_file;                      /* Stream for reading input
+  istream* formula_input_stream;                    /* Stream for reading input
+						     * formulae.
+						     */
+
+  ifstream formula_input_file;                      /* File for reading input
 						     * formulae.
 						     */
 
@@ -90,6 +94,10 @@ public:
 						     * current round.
 						     */
 
+  bool all_tests_successful;                        /* True if no errors have
+						     * occurred during testing.
+						     */
+
   bool skip;                                        /* True if the current
 						     * round is to be skipped.
 						     */
@@ -122,11 +130,6 @@ public:
 						     * paths as state spaces.
 						     */
 
-  const Graph::ProductAutomaton* product_automaton; /* Pointer to the product
-						     * automaton used in the
-						     * current test round.
-						     */
-
   unsigned long int real_emptiness_check_size;      /* Number of states in the
 						     * state space where the
 						     * emptiness check should
@@ -150,9 +153,9 @@ public:
 						     * current round.
 						     */
 
-  vector<class ::Ltl::LtlFormula*,                  /* Formulae used in the  */
-         ALLOC(class ::Ltl::LtlFormula*) >          /* current round:        */
-    formulae;                                       /* formulae[0]:
+  vector<class ::Ltl::LtlFormula*> formulae;        /* Formulae used in the
+                                                     * current round:
+                                                     * formulae[0]:
 						     *   positive formula in
 						     *   negation normal
 						     *   form
@@ -168,7 +171,7 @@ public:
 						     *   generated
 						     */
 
-  vector<bool, ALLOC(bool) > formula_in_file;       /* The values in this
+  vector<bool> formula_in_file;                     /* The values in this
 						     * vector will be set to
 						     * true when the
 						     * corresponding
@@ -181,10 +184,10 @@ public:
 						     * formula.
 						     */
 
-  char formula_file_name[2][L_tmpnam + 1];          /* Storage space for the */
-  char automaton_file_name[L_tmpnam + 1];           /* names of several      */
-  char cout_capture_file[L_tmpnam + 1];             /* temporary files.      */
-  char cerr_capture_file[L_tmpnam + 1];
+  TempFsysName* formula_file_name[2];               /* Names for temporary */
+  TempFsysName* automaton_file_name;                /* files.              */
+  TempFsysName* cout_capture_file;
+  TempFsysName* cerr_capture_file;
 
 private:
   TestRoundInfo(const TestRoundInfo& info);         /* Prevent copying and */
@@ -206,14 +209,15 @@ private:
 inline TestRoundInfo::TestRoundInfo() :
   cout(&std::cout, ios::failbit | ios::badbit), number_of_translators(0),
   current_round(1), next_round_to_run(1), next_round_to_stop(1),
-  error_report_round(0), error(false), skip(false), abort(false),
-  num_generated_statespaces(0), total_statespace_states(0),
-  total_statespace_transitions(0), num_processed_formulae(0),
-  fresh_statespace(false), statespace(0), path_iterator(0),
-  product_automaton(0), real_emptiness_check_size(0),
+  error_report_round(0), error(false), all_tests_successful(true),
+  skip(false), abort(false), num_generated_statespaces(0),
+  total_statespace_states(0), total_statespace_transitions(0),
+  num_processed_formulae(0), fresh_statespace(false), statespace(0),
+  path_iterator(0), real_emptiness_check_size(0),
   next_round_to_change_statespace(1), next_round_to_change_formula(1),
   fresh_formula(false), formulae(4, static_cast<class ::Ltl::LtlFormula*>(0)),
-  formula_in_file(2, false)
+  formula_in_file(2, false), automaton_file_name(0), cout_capture_file(0),
+  cerr_capture_file(0)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Constructor for class TestRoundInfo. Creates a new
@@ -225,6 +229,7 @@ inline TestRoundInfo::TestRoundInfo() :
  *
  * ------------------------------------------------------------------------- */
 {
+  formula_file_name[0] = formula_file_name[1] = 0;
 }
 
 /* ========================================================================= */
