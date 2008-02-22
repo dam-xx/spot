@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2005, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -36,14 +36,15 @@ namespace spot
 
     virtual ~tgba_bdd_concrete_factory();
 
-    /// Create a state variable for formula \a f.
+    /// Create a Now/Next variables for formula \a f.
     ///
     /// \param f The formula to create a state for.
-    /// \return The variable number for this state.
+    /// \return The BDD variable number v for the Now state.  The
+    ///         Next BDD corresponds to v+1.
     ///
-    /// The state is not created if it already exists.  Instead its
-    /// existing variable number is returned.  Variable numbers
-    /// can be turned into BDD using ithvar().
+    /// The state variables are not created if they already exist.
+    /// Instead their existing variable numbers are returned.
+    /// Variable numbers can be turned into BDD using ithvar().
     int create_state(const ltl::formula* f);
 
     /// Create an atomic proposition variable for formula \a f.

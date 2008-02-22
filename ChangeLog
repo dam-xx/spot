@@ -1,3 +1,8 @@
+2008-02-22  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgba/tgbabddconcretefactory.hh (create_state):
+	Clarify comments.
+
 2008-02-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_shy::dump_queue):
