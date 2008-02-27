@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2008  Laboratoire d'Informatique de Paris 6
+// (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
+// Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -41,7 +41,7 @@ namespace spot
     ///
     /// This is a template method that will call add_state(), next_state(),
     /// start(), end(), process_state(), and process_link(), while it
-    /// iterate over state.
+    /// iterates over states.
     void run();
 
     /// \name Todo list management.
@@ -52,7 +52,7 @@ namespace spot
     /// \{
     /// \brief Called by run() to register newly discovered states.
     virtual void add_state(const state* s) = 0;
-    /// \brief Called by run() to obtain the
+    /// \brief Called by run() to obtain the next state to process.
     virtual const state* next_state() = 0;
     /// \}
 
