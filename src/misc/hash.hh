@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -34,16 +34,26 @@
     namespace Sgi
     { // inherit globals
       using ::hash_map;
+      using ::hash_multimap;
       using ::hash_set;
       using ::hash;
-    };
+    }
 #  else
-#    include <ext/hash_map>
-#    include <ext/hash_set>
-#    if __GNUC__ == 3 && __GNUC_MINOR__ == 0
-      namespace Sgi = std;               // GCC 3.0
+#    if (__GNUC__ == 4 && __GNUC_MINOR__ > 3) || __GNUC__ >= 4
+#      include <tr1/unordered_set>         // GCC 4.3
+#      include <tr1/unordered_map>
+       namespace Sgi = std::tr1;
+#      define hash_map unordered_map
+#      define hash_multimap unordered_multimap
+#      define hash_set unordered_set
 #    else
-      namespace Sgi = ::__gnu_cxx;       // GCC 3.1 and later
+#      include <ext/hash_map>
+#      include <ext/hash_set>
+#      if __GNUC__ == 3 && __GNUC_MINOR__ == 0
+        namespace Sgi = std;               // GCC 3.0
+#      else
+        namespace Sgi = ::__gnu_cxx;       // GCC 3.1 to 4.2
+#      endif
 #    endif
 #  endif
 #  else      // ...  there are other compilers, right?
@@ -70,6 +80,10 @@ namespace spot
 
   /// \brief A hash function for strings.
   /// \ingroup hash_funcs
+  /// @{
+#  if (__GNUC__ == 4 && __GNUC_MINOR__ > 3) || __GNUC__ >= 4
+  typedef std::tr1::hash<std::string> string_hash;
+#  else  // GCC < 4.3
   struct string_hash :
     public Sgi::hash<const char*>,
     public std::unary_function<const std::string&, size_t>
@@ -81,6 +95,8 @@ namespace spot
       return Sgi::hash<const char*>::operator()(s.c_str());
     }
   };
+  /// @}
+#  endif
 }
 
 #endif // SPOT_MISC_HASH_HH

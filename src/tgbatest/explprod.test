@@ -1,7 +1,7 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-# département Systèmes Répartis Coopératifs (SRC), Université Pierre
-# et Marie Curie.
+# Copyright (C) 2003, 2004, 2005, 2008 Laboratoire d'Informatique de
+# Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+# Université Pierre et Marie Curie.
 #
 # This file is part of Spot, a model checking library.
 #
@@ -46,7 +46,8 @@ acc = "p3" "p2" "p1";
 "s2 * s2", "s3 * s1", "a & c", "p3" "p1";
 EOF
 
-run 0 ./explprod input1 input2 > stdout
+run 0 ./explprod input1 input2 |
+  sed 's/b & a/a \& b/;s/c & a/a \& c/' > stdout
 
 cat stdout
 diff stdout expected

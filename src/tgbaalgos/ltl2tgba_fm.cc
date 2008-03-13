@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
-// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
-// Université Pierre et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006, 2008 Laboratoire
+// d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
+// Coopératifs (SRC), Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -830,8 +830,9 @@ namespace spot
 	bdd all_props = bdd_existcomp(res, d.var_set);
 	while (all_props != bddfalse)
 	  {
-	    bdd one_prop_set =
-	      exprop ? bdd_satoneset(all_props, var_set, bddtrue) : bddtrue;
+	    bdd one_prop_set = bddtrue;
+	    if (exprop)
+	      one_prop_set = bdd_satoneset(all_props, var_set, bddtrue);
 	    all_props -= one_prop_set;
 
 	    typedef std::map<bdd, const formula*, bdd_less_than> succ_map;

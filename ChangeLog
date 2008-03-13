@@ -1,3 +1,30 @@
+2008-03-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Make sure Spot compiles with g++-4.3.
+
+	* src/ltlast/formula.hh (hash): Remove const from return type.
+	This kills a g++-4.3 warning.
+	* src/misc/hash.hh: Adjust to use unordered_set and unordered_map
+	from TR1 when g++-4.3 is used.
+	* src/evtgba/product.cc, src/ltltest/randltl.cc,
+	src/ltlvisit/randomltl.cc, src/ltlvisit/tostring.cc,
+	src/misc/freelist.hh, src/misc/optionmap.cc,
+	src/tgba/tgbareduc.hh, src/tgbaalgos/gv04.cc,
+	src/tgbaalgos/ltl2tgba_fm.cc, src/tgbaalgos/randomgraph.cc,
+	src/tgbatest/ltl2tgba.cc, src/tgbatest/randtgba.cc,
+	src/ltltest/equals.cc, src/ltltest/readltl.cc,
+	src/ltltest/reduc.cc, src/ltltest/syntimpl.cc,
+	src/ltltest/tostring.cc, src/tgbatest/ltlprod.cc,
+	src/tgbatest/powerset.cc, src/tgbatest/explprod.cc,
+	src/tgbatest/mixprod.cc, src/tgbatest/readsave.cc,
+	src/tgbatest/reductgba.cc, src/tgbatest/tgbaread.cc,
+	src/tgbatest/tripprod.cc, src/evtgbatest/product.cc,
+	src/evtgbatest/readsave.cc, src/evtgbatest/ltl2evtgba.cc,
+	src/evtgbatest/readsave.cc: Add missing includes.
+	* src/tgbatest/explicit.test, src/tgbatest/explprod.test,
+	src/tgbatest/explpro2.test, src/tgbatest/troprod.test,
+	src/tgbatest/emptchk.test: Cope with different outputs.
+
 2008-03-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* doc/Doxyfile.in (LATEX_HIDE_INDICES): Do not generate indices

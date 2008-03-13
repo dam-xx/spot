@@ -1,6 +1,6 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2004, 2005, 2008 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -29,6 +29,7 @@
 #include <utility>
 #include <set>
 #include <string>
+#include <vector>
 #include "ltlparse/public.hh"
 #include "ltlvisit/apcollect.hh"
 #include "ltlvisit/destroy.hh"

@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2005, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,6 +23,8 @@
 #include <iostream>
 #include <set>
 #include <string>
+#include <cstdlib>
+#include <cstring>
 #include "ltlast/atomic_prop.hh"
 #include "ltlvisit/randomltl.hh"
 #include "ltlvisit/tostring.hh"

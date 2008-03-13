@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2006, 2007 Laboratoire d'Informatique de Paris
+// Copyright (C) 2004, 2006, 2007, 2008 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <cstdlib>
 #include "ltlparse/public.hh"
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/tunabbrev.hh"

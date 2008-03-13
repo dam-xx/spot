@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6
-// (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
-// Pierre et Marie Curie.
+// Copyright (C) 2003, 2004, 2006, 2008 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -21,6 +21,8 @@
 
 #include <iostream>
 #include <cassert>
+#include <cstdlib>
+#include <cstring>
 #include "tgbaparse/public.hh"
 #include "tgba/tgbaexplicit.hh"
 #include "tgbaalgos/dotty.hh"

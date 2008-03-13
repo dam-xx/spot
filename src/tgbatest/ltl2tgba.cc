@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2007 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -24,6 +24,7 @@
 #include <cassert>
 #include <fstream>
 #include <string>
+#include <cstdlib>
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/contain.hh"
 #include "ltlvisit/tostring.hh"
