@@ -1,0 +1,7 @@
+Makefile.in
+Makefile
+*.cfg
+*.txt
+*.log
+defs
+ltl2baw.pl
