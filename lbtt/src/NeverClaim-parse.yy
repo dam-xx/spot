@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2008
  *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -83,7 +83,7 @@ extern int yyleng;                                  /* Length of the last
  *****************************************************************************/
 
 /* ========================================================================= */
-void yyerror(char*)
+void yyerror(const char*)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Function for reporting never claim parse errors.
@@ -219,12 +219,12 @@ transition:          NC_DOUBLE_COLON formula NC_RIGHT_ARROW NC_GOTO NC_LABEL
                    ;
 
 formula:             NC_PROPOSITION
-                       { 
-                         $$ = $1; 
+                       {
+                         $$ = $1;
                        }
                    | NC_TRUE
-                       { 
-                         $$ = $1; 
+                       {
+                         $$ = $1;
                        }
                    | NC_FALSE
                        {
@@ -290,7 +290,7 @@ int parseNeverClaim(FILE* stream, NeverClaimAutomaton& a)
  *                a       --  A reference to a NeverClaimAutomaton object in
  *                            which the results should be stored.
  *
- * Returns:       
+ * Returns:
  *
  * ------------------------------------------------------------------------- */
 {

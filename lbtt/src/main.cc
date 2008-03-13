@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2008
  *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -21,6 +21,7 @@
 #include <csignal>
 #include <cstdlib>
 #include <ctime>
+#include <climits>
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif /* HAVE_SYS_TYPES_H */
@@ -366,7 +367,7 @@ bool testLoop()
     round_info.error = false;
     round_info.skip
       = (round_info.current_round < round_info.next_round_to_run);
-	
+
     if (!round_info.skip)
       printText(string("Round ") + toString(round_info.current_round)
 		+ " of " + toString(global_options.number_of_rounds) + "\n\n",
@@ -395,7 +396,7 @@ bool testLoop()
 	configuration.global_options.statespace_random_seed
 	  = LRAND(0, RAND_MAX);
 #endif /* HAVE_RAND48 */
-	
+
 	if (global_options.statespace_change_interval == 0)
 	  round_info.next_round_to_change_statespace
 	    = global_options.number_of_rounds + 1;
@@ -433,7 +434,7 @@ bool testLoop()
        */
 
       round_info.fresh_formula
-	= (round_info.next_round_to_change_formula 
+	= (round_info.next_round_to_change_formula
 	     == round_info.current_round);
 
       if (round_info.fresh_formula)
@@ -742,7 +743,7 @@ bool testLoop()
 
 int main(int argc, char* argv[])
 {
-  try 
+  try
   {
     configuration.read(argc, argv);
   }
@@ -791,7 +792,7 @@ int main(int argc, char* argv[])
   using_history();
 #endif  /* HAVE_READLINE */
 
-  try 
+  try
   {
     allocateTempFilenames();
     if (!testLoop())
