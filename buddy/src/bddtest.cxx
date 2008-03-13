@@ -1,5 +1,5 @@
 /*========================================================================
-               Copyright (C) 1996-2002 by Jorn Lind-Nielsen
+               Copyright (C) 1996-2002, 2008 by Jorn Lind-Nielsen
                             All rights reserved
 
     Permission is hereby granted, without written agreement and without
@@ -28,6 +28,7 @@
 ========================================================================*/
 
 #include <string>
+#include <cstdlib>
 #include "bdd.h"
 #include "bvec.h"
 
@@ -49,7 +50,7 @@ static void testSupport(void)
   bdd odd  = bdd_ithvar(1) | bdd_ithvar(3) | bdd_ithvar(5);
 
   cout << "Testing support\n";
-  
+
   bdd s1 = bdd_support(even);
   bdd s2 = bdd_support(odd);
 
@@ -76,7 +77,7 @@ static void testSupport(void)
 void testBvecIte()
 {
   cout << "Testing ITE for vector\n";
-  
+
   bdd  a = bdd_ithvar(0);
   bvec b = bvec_var(3, 1, 2);
   bvec c = bvec_var(3, 2, 2);
