@@ -37,7 +37,7 @@
 2008-03-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* doc/Doxyfile.in (LATEX_HIDE_INDICES): Do not generate indices
-	until Doxygen is fixed.  Doxygen 1.5.5 generate incorrect LaTeX
+	until Doxygen is fixed.  Doxygen 1.5.5 generates incorrect LaTeX
 	code.
 
 2008-02-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
