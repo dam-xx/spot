@@ -25,7 +25,7 @@
 
 #include <list>
 #include <utility>
-#include <iostream>
+#include <iosfwd>
 
 namespace spot
 {
