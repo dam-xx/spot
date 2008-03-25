@@ -39,7 +39,7 @@
       using ::hash;
     }
 #  else
-#    if (__GNUC__ == 4 && __GNUC_MINOR__ > 3) || __GNUC__ >= 4
+#    if (__GNUC__ == 4 && __GNUC_MINOR__ >= 3) || __GNUC__ > 4
 #      include <tr1/unordered_set>         // GCC 4.3
 #      include <tr1/unordered_map>
        namespace Sgi = std::tr1;
