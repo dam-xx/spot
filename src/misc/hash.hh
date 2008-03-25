@@ -81,7 +81,7 @@ namespace spot
   /// \brief A hash function for strings.
   /// \ingroup hash_funcs
   /// @{
-#  if (__GNUC__ == 4 && __GNUC_MINOR__ > 3) || __GNUC__ >= 4
+#  if (__GNUC__ == 4 && __GNUC_MINOR__ >= 3) || __GNUC__ > 4
   typedef std::tr1::hash<std::string> string_hash;
 #  else  // GCC < 4.3
   struct string_hash :
