@@ -23,6 +23,7 @@
 #include "tgbatba.hh"
 #include "bddprint.hh"
 #include "ltlast/constant.hh"
+#include "ltlast/visitor.hh"
 #include "misc/hashfunc.hh"
 
 namespace spot

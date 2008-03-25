@@ -1,3 +1,27 @@
+2008-04-16  Damien Lefortier <dam@lrde.epita.fr>
+
+	* configure.ac, Makefile.am: Add src/eltltest/ support.
+	* src/eltlast/Makefile.am, src/eltlast/formula.hh,
+	src/eltlast/nfa.cc, src/eltlast/nfa.hh: Update nfa implementation.
+	* src/eltlparse/Makefile.am, src/eltlparse/eltlparse.yy,
+	src/eltlparse/eltlscan.ll, src/eltlparse/parsedecl.hh,
+	src/eltlparse/public.hh: Finish the parser for ELTL files.
+	* src/eltltest/Makefile.am, src/eltltest/acc.cc,
+	src/eltltest/acc.test: Add tests for the ELTL parser.
+	* src/internal/atomic_prop.hh, src/internal/atomic_prop.hxx,
+	src/internal/binop.hh, src/internal/binop.hxx,
+	src/internal/constant.hh, src/internal/constant.hxx,
+	src/internal/defaultenv.hh, src/internal/defaultenv.hxx,
+	src/internal/environment.hh, src/internal/formula.hh,
+	src/internal/formula.hxx, src/internal/multop.hh,
+	src/internal/multop.hxx, src/internal/predecl.hh,
+	src/internal/refformula.hh, src/internal/refformula.hxx,
+	src/internal/unop.hh src/internal/unop.hxx: Clean and update
+	documentation.
+	* src/ltlast/formula.hh, src/ltlenv/Makefile.am,
+	src/ltlenv/declenv.hh, src/tgbaalgos/randomgraph.hh: Fix make
+	check issues.
+
 2008-04-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Kill some FIXMEs.

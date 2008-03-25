@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,10 +23,7 @@
 # define SPOT_LTLENV_DECLENV_HH
 
 # include "environment.hh"
-# include <string>
-# include <map>
-# include "ltlvisit/destroy.hh"
-# include "ltlast/atomic_prop.hh"
+# include "internal/declenv.hh"
 
 namespace spot
 {
@@ -38,29 +35,9 @@ namespace spot
     ///
     /// This environment recognizes all atomic propositions
     /// that have been previously declared.  It will reject other.
-    class declarative_environment : public environment
-    {
-    public:
-      declarative_environment();
-      ~declarative_environment();
+    typedef spot::internal::declarative_environment<ltl_t>
+    declarative_environment;
 
-      /// Declare an atomic proposition.  Return false iff the
-      /// proposition was already declared.
-      bool declare(const std::string& prop_str);
-
-      virtual ltl::formula* require(const std::string& prop_str);
-
-      /// Get the name of the environment.
-      virtual const std::string& name();
-
-      typedef std::map<const std::string, ltl::atomic_prop*> prop_map;
-
-      /// Get the map of atomic proposition known to this environment.
-      const prop_map& get_prop_map() const;
-
-    private:
-      prop_map props_;
-    };
   }
 }
 

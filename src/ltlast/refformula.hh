@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -24,7 +24,8 @@
 #ifndef SPOT_LTLAST_REFFORMULA_HH
 # define SPOT_LTLAST_REFFORMULA_HH
 
-#include "formula.hh"
+# include "formula.hh"
+# include "internal/refformula.hh"
 
 namespace spot
 {
@@ -33,18 +34,7 @@ namespace spot
 
     /// \brief A reference-counted LTL formula.
     /// \ingroup ltl_ast
-    class ref_formula : public formula
-    {
-    protected:
-      virtual ~ref_formula();
-      ref_formula();
-      void ref_();
-      bool unref_();
-      /// Number of references to this formula.
-      unsigned ref_count_();
-    private:
-      unsigned ref_counter_;
-    };
+    typedef spot::internal::ref_formula<ltl_t> ref_formula;
 
   }
 }

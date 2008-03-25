@@ -79,11 +79,17 @@ AC_CONFIG_FILES([
   iface/gspn/Makefile
   iface/gspn/defs
   src/Makefile
+  src/eltlast/Makefile
+  src/eltlenv/Makefile
+  src/eltlparse/Makefile
+  src/eltltest/Makefile
+  src/eltltest/defs
   src/evtgba/Makefile
   src/evtgbaalgos/Makefile
   src/evtgbaparse/Makefile
   src/evtgbatest/Makefile
   src/evtgbatest/defs
+  src/internal/Makefile
   src/ltlast/Makefile
   src/ltlenv/Makefile
   src/ltlparse/Makefile

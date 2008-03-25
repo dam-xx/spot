@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2008 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -24,7 +24,11 @@
 #ifndef SPOT_LTLAST_VISITOR_HH
 # define SPOT_LTLAST_VISITOR_HH
 
-#include "predecl.hh"
+# include "binop.hh"
+# include "unop.hh"
+# include "multop.hh"
+# include "atomic_prop.hh"
+# include "constant.hh"
 
 namespace spot
 {
@@ -66,7 +70,6 @@ namespace spot
       virtual void visit(const unop* node) = 0;
       virtual void visit(const multop* node) = 0;
     };
-
 
   }
 }

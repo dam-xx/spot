@@ -25,6 +25,7 @@
 #include "tgba/tgbaexplicit.hh"
 #include "tgbaalgos/dotty.hh"
 #include "ltlast/allnodes.hh"
+#include "ltlast/visitor.hh"
 
 int
 main()

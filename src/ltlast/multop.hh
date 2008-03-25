@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -24,9 +24,8 @@
 #ifndef SPOT_LTLAST_MULTOP_HH
 # define SPOT_LTLAST_MULTOP_HH
 
-#include <vector>
-#include <map>
-#include "refformula.hh"
+# include "formula.hh"
+# include "internal/multop.hh"
 
 namespace spot
 {
@@ -37,87 +36,7 @@ namespace spot
     /// \ingroup ltl_ast
     ///
     /// These operators are considered commutative and associative.
-    class multop : public ref_formula
-    {
-    public:
-      enum type { Or, And };
-
-      /// List of formulae.
-      typedef std::vector<formula*> vec;
-
-      /// \brief Build a spot::ltl::multop with two children.
-      ///
-      /// If one of the children itself is a spot::ltl::multop
-      /// with the same type, it will be merged.  I.e., children
-      /// if that child will be added, and that child itself will
-      /// be destroyed.  This allows incremental building of
-      /// n-ary ltl::multop.
-      ///
-      /// This functions can perform slight optimizations and
-      /// may not return an ltl::multop objects.  For instance
-      /// if \c first and \c second are equal, that formula is
-      /// returned as-is.
-      static formula* instance(type op, formula* first, formula* second);
-
-      /// \brief Build a spot::ltl::multop with many children.
-      ///
-      /// Same as the other instance() function, but take a vector of
-      /// formula in argument.  This vector is acquired by the
-      /// spot::ltl::multop class, the caller should allocate it with
-      /// \c new, but not use it (especially not destroy it) after it
-      /// has been passed to spot::ltl::multop.
-      ///
-      /// This functions can perform slight optimizations and
-      /// may not return an ltl::multop objects.  For instance
-      /// if the vector contain only one unique element, this
-      /// this formula will be returned as-is.
-      static formula* instance(type op, vec* v);
-
-      virtual void accept(visitor& v);
-      virtual void accept(const_visitor& v) const;
-
-      /// Get the number of children.
-      unsigned size() const;
-      /// \brief Get the nth children.
-      ///
-      /// Starting with \a n = 0.
-      const formula* nth(unsigned n) const;
-      /// \brief Get the nth children.
-      ///
-      /// Starting with \a n = 0.
-      formula* nth(unsigned n);
-
-      /// Get the type of this operator.
-      type op() const;
-      /// Get the type of this operator, as a string.
-      const char* op_name() const;
-
-      /// Number of instantiated multi-operand operators.  For debugging.
-      static unsigned instance_count();
-
-    protected:
-      typedef std::pair<type, vec*> pair;
-      /// Comparison functor used internally by ltl::multop.
-      struct paircmp
-      {
-	bool
-	operator () (const pair& p1, const pair& p2) const
-	{
-	  if (p1.first != p2.first)
-	    return p1.first < p2.first;
-	  return *p1.second < *p2.second;
-	}
-      };
-      typedef std::map<pair, formula*, paircmp> map;
-      static map instances;
-
-      multop(type op, vec* v);
-      virtual ~multop();
-
-    private:
-      type op_;
-      vec* children_;
-    };
+    typedef spot::internal::multop<ltl_t> multop;
 
   }
 }

@@ -23,8 +23,6 @@
 /// \brief Define all LTL node types.
 ///
 /// This file is usually needed when \b defining a visitor.
-/// Prefer ltlast/predecl.hh when only \b declaring methods and functions
-/// over LTL nodes.
 #ifndef SPOT_LTLAST_ALLNODES_HH
 # define SPOT_LTLAST_ALLNODES_HH
 

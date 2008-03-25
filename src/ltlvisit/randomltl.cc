@@ -23,6 +23,7 @@
 #include <algorithm>
 #include "randomltl.hh"
 #include "ltlast/allnodes.hh"
+#include "ltlast/visitor.hh"
 #include "misc/random.hh"
 #include <iostream>
 #include <cstring>

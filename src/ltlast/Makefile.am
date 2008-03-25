@@ -19,9 +19,6 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-AM_CPPFLAGS = -I$(srcdir)/..
-AM_CXXFLAGS = $(WARNING_CXXFLAGS)
-
 ltlastdir = $(pkgincludedir)/ltlast
 
 ltlast_HEADERS = \
@@ -31,17 +28,6 @@ ltlast_HEADERS = \
   constant.hh \
   formula.hh \
   multop.hh \
-  predecl.hh \
   refformula.hh \
   unop.hh \
   visitor.hh
-
-noinst_LTLIBRARIES = libltlast.la
-libltlast_la_SOURCES = \
-  atomic_prop.cc \
-  binop.cc \
-  constant.cc \
-  formula.cc \
-  multop.cc \
-  refformula.cc \
-  unop.cc

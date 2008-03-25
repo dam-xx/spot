@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -24,11 +24,8 @@
 #ifndef SPOT_LTLAST_ATOMIC_PROP_HH
 # define SPOT_LTLAST_ATOMIC_PROP_HH
 
-#include <string>
-#include <iosfwd>
-#include <map>
-#include "refformula.hh"
-#include "ltlenv/environment.hh"
+# include "formula.hh"
+# include "internal/atomic_prop.hh"
 
 namespace spot
 {
@@ -37,38 +34,7 @@ namespace spot
 
     /// \brief Atomic propositions.
     /// \ingroup ltl_ast
-    class atomic_prop : public ref_formula
-    {
-    public:
-      /// Build an atomic proposition with name \a name in
-      /// environment \a env.
-      static atomic_prop* instance(const std::string& name, environment& env);
-
-      virtual void accept(visitor& visitor);
-      virtual void accept(const_visitor& visitor) const;
-
-      /// Get the name of the atomic proposition.
-      const std::string& name() const;
-      /// Get the environment of the atomic proposition.
-      environment& env() const;
-
-      /// Number of instantiated atomic propositions.  For debugging.
-      static unsigned instance_count();
-      /// List all instances of atomic propositions.  For debugging.
-      static std::ostream& dump_instances(std::ostream& os);
-
-    protected:
-      atomic_prop(const std::string& name, environment& env);
-      virtual ~atomic_prop();
-
-      typedef std::pair<std::string, environment*> pair;
-      typedef std::map<pair, atomic_prop*> map;
-      static map instances;
-
-    private:
-      std::string name_;
-      environment* env_;
-    };
+    typedef spot::internal::atomic_prop<ltl_t> atomic_prop;
 
   }
 }

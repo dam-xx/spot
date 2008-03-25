@@ -27,6 +27,7 @@
 # undef BISON_LOCATION_HH
 # undef BISON_POSITION_HH
 # include "tgbaparse/location.hh"
+# include "ltlast/visitor.hh"
 # include "ltlenv/defaultenv.hh"
 # include <string>
 # include <list>
