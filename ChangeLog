@@ -1,3 +1,10 @@
+2008-03-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/evtgbaparse/Makefile.am (AM_CXXFLAGS): Remove -Werror
+	so we tolerate more flex versions.
+	* src/ltlparse/Makefile.am (AM_CXXFLAGS): Likewise.
+	* src/tgbaparse/Makefile.am (AM_CXXFLAGS): Likewise.
+
 2008-03-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/misc/hash.hh: Second thinko in #if/#else.

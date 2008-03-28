@@ -1,6 +1,6 @@
-## Copyright (C) 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
-## département Systèmes Répartis Coopératifs (SRC), Université Pierre
-## et Marie Curie.
+## Copyright (C) 2004, 2006, 2008 Laboratoire d'Informatique de Paris 6
+## (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
+## Pierre et Marie Curie.
 ##
 ## This file is part of Spot, a model checking library.
 ##
@@ -20,7 +20,8 @@
 ## 02111-1307, USA.
 
 AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
-AM_CXXFLAGS = $(WARNING_CXXFLAGS)
+# Disable -Werror because too many versions of flex yield warnings.
+AM_CXXFLAGS = $(WARNING_CXXFLAGS:-Werror=)
 
 evtgbaparsedir = $(pkgincludedir)/evtgbaparse
 
