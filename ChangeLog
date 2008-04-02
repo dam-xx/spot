@@ -1,3 +1,45 @@
+2008-05-29  Guillaume SADEGH  <sadegh@lrde.epita.fr>
+
+	* iface/nips/nips.cc, iface/nips/nips.hh, iface/nips/common.cc,
+	iface/nips/common.hh, iface/nips/Makefile.am: TGBA implementation
+	with the NIPS library.
+	* iface/nips/emptiness_check.cc: Emptiness check on a Promela
+	interface.
+	* iface/nips/dottynips.cc: Dot printer on the NIPS interface.
+	* iface/nips/compile.sh: Add. Wrapper around nips compiler to
+	compile Promela to NIPS bytecode.
+	* iface/nips/nips_vm,iface/nips/nips_vm/bytecode.h,
+	iface/nips/nips_vm/ChangeLog, iface/nips/nips_vm/COPYING,
+	iface/nips/nips_vm/hashtab.c, iface/nips/nips_vm/hashtab.h,
+	iface/nips/nips_vm/INSTALL, iface/nips/nips_vm/instr.c,
+	iface/nips/nips_vm/instr.h, iface/nips/nips_vm/instr_step.c,
+	iface/nips/nips_vm/instr_step.h,
+	iface/nips/nips_vm/instr_tools.c,
+	iface/nips/nips_vm/instr_tools.h,
+	iface/nips/nips_vm/instr_wrap.c,
+	iface/nips/nips_vm/instr_wrap.h,
+	iface/nips/nips_vm/interactive.c,
+	iface/nips/nips_vm/interactive.h, iface/nips/nips_vm/main.c,
+	iface/nips/nips_vm/Makefile, iface/nips/nips_vm/Makefile.am,
+	iface/nips/nips_vm/nips_asm_help.pl,
+	iface/nips/nips_vm/nips_asm_instr.pl,
+	iface/nips/nips_vm/nips_asm.pl,
+	iface/nips/nips_vm/nips_disasm.pl, iface/nips/nips_vm/nipsvm.c,
+	iface/nips/nips_vm/nipsvm.h, iface/nips/nips_vm/README,
+	iface/nips/nips_vm/rt_err.c, iface/nips/nips_vm/rt_err.h,
+	iface/nips/nips_vm/search.c, iface/nips/nips_vm/search.h,
+	iface/nips/nips_vm/split.c, iface/nips/nips_vm/split.h,
+	iface/nips/nips_vm/state.c, iface/nips/nips_vm/state.h,
+	iface/nips/nips_vm/state_inline.h,
+	iface/nips/nips_vm/state_parts.c,
+	iface/nips/nips_vm/state_parts.h, iface/nips/nips_vm/timeval.h,
+	iface/nips/nips_vm/tools.h: NIPS VM added to the SPOT
+	distribution.
+	* configure.ac, iface/Makefile.am: Build system updated for the
+	NIPS front-end.
+
+	* src/Makefile.am (_.cc): Fix for `make tags`.
+
 2008-04-16  Damien Lefortier <dam@lrde.epita.fr>
 
 	* configure.ac, Makefile.am: Add src/eltltest/ support.

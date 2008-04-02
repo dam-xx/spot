@@ -47,3 +47,4 @@ libspot_la_LIBADD =  \
 
 # Dummy C++ source to cause C++ linking.
 nodist_EXTRA_libspot_la_SOURCES = _.cc
+_.cc:; touch $@

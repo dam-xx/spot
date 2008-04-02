@@ -1,0 +1,12 @@
+KILL
+----
+  set process <pid> to terminated
+  stack before: [...] <pid>
+  stack after: [...]
+
+POPX
+----
+  discard topmost value from stack
+  stack before: [...] <value>
+  stack after: [...]
+

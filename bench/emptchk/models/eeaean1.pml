@@ -87,7 +87,7 @@ restart:
 	od;
 
 	if
-	:: win == myid -> 
+	:: win == myid ->
 		leader = myid;
 		nr_leaders++;
 		assert(nr_leaders == 1);

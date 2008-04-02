@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -19,8 +19,28 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-SUBDIRS = nips
+AM_CPPFLAGS = -I$(top_srcdir)/src $(BUDDY_CPPFLAGS) -I$(srcdir)/nips_vm
+AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-if WITH_GSPN
-  SUBDIRS += gspn
-endif
+nipsdir = $(pkgincludedir)/nips
+
+nips_HEADERS = \
+  common.hh \
+  nips.hh
+
+lib_LTLIBRARIES = libspotnips.la
+libspotnips_la_LIBADD = $(top_builddir)/src/libspot.la
+libspotnips_la_SOURCES = \
+  common.cc \
+  nips.cc
+
+noinst_PROGRAMS = \
+  dottynips
+
+dottynips_SOURCES = dottynips.cc
+dottynips_LDADD = libspotnips.la $(builddir)/nips_vm/libnipsvm.la
+
+empt_check_SOURCES = emptiness_check.cc
+empt_check_LDADD = libspotnips.la $(builddir)/nips_vm/libnipsvm.la
+
+SUBDIRS = nips_vm

@@ -78,6 +78,8 @@ AC_CONFIG_FILES([
   iface/Makefile
   iface/gspn/Makefile
   iface/gspn/defs
+  iface/nips/Makefile
+  iface/nips/nips_vm/Makefile
   src/Makefile
   src/eltlast/Makefile
   src/eltlenv/Makefile
