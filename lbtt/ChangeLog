@@ -25,13 +25,13 @@
 	Update description of the --formulafile command line option.
 	(Configuration::print): Do not display a file name when reading
 	formulas from standard input.
-
+	
 	* src/SpotWrapper.h, src/SpotWrapper.cc: Merge files from
 	Spot 0.2 (contributed by Alexandre Duret-Lutz); remove #pragma
 	definitions.
 	* src/ExternalTranslator.h, src/Makefile.in, src/translate.cc:
 	Merge changes from Spot 0.2 (contributed by Alexandre Duret-Lutz).
-
+	
 	* doc/lbtt.texi: Fix typo in URL of the FormulaOptions block
 	generator.  Update version, add documentation and references about
 	support for Spot.  Describe the new semantics of the --formulafile
@@ -133,7 +133,7 @@
 	log file.
 
 	* configure.ac: Add test for the setsid library function.
-
+	
 2004-07-31  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* src/Product.h (ProductEdge::edge_1, ProductEdge::edge_2):
@@ -187,7 +187,7 @@
 	* doc/texinfo.tex: New upstream version.
 	* doc/lbtt.texi: Update to edition 1.1.0.
 	* NEWS: Update.
-
+	
 2004-07-02  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* src/UserCommandReader.cc (parseCommand): Recognize
@@ -266,13 +266,13 @@
 	New files for providing specializations of the general product
 	computation operation applicable to Büchi automata and state
 	spaces.
-
+	
 	* src/Makefile.am: Add BuchiProduct.h, BuchiProduct.cc,
 	Product.h, SccCollection.h and StateSpaceProduct.h to
 	lbtt_SOURCES.
 	Remove ProductAutomaton.h, ProductAutomaton.cc and
 	SccIterator.h from lbtt_SOURCES.
-
+	
 	* src/Graph.h.in (Graph::EdgeContainerType, Graph::Path): New
 	type definitions.
 	(Graph::PathElement): New class.
@@ -346,7 +346,7 @@
 	(printAcceptingCycle): Update parameter list and documentation.
 	Display all relevant information about an accepting execution
 	of a Büchi automaton.
-
+	
 2004-05-18  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* configure.ac (YACC): Do not add `-d' here.
@@ -374,7 +374,7 @@
 
 	* src/NeverClaim-lex.ll: Add %option nounput to avoid a
 	compiler warning.
-
+	
 	* src/ExternalTranslator.h: Include the TempFsysName.h header.
 	(ExternalTranslator::TempFileObject): Remove.
 	(ExternalTranslator::registerTempFileObject): Change
@@ -484,7 +484,7 @@
 	command line option.
 	(printCommandHelp): Update the description of the `formula'
 	command.
-
+	
 	* src/UserCommandReader.cc (executeUserCommands): Accept one
 	optional parameter for the `formula' command. Pass the input
 	tokens as an additional parameter in the printFormula call.
@@ -514,7 +514,7 @@
 	* src/TempFsysName.h, src/TempFsysName.cc New files.
 	* src/Makefile.am: Add TempFsysName.h and TempFsysName.cc to
 	lbtt_SOURCES.
-
+	
 	* src/TestRoundInfo.h: Include the TempFsysName.h header.
 	(TestRoundInfo::formula_file_name[])
 	(TestRoundInfo::automaton_file_name)
@@ -522,7 +522,7 @@
 	TempFsysName*.
 	(TestRoundInfo::TestRoundInfo): Initialize temporary file
 	name pointers to 0.
-
+	
 	* src/main.cc: Include the TempFsysName.h header.
 	(allocateTempFilenames, deallocateTempFilenames): New functions.
 	(abortHandler): New signal handler.
@@ -867,7 +867,7 @@
 	after colon in output. Return 3 if an unexpected exception
 	occurred. In this case print an additional newline before the
 	error message.
-
+	
 2004-02-19  Heikki Tauriainen  <heikki.tauriainen@hut.fi>
 
 	* src/StringUtil.h: Include the IntervalList.h header.
@@ -935,7 +935,7 @@
 	Reformat the automata file format section to avoid overfull lines
 	in dvi generation.
 	Fix description of the Algorithm block used with lbtt-translate.
-
+	
 	* doc/testprocedure.txt, doc/intersectioncheck.txt: Add initial
 	newlines.
 

@@ -1,5 +1,5 @@
-lbtt NEWS -- history of user-visible changes.   30 Aug 2005
-Copyright (C) 2005 Heikki Tauriainen
+lbtt NEWS -- history of user-visible changes.   9 Apr 2008
+Copyright (C) 2008 Heikki Tauriainen
 
    Permission is granted to anyone to make or distribute verbatim copies
    of this document as received, in any medium, provided that the
@@ -11,6 +11,11 @@ Copyright (C) 2005 Heikki Tauriainen
    changed them.
 
 Please send bug reports to <heikki.tauriainen@tkk.fi>.
+
+Version 1.2.1
+
+* Fix compilation and warnings on GCC 4.3 (thanks to Alexandre Duret-Lutz
+  for the patch).
 
 Version 1.2.0
 
