@@ -1,0 +1,13 @@
+.deps
+Makefile
+Makefile.in
+location.hh
+sautparse.cc
+sautparse.hh
+sautparse.output
+sautscan.cc
+position.hh
+stack.hh
+*.lo
+*.la
+.libs
