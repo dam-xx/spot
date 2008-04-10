@@ -1,0 +1,8 @@
+Doxyfile
+Makefile
+Makefile.in
+spot.html
+spot.latex
+spot.tag
+*.pdf
+stamp

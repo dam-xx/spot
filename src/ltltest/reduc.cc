@@ -1,6 +1,6 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2004, 2006, 2007, 2008 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <cstdlib>
 #include "ltlparse/public.hh"
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/tunabbrev.hh"
@@ -30,6 +31,7 @@
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/reduce.hh"
 #include "ltlvisit/length.hh"
+#include "ltlvisit/contain.hh"
 #include "ltlast/allnodes.hh"
 
 void
@@ -58,7 +60,9 @@ main(int argc, char** argv)
       o = spot::ltl::Reduce_Eventuality_And_Universality;
       break;
     case 3:
-      o = spot::ltl::Reduce_All;
+      o = spot::ltl::Reduce_Basics
+	| spot::ltl::Reduce_Syntactic_Implications
+	| spot::ltl::Reduce_Eventuality_And_Universality;
       break;
     case 4:
       o = spot::ltl::Reduce_Basics | spot::ltl::Reduce_Syntactic_Implications;
@@ -70,6 +74,37 @@ main(int argc, char** argv)
     case 6:
       o = (spot::ltl::Reduce_Syntactic_Implications
 	   | spot::ltl::Reduce_Eventuality_And_Universality);
+      break;
+    case 7:
+      o = spot::ltl::Reduce_Containment_Checks;
+      break;
+    case 8:
+      o = spot::ltl::Reduce_Containment_Checks_Stronger;
+      break;
+    case 9:
+      o = spot::ltl::Reduce_All;
+      break;
+    case 10:
+      o = (spot::ltl::Reduce_Basics
+	   | spot::ltl::Reduce_Containment_Checks_Stronger);
+      break;
+    case 11:
+      o = (spot::ltl::Reduce_Syntactic_Implications
+	   | spot::ltl::Reduce_Containment_Checks_Stronger);
+      break;
+    case 12:
+      o = (spot::ltl::Reduce_Basics
+	   | spot::ltl::Reduce_Syntactic_Implications
+	   | spot::ltl::Reduce_Containment_Checks_Stronger);
+      break;
+    case 13:
+      o = (spot::ltl::Reduce_Eventuality_And_Universality
+	   | spot::ltl::Reduce_Containment_Checks_Stronger);
+      break;
+    case 14:
+      o = (spot::ltl::Reduce_Basics
+	   | spot::ltl::Reduce_Eventuality_And_Universality
+	   | spot::ltl::Reduce_Containment_Checks_Stronger);
       break;
     default:
       return 2;

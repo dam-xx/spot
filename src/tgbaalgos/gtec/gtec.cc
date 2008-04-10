@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2005, 2006, 2008 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -19,10 +19,20 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+// #define TRACE
+
+#include <iostream>
+#ifdef TRACE
+#define trace std::cerr
+#else
+#define trace while (0) std::cerr
+#endif
+
 #include "gtec.hh"
 #include "ce.hh"
 #include "tgba/proviso.hh"
 #include "tgba/bddprint.hh"
+#include "misc/memusage.hh"
 
 namespace spot
 {
@@ -65,6 +75,10 @@ namespace spot
 	static_cast<spot::unsigned_statistics::unsigned_fun>
 	(&couvreur99_check::get_removed_components);
 
+    stats["vmsize"] =
+	static_cast<spot::unsigned_statistics::unsigned_fun>
+	(&couvreur99_check::get_vmsize);
+
     const streett_acceptance_conditions* st =
       dynamic_cast<const streett_acceptance_conditions*>(a);
     if (st)
@@ -88,6 +102,15 @@ namespace spot
   couvreur99_check::get_removed_components() const
   {
     return removed_components;
+  }
+
+  unsigned
+  couvreur99_check::get_vmsize() const
+  {
+    int size = memusage();
+    if (size > 0)
+      return size;
+    return 0;
   }
 
   void
@@ -406,6 +429,7 @@ namespace spot
     group_ = o.get("group", 1);
     group2_ = o.get("group2", 0);
     group_ |= group2_;
+    onepass_ = o.get("onepass", 0);
 
     // Setup depth-first search from the initial state.
     const state* i = ecs_->aut->get_init_state();
@@ -464,14 +488,39 @@ namespace spot
     assert(depth() == 0);
   }
 
+  void
+  couvreur99_check_shy::dump_queue(std::ostream& os)
+  {
+    os << "--- TODO ---" << std::endl;
+    unsigned pos = 0;
+    for (todo_list::const_iterator ti = todo.begin(); ti != todo.end(); ++ti)
+      {
+	++pos;
+	os << "#" << pos << " s:" << ti->s << " n:" << ti->n
+	   << " q:{";
+	for (succ_queue::const_iterator qi = ti->q.begin(); qi != ti->q.end();)
+	  {
+	    os << qi->s;
+	    ++qi;
+	    if (qi != ti->q.end())
+	      os << ", ";
+	  }
+	os << "}" << std::endl;
+      }
+  }
+
   emptiness_check_result*
   couvreur99_check_shy::check()
   {
     // Position in the loop seeking known successors.
-    succ_queue::iterator pos = todo.back().q.begin();
+    pos = todo.back().q.begin();
 
     for (;;)
       {
+#ifdef TRACE
+	dump_queue();
+#endif
+
 	assert(ecs_->root.size() == 1 + arc.size());
 
 	// Get the successors of the current state.
@@ -486,6 +535,8 @@ namespace spot
 	// If there is no more successor, backtrack.
 	if (queue.empty())
 	  {
+	    trace << "backtrack" << std::endl;
+
 	    // We have explored all successors of state CURR.
 	    const state* curr = todo.back().s;
 	    int index = todo.back().n;
@@ -597,14 +648,21 @@ namespace spot
 	// which state we are considering.  Otherwise just pick the
 	// first one.
 	succ_queue::iterator old;
+	if (onepass_)
+	  pos = queue.end();
 	if (pos == queue.end())
 	  old = queue.begin();
 	else
-	  old = pos++;
+	  old = pos;
 	successor succ = *old;
-
+	// Beware: the implementation of find_state in ifage/gspn/ssp.cc
+	// uses POS and modifies QUEUE.
 	numbered_state_heap::state_index_p sip = find_state(succ.s);
+	if (pos != queue.end())
+	  ++pos;
 	int* i = sip.second;
+
+	trace << "picked state " << succ.s << std::endl;
 
 	if (!i || *i == -2)
 	  {
@@ -612,6 +670,9 @@ namespace spot
 	    // If we are seeking known states, just skip it.
 	    if (pos != queue.end())
 	      continue;
+
+	    trace << "new state" << std::endl;
+
 	    // Otherwise, number it and stack it so we recurse.
 	    queue.erase(old);
 	    dec_depth();
@@ -632,7 +693,12 @@ namespace spot
 
 	// Skip dead states.
 	if (*i == -1)
-	  continue;
+	  {
+	    trace << "dead state" << std::endl;
+	    continue;
+	  }
+
+	trace << "merging..." << std::endl;
 
 	// ignore "avoided" transitions
 	if (*i <= min.back())
@@ -713,7 +779,7 @@ namespace spot
 		todo_list::reverse_iterator last = prev++;
 		// If group2 is used we insert the last->q in front
 		// of prev->q so that the states in prev->q are checked
-		// for existence again after we have done with the states
+		// for existence again after we have processed the states
 		// of last->q.  Otherwise we just append to the end.
 		prev->q.splice(group2_ ? prev->q.begin() : prev->q.end(),
 			       last->q);

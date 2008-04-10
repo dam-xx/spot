@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -54,6 +54,10 @@ namespace spot
     fv_map acc_map;		///< Maps acceptance conditions to BDD variables
     vf_map acc_formula_map;	///< Maps BDD variables to acceptance conditions
 
+    /// Clone counts.
+    typedef std::map<int, int> cc_map;
+    cc_map clone_counts;
+
     /// \brief Map Next variables to Now variables.
     ///
     /// Use with BuDDy's bdd_replace() function.
@@ -108,6 +112,13 @@ namespace spot
     /// \return The variable number.  Use bdd_ithvar() or bdd_nithvar()
     ///   to convert this to a BDD.
     int register_acceptance_variable(const ltl::formula* f, const void* for_me);
+
+    /// \brief Clone an acceptance variable VAR for FOR_ME.
+    ///
+    /// This is used in products TGBAs when both operands share the
+    /// same acceptance variables but they need to be distinguished in
+    /// the result.
+    int register_clone_acc(int var, const void* for_me);
 
     /// \brief Register BDD variables as acceptance variables.
     ///
@@ -172,13 +183,13 @@ namespace spot
     // SWIG does not grok the following definition, no idea why.
     // It's not important for the Python interface anyway.
 #ifndef SWIG
-    class annon_free_list : public spot::free_list
+    class anon_free_list : public spot::free_list
     {
     public:
       // WARNING: We need a default constructor so this can be used in
       // a hash; but we should ensure that no object in the hash is
       // constructed with d==0.
-      annon_free_list(bdd_dict* d = 0);
+      anon_free_list(bdd_dict* d = 0);
       virtual int extend(int n);
     private:
       bdd_dict* dict_;
@@ -186,8 +197,8 @@ namespace spot
 #endif
 
     /// List of unused anonymous variable number for each automaton.
-    typedef std::map<const void*, annon_free_list> free_annonymous_list_of_type;
-    free_annonymous_list_of_type free_annonymous_list_of;
+    typedef std::map<const void*, anon_free_list> free_anonymous_list_of_type;
+    free_anonymous_list_of_type free_anonymous_list_of;
 
   private:
     // Disallow copy.

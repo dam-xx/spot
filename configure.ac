@@ -1,4 +1,4 @@
-# Copyright (C) 2003, 2004, 2005, 2006  Laboratoire d'Informatique
+# Copyright (C) 2003, 2004, 2005, 2006, 2007  Laboratoire d'Informatique
 # de Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 # Université Pierre et Marie Curie.
 #
@@ -19,10 +19,10 @@
 # Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-AC_PREREQ([2.59])
-AC_INIT([spot], [0.3a])
+AC_PREREQ([2.61])
+AC_INIT([spot], [0.4a])
 AC_CONFIG_AUX_DIR([tools])
-AM_INIT_AUTOMAKE([1.9 gnits nostdinc tar-ustar])
+AM_INIT_AUTOMAKE([1.10 gnits nostdinc tar-ustar])
 
 # If the user didn't supplied a CFLAGS value,
 # set an empty one to prevent autoconf to stick -O2 -g here.
@@ -63,7 +63,7 @@ AC_CHECK_PROG([MODELLA], [modella], [modella])
 AC_CHECK_PROG([LTL2NBA], [script4lbtt.py], [script4lbtt.py])
 AC_CHECK_PROG([PERL], [perl], [perl])
 AC_CHECK_PROG([SPIN], [spin], [spin])
-AC_CHECK_PROG([VALGRIND], [valgrind], [valgrind])
+AX_CHECK_VALGRIND
 AC_CHECK_PROG([WRING2LBTT], [wring2lbtt], [wring2lbtt])
 
 AC_CONFIG_FILES([

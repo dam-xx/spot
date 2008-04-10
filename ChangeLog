@@ -1,3 +1,94 @@
+2008-03-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/evtgbaparse/Makefile.am (AM_CXXFLAGS): Remove -Werror
+	so we tolerate more flex versions.
+	* src/ltlparse/Makefile.am (AM_CXXFLAGS): Likewise.
+	* src/tgbaparse/Makefile.am (AM_CXXFLAGS): Likewise.
+
+2008-03-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/misc/hash.hh: Second thinko in #if/#else.
+
+2008-03-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/misc/hash.hh: Thinko in #if/#else.
+
+2008-03-21  Damien Lefortier <dam@lrde.epita.fr>
+
+	* src/misc/freelist.hh: Avoid <iostream> in headers, better use <iosfwd>.
+
+2008-03-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbatest/ltl2tgba.cc, src/misc/hash.hh: Reformat the header
+	using 80 columns.
+
+2008-03-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Make sure Spot compiles with g++-4.3.
+
+	* src/ltlast/formula.hh (hash): Remove const from return type.
+	This kills a g++-4.3 warning.
+	* src/misc/hash.hh: Adjust to use unordered_set and unordered_map
+	from TR1 when g++-4.3 is used.
+	* src/evtgba/product.cc, src/ltltest/randltl.cc,
+	src/ltlvisit/randomltl.cc, src/ltlvisit/tostring.cc,
+	src/misc/freelist.hh, src/misc/optionmap.cc,
+	src/tgba/tgbareduc.hh, src/tgbaalgos/gv04.cc,
+	src/tgbaalgos/ltl2tgba_fm.cc, src/tgbaalgos/randomgraph.cc,
+	src/tgbatest/ltl2tgba.cc, src/tgbatest/randtgba.cc,
+	src/ltltest/equals.cc, src/ltltest/readltl.cc,
+	src/ltltest/reduc.cc, src/ltltest/syntimpl.cc,
+	src/ltltest/tostring.cc, src/tgbatest/ltlprod.cc,
+	src/tgbatest/powerset.cc, src/tgbatest/explprod.cc,
+	src/tgbatest/mixprod.cc, src/tgbatest/readsave.cc,
+	src/tgbatest/reductgba.cc, src/tgbatest/tgbaread.cc,
+	src/tgbatest/tripprod.cc, src/evtgbatest/product.cc,
+	src/evtgbatest/readsave.cc, src/evtgbatest/ltl2evtgba.cc,
+	src/evtgbatest/readsave.cc: Add missing includes.
+	* src/tgbatest/explicit.test, src/tgbatest/explprod.test,
+	src/tgbatest/explpro2.test, src/tgbatest/troprod.test,
+	src/tgbatest/emptchk.test: Cope with different outputs.
+
+2008-03-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* doc/Doxyfile.in (LATEX_HIDE_INDICES): Do not generate indices
+	until Doxygen is fixed.  Doxygen 1.5.5 generates incorrect LaTeX
+	code.
+
+2008-02-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbaalgos/reachiter.hh: Typos in comments.
+
+2008-02-22  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgba/tgbabddconcretefactory.hh (create_state):
+	Clarify comments.
+
+2008-02-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbaalgos/gtec/gtec.cc (couvreur99_check_shy::dump_queue):
+	Remove superfluous semicolon.
+
+2008-01-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbaalgos/reductgba_sim.cc (reduc_tgba_sim): Add two
+	assert().  This patch has been lying in my tree since 2007-04-30.
+
+2008-01-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	This is something Soheib and I worked on back in July, but a
+	intricate memory corruption bug prevented me to check the patch
+	in.  It took me two days to realize why find_state() must do a
+	double loop over the candidates to check for equality before
+	checking for inclusion(s).
+
+	* iface/gspn/ltlgspn.cc: New options, -e45 and -n.
+	* iface/gspn/ssp.cc, iface/gspn/ssp.hh: Handle these.
+	* src/tgbaalgos/gtec/gtec.cc (TRACE): Add some debugging traces.
+	(couvreur99_check_shy::dump_queue): New function.
+	* src/tgbaalgos/gtec/gtec.hh (couvreur99_check_shy::dump_queue):
+	New function.
+
 2007-12-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgba/proviso.cc (dummy_proviso::intersect): Kill a "unused
@@ -7,6 +98,97 @@
 	sense to use an anonymous namespace in a .hh, and g++ 4.2.3
 	complains.
 
+2007-11-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Keep libtool's files under CVS so that we don't use the broken
+	Debian versions installed in build hosts during automatic builds.
+
+	* m4/libtool.m4: New file, from GNU Libtool 1.4.24.
+	* tools/ltmain.sh: New file, from GNU Libtool 1.4.24.
+	* HACKING: Installing Libtool is no longer required.
+
+2007-11-22  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* m4/valgrind.m4: New file.
+	* configure.ac: Use it.
+
+2007-10-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* wrap/python/cgi/ltl2tgba.in: Adjust to newer versions of swig.
+
+2007-09-19  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/misc/bddalloc.cc (bdd_allocator::initialize):
+	Disable the default GC handler.  Reported by
+	Kristin Yvonne Rozier <kyrozier@cs.rice.edu>.
+
+2007-07-26  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/tgbatest/ltl2tgba.cc (main): Correctly destroy unobservable
+	events.
+
+2007-07-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* iface/gspn/ltlgspn.cc: New option -L.
+	* iface/gspn/ssp.cc, iface/gspn/ssp.hh (gspn_ssp_interface)
+	support for a new option "pushfront".
+
+	* NEWS, configure.in: Bump version to 0.4a.
+
+2007-07-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* NEWS, configure.in: Bump version to 0.4.
+	* HACKING, INSTALL, doc/Doxyfile.in, lbtt/INSTALL: Update to newer
+	tools.
+
+2007-07-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* iface/gspn/ssp.cc (tgba_gspn_ssp_private_::~tgba_gspn_ssp_private_):
+	Fix the declaration for GCC 4.1.2.
+	* iface/gspn/gspn.cc (tgba_gspn_private_::~tgba_gspn_private_):
+	Likewise.
+
+2007-06-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/spotlbtt.test: Do not check -R1q -R1t -R2q -R2t.
+
+2007-04-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/ltl2tgba.cc (main): Fix handling of -R1q -R1t -R2q -R2t.
+	Add support for -r8/-fr8.
+
+	* src/tgbatest/spotlbtt.test: Also check -R1q -R1t -R2q -R2t.
+
+2007-04-29  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlvisit/reduce.cc (reduce): Repeat the reduction as
+	long as the formula changes, it makes more sense when
+	combining algorithm.  E.g. basic reductions can help language
+	containment and vice-versa.
+
+2007-04-20  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbatest/spotlbtt.test: Disable formula rewriting during
+	construction.
+
+2007-04-19  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltltest/reduc.cc (main): More cases to test.
+	* src/ltlvisit/basicreduce.cc (basic_reduce_visitor::visit):
+	Simplify the formula again after FX->XF and GX->XG permutations.
+	This is so that formulae like GFXXa become GFa and not just GFXa.
+	* src/ltlvisit/contain.cc (reduce_tau03_visitor): Fix a typo
+	in the rules for i|j or i&j, resulting in missing simplifications.
+
+	* src/ltlvisit/contain.cc (reduce_tau03_visitor): Simplify the
+	rules for "a U b" and "a R b", an implication check is enough.
+
+2007-04-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/misc/bddalloc.cc (bdd_allocator::initialize): Call
+	bdd_isrunning() and don't run bdd_init() if it has already been
+	called.
+
 2007-02-06  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/tgbaalgos/randomgraph.cc (random_graph): Fix the
@@ -14,6 +196,8 @@
 	duplicate transitions because of that bug.
 
 2006-08-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* HACKING: We need Bison 2.3.
 
 	* evtgbaparse/evtgbaparse.yy, ltlparse/ltlparse.yy,
 	tgbaparse/tgbaparse.yy, src/sautparse/sautparse.yy:
@@ -25,15 +209,35 @@
 	* src/evtgbaparse/Makefile.am (evtgbaparse_HEADERS): Likewise.
 	* src/sautparse/Makefile.am (sautparse_HEADERS): Likewise.
 
+2006-08-17  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlparse/public.hh: Work around Bison 2.3 unique guards.
+
+2006-08-16  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/evtgbaparse/public.hh: Work around Bison 2.3 unique guards.
+	* src/ltlvisit/reduce.hh, src/ltlvisit/reduce.hh:
+	Add Reduce_Containment_Checks and Reduce_Containment_Checks_Stronger
+	flags, and call reduce_tau03.
+	* src/ltlvisit/contain.hh (reduce_tau03): Make "stronger" the
+	default.
+	* src/ltlvisit/contain.cc: Style.
+	* src/ltltest/reduc.cc: Simplify using the reduce() interface
+	instead of reduce_tau03.
+	* src/tgbatest/ltl2tgba.cc: Likewise.  Add -fr5, -fr6, and -fr7
+	options.
+	* src/tgbatest/spotlbtt.test: Remove cases using "-c", since its
+	current implementation is not always correct (and apparently
+	reduces less than -fr7).
+
 2006-08-02  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* src/sautparse/parsedecl.hh, src/sautparse/public.hh,
 	src/sautparse/sautparse.yy, src/sautparse/sautscan.ll:
 	Adjust for Bison 2.3.  Adjust for Bison 2.3.
 
-	Merges from HEAD:
+2006-08-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
-	2006-08-01  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 	* src/evtgbatest/evtgbaparse.yy, src/evtgbaparse/evtgbascan.ll,
 	src/evtgbaparse/parsedecl.hh, src/evtgbaparse/public.hh,
 	src/ltlparse/fmterror.cc, src/ltlparse/ltlparse.yy,
@@ -43,10 +247,78 @@
 	src/tgbaparse/tgbascan.ll: Adjust for Bison 2.3.  Use %name-prefix
 	instead of the "#define yy ... " kludge.
 
-	2006-07-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+2006-07-24  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlvisit/contain.hh, src/ltlvisit/contain.cc: Adjust to only
+	check containment on demand.
+
+2006-07-19  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/ltlvisit/contain.hh, src/ltlvisit/contain.cc (reduce_tau03):
+	New function, performing LTL reduction a la tauriainen.03.a83.
+	* src/ltltest/equals.cc, src/ltltest/reduc.cc: Add support for
+	the new reduction.
+	* src/ltltest/reduc.test: Cut the test in half, and additionally
+	test the new reduction.
+	* src/ltltest/reduccmp.test: Run on the new reduction.
+	* src/ltltest/Makefile.am: Adjust.
+	* src/tgbatest/ltl2tgba.cc: Add new options to apply the reduction.
+	* src/tgbatest/spotlbtt.test: Use them.
+
+	* src/tgba/tgbaproduct.cc: Fix computation of common acceptance
+	conditions.
+
+	* src/tgba/bdddict.cc, src/tgba/bdddict.cc (register_clone_acc):
+	New function.
+	* src/tgba/tgbaproduct.cc, src/tgba/tgbaproduct.hh: Use it to
+	distinguish acceptance conditions that are identical in both
+	operands.
+
+	* src/tgbatest/explpro4.test: New file.
+	* src/tgbatest/explpro2.test, src/tgbatest/Makefile.am: Adjust.
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (language_containment_checker): Move ...
+	* src/ltlvisit/contain.cc, src/ltlvisit/contain.hh
+	(spot::ltl::language_containment_checker): ... in these new files.
+	* src/ltlvisit/Makefile.am: Adjust.
+
+2006-07-18  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/misc/memusage.cc, src/misc/memusage.hh: New files.
+	* src/misc/Makefile.am: Add them.
+	* src/tgbaalgos/gtec/gtec.cc,
+	src/tgbaalgos/gtec/gtec.hh: Add a "vmsize" statistic.
+
+2006-07-14  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgba/bdddict.cc, src/tgba/bdddict.hh (free_annonymous_list_of):
+	Rename as ...
+	(free_anonymous_list_of): ... this, and correct their update on
+	release.  Also correct yesterday's the correction (ahem!).
+	(dump): Improve verbosity.
+	* src/misc/freelist.cc (free_list::remove, free_list::insert): Fix
+	longstanding thinkos.
+	(free_list::free_count): New function.
+
 	* src/tgba/tgbabddconcrete.hh, src/tgba/tgbaexplicit.hh,
 	src/tgba/tgbaproduct.hh, src/tgba/tgbareduc.hh, src/tgba/tgbatba.hh:
 	Remove superfluous class qualifiers worrying gcc 4.1.2.
+
+2006-07-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/ltl2tgba_fm.hh, src/tgbaalgos/ltl2tgba_fm.cc
+	(ltl_to_tgba_fm): Add a new option "containment_checks" to enable
+	some language containment checks (via emptiness checks) during the
+	translation.  This first attempt currently only use containment
+	checks to merge states bisimulating each other.
+	* src/tgbatest/ltl2tgba.cc: Bind this to option "-c".
+	* src/tgbatest/spotlbtt.test: Check it.
+
+	* src/tgba/bdddict.cc (bdd_dict::unregister_variable): Correctly
+	call release_n(), not remove() to repopulated the freelist of
+	anonymous BDD variables.  New code I'm working on triggered an
+	assertion inside remove(), but I'm surprised this bug hadn't
+	manifested before !
 
 2006-06-30  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
@@ -172,6 +444,22 @@
 	of LTL formulae, fix its error locations.
 	* src/tgbaparse/tgbaparse.yy (line): Fix error locations of
 	LTL formulae.
+
+2006-06-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* iface/gspn/common.hh, iface/gspn/common.cc, iface/gspn/gspn.cc,
+	iface/gspn/ltlgspn.cc, iface/gspn/dottygspn.cc, iface/gspn/ssp.cc,
+	iface/gspn/dottyssp.cc: s/exeption/exception/g.
+
+2006-04-05  Alexandre Duret-Lutz  <adl@src.lip6.fr>
+
+	* src/tgbaalgos/gtec/gtec.cc, src/tgbaalgos/gtec/gtec.hh:
+	(couvreur99_check_shy_ssp): Add a onepass_ attribute to
+	disable the "shyness", and do not increment pos before calling
+	find_state since gspn's implementation uses it.
+	* iface/gspn/ssp.cc: Enable "onepass_" for all "shy" variants,
+	and also fix find_state for the case where onepass_ is
+	disabled (but I do not yet know why the latter fix isn't enough).
 
 2006-03-13  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
@@ -1931,7 +2219,7 @@
 	tgba_explicit_succ_iterator::current_accepting_conditions): Assert
 	the iteration is not finished.
 
-2004-10-12  Alexandre Duret-Lutz  <adl@gnu.org>
+2004-10-12  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* wrap/python/tests/run.in: Typo.  From Akim Demaille.
 
@@ -4409,7 +4697,7 @@
 	* wrap/python/Makefile.am (spot_wrap.cxx, spot.py): Lookup
 	spot.i in $(srcdir).
 
-2003-07-31  Alexandre Duret-Lutz  <adl@gnu.org>
+2003-07-31  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac: Output wrap/python/tests/Makefile
 	and wrap/python/tests/run.

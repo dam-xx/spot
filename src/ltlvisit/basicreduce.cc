@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2007  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -159,13 +159,16 @@ namespace spot
 	      u = dynamic_cast<unop*>(result_);
 	      if (u && u->op() == unop::X)
 		{
-		  result_ =
+		  formula* res =
 		    unop::instance(unop::X,
 				   unop::instance(unop::F,
 						  basic_reduce(u->child())));
 		  destroy(u);
-		return;
-	      }
+		  // FXX(a) = XXF(a) ...
+		  result_ = basic_reduce(res);
+		  destroy(res);
+		  return;
+		}
 
 	      // F(f1 & GF(f2)) = F(f1) & GF(F2)
 	      mo = dynamic_cast<multop*>(result_);
@@ -198,11 +201,15 @@ namespace spot
 	      u = dynamic_cast<unop*>(result_);
 	      if (u && u->op() == unop::X)
 		{
-		  result_ =
+		  formula* res =
 		    unop::instance(unop::X,
 				   unop::instance(unop::G,
 						  basic_reduce(u->child())));
 		  destroy(u);
+		  // GXX(a) = XXG(a) ...
+		  // GXF(a) = XGF(a) = GF(a) ...
+		  result_ = basic_reduce(res);
+		  destroy(res);
 		  return;
 		}
 

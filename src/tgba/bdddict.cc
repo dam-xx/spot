@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -20,10 +20,14 @@
 // 02111-1307, USA.
 
 #include <ostream>
+#include <sstream>
 #include <cassert>
 #include <ltlvisit/clone.hh>
 #include <ltlvisit/destroy.hh>
 #include <ltlvisit/tostring.hh>
+#include <ltlvisit/tostring.hh>
+#include <ltlast/atomic_prop.hh>
+#include <ltlenv/defaultenv.hh>
 #include "bdddict.hh"
 
 namespace spot
@@ -33,7 +37,7 @@ namespace spot
       next_to_now(bdd_newpair()),
       now_to_next(bdd_newpair())
   {
-    free_annonymous_list_of[0] = annon_free_list(this);
+    free_anonymous_list_of[0] = anon_free_list(this);
   }
 
   bdd_dict::~bdd_dict()
@@ -141,20 +145,40 @@ namespace spot
 
 
   int
+  bdd_dict::register_clone_acc(int var, const void* for_me)
+  {
+    vf_map::iterator i = acc_formula_map.find(var);
+    assert(i != acc_formula_map.end());
+    std::ostringstream s;
+    // FIXME: We could be smarter and reuse unused "$n" numbers.
+    s << ltl::to_string(i->second) << "$"
+      << ++clone_counts[var];
+    ltl::formula* f =
+      ltl::atomic_prop::instance(s.str(),
+				 ltl::default_environment::instance());
+    int res = register_acceptance_variable(f, for_me);
+    ltl::destroy(f);
+    return res;
+  }
+
+
+  int
   bdd_dict::register_anonymous_variables(int n, const void* for_me)
   {
-    free_annonymous_list_of_type::iterator i =
-      free_annonymous_list_of.find(for_me);
+    free_anonymous_list_of_type::iterator i =
+      free_anonymous_list_of.find(for_me);
 
-    if (i == free_annonymous_list_of.end())
+    if (i == free_anonymous_list_of.end())
       {
- 	typedef free_annonymous_list_of_type fal;
-	i = (free_annonymous_list_of.insert
-	     (fal::value_type(for_me, free_annonymous_list_of[0]))).first;
+ 	typedef free_anonymous_list_of_type fal;
+	i = (free_anonymous_list_of.insert
+	     (fal::value_type(for_me, free_anonymous_list_of[0]))).first;
       }
     int res = i->second.register_n(n);
+
     while (n--)
       var_refs[res + n].insert(for_me);
+
     return res;
   }
 
@@ -170,7 +194,11 @@ namespace spot
 	if (s.find(from_other) != s.end())
 	  s.insert(for_me);
       }
-    free_annonymous_list_of[for_me] = free_annonymous_list_of[from_other];
+
+    free_anonymous_list_of_type::const_iterator j =
+      free_anonymous_list_of.find(from_other);
+    if (j != free_anonymous_list_of.end())
+      free_anonymous_list_of[for_me] = j->second;
   }
 
   void
@@ -188,14 +216,23 @@ namespace spot
     ref_set::iterator si = s.find(me);
     if (si == s.end())
       return;
+
     s.erase(si);
+
+    int var = cur->first;
+    // If var is anonymous, we should reinsert it into the free list
+    // of ME's anonymous variables.
+    if (var_formula_map.find(var) == var_formula_map.end()
+	&& now_formula_map.find(var) == now_formula_map.end()
+	&& acc_formula_map.find(var) == acc_formula_map.end())
+      free_anonymous_list_of[me].release_n(var, 1);
+
     if (!s.empty())
       return;
 
     // ME was the last user of this variable.
     // Let's free it.  First, we need to find
     // if this is a Now, a Var, or an Acc variable.
-    int var = cur->first;
     int n = 1;
     const ltl::formula* f = 0;
     vf_map::iterator vi = var_formula_map.find(var);
@@ -228,9 +265,12 @@ namespace spot
 	      }
 	    else
 	      {
-		free_annonymous_list_of_type::iterator i;
-		for (i = free_annonymous_list_of.begin();
-		     i != free_annonymous_list_of.end(); ++i)
+		free_anonymous_list_of_type::iterator i;
+		// Nobody use this variable as an anonymous variable
+		// anymore, so remove it entirely from the anonymous
+		// free list so it can be used for something else.
+		for (i = free_anonymous_list_of.begin();
+		     i != free_anonymous_list_of.end(); ++i)
 		  i->second.remove(var, n);
 	      }
 	  }
@@ -254,7 +294,7 @@ namespace spot
 	vr_map::iterator cur = i++;
 	unregister_variable(cur, me);
       }
-    free_annonymous_list_of.erase(me);
+    free_anonymous_list_of.erase(me);
   }
 
   bool
@@ -315,6 +355,24 @@ namespace spot
 	   << var_refs.find(fi->second)->second.size() << "): Acc[";
 	to_string(fi->first, os) << "]" << std::endl;
       }
+    os << "Ref counts:" << std::endl;
+    vr_map::const_iterator ri;
+    for (ri = var_refs.begin(); ri != var_refs.end(); ++ri)
+      {
+	os << "  " << ri->first << " :";
+	for (ref_set::const_iterator si = ri->second.begin();
+	     si != ri->second.end(); ++si)
+	  os << " " << *si;
+	os << std::endl;
+      }
+    os << "Anonymous lists:" << std::endl;
+    free_anonymous_list_of_type::const_iterator ai;
+    for (ai = free_anonymous_list_of.begin();
+	 ai != free_anonymous_list_of.end(); ++ai)
+      {
+	os << "  [" << ai->first << "] ";
+	ai->second.dump_free_list(os) << std::endl;
+      }
     os << "Free list:" << std::endl;
     dump_free_list(os);
     os << std::endl;
@@ -368,20 +426,20 @@ namespace spot
   }
 
 
-  bdd_dict::annon_free_list::annon_free_list(bdd_dict* d)
+  bdd_dict::anon_free_list::anon_free_list(bdd_dict* d)
     : dict_(d)
   {
   }
 
   int
-  bdd_dict::annon_free_list::extend(int n)
+  bdd_dict::anon_free_list::extend(int n)
   {
     assert(dict_);
     int b = dict_->allocate_variables(n);
 
-    free_annonymous_list_of_type::iterator i;
-    for (i = dict_->free_annonymous_list_of.begin();
-	 i != dict_->free_annonymous_list_of.end(); ++i)
+    free_anonymous_list_of_type::iterator i;
+    for (i = dict_->free_anonymous_list_of.begin();
+	 i != dict_->free_anonymous_list_of.end(); ++i)
       if (&i->second != this)
 	i->second.insert(b, n);
     return b;

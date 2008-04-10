@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
-// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
-// Université Pierre et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Laboratoire
+// d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
+// Coopératifs (SRC), Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -24,8 +24,9 @@
 #include <cassert>
 #include <fstream>
 #include <string>
+#include <cstdlib>
 #include "ltlvisit/destroy.hh"
-#include "ltlvisit/reduce.hh"
+#include "ltlvisit/contain.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/apcollect.hh"
 #include "ltlast/allnodes.hh"
@@ -65,6 +66,8 @@ syntax(char* prog)
 	    << "  -A    same as -a, but as a set" << std::endl
 	    << "  -b    display the automaton in the format of spot"
             << std::endl
+	    << "  -c    enable language containment checks (implies -f)"
+	    << std::endl
 	    << "  -d    turn on traces during parsing" << std::endl
 	    << "  -D    degeneralize the automaton as a TBA" << std::endl
 	    << "  -DS   degeneralize the automaton as an SBA" << std::endl
@@ -78,6 +81,10 @@ syntax(char* prog)
 	    << "  -fr2  use -r2 (see below) at each step of FM" << std::endl
 	    << "  -fr3  use -r3 (see below) at each step of FM" << std::endl
 	    << "  -fr4  use -r4 (see below) at each step of FM" << std::endl
+	    << "  -fr5  use -r5 (see below) at each step of FM" << std::endl
+	    << "  -fr6  use -r6 (see below) at each step of FM" << std::endl
+	    << "  -fr7  use -r7 (see below) at each step of FM" << std::endl
+	    << "  -fr8  use -r8 (see below) at each step of FM" << std::endl
             << "  -F    read the formula from the file" << std::endl
 	    << "  -g    graph the accepting run on the automaton (requires -e)"
 	    << std::endl
@@ -98,7 +105,11 @@ syntax(char* prog)
 	    << "and universality" << std::endl
 	    << "  -r3   reduce formula using implication between "
 	    << "sub-formulae" << std::endl
-	    << "  -r4   reduce formula using all rules" << std::endl
+	    << "  -r4   reduce formula using all above rules" << std::endl
+	    << "  -r5   reduce formula using tau03" << std::endl
+	    << "  -r6   reduce formula using tau03+" << std::endl
+	    << "  -r7   reduce formula using tau03+ and -r1" << std::endl
+	    << "  -r8   reduce formula using tau03+ and -r4" << std::endl
 	    << "  -rd   display the reduce formula" << std::endl
 	    << "  -R    same as -r, but as a set" << std::endl
 	    << "  -R1q  merge states using direct simulation "
@@ -118,8 +129,10 @@ syntax(char* prog)
 	    << "  -S    convert to explicit automata, and number states "
 	    << "in BFS order" << std::endl
 	    << "  -t    display reachable states in LBTT's format" << std::endl
-            << "  -U[PROPS]  consider atomic properties PROPS as exclusive "
-	    << "events (implies -f)" << std::endl
+            << "  -U[PROPS]  consider atomic properties of the formula as "
+	    << "exclusive events, and" << std::endl
+	    << "        PROPS as unobservables events (implies -f)"
+	    << std::endl
 	    << "  -v    display the BDD variables used by the automaton"
 	    << std::endl
             << "  -x    try to produce a more deterministic automata "
@@ -169,6 +182,7 @@ main(int argc, char** argv)
   bool graph_run_opt = false;
   bool graph_run_tgba_opt = false;
   bool opt_reduce = false;
+  bool containment = false;
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* unobservables = 0;
   spot::tgba_explicit* system = 0;
@@ -198,6 +212,11 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-b"))
 	{
 	  output = 7;
+	}
+      else if (!strcmp(argv[formula_index], "-c"))
+	{
+	  containment = true;
+	  fm_opt = true;
 	}
       else if (!strcmp(argv[formula_index], "-d"))
 	{
@@ -269,6 +288,23 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-fr4"))
 	{
 	  fm_opt = true;
+ 	  fm_red |= spot::ltl::Reduce_Basics
+	    | spot::ltl::Reduce_Eventuality_And_Universality
+	    | spot::ltl::Reduce_Syntactic_Implications;
+	}
+      else if (!strcmp(argv[formula_index], "-fr5"))
+	{
+	  fm_opt = true;
+	  fm_red |= spot::ltl::Reduce_Containment_Checks;
+	}
+      else if (!strcmp(argv[formula_index], "-fr6"))
+	{
+	  fm_opt = true;
+	  fm_red |= spot::ltl::Reduce_Containment_Checks_Stronger;
+	}
+      else if (!strcmp(argv[formula_index], "-fr7"))
+	{
+	  fm_opt = true;
 	  fm_red |= spot::ltl::Reduce_All;
 	}
       else if (!strcmp(argv[formula_index], "-F"))
@@ -332,6 +368,20 @@ main(int argc, char** argv)
 	  redopt |= spot::ltl::Reduce_Syntactic_Implications;
 	}
       else if (!strcmp(argv[formula_index], "-r4"))
+	{
+ 	  redopt |= spot::ltl::Reduce_Basics
+	    | spot::ltl::Reduce_Eventuality_And_Universality
+	    | spot::ltl::Reduce_Syntactic_Implications;
+	}
+      else if (!strcmp(argv[formula_index], "-r5"))
+	{
+	  redopt |= spot::ltl::Reduce_Containment_Checks;
+	}
+      else if (!strcmp(argv[formula_index], "-r6"))
+	{
+	  redopt |= spot::ltl::Reduce_Containment_Checks_Stronger;
+	}
+      else if (!strcmp(argv[formula_index], "-r7"))
 	{
 	  redopt |= spot::ltl::Reduce_All;
 	}
@@ -499,7 +549,7 @@ main(int argc, char** argv)
 					       fm_symb_merge_opt,
 					       post_branching,
 					       fair_loop_approx, unobservables,
-					       fm_red);
+					       fm_red, containment);
 	  else
 	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 	}
@@ -535,16 +585,22 @@ main(int argc, char** argv)
 
 	      if (reduc_aut & (spot::Reduce_quotient_Dir_Sim |
 			       spot::Reduce_transition_Dir_Sim))
-		rel_dir =
-		  spot::get_direct_relation_simulation(a,
-						       std::cout,
-						       display_parity_game);
-	      else if (reduc_aut & (spot::Reduce_quotient_Del_Sim |
+		{
+		  rel_dir =
+		    spot::get_direct_relation_simulation(a,
+							 std::cout,
+							 display_parity_game);
+		  assert(rel_dir);
+		}
+	      if (reduc_aut & (spot::Reduce_quotient_Del_Sim |
 				    spot::Reduce_transition_Del_Sim))
-		rel_del =
-		  spot::get_delayed_relation_simulation(a,
-							std::cout,
-							display_parity_game);
+		{
+		  rel_del =
+		    spot::get_delayed_relation_simulation(a,
+							  std::cout,
+							  display_parity_game);
+		  assert(rel_del);
+		}
 
 	      if (display_rel_sim)
 		{
@@ -794,6 +850,14 @@ main(int argc, char** argv)
   else
     {
       exit_code = 1;
+    }
+
+  if (unobservables)
+    {
+      for (spot::ltl::atomic_prop_set::iterator i =
+	     unobservables->begin(); i != unobservables->end(); ++i)
+	spot::ltl::destroy(*i);
+      delete unobservables;
     }
 
   assert(spot::ltl::atomic_prop::instance_count() == 0);

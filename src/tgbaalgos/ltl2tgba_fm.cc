@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006, 2008 Laboratoire
+// d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
+// Coopératifs (SRC), Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -33,8 +33,8 @@
 #include "ltlvisit/apcollect.hh"
 #include <cassert>
 #include <memory>
-#include "tgba/tgbabddconcretefactory.hh"
 #include "ltl2tgba_fm.hh"
+#include "ltlvisit/contain.hh"
 
 namespace spot
 {
@@ -541,10 +541,12 @@ namespace spot
     {
     public:
       formula_canonizer(translate_dict& d,
-			bool fair_loop_approx, bdd all_promises)
+			bool fair_loop_approx, bdd all_promises,
+			language_containment_checker* lcc)
 	: v_(d),
 	  fair_loop_approx_(fair_loop_approx),
-	  all_promises_(all_promises)
+	  all_promises_(all_promises),
+	  lcc_(lcc)
       {
 	// For cosmetics, register 1 initially, so the algorithm will
 	// not register an equivalent formula first.
@@ -563,12 +565,15 @@ namespace spot
       }
 
       bdd
-      translate(const formula* f)
+      translate(const formula* f, bool* new_flag = 0)
       {
 	// Use the cached result if available.
 	formula_to_bdd_map::const_iterator i = f2b_.find(f);
 	if (i != f2b_.end())
 	  return i->second;
+
+	if (new_flag)
+	  *new_flag = true;
 
 	// Perform the actual translation.
 	f->accept(v_);
@@ -596,16 +601,35 @@ namespace spot
       const formula*
       canonize(const formula* f)
       {
-	bdd b = translate(f);
+	bool new_variable = false;
+	bdd b = translate(f, &new_variable);
 
 	bdd_to_formula_map::iterator i = b2f_.find(b);
-	// Since we have just translated the formula, it is necessary in b2f_.
+	// Since we have just translated the formula, it is
+	// necessarily in b2f_.
 	assert(i != b2f_.end());
 
 	if (i->second != f)
 	  {
+	    // The translated bdd maps to an already seen formula.
 	    destroy(f);
 	    f = clone(i->second);
+	  }
+	else if (new_variable && lcc_)
+	  {
+	    // It's a new bdd for a new formula.  Let's see if we can
+	    // find an equivalent formula with language containment
+	    // checks.
+	    for (formula_to_bdd_map::const_iterator j = f2b_.begin();
+		 j != f2b_.end(); ++j)
+	      if (f != j->first && lcc_->equal(f, j->first))
+		{
+		  f2b_[f] = j->second;
+		  i->second = j->first;
+		  destroy(f);
+		  f = clone(i->second);
+		  break;
+		}
 	  }
 	return f;
       }
@@ -627,6 +651,7 @@ namespace spot
       possible_fair_loop_checker pflc_;
       bool fair_loop_approx_;
       bdd all_promises_;
+      language_containment_checker* lcc_;
     };
 
   }
@@ -657,8 +682,10 @@ namespace spot
   ltl_to_tgba_fm(const formula* f, bdd_dict* dict,
 		 bool exprop, bool symb_merge, bool branching_postponement,
 		 bool fair_loop_approx, const atomic_prop_set* unobs,
-		 int reduce_ltl)
+		 int reduce_ltl, bool containment_checks)
   {
+    symb_merge |= containment_checks;
+
     // Normalize the formula.  We want all the negations on
     // the atomic propositions.  We also suppress logic
     // abbreviations such as <=>, =>, or XOR, since they
@@ -691,7 +718,12 @@ namespace spot
 	all_promises = pv.result();
       }
 
-    formula_canonizer fc(d, fair_loop_approx, all_promises);
+    language_containment_checker lcc(dict, exprop, symb_merge,
+				     branching_postponement,
+				     fair_loop_approx);
+
+    formula_canonizer fc(d, fair_loop_approx, all_promises,
+			 containment_checks ? &lcc : 0);
 
     // These are used when atomic propositions are interpreted as
     // events.  There are two kinds of events: observable events are
@@ -798,8 +830,9 @@ namespace spot
 	bdd all_props = bdd_existcomp(res, d.var_set);
 	while (all_props != bddfalse)
 	  {
-	    bdd one_prop_set =
-	      exprop ? bdd_satoneset(all_props, var_set, bddtrue) : bddtrue;
+	    bdd one_prop_set = bddtrue;
+	    if (exprop)
+	      one_prop_set = bdd_satoneset(all_props, var_set, bddtrue);
 	    all_props -= one_prop_set;
 
 	    typedef std::map<bdd, const formula*, bdd_less_than> succ_map;

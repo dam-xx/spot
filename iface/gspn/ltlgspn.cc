@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de Paris 6
-// (LIP6), département Systèmes Répartis Coopératifs (SRC),
-// Université Pierre et Marie Curie.
+// Copyright (C) 2003, 2004, 2006, 2007, 2008 Laboratoire
+// d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
+// Coopératifs (SRC), Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -53,6 +53,8 @@ syntax(char* prog)
 #ifdef SSP
 	    << "  -1  do not use a double hash (for inclusion check)"
 	    << std::endl
+	    << "  -L  use LIFO ordering for inclusion check"
+	    << std::endl
 #endif
 	    << "  -c  compute an example" << std::endl
 	    << "      (instead of just checking for emptiness)" << std::endl
@@ -71,6 +73,7 @@ syntax(char* prog)
 	    << "  -e4 use semi-d. incl. Couvreur's emptiness-check's "
 	    << "shy variant"
 	    << std::endl
+	    << "  -e45 mix of -e4 and -e5 " << std::endl
 	    << "  -e5 use d. incl. Couvreur's emptiness-check's shy variant"
 	    << std::endl
 	    << "  -e6 like -e5, but without inclusion checks in the "
@@ -78,6 +81,9 @@ syntax(char* prog)
 #endif
 	    << "  -m  degeneralize and perform a magic-search" << std::endl
 	    << std::endl
+#ifdef SSP
+            << "  -n  do not perform any decomposition" << std::endl
+#endif
             << "  -l  use Couvreur's LaCIM algorithm for translation (default)"
 	    << std::endl
             << "  -f  use Couvreur's FM algorithm for translation" << std::endl
@@ -108,6 +114,9 @@ main(int argc, char **argv)
 #ifdef SSP
       bool doublehash = true;
       bool stack_inclusion = true;
+      bool pushfront = false;
+      bool double_inclusion = false;
+      bool no_decomp = false;
 #endif
       std::string dead = "true";
 
@@ -119,6 +128,10 @@ main(int argc, char **argv)
 	  if (!strcmp(argv[formula_index], "-1"))
 	    {
 	      doublehash = false;
+	    }
+	  else if (!strcmp(argv[formula_index], "-L"))
+	    {
+	      pushfront = true;
 	    }
 	  else
 #endif
@@ -154,6 +167,11 @@ main(int argc, char **argv)
 	    {
 	      check = Couvreur4;
 	    }
+	  else if (!strcmp(argv[formula_index], "-e45"))
+	    {
+	      check = Couvreur5;
+	      double_inclusion = true;
+	    }
 	  else if (!strcmp(argv[formula_index], "-e5"))
 	    {
 	      check = Couvreur5;
@@ -168,6 +186,12 @@ main(int argc, char **argv)
 	    {
 	      check = Magic;
 	    }
+#ifdef SSP
+	  else if (!strcmp(argv[formula_index], "-n"))
+	    {
+	      no_decomp = true;
+	    }
+#endif
 	  else if (!strcmp(argv[formula_index], "-l"))
 	    {
 	      trans = Lacim;
@@ -209,7 +233,8 @@ main(int argc, char **argv)
 
 #if SSP
       bool inclusion = (check != Couvreur && check != Couvreur2);
-      spot::gspn_ssp_interface gspn(2, argv, dict, env, inclusion, doublehash);
+      spot::gspn_ssp_interface gspn(2, argv, dict, env, inclusion,
+				    doublehash, pushfront);
 
       spot::tgba_parse_error_list pel1;
       spot::tgba_explicit* control = spot::tgba_parse(argv[formula_index + 2],
@@ -268,7 +293,9 @@ main(int argc, char **argv)
 		ec = spot::couvreur99_check_ssp_shy_semi(prod);
 		break;
 	      case Couvreur5:
-		ec = spot::couvreur99_check_ssp_shy(prod, stack_inclusion);
+		ec = spot::couvreur99_check_ssp_shy(prod, stack_inclusion,
+						    double_inclusion,
+						    no_decomp);
 		break;
 #endif
 	      default:
@@ -381,11 +408,12 @@ main(int argc, char **argv)
 #else
       delete model;
       delete control;
+      delete ca;
 #endif
       delete a_f;
       delete dict;
     }
-  catch (spot::gspn_exeption e)
+  catch (spot::gspn_exception e)
     {
       std::cerr << e << std::endl;
       throw;

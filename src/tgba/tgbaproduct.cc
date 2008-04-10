@@ -82,10 +82,11 @@ namespace spot
 
   tgba_succ_iterator_product::tgba_succ_iterator_product
   (tgba_succ_iterator* left, tgba_succ_iterator* right,
-   bdd left_neg, bdd right_neg)
+   bdd left_neg, bdd right_neg, bddPair* right_common_acc)
     : left_(left), right_(right),
       left_neg_(left_neg),
-      right_neg_(right_neg)
+      right_neg_(right_neg),
+      right_common_acc_(right_common_acc)
   {
   }
 
@@ -175,7 +176,8 @@ namespace spot
   bdd tgba_succ_iterator_product::current_acceptance_conditions() const
   {
     return ((left_->current_acceptance_conditions() & right_neg_)
-	    | (right_->current_acceptance_conditions() & left_neg_));
+	    | (bdd_replace(right_->current_acceptance_conditions(),
+			   right_common_acc_) & left_neg_));
   }
 
   struct tgba_succ_iterator_product_proviso : public proviso
@@ -246,7 +248,8 @@ namespace spot
 
       return new tgba_succ_iterator_product(li, ri,
 					    la->left_acc_complement_,
-					    la->right_acc_complement_);
+					    la->right_acc_complement_,
+					    la->right_common_acc_);
     }
   };
 
@@ -272,13 +275,35 @@ namespace spot
 
     bdd lna = left_->neg_acceptance_conditions();
     bdd rna = right_->neg_acceptance_conditions();
-    left_acc_complement_ = bdd_exist(lna, bdd_support(rna));
-    right_acc_complement_ = bdd_exist(rna, bdd_support(lna));
 
-    all_acceptance_conditions_ = ((left_->all_acceptance_conditions()
-				  & right_acc_complement_)
-				 | (right_->all_acceptance_conditions()
-				    & left_acc_complement_));
+    right_common_acc_ = bdd_newpair();
+
+    bdd tmp = lna;
+    while (tmp != bddtrue)
+      {
+	assert(bdd_high(tmp) == bddfalse);
+	int var = bdd_var(tmp);
+	if ((bdd_nithvar(var) & rna) == rna)
+	  {
+	    int varclone = dict_->register_clone_acc(var, this);
+	    bdd_setpair(right_common_acc_, var, varclone);
+	  }
+	tmp = bdd_low(tmp);
+      }
+
+    bdd lac = left_->all_acceptance_conditions();
+    bdd rac = right_->all_acceptance_conditions();
+
+    rna = bdd_replace(rna, right_common_acc_);
+    rac = bdd_replace(rac, right_common_acc_);
+
+    left_acc_complement_ = lna;
+    assert(bdd_exist(lna, rna) == lna);
+    right_acc_complement_ = rna;
+    assert(bdd_exist(rna, lna) == rna);
+
+    all_acceptance_conditions_ = ((lac & right_acc_complement_)
+				  | (rac & left_acc_complement_));
     neg_acceptance_conditions_ = lna & rna;
 
     dict_->register_all_variables_of(&left_, this);
@@ -287,6 +312,7 @@ namespace spot
 
   tgba_product::~tgba_product()
   {
+    bdd_freepair(right_common_acc_);
     dict_->unregister_all_my_variables(this);
   }
 
@@ -320,7 +346,8 @@ namespace spot
 					       global_state, global_automaton);
     return new tgba_succ_iterator_product(li, ri,
 					  left_acc_complement_,
-					  right_acc_complement_);
+					  right_acc_complement_,
+					  right_common_acc_);
   }
 
   bdd

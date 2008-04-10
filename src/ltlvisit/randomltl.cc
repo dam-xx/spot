@@ -1,6 +1,6 @@
-// Copyright (C) 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2005, 2008 Laboratoire d'Informatique de Paris 6
+// (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
+// Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -25,6 +25,7 @@
 #include "ltlast/allnodes.hh"
 #include "misc/random.hh"
 #include <iostream>
+#include <cstring>
 
 namespace spot
 {

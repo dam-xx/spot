@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2006, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -25,6 +25,7 @@
 
 #include <list>
 #include <utility>
+#include <iosfwd>
 
 namespace spot
 {
@@ -54,6 +55,9 @@ namespace spot
 
     /// Remove \a n consecutive entries from the list, starting at \a base.
     void remove(int base, int n = 0);
+
+    /// Return the number of free integers on the list.
+    int free_count() const;
 
   protected:
 

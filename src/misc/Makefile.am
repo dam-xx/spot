@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004, 2005, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -34,6 +34,7 @@ misc_HEADERS = \
   hashfunc.hh \
   ltstr.hh \
   minato.hh \
+  memusage.hh \
   modgray.hh \
   optionmap.hh \
   random.hh \
@@ -46,6 +47,7 @@ libmisc_la_SOURCES = \
   bddalloc.cc \
   escape.cc \
   freelist.cc \
+  memusage.cc \
   minato.cc \
   modgray.cc \
   optionmap.cc \

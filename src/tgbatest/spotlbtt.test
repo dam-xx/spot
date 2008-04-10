@@ -1,7 +1,7 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-# département Systèmes Répartis Coopératifs (SRC), Université Pierre
-# et Marie Curie.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007 Laboratoire d'Informatique de
+# Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+# Université Pierre et Marie Curie.
 #
 # This file is part of Spot, a model checking library.
 #
@@ -102,11 +102,29 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- FM), reduction7 of formula (pre reduction)"
+   Path = "${LBTT_TRANSLATE}"
+   Parameters = "--spot './ltl2tgba -r7 -F -f -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM), reduction of formula in FM"
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot './ltl2tgba -fr4 -F -f -t'"
-   Enabled = yes
+   Enabled = no
 }
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM) reduction7 of formula in FM"
+   Path = "${LBTT_TRANSLATE}"
+   Parameters = "--spot './ltl2tgba -fr7 -F -f -t'"
+   Enabled = no
+}
+
+
 
 Algorithm
 {
@@ -138,6 +156,14 @@ Algorithm
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot './ltl2tgba -r4 -R1q -R1t -R3 -F -f -t'"
    Enabled = yes
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- FM), pre + allpost reduction"
+   Path = "${LBTT_TRANSLATE}"
+   Parameters = "--spot './ltl2tgba -r4 -R1q -R1t -R2q -R2t -R3 -F -f -t'"
+   Enabled = no
 }
 
 Algorithm

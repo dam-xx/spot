@@ -1,0 +1,14 @@
+.deps
+Makefile
+Makefile.in
+location.hh
+ltlparse.cc
+ltlparse.hh
+ltlparse.output
+ltlscan.cc
+position.hh
+readltl
+stack.hh
+*.lo
+*.la
+.libs

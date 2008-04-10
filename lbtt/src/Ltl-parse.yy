@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2004, 2005
+ *  Copyright (C) 2004, 2005, 2008
  *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -372,7 +372,7 @@ infix_b_formula:     formula LTLPARSE_AND formula
  *****************************************************************************/
 
 static inline size_t matchCharactersFromStream
-  (istream& stream, char* chars)
+  (istream& stream, const char* chars)
 {
   size_t num_matched;
   for (num_matched = 0; *chars != '\0' && stream.peek() == *chars; ++chars)

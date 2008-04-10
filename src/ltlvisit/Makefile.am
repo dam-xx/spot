@@ -1,4 +1,4 @@
-## Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2004, 2005, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -19,7 +19,7 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-AM_CPPFLAGS = -I$(srcdir)/..
+AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
 ltlvisitdir = $(pkgincludedir)/ltlvisit
@@ -27,6 +27,7 @@ ltlvisitdir = $(pkgincludedir)/ltlvisit
 ltlvisit_HEADERS = \
   apcollect.hh \
   basicreduce.hh \
+  contain.hh \
   clone.hh \
   destroy.hh \
   dotty.hh \
@@ -46,6 +47,7 @@ noinst_LTLIBRARIES = libltlvisit.la
 libltlvisit_la_SOURCES = \
   apcollect.cc \
   basicreduce.cc \
+  contain.cc \
   clone.cc \
   destroy.cc \
   dotty.cc \

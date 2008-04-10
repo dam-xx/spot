@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2005, 2006, 2008 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -184,6 +184,7 @@ namespace spot
     /// Number of dead SCC removed by the algorithm.
     unsigned removed_components;
     unsigned get_removed_components() const;
+    unsigned get_vmsize() const;
     bool found_acc() const;
 
     streett_acceptance_conditions::acc_list streett_acc;
@@ -225,6 +226,9 @@ namespace spot
     //   (ACCEPTANCE_CONDITIONS, STATE) pairs.
     typedef std::list<successor> succ_queue;
 
+    // Position in the loop seeking known successors.
+    succ_queue::iterator pos;
+
     struct todo_item
     {
       const state* s;
@@ -246,11 +250,18 @@ namespace spot
 
     void clear_todo();
 
+    /// Dump the queue for debugging.
+    void dump_queue(std::ostream& os = std::cerr);
+
     /// Whether successors should be grouped for states in the same SCC.
     bool group_;
     // If the "group2" option is set (it implies "group"), we
     // reprocess the successor states of SCC that have been merged.
     bool group2_;
+    // If the onepass option is true, do only one pass.  This cancels
+    // all the "shyness" of the algorithm, but we need the framework
+    // of the implementation when working with GreatSPN.
+    bool onepass_;
 
     /// \brief find the SCC number of a unprocessed state.
     ///

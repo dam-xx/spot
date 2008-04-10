@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -26,7 +26,7 @@ namespace spot
 {
 
   std::ostream&
-  operator<<(std::ostream& os, const gspn_exeption& e)
+  operator<<(std::ostream& os, const gspn_exception& e)
   {
     os << e.get_where() << " exited with " << e.get_err();
     return os;

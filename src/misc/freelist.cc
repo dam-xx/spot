@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -73,13 +73,31 @@ namespace spot
     for (cur = fl.begin(); cur != fl.end(); ++cur)
       {
 	int cend = cur->first + cur->second;
+	// cur              [...]
+	// to insert  [...]
+	// -----------------------
+	// result     [...] [...]
+	// (Insert a new range, unconnected.)
+	if (cur->first > end)
+	  {
+	    break;
+	  }
+	// cur        [...]
+	// to insert        [...]
+	// -----------------------
+	// result unknown : we should look at the rest of the freelist.
+	else if (base > cend)
+	  {
+	    continue;
+	  }
 	//  cur          [....[       [......[
 	//  to insert      [....[       [..[
 	//  ----------------------------------
 	//  result       [......[     [......[
-	if (cend >= base)
+	else if (cur->first <= base)
 	  {
 	    if (cend >= end)
+	      // second case : nothing to do
 	      return;
 	    // cur->second is set below.
 	  }
@@ -87,27 +105,21 @@ namespace spot
 	//  to insert   [....[       [.......[
 	//  ----------------------------------
 	//  result      [......[     [.......[
-	else if (cend >= base && cur->first <= end)
+	else
 	  {
 	    cur->first = base;
-	    if (cend >= end)
-	      return;
 	    // cur->second is set below.
 	  }
-	else if (cur->first > end)
-	  // Insert a new range, unconnected.
-	  break;
-	else
-	  continue;
 
-	// We get here in one of these two situations:
+	// We get here in one of these three situations:
 	//
-	//  cur          [....[        [..[
-	//  to insert      [....[    [.......[
-	//  ----------------------------------
-	//  result       [......[    [.......[
+	//  cur          [....[      [....[    [..[
+	//  to insert      [....[  [....[    [.......[
+	//  -------------------------------------------
+	//  result       [......[  [......[  [.......[
 	//
 	// cur->first is already set, be cur->second has yet to be.
+	end = std::max(cend, end);
 	cur->second = end - cur->first;
 	// Since we have extended the current range, maybe the next
 	// items on the list should be merged.
@@ -115,8 +127,8 @@ namespace spot
 	++next;
 	while (next != fl.end() && next->first <= end)
 	  {
-	    cur->second =
-	      std::max(next->first + next->second, end) - cur->first;
+	    end = std::max(next->first + next->second, end);
+	    cur->second = end - cur->first;
 	    free_list_type::iterator next2 = next++;
 	    fl.erase(next2);
 	  }
@@ -133,13 +145,17 @@ namespace spot
   {
     free_list_type::iterator cur = fl.begin();
     int end = base + n;
-    while (cur != fl.end() && cur->first <= end)
+    while (cur != fl.end() && cur->first < end)
       {
 	int cend = cur->first + cur->second;
 	// Remove may invalidate the current iterator, so advance it first.
 	free_list_type::iterator old = cur++;
-	if (cend >= end)
-	  remove(old, base, std::max(n, cend - base));
+	if (cend >= base)
+	  {
+	    int newbase = std::max(base, old->first);
+	    int q = std::min(cend, end) - newbase;
+	    remove(old, newbase, q);
+	  }
       }
   }
 
@@ -148,6 +164,7 @@ namespace spot
   {
     if (base == i->first)
       {
+	// Removing at the beginning of the range
 	i->second -= n;
 	assert(i->second >= 0);
 	// Erase the range if it's now empty.
@@ -158,6 +175,7 @@ namespace spot
       }
     else if (base + n == i->first + i->second)
       {
+	// Removing at the end of the range
 	i->second -= n;
 	assert(i->second > 0); // cannot be empty because base != i->first
       }
@@ -166,14 +184,13 @@ namespace spot
 	// Removing in the middle of a range.
 	int b1 = i->first;
 	int n1 = base - i->first;
-	int n2 = i->second - n - base;
+	int n2 = i->first + i->second - base - n;
 	assert(n1 > 0);
 	assert(n2 > 0);
 	*i = pos_lenght_pair(base + n, n2);
 	fl.insert(i, pos_lenght_pair(b1, n1));
       }
   }
-
 
   void
   free_list::release_n(int base, int n)
@@ -190,5 +207,14 @@ namespace spot
     return os;
   }
 
+  int
+  free_list::free_count() const
+  {
+    int res = 0;
+    free_list_type::const_iterator i;
+    for (i = fl.begin(); i != fl.end(); ++i)
+      res += i->second;
+    return res;
+  }
 
 }

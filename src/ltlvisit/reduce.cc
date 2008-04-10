@@ -1,6 +1,6 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2004, 2006, 2007 Laboratoire d'Informatique de Paris 6
+// (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -29,6 +29,7 @@
 #include "simpfg.hh"
 #include "nenoform.hh"
 #include "ltlvisit/destroy.hh"
+#include "contain.hh"
 
 namespace spot
 {
@@ -295,43 +296,61 @@ namespace spot
     {
       formula* f1;
       formula* f2;
+      formula* prev = 0;
 
-      f1 = unabbreviate_logic(f);
-      f2 = simplify_f_g(f1);
-      destroy(f1);
-      f1 = negative_normal_form(f2);
-      destroy(f2);
-      f2 = f1;
+      int n = 0;
 
-      if (opt & Reduce_Basics)
+      while (f != prev)
 	{
-	  f1 = basic_reduce(f2);
+	  ++n;
+	  assert(n < 100);
+	  if (prev)
+	    {
+	      destroy(prev);
+	      prev = const_cast<formula*>(f);
+	    }
+	  else
+	    {
+	      prev = clone(f);
+	    }
+	  f1 = unabbreviate_logic(f);
+	  f2 = simplify_f_g(f1);
+	  destroy(f1);
+	  f1 = negative_normal_form(f2);
 	  destroy(f2);
 	  f2 = f1;
-	}
 
-      if (opt & (Reduce_Syntactic_Implications
-		 | Reduce_Eventuality_And_Universality))
-	{
-	  reduce_visitor v(opt);
-	  f2->accept(v);
-	  f1 = v.result();
-	  destroy(f2);
-	  f2 = f1;
-
-	  // Run basic_reduce again.
-	  //
-	  // Consider `FG b & g'   were g is an eventual formula rewritten
-	  // as `g = FG c'  Then basic_reduce with rewrite it
-	  // as FG(b & c).
 	  if (opt & Reduce_Basics)
 	    {
 	      f1 = basic_reduce(f2);
 	      destroy(f2);
 	      f2 = f1;
 	    }
+
+	  if (opt & (Reduce_Syntactic_Implications
+		     | Reduce_Eventuality_And_Universality))
+	    {
+	      reduce_visitor v(opt);
+	      f2->accept(v);
+	      f1 = v.result();
+	      destroy(f2);
+	      f2 = f1;
+	    }
+
+
+	  if (opt & (Reduce_Containment_Checks
+		     | Reduce_Containment_Checks_Stronger))
+	    {
+	      formula* f1 =
+		reduce_tau03(f2,
+			     opt & Reduce_Containment_Checks_Stronger);
+	      destroy(f2);
+	      f2 = f1;
+	    }
+	  f = f2;
 	}
-      return f2;
+      destroy(prev);
+      return const_cast<formula*>(f);
     }
   }
 }

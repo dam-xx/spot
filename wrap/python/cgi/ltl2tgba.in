@@ -1,8 +1,8 @@
 #!@PYTHON@
 # -*- mode: python; coding: iso-8859-1 -*-
-# Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
-# département Systèmes Répartis Coopératifs (SRC), Université Pierre
-# et Marie Curie.
+# Copyright (C) 2003, 2004, 2006, 2007 Laboratoire d'Informatique de
+# Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+# Université Pierre et Marie Curie.
 #
 # This file is part of Spot, a model checking library.
 #
@@ -528,7 +528,7 @@ if show_dictionnary:
     automaton.get_dict().dump(spot.get_cout())
     print '</pre>'
 
-if (type(automaton) == spot.tgba_bdd_concretePtr
+if (type(automaton) == spot.tgba_bdd_concrete
     and (show_relation_set or show_relation_png)):
     print '<H3>Transition relation</H3>'
     if show_relation_set:
@@ -538,7 +538,7 @@ if (type(automaton) == spot.tgba_bdd_concretePtr
         render_bdd(imgprefix + '-b', automaton.get_dict(),
                    automaton.get_core_data().relation)
 
-if (type(automaton) == spot.tgba_bdd_concretePtr
+if (type(automaton) == spot.tgba_bdd_concrete
     and (show_acceptance_set or show_acceptance_png)):
     print '<H3>Acceptance relation</H3>'
     if show_acceptance_set:

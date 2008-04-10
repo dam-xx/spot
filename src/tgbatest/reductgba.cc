@@ -1,5 +1,5 @@
-// Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de Paris 6
-// (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Copyright (C) 2003, 2004, 2006, 2008 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
@@ -18,6 +18,8 @@
 // along with Spot; see the file COPYING.  If not, write to the Free
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
+
+#include <cstdlib>
 
 #include "tgbaalgos/ltl2tgba_fm.hh"
 #include "tgbaalgos/reductgba_sim.hh"

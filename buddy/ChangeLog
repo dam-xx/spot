@@ -1,3 +1,13 @@
+2008-03-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/bddtest.cxx: Include <cstdlib> to compile with g++-4.3.
+
+2007-09-19  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* src/kernel.c (bdd_default_gbchandler): Log garbage collection to
+	stderr, not stdout.  Reported by Kristin Yvonne Rozier
+	<kyrozier@cs.rice.edu>.
+
 2004-07-23  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
 	* configure.ac: Call AC_LIBTOOL_WIN32_DLL

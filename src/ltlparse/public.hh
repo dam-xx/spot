@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -23,6 +23,9 @@
 # define SPOT_LTLPARSE_PUBLIC_HH
 
 # include "ltlast/formula.hh"
+// Unfortunately Bison 2.3 uses the same guards in all parsers :(
+# undef BISON_LOCATION_HH
+# undef BISON_POSITION_HH
 # include "ltlparse/location.hh"
 # include "ltlenv/defaultenv.hh"
 # include <string>

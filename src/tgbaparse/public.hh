@@ -23,7 +23,7 @@
 # define SPOT_TGBAPARSE_PUBLIC_HH
 
 # include "tgba/tgbaexplicit.hh"
-  /* Unfortunately Bison 2.3 uses the same guards in all parsers :( */
+// Unfortunately Bison 2.3 uses the same guards in all parsers :(
 # undef BISON_LOCATION_HH
 # undef BISON_POSITION_HH
 # include "tgbaparse/location.hh"

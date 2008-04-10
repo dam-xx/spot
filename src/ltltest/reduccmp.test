@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -21,81 +21,87 @@
 # 02111-1307, USA.
 
 
-# Check for the equals visitor
+# Check LTL reductions
 
 . ./defs || exit 1
 
-# No reduction
-run 0 ./reduccmp 'a U b' 'a U b'
-run 0 ./reduccmp 'a R b' 'a R b'
-run 0 ./reduccmp 'a & b' 'a & b'
-run 0 ./reduccmp 'a | b' 'a | b'
-run 0 ./reduccmp 'a & (a U b)' 'a & (a U b)'
-run 0 ./reduccmp 'a | (a U b)' 'a | (a U b)'
+for x in ./reduccmp ./reductaustr; do
 
-# Syntactic reduction
-run 0 ./reduccmp 'a & (!b R !a)' 'false'
-run 0 ./reduccmp '(!b R !a) & a' 'false'
-#run 0 ./reduccmp '(!b R !a) | a' 'true'
-#run 0 ./reduccmp 'a | (!b R !a)' 'true'
+  # No reduction
+  run 0 $x 'a U b' 'a U b'
+  run 0 $x 'a R b' 'a R b'
+  run 0 $x 'a & b' 'a & b'
+  run 0 $x 'a | b' 'a | b'
+  run 0 $x 'a & (a U b)' 'a & (a U b)'
+  run 0 $x 'a | (a U b)' 'a | (a U b)'
 
-run 0 ./reduccmp 'a & (!b R !a) & c' 'false'
-run 0 ./reduccmp 'c & (!b R !a) & a' 'false'
-#run 0 ./reduccmp 'a | (!b R !a) | c' 'true'
-#run 0 ./reduccmp 'c | (!b R !a) | a' 'true'
+  # Syntactic reduction
+  run 0 $x 'a & (!b R !a)' 'false'
+  run 0 $x '(!b R !a) & a' 'false'
 
-run 0 ./reduccmp 'a & (b U a)' 'a'
-run 0 ./reduccmp '(b U a) & a' 'a'
-run 0 ./reduccmp 'a | (b U a)' '(b U a)'
-run 0 ./reduccmp '(b U a) | a' '(b U a)'
-run 0 ./reduccmp 'a U (b U a)' '(b U a)'
+  run 0 $x 'a & (!b R !a) & c' 'false'
+  run 0 $x 'c & (!b R !a) & a' 'false'
 
-run 0 ./reduccmp 'a & (b U a) & a' 'a'
-run 0 ./reduccmp 'a & (b U a) & a' 'a'
-run 0 ./reduccmp 'a | (b U a) | a' '(b U a)'
-run 0 ./reduccmp 'a | (b U a) | a' '(b U a)'
-run 0 ./reduccmp 'a U (b U a)' '(b U a)'
+  run 0 $x 'a & (b U a)' 'a'
+  run 0 $x '(b U a) & a' 'a'
+  run 0 $x 'a | (b U a)' '(b U a)'
+  run 0 $x '(b U a) | a' '(b U a)'
+  run 0 $x 'a U (b U a)' '(b U a)'
+
+  run 0 $x 'a & (b U a) & a' 'a'
+  run 0 $x 'a & (b U a) & a' 'a'
+  run 0 $x 'a | (b U a) | a' '(b U a)'
+  run 0 $x 'a | (b U a) | a' '(b U a)'
+  run 0 $x 'a U (b U a)' '(b U a)'
 
 
-# Basics reduction
-run 0 ./reduccmp 'X(true)' 'true'
-run 0 ./reduccmp 'X(false)' 'false'
-run 0 ./reduccmp 'F(true)' 'true'
-run 0 ./reduccmp 'F(false)' 'false'
-run 0 ./reduccmp 'G(true)' 'true'
-run 0 ./reduccmp 'G(false)' 'false'
+  # Basics reduction
+  run 0 $x 'X(true)' 'true'
+  run 0 $x 'X(false)' 'false'
+  run 0 $x 'F(true)' 'true'
+  run 0 $x 'F(false)' 'false'
+  run 0 $x 'G(true)' 'true'
+  run 0 $x 'G(false)' 'false'
 
-run 0 ./reduccmp 'XGF(f)' 'GF(f)'
-run 0 ./reduccmp 'FX(a)' 'XF(a)'
-run 0 ./reduccmp 'G(a R b)' 'G(b)'
-run 0 ./reduccmp 'GX(a)' 'XG(a)'
+  run 0 $x 'XGF(f)' 'GF(f)'
+  case $x in
+   *tau*);;
+   *)
+     run 0 $x 'G(a R b)' 'G(b)'
 
-run 0 ./reduccmp 'X(a) U X(b)' 'X(a U b)'
-run 0 ./reduccmp 'X(a) R X(b)' 'X(a R b)'
+     run 0 $x 'FX(a)' 'XF(a)'
+     run 0 $x 'GX(a)' 'XG(a)'
 
-run 0 ./reduccmp 'Xa & Xb' 'X(a & b)'
-run 0 ./reduccmp '(a U b) & (c U b)' '(a & c) U b'
-run 0 ./reduccmp '(a R b) & (a R c)' 'a R (b & c)'
-run 0 ./reduccmp 'Xa | Xb' 'X(a | b)'
-run 0 ./reduccmp '(a U b) | (a U c)' 'a U (b | c)'
-run 0 ./reduccmp '(a R b) | (c R b)' '(a | c) R b'
+     run 0 $x 'X(a) U X(b)' 'X(a U b)'
+     run 0 $x 'X(a) R X(b)' 'X(a R b)'
+     run 0 $x 'Xa & Xb' 'X(a & b)'
+     run 0 $x 'Xa | Xb' 'X(a | b)'
 
-run 0 ./reduccmp 'X(a & GFb)' 'Xa & GFb'
-run 0 ./reduccmp 'X(a | GFb)' 'Xa | GFb'
-run 0 ./reduccmp 'F(a & GFb)' 'Fa & GFb'
-run 0 ./reduccmp 'G(a | GFb)' 'Ga | GFb'
+     run 0 $x '(a U b) & (c U b)' '(a & c) U b'
+     run 0 $x '(a R b) & (a R c)' 'a R (b & c)'
+     run 0 $x '(a U b) | (a U c)' 'a U (b | c)'
+     run 0 $x '(a R b) | (c R b)' '(a | c) R b'
 
-run 0 ./reduccmp 'X(a & GFb & c)' 'X(a & c) & GFb'
-run 0 ./reduccmp 'X(a | GFb | c)' 'X(a | c) | GFb'
-run 0 ./reduccmp 'F(a & GFb & c)' 'F(a & c) & GFb'
-run 0 ./reduccmp 'G(a | GFb | c)' 'G(a | c) | GFb'
+     run 0 $x 'X(a & GFb)' 'Xa & GFb'
+     run 0 $x 'X(a | GFb)' 'Xa | GFb'
+     run 0 $x 'F(a & GFb)' 'Fa & GFb'
+     run 0 $x 'G(a | GFb)' 'Ga | GFb'
 
-# Eventuality and universality class reduction
-run 0 ./reduccmp 'FFa' 'Fa'
-run 0 ./reduccmp 'FGFa' 'GFa'
-run 0 ./reduccmp 'b U Fa' 'Fa'
-run 0 ./reduccmp 'b U GFa' 'GFa'
-run 0 ./reduccmp 'Ga' 'Ga'
-run 0 ./reduccmp 'GFGa' 'FGa'
-run 0 ./reduccmp 'b R Ga' 'Ga'
-run 0 ./reduccmp 'b R FGa' 'FGa'
+     run 0 $x 'X(a & GFb & c)' 'X(a & c) & GFb'
+     run 0 $x 'X(a | GFb | c)' 'X(a | c) | GFb'
+     run 0 $x 'F(a & GFb & c)' 'F(a & c) & GFb'
+     run 0 $x 'G(a | GFb | c)' 'G(a | c) | GFb'
+     ;;
+  esac
+
+  # Eventuality and universality class reduction
+  run 0 $x 'FFa' 'Fa'
+  run 0 $x 'FGFa' 'GFa'
+  run 0 $x 'b U Fa' 'Fa'
+  run 0 $x 'b U GFa' 'GFa'
+  run 0 $x 'Ga' 'Ga'
+  run 0 $x 'GFGa' 'FGa'
+  run 0 $x 'b R Ga' 'Ga'
+  run 0 $x 'b R FGa' 'FGa'
+
+done

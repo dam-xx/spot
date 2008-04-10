@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2006, 2007 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -41,7 +41,8 @@ namespace spot
     gspn_ssp_interface(int argc, char **argv,
 		       bdd_dict* dict, const ltl::declarative_environment& env,
 		       bool inclusion = false,
-		       bool doublehash = true);
+		       bool doublehash = true,
+		       bool pushfront = false);
     ~gspn_ssp_interface();
     tgba* automaton(const tgba* operand) const;
   private:
@@ -55,7 +56,9 @@ namespace spot
   couvreur99_check* couvreur99_check_ssp_semi(const tgba* ssp_automata);
   couvreur99_check* couvreur99_check_ssp_shy_semi(const tgba* ssp_automata);
   couvreur99_check* couvreur99_check_ssp_shy(const tgba* ssp_automata,
-					     bool stack_inclusion = true);
+					     bool stack_inclusion = true,
+					     bool double_inclusion = false,
+					     bool no_decomp = false);
 
   /// @}
 

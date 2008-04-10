@@ -1,6 +1,6 @@
-## Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-## département Systèmes Répartis Coopératifs (SRC), Université Pierre
-## et Marie Curie.
+## Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+## Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+## Université Pierre et Marie Curie.
 ##
 ## This file is part of Spot, a model checking library.
 ##
@@ -19,7 +19,7 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-AM_CPPFLAGS = -I$(srcdir)/..
+AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 LDADD = ../libspot.la
 
@@ -33,6 +33,8 @@ check_PROGRAMS = \
   nenoform \
   reduc \
   reduccmp \
+  reductau \
+  reductaustr \
   syntimpl \
   tostring \
   tunabbrev \
@@ -53,6 +55,10 @@ randltl_SOURCES = randltl.cc
 reduc_SOURCES = reduc.cc
 reduccmp_SOURCES = equals.cc
 reduccmp_CPPFLAGS = $(AM_CPPFLAGS) -DREDUC
+reductau_SOURCES = equals.cc
+reductau_CPPFLAGS = $(AM_CPPFLAGS) -DREDUC_TAU
+reductaustr_SOURCES = equals.cc
+reductaustr_CPPFLAGS = $(AM_CPPFLAGS) -DREDUC_TAUSTR
 syntimpl_SOURCES = syntimpl.cc
 tostring_SOURCES = tostring.cc
 tunabbrev_SOURCES = equals.cc

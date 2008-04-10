@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005, 2007  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -673,6 +673,8 @@ namespace spot
 	direct_simulation_relation* rel
 	  = get_direct_relation_simulation(automatareduc, std::cout);
 
+	assert(rel);
+
 	automatareduc->display_rel_sim(rel, std::cout);
 	automatareduc->quotient_state(rel);
 	automatareduc->delete_transitions(rel);
@@ -684,6 +686,8 @@ namespace spot
 	{
 	  delayed_simulation_relation* rel
 	    = get_delayed_relation_simulation(automatareduc, std::cout);
+
+	  assert(rel);
 
 	  automatareduc->display_rel_sim(rel, std::cout);
 	  automatareduc->quotient_state(rel);

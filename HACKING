@@ -9,22 +9,33 @@ conflicts.
 Here are the tools you need to bootstrap the CVS tree, or more
 generally if you plan to regenerate some of the generated files.
 
-  GNU Autoconf >= 2.59
-  GNU Automake >= 1.9
-  GNU Libtool >= 1.4
+  GNU Autoconf >= 2.61
+  GNU Automake >= 1.10
   GNU Flex (the version seems to matters, we used 2.5.31)
-  GNU Bison == 2.0  (2.1 will not work, but 2.2 is expected to.)
-  SWIG >= 1.3.23
+  GNU Bison >= 2.3
+  SWIG >= 1.3.31
   Doxygen >= 1.4.0
 
 Bootstrap the CVS tree by running
 
-  autoreconf -vfi
+  autoreconf -vi
 
 and then go on with the usual
 
   ./configure
   make
+
+
+We also use
+
+  GNU Libtool >= 1.4
+
+however since many distributions modify their version, some
+(e.g. Debian) in a way that break Spot, we have our own copy of
+ltmain.sh and libtool.m4 in the CVS repository of Spot.  That means
+you do not need an installed copy of Libtool.  If you want to
+overwrite these files with those from your copy of Libtool, use
+`autoreconf -vfi' instead of `autoreconf -vi'.
 
 
 Coding conventions:

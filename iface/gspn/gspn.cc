@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2006, 2007 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -114,11 +114,11 @@ namespace spot
 		AtomicProp index;
 		int err = prop_index(i->first.c_str(), &index);
 		if (err)
-		  throw gspn_exeption("prop_index(" + i->first + ")", err);
+		  throw gspn_exception("prop_index(" + i->first + ")", err);
 		AtomicPropKind kind;
 		err = prop_kind(index, &kind);
 		if (err)
-		  throw gspn_exeption("prop_kind(" + i->first + ")", err);
+		  throw gspn_exception("prop_kind(" + i->first + ")", err);
 
 		prop_dict[index] = ab_pair(kind, bdd_ithvar(var));
 	      }
@@ -172,7 +172,7 @@ namespace spot
 	  }
       }
 
-      tgba_gspn_private_::~tgba_gspn_private_()
+      ~tgba_gspn_private_()
       {
 	dict->unregister_all_my_variables(this);
 	delete last_state_conds_input;
@@ -201,7 +201,7 @@ namespace spot
 	    size_t count = index_count;
 	    int res = satisfy(s->get_state(), want, &cube, count);
 	    if (res)
-	      throw gspn_exeption("satisfy()", res);
+	      throw gspn_exception("satisfy()", res);
 	    assert(cube);
 	    last_state_conds_output = bddtrue;
 	    for (size_t i = 0; i < count; ++i)
@@ -236,7 +236,7 @@ namespace spot
       {
 	int res = succ(state, &successors_, &size_);
 	if (res)
-	  throw gspn_exeption("succ()", res);
+	  throw gspn_exception("succ()", res);
 	// GreatSPN should return successors_ == 0 and size_ == 0 when a
 	// state has no successors.
 	assert((size_ <= 0) ^ (successors_ != 0));
@@ -377,7 +377,7 @@ namespace spot
       State s;
       int err = initial_state(&s);
       if (err)
-	throw gspn_exeption("initial_state()", err);
+	throw gspn_exception("initial_state()", err);
       return new state_gspn(s);
     }
 
@@ -436,7 +436,7 @@ namespace spot
       char* str;
       int err = print_state(s->get_state(), &str);
       if (err)
-	throw gspn_exeption("print_state()", err);
+	throw gspn_exception("print_state()", err);
       // Strip trailing \n...
       unsigned len = strlen(str);
       while (str[--len] == '\n')
@@ -473,14 +473,14 @@ namespace spot
   {
     int res = initialize(argc, argv);
     if (res)
-      throw gspn_exeption("initialize()", res);
+      throw gspn_exception("initialize()", res);
   }
 
   gspn_interface::~gspn_interface()
   {
     int res = finalize();
     if (res)
-      throw gspn_exeption("finalize()", res);
+      throw gspn_exception("finalize()", res);
   }
 
   tgba*

@@ -1,3 +1,12 @@
+2008-03-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/main.cc: Include <climits> for LONG_MAX.  lbtt won't
+	compile with g++-4.3 otherwise.
+	* src/Ltl-parse.yy (matchCharactersFromStream): Declare the chars
+	as const to kill a g++ warning.
+	* src/NeverClaim-parse.yy (yyerror): Declare the error
+	message as const to kill a g++ warning.
+
 2005-08-30  Heikki Tauriainen  <heikki.tauriainen@tkk.fi>
 
 	* src/main.cc: [HAVE_ISATTY && HAVE_UNISTD_H]: Include the

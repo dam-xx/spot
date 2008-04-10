@@ -1,6 +1,6 @@
-## Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-## département Systèmes Répartis Coopératifs (SRC), Université Pierre
-## et Marie Curie.
+## Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+## Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+## Université Pierre et Marie Curie.
 ##
 ## This file is part of Spot, a model checking library.
 ##
@@ -75,6 +75,7 @@ TESTS = \
   explprod.test \
   explpro2.test \
   explpro3.test \
+  explpro4.test \
   tripprod.test \
   mixprod.test \
   dupexp.test \
