@@ -16,3 +16,5 @@ libtool
 *.bak
 *.err
 stdout
+*.lo
+*.la
