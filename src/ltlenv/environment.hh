@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2008 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -60,9 +60,6 @@ namespace spot
       ~environment()
       {
       }
-
-      // FIXME: More functions will be needed later, but
-      // it's enough for now.
     };
 
   }

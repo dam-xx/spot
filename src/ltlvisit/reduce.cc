@@ -1,5 +1,5 @@
-// Copyright (C) 2004, 2006, 2007 Laboratoire d'Informatique de Paris 6
-// (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Copyright (C) 2004, 2006, 2007, 2008 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
@@ -121,12 +121,6 @@ namespace spot
 
 	  if (opt_ & Reduce_Syntactic_Implications)
 	    {
-	      // FIXME: These should be done only when needed.
-	      bool inf = syntactic_implication(f1, f2);
-	      bool infinv = syntactic_implication(f2, f1);
-	      bool infnegleft = syntactic_implication_neg(f2, f1, false);
-	      bool infnegright = syntactic_implication_neg(f2, f1, true);
-
 	      switch (bo->op())
 		{
 		case binop::Xor:
@@ -136,14 +130,14 @@ namespace spot
 
 		case binop::U:
 		  /* a < b => a U b = b */
-		  if (inf)
+		  if (syntactic_implication(f1, f2))
 		    {
 		      result_ = f2;
 		      destroy(f1);
 		      return;
 		    }
 		  /* !b < a => a U b = Fb */
-		  if (infnegleft)
+		  if (syntactic_implication_neg(f2, f1, false))
 		    {
 		      result_ = unop::instance(unop::F, f2);
 		      destroy(f1);
@@ -164,14 +158,14 @@ namespace spot
 
 		case binop::R:
 		  /* b < a => a R b = b */
-		  if (infinv)
+		  if (syntactic_implication(f2, f1))
 		    {
 		      result_ = f2;
 		      destroy(f1);
 		      return;
 		    }
 		  /* b < !a => a R b = Gb */
-		  if (infnegright)
+		  if (syntactic_implication_neg(f2, f1, true))
 		    {
 		      result_ = unop::instance(unop::G, f2);
 		      destroy(f1);
@@ -247,7 +241,6 @@ namespace spot
 		    }
 		}
 
-	      // FIXME
 	      /* f1 < !f2 => f1 & f2 = false
 		 !f1 < f2 => f1 | f2 = true */
 	      for (f1 = res->begin(); f1 != res->end(); f1++)

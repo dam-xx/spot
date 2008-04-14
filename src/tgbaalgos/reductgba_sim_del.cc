@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -389,9 +389,7 @@ namespace spot
   build_recurse_successor_spoiler(spoiler_node* sn,
 				  std::ostringstream& os)
   {
-    // FIXME
-    if (sn == 0)
-      return;
+    assert(sn);
 
     tgba_succ_iterator* si = automata_->succ_iter(sn->get_spoiler_node());
 

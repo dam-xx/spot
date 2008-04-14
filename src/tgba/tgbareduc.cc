@@ -1,6 +1,6 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2004, 2005, 2008 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -318,10 +318,9 @@ namespace spot
   void
   tgba_reduc::remove_state(const spot::state* s)
   {
-    // We suppose than the state is not reachable when call by
-    // merge_state => NO PREDECESSOR !!
-    // But it can be have some predecessor in state_predecessor_map_ !!
-    // So, we remove from it.
+    // We suppose that the state is not reachable when called by
+    // merge_state => NO PREDECESSOR.  But it can be have some
+    // predecessor in state_predecessor_map_.
 
     ns_map::iterator k =
       name_state_map_.find(tgba_explicit::format_state(s));
@@ -341,7 +340,7 @@ namespace spot
     if (i == state_predecessor_map_.end()) // 0 predecessor
 	return;
 
-    // for all predecessor of s. Zero if call by merge_state.
+    // for all predecessor of s (none when called by merge_state)
     for (std::list<state*>::iterator p = (i->second)->begin();
 	 p != (i->second)->end(); ++p)
       {
@@ -362,7 +361,7 @@ namespace spot
       }
 
     // DESTROY THE STATE !? USELESS
-    // it will be destroy when the automaton will be delete
+    // it will be destroyed when the automaton is deleted
     // name_state_map_::iterator = name_state_map_[st];
     // const tgba_explicit::state* st = name_state_map_[this->format_state(s)];
   }
@@ -391,14 +390,14 @@ namespace spot
     sp_map::iterator i = state_predecessor_map_.find(s1);
     if (i == state_predecessor_map_.end()) // 0 predecessor
       {
-	// We can remove s1 safely, without change the language
+	// We can remove s1 safely, without changing the language
 	// of the automaton.
 	this->remove_state(sim1);
 	return;
       }
 
     // for all predecessor of s1, not the initial state,
-    // we redirect transition whose lead to s1 to s2.
+    // we redirect to s2 the transitions that lead to s1.
     for (std::list<state*>::iterator p = (i->second)->begin();
 	 p != (i->second)->end(); ++p)
       {
@@ -406,24 +405,24 @@ namespace spot
 	for (tgba_explicit::state::iterator j = (*p)->begin();
 	     j != (*p)->end(); ++j)
 	  {
-	    // if the successor if s1.
+	    // if the successor was s1...
 	    if ((*j)->dest == s1)
 	      {
-		// We can redirect transition to s2.
+		// ... make it s2.
 		(*j)->dest = const_cast<tgba_explicit::state*>(s2);
 	      }
 	  }
       }
 
-    // FIXME:
-    // Be careful, we have to stock on s2 the acceptance condition on the arc
-    // leaving s1 (possible when the simulation is delayed). Since s2 simulate
-    // s1, s2 has some label whose implies these of s1, so we can put the
-    // acceptance conditions on this arcs.
+    // FIXME: The following justification sounds really dubious.
+    //
+    // We have to stock on s2 the acceptance condition of the arc
+    // leaving s1 (possible when the simulation is delayed). Since s2
+    // simulates s1, s2 has some labels that imply these of s1, so we
+    // can put the acceptance conditions on its arcs.
     for (tgba_explicit::state::const_iterator j = s1->begin();
 	 j != s1->end(); ++j)
       {
-	// FIXME
 	transition* t = new transition();
 	t->dest = (*j)->dest;
 	t->condition = (*j)->condition;
@@ -434,11 +433,9 @@ namespace spot
     // We remove all the predecessor of s1.
     (i->second)->clear();
 
-    // then we can remove s1 safely, without change the language
+    // then we can remove s1 safely, without changing the language
     // of the automaton.
-    // useless because the state is not reachable.
     this->remove_state(sim1);
-
   }
 
   void
@@ -621,25 +618,6 @@ namespace spot
 		 i != s1->end(); ++i)
 	      (*i)->acceptance_conditions = bddfalse;
 	  }
-	/*
-	  else
-	  {
-	  // FIXME
-	  tgba_succ_iterator* si = this->succ_iter(sm->first);
-	  spot::state* s2 = si->current_state();
-	  seen_map::iterator sm2 = si_.find(s2);
-	  if (sm2->second == n)
-	  {
-	  s1 = name_state_map_[tgba_explicit::format_state(sm2->first)];
-	  for (state::iterator i = s1->begin();
-	  i != s1->end(); ++i)
-	  (*i)->acceptance_conditions = bddfalse;
-	  }
-	  delete s2;
-	  delete si;
-	  }
-	*/
-
       }
   }
 
@@ -825,7 +803,7 @@ namespace spot
   void
   tgba_reduc::remove_scc(spot::state* s)
   {
-    // To remove a scc, we remove all his state.
+    // To remove a scc, we remove all its states.
 
     seen_map::iterator sm = si_.find(s);
     sm = si_.find(s);
@@ -841,95 +819,6 @@ namespace spot
       }
 
   }
-
-  /*
-  void
-  tgba_reduc::remove_scc_depth_first(spot::state* s, int n)
-  {
-    if (n == -1)
-      {
-	assert(seen_ == 0);
-	seen_ = new seen_map();
-      }
-
-    seen_map::const_iterator sm = seen_->find(s);
-    if (sm == seen_->end())
-	seen_->insert(std::pair<const spot::state*, int>(s, 1));
-    else
-	return;
-
-    tgba_succ_iterator* j = this->succ_iter(s);
-    for (j->first(); !j->done(); j->next())
-      {
-	this->remove_scc_depth_first(j->current_state(), 1);
-      }
-    this->remove_state(s);
-
-    if (n == -1)
-      {
-	delete seen_;
-	seen_ = 0;
-      }
-  }
-  */
-
-  /*
-  bool
-  tgba_reduc::is_alpha_ball(const spot::state* s, bdd label, int n)
-  {
-    /// FIXME
-    // a SCC is alpha ball if she's terminal but with some acceptance
-    // condition, and all transition have the same label.
-    // So we replace this SCC by a single state.
-
-    bool b = false;
-
-    seen_map::const_iterator i;
-    if ((n == -1) &&
-	(label == bddfalse))
-      {
-	acc_ == bddfalse;
-	b = true;
-	assert(seen_ == 0);
-	seen_ = new seen_map();
-	i = si_.find(s);
-	assert(i->first != 0);
-	n = i->second;
-      }
-
-    seen_map::const_iterator sm = seen_->find(s);
-    if (sm == seen_->end())
-      {
-	seen_->insert(std::pair<const spot::state*, int>(s, 1));
-	i = si_.find(s);
-	assert(i->first != 0);
-	if (n != i->second)
-	    return false;
-      }
-    else
-      {
-	return true;
-      }
-
-    bool ret = true;
-    tgba_succ_iterator* j = this->succ_iter(s);
-    for (j->first(); !j->done(); j->next())
-      {
-	acc_ |= j->current_acceptance_conditions();
-	ret &= this->is_terminal(j->current_state(), n);
-      }
-
-    if (b)
-      {
-	delete seen_;
-	seen_ = 0;
-	if (acc_ == this->all_acceptance_conditions())
-	  ret = false;
-      }
-
-    return ret;
-  }
-  */
 
   int
   tgba_reduc::nb_set_acc_cond() const

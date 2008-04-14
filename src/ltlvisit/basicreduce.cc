@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2007  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2007, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -309,7 +309,8 @@ namespace spot
 
 	      for (multop::vec::iterator i = res->begin(); i != res->end(); i++)
 		{
-		  // FIXME: why would *i be 0 ?
+		  // An iteration of the loop may zero some later elements
+		  // of the vector to mark them as redundant.  Skip them.
 		  if (!*i)
 		    continue;
 		  unop* uo = dynamic_cast<unop*>(*i);

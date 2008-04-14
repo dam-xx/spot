@@ -1,3 +1,16 @@
+2008-04-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Kill some FIXMEs.
+
+	* src/ltlenv/environment.hh, src/ltlvisit/basicreduce.cc: Remove
+	useless FIXMEs.
+	* src/ltlvisit/reduce.cc (reduce_visitor::visit(binop)): Compute
+	syntactic implications only when needed.
+	* src/tgbaalgos/reductgba_sim_del.cc
+	(build_recurse_successor_spoiler): Remplace the FIXME by an assert.
+	* src/tgba/tgbareduc.cc: Reword some comments, discard old
+	commented code.
+
 2008-03-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/evtgbaparse/Makefile.am (AM_CXXFLAGS): Remove -Werror
