@@ -35,7 +35,7 @@ libspotnips_la_SOURCES = \
   nips.cc
 
 noinst_PROGRAMS = \
-  dottynips
+  dottynips empt_check
 
 dottynips_SOURCES = dottynips.cc
 dottynips_LDADD = libspotnips.la $(builddir)/nips_vm/libnipsvm.la

@@ -22,6 +22,7 @@
 #include <cassert>
 #include "misc/hashfunc.hh"
 #include "nips.hh"
+#include "nipsvm.h"
 
 namespace spot
 {
@@ -385,7 +386,8 @@ namespace spot
     if (bytecode_ == 0)
       throw nips_exception("bytecode_load_from_file()");
 
-    int res = nipsvm_init(&nipsvm_, bytecode_, successor_state_callback,
+    nipsvm_ = new nipsvm_t();
+    int res = nipsvm_init(nipsvm_, bytecode_, successor_state_callback,
 			  search_error_callback);
 
     if (res != 0)
@@ -394,12 +396,21 @@ namespace spot
 
   nips_interface::~nips_interface()
   {
-    nipsvm_finalize(&nipsvm_);
+    nipsvm_finalize(nipsvm_);
     bytecode_unload(bytecode_);
+    delete nipsvm_;
+  }
+
+  bool nips_interface::has_monitor() const
+  {
+    if (bytecode_ == 0)
+      throw nips_exception("The bytecode isn't loaded");
+
+    return bytecode_monitor_present(bytecode_);
   }
 
   tgba* nips_interface::automaton()
   {
-    return new tgba_nips(dict_, &nipsvm_);
+    return new tgba_nips(dict_, nipsvm_);
   }
 }

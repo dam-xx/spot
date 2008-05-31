@@ -30,9 +30,10 @@
 # include "tgba/tgba.hh"
 # include "common.hh"
 
-// Damn, nipsvm.h is include, to fix.
-# include "nipsvm.h"
 
+// Fwd declarations.
+typedef struct nipsvm_t nipsvm_t;
+typedef struct t_bytecode nipsvm_bytecode_t;
 
 namespace spot
 {
@@ -54,10 +55,11 @@ namespace spot
   public:
     nips_interface(bdd_dict* dict, const std::string& filename);
     ~nips_interface();
+    bool has_monitor() const;
     tgba* automaton();
   private:
     bdd_dict* dict_;
-    nipsvm_t nipsvm_;
+    nipsvm_t* nipsvm_;
     nipsvm_bytecode_t* bytecode_;
   };
 }
