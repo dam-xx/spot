@@ -69,35 +69,24 @@ namespace spot
     {
     public:
       state_nips(nipsvm_state_t* s)
+	: ref_(new unsigned(1))
       {
-	state_nips_init(s);
-	nips_state_ = s;
-      }
-
-      state_nips(nipsvm_state_t* s, nipsvm_state_t* nips_state)
-      {
-	state_nips_init(s);
-	nips_state_ = nips_state;
-      }
-
-      void state_nips_init(nipsvm_state_t* s)
-      {
-	ref_ = new unsigned(1);
 	unsigned long size = nipsvm_state_size(s);
 	unsigned long size_buf = size;
 	char* state_as_char = new char[size];
 	state_ = reinterpret_cast<nipsvm_state_t*>(state_as_char);
 	nipsvm_state_copy(size, s, &state_as_char, &size_buf);
+	hash_comp();
       }
 
       state_nips(const state* other)
-	: ref_(new unsigned(1))
       {
 	const state_nips* o = dynamic_cast<const state_nips*>(other);
 	assert(o);
 	ref_ = o->ref_;
 	++(*ref_);
 	state_ = o->state_;
+	hash_ = o->hash_;
       }
 
       virtual
@@ -141,14 +130,16 @@ namespace spot
       {
 	const state_nips* o = dynamic_cast<const state_nips*>(other);
 	assert(o);
-	return reinterpret_cast<char*>(o->get_state())
-	  - reinterpret_cast<char*>(get_state());
+
+	return nipsvm_state_compare(get_state(), o->get_state(),
+				    min(nipsvm_state_size(get_state()),
+					nipsvm_state_size(o->get_state())));
       }
 
       virtual size_t
       hash() const
       {
-	return reinterpret_cast<char*>(get_state()) - static_cast<char*>(0);
+	return hash_;
       }
 
       virtual state_nips* clone() const
@@ -162,16 +153,10 @@ namespace spot
 	return state_;
       }
 
-      nipsvm_state_t*
-      get_nips_state() const
-      {
-	return nips_state_;
-      }
-
     private:
       unsigned* ref_;
       nipsvm_state_t* state_;
-      nipsvm_state_t* nips_state_;
+      size_t hash_;
     }; // state_nips
 
     // Callback for successors
@@ -222,9 +207,6 @@ namespace spot
 
     tgba_succ_iterator_nips::~tgba_succ_iterator_nips()
     {
-//       s_list::iterator it = succ_list_->begin();
-//       for (; it != succ_list_->end(); ++it)
-// 	delete *it;
       delete succ_list_;
     }
 
