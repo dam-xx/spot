@@ -29,7 +29,7 @@ nips_HEADERS = \
   nips.hh
 
 lib_LTLIBRARIES = libspotnips.la
-libspotnips_la_LIBADD = $(top_builddir)/src/libspot.la
+libspotnips_la_LIBADD = $(top_builddir)/src/libspot.la $(builddir)/nips_vm/libnipsvm.la
 libspotnips_la_SOURCES = \
   common.cc \
   nips.cc
@@ -38,9 +38,9 @@ noinst_PROGRAMS = \
   dottynips empt_check
 
 dottynips_SOURCES = dottynips.cc
-dottynips_LDADD = libspotnips.la $(builddir)/nips_vm/libnipsvm.la
+dottynips_LDADD = libspotnips.la
 
 empt_check_SOURCES = emptiness_check.cc
-empt_check_LDADD = libspotnips.la $(builddir)/nips_vm/libnipsvm.la
+empt_check_LDADD = libspotnips.la
 
 SUBDIRS = nips_vm
