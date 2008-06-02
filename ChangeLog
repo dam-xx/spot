@@ -1,5 +1,7 @@
 2008-06-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* iface/nips/nips_vm/Makefile.am: Do not install NipsVM.
+
 	* iface/nips/Makefile.am (empt_check_LDADD, dottynips_LDADD):
 	Do not link libnipsvm.la here...
 	(libspotnips_la_LIBADD): ... do it here.

@@ -1,6 +1,4 @@
-nipsvmdir = $(srcdir)
-
-nipsvm_HEADERS = \
+noinst_HEADERS = \
    bytecode.h \
    hashtab.h \
    instr.h \
@@ -18,7 +16,7 @@ nipsvm_HEADERS = \
    timeval.h \
    tools.h
 
-lib_LTLIBRARIES = libnipsvm.la
+noinst_LTLIBRARIES = libnipsvm.la
 
 libnipsvm_la_SOURCES = \
   bytecode.c \
