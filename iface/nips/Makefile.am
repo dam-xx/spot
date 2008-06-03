@@ -22,7 +22,7 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src $(BUDDY_CPPFLAGS) -I$(srcdir)/nips_vm
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-nipsdir = $(pkgincludedir)/nips
+nipsdir = $(pkgincludedir)/iface/nips
 
 nips_HEADERS = \
   common.hh \

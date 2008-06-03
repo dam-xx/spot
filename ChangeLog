@@ -1,3 +1,11 @@
+2008-06-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Install interfaces' headers in the spot/iface/ directory, not
+	directly in the spot/ directory.
+
+	* iface/gspn/Makefile.am (gspndir): Install in spot/iface/gspn/.
+	* iface/nips/Makefile.am (nipsdir): Install in spot/iface/nips/.
+
 2008-06-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* iface/nips/nips_vm/Makefile.am: Do not install NipsVM.

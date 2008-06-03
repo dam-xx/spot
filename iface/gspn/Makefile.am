@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -22,7 +22,7 @@
 AM_CPPFLAGS = -I$(top_srcdir)/src $(BUDDY_CPPFLAGS) $(LIBGSPN_CPPFLAGS)
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-gspndir = $(pkgincludedir)/gspn
+gspndir = $(pkgincludedir)/iface/gspn
 
 gspn_HEADERS = \
   common.hh \
