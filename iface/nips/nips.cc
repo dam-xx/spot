@@ -384,14 +384,15 @@ namespace spot
     bytecode_ = bytecode_load_from_file(filename.c_str(), 0);
 
     if (bytecode_ == 0)
-      throw nips_exception("bytecode_load_from_file()");
+      throw nips_exception("Unable to open `" + filename +
+			   "' as a NIPS bytecode.");
 
     nipsvm_ = new nipsvm_t();
     int res = nipsvm_init(nipsvm_, bytecode_, successor_state_callback,
 			  search_error_callback);
 
     if (res != 0)
-      throw nips_exception("nipsvm_init()", res);
+      throw nips_exception("Error while initializing the NIPS VM", res);
   }
 
   nips_interface::~nips_interface()

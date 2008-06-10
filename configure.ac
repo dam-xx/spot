@@ -1,6 +1,6 @@
-# Copyright (C) 2003, 2004, 2005, 2006, 2007  Laboratoire d'Informatique
-# de Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
-# Université Pierre et Marie Curie.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Laboratoire
+# d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
+# Coopératifs (SRC), Université Pierre et Marie Curie.
 #
 # This file is part of Spot, a model checking library.
 #
@@ -80,6 +80,8 @@ AC_CONFIG_FILES([
   iface/gspn/defs
   iface/nips/Makefile
   iface/nips/nips_vm/Makefile
+  iface/nips/nipstest/Makefile
+  iface/nips/nipstest/defs
   src/Makefile
   src/eltlast/Makefile
   src/eltlenv/Makefile

@@ -1,3 +1,16 @@
+2008-06-02  Guillaume SADEGH  <sadegh@lrde.epita.fr>
+
+	Test suite for the NipsVM front-end.
+
+	* iface/nips/nipstest/Makefile.am, iface/nips/Makefile.am,
+	configure.ac, iface/nips/nipstest/emptiness.test,
+	iface/nips/nipstest/dotty.test: Test suite for the NipsVM
+	front-end.
+	* iface/nips/emptiness_check.cc, iface/nips/dottynips.cc: `catch'
+	don't throw anymore an exception, but exit with 1.
+	* iface/nips/common.cc, iface/nips/nips.cc (nips_interface):
+	Change messages of nips_exception.
+
 2008-06-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/sanity/includes.test (INCDIR): Remove any trailing slash.

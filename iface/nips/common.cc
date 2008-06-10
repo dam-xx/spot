@@ -29,9 +29,9 @@ namespace spot
   operator<<(std::ostream& os, const nips_exception& e)
   {
     if (e.get_err_defined())
-      os << e.get_where() << " exited with " << e.get_err();
+      os << e.get_where() << " with exit value: " << e.get_err();
     else
-      os << e.get_where() << " with no exit value";
+      os << e.get_where();
 
     return os;
   }

@@ -43,4 +43,4 @@ dottynips_LDADD = libspotnips.la
 empt_check_SOURCES = emptiness_check.cc
 empt_check_LDADD = libspotnips.la
 
-SUBDIRS = nips_vm
+SUBDIRS = nips_vm nipstest

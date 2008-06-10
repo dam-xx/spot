@@ -44,5 +44,5 @@ main(int argc, char **argv)
   catch (spot::nips_exception& e)
   {
     std::cerr << e << std::endl;
-    throw;
+    return 1;
   }
