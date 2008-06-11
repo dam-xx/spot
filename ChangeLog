@@ -1,5 +1,8 @@
 2008-06-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/eltlparse/eltlparse.yy: Include limits.h for INT_MIN and
+	INT_MAX.
+
 	* src/sanity/includes.test: Remove empty line at beginning of file.
 
 	* src/internal/formula.hh (formula::hash): Remove the const

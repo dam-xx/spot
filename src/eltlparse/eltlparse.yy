@@ -23,6 +23,7 @@
 #include <string>
 #include <sstream>
 #include <cerrno>
+#include <limits.h>
 #include "public.hh"
 #include "eltlast/allnodes.hh"
 
