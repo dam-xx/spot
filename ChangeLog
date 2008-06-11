@@ -1,5 +1,8 @@
 2008-06-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* iface/nips/dottynips.cc: Include ctsdlib for exit().
+	* iface/nips/emptiness_check.cc: Likewise.
+
 	* src/eltlparse/eltlparse.yy: Include limits.h for INT_MIN and
 	INT_MAX.
 
