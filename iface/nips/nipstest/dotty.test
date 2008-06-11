@@ -1,0 +1,13 @@
+#!/bin/sh
+
+. ./defs || exit 1
+
+set -e
+
+
+BYTECODE="never.pr.b regbit.b"
+for bytecode in $BYTECODE; do
+    run 0 ${top_builddir}/dottynips ${bytecode} > dotty || exit 1
+    ${DOT} -Tps dotty > /dev/null || exit 1
+    rm -f dotty
+done
