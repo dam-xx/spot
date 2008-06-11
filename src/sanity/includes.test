@@ -1,4 +1,3 @@
-
 #! /bin/sh
 
 # Check that each header is self contained and generates no warning.
