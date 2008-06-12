@@ -10,7 +10,7 @@ ALGO="Cou99 CVWY90 GV04 SE05 Tau03 Tau03"
 BYTECODE="dinner.pr.nips.b never.pr.b"
 for algo in $ALGO; do
     for bytecode in $BYTECODE; do
-	run 0 ${top_builddir}/empt_check -c -e${algo} ${bytecode} |
+	run 0 "$top_builddir/empt_check" -c -e$algo "$srcdir/$bytecode" |
 	grep '^non empty$' > /dev/null  || exit 1
     done
 done
@@ -19,7 +19,7 @@ done
 BYTECODE="peterson.pm.b"
 for algo in $ALGO; do
     for bytecode in $BYTECODE; do
-	run 0 ${top_builddir}/empt_check -c -e${algo} ${bytecode} |
+	run 0 "$top_builddir/empt_check" -c -e$algo "$srcdir/$bytecode" |
 	grep '^empty$' > /dev/null || exit 1
     done
 done

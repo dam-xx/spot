@@ -1,5 +1,11 @@
 2008-06-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* iface/nips/nipstest/dotty.test,
+	iface/nips/nipstest/emptiness.test: Prefix bytecode filenames
+	with $srcdir so the tests work in VPATH builds.
+
+2008-06-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* wrap/python/spot.i: Adjust includes after the previous patch.
 	This is enough to make the python/ directory compile, but not
 	enough to make it pass "make check".  Some major work is needed
