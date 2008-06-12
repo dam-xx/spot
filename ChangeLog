@@ -1,5 +1,12 @@
 2008-06-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* wrap/python/spot.i: Adjust includes after the previous patch.
+	This is enough to make the python/ directory compile, but not
+	enough to make it pass "make check".  Some major work is needed
+	after the changes from 2008-04-16.
+
+2008-06-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Merge all ltlast/ files into formula.hh.  The forward declaration
 	of visitor was causing error messages too cryptic for users.
 
