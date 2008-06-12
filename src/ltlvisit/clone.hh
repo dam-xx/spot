@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,7 +23,6 @@
 # define SPOT_LTLVISIT_CLONE_HH
 
 #include "ltlast/formula.hh"
-#include "ltlast/visitor.hh"
 
 namespace spot
 {

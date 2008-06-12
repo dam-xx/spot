@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -24,8 +24,7 @@
 #include "ltlenv/defaultenv.hh"
 #include "tgba/tgbaexplicit.hh"
 #include "tgbaalgos/dotty.hh"
-#include "ltlast/allnodes.hh"
-#include "ltlast/visitor.hh"
+#include "ltlast/formula.hh"
 
 int
 main()

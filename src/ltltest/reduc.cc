@@ -32,7 +32,6 @@
 #include "ltlvisit/reduce.hh"
 #include "ltlvisit/length.hh"
 #include "ltlvisit/contain.hh"
-#include "ltlast/allnodes.hh"
 
 void
 syntax(char* prog)

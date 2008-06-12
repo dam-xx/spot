@@ -22,7 +22,6 @@
 #include "randomgraph.hh"
 #include "tgba/tgbaexplicit.hh"
 #include "misc/random.hh"
-#include "ltlast/atomic_prop.hh"
 #include "ltlvisit/destroy.hh"
 #include <sstream>
 #include <list>

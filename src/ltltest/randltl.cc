@@ -25,7 +25,6 @@
 #include <string>
 #include <cstdlib>
 #include <cstring>
-#include "ltlast/atomic_prop.hh"
 #include "ltlvisit/randomltl.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/destroy.hh"

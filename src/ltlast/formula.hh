@@ -20,11 +20,16 @@
 // 02111-1307, USA.
 
 /// \file ltlast/formula.hh
-/// \brief LTL formula interface
+/// \brief LTL formula, AST and visitor interface
 #ifndef SPOT_LTLAST_FORMULA_HH
 # define SPOT_LTLAST_FORMULA_HH
 
 # include "internal/formula.hh"
+# include "internal/atomic_prop.hh"
+# include "internal/constant.hh"
+# include "internal/unop.hh"
+# include "internal/binop.hh"
+# include "internal/multop.hh"
 
 namespace spot
 {
@@ -118,6 +123,68 @@ namespace spot
 
     typedef spot::internal::formula_ptr_less_than<ltl_t> formula_ptr_less_than;
     typedef spot::internal::formula_ptr_hash<ltl_t> formula_ptr_hash;
+
+
+
+    /// \brief Atomic propositions.
+    /// \ingroup ltl_ast
+    typedef spot::internal::atomic_prop<ltl_t> atomic_prop;
+
+    /// \brief A constant (True or False)
+    /// \ingroup ltl_ast
+    typedef spot::internal::constant<ltl_t> constant;
+
+    /// \brief Unary operators.
+    /// \ingroup ltl_ast
+    typedef spot::internal::unop<ltl_t> unop;
+
+    /// \brief Binary operator.
+    /// \ingroup ltl_ast
+    typedef spot::internal::binop<ltl_t> binop;
+
+    /// \brief Multi-operand operators.
+    /// \ingroup ltl_ast
+    ///
+    /// These operators are considered commutative and associative.
+    typedef spot::internal::multop<ltl_t> multop;
+
+
+    /// \brief Formula visitor that can modify the formula.
+    /// \ingroup ltl_essential
+    ///
+    /// Writing visitors is the prefered way
+    /// to traverse a formula, since it doesn't
+    /// involve any cast.
+    ///
+    /// If you do not need to modify the visited formula, inherit from
+    /// spot::ltl:const_visitor instead.
+    struct visitor
+    {
+      virtual ~visitor() {}
+      virtual void visit(atomic_prop* node) = 0;
+      virtual void visit(constant* node) = 0;
+      virtual void visit(binop* node) = 0;
+      virtual void visit(unop* node) = 0;
+      virtual void visit(multop* node) = 0;
+    };
+
+    /// \brief Formula visitor that cannot modify the formula.
+    ///
+    /// Writing visitors is the prefered way
+    /// to traverse a formula, since it doesn't
+    /// involve any cast.
+    ///
+    /// If you want to modify the visited formula, inherit from
+    /// spot::ltl:visitor instead.
+    struct const_visitor
+    {
+      virtual ~const_visitor() {}
+      virtual void visit(const atomic_prop* node) = 0;
+      virtual void visit(const constant* node) = 0;
+      virtual void visit(const binop* node) = 0;
+      virtual void visit(const unop* node) = 0;
+      virtual void visit(const multop* node) = 0;
+    };
   }
 }
 

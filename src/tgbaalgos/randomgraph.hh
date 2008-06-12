@@ -23,7 +23,6 @@
 # define SPOT_TGBAALGOS_RANDOMGRAPH_HH
 
 #include "ltlvisit/apcollect.hh"
-#include "ltlast/visitor.hh"
 #include "ltlenv/defaultenv.hh"
 
 namespace spot

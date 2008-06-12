@@ -29,7 +29,6 @@
 #include "ltlvisit/contain.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/apcollect.hh"
-#include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
 #include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"

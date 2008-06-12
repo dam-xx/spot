@@ -23,8 +23,6 @@
 #include "misc/bddalloc.hh"
 #include "misc/bddlt.hh"
 #include "misc/minato.hh"
-#include "ltlast/visitor.hh"
-#include "ltlast/allnodes.hh"
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/nenoform.hh"
 #include "ltlvisit/destroy.hh"

@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,7 +19,6 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include "ltlast/allnodes.hh"
 #include "ltlvisit/clone.hh"
 #include "lunabbrev.hh"
 #include <cassert>

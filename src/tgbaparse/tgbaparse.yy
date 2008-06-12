@@ -1,4 +1,4 @@
-/* Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+/* Copyright (C) 2003, 2004, 2005, 2006, 2008 Laboratoire d'Informatique de
 ** Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 ** Université Pierre et Marie Curie.
 **
@@ -47,7 +47,6 @@ typedef std::map<std::string, bdd> formula_cache;
 }
 
 %{
-#include "ltlast/constant.hh"
 #include "ltlvisit/destroy.hh"
   /* Unfortunately Bison 2.3 uses the same guards in all parsers :( */
 #undef BISON_POSITION_HH

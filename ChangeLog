@@ -1,5 +1,35 @@
 2008-06-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Merge all ltlast/ files into formula.hh.  The forward declaration
+	of visitor was causing error messages too cryptic for users.
+
+	* src/ltlast/allnodes.hh, src/ltlast/atomic_prop.hh,
+	src/ltlast/binop.hh, src/ltlast/constant.hh, src/ltlast/multop.hh,
+	src/ltlast/refformula.hh, src/ltlast/unop.hh,
+	src/ltlast/visitor.hh: Delete and merge all these files into ...
+	* src/ltlast/formula.hh: ... this one.
+	* src/ltlast/Makefile.am: Adjust.
+	* ltlparse/ltlparse.yy, ltlparse/public.hh, ltltest/equals.cc,
+	ltltest/randltl.cc, ltltest/readltl.cc, ltltest/reduc.cc,
+	ltltest/syntimpl.cc, ltltest/tostring.cc, ltlvisit/apcollect.hh,
+	ltlvisit/basicreduce.cc, ltlvisit/clone.cc, ltlvisit/clone.hh,
+	ltlvisit/contain.cc, ltlvisit/dotty.cc, ltlvisit/dump.cc,
+	ltlvisit/lunabbrev.cc, ltlvisit/nenoform.cc, ltlvisit/nenoform.hh,
+	ltlvisit/postfix.cc, ltlvisit/postfix.hh, ltlvisit/randomltl.cc,
+	ltlvisit/reduce.cc, ltlvisit/reduce.hh, ltlvisit/simpfg.cc,
+	ltlvisit/syntimpl.cc, ltlvisit/tostring.cc, ltlvisit/tunabbrev.cc,
+	tgba/bdddict.cc, tgba/formula2bdd.cc, tgba/tgbaexplicit.cc,
+	tgba/tgbatba.cc, tgbaalgos/ltl2tgba_fm.cc,
+	tgbaalgos/ltl2tgba_lacim.cc, tgbaalgos/randomgraph.cc,
+	tgbaalgos/randomgraph.hh, tgbaalgos/save.cc, tgbaparse/public.hh,
+	tgbaparse/tgbaparse.yy, tgbatest/explicit.cc,
+	tgbatest/explprod.cc, tgbatest/ltl2tgba.cc, tgbatest/ltlprod.cc,
+	tgbatest/mixprod.cc, tgbatest/powerset.cc, tgbatest/randtgba.cc,
+	tgbatest/readsave.cc, tgbatest/reductgba.cc, tgbatest/tgbaread.cc,
+	tgbatest/tripprod.cc: Adjust includes.
+
+2008-06-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/ltlast/atomic_prop.cc, src/ltlast/binop.cc,
 	src/ltlast/constant.cc, src/ltlast/formula.cc,
 	src/ltlast/multop.cc, src/ltlast/predecl.hh,

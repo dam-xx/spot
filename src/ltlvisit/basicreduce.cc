@@ -20,8 +20,6 @@
 // 02111-1307, USA.
 
 #include "basicreduce.hh"
-#include "ltlast/visitor.hh"
-#include "ltlast/allnodes.hh"
 #include <cassert>
 
 #include "clone.hh"

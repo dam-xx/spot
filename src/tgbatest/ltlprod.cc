@@ -23,7 +23,6 @@
 #include <cassert>
 #include <cstdlib>
 #include "ltlvisit/destroy.hh"
-#include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
 #include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgba/tgbaproduct.hh"

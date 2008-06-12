@@ -25,7 +25,6 @@
 #include "ltlparse/public.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/destroy.hh"
-#include "ltlast/allnodes.hh"
 
 void
 syntax(char *prog)

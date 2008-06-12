@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -22,8 +22,6 @@
 #include <cassert>
 #include "tgbatba.hh"
 #include "bddprint.hh"
-#include "ltlast/constant.hh"
-#include "ltlast/visitor.hh"
 #include "misc/hashfunc.hh"
 
 namespace spot

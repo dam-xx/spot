@@ -27,7 +27,6 @@
 
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/reduce.hh"
-#include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
 #include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"

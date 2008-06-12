@@ -1,4 +1,4 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -21,13 +21,4 @@
 
 ltlastdir = $(pkgincludedir)/ltlast
 
-ltlast_HEADERS = \
-  allnodes.hh \
-  atomic_prop.hh \
-  binop.hh \
-  constant.hh \
-  formula.hh \
-  multop.hh \
-  refformula.hh \
-  unop.hh \
-  visitor.hh
+ltlast_HEADERS = formula.hh

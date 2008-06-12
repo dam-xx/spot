@@ -26,7 +26,6 @@
 #include "tgbaalgos/powerset.hh"
 #include "tgbaparse/public.hh"
 #include "tgbaalgos/save.hh"
-#include "ltlast/allnodes.hh"
 #include "tgbaalgos/dotty.hh"
 
 void

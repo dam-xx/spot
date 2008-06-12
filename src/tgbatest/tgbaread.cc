@@ -26,7 +26,6 @@
 #include "tgbaparse/public.hh"
 #include "tgba/tgbaexplicit.hh"
 #include "tgbaalgos/dotty.hh"
-#include "ltlast/allnodes.hh"
 
 void
 syntax(char* prog)
