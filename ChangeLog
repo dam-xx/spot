@@ -1,3 +1,11 @@
+2008-06-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/ltlast/atomic_prop.cc, src/ltlast/binop.cc,
+	src/ltlast/constant.cc, src/ltlast/formula.cc,
+	src/ltlast/multop.cc, src/ltlast/predecl.hh,
+	src/ltlast/refformula.cc, src/ltlast/unop.cc: Delete these files,
+	not used anymore since 2008-04-16.
+
 2008-06-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* iface/nips/dottynips.cc: Include ctsdlib for exit().
