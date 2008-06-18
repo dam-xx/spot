@@ -23,7 +23,6 @@
 # define SPOT_ELTLPARSE_PUBLIC_HH
 
 # include "eltlast/formula.hh"
-# include "eltlast/visitor.hh"
 // Unfortunately Bison 2.3 uses the same guards in all parsers :(
 # undef BISON_LOCATION_HH
 # undef BISON_POSITION_HH

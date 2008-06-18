@@ -25,6 +25,11 @@
 # define SPOT_ELTLAST_FORMULA_HH
 
 # include "internal/formula.hh"
+# include "internal/atomic_prop.hh"
+# include "internal/constant.hh"
+# include "internal/unop.hh"
+# include "internal/binop.hh"
+# include "internal/multop.hh"
 
 namespace spot
 {
@@ -40,7 +45,21 @@ namespace spot
     /// \addtogroup eltl_ast ELTL Abstract Syntax Tree
     /// \ingroup eltl
 
+    /// \addtogroup eltl_environment ELTL environments
+    /// \ingroup eltl
+    /// ELTL environment implementations.
+
+    /// \addtogroup eltl_algorithm Algorithms for ELTL formulae
+    /// \ingroup eltl
+
+    /// \addtogroup eltl_io Input/Output of ELTL formulae
+    /// \ingroup eltl_algorithm
+
+    /// \addtogroup eltl_visitor Derivable visitors
+    /// \ingroup eltl_algorithm
+
     /// Forward declarations
+    struct eltl_t;
     struct visitor;
     struct const_visitor;
 
@@ -50,10 +69,32 @@ namespace spot
     ///
     /// The only way you can work with a formula is to
     /// build a spot::eltl::visitor or spot::eltl::const_visitor.
+    typedef spot::internal::formula<eltl_t> formula;
+
+    /// Forward declarations
+    formula* clone(const formula* f);
+    std::ostream& to_string(const formula* f, std::ostream& os);
+    void destroy(const formula* f);
+
     struct eltl_t
     {
       typedef spot::eltl::visitor visitor;
       typedef spot::eltl::const_visitor const_visitor;
+
+      static formula* clone_(const formula* f)
+      {
+	return clone(f);
+      }
+
+      static std::ostream& to_string_(const formula* f, std::ostream& os)
+      {
+	return to_string(f, os);
+      }
+
+      static void destroy_(const formula* f)
+      {
+	destroy(f);
+      }
 
       enum binop { Xor, Implies, Equiv };
       const char* binop_name(binop op) const
@@ -86,10 +127,73 @@ namespace spot
       }
     };
 
-    typedef spot::internal::formula<eltl_t> formula;
+    typedef spot::internal::formula_ptr_less_than formula_ptr_less_than;
+    typedef spot::internal::formula_ptr_hash formula_ptr_hash;
 
-    typedef spot::internal::formula_ptr_less_than<eltl_t> formula_ptr_less_than;
-    typedef spot::internal::formula_ptr_hash<eltl_t> formula_ptr_hash;
+    /// \brief Atomic propositions.
+    /// \ingroup eltl_ast
+    typedef spot::internal::atomic_prop<eltl_t> atomic_prop;
+
+    /// \brief A constant (True or False)
+    /// \ingroup eltl_ast
+    typedef spot::internal::constant<eltl_t> constant;
+
+    /// \brief Unary operators.
+    /// \ingroup eltl_ast
+    typedef spot::internal::unop<eltl_t> unop;
+
+    /// \brief Binary operator.
+    /// \ingroup eltl_ast
+    typedef spot::internal::binop<eltl_t> binop;
+
+    /// \brief Multi-operand operators.
+    /// \ingroup eltl_ast
+    ///
+    /// These operators are considered commutative and associative.
+    typedef spot::internal::multop<eltl_t> multop;
+
+    // Forward declaration.
+    struct automatop;
+
+    /// \brief Formula visitor that can modify the formula.
+    /// \ingroup eltl_essential
+    ///
+    /// Writing visitors is the prefered way
+    /// to traverse a formula, since it doesn't
+    /// involve any cast.
+    ///
+    /// If you do not need to modify the visited formula, inherit from
+    /// spot::eltl:const_visitor instead.
+    struct visitor
+    {
+      virtual ~visitor() {}
+      virtual void visit(atomic_prop* node) = 0;
+      virtual void visit(constant* node) = 0;
+      virtual void visit(binop* node) = 0;
+      virtual void visit(unop* node) = 0;
+      virtual void visit(multop* node) = 0;
+      virtual void visit(automatop* node) = 0;
+    };
+
+    /// \brief Formula visitor that cannot modify the formula.
+    ///
+    /// Writing visitors is the prefered way
+    /// to traverse a formula, since it doesn't
+    /// involve any cast.
+    ///
+    /// If you want to modify the visited formula, inherit from
+    /// spot::eltl:visitor instead.
+    struct const_visitor
+    {
+      virtual ~const_visitor() {}
+      virtual void visit(const atomic_prop* node) = 0;
+      virtual void visit(const constant* node) = 0;
+      virtual void visit(const binop* node) = 0;
+      virtual void visit(const unop* node) = 0;
+      virtual void visit(const multop* node) = 0;
+      virtual void visit(const automatop* node) = 0;
+    };
+
   }
 }
 

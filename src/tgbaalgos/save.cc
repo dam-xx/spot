@@ -84,7 +84,7 @@ namespace spot
 		    bdd_dict::vf_map::const_iterator vi =
 		      d->acc_formula_map.find(v);
 		    assert(vi != d->acc_formula_map.end());
-		    std::string s = ltl::to_string(vi->second);
+		    std::string s = vi->second->to_string();
 		    if (dynamic_cast<const ltl::atomic_prop*>(vi->second)
 			&& s[0] == '"')
 		      {

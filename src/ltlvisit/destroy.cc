@@ -25,17 +25,10 @@ namespace spot
 {
   namespace ltl
   {
-    namespace
+    void
+    destroy_visitor::doit_default(formula* c)
     {
-      class destroy_visitor: public postfix_visitor
-      {
-      public:
-	virtual void
-	doit_default(formula* c)
-	{
-	  formula::unref(c);
-	}
-      };
+      formula::unref(c);
     }
 
     void

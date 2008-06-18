@@ -86,10 +86,10 @@ namespace spot
 		bdd low = bdd_low(one);
 		if (low == bddfalse)
 		  {
-		    const ltl::formula* v =
+		    const internal::base_formula* v =
 		      automata_->get_dict()->var_formula_map[bdd_var(one)];
 		    res->add_transition(name_[in],
-					to_string(v),
+					v->to_string(),
 					ss,
 					name_[out]);
 		    break;
@@ -121,8 +121,8 @@ namespace spot
 		bdd low = bdd_low(one);
 		if (low == bddfalse)
 		  {
-		    const ltl::formula* v =
-		      automata_->get_dict()->acc_formula_map[bdd_var(one)];
+		    const ltl::formula* v = dynamic_cast<const ltl::formula*>(
+			automata_->get_dict()->acc_formula_map[bdd_var(one)]);
 		    ss.insert(rsymbol(to_string(v)));
 		    break;
 		  }

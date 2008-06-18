@@ -25,18 +25,9 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 eltlastdir = $(pkgincludedir)/eltlast
 
 eltlast_HEADERS = \
-  allnodes.hh \
-  atomic_prop.hh \
   automatop.hh \
-  binop.hh \
-  constant.hh \
   formula.hh \
-  multop.hh \
-  nfa.hh \
-  refformula.hh \
-  unop.hh \
-  visitor.hh
-
+  nfa.hh
 
 noinst_LTLIBRARIES = libeltlast.la
 libeltlast_la_SOURCES = \

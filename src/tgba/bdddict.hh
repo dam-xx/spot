@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -27,7 +27,7 @@
 #include <map>
 #include <iosfwd>
 #include <bdd.h>
-#include "ltlast/formula.hh"
+#include "internal/baseformula.hh"
 #include "misc/bddalloc.hh"
 
 namespace spot
@@ -43,9 +43,9 @@ namespace spot
     ~bdd_dict();
 
     /// Formula-to-BDD-variable maps.
-    typedef std::map<const ltl::formula*, int> fv_map;
+    typedef std::map<const internal::base_formula*, int> fv_map;
     /// BDD-variable-to-formula maps.
-    typedef std::map<int, const ltl::formula*> vf_map;
+    typedef std::map<int, const internal::base_formula*> vf_map;
 
     fv_map now_map;		///< Maps formulae to "Now" BDD variables
     vf_map now_formula_map;	///< Maps "Now" BDD variables to formulae
@@ -77,7 +77,8 @@ namespace spot
     ///
     /// \return The variable number.  Use bdd_ithvar() or bdd_nithvar()
     ///   to convert this to a BDD.
-    int register_proposition(const ltl::formula* f, const void* for_me);
+    int
+    register_proposition(const internal::base_formula* f, const void* for_me);
 
     /// \brief Register BDD variables as atomic propositions.
     ///
@@ -99,7 +100,7 @@ namespace spot
     /// \return The first variable number.  Add one to get the second
     /// variable.  Use bdd_ithvar() or bdd_nithvar() to convert this
     /// to a BDD.
-    int register_state(const ltl::formula* f, const void* for_me);
+    int register_state(const internal::base_formula* f, const void* for_me);
 
     /// \brief Register an atomic proposition.
     ///
@@ -111,7 +112,8 @@ namespace spot
     ///
     /// \return The variable number.  Use bdd_ithvar() or bdd_nithvar()
     ///   to convert this to a BDD.
-    int register_acceptance_variable(const ltl::formula* f, const void* for_me);
+    int register_acceptance_variable(const internal::base_formula* f,
+				     const void* for_me);
 
     /// \brief Clone an acceptance variable VAR for FOR_ME.
     ///
@@ -156,9 +158,12 @@ namespace spot
 
     /// @{
     /// Check whether formula \a f has already been registered by \a by_me.
-    bool is_registered_proposition(const ltl::formula* f, const void* by_me);
-    bool is_registered_state(const ltl::formula* f, const void* by_me);
-    bool is_registered_acceptance_variable(const ltl::formula* f,
+    bool is_registered_proposition(const internal::base_formula* f,
+				   const void* by_me);
+
+    bool is_registered_state(const internal::base_formula* f,
+			     const void* by_me);
+    bool is_registered_acceptance_variable(const internal::base_formula* f,
 					   const void* by_me);
     /// @}
 

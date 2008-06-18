@@ -23,7 +23,7 @@
 # define SPOT_TGBA_TGBABDDCONCRETEFACTORY_HH
 
 #include "misc/hash.hh"
-#include "ltlast/formula.hh"
+#include "internal/baseformula.hh"
 #include "tgbabddfactory.hh"
 
 namespace spot
@@ -45,7 +45,7 @@ namespace spot
     /// The state variables are not created if they already exist.
     /// Instead their existing variable numbers are returned.
     /// Variable numbers can be turned into BDD using ithvar().
-    int create_state(const ltl::formula* f);
+    int create_state(const internal::base_formula* f);
 
     /// Create an atomic proposition variable for formula \a f.
     ///
@@ -55,7 +55,7 @@ namespace spot
     /// The atomic proposition is not created if it already exists.
     /// Instead its existing variable number is returned.  Variable numbers
     /// can be turned into BDD using ithvar().
-    int create_atomic_prop(const ltl::formula* f);
+    int create_atomic_prop(const internal::base_formula* f);
 
     /// Declare an acceptance condition.
     ///
@@ -68,7 +68,7 @@ namespace spot
     /// \param b a BDD indicating which variables are in the
     ///          acceptance set
     /// \param a the formula associated
-    void declare_acceptance_condition(bdd b, const ltl::formula* a);
+    void declare_acceptance_condition(bdd b, const internal::base_formula* a);
 
     const tgba_bdd_core_data& get_core_data() const;
     bdd_dict* get_dict() const;
@@ -86,8 +86,8 @@ namespace spot
   private:
     tgba_bdd_core_data data_;	///< Core data for the new automata.
 
-    typedef Sgi::hash_map<const ltl::formula*, bdd,
-			  ltl::formula_ptr_hash> acc_map_;
+    typedef Sgi::hash_map<const internal::base_formula*, bdd,
+			  internal::formula_ptr_hash> acc_map_;
     acc_map_ acc_;		///< BDD associated to each acceptance condition
   };
 

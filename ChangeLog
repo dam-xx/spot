@@ -1,3 +1,22 @@
+2008-06-12  Damien Lefortier  <dam@lrde.epita.fr>
+
+	Add ELTL visitors in eltlvisit/ and start the ELTL translation (LACIM).
+	Merge all eltlast/ files into formula.hh (except automatop.hh).
+
+	* src/eltlast/allnodes.hh, src/eltlast/atomic_prop.hh,
+	src/eltlast/binop.hh, src/eltlast/constant.hh, src/eltlast/multop.hh,
+	src/eltlast/refformula.hh, src/eltlast/unop.hh,
+	src/eltlast/visitor.hh: Delete and merge all these files into ...
+	* src/eltlast/formula.hh: ... this one.
+	* src/eltlvisit/: Add some visitors (clone, destroy, ...).
+	* src/internal/baseformula.hh, src/internal/baseformula.cc:
+	Add base_formula, a new base class of internal::formula.
+	* src/tgba/bdddict.cc src/tgba/bdddict.hh, src/tgba/bddprint.cc,
+	src/tgba/tgbabddconcretefactory.cc, src/tgba/tgbabddconcretefactory.hh
+	Replace ltl::formula by internal::base_formula.
+	* src/tgbatest/eltl2tgba.cc: Beginning of the ELTL translation (LACIM).
+	* m4/boost.m4: Add AX_BOOST_BASE([MINIMUM-VERSION]).
+
 2008-06-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* iface/nips/nipstest/dotty.test,

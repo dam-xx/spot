@@ -61,7 +61,7 @@ namespace spot
     }
 
     void
-    nfa::add_transition(const std::string& s, const std::string& d, unsigned c)
+    nfa::add_transition(const std::string& s, const std::string& d, int c)
     {
       state* source = add_state(s);
       nfa::transition* t = new transition;
@@ -90,7 +90,7 @@ namespace spot
       return finals_.find(state) != finals_.end();
     }
 
-    unsigned
+    int
     nfa::arity()
     {
       return arity_ + 1;

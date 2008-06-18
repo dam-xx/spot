@@ -22,10 +22,11 @@
 %{
 #include <string>
 #include <sstream>
+#include <limits>
 #include <cerrno>
 #include <limits.h>
 #include "public.hh"
-#include "eltlast/allnodes.hh"
+#include "eltlast/automatop.hh"
 
 // Implementation detail for error handling.
 namespace spot
@@ -87,7 +88,8 @@ using namespace spot::eltl;
 	      OP_IMPLIES "implication operator"
 	      OP_EQUIV "equivalent operator"
 
-%token EQ "="
+%token ACC "accept"
+       EQ "="
        LPAREN "("
        RPAREN ")"
        COMMA ","
@@ -131,6 +133,7 @@ nfa_list: /* empty. */
 nfa: IDENT "=" "(" nfa_def ")"
 	{
           nmap[*$1] = nfa::ptr($4);
+	  delete $1;
         }
 ;
 
@@ -142,7 +145,8 @@ nfa_def: /* empty. */
         {
 	  errno = 0;
 	  long i = strtol($4->c_str(), 0, 10);
-	  if (i > INT_MAX || i < INT_MIN || errno == ERANGE)
+	  if (i > std::numeric_limits<long>::max() ||
+	      i < std::numeric_limits<long>::min() || errno == ERANGE)
 	  {
 	    std::string s = "out of range integer `";
 	    s += *$4;
@@ -156,7 +160,12 @@ nfa_def: /* empty. */
 	  $1->add_transition(*$2, *$3, i);
 	  $$ = $1;
         }
-        | nfa_def EQ STATE
+        | nfa_def STATE STATE CONST_TRUE
+        {
+	  $1->add_transition(*$2, *$3, -1);
+	  $$ = $1;
+	}
+        | nfa_def ACC STATE
         {
  	  $1->set_final(*$3);
         }

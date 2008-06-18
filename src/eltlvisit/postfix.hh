@@ -19,24 +19,43 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-/// \file eltlast/atomic_prop.hh
-/// \brief ELTL atomic propositions
-#ifndef SPOT_ELTLAST_ATOMIC_PROP_HH
-# define SPOT_ELTLAST_ATOMIC_PROP_HH
+#ifndef SPOT_ELTLVISIT_POSTFIX_HH
+# define SPOT_ELTLVISIT_POSTFIX_HH
 
-# include "formula.hh"
-# include "internal/atomic_prop.hh"
+#include "eltlast/formula.hh"
 
 namespace spot
 {
   namespace eltl
   {
+    /// \brief Apply an algorithm on each node of an AST,
+    /// during a postfix traversal.
+    /// \ingroup eltl_visitor
+    ///
+    /// Override one or more of the postifix_visitor::doit methods
+    /// with the algorithm to apply.
+    class postfix_visitor : public visitor
+    {
+    public:
+      postfix_visitor();
+      virtual ~postfix_visitor();
 
-    /// \brief Atomic propositions.
-    /// \ingroup eltl_ast
-    typedef spot::internal::atomic_prop<eltl_t> atomic_prop;
+      void visit(atomic_prop* ap);
+      void visit(unop* uo);
+      void visit(binop* bo);
+      void visit(multop* mo);
+      void visit(constant* c);
+      void visit(automatop* ao);
 
+      virtual void doit(atomic_prop* ap);
+      virtual void doit(unop* uo);
+      virtual void doit(binop* bo);
+      virtual void doit(multop* mo);
+      virtual void doit(constant* c);
+      virtual void doit(automatop* ao);
+      virtual void doit_default(formula* f);
+    };
   }
 }
 
-#endif // SPOT_ELTLAST_ATOMICPROP_HH
+#endif // SPOT_ELTLVISIT_POSTFIX_HH

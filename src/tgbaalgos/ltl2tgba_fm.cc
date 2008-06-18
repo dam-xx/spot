@@ -64,7 +64,7 @@ namespace spot
       {
 	fv_map::iterator i;
 	for (i = next_map.begin(); i != next_map.end(); ++i)
-	  destroy(i->first);
+	  destroy(dynamic_cast<const ltl::formula*>(i->first));
 	dict->unregister_all_my_variables(this);
       }
 
@@ -125,7 +125,7 @@ namespace spot
 	for (fi = next_map.begin(); fi != next_map.end(); ++fi)
 	{
 	  os << "  " << fi->second << ": Next[";
-	  to_string(fi->first, os) << "]" << std::endl;
+	  fi->first->to_string(os) << "]" << std::endl;
 	}
 	os << "Shared Dict:" << std::endl;
 	dict->dump(os);
@@ -137,13 +137,13 @@ namespace spot
       {
 	vf_map::const_iterator isi = next_formula_map.find(var);
 	if (isi != next_formula_map.end())
-	  return clone(isi->second);
+	  return dynamic_cast<ltl::formula*>(isi->second->clone());
 	isi = dict->acc_formula_map.find(var);
 	if (isi != dict->acc_formula_map.end())
-	  return clone(isi->second);
+	  return dynamic_cast<ltl::formula*>(isi->second->clone());
 	isi = dict->var_formula_map.find(var);
 	if (isi != dict->var_formula_map.end())
-	  return clone(isi->second);
+	  return dynamic_cast<ltl::formula*>(isi->second->clone());
 	assert(0);
 	// Never reached, but some GCC versions complain about
 	// a missing return otherwise.

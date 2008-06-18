@@ -25,7 +25,6 @@
 #include <ltlvisit/clone.hh>
 #include <ltlvisit/destroy.hh>
 #include <ltlvisit/tostring.hh>
-#include <ltlvisit/tostring.hh>
 #include <ltlenv/defaultenv.hh>
 #include "bdddict.hh"
 
@@ -47,7 +46,8 @@ namespace spot
   }
 
   int
-  bdd_dict::register_proposition(const ltl::formula* f, const void* for_me)
+  bdd_dict::register_proposition(const internal::base_formula* f,
+				 const void* for_me)
   {
     int num;
     // Do not build a variable that already exists.
@@ -58,7 +58,7 @@ namespace spot
       }
     else
       {
-	f = clone(f);
+	f = f->clone();
 	num = allocate_variables(1);
 	var_map[f] = num;
 	var_formula_map[num] = f;
@@ -82,7 +82,8 @@ namespace spot
   }
 
   int
-  bdd_dict::register_state(const ltl::formula* f, const void* for_me)
+  bdd_dict::register_state(const internal::base_formula* f,
+			   const void* for_me)
   {
     int num;
     // Do not build a state that already exists.
@@ -93,7 +94,7 @@ namespace spot
       }
     else
       {
-	f = ltl::clone(f);
+	f = f->clone();
 	num = allocate_variables(2);
 	now_map[f] = num;
 	now_formula_map[num] = f;
@@ -107,8 +108,8 @@ namespace spot
   }
 
   int
-  bdd_dict::register_acceptance_variable(const ltl::formula* f,
-					const void* for_me)
+  bdd_dict::register_acceptance_variable(const internal::base_formula* f,
+					 const void* for_me)
   {
     int num;
     // Do not build an acceptance variable that already exists.
@@ -119,7 +120,7 @@ namespace spot
       }
     else
       {
-	f = clone(f);
+	f = f->clone();
 	num = allocate_variables(1);
 	acc_map[f] = num;
 	acc_formula_map[num] = f;
@@ -150,13 +151,14 @@ namespace spot
     assert(i != acc_formula_map.end());
     std::ostringstream s;
     // FIXME: We could be smarter and reuse unused "$n" numbers.
-    s << ltl::to_string(i->second) << "$"
+    s << i->second->to_string()
+      << "$"
       << ++clone_counts[var];
-    ltl::formula* f =
+    internal::base_formula* f =
       ltl::atomic_prop::instance(s.str(),
 				 ltl::default_environment::instance());
     int res = register_acceptance_variable(f, for_me);
-    ltl::destroy(f);
+    f->destroy();
     return res;
   }
 
@@ -233,7 +235,7 @@ namespace spot
     // Let's free it.  First, we need to find
     // if this is a Now, a Var, or an Acc variable.
     int n = 1;
-    const ltl::formula* f = 0;
+    const internal::base_formula* f = 0;
     vf_map::iterator vi = var_formula_map.find(var);
     if (vi != var_formula_map.end())
       {
@@ -278,7 +280,7 @@ namespace spot
     // formula itself.
     release_variables(var, n);
     if (f)
-      ltl::destroy(f);
+      f->destroy();
     var_refs.erase(cur);
   }
 
@@ -297,7 +299,8 @@ namespace spot
   }
 
   bool
-  bdd_dict::is_registered_proposition(const ltl::formula* f, const void* by_me)
+  bdd_dict::is_registered_proposition(const internal::base_formula* f,
+				      const void* by_me)
   {
     fv_map::iterator fi = var_map.find(f);
     if (fi == var_map.end())
@@ -307,7 +310,8 @@ namespace spot
   }
 
   bool
-  bdd_dict::is_registered_state(const ltl::formula* f, const void* by_me)
+  bdd_dict::is_registered_state(const internal::base_formula* f,
+				const void* by_me)
   {
     fv_map::iterator fi = now_map.find(f);
     if (fi == now_map.end())
@@ -317,7 +321,7 @@ namespace spot
   }
 
   bool
-  bdd_dict::is_registered_acceptance_variable(const ltl::formula* f,
+  bdd_dict::is_registered_acceptance_variable(const internal::base_formula* f,
 					     const void* by_me)
   {
     fv_map::iterator fi = acc_map.find(f);
@@ -336,23 +340,23 @@ namespace spot
       {
 	os << "  " << fi->second << " (x"
 	   << var_refs.find(fi->second)->second.size() << "): ";
-	to_string(fi->first, os) << std::endl;
+	fi->first->to_string(os) << std::endl;
       }
     os << "States:" << std::endl;
     for (fi = now_map.begin(); fi != now_map.end(); ++fi)
       {
 	int refs = var_refs.find(fi->second)->second.size();
 	os << "  " << fi->second << " (x" << refs << "): Now[";
-	to_string(fi->first, os) << "]" << std::endl;
+	fi->first->to_string(os) << "]" << std::endl;
 	os << "  " << fi->second + 1 << " (x" << refs << "): Next[";
-	to_string(fi->first, os) << "]" << std::endl;
+	fi->first->to_string(os) << "]" << std::endl;
       }
     os << "Acceptance Conditions:" << std::endl;
     for (fi = acc_map.begin(); fi != acc_map.end(); ++fi)
       {
 	os << "  " << fi->second << " (x"
 	   << var_refs.find(fi->second)->second.size() << "): Acc[";
-	to_string(fi->first, os) << "]" << std::endl;
+	fi->first->to_string(os) << "]" << std::endl;
       }
     os << "Ref counts:" << std::endl;
     vr_map::const_iterator ri;

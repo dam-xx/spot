@@ -1,5 +1,5 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
+// Copyright (C) 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
+// dÃ©partement SystÃ¨mes RÃ©partis CoopÃ©ratifs (SRC), UniversitÃ© Pierre
 // et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
@@ -19,24 +19,38 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-/// \file eltlast/constant.hh
-/// \brief ELTL constants
-#ifndef SPOT_ELTLAST_CONSTANT_HH
-# define SPOT_ELTLAST_CONSTANT_HH
-
-# include "formula.hh"
-# include "internal/constant.hh"
+#include <sstream>
+#include "baseformula.hh"
 
 namespace spot
 {
-  namespace eltl
+  namespace internal
   {
+    std::string
+    base_formula::to_string() const
+    {
+      std::ostringstream os;
+      to_string(os);
+      return os.str();
+    }
 
-    /// \brief A constant (True or False)
-    /// \ingroup eltl_ast
-    typedef spot::internal::constant<eltl_t> constant;
+    const std::string&
+    base_formula::dump() const
+    {
+      return dump_;
+    }
 
+    size_t
+    base_formula::hash() const
+    {
+      return hash_key_;
+    }
+
+    void
+    base_formula::set_key_()
+    {
+      string_hash sh;
+      hash_key_ = sh(dump_);
+    }
   }
 }
-
-#endif // SPOT_ELTLAST_CONSTANT_HH

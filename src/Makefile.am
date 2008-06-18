@@ -24,7 +24,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 # List directories in the order they must be built.
 # Keep tests at the end.
 SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse internal \
-	  eltlenv eltlast eltlparse \
+	  eltlenv eltlast eltlvisit eltlparse \
           tgba tgbaalgos tgbaparse \
 	  evtgba evtgbaalgos evtgbaparse . \
 	  ltltest eltltest tgbatest evtgbatest sanity
@@ -36,8 +36,10 @@ libspot_la_LIBADD =  \
   misc/libmisc.la \
   ltlparse/libltlparse.la \
   ltlvisit/libltlvisit.la \
+  internal/libinternal.la \
   eltlast/libeltlast.la \
   eltlparse/libeltlparse.la \
+  eltlvisit/libeltlvisit.la \
   tgba/libtgba.la \
   tgbaalgos/libtgbaalgos.la \
   tgbaparse/libtgbaparse.la \

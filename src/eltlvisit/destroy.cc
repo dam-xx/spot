@@ -19,24 +19,24 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-/// \file eltlast/refformula.hh
-/// \brief Reference-counted ELTL formulae
-#ifndef SPOT_ELTLAST_REFFORMULA_HH
-# define SPOT_ELTLAST_REFFORMULA_HH
-
-# include "formula.hh"
-# include "internal/refformula.hh"
+#include "eltlvisit/destroy.hh"
+#include "eltlvisit/clone.hh"
 
 namespace spot
 {
   namespace eltl
   {
+    void
+    destroy_visitor::doit_default(formula* c)
+    {
+      formula::unref(c);
+    }
 
-    /// \brief A reference-counted ELTL formula.
-    /// \ingroup eltl_ast
-    typedef spot::internal::ref_formula<eltl_t> ref_formula;
-
+    void
+    destroy(const formula* f)
+    {
+      destroy_visitor v;
+      const_cast<formula*>(f)->accept(v);
+    }
   }
 }
-
-#endif // SPOT_ELTLAST_REFFORMULA_HH

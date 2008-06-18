@@ -64,13 +64,42 @@ namespace spot
     /// \addtogroup ltl_misc Miscellaneous algorithms for LTL formulae
     /// \ingroup ltl_algorithm
 
+    struct ltl_t;
     struct visitor;
     struct const_visitor;
+
+    /// \brief An LTL formula.
+    /// \ingroup ltl_essential
+    /// \ingroup ltl_ast
+    ///
+    /// The only way you can work with a formula is to
+    /// build a spot::ltl::visitor or spot::ltl::const_visitor.
+    typedef spot::internal::formula<ltl_t> formula;
+
+    /// Forward declarations
+    formula* clone(const formula* f);
+    std::ostream& to_string(const formula* f, std::ostream& os);
+    void destroy(const formula* f);
 
     struct ltl_t
     {
       typedef spot::ltl::visitor visitor;
       typedef spot::ltl::const_visitor const_visitor;
+
+      static formula* clone_(const formula* f)
+      {
+	return clone(f);
+      }
+
+      static std::ostream& to_string_(const formula* f, std::ostream& os)
+      {
+	return to_string(f, os);
+      }
+
+      static void destroy_(const formula* f)
+      {
+	destroy(f);
+      }
 
       enum binop { Xor, Implies, Equiv, U, R };
       const char* binop_name(binop op) const
@@ -113,18 +142,8 @@ namespace spot
       }
     };
 
-    /// \brief An LTL formula.
-    /// \ingroup ltl_essential
-    /// \ingroup ltl_ast
-    ///
-    /// The only way you can work with a formula is to
-    /// build a spot::ltl::visitor or spot::ltl::const_visitor.
-    typedef spot::internal::formula<ltl_t> formula;
-
-    typedef spot::internal::formula_ptr_less_than<ltl_t> formula_ptr_less_than;
-    typedef spot::internal::formula_ptr_hash<ltl_t> formula_ptr_hash;
-
-
+    typedef spot::internal::formula_ptr_less_than formula_ptr_less_than;
+    typedef spot::internal::formula_ptr_hash formula_ptr_hash;
 
     /// \brief Atomic propositions.
     /// \ingroup ltl_ast

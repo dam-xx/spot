@@ -1,4 +1,4 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -19,34 +19,24 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-AM_CPPFLAGS = -I$(srcdir)/..
+AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-internaldir = $(pkgincludedir)/internal
+eltlvisitdir = $(pkgincludedir)/eltlvisit
 
-internal_HEADERS = \
-  baseformula.hh \
-  refformula.hh \
-  refformula.hxx \
-  formula.hh \
-  formula.hxx \
-  atomic_prop.hh \
-  atomic_prop.hxx \
-  binop.hh \
-  binop.hxx \
-  constant.hh \
-  constant.hxx \
-  multop.hh \
-  multop.hxx \
-  predecl.hh \
-  unop.hh \
-  unop.hxx \
-  defaultenv.hh \
-  defaultenv.hxx \
-  declenv.hh \
-  declenv.hxx \
-  environment.hh
+eltlvisit_HEADERS = \
+  clone.hh \
+  destroy.hh \
+  lunabbrev.hh \
+  nenoform.hh \
+  postfix.hh \
+  tostring.hh
 
-noinst_LTLIBRARIES = libinternal.la
-libinternal_la_SOURCES = \
-  baseformula.cc
+noinst_LTLIBRARIES = libeltlvisit.la
+libeltlvisit_la_SOURCES = \
+  clone.cc \
+  destroy.cc \
+  lunabbrev.cc \
+  nenoform.cc \
+  postfix.cc \
+  tostring.cc

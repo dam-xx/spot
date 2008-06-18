@@ -1,4 +1,4 @@
-// Copyright (C) 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,26 +19,30 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-/// \file eltlast/multop.hh
-/// \brief ELTL multi-operand operators
-#ifndef SPOT_ELTLAST_MULTOP_HH
-# define SPOT_ELTLAST_MULTOP_HH
+#ifndef SPOT_ELTLVISIT_TOSTRING_HH
+# define SPOT_ELTLVISIT_TOSTRING_HH
 
-# include "formula.hh"
-# include "internal/multop.hh"
+#include <iosfwd>
+#include "eltlast/formula.hh"
 
 namespace spot
 {
   namespace eltl
   {
+    /// \addtogroup eltl_io
+    /// @{
 
-    /// \brief Multi-operand operators.
-    /// \ingroup eltl_ast
-    ///
-    /// These operators are considered commutative and associative.
-    typedef spot::internal::multop<eltl_t> multop;
+    /// \brief Output a formula as a (parsable) string.
+    /// \param f The formula to translate.
+    /// \param os The stream where it should be output.
+    std::ostream& to_string(const formula* f, std::ostream& os);
 
+    /// \brief Convert a formula into a (parsable) string.
+    /// \param f The formula to translate.
+    std::string to_string(const formula* f);
+
+    /// @}
   }
 }
 
-#endif // SPOT_ELTLAST_MULTOP_HH
+#endif // SPOT_ELTLVISIT_TOSTRING_HH

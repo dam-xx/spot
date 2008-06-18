@@ -150,7 +150,7 @@ namespace spot
 	v->insert(v->end(), inlined.begin(), inlined.end());
       }
 
-      std::sort(v->begin(), v->end(), formula_ptr_less_than<T>());
+      std::sort(v->begin(), v->end(), formula_ptr_less_than());
 
       // Remove duplicates.  We can't use std::unique(), because we
       // must destroy() any formula we drop.

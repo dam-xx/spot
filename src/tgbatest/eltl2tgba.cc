@@ -1,5 +1,5 @@
 // Copyright (C) 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
+// dÃ©partement SystÃ¨mes RÃ©partis CoopÃ©ratifs (SRC), UniversitÃ© Pierre
 // et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
@@ -19,27 +19,32 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-/// \file eltlast/binop.hh
-/// \brief ELTL binary operators
-///
-/// This does not include \c AND and \c OR operators.  These are
-/// considered to be multi-operand operators (see spot::eltl::multop).
-#ifndef SPOT_ELTLAST_BINOP_HH
-# define SPOT_ELTLAST_BINOP_HH
+#include <iostream>
+#include <cassert>
+#include "eltlparse/public.hh"
+#include "tgbaalgos/eltl2tgba_lacim.hh"
+#include "tgbaalgos/dotty.hh"
 
-# include "formula.hh"
-# include "internal/binop.hh"
-
-namespace spot
+int
+main(int argc, char** argv)
 {
-  namespace eltl
+  spot::eltl::parse_error_list p;
+  const spot::eltl::formula* f = spot::eltl::parse(
+    argv[1], p, spot::eltl::default_environment::instance(), argc > 2);
+
+  if (spot::eltl::format_parse_errors(std::cerr, p))
   {
-
-    /// \brief Binary operator.
-    /// \ingroup eltl_ast
-    typedef spot::internal::binop<eltl_t> binop;
-
+    if (f != 0)
+      std::cout << f->dump() << std::endl;
+    return 1;
   }
-}
 
-#endif // SPOT_ELTLAST_BINOP_HH
+  assert(f != 0);
+  std::cout << f->dump() << std::endl;
+
+  spot::bdd_dict* dict = new spot::bdd_dict();
+  spot::tgba_bdd_concrete* concrete = spot::eltl_to_tgba_lacim(f, dict);
+
+  spot::dotty_reachable(std::cout, concrete);
+  delete concrete;
+}

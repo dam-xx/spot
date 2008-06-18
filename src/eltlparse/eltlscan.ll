@@ -59,6 +59,10 @@ eol      \n|\r|\n\r|\r\n
   /* Rules for the automaton definitions part. */
 
 <INITIAL>"="		return token::EQ;
+<IINTIAL>"accept"	return token::ACC;
+<INITIAL>[tT][rR][uU][eE] {
+			  return token::CONST_TRUE;
+			}
 <INITIAL>"("		return token::LPAREN;
 <INITIAL>")"		return token::RPAREN;
 <INITIAL>"%"		BEGIN(formula);

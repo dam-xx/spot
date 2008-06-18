@@ -23,9 +23,7 @@
 #include <cassert>
 #include <ostream>
 #include "bddprint.hh"
-#include "ltlvisit/tostring.hh"
 #include "formula2bdd.hh"
-#include "ltlvisit/destroy.hh"
 
 namespace spot
 {
@@ -42,7 +40,7 @@ namespace spot
     bdd_dict::vf_map::const_iterator isi =
       dict->var_formula_map.find(var);
     if (isi != dict->var_formula_map.end())
-      to_string(isi->second, o);
+      isi->second->to_string(o);
     else
       {
 	isi = dict->acc_formula_map.find(var);
@@ -51,12 +49,12 @@ namespace spot
 	    if (want_acc)
 	      {
 		o << "Acc[";
-		to_string(isi->second, o) << "]";
+		isi->second->to_string(o) << "]";
 	      }
 	    else
 	      {
 		o << "\"";
-		to_string(isi->second, o) << "\"";
+		isi->second->to_string(o) << "\"";
 	      }
 	  }
 	else
@@ -64,14 +62,14 @@ namespace spot
 	    isi = dict->now_formula_map.find(var);
 	    if (isi != dict->now_formula_map.end())
 	      {
-		o << "Now["; to_string(isi->second, o) << "]";
+		o << "Now["; isi->second->to_string(o) << "]";
 	      }
 	    else
 	      {
 		isi = dict->now_formula_map.find(var - 1);
 		if (isi != dict->now_formula_map.end())
 		  {
-		    o << "Next["; to_string(isi->second, o) << "]";
+		    o << "Next["; isi->second->to_string(o) << "]";
 		  }
 		else
 		  {

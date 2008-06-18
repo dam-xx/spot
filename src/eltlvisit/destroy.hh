@@ -1,5 +1,5 @@
-// Copyright (C) 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
+// Copyright (C) 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
+// dÃ©partement SystÃ¨mes RÃ©partis CoopÃ©ratifs (SRC), UniversitÃ© Pierre
 // et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
@@ -19,24 +19,32 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-/// \file eltlast/unop.hh
-/// \brief ELTL unary operators
-#ifndef SPOT_ELTLAST_UNOP_HH
-# define SPOT_ELTLAST_UNOP_HH
+#ifndef SPOT_ELTLVISIT_DESTROY_HH
+# define SPOT_ELTLVISIT_DESTROY_HH
 
-# include "formula.hh"
-# include "internal/unop.hh"
+#include "eltlvisit/postfix.hh"
 
 namespace spot
 {
   namespace eltl
   {
+   /// \ingroup eltl_visitor
+    ///
+    /// This visitor is public, because it's convenient to write the
+    /// destroy method of the base_formula class.  But if you just
+    /// want the functionality, consider using spot::eltl::destroy
+    /// instead.
+    class destroy_visitor: public postfix_visitor
+    {
+    public:
+      virtual void
+      doit_default(formula* c);
+    };
 
-    /// \brief Unary operators.
-    /// \ingroup eltl_ast
-    typedef spot::internal::unop<eltl_t> unop;
-
+    /// \brief Destroys a formula
+    /// \ingroup eltl_essential
+    void destroy(const formula *f);
   }
 }
 
-#endif // SPOT_ELTLAST_UNOP_HH
+#endif // SPOT_ELTLVISIT_DESTROY_HH

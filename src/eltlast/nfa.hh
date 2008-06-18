@@ -51,7 +51,7 @@ namespace spot
       /// Explicit transitions.
       struct transition
       {
-	unsigned cost;
+	int cost;
       	const state* dest;
       };
 
@@ -59,7 +59,7 @@ namespace spot
       ~nfa();
 
       void
-      add_transition(const std::string& s, const std::string& d, unsigned c);
+      add_transition(const std::string& s, const std::string& d, int c);
 
       void
       set_init_state(const std::string& state);
@@ -72,7 +72,7 @@ namespace spot
       is_final(const std::string& state);
 
       /// \brief Get the `arity' i.e. max t.cost, for each transition t.
-      unsigned
+      int
       arity();
 
       /// \brief Return an iterator on the first succesor (if any) of \a state.
@@ -103,7 +103,7 @@ namespace spot
       sn_map sn_;
       state* init_;
 
-      unsigned arity_;
+      int arity_;
       std::set<std::string> finals_;
 
       /// Explicitly disllow use of implicity generated member functions

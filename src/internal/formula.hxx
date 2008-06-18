@@ -67,18 +67,24 @@ namespace spot
     }
 
     template<typename T>
-    const std::string&
-    formula<T>::dump() const
+    base_formula*
+    formula<T>::clone() const
     {
-      return dump_;
+      return T::clone_(this);
+    }
+
+    template<typename T>
+    std::ostream&
+    formula<T>::to_string(std::ostream& os) const
+    {
+      return T::to_string_(this, os);
     }
 
     template<typename T>
     void
-    formula<T>::set_key_()
+    formula<T>::destroy() const
     {
-      string_hash sh;
-      hash_key_ = sh(dump_);
+      T::destroy_(this);
     }
   }
 }

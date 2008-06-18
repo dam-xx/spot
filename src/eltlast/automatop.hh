@@ -24,14 +24,16 @@
 #ifndef SPOT_ELTLAST_AUTOMATOP_HH
 # define SPOT_ELTLAST_AUTOMATOP_HH
 
-# include "multop.hh"
-# include "refformula.hh"
+# include "formula.hh"
 # include "nfa.hh"
 
 namespace spot
 {
   namespace eltl
   {
+    /// \brief Counted-reference formulae.
+    /// \ingroup eltl_ast
+    typedef spot::internal::ref_formula<eltl_t> ref_formula;
 
     /// \brief Automaton operators.
     /// \ingroup eltl_ast
