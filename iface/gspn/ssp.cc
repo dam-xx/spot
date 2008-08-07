@@ -994,7 +994,9 @@ namespace spot
   {
   public:
     couvreur99_check_shy_ssp(const tgba* a, bool stack_inclusion,
-			     bool double_inclusion, bool no_decomp)
+			     bool double_inclusion,
+			     bool reversed_double_inclusion,
+			     bool no_decomp)
       : couvreur99_check_shy(a,
 			     option_map(),
 			     numbered_state_heap_ssp_factory_semi::instance()),
@@ -1002,6 +1004,7 @@ namespace spot
 	inclusion_count_stack(0),
 	stack_inclusion(stack_inclusion),
 	double_inclusion(double_inclusion),
+	reversed_double_inclusion(reversed_double_inclusion),
 	no_decomp(no_decomp)
     {
       onepass_ = true;
@@ -1022,6 +1025,7 @@ namespace spot
     unsigned inclusion_count_stack;
     bool stack_inclusion;
     bool double_inclusion;
+    bool reversed_double_inclusion;
     bool no_decomp;
 
   protected:
@@ -1110,6 +1114,7 @@ namespace spot
 			{
 			  if (stack_inclusion
 			      && double_inclusion
+			      && !reversed_double_inclusion
 			      && spot_inclusion(new_state->left(),
 						old_state->left()))
 			    break;
@@ -1181,6 +1186,12 @@ namespace spot
 
 			      break;
 			    }
+			  if (stack_inclusion
+			      && double_inclusion
+			      && reversed_double_inclusion
+			      && spot_inclusion(new_state->left(),
+						old_state->left()))
+			    break;
 			}
 		    }
 		}
@@ -1296,11 +1307,15 @@ namespace spot
 
   couvreur99_check*
   couvreur99_check_ssp_shy(const tgba* ssp_automata, bool stack_inclusion,
-			   bool double_inclusion, bool no_decomp)
+			   bool double_inclusion,
+			   bool reversed_double_inclusion,
+			   bool no_decomp)
   {
     assert(dynamic_cast<const tgba_gspn_ssp*>(ssp_automata));
     return new couvreur99_check_shy_ssp(ssp_automata, stack_inclusion,
-					double_inclusion, no_decomp);
+					double_inclusion,
+					reversed_double_inclusion,
+					no_decomp);
   }
 
 #if 0

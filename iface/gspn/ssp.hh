@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2006, 2007 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2006, 2007, 2008 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -58,6 +58,8 @@ namespace spot
   couvreur99_check* couvreur99_check_ssp_shy(const tgba* ssp_automata,
 					     bool stack_inclusion = true,
 					     bool double_inclusion = false,
+					     bool reversed_double_inclusion
+					     = false,
 					     bool no_decomp = false);
 
   /// @}

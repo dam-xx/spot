@@ -1,3 +1,9 @@
+2008-08-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* iface/gspn/ltlgspn.cc: New option: -e54.
+	* iface/gspn/ssp.hh, iface/gspn/ssp.cc: Add the
+	reversed_double_inclusion boolean for this.
+
 2008-06-12  Damien Lefortier  <dam@lrde.epita.fr>
 
 	Add ELTL visitors in eltlvisit/ and start the ELTL translation (LACIM).

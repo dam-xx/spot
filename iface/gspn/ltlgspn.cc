@@ -73,7 +73,9 @@ syntax(char* prog)
 	    << "  -e4 use semi-d. incl. Couvreur's emptiness-check's "
 	    << "shy variant"
 	    << std::endl
-	    << "  -e45 mix of -e4 and -e5 " << std::endl
+	    << "  -e45 mix of -e4 and -e5 (semi.d. incl. before d.incl.)"
+	    << std::endl
+	    << "  -e54 mix of -e5 and -e4 (the other way around)" << std::endl
 	    << "  -e5 use d. incl. Couvreur's emptiness-check's shy variant"
 	    << std::endl
 	    << "  -e6 like -e5, but without inclusion checks in the "
@@ -116,6 +118,7 @@ main(int argc, char **argv)
       bool stack_inclusion = true;
       bool pushfront = false;
       bool double_inclusion = false;
+      bool reversed_double_inclusion = false;
       bool no_decomp = false;
 #endif
       std::string dead = "true";
@@ -171,6 +174,12 @@ main(int argc, char **argv)
 	    {
 	      check = Couvreur5;
 	      double_inclusion = true;
+	    }
+	  else if (!strcmp(argv[formula_index], "-e54"))
+	    {
+	      check = Couvreur5;
+	      double_inclusion = true;
+	      reversed_double_inclusion = true;
 	    }
 	  else if (!strcmp(argv[formula_index], "-e5"))
 	    {
@@ -295,6 +304,7 @@ main(int argc, char **argv)
 	      case Couvreur5:
 		ec = spot::couvreur99_check_ssp_shy(prod, stack_inclusion,
 						    double_inclusion,
+						    reversed_double_inclusion,
 						    no_decomp);
 		break;
 #endif
