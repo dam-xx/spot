@@ -6,3 +6,10 @@ Makefile
 .deps
 .libs
 defs
+dottygspn-rg
+dottygspn-srg
+dottygspn-ssp
+ltlgspn-rg
+ltlgspn-srg
+ltlgspn-ssp
+testSubDir
