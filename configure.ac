@@ -72,6 +72,8 @@ AC_CONFIG_FILES([
   bench/Makefile
   bench/emptchk/Makefile
   bench/emptchk/defs
+  bench/gspn-ssp/Makefile
+  bench/gspn-ssp/defs
   bench/ltl2tgba/Makefile
   bench/ltl2tgba/defs
   doc/Doxyfile

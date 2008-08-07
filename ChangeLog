@@ -1,5 +1,18 @@
 2008-08-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* bench/gspn-ssp/Makefile.am, bench/gspn-ssp/trans2prop.pl: New files.
+	* bench/gspn-ssp/config: Rename as bench/gspn-ssp/defs.in.
+	* bench/Makefile.am (SUBDIRS): Add gspn-ssp.
+	* configure.ac: Output bench/gspn-ssp/Makefile and bench/gspn-ssp/defs.
+	* bench/gspn-ssp/bench: Include defs.
+
+2008-08-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* bench/gspn-ssp/: New directory.  Contains some of the benches
+	used in baarir.06.tr03, baarir.07.acsd, and baarir.07.msr.
+
+2008-08-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* iface/gspn/ltlgspn.cc: New option: -e54.
 	* iface/gspn/ssp.hh, iface/gspn/ssp.cc: Add the
 	reversed_double_inclusion boolean for this.

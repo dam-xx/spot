@@ -1,0 +1,8 @@
+#!/bin/sh
+for i in 2; do
+  sfx=$i
+  . ../common
+  X=`seq 1 $i | sed 's/^/x/;s/$/,/' | tr -d '\n' | sed 's/,$//'`
+  sed "s/@X@/$X/" "$name.def" > "$dst/$name$sfx.def"
+  sed "s/:.*//" < "$name.prop" | tr '\n' ' ' > "$dst/$name$sfx.ap"
+done

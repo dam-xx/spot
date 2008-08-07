@@ -1,0 +1,7 @@
+name=$(basename $(pwd))
+dst=../../models/$name$sfx
+mkdir "$dst"
+for ext in con net prop; do
+  cp "$name".$ext "$dst/$name$sfx.$ext"
+done
+test -f "$name".gd && cp "$name".gd "$dst/$name$sfx.gd"

@@ -1,0 +1,23 @@
+#!/bin/sh
+. ./defs
+H=`pwd`
+test -d results || mkdir results
+cd models
+[ $# -eq 0 ] &&  set -- *
+for i; do
+  cd $i
+  for ltl2tgba in -f; do
+    case $i in
+      *.rg) checks=e2;;
+      *) checks='e4 e6 e5 e5L e5n e2 e45 e45n';;
+    esac
+    for check in $checks; do
+      res=$H/results/$i.RES-$check$ltl2tgba
+      test -f $res && continue
+      export res check i ltl2tgba
+      rm -f $res
+      $TIME "$H/benchaux" 2>$res-TOTAL
+    done
+  done
+  cd ..
+done

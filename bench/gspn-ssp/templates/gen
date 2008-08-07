@@ -1,0 +1,6 @@
+#!/bin/sh
+rm -Rf ../models
+mkdir ../models
+for dir in predef WCSsym bagrodia s2j2t2 s2j3t2 s3j2t2; do
+  (cd $dir && ./gen)
+done

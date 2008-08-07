@@ -1,0 +1,9 @@
+#!/bin/sh
+for i in 3 4 5 6 8; do
+  dst=../../models/WCSasym$i.rg
+  mkdir $dst
+  for e in def net tobs; do
+    cp WCSasym$i.$e $dst/WCSasym$i.rg.$e
+  done
+  echo 'P1 P2 P3 P4 P5 P6 P7 P8' > $dst/WCSasym$i.rg.ap
+done
