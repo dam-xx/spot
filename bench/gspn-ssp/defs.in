@@ -34,10 +34,10 @@ test -f "$srcdir/defs.in" || {
    exit 1
 }
 
-RANDLTL='@top_builddir@/src/ltltest/randltl'
-LTLGSPNSSP='@top_builddir@/iface/gspn/ltlgspn-ssp'
-LTLGSPNSRG='@top_builddir@/iface/gspn/ltlgspn-srg'
+RANDLTL='@abs_top_builddir@/src/ltltest/randltl'
+LTLGSPNSSP='@abs_top_builddir@/iface/gspn/ltlgspn-ssp'
+LTLGSPNSRG='@abs_top_builddir@/iface/gspn/ltlgspn-srg'
 SNOW=/home/adl/projs/src/gspn/snow
-TRANS2PL='@srcdir@/trans2prop.pl'
+TRANS2PL='@abs_srcdir@/tools/trans2prop.pl'
 TIME='/usr/bin/time -p'
 export RANDLTL LTLGSPNSSP LTLGSPNSRG TIME SNOW TRANS2PL

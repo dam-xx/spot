@@ -27,6 +27,7 @@ my %C = (
 	"contained map size",
 	"find_state count",
 	"max. depth",
+	"inclusion count",
 	"removed components",
 	"states",
 	"transitions",
@@ -97,6 +98,12 @@ my %C = (
     ],
     );
 
+$C{e45} = $C{e5};
+$C{e54} = $C{e5};
+$C{e5L} = $C{e5};
+$C{e5n} = $C{e5};
+$C{e45n} = $C{e5};
+
 my %filter = (states => 1, transitions => 1, user => 1);
 my %order = (e2 => 2, e6 => 3, e5 => 4, e4 => 5);
 
@@ -114,10 +121,9 @@ while (<>)
     my $e = shift @l;
     $e =~ s/non empty/non e./;
 
-    $ARGV =~ /([\w.]+).RES-(\w+)/;
+    $ARGV =~ /([\w.]+)\.(e.*)-f\.all$/;
     my $name = $1;
     my $meth = $2;
-    $meth =~ s/[nL]$//;
 
     $P{$name}{$e}{$meth} = 1;
 
@@ -157,7 +163,7 @@ if (exists $ENV{FORTETABLE})
 		foreach my $meth (sort { $order{$a} <=> $order{$b} }
 				  keys %{$P{$model}{$e}})
 		{
-		    my $n = "results/$model.RES-$meth-f";
+		    my $n = "$model.$meth";
 		    next unless exists $H{$meth}{$n}{$e};
 		    my @l = @{$H{$meth}{$n}{$e}};
 		    print " "x17 . "% $model $meth $e\n";
@@ -187,7 +193,7 @@ foreach my $meth (sort keys %H)
     foreach my $n (sort keys %{$H{$meth}})
     {
 	$n =~ s,.*/,,;
-	$n =~ s,\.RES,,;
+	$n =~ s,\.all,,;
 	$n =~ s,-f,,;
 	printf "%18s", $n;
     }

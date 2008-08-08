@@ -19,46 +19,29 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
+TEMPLATES =
+MODELS =
+
+include modelgen.mk
+include bench.mk
+
 EXTRA_DIST = 					\
-  bench						\
-  benchaux					\
-  gen						\
-  sum						\
-  sumall					\
-  templates/bagrodia/bagrodia.con		\
-  templates/bagrodia/bagrodia.def		\
-  templates/bagrodia/bagrodia.gd		\
-  templates/bagrodia/bagrodia.net		\
-  templates/bagrodia/bagrodia.prop		\
-  templates/bagrodia/gen			\
+  $(TEMPLATES)					\
   templates/common				\
-  templates/gen					\
-  templates/predef/gen				\
-  templates/predef/WCSasym10.def		\
-  templates/predef/WCSasym10.net		\
-  templates/predef/WCSasym10.tobs		\
-  templates/predef/WCSasym2.def			\
-  templates/predef/WCSasym2.net			\
-  templates/predef/WCSasym2.tobs		\
-  templates/predef/WCSasym3.def			\
-  templates/predef/WCSasym3.net			\
-  templates/predef/WCSasym3.tobs		\
-  templates/predef/WCSasym4.def			\
-  templates/predef/WCSasym4.net			\
-  templates/predef/WCSasym4.tobs		\
-  templates/predef/WCSasym5.def			\
-  templates/predef/WCSasym5.net			\
-  templates/predef/WCSasym5.tobs		\
-  templates/predef/WCSasym6.def			\
-  templates/predef/WCSasym6.net			\
-  templates/predef/WCSasym6.tobs		\
-  templates/predef/WCSasym8.def			\
-  templates/predef/WCSasym8.net			\
-  templates/predef/WCSasym8.tobs		\
-  templates/WCSsym/gen				\
-  templates/WCSsym/WCSsym.con			\
-  templates/WCSsym/WCSsym.def			\
-  templates/WCSsym/WCSsym.gd			\
-  templates/WCSsym/WCSsym.net			\
-  templates/WCSsym/WCSsym.prop			\
-  trans2prop.pl
+  templates/gen
+
+run_bench = tools/runbench
+collate =  tools/collate
+
+dist_noinst_SCRIPTS = \
+  tools/bench-create \
+  tools/modelgen-create \
+  tools/trans2prop.pl \
+  tools/sum \
+  $(run_bench) \
+  $(collate)
+
+nodist_check_DATA = $(RESULTS)
+
+clean-local:
+	rm -rf models results

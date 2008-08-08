@@ -1,8 +1,10 @@
 #!/bin/sh
 for i in 2; do
   sfx=$i
-  . ../common
+  . templates/common
   X=`seq 1 $i | sed 's/^/x/;s/$/,/' | tr -d '\n' | sed 's/,$//'`
-  sed "s/@X@/$X/" "$name.def" > "$dst/$name$sfx.def"
-  sed "s/:.*//" < "$name.prop" | tr '\n' ' ' > "$dst/$name$sfx.ap"
+  echo "	sed 's/@X@/$X/' '\$(srcdir)/$name/$bname.def' > '$dst/$bname$sfx.def'" >>tmp$$
+  echo "	sed 's/:.*//' '\$(srcdir)/$name/$bname.prop' | tr '\n' ' ' > '$dst/$bname$sfx.ap'" >>tmp$$
+  FILES="$FILES $name/$bname.def $name/$bname.prop"
+  finish
 done

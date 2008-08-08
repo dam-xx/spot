@@ -1,0 +1,13 @@
+#!/bin/sh
+
+for f in "$@"; do
+  sed -n '/^$/n;
+	  /^Command exited with non-zero status/n;
+	  2,$s/[^0-9.]//g;
+	  s/^[.]//;
+	  1x;
+	  2,$H;
+	  $x;
+	  $s/\n/,/g;
+	  $p' "$f"
+done
