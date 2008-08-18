@@ -657,6 +657,11 @@ namespace spot
   class numbered_state_heap_ssp_semi : public numbered_state_heap
   {
   public:
+    numbered_state_heap_ssp_semi()
+      : numbered_state_heap(), inclusions(0)
+    {
+    }
+
     virtual
     ~numbered_state_heap_ssp_semi()
     {
@@ -700,7 +705,10 @@ namespace spot
 		  if (old_state->left()
 		      && new_state->left()
 		      && spot_inclusion(new_state->left(), old_state->left()))
-			break;
+		    {
+		      ++inclusions;
+		      break;
+		    }
 		}
 	      if (j != l.end())
 		{
@@ -772,7 +780,10 @@ namespace spot
 		  if (old_state->left()
 		      && new_state->left()
 		      && spot_inclusion(new_state->left(), old_state->left()))
-			break;
+		    {
+		      ++inclusions;
+		      break;
+		    }
 		}
 	      if (j != l.end())
 		{
@@ -897,6 +908,8 @@ namespace spot
     friend class numbered_state_heap_ssp_const_iterator;
     friend class couvreur99_check_shy_ssp;
     friend class couvreur99_check_shy_semi_ssp;
+
+    mutable unsigned inclusions;
   };
 
 
@@ -1250,27 +1263,41 @@ namespace spot
       : couvreur99_check_shy(a,
 			     option_map(),
 			     numbered_state_heap_ssp_factory_semi::instance()),
-	inclusion_count(0)
+	find_count(0)
     {
       onepass_ = true;
 
       stats["find_state count"] =
 	static_cast<spot::unsigned_statistics::unsigned_fun>
-	(&couvreur99_check_shy_semi_ssp::get_inclusion_count);
+	(&couvreur99_check_shy_semi_ssp::get_find_count);
       stats["contained map size"] =
 	static_cast<spot::unsigned_statistics::unsigned_fun>
 	(&couvreur99_check_shy_semi_ssp::get_contained_map_size);
+      stats["inclusion count"] =
+	static_cast<spot::unsigned_statistics::unsigned_fun>
+	(&couvreur99_check_shy_semi_ssp::get_inclusion_count);
+
+      //dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->stats = this;
     }
 
   private:
-    unsigned inclusion_count;
+    unsigned find_count;
 
   protected:
     unsigned
+    get_find_count() const
+    {
+      return find_count;
+    };
+
+    unsigned
     get_inclusion_count() const
     {
-      return inclusion_count;
+      return
+	dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->inclusions;
+
     };
+
     unsigned
     get_contained_map_size() const
     {
@@ -1281,7 +1308,7 @@ namespace spot
     virtual numbered_state_heap::state_index_p
     find_state(const state* s)
     {
-      ++inclusion_count;
+      ++find_count;
       return couvreur99_check_shy::find_state(s);
     }
   };
