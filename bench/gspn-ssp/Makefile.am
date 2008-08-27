@@ -31,15 +31,13 @@ EXTRA_DIST = 					\
   templates/gen
 
 run_bench = tools/runbench
-collate =  tools/collate
 
 dist_noinst_SCRIPTS = \
   tools/bench-create \
   tools/modelgen-create \
   tools/trans2prop.pl \
   tools/sum \
-  $(run_bench) \
-  $(collate)
+  $(run_bench)
 
 nodist_check_DATA = $(RESULTS)
 

@@ -1,3 +1,14 @@
+2008-08-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* bench/gspn-ssp/tools/sum: Output WCSsym* and WCSasym* on
+	separate lines.  Canonize the names used as keys to that
+	WCSsymN appears always in the same column as WCSasymN.  Read the
+	*.log files directly, we don't need the *.all files anymore.
+	* bench/gspn-ssp/tools/collate: Delete.
+	* bench/gspn-ssp/tools/Makefile.am: Adjust.
+	* bench/gspn-ssp/tools/bench-create: Do not output rules to
+	build *.all files.
+
 2008-08-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Build the benchmark in bench/gspn-ssp/ using makefiles, so we

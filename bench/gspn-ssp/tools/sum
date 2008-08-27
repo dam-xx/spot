@@ -98,6 +98,7 @@ my %C = (
     ],
     );
 
+$C{e2a} = $C{e4};
 $C{e45} = $C{e5};
 $C{e54} = $C{e5};
 $C{e5L} = $C{e5};
@@ -111,35 +112,67 @@ my %order = (e2 => 2, e6 => 3, e5 => 4, e4 => 5);
 my %H;
 my %S;
 my %P;
+my %Canon;
+my %Canons;
+
+if (0 == @ARGV)
+{
+    @ARGV = glob "results/*.log";
+}
 
 while (<>)
 {
-    my @l = split (/,/);
+    my @l = ();
+
+    chomp;
+    push @l, $_;
+    while (! eof)
+    {
+	$_ = <>;
+	chomp;
+	if (length > 0 && !/^Command exited with non-zero status/)
+	{
+	    s/[^0-9.]//g if $. > 1;
+	    s/^[.]//;
+	    push @l, $_;
+	}
+    }
+    close ARGV; # reset line numbering
 
     push @l, ($l[-1] + $l[-2] + $l[-6] * 4096)/1024;
 
     my $e = shift @l;
     $e =~ s/non empty/non e./;
 
-    $ARGV =~ /([\w.]+)\.(e.*)-f\.all$/;
+    $ARGV =~ /([\w.]+)\.(e.*)-f-\d+\.log$/;
     my $name = $1;
-    my $meth = $2;
+    (my $meth = $2) =~ s/-//g;
+    my $namea = "$name-$meth";
+
+    $meth = $meth.'a' if $name =~ /asym/;
 
     $P{$name}{$e}{$meth} = 1;
 
-    if (!exists $H{$meth}{$ARGV}{$e})
+    my $namec = $name;
+    $namec =~ s/asym/sym/;
+    $namec =~ s/\.rg//;
+    $Canon{$meth}{$namec} = $namea;
+    $Canons{$namec} = 1;
+
+    if (!exists $H{$meth}{$namec}{$e})
     {
-	$H{$meth}{$ARGV}{$e} = [1, @l];
+	$H{$meth}{$namec}{$e} = [1, @l];
 	$S{$meth} = 1 + @l;
     }
     else
     {
-	$H{$meth}{$ARGV}{$e}->[0]++;
+	$H{$meth}{$namec}{$e}->[0]++;
 	for (my $i = 0; $i < @l; ++$i)
 	{
-	    $H{$meth}{$ARGV}{$e}->[$i + 1] += $l[$i];
+	    $H{$meth}{$namec}{$e}->[$i + 1] += $l[$i];
 	}
     }
+
 }
 
 sub model_sort ($$)
@@ -147,8 +180,10 @@ sub model_sort ($$)
     my ($a, $b) = @_;
     $a =~ s/\.rg//;
     $a =~ s/.*(\d)$/$1$&/;
+    $a =~ s/asym/sym/;
     $b =~ s/\.rg//;
     $b =~ s/.*(\d)$/$1$&/;
+    $b =~ s/asym/sym/;
     return $a cmp $b;
 };
 
@@ -177,11 +212,6 @@ if (exists $ENV{FORTETABLE})
 	    }
 	}
     }
-
-
-
-	#if not exists $filter{$C{$meth}->[$i]};
-
     exit 0;
 }
 
@@ -189,18 +219,19 @@ if (exists $ENV{FORTETABLE})
 
 foreach my $meth (sort keys %H)
 {
+    my @models = sort keys %Canons;
+
     printf "%21s", "";
-    foreach my $n (sort keys %{$H{$meth}})
+    foreach my $m (@models)
     {
-	$n =~ s,.*/,,;
-	$n =~ s,\.all,,;
-	$n =~ s,-f,,;
+	my $n = $Canon{$meth}{$m} || "";
+	$n .= " " x ((16-length($n))/2);
 	printf "%18s", $n;
     }
     print "\n";
 
     printf "%21s", "";
-    foreach my $n (sort keys %{$H{$meth}})
+    foreach my $n (@models)
     {
         my $x = 2;
     	foreach my $k (keys %{$H{$meth}{$n}})
@@ -215,7 +246,7 @@ foreach my $meth (sort keys %H)
     for (my $i = 0; $i < $S{$meth}; ++$i)
     {
 	printf "%-22s", $C{$meth}->[$i];
-	foreach my $n (sort keys %{$H{$meth}})
+	foreach my $n (@models)
 	{
 	    my $x = 2;
 	    foreach my $k (keys %{$H{$meth}{$n}})
@@ -223,7 +254,19 @@ foreach my $meth (sort keys %H)
 		my @l = @{$H{$meth}{$n}{$k}};
 		if ($i)
 		{
-		    printf "%8.2f ", $l[$i]/$l[0];
+		    my $val = $l[$i]/$l[0];
+		    if ($val < 100000)
+		    {
+			printf "%8.2f ", $val;
+		    }
+		    elsif ($val < 1000000)
+		    {
+			printf "%8.1f ", $val;
+		    }
+		    else
+		    {
+			printf "%8d ", $val;
+		    }
 		}
 		else
 		{

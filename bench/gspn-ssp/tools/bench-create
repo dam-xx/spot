@@ -42,22 +42,15 @@ for i in *; do
       check="${check## } $ltl2tgba"
 
       resall=`echo results/$i.$check | tr -d ' ' `
-      all=
       for fi in `seq 1 $F`; do
 	res=`echo $resall-$fi.log | tr -d ' ' `
 	echo "$res: $Ffile"
 	echo "	\$(run_bench) $Ffile $fi '-$check' $i > \$@.tmp"
 	echo "	mv \$@.tmp \$@"
-	all="$all $res"
+	allres="$allres $res"
       done
 
       echo
-      echo "$resall.all: $all"
-      echo "	\$(collate) $all > \$@.tmp"
-      echo "	mv \$@.tmp \$@"
-      echo
-
-      allres="$allres $resall.all"
     done
   done
   cd ..
