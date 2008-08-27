@@ -28,7 +28,8 @@ include bench.mk
 EXTRA_DIST = 					\
   $(TEMPLATES)					\
   templates/common				\
-  templates/gen
+  templates/gen					\
+  README
 
 run_bench = tools/runbench
 
