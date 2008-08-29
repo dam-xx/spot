@@ -4,10 +4,12 @@ formula=`sed -n "$2{p;q}" $1`
 check=$3
 model=$4
 
-. ./defs
+. ./defs || exit 1
 
-cp -r models/$model tmp-$$
-cd tmp-$$
+cp -r models/$model $TMPDIR/tmp-$$ || exit 1
+cd $TMPDIR/tmp-$$ || exit 1
+
+(
 case $model in
     *.rg)
       if [ ! -f $model.snow ]; then
@@ -27,6 +29,6 @@ esac
 test -f $model.mark || touch $model.mark
 test -f $model.event || touch $model.event
 du -b *.mark *.event | cut -f 1
+)
 
-cd ..
-rm -rf tmp-$$
+rm -rf $TMPDIR/tmp-$$

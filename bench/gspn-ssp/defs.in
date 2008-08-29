@@ -40,4 +40,5 @@ LTLGSPNSRG='@abs_top_builddir@/iface/gspn/ltlgspn-srg'
 SNOW=/home/adl/projs/src/gspn/snow
 TRANS2PL='@abs_srcdir@/tools/trans2prop.pl'
 TIME='/usr/bin/time -p'
-export RANDLTL LTLGSPNSSP LTLGSPNSRG TIME SNOW TRANS2PL
+TMPDIR=${TMPDIR-/tmp}
+export RANDLTL LTLGSPNSSP LTLGSPNSRG TIME SNOW TRANS2PL TMPDIR
