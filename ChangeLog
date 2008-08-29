@@ -1,5 +1,12 @@
 2008-08-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* bench/gspn-ssp/tools/modelgen-create: Remove and fold into ...
+	* bench/gspn-ssp/tools/bench-create: ... this.
+	* bench/gspn-ssp/Makefile.am: Update.
+	* bench/gspn-ssp/bench.mk: Regen.
+
+2008-08-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* bench/gspn-ssp/tools/defs.in (TMPDIR): New variable.
 	* bench/gspn-ssp/tools/runbench: Use it.
 

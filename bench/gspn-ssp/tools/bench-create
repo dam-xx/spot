@@ -1,9 +1,13 @@
 #!/bin/sh
 
-if test ! -d models; then
-  echo "Error: this script should be run from the parent of the models/ directory." 2>&1
+if test ! -d templates; then
+  echo "Error: this script should be run from the parent of the templates/ directory." 2>&1
   exit 1
 fi
+
+rm -f modelgen.mk
+templates/gen > modelgen.mk
+chmod -w modelgen.mk
 
 out=bench.mk
 rm -f $out
@@ -16,8 +20,7 @@ F=50
 
 allres=
 
-cd models
-for i in *; do
+for i in `grep /stamp: modelgen.mk | sed 's,^models/\(.*\)/stamp:.*,\1,'`; do
 
   Ffile=models/$i/formulae
   echo "############################## $i ##############################"
@@ -27,7 +30,6 @@ for i in *; do
   echo "	\$(top_builddir)/src/ltltest/randltl -F $F -u -s 0 -f 10 -r 7 \`cat models/$i/$i.ap\` > \$@"
   echo
 
-  cd $i
   for ltl2tgba in -f; do
     case $i in
       *.rg) checks=e2;;
@@ -53,10 +55,8 @@ for i in *; do
       echo
     done
   done
-  cd ..
 done
 
 echo "RESULTS =$allres"
 
-cd ..
 chmod -w $out

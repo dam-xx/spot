@@ -35,11 +35,11 @@ run_bench = tools/runbench
 
 dist_noinst_SCRIPTS = \
   tools/bench-create \
-  tools/modelgen-create \
   tools/trans2prop.pl \
   tools/sum \
   $(run_bench)
 
+$(RESULTS): defs
 nodist_check_DATA = $(RESULTS)
 
 clean-local:
