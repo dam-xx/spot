@@ -1,3 +1,9 @@
+2008-08-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* bench/gspn-ssp/tools/sum: Fix the order of stats in -e4.
+	If the MAXLINES environment variable is defined, flush the page
+	as needed.  Sort the models only once.
+
 2008-08-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* bench/gspn-ssp/README: New file.

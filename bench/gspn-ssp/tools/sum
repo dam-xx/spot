@@ -26,8 +26,8 @@ my %C = (
 	"SCC in search stack",
 	"contained map size",
 	"find_state count",
-	"max. depth",
 	"inclusion count",
+	"max. depth",
 	"removed components",
 	"states",
 	"transitions",
@@ -98,7 +98,7 @@ my %C = (
     ],
     );
 
-$C{e2a} = $C{e4};
+$C{e2a} = $C{e2};
 $C{e45} = $C{e5};
 $C{e54} = $C{e5};
 $C{e5L} = $C{e5};
@@ -114,6 +114,8 @@ my %S;
 my %P;
 my %Canon;
 my %Canons;
+
+my $lines = 0;
 
 if (0 == @ARGV)
 {
@@ -216,10 +218,15 @@ if (exists $ENV{FORTETABLE})
 }
 
 
+my @models = sort keys %Canons;
 
 foreach my $meth (sort keys %H)
 {
-    my @models = sort keys %Canons;
+    if ((exists $ENV{MAXLINES})
+	&& ($lines + $S{$meth} + 2 > $ENV{MAXLINES}))
+    {
+	print ""; $lines=0;
+    }
 
     printf "%21s", "";
     foreach my $m (@models)
@@ -228,7 +235,7 @@ foreach my $meth (sort keys %H)
 	$n .= " " x ((16-length($n))/2);
 	printf "%18s", $n;
     }
-    print "\n";
+    print "\n"; ++$lines;
 
     printf "%21s", "";
     foreach my $n (@models)
@@ -241,7 +248,7 @@ foreach my $meth (sort keys %H)
 	}
         print " " x (9*$x);
     }
-    print "\n";
+    print "\n"; ++$lines;
 
     for (my $i = 0; $i < $S{$meth}; ++$i)
     {
@@ -276,6 +283,6 @@ foreach my $meth (sort keys %H)
 	    }
 	    print " " x (9*$x);
 	}
-	print "\n";
+	print "\n"; ++$lines;
     }
 }
