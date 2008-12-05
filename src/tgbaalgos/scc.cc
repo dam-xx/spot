@@ -1,0 +1,306 @@
+// Copyright (C) 2008  Laboratoire de Recherche et Developpement de
+// l'Epita.
+//
+// This file is part of Spot, a model checking library.
+//
+// Spot is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// Spot is distributed in the hope that it will be useful, but WITHOUT
+// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+// or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+// License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Spot; see the file COPYING.  If not, write to the Free
+// Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+// 02111-1307, USA.
+
+#include <queue>
+#include <set>
+#include <iostream>
+#include "scc.hh"
+#include "tgba/bddprint.hh"
+
+namespace spot
+{
+  std::ostream&
+  scc_stats::dump(std::ostream& out) const
+  {
+    out << "total SCCs: " << scc_total << std::endl;
+    return out;
+  }
+
+
+  scc_map::scc_map(const tgba* aut)
+    : aut_(aut)
+  {
+  }
+
+  int
+  scc_map::initial() const
+  {
+    state* in = aut_->get_init_state();
+    hash_type::const_iterator i = h_.find(in);
+    assert(i != h_.end());
+    int val = i->second;
+    delete in;
+    return val;
+  }
+
+  const scc_map::succ_type&
+  scc_map::succ(int i) const
+  {
+    std::map<int, scc>::const_iterator j = scc_map_.find(i);
+    assert (j != scc_map_.end());
+    return j->second.succ;
+  }
+
+  bool
+  scc_map::accepting(int i) const
+  {
+    std::map<int, scc>::const_iterator j = scc_map_.find(i);
+    assert (j != scc_map_.end());
+    return j->second.acc == aut_->all_acceptance_conditions();
+  }
+
+  const tgba*
+  scc_map::get_aut() const
+  {
+    return aut_;
+  }
+
+
+  void
+  scc_map::relabel_component(int n)
+  {
+    assert(!root_.front().states.empty());
+    std::list<const state*>::iterator i;
+    for (i = root_.front().states.begin(); i != root_.front().states.end(); ++i)
+      {
+	hash_type::iterator spi = h_.find(*i);
+	assert(spi != h_.end());
+	assert(spi->first == *i);
+	assert(spi->second != -1);
+	spi->second = n;
+      }
+    scc_map_.insert(std::make_pair(n, root_.front()));
+  }
+
+  void
+  scc_map::build_map()
+  {
+    // Setup depth-first search from the initial state.
+    {
+      state* init = aut_->get_init_state();
+      num_ = 1;
+      scc_num_ = 0;
+      h_.insert(std::make_pair(init, 1));
+      root_.push_front(scc(1));
+      arc_.push(bddfalse);
+      tgba_succ_iterator* iter = aut_->succ_iter(init);
+      iter->first();
+      todo_.push(pair_state_iter(init, iter));
+    }
+
+    while (!todo_.empty())
+      {
+	assert(root_.size() == arc_.size());
+
+	// We are looking at the next successor in SUCC.
+	tgba_succ_iterator* succ = todo_.top().second;
+
+	// If there is no more successor, backtrack.
+	if (succ->done())
+	  {
+	    // We have explored all successors of state CURR.
+	    const state* curr = todo_.top().first;
+
+	    // Backtrack TODO_.
+	    todo_.pop();
+
+	    // Fill rem with any component removed, so that
+	    // remove_component() does not have to traverse the SCC
+	    // again.
+	    hash_type::const_iterator spi = h_.find(curr);
+	    assert(spi != h_.end());
+	    root_.front().states.push_front(spi->first);
+
+	    // When backtracking the root of an SCC, we must also
+	    // remove that SCC from the ARC/ROOT stacks.  We must
+	    // discard from H all reachable states from this SCC.
+	    assert(!root_.empty());
+	    if (root_.front().index == spi->second)
+	      {
+		assert(!arc_.empty());
+		arc_.pop();
+		relabel_component(--scc_num_);
+		root_.pop_front();
+	      }
+
+	    delete succ;
+	    // Do not delete CURR: it is a key in H.
+	    continue;
+	  }
+
+	// We have a successor to look at.
+	// Fetch the values (destination state, acceptance conditions
+	// of the arc) we are interested in...
+	const state* dest = succ->current_state();
+	bdd acc = succ->current_acceptance_conditions();
+	bdd cond = succ->current_condition();
+	// ... and point the iterator to the next successor, for
+	// the next iteration.
+	succ->next();
+	// We do not need SUCC from now on.
+
+	// Are we going to a new state?
+	hash_type::const_iterator spi = h_.find(dest);
+	if (spi == h_.end())
+	  {
+	    // Yes.  Number it, stack it, and register its successors
+	    // for later processing.
+	    h_.insert(std::make_pair(dest, ++num_));
+	    root_.push_front(scc(num_));
+	    arc_.push(acc);
+	    tgba_succ_iterator* iter = aut_->succ_iter(dest);
+	    iter->first();
+	    todo_.push(pair_state_iter(dest, iter));
+	    continue;
+	  }
+
+	// Have we reached maximal SCC?
+	if (spi->second < 0)
+	  {
+	    int dest = spi->second;
+	    // Record that there is a transition from this SCC to the
+	    // dest SCC labelled with cond.
+	    succ_type::iterator i = root_.front().succ.find(dest);
+	    if (i == root_.front().succ.end())
+	      root_.front().succ.insert(std::make_pair(dest, cond));
+	    else
+	      i->second |= cond;
+
+	    continue;
+	  }
+
+	// Now this is the most interesting case.  We have reached a
+	// state S1 which is already part of a non-dead SCC.  Any such
+	// non-dead SCC has necessarily been crossed by our path to
+	// this state: there is a state S2 in our path which belongs
+	// to this SCC too.  We are going to merge all states between
+	// this S1 and S2 into this SCC.
+	//
+	// This merge is easy to do because the order of the SCC in
+	// ROOT is ascending: we just have to merge all SCCs from the
+	// top of ROOT that have an index greater to the one of
+	// the SCC of S2 (called the "threshold").
+	int threshold = spi->second;
+	std::list<const state*> states;
+	succ_type succs;
+	while (threshold < root_.front().index)
+	  {
+	    assert(!root_.empty());
+	    assert(!arc_.empty());
+	    acc |= root_.front().acc;
+	    acc |= arc_.top();
+	    states.splice(states.end(), root_.front().states);
+	    succs.insert(root_.front().succ.begin(),
+			 root_.front().succ.end());
+	    root_.pop_front();
+	    arc_.pop();
+	  }
+	// Note that we do not always have
+	//  threshold == root_.front().index
+	// after this loop, the SCC whose index is threshold might have
+	// been merged with a lower SCC.
+
+	// Accumulate all acceptance conditions into the merged SCC.
+	root_.front().acc |= acc;
+	root_.front().states.splice(root_.front().states.end(), states);
+	// Likewise with SCC successors.
+	root_.front().succ.insert(succs.begin(), succs.end());
+      }
+  }
+
+  int scc_map::scc_count() const
+  {
+    return -scc_num_;
+  }
+
+  scc_stats build_scc_stats(const scc_map& m)
+  {
+    scc_stats res;
+    res.scc_total = m.scc_count();
+    return res;
+  }
+
+  scc_stats
+  build_scc_stats(const tgba* a)
+  {
+    scc_map m(a);
+    m.build_map();
+    return build_scc_stats(m);
+  }
+
+  std::ostream&
+  dump_scc_dot(const scc_map& m, std::ostream& out)
+  {
+    out << "digraph G {\n  0 [label=\"\", style=invis, height=0]" << std::endl;
+    int start = m.initial();
+    out << "  0 -> " << -start << std::endl;
+
+    typedef std::set<int> seen_map;
+    seen_map seen;
+    seen.insert(start);
+
+    std::queue<int> q;
+    q.push(start);
+    while (!q.empty())
+      {
+	int state = q.front();
+	q.pop();
+
+	if (m.accepting(state))
+	  std::cout << "  " << -state << " [shape=doublecircle]" << std::endl;
+	else
+	  std::cout << "  " << -state << " [shape=circle]" << std::endl;
+
+	const scc_map::succ_type& succ = m.succ(state);
+
+	scc_map::succ_type::const_iterator it;
+	for (it = succ.begin(); it != succ.end(); ++it)
+	  {
+	    int dest = it->first;
+	    bdd label = it->second;
+
+	    out << "  " << -state << " -> " << -dest
+		<< " [label=\""
+		<< bdd_format_formula(m.get_aut()->get_dict(), label)
+		<< "\"]" << std::endl;
+
+	    seen_map::const_iterator it = seen.find(dest);
+	    if (it != seen.end())
+	      continue;
+
+	    seen.insert(dest);
+	    q.push(dest);
+	  }
+      }
+
+    out << "}" << std::endl;
+
+    return out;
+  }
+
+  std::ostream&
+  dump_scc_dot(const tgba* a, std::ostream& out)
+  {
+    scc_map m(a);
+    m.build_map();
+    return dump_scc_dot(m, out);
+  }
+
+}

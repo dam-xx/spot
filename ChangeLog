@@ -1,3 +1,10 @@
+2008-12-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbaalgos/scc.hh, src/tgbaalgos/scc.cc: New files.
+	* src/tgbaalgos/Makefile.am: Add them.
+	* src/tgbatest/ltl2tgba.cc (-k): Also call build_scc_stats().
+	(-K): New option that dumps the SCCs for dot.
+
 2008-12-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgbatest/ltl2tgba.cc (-k): New option that calls

@@ -47,6 +47,7 @@
 #include "tgbaalgos/rundotdec.hh"
 
 #include "tgbaalgos/stats.hh"
+#include "tgbaalgos/scc.hh"
 #include "tgbaalgos/emptiness_stats.hh"
 
 void
@@ -90,6 +91,8 @@ syntax(char* prog)
 	    << "  -G    graph the accepting run seen as an automaton "
 	    << " (requires -e)" << std::endl
 	    << "  -k    display statistics on the TGBA instead of dumping it"
+	    << std::endl
+	    << "  -K    dump the graph of SCCs in dot"
 	    << std::endl
             << "  -L    fair-loop approximation (implies -f)" << std::endl
 	    << "  -m    try to reduce accepting runs, in a second pass"
@@ -323,6 +326,10 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-k"))
 	{
 	  output = 9;
+	}
+      else if (!strcmp(argv[formula_index], "-K"))
+	{
+	  output = 10;
 	}
       else if (!strcmp(argv[formula_index], "-L"))
 	{
@@ -731,6 +738,10 @@ main(int argc, char** argv)
 	  }
 	case 9:
 	  stats_reachable(a).dump(std::cout);
+	  build_scc_stats(a).dump(std::cout);
+	  break;
+	case 10:
+	  dump_scc_dot(a, std::cout);
 	  break;
 	default:
 	  assert(!"unknown output option");

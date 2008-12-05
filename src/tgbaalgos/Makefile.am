@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004, 2005, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -48,6 +48,7 @@ tgbaalgos_HEADERS = \
   replayrun.hh \
   rundotdec.hh \
   save.hh \
+  scc.hh \
   se05.hh \
   stats.hh \
   tau03.hh \
@@ -78,6 +79,7 @@ libtgbaalgos_la_SOURCES = \
   replayrun.cc \
   rundotdec.cc \
   save.cc \
+  scc.cc \
   se05.cc \
   stats.cc \
   tau03.cc \
