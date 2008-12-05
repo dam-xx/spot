@@ -89,6 +89,8 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -G    graph the accepting run seen as an automaton "
 	    << " (requires -e)" << std::endl
+	    << "  -k    display statistics on the TGBA instead of dumping it"
+	    << std::endl
             << "  -L    fair-loop approximation (implies -f)" << std::endl
 	    << "  -m    try to reduce accepting runs, in a second pass"
 	    << std::endl
@@ -317,6 +319,10 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-G"))
 	{
 	  graph_run_tgba_opt = true;
+	}
+      else if (!strcmp(argv[formula_index], "-k"))
+	{
+	  output = 9;
 	}
       else if (!strcmp(argv[formula_index], "-L"))
 	{
@@ -723,6 +729,9 @@ main(int argc, char** argv)
 	    spot::never_claim_reachable(std::cout, s, f);
 	    break;
 	  }
+	case 9:
+	  stats_reachable(a).dump(std::cout);
+	  break;
 	default:
 	  assert(!"unknown output option");
 	}

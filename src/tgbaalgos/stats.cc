@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,6 +19,7 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+#include <iostream>
 #include "tgba/tgba.hh"
 #include "stats.hh"
 #include "reachiter.hh"
@@ -52,6 +53,14 @@ namespace spot
       tgba_statistics& s_;
     };
   } // anonymous
+
+
+  std::ostream& tgba_statistics::dump(std::ostream& out) const
+  {
+    out << "transitions: " << transitions << std::endl;
+    out << "states: " << states << std::endl;
+    return out;
+  }
 
   tgba_statistics
   stats_reachable(const tgba* g)

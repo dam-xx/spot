@@ -1,3 +1,10 @@
+2008-12-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbatest/ltl2tgba.cc (-k): New option that calls
+	stats_reachable(a).dump().
+	* src/tgbaalgos/stats.cc, src/tgbaalgos/stats.hh:
+	Add tgba_statistics::dump().
+
 2008-08-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* bench/gspn-ssp/tools/modelgen-create: Remove and fold into ...

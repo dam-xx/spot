@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,6 +23,7 @@
 # define SPOT_TGBAALGOS_STATS_HH
 
 #include "tgba/tgba.hh"
+#include <iosfwd>
 
 namespace spot
 {
@@ -34,6 +35,8 @@ namespace spot
   {
     unsigned transitions;
     unsigned states;
+
+    std::ostream& dump(std::ostream& out) const;
   };
 
   /// \brief Compute statistics for an automaton.
