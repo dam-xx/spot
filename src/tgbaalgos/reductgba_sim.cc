@@ -276,16 +276,16 @@ namespace spot
 
   void
   parity_game_graph::process_state(const state* s,
-				    int ,
-				    tgba_succ_iterator*)
+				   int,
+				   tgba_succ_iterator*)
   {
     tgba_state_.push_back(s);
   }
 
   void
-  parity_game_graph::process_link(int ,
-				   int ,
-				   const tgba_succ_iterator*)
+  parity_game_graph::process_link(int,
+				  int,
+				  const tgba_succ_iterator*)
   {
   }
 

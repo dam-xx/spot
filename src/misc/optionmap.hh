@@ -82,6 +82,6 @@ namespace spot
   private:
     std::map<std::string, int> options_;
   };
-};
+}
 
 #endif // SPOT_MISC_OPTIONMAP_HH

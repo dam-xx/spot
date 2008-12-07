@@ -1,3 +1,25 @@
+2008-12-11  Guillaume SADEGH  <sadegh@lrde.epita.fr>
+
+	Update to compile with the Intel compiler.
+
+  	* m4/intel.m4: New file.
+	* configure.ac: Update.
+	* src/tgbaalgos/emptiness.cc (tgba_run): Modify s.s->clone() in
+	i->s->clone().
+	* src/misc/optionmap.hh, src/misc/optionmap.cc: Remove the extra
+	`;' after the namespace.
+        * src/tgbaalgos/tau03opt.cc
+	(tau03_opt_search::add_new_state): Remove unreferenced method.
+        * src/tgbaalgos/ltl2tgba_fm.cc
+	(translate_dict::dump): Remove unreferenced method.
+        * src/tgbaalgos/lbtt.cc
+	(acceptance_cond_splitter::count): Remove unreferenced method.
+        * src/tgba/tgbabddconcreteproduct.cc
+	(tgba_bdd_product_factory::get_dict): Remove unreferenced method.
+        * src/ltlvisit/syntimpl.cc
+        (eventual_universal_visitor::recurse): Remove unreferenced method.
+	* src/tgbaalgos/reductgba_sim.cc: Reindent.
+
 2008-12-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Compute more statistics about SCCs.

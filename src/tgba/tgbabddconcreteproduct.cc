@@ -56,12 +56,6 @@ namespace spot
 	return data_;
       }
 
-      bdd_dict*
-      get_dict() const
-      {
-	return dict_;
-      }
-
       bdd
       get_init_state() const
       {

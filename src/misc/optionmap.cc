@@ -157,4 +157,4 @@ namespace spot
       os << "\"" << it->first << "\" = " << it->second << std::endl;
     return os;
   }
-};
+}

@@ -117,21 +117,6 @@ namespace spot
 	return num;
       }
 
-      std::ostream&
-      dump(std::ostream& os) const
-      {
-	fv_map::const_iterator fi;
-	os << "Next Variables:" << std::endl;
-	for (fi = next_map.begin(); fi != next_map.end(); ++fi)
-	{
-	  os << "  " << fi->second << ": Next[";
-	  fi->first->to_string(os) << "]" << std::endl;
-	}
-	os << "Shared Dict:" << std::endl;
-	dict->dump(os);
-	return os;
-      }
-
       formula*
       var_to_formula(int var) const
       {

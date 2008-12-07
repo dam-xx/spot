@@ -62,12 +62,6 @@ namespace spot
 	return os;
       }
 
-      unsigned
-      count() const
-      {
-	return sm.size();
-      }
-
     private:
       typedef std::map<bdd, unsigned, bdd_less_than> split_map;
       split_map sm;

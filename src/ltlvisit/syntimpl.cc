@@ -301,16 +301,6 @@ namespace spot
 	    }
 	}
 
-	bool
-	recurse(const formula* f1, const formula* f2)
-	{
-	  if (f1 == f2)
-	    return true;
-	  inf_right_recurse_visitor v(f2);
-	  const_cast<formula*>(f1)->accept(v);
-	  return v.result();
-	}
-
       protected:
 	bool result_; /* true if f < f1, false otherwise. */
 	const formula* f;

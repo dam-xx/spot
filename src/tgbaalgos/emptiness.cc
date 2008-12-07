@@ -50,13 +50,13 @@ namespace spot
     for (steps::const_iterator i = run.prefix.begin();
 	 i != run.prefix.end(); ++i)
       {
-	step s = { s.s->clone(), i->label, i->acc };
+	step s = { i->s->clone(), i->label, i->acc };
 	prefix.push_back(s);
       }
     for (steps::const_iterator i = run.cycle.begin();
 	 i != run.cycle.end(); ++i)
       {
-	step s = { s.s->clone(), i->label, i->acc };
+	step s = { i->s->clone(), i->label, i->acc };
 	cycle.push_back(s);
       }
   }
