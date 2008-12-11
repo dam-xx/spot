@@ -99,7 +99,8 @@ namespace spot
       scc_num_ = 0;
       h_.insert(std::make_pair(init, 1));
       root_.push_front(scc(1));
-      arc_.push(bddfalse);
+      arc_acc_.push(bddfalse);
+      arc_cond_.push(bddfalse);
       tgba_succ_iterator* iter = aut_->succ_iter(init);
       iter->first();
       todo_.push(pair_state_iter(init, iter));
@@ -107,7 +108,8 @@ namespace spot
 
     while (!todo_.empty())
       {
-	assert(root_.size() == arc_.size());
+	assert(root_.size() == arc_acc_.size());
+	assert(root_.size() == arc_cond_.size());
 
 	// We are looking at the next successor in SUCC.
 	tgba_succ_iterator* succ = todo_.top().second;
@@ -134,10 +136,18 @@ namespace spot
 	    assert(!root_.empty());
 	    if (root_.front().index == spi->second)
 	      {
-		assert(!arc_.empty());
-		arc_.pop();
+		assert(!arc_acc_.empty());
+		assert(arc_cond_.size() == arc_acc_.size());
+		bdd cond = arc_cond_.top();
+		arc_cond_.pop();
+		arc_acc_.pop();
 		relabel_component(--scc_num_);
 		root_.pop_front();
+
+		// Record the transition between the SCC being popped
+		// and the previous SCC.
+		if (!root_.empty())
+		  root_.front().succ.insert(std::make_pair(scc_num_, cond));
 	      }
 
 	    delete succ;
@@ -164,7 +174,8 @@ namespace spot
 	    // for later processing.
 	    h_.insert(std::make_pair(dest, ++num_));
 	    root_.push_front(scc(num_));
-	    arc_.push(acc);
+	    arc_acc_.push(acc);
+	    arc_cond_.push(cond);
 	    tgba_succ_iterator* iter = aut_->succ_iter(dest);
 	    iter->first();
 	    todo_.push(pair_state_iter(dest, iter));
@@ -203,14 +214,16 @@ namespace spot
 	while (threshold < root_.front().index)
 	  {
 	    assert(!root_.empty());
-	    assert(!arc_.empty());
+	    assert(!arc_acc_.empty());
+	    assert(arc_acc_.size() == arc_cond_.size());
 	    acc |= root_.front().acc;
-	    acc |= arc_.top();
+	    acc |= arc_acc_.top();
 	    states.splice(states.end(), root_.front().states);
 	    succs.insert(root_.front().succ.begin(),
 			 root_.front().succ.end());
 	    root_.pop_front();
-	    arc_.pop();
+	    arc_acc_.pop();
+	    arc_cond_.pop();
 	  }
 	// Note that we do not always have
 	//  threshold == root_.front().index

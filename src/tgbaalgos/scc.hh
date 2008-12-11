@@ -74,7 +74,9 @@ namespace spot
     const tgba* aut_;		// Automata to decompose.
     typedef std::list<scc> stack_type;
     stack_type root_;		// Stack of SCC roots.
-    std::stack<bdd> arc_;	// A stack of acceptance conditions
+    std::stack<bdd> arc_acc_;	// A stack of acceptance conditions
+				// between each of these SCC.
+    std::stack<bdd> arc_cond_;	// A stack of conditions
 				// between each of these SCC.
     typedef Sgi::hash_map<const state*, int,
 			  state_ptr_hash, state_ptr_equal> hash_type;

@@ -1,3 +1,13 @@
+2008-12-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix tracking of SCCs on the search stack.
+
+	* src/tgbaalgos/scc.hh (scc::arc_): Rename as ...
+	(scc::arc_acc_): ... this.
+	(scc::arc_cond_): New attribute.
+	* src/tgbaalgos/scc.cc (build_map): Adjust and keep
+	track of transitions between SCCs on the search stack.
+
 2008-12-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgbaalgos/scc.hh, src/tgbaalgos/scc.cc: New files.
