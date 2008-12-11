@@ -1,5 +1,15 @@
 2008-12-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Compute more statistics about SCCs.
+
+	* src/tgbaalgos/scc.hh (scc_stats): Add new attributes:
+	acc_scc, dead_scc, acc_paths, dead_paths.
+	* src/tgbaalgos/scc.hh (scc_stats::dump): Display them.
+	(build_scc_stats): Compute them.
+	(scc_recurse_data, scc_recurse): New helper structure and function.
+
+2008-12-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix tracking of SCCs on the search stack.
 
 	* src/tgbaalgos/scc.hh (scc::arc_): Rename as ...

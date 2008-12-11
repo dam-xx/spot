@@ -31,7 +31,25 @@ namespace spot
 
   struct scc_stats
   {
+    /// Total number of SCCs.
     unsigned scc_total;
+    /// Total number of accepting SCC.
+    unsigned acc_scc;
+    /// Total number of dead SCC.
+    ///
+    /// An SCC is dead if no accepting SCC is reachable from it.
+    /// Note that an SCC can be neither dead nor accepting.
+    unsigned dead_scc;
+
+    /// Number of path to a terminal accepting SCC.
+    ///
+    /// A terminal accepting SCC is an accepting SCC that has
+    /// only dead successors (or no successors at all).
+    unsigned acc_paths;
+    /// Number of paths to a terminal dead SCC.
+    ///
+    /// A terminal dead SCC is a dead SCC without successors.
+    unsigned dead_paths;
 
     std::ostream& dump(std::ostream& out) const;
   };
