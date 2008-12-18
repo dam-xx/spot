@@ -1,3 +1,9 @@
+2008-12-17  Guillaume SADEGH  <sadegh@lrde.epita.fr>
+	Update to compile with GCC 4.4.0 (trunk).
+
+	* src/tgba/tgbabddconcrete.cc (tgba_bdd_concrete::succ_iter):
+	Rename `state' as `local_state'.
+
 2008-12-11  Guillaume SADEGH  <sadegh@lrde.epita.fr>
 
 	Update to compile with the Intel compiler.

@@ -92,11 +92,11 @@ namespace spot
   }
 
   tgba_succ_iterator_concrete*
-  tgba_bdd_concrete::succ_iter(const state* state,
+  tgba_bdd_concrete::succ_iter(const state* local_state,
 			       const state* global_state,
 			       const tgba* global_automaton) const
   {
-    const state_bdd* s = dynamic_cast<const state_bdd*>(state);
+    const state_bdd* s = dynamic_cast<const state_bdd*>(local_state);
     assert(s);
     bdd succ_set = data_.relation & s->as_bdd();
     // If we are in a product, inject the local conditions of
