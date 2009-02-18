@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -51,9 +51,9 @@ namespace spot
   {
     assert(!done());
     // succ_set_ is the set of successors we have to explore.  it
-    // contains Now/Next variable and atomic propositions.  Each
+    // contains Now/Next variables and atomic propositions.  Each
     // satisfaction of succ_set_ represents a transition, and we want
-    // to compute as little transitions as possible.  However one
+    // to compute as few transitions as possible.  However one
     // important constraint is that all Next variables must appear in
     // the satisfaction.
     //
@@ -75,7 +75,7 @@ namespace spot
     // acceptance conditions.
     // Let's label transitions with hypothetic acceptance sets:
     //      a &  b &  Next[a] &  Next[b] ;  Acc[1]
-    //     !a &  b &  Next[a] &  Next[b] ;  Acc[2]
+    //     !a &  b &  Next[a] &  Next[b] ;  Acc[1]
     //      a & !b &  Next[a] &  Next[b] ;  Acc[2]
     //      a &  b &  Next[a] & !Next[b] ;  Acc[1]
     // Now it's pretty clear only the first two transitions
