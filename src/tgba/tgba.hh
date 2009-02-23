@@ -52,12 +52,12 @@ namespace spot
   /// TGBAs are transition-based, meanings their labels are put
   /// on arcs, not on nodes.  They use Generalized Büchi acceptance
   /// conditions: there are several acceptance sets (of
-  /// transitions), and a path can be accepted only if it traverse
+  /// transitions), and a path can be accepted only if it traverses
   /// at least one transition of each set infinitely often.
   ///
-  /// Browsing such automaton can be achieved using two functions.
+  /// Browsing such automaton can be achieved using two functions:
   /// \c get_init_state, and \c succ_iter.  The former returns
-  /// the initial state while the latter allows to explore the
+  /// the initial state while the latter lists the
   /// successor states of any state.
   ///
   /// Note that although this is a transition-based automata,
