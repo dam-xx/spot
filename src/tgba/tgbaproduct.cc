@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2006, 2009 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -123,7 +123,7 @@ namespace spot
 
     left_->first();
     right_->first();
-    // If one of the two successor set is empty initially, we reset
+    // If one of the two successor sets is empty initially, we reset
     // right_, so that done() can detect this situation easily.  (We
     // choose to reset right_ because this variable is already used by
     // done().)

@@ -1,5 +1,10 @@
 2009-02-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgba/tgbaproduct.cc (tgba_succ_iterator_product::first):
+	Typo in comment.
+
+2009-02-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgba/tgba.hh: Typos.
 
 2009-02-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
