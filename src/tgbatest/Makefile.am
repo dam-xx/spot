@@ -31,6 +31,7 @@ check_SCRIPTS = defs
 # Keep this sorted alphabetically.
 check_PROGRAMS = \
   bddprod \
+  complement \
   explicit \
   expldot \
   explprod \
@@ -46,6 +47,7 @@ check_PROGRAMS = \
 # Keep this sorted alphabetically.
 bddprod_SOURCES  = ltlprod.cc
 bddprod_CXXFLAGS = -DBDD_CONCRETE_PRODUCT
+complement_SOURCES = complementation.cc
 eltl2tgba_SOURCES = eltl2tgba.cc
 explicit_SOURCES = explicit.cc
 expldot_SOURCES  = powerset.cc
@@ -88,7 +90,8 @@ TESTS = \
   emptchke.test \
   dfs.test \
   emptchkr.test \
-  spotlbtt.test
+  spotlbtt.test \
+  complementation.test
 
 EXTRA_DIST = $(TESTS)
 

@@ -1,3 +1,17 @@
+2009-06-05  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	Add an algorithm to complement Büchi automata.
+
+	* src/tgba/tgbacomplement.hh, src/tgba/tgbacomplement.cc: New
+	files. The complementation algorithm.
+	* src/tgba/Makefile.am: Adjust.
+	* src/tgbatest/complementation.test,
+	src/tgbatest/complementation.cc: New files. Test suite for the
+	complementation algorithm.
+	* src/tgbatest/Makefile.am: Adjust.
+	* src/tgbaalgos/Makefile.am: Reformat the header using 80
+	columns.
+
 2009-06-05  Damien Lefortier <dam@lrde.epita.fr>
 
 	Modify the ELTL parser to be able to support PSL operators.  Add a
