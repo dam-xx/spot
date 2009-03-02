@@ -1,5 +1,5 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
+// Copyright (C) 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
+// dÃ©partement SystÃ¨mes RÃ©partis CoopÃ©ratifs (SRC), UniversitÃ© Pierre
 // et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
@@ -19,20 +19,24 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-/// \file ltlast/allnodes.hh
-/// \brief Define all LTL node types.
-///
-/// This file is usually needed when \b defining a visitor.
-/// Prefer ltlast/predecl.hh when only \b declaring methods and functions
-/// over LTL nodes.
-#ifndef SPOT_LTLAST_ALLNODES_HH
-# define SPOT_LTLAST_ALLNODES_HH
+#include <iostream>
+#include <cassert>
+#include "eltlparse/public.hh"
 
-# include "binop.hh"
-# include "unop.hh"
-# include "multop.hh"
-# include "atomic_prop.hh"
-# include "constant.hh"
-# include "automatop.hh"
+int
+main(int argc, char** argv)
+{
+  spot::eltl::parse_error_list p;
+  const spot::ltl::formula* f = spot::eltl::parse_file(
+    argv[1], p, spot::ltl::default_environment::instance(), argc > 2);
 
-#endif // SPOT_LTLAST_ALLNODES_HH
+  if (spot::eltl::format_parse_errors(std::cerr, p))
+  {
+    if (f != 0)
+      std::cout << f->dump() << std::endl;
+    return 1;
+  }
+
+  assert(f != 0);
+  std::cout << f->dump() << std::endl;
+}

@@ -286,6 +286,12 @@ namespace spot
 	}
 
 	void
+	visit(automatop*)
+	{
+	  assert(0);
+	}
+
+	void
 	visit(multop* mo)
 	{
 	  multop::type op = mo->op();

@@ -48,6 +48,18 @@ namespace spot
   }
 
   int
+  tgba_bdd_concrete_factory::create_anonymous_state()
+  {
+    int num = get_dict()->register_anonymous_variables(2, this);
+    bdd_setpair(get_dict()->next_to_now, num + 1, num);
+    bdd_setpair(get_dict()->now_to_next, num, num + 1);
+    // Keep track of all "Now" variables for easy
+    // existential quantification.
+    data_.declare_now_next (bdd_ithvar(num), bdd_ithvar(num + 1));
+    return num;
+  }
+
+  int
   tgba_bdd_concrete_factory::create_atomic_prop(const ltl::formula* f)
   {
     int num = get_dict()->register_proposition(f, this);

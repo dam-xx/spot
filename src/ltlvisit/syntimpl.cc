@@ -123,6 +123,12 @@ namespace spot
 	}
 
 	void
+	visit(const automatop*)
+	{
+	  assert(0);
+	}
+
+	void
 	visit(const multop* mo)
 	{
 	  unsigned mos = mo->size();
@@ -278,6 +284,12 @@ namespace spot
 	      return;
 	    }
 	  /* Unreachable code.  */
+	  assert(0);
+	}
+
+	void
+	visit(const automatop*)
+	{
 	  assert(0);
 	}
 
@@ -476,6 +488,12 @@ namespace spot
 	      return;
 	    }
 	  /* Unreachable code.  */
+	  assert(0);
+	}
+
+	void
+	visit(const automatop*)
+	{
 	  assert(0);
 	}
 

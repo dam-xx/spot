@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -27,7 +27,7 @@
 #include "tgba/tgbabddconcretefactory.hh"
 #include <cassert>
 
-#include "ltl2tgba_lacim.hh"
+#include "eltl2tgba_lacim.hh"
 
 namespace spot
 {
@@ -36,19 +36,16 @@ namespace spot
     using namespace ltl;
 
     /// \brief Recursively translate a formula into a BDD.
-    ///
-    /// The algorithm used here is adapted from Jean-Michel Couvreur's
-    /// Probataf tool.
-    class ltl_trad_visitor: public const_visitor
+    class eltl_trad_visitor: public const_visitor
     {
     public:
-      ltl_trad_visitor(tgba_bdd_concrete_factory& fact, bool root = false)
+      eltl_trad_visitor(tgba_bdd_concrete_factory& fact, bool root = false)
 	: fact_(fact), root_(root)
       {
       }
 
       virtual
-      ~ltl_trad_visitor()
+      ~eltl_trad_visitor()
       {
       }
 
@@ -85,67 +82,15 @@ namespace spot
       {
 	switch (node->op())
 	  {
-	  case unop::F:
-	    {
-	      /*
-		     Fx  <=> x | XFx
-		 In other words:
-		     now <=> x | next
-	      */
-	      int v = fact_.create_state(node);
-	      bdd now = bdd_ithvar(v);
-	      bdd next = bdd_ithvar(v + 1);
-	      bdd x = recurse(node->child());
-	      fact_.constrain_relation(bdd_apply(now, x | next, bddop_biimp));
-	      /*
-		`x | next', doesn't actually encode the fact that x
-		should be fulfilled eventually.  We ensure this by
-		creating a new generalized Büchi acceptance set, Acc[x],
-		and leave out of this set any transition going off NOW
-		without checking X.  Such acceptance conditions are
-		checked for during the emptiness check.
-	      */
-	      fact_.declare_acceptance_condition(x | !now, node->child());
-	      res_ = now;
-	      return;
-	    }
-	  case unop::G:
-	    {
-	      bdd child = recurse(node->child());
-	      // If G occurs at the top of the formula we don't
-	      // need Now/Next variables.  We just constrain
-	      // the relation so that the child always happens.
-	      // This saves 2 BDD variables.
-	      if (root_)
-		{
-		  fact_.constrain_relation(child);
-		  res_ = child;
-		  return;
-		}
-	      // Gx  <=>  x && XGx
-	      int v = fact_.create_state(node);
-	      bdd now = bdd_ithvar(v);
-	      bdd next = bdd_ithvar(v + 1);
-	      fact_.constrain_relation(bdd_apply(now, child & next,
-						 bddop_biimp));
-	      res_ = now;
-	      return;
-	    }
 	  case unop::Not:
 	    {
 	      res_ = bdd_not(recurse(node->child()));
 	      return;
 	    }
 	  case unop::X:
-	    {
-	      int v = fact_.create_state(node->child());
-	      bdd now = bdd_ithvar(v);
-	      bdd next = bdd_ithvar(v + 1);
-	      fact_.constrain_relation(bdd_apply(now, recurse(node->child()),
-						 bddop_biimp));
-	      res_ = next;
-	      return;
-	    }
+	  case unop::F:
+          case unop::G:
+	    assert(!"unsupported operator");
 	  }
 	/* Unreachable code.  */
 	assert(0);
@@ -169,51 +114,11 @@ namespace spot
 	    res_ = bdd_apply(f1, f2, bddop_biimp);
 	    return;
 	  case binop::U:
-	    {
-	      /*
-		 f1 U f2 <=> f2 | (f1 & X(f1 U f2))
-		 In other words:
-		     now <=> f2 | (f1 & next)
-	      */
-	      int v = fact_.create_state(node);
-	      bdd now = bdd_ithvar(v);
-	      bdd next = bdd_ithvar(v + 1);
-	      fact_.constrain_relation(bdd_apply(now, f2 | (f1 & next),
-						 bddop_biimp));
-	      /*
-		The rightmost conjunction, f1 & next, doesn't actually
-		encode the fact that f2 should be fulfilled eventually.
-		We declare an acceptance condition for this purpose (see
-		the comment in the unop::F case).
-	      */
-	      fact_.declare_acceptance_condition(f2 | !now, node->second());
-	      res_ = now;
-	      return;
-	    }
 	  case binop::R:
-	    {
-	      /*
-		 f1 R f2 <=> f2 & (f1 | X(f1 R f2))
-		 In other words:
-		     now <=> f2 & (f1 | next)
-	      */
-	      int v = fact_.create_state(node);
-	      bdd now = bdd_ithvar(v);
-	      bdd next = bdd_ithvar(v + 1);
-	      fact_.constrain_relation(bdd_apply(now, f2 & (f1 | next),
-						 bddop_biimp));
-	      res_ = now;
-	      return;
-	    }
+	    assert(!"unsupported operator");
 	  }
 	/* Unreachable code.  */
 	assert(0);
-      }
-
-      void
-      visit(const automatop*)
-      {
-	assert(!"unsupported operator");
       }
 
       void
@@ -245,10 +150,31 @@ namespace spot
 	  }
       }
 
+      void
+      visit (const automatop* node)
+      {
+	nmap m;
+	bdd acc = bddtrue;
+	std::pair<int, int> vp =
+	  recurse_state(node, node->nfa()->get_init_state(), m, acc);
+
+	bdd tmp = bddtrue;
+	for (nmap::iterator it = m.begin(); it != m.end(); ++it)
+	  tmp &= bdd_apply(bdd_ithvar(it->second.first  + 1),
+			   bdd_ithvar(it->second.second + 1), bddop_biimp);
+	fact_.constrain_relation(bdd_apply(acc, tmp, bddop_imp));
+
+	if (!node->nfa()->is_loop())
+	  fact_.declare_acceptance_condition(acc, node);
+
+	bdd init = bdd_ithvar(vp.first);
+	res_ = node->negated_ ? bdd_not(init) : init;
+      }
+
       bdd
       recurse(const formula* f, bool root = false)
       {
-	ltl_trad_visitor v(fact_, root);
+	eltl_trad_visitor v(fact_, root);
 	f->accept(v);
 	return v.result();
       }
@@ -257,11 +183,62 @@ namespace spot
       bdd res_;
       tgba_bdd_concrete_factory& fact_;
       bool root_;
+
+      // Table containing the two now variables associated with each state.
+      // TODO: a little documentation about that.
+      typedef Sgi::hash_map<
+	const nfa::state*, std::pair<int, int>, ptr_hash<nfa::state> > nmap;
+
+      std::pair<int, int>&
+      recurse_state(const automatop* n, const nfa::state* s, nmap& m, bdd& acc)
+      {
+	const nfa::ptr nfa = n->nfa();
+	nmap::iterator it;
+	it = m.find(s);
+
+	int v1 = 0;
+	int v2 = 0;
+	if (it != m.end())
+	  return it->second;
+	else
+	{
+	  v1 = fact_.create_anonymous_state();
+	  v2 = fact_.create_anonymous_state();
+	  m[s] = std::make_pair(v1, v2);
+	}
+
+	bdd tmp1 = bddfalse;
+	bdd tmp2 = bddfalse;
+	bdd tmpacc = !bdd_ithvar(v2);
+
+	for (nfa::iterator i = nfa->begin(s); i != nfa->end(s); ++i)
+	{
+	  bdd f = (*i)->label == -1 ? bddtrue : recurse(n->nth((*i)->label));
+	  if (nfa->is_final((*i)->dst))
+	  {
+	    tmp1 |= f;
+	    tmp2 |= f;
+	    tmpacc |= f;
+	  }
+	  else
+	  {
+	    std::pair<int, int> vp = recurse_state(n, (*i)->dst, m, acc);
+	    tmp1 |= (f & bdd_ithvar(vp.first + 1));
+	    tmp2 |= (f & bdd_ithvar(vp.second + 1));
+	  }
+	}
+	acc &= tmpacc;
+	fact_.constrain_relation(bdd_apply(bdd_ithvar(v1), tmp1, bddop_biimp));
+	fact_.constrain_relation(bdd_apply(bdd_ithvar(v2), tmp2, bddop_imp));
+	fact_.constrain_relation(
+	  bdd_apply(bdd_ithvar(v2), bdd_ithvar(v1), bddop_imp));
+	return m[s];
+      }
     };
   } // anonymous
 
   tgba_bdd_concrete*
-  ltl_to_tgba_lacim(const ltl::formula* f, bdd_dict* dict)
+  eltl_to_tgba_lacim(const ltl::formula* f, bdd_dict* dict)
   {
     // Normalize the formula.  We want all the negations on
     // the atomic propositions.  We also suppress logic
@@ -273,7 +250,7 @@ namespace spot
 
     // Traverse the formula and draft the automaton in a factory.
     tgba_bdd_concrete_factory fact(dict);
-    ltl_trad_visitor v(fact, true);
+    eltl_trad_visitor v(fact, true);
     f2->accept(v);
     ltl::destroy(f2);
     fact.finish();

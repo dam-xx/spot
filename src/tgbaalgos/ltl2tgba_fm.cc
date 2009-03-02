@@ -402,6 +402,12 @@ namespace spot
       }
 
       void
+      visit(const automatop*)
+      {
+	assert(!"unsupported operator");
+      }
+
+      void
       visit(const multop* node)
       {
 	int op = -1;
@@ -498,6 +504,12 @@ namespace spot
 	  }
 	/* Unreachable code.  */
 	assert(0);
+      }
+
+      void
+      visit(const automatop*)
+      {
+	assert(!"unsupported operator");
       }
 
       void

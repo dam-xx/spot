@@ -25,7 +25,7 @@ LDADD = ../libspot.la
 
 # These are the most used test programs, and they are also useful
 # to run manually outside the test suite.  Always build them.
-noinst_PROGRAMS = ltl2tgba randtgba
+noinst_PROGRAMS = eltl2tgba ltl2tgba randtgba
 
 check_SCRIPTS = defs
 # Keep this sorted alphabetically.
@@ -46,6 +46,7 @@ check_PROGRAMS = \
 # Keep this sorted alphabetically.
 bddprod_SOURCES  = ltlprod.cc
 bddprod_CXXFLAGS = -DBDD_CONCRETE_PRODUCT
+eltl2tgba_SOURCES = eltl2tgba.cc
 explicit_SOURCES = explicit.cc
 expldot_SOURCES  = powerset.cc
 expldot_CXXFLAGS = -DDOTTY
@@ -65,6 +66,7 @@ tripprod_SOURCES = tripprod.cc
 # Keep this sorted by STRENGTH.  Test basic things first,
 # because such failures will be easier to diagnose and fix.
 TESTS = \
+  eltl2tgba.test \
   explicit.test \
   tgbaread.test \
   readsave.test \

@@ -56,6 +56,15 @@ namespace spot
     }
 
     void
+    postfix_visitor::visit(automatop* ao)
+    {
+      unsigned s = ao->size();
+      for (unsigned i = 0; i < s; ++i)
+	ao->nth(i)->accept(*this);
+      doit(ao);
+    }
+
+    void
     postfix_visitor::visit(multop* mo)
     {
       unsigned s = mo->size();
@@ -92,6 +101,12 @@ namespace spot
     postfix_visitor::doit(multop* mo)
     {
       doit_default(mo);
+    }
+
+    void
+    postfix_visitor::doit(automatop* ao)
+    {
+      doit_default(ao);
     }
 
     void

@@ -66,6 +66,15 @@ namespace spot
     }
 
     void
+    clone_visitor::visit(automatop* ao)
+    {
+      automatop::vec* res = new automatop::vec;
+      for (unsigned i = 0; i < ao->size(); ++i)
+        res->push_back(recurse(ao->nth(i)));
+      result_ = automatop::instance(ao->nfa(), res);
+    }
+
+    void
     clone_visitor::visit(multop* mo)
     {
       multop::vec* res = new multop::vec;

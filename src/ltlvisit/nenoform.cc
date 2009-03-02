@@ -152,6 +152,21 @@ namespace spot
 	}
 
 	void
+	visit(automatop* ao)
+	{
+	  if (negated_)
+	  {
+	    negated_ = false;
+	    ao->negated_ = true;
+	  }
+	  automatop::vec* res = new automatop::vec;
+	  unsigned aos = ao->size();
+	  for (unsigned i = 0; i < aos; ++i)
+	    res->push_back(recurse(ao->nth(i)));
+	  result_ = automatop::instance(ao->nfa(), res);
+	}
+
+	void
 	visit(multop* mo)
 	{
 	  /* !(a & b & c) == !a | !b | !c  */

@@ -47,6 +47,12 @@ namespace spot
     /// Variable numbers can be turned into BDD using ithvar().
     int create_state(const ltl::formula* f);
 
+    /// Create a anonymous Now/Next variables.
+    ///
+    /// \return The BDD variable number v for the Now state.  The
+    ///         Next BDD corresponds to v+1.
+    int create_anonymous_state();
+
     /// Create an atomic proposition variable for formula \a f.
     ///
     /// \param f The formula to create an aotmic proposition for.

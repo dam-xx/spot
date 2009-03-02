@@ -155,6 +155,27 @@ namespace spot
 	}
 
 	void
+	visit(const automatop* ao)
+	{
+	  // Warning: this string isn't parsable.
+	  bool top_level = top_level_;
+	  top_level_ = false;
+	  if (!top_level)
+	    os_ << "(";
+	  os_ << ao->nfa()->get_name() << "(";
+	  unsigned max = ao->size();
+	  ao->nth(0)->accept(*this);
+	  for (unsigned n = 1; n < max; ++n)
+	    {
+	      os_ << ",";
+	      ao->nth(n)->accept(*this);
+	    }
+	  os_ << ")";
+	  if (!top_level)
+	    os_ << ")";
+	}
+
+	void
 	visit(const multop* mo)
 	{
 	  bool top_level = top_level_;
@@ -281,6 +302,27 @@ namespace spot
 	    os_ << "(";
 	  uo->child()->accept(*this);
 	  if (need_parent)
+	    os_ << ")";
+	}
+
+	void
+	visit(const automatop* ao)
+	{
+	  // Warning: this string isn't parsable.
+	  bool top_level = top_level_;
+	  top_level_ = false;
+	  if (!top_level)
+	    os_ << "(";
+	  os_ << ao->nfa()->get_name() << "(";
+	  unsigned max = ao->size();
+	  ao->nth(0)->accept(*this);
+	  for (unsigned n = 1; n < max; ++n)
+	    {
+	      os_ << ",";
+	      ao->nth(n)->accept(*this);
+	    }
+	  os_ << ")";
+	  if (!top_level)
 	    os_ << ")";
 	}
 

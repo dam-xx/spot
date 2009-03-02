@@ -44,6 +44,7 @@ AC_LANG(C++)
 AX_CHECK_BUDDY
 AX_CHECK_LBTT
 AX_CHECK_GSPNLIB
+AX_BOOST_BASE([1.34])
 
 AC_CHECK_FUNCS([srand48 drand48])
 
@@ -86,6 +87,9 @@ AC_CONFIG_FILES([
   iface/nips/nipstest/Makefile
   iface/nips/nipstest/defs
   src/Makefile
+  src/eltlparse/Makefile
+  src/eltltest/Makefile
+  src/eltltest/defs
   src/evtgba/Makefile
   src/evtgbaalgos/Makefile
   src/evtgbaparse/Makefile

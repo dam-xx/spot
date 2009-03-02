@@ -1,3 +1,44 @@
+2009-03-26  Damien Lefortier <dam@lrde.epita.fr>
+
+	Add support for ELTL (AST & parser), and an adaptation of LaCIM
+	for ELTL.
+
+        * configure.ac: Adjust for src/eltlparse/ and src/eltltest/
+	directories, and call AX_BOOST_BASE.
+	* m4/boost.m4: New file defining AX_BOOST_BASE([MINIMUM-VERSION]).
+	* src/Makefile.am: Add eltlparse and eltltest.
+	* src/eltlparse/: New directory.  Contains the ELTL parser.
+	* src/eltltest/: New directory.  Contains tests related to
+	ELTL (parser and AST).
+	* src/ltlast/Makefile.am: Adjust for ELTL AST files.
+	* src/ltlast/automatop.cc, src/ltlast/automatop.hh: New files.
+	Represent automaton operators nodes used in ELTL ASTs.
+	* src/ltlast/nfa.cc, src/ltlast/nfa.hh: New files.  Represent
+	simple NFAs used internally by automatop nodes.
+	* src/ltlast/allnode.hh, src/ltlast/predecl.hh,
+	src/ltlast/visitor.hh: Adjust for automatop.
+	* src/ltlvisit/basicreduce.cc, src/ltlvisit/clone.cc,
+	src/ltlvisit/clone.hh, src/ltlvisit/contain.cc,
+	src/ltlvisit/dotty.cc, src/ltlvisit/nenoform.cc,
+	src/ltlvisit/postfix.cc, src/ltlvisit/postfix.hh,
+	src/ltlvisit/reduce.cc, src/ltlvisit/syntimpl.cc,
+	src/ltlvisit/tostring.cc: Because LTL and ELTL formulae share the
+	same class hierarchy, LTL visitors need to handle automatop nodes
+	to compile.  When it's meaningful the visitor applies on automatop
+	nodes or simply assert(0) otherwise.
+	* src/tgba/tgbabddconcretefactory.cc (create_anonymous_state),
+	src/tgba/tgbabddconcretefactory.hh (create_anonymous_state): New
+	function used by the LaCIM translation algorithm for ELTL.
+	* src/tgbaalgos/Makefile.am: Adjust for eltl2tgba_lacim* files.
+	* src/tgbaalgos/eltl2tgba_lacim.cc,
+	src/tgbaalgos/eltl2tgba_lacim.hh: New files.  Implementation of
+	the LaCIM translation algorithm for ELTL.
+	* src/tgbaalgos/ltl2tgba_fm.cc, src/tgbaalgos/ltl2tgba_lacim.cc:
+	Handle automatop nodes in the translation by an assert(0).
+	* src/tgbatest/Makefile.am: Adjust for eltl2tgba.* files.
+	* src/src/tgbatest/eltl2tgba.cc, src/tgbatest/eltl2tgba.test: New
+	files.
+
 2009-03-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/evtgbaparse/evtgbaparse.yy: Stay on 80 columns.

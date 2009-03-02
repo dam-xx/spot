@@ -47,6 +47,7 @@ namespace spot
       void visit(atomic_prop* ap);
       void visit(unop* uo);
       void visit(binop* bo);
+      void visit(automatop* mo);
       void visit(multop* mo);
       void visit(constant* c);
 

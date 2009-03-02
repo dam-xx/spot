@@ -1,6 +1,6 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
-## département Systèmes Répartis Coopératifs (SRC), Université Pierre
-## et Marie Curie.
+## Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+## Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+## Université Pierre et Marie Curie.
 ##
 ## This file is part of Spot, a model checking library.
 ##
@@ -19,33 +19,26 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-AM_CPPFLAGS = -I$(srcdir)/..
+AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
+LDADD = ../libspot.la
 
-ltlastdir = $(pkgincludedir)/ltlast
+check_SCRIPTS = defs
+# Keep this sorted alphabetically.
+check_PROGRAMS = \
+  acc \
+  nfa
 
-ltlast_HEADERS = \
-  allnodes.hh \
-  atomic_prop.hh \
-  automatop.hh \
-  binop.hh \
-  constant.hh \
-  formula.hh \
-  multop.hh \
-  nfa.hh \
-  predecl.hh \
-  refformula.hh \
-  unop.hh \
-  visitor.hh
+acc_SOURCES = acc.cc
+nfa_SOURCES = nfa.cc
 
-noinst_LTLIBRARIES = libltlast.la
-libltlast_la_SOURCES = \
-  atomic_prop.cc \
-  automatop.cc \
-  binop.cc \
-  constant.cc \
-  formula.cc \
-  multop.cc \
-  nfa.cc \
-  refformula.cc \
-  unop.cc
+EXTRA_DIST = $(TESTS)
+
+# Ordered by strength of the test.  Test basic features first.
+TESTS = \
+  acc.test \
+  nfa.test
+
+CLEANFILES = \
+  input \
+  prelude

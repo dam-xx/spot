@@ -1,0 +1,114 @@
+#!/bin/sh
+
+. ./defs || exit -1
+set -e
+
+# Check if the TGBA was corretly constructed.
+check_construct()
+{
+  run 0 ./eltl2tgba -F "$1" input
+}
+
+# Check if the TGBA behaves correctly by doing an emptiness check on
+# the product between the constructed TGBA and a given formula
+# translated using FM.
+check_true()
+{
+  run 0 ./ltl2tgba -e -Pinput -f "$1"
+}
+check_false()
+{
+  run 1 ./ltl2tgba -e -Pinput -f "$1"
+}
+
+# Create the prelude file.
+cat >input1 <<EOF
+X=(
+    0 1 true
+    1 2 \$0
+    accept 2
+  )
+U=(
+    0 0 \$0
+    0 1 \$1
+    accept 1
+  )
+G=(
+    0 0 \$0
+  )
+EOF
+
+cat >input <<EOF
+A=(
+  )
+%
+!0|1
+EOF
+
+check_construct input
+check_true 'Ga'
+
+cat >input <<EOF
+include input1
+%
+U(a,b)
+EOF
+
+check_construct input
+check_true 'a U b'
+check_false '!(a U b)'
+check_false 'G(a&!b)'
+
+cat >input <<EOF
+include input1
+%
+!U(a,b)
+EOF
+
+check_construct input
+check_true '!(a U b)'
+check_true 'G(a&!b)'
+check_false 'a U b'
+
+cat >input <<EOF
+include input1
+%
+X(a)
+EOF
+
+check_construct input
+check_true 'Xa'
+check_true 'G(a)'
+check_false '!Xa'
+check_false 'G(!a)'
+
+cat >input <<EOF
+include input1
+%
+X(X(a))
+EOF
+
+check_construct input
+check_true 'XXa'
+check_false '!XXa'
+
+cat >input <<EOF
+include input1
+%
+G(a)
+EOF
+
+check_construct input
+check_true 'Ga'
+check_false '!Ga'
+
+cat >input <<EOF
+T=(
+    0 1 true
+    1 0 \$0
+  )
+%
+T(f)
+EOF
+
+check_construct input

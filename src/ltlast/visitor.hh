@@ -47,6 +47,7 @@ namespace spot
       virtual void visit(binop* node) = 0;
       virtual void visit(unop* node) = 0;
       virtual void visit(multop* node) = 0;
+      virtual void visit(automatop* node) = 0;
     };
 
     /// \brief Formula visitor that cannot modify the formula.
@@ -65,6 +66,7 @@ namespace spot
       virtual void visit(const binop* node) = 0;
       virtual void visit(const unop* node) = 0;
       virtual void visit(const multop* node) = 0;
+      virtual void visit(const automatop* node) = 0;
     };
 
 

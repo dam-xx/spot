@@ -42,6 +42,7 @@ namespace spot
     struct binop;
     struct formula;
     struct multop;
+    struct automatop;
   }
 }
 

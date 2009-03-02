@@ -112,6 +112,12 @@ namespace spot
       }
 
       virtual void
+      visit(const automatop*)
+      {
+	assert(!"unsupported operator");
+      }
+
+      virtual void
       visit(const multop* node)
       {
 	int op = -1;

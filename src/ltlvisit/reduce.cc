@@ -189,6 +189,12 @@ namespace spot
 	}
 
 	void
+	visit(automatop*)
+	{
+	  assert(0);
+	}
+
+	void
 	visit(multop* mo)
 	{
 	  unsigned mos = mo->size();

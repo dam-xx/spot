@@ -232,6 +232,12 @@ namespace spot
 	}
 
 	void
+	visit(automatop*)
+	{
+	  assert(0);
+	}
+
+	void
 	visit(multop* mo)
 	{
 	  multop::vec* res = new multop::vec;

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+. ./defs || exit 1
+
+set -e
+run 0 ./nfa || exit 1

@@ -45,12 +45,14 @@ namespace spot
       void visit(unop* uo);
       void visit(binop* bo);
       void visit(multop* mo);
+      void visit(automatop* c);
       void visit(constant* c);
 
       virtual void doit(atomic_prop* ap);
       virtual void doit(unop* uo);
       virtual void doit(binop* bo);
       virtual void doit(multop* mo);
+      virtual void doit(automatop* mo);
       virtual void doit(constant* c);
       virtual void doit_default(formula* f);
     };
