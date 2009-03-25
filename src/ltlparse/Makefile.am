@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004, 2008 Laboratoire d'Informatique de Paris
+## Copyright (C) 2003, 2004, 2008, 2009 Laboratoire d'Informatique de Paris
 ## 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 ## Université Pierre et Marie Curie.
 ##
@@ -44,7 +44,7 @@ $(FROM_LTLPARSE_YY_MAIN): $(srcdir)/$(LTLPARSE_YY)
 ## $(srcdir)/$(LTLPARSE_YY), it will also use the value of $(srcdir)/
 ## in the generated include statements.
 	cd $(srcdir) && \
-	  bison --defines --locations --skeleton=lalr1.cc --report=all \
+	  bison -Wall -Werror --report=all \
 	  $(LTLPARSE_YY) -o $(FROM_LTLPARSE_YY_MAIN)
 $(FROM_LTLPARSE_YY_OTHERS): $(LTLPARSE_YY)
 	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) $(FROM_LTLPARSE_YY_MAIN)

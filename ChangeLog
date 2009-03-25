@@ -1,5 +1,22 @@
 2009-03-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Update parsers to work with Bison 2.4.1.
+
+	* HACKING: Mention that we require Bison >= 2.4 for developers.
+	* src/evtgbaparse/evtgbaparse.yy, src/tgbaparse/tgbaparse.yy,
+	src/ltlparse/ltlparse.yy: The sections "%{ ... %}" should now be
+	renamed "%code requires { ... }" or "%code { ... }" depending on
+	whether they should end up in the parser's header file or its cc
+	file.  Also use %language, %locations, %defines, instead of
+	command-line arguments.
+	* src/evtgbaparse/Makefile.am, src/tgbaparse/Makefile.am,
+	src/ltlparse/Makefile.am: Remove the --locations, --defines
+	and --languages in the call to bison.  Add -Wall -Werror to
+	catch more errors.
+	Thanks to Akim Demaille <akim@lrde.epita.fr> for the help.
+
+2009-03-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbaalgos/scc.hh: Add missing misc/hash.hh inclusion.
 
 2009-02-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

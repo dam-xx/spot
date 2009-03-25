@@ -1,4 +1,4 @@
-/* Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+/* Copyright (C) 2003, 2004, 2005, 2006, 2009 Laboratoire d'Informatique de
 ** Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 ** Université Pierre et Marie Curie.
 **
@@ -19,20 +19,24 @@
 ** Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ** 02111-1307, USA.
 */
-%{
+%language "C++"
+%locations
+%defines
+%name-prefix "ltlyy"
+%debug
+%error-verbose
+
+%code requires
+{
 #include <string>
 #include "public.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlvisit/destroy.hh"
+}
 
-%}
-
-%name-prefix="ltlyy"
 %parse-param {spot::ltl::parse_error_list &error_list}
 %parse-param {spot::ltl::environment &parse_environment}
 %parse-param {spot::ltl::formula* &result}
-%debug
-%error-verbose
 %union
 {
   int token;
@@ -40,7 +44,7 @@
   spot::ltl::formula* ltl;
 }
 
-%{
+%code {
 /* ltlparse.hh and parsedecl.hh include each other recursively.
    We mut ensure that YYSTYPE is declared (by the above %union)
    before parsedecl.hh uses it. */
@@ -69,7 +73,7 @@ using namespace spot::ltl;
     }						\
   while (0);
 
-%}
+}
 
 
 /* All tokens.  */

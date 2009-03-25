@@ -1,4 +1,4 @@
-/* Copyright (C) 2004, 2005, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2004, 2005, 2006, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -19,17 +19,22 @@
 ** Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ** 02111-1307, USA.
 */
-%{
+%language "C++"
+%locations
+%defines
+%name-prefix "evtgbayy"
+%debug
+%error-verbose
+
+%code requires
+{
 #include <string>
 #include "public.hh"
 #include "evtgba/symbol.hh"
-%}
+}
 
-%name-prefix="evtgbayy"
 %parse-param {spot::evtgba_parse_error_list &error_list}
 %parse-param {spot::evtgba_explicit* &result}
-%debug
-%error-verbose
 %union
 {
   int token;
@@ -37,7 +42,8 @@
   spot::rsymbol_set* symset;
 }
 
-%{
+%code
+{
 /* evtgbaparse.hh and parsedecl.hh include each other recursively.
    We mut ensure that YYSTYPE is declared (by the above %union)
    before parsedecl.hh uses it. */
@@ -47,7 +53,7 @@
    (%name-prefix doesn't work for the lalr1.cc skeleton
    at the time of writing.)  */
 #define yylex evtgbayylex
-%}
+}
 
 %token <str> STRING UNTERMINATED_STRING
 %token <str> IDENT

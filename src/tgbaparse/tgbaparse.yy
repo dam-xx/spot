@@ -1,4 +1,4 @@
-/* Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+/* Copyright (C) 2003, 2004, 2005, 2006, 2009 Laboratoire d'Informatique de
 ** Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 ** Université Pierre et Marie Curie.
 **
@@ -19,7 +19,15 @@
 ** Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ** 02111-1307, USA.
 */
-%{
+%language "C++"
+%locations
+%defines
+%name-prefix "tgbayy"
+%debug
+%error-verbose
+
+%code requires
+{
 #include <string>
 #include "public.hh"
 
@@ -28,16 +36,13 @@
    over, and to register all their atomic_propositions in the
    bdd_dict.  Keep the bdd result around so we can reuse it.  */
 typedef std::map<std::string, bdd> formula_cache;
-%}
+}
 
-%name-prefix="tgbayy"
 %parse-param {spot::tgba_parse_error_list& error_list}
 %parse-param {spot::ltl::environment& parse_environment}
 %parse-param {spot::ltl::environment& parse_envacc}
 %parse-param {spot::tgba_explicit*& result}
 %parse-param {formula_cache& fcache}
-%debug
-%error-verbose
 %union
 {
   int token;
@@ -46,7 +51,8 @@ typedef std::map<std::string, bdd> formula_cache;
   std::list<spot::ltl::formula*>* list;
 }
 
-%{
+%code
+{
 #include "ltlast/constant.hh"
 #include "ltlvisit/destroy.hh"
   /* Unfortunately Bison 2.3 uses the same guards in all parsers :( */
@@ -67,7 +73,7 @@ using namespace spot::ltl;
 #define yylex tgbayylex
 
 typedef std::pair<bool, spot::ltl::formula*> pair;
-%}
+}
 
 %token <str> STRING UNTERMINATED_STRING
 %token <str> IDENT
@@ -161,7 +167,7 @@ strident: string | IDENT
 
 condition:
        {
-	 $$ = 0
+	 $$ = 0;
        }
        | string
        {

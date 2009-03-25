@@ -1,4 +1,4 @@
-## Copyright (C) 2004, 2006, 2008 Laboratoire d'Informatique de Paris 6
+## Copyright (C) 2004, 2006, 2008, 2009 Laboratoire d'Informatique de Paris 6
 ## (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
 ## Pierre et Marie Curie.
 ##
@@ -50,7 +50,7 @@ $(FROM_EVTGBAPARSE_YY_MAIN): $(srcdir)/$(EVTGBAPARSE_YY)
 ## $(srcdir)/$(EVTGBAPARSE_YY), it will also use the value of $(srcdir)/
 ## in the generated include statements.
 	cd $(srcdir) && \
-	  bison --defines --locations --skeleton=lalr1.cc --report=all \
+	  bison -Wall -Werror --report=all \
 	  $(EVTGBAPARSE_YY) -o $(FROM_EVTGBAPARSE_YY_MAIN)
 $(FROM_EVTGBAPARSE_YY_OTHERS): $(EVTGBAPARSE_YY)
 	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) $(FROM_EVTGBAPARSE_YY_MAIN)
