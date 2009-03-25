@@ -23,6 +23,8 @@
 #include "misc/bddalloc.hh"
 #include "misc/bddlt.hh"
 #include "misc/minato.hh"
+#include "ltlast/visitor.hh"
+#include "ltlast/allnodes.hh"
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/nenoform.hh"
 #include "ltlvisit/destroy.hh"
@@ -64,7 +66,7 @@ namespace spot
       {
 	fv_map::iterator i;
 	for (i = next_map.begin(); i != next_map.end(); ++i)
-	  destroy(dynamic_cast<const ltl::formula*>(i->first));
+	  destroy(i->first);
 	dict->unregister_all_my_variables(this);
       }
 
@@ -117,18 +119,33 @@ namespace spot
 	return num;
       }
 
+      std::ostream&
+      dump(std::ostream& os) const
+      {
+	fv_map::const_iterator fi;
+	os << "Next Variables:" << std::endl;
+	for (fi = next_map.begin(); fi != next_map.end(); ++fi)
+	{
+	  os << "  " << fi->second << ": Next[";
+	  to_string(fi->first, os) << "]" << std::endl;
+	}
+	os << "Shared Dict:" << std::endl;
+	dict->dump(os);
+	return os;
+      }
+
       formula*
       var_to_formula(int var) const
       {
 	vf_map::const_iterator isi = next_formula_map.find(var);
 	if (isi != next_formula_map.end())
-	  return dynamic_cast<ltl::formula*>(isi->second->clone());
+	  return clone(isi->second);
 	isi = dict->acc_formula_map.find(var);
 	if (isi != dict->acc_formula_map.end())
-	  return dynamic_cast<ltl::formula*>(isi->second->clone());
+	  return clone(isi->second);
 	isi = dict->var_formula_map.find(var);
 	if (isi != dict->var_formula_map.end())
-	  return dynamic_cast<ltl::formula*>(isi->second->clone());
+	  return clone(isi->second);
 	assert(0);
 	// Never reached, but some GCC versions complain about
 	// a missing return otherwise.

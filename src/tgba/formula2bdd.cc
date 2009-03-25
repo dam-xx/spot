@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -21,6 +21,8 @@
 
 #include <cassert>
 #include "formula2bdd.hh"
+#include "ltlast/allnodes.hh"
+#include "ltlast/visitor.hh"
 #include "misc/minato.hh"
 #include "ltlvisit/clone.hh"
 
@@ -162,7 +164,7 @@ namespace spot
 	  int var = bdd_var(b);
 	  bdd_dict::vf_map::const_iterator isi = d->var_formula_map.find(var);
 	  assert(isi != d->var_formula_map.end());
-	  formula* res = clone(dynamic_cast<const ltl::formula*>(isi->second));
+	  formula* res = clone(isi->second);
 
 	  bdd high = bdd_high(b);
 	  if (high == bddfalse)

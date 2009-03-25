@@ -24,6 +24,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "ltlvisit/destroy.hh"
+#include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
 #include "evtgbaparse/public.hh"
 #include "evtgbaalgos/save.hh"

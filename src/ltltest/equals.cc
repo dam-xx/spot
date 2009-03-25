@@ -30,6 +30,7 @@
 #include "ltlvisit/nenoform.hh"
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/contain.hh"
+#include "ltlast/allnodes.hh"
 #include "ltlvisit/reduce.hh"
 #include "ltlvisit/tostring.hh"
 

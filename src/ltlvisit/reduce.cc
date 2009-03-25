@@ -22,6 +22,7 @@
 #include "reduce.hh"
 #include "basicreduce.hh"
 #include "syntimpl.hh"
+#include "ltlast/allnodes.hh"
 #include <cassert>
 
 #include "lunabbrev.hh"

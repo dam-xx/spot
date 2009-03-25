@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -19,6 +19,29 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
+AM_CPPFLAGS = -I$(srcdir)/..
+AM_CXXFLAGS = $(WARNING_CXXFLAGS)
+
 ltlastdir = $(pkgincludedir)/ltlast
 
-ltlast_HEADERS = formula.hh
+ltlast_HEADERS = \
+  allnodes.hh \
+  atomic_prop.hh \
+  binop.hh \
+  constant.hh \
+  formula.hh \
+  multop.hh \
+  predecl.hh \
+  refformula.hh \
+  unop.hh \
+  visitor.hh
+
+noinst_LTLIBRARIES = libltlast.la
+libltlast_la_SOURCES = \
+  atomic_prop.cc \
+  binop.cc \
+  constant.cc \
+  formula.cc \
+  multop.cc \
+  refformula.cc \
+  unop.cc

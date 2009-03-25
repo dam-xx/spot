@@ -1,4 +1,4 @@
-// Copyright (C) 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,7 +23,6 @@
 # define SPOT_LTLENV_DEFAULTENV_HH
 
 # include "environment.hh"
-# include "internal/defaultenv.hh"
 
 namespace spot
 {
@@ -37,7 +36,18 @@ namespace spot
     ///
     /// This is a singleton.  Use default_environment::instance()
     /// to obtain the instance.
-    typedef spot::internal::default_environment<ltl_t> default_environment;
+    class default_environment : public environment
+    {
+    public:
+      virtual ~default_environment();
+      virtual formula* require(const std::string& prop_str);
+      virtual const std::string& name();
+
+      /// Get the sole instance of spot::ltl::default_environment.
+      static default_environment& instance();
+    protected:
+      default_environment();
+    };
 
   }
 }

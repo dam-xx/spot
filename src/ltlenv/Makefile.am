@@ -19,9 +19,17 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
+AM_CPPFLAGS = -I$(srcdir)/..
+AM_CXXFLAGS = $(WARNING_CXXFLAGS)
+
 ltlenvdir = $(pkgincludedir)/ltlenv
 
 ltlenv_HEADERS = \
-  defaultenv.hh \
   declenv.hh \
+  defaultenv.hh \
   environment.hh
+
+noinst_LTLIBRARIES = libltlenv.la
+libltlenv_la_SOURCES = \
+  declenv.cc \
+  defaultenv.cc

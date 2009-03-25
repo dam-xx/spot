@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,7 +23,7 @@
 # define SPOT_LTLVISIT_APCOLLECT_HH
 
 #include <set>
-#include "ltlast/formula.hh"
+#include "ltlast/atomic_prop.hh"
 
 namespace spot
 {

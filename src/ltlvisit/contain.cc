@@ -1,4 +1,4 @@
-// Copyright (C) 2006, 2007, 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2006, 2007 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,6 +23,10 @@
 #include "destroy.hh"
 #include "clone.hh"
 #include "tunabbrev.hh"
+#include "ltlast/unop.hh"
+#include "ltlast/binop.hh"
+#include "ltlast/multop.hh"
+#include "ltlast/constant.hh"
 #include "tgba/tgbaproduct.hh"
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/save.hh"

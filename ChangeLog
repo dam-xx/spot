@@ -159,25 +159,6 @@
 	* iface/gspn/ssp.hh, iface/gspn/ssp.cc: Add the
 	reversed_double_inclusion boolean for this.
 
-2008-06-12  Damien Lefortier  <dam@lrde.epita.fr>
-
-	Add ELTL visitors in eltlvisit/ and start the ELTL translation (LACIM).
-	Merge all eltlast/ files into formula.hh (except automatop.hh).
-
-	* src/eltlast/allnodes.hh, src/eltlast/atomic_prop.hh,
-	src/eltlast/binop.hh, src/eltlast/constant.hh, src/eltlast/multop.hh,
-	src/eltlast/refformula.hh, src/eltlast/unop.hh,
-	src/eltlast/visitor.hh: Delete and merge all these files into ...
-	* src/eltlast/formula.hh: ... this one.
-	* src/eltlvisit/: Add some visitors (clone, destroy, ...).
-	* src/internal/baseformula.hh, src/internal/baseformula.cc:
-	Add base_formula, a new base class of internal::formula.
-	* src/tgba/bdddict.cc src/tgba/bdddict.hh, src/tgba/bddprint.cc,
-	src/tgba/tgbabddconcretefactory.cc, src/tgba/tgbabddconcretefactory.hh
-	Replace ltl::formula by internal::base_formula.
-	* src/tgbatest/eltl2tgba.cc: Beginning of the ELTL translation (LACIM).
-	* m4/boost.m4: Add AX_BOOST_BASE([MINIMUM-VERSION]).
-
 2008-06-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* iface/nips/nipstest/dotty.test,
@@ -191,56 +172,15 @@
 	enough to make it pass "make check".  Some major work is needed
 	after the changes from 2008-04-16.
 
-2008-06-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
-
-	Merge all ltlast/ files into formula.hh.  The forward declaration
-	of visitor was causing error messages too cryptic for users.
-
-	* src/ltlast/allnodes.hh, src/ltlast/atomic_prop.hh,
-	src/ltlast/binop.hh, src/ltlast/constant.hh, src/ltlast/multop.hh,
-	src/ltlast/refformula.hh, src/ltlast/unop.hh,
-	src/ltlast/visitor.hh: Delete and merge all these files into ...
-	* src/ltlast/formula.hh: ... this one.
-	* src/ltlast/Makefile.am: Adjust.
-	* ltlparse/ltlparse.yy, ltlparse/public.hh, ltltest/equals.cc,
-	ltltest/randltl.cc, ltltest/readltl.cc, ltltest/reduc.cc,
-	ltltest/syntimpl.cc, ltltest/tostring.cc, ltlvisit/apcollect.hh,
-	ltlvisit/basicreduce.cc, ltlvisit/clone.cc, ltlvisit/clone.hh,
-	ltlvisit/contain.cc, ltlvisit/dotty.cc, ltlvisit/dump.cc,
-	ltlvisit/lunabbrev.cc, ltlvisit/nenoform.cc, ltlvisit/nenoform.hh,
-	ltlvisit/postfix.cc, ltlvisit/postfix.hh, ltlvisit/randomltl.cc,
-	ltlvisit/reduce.cc, ltlvisit/reduce.hh, ltlvisit/simpfg.cc,
-	ltlvisit/syntimpl.cc, ltlvisit/tostring.cc, ltlvisit/tunabbrev.cc,
-	tgba/bdddict.cc, tgba/formula2bdd.cc, tgba/tgbaexplicit.cc,
-	tgba/tgbatba.cc, tgbaalgos/ltl2tgba_fm.cc,
-	tgbaalgos/ltl2tgba_lacim.cc, tgbaalgos/randomgraph.cc,
-	tgbaalgos/randomgraph.hh, tgbaalgos/save.cc, tgbaparse/public.hh,
-	tgbaparse/tgbaparse.yy, tgbatest/explicit.cc,
-	tgbatest/explprod.cc, tgbatest/ltl2tgba.cc, tgbatest/ltlprod.cc,
-	tgbatest/mixprod.cc, tgbatest/powerset.cc, tgbatest/randtgba.cc,
-	tgbatest/readsave.cc, tgbatest/reductgba.cc, tgbatest/tgbaread.cc,
-	tgbatest/tripprod.cc: Adjust includes.
-
-2008-06-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
-
-	* src/ltlast/atomic_prop.cc, src/ltlast/binop.cc,
-	src/ltlast/constant.cc, src/ltlast/formula.cc,
-	src/ltlast/multop.cc, src/ltlast/predecl.hh,
-	src/ltlast/refformula.cc, src/ltlast/unop.cc: Delete these files,
-	not used anymore since 2008-04-16.
-
 2008-06-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* iface/nips/dottynips.cc: Include ctsdlib for exit().
 	* iface/nips/emptiness_check.cc: Likewise.
 
-	* src/eltlparse/eltlparse.yy: Include limits.h for INT_MIN and
-	INT_MAX.
-
 	* src/sanity/includes.test: Remove empty line at beginning of file.
 
 	* src/internal/formula.hh (formula::hash): Remove the const
-	qualifier from the return type, GCC 4.3.1 gicomplains.
+	qualifier from the return type, GCC 4.3.1 complains.
 
 2008-06-02  Guillaume SADEGH  <sadegh@lrde.epita.fr>
 
@@ -316,30 +256,6 @@
 	NIPS front-end.
 
 	* src/Makefile.am (_.cc): Fix for `make tags`.
-
-2008-04-16  Damien Lefortier <dam@lrde.epita.fr>
-
-	* configure.ac, Makefile.am: Add src/eltltest/ support.
-	* src/eltlast/Makefile.am, src/eltlast/formula.hh,
-	src/eltlast/nfa.cc, src/eltlast/nfa.hh: Update nfa implementation.
-	* src/eltlparse/Makefile.am, src/eltlparse/eltlparse.yy,
-	src/eltlparse/eltlscan.ll, src/eltlparse/parsedecl.hh,
-	src/eltlparse/public.hh: Finish the parser for ELTL files.
-	* src/eltltest/Makefile.am, src/eltltest/acc.cc,
-	src/eltltest/acc.test: Add tests for the ELTL parser.
-	* src/internal/atomic_prop.hh, src/internal/atomic_prop.hxx,
-	src/internal/binop.hh, src/internal/binop.hxx,
-	src/internal/constant.hh, src/internal/constant.hxx,
-	src/internal/defaultenv.hh, src/internal/defaultenv.hxx,
-	src/internal/environment.hh, src/internal/formula.hh,
-	src/internal/formula.hxx, src/internal/multop.hh,
-	src/internal/multop.hxx, src/internal/predecl.hh,
-	src/internal/refformula.hh, src/internal/refformula.hxx,
-	src/internal/unop.hh src/internal/unop.hxx: Clean and update
-	documentation.
-	* src/ltlast/formula.hh, src/ltlenv/Makefile.am,
-	src/ltlenv/declenv.hh, src/tgbaalgos/randomgraph.hh: Fix make
-	check issues.
 
 2008-04-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 

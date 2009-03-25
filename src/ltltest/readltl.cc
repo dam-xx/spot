@@ -27,6 +27,7 @@
 #include "ltlvisit/dump.hh"
 #include "ltlvisit/dotty.hh"
 #include "ltlvisit/destroy.hh"
+#include "ltlast/allnodes.hh"
 
 void
 syntax(char* prog)

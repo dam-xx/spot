@@ -25,6 +25,9 @@
 #include <ostream>
 #include <cstring>
 #include "tostring.hh"
+#include "ltlast/visitor.hh"
+#include "ltlast/allnodes.hh"
+
 
 namespace spot
 {

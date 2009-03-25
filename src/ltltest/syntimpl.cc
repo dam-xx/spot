@@ -29,6 +29,7 @@
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/syntimpl.hh"
+#include "ltlast/allnodes.hh"
 #include "ltlvisit/nenoform.hh"
 
 void

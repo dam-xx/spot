@@ -28,19 +28,6 @@ namespace spot
 {
   namespace ltl
   {
-    /// \ingroup ltl_visitor
-    ///
-    /// This visitor is public, because it's convenient to write the
-    /// destroy method of the base_formula class.  But if you just
-    /// want the functionality, consider using spot::ltl::destroy
-    /// instead.
-    class destroy_visitor: public postfix_visitor
-    {
-    public:
-      virtual void
-      doit_default(formula* c);
-    };
-
     /// \brief Destroys a formula
     /// \ingroup ltl_essential
     void destroy(const formula *f);

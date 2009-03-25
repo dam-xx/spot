@@ -41,6 +41,7 @@
 #include "tgbaalgos/save.hh"
 #include "tgbaalgos/stats.hh"
 #include "ltlenv/defaultenv.hh"
+#include "ltlast/atomic_prop.hh"
 #include "tgbaalgos/dotty.hh"
 #include "tgbaparse/public.hh"
 #include "misc/random.hh"
