@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2008  Laboratoire d'Informatique
+// Copyright (C) 2003, 2004, 2005, 2006  Laboratoire d'Informatique
 // de Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -40,6 +40,13 @@
 #include "misc/random.hh"
 
 #include "ltlast/formula.hh"
+#include "ltlast/refformula.hh"
+#include "ltlast/atomic_prop.hh"
+#include "ltlast/binop.hh"
+#include "ltlast/constant.hh"
+#include "ltlast/multop.hh"
+#include "ltlast/unop.hh"
+#include "ltlast/visitor.hh"
 
 #include "ltlenv/environment.hh"
 #include "ltlenv/defaultenv.hh"
@@ -105,6 +112,13 @@ using namespace spot;
 %include "misc/modgray.hh"
 
 %include "ltlast/formula.hh"
+%include "ltlast/refformula.hh"
+%include "ltlast/atomic_prop.hh"
+%include "ltlast/binop.hh"
+%include "ltlast/constant.hh"
+%include "ltlast/multop.hh"
+%include "ltlast/unop.hh"
+%include "ltlast/visitor.hh"
 
 %include "ltlenv/environment.hh"
 %include "ltlenv/defaultenv.hh"
