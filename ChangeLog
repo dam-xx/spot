@@ -1,3 +1,7 @@
+2009-03-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbaalgos/scc.hh: Add missing misc/hash.hh inclusion.
+
 2009-02-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgba/tgbaproduct.cc (tgba_succ_iterator_product::first):
