@@ -1,5 +1,9 @@
 2009-03-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/evtgbaparse/evtgbaparse.yy: Stay on 80 columns.
+
+2009-03-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Update parsers to work with Bison 2.4.1.
 
 	* HACKING: Mention that we require Bison >= 2.4 for developers.
