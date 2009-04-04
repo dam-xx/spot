@@ -32,29 +32,144 @@
 #include <sstream>
 #include <limits>
 #include <cerrno>
+#include <algorithm>
+#include <boost/shared_ptr.hpp>
 #include "public.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlvisit/destroy.hh"
 
-// Implementation details for error handling.
 namespace spot
 {
   namespace eltl
   {
+    /// The following parser allows one to define aliases of automaton
+    /// operators such as: F=U(true,$0). Internally it's handled by
+    /// creating a small AST associated with each alias in order to
+    /// instanciate the right automatop after: U(constant(1), AP(f))
+    /// for the formula F(f).
+    ///
+    struct alias
+    {
+      virtual ~alias() {};
+    };
+    /// We use boost::shared_ptr to easily handle deletion.
+    typedef boost::shared_ptr<alias> alias_ptr;
+
+    struct alias_not : alias
+    {
+      alias_ptr s;
+    };
+    enum type { Xor, Implies, Equiv, Or, And };
+    struct alias_binary : alias
+    {
+      type ty;
+      alias_ptr lhs;
+      alias_ptr rhs;
+    };
+    struct alias_nfa : alias
+    {
+      nfa::ptr nfa;
+      std::list<alias_ptr> s;
+    };
+    struct alias_arg : alias
+    {
+      int i;
+    };
+
+    typedef std::map<std::string, nfa::ptr> nfamap;
+    typedef std::map<std::string, alias_ptr> aliasmap;
+
+    /// Implementation details for error handling.
     struct parse_error_list_t
     {
       parse_error_list list_;
       std::string file_;
     };
+
+    /// Instanciate the formula corresponding to the given alias.
+    static formula*
+    alias2formula(alias_ptr ap, spot::ltl::automatop::vec* v)
+    {
+      if (alias_not* a = dynamic_cast<alias_not*>(ap.get()))
+	return unop::instance(unop::Not, alias2formula(a->s, v));
+      if (alias_arg* a = dynamic_cast<alias_arg*>(ap.get()))
+	return a->i == -1 ? constant::true_instance() : v->at(a->i);
+      if (alias_nfa* a = dynamic_cast<alias_nfa*>(ap.get()))
+      {
+	automatop::vec* va = new automatop::vec;
+	std::list<alias_ptr>::const_iterator i = a->s.begin();
+	while (i != a->s.end())
+	  va->push_back(alias2formula(*i++, v));
+	return automatop::instance(a->nfa, va);
+      }
+      /// TODO.
+      assert(0);
+    }
+
+    /// Get the arity of a given alias.
+    static size_t
+    arity(alias_ptr ap)
+    {
+      if (alias_not* a = dynamic_cast<alias_not*>(ap.get()))
+	return arity(a->s);
+      if (alias_arg* a = dynamic_cast<alias_arg*>(ap.get()))
+	return a->i + 1;
+      if (alias_nfa* a = dynamic_cast<alias_nfa*>(ap.get()))
+      {
+	size_t res = 0;
+	std::list<alias_ptr>::const_iterator i = a->s.begin();
+	while (i != a->s.end())
+	  res = std::max(arity(*i++), res);
+	return res;
+      }
+      /// TODO.
+      assert(0);
+    }
   }
 }
 
-#define PARSE_ERROR(Loc, Msg) \
-  pe.list_.push_back \
+#define PARSE_ERROR(Loc, Msg)			\
+  pe.list_.push_back				\
     (parse_error(Loc, spair(pe.file_, Msg)))
+
+#define CHECK_EXISTING_NMAP(Loc, Ident)			\
+  {							\
+    nfamap::iterator i = nmap.find(*Ident);		\
+    if (i == nmap.end())				\
+    {							\
+      std::string s = "unknown automaton operator `";	\
+      s += *Ident;					\
+      s += "'";						\
+      PARSE_ERROR(Loc, s);				\
+      delete Ident;					\
+      YYERROR;						\
+    }							\
+  }
+
+#define CHECK_ARITY(Loc, Ident, A1, A2)			\
+  {							\
+    if (A1 != A2)					\
+    {							\
+      std::ostringstream oss1;				\
+      oss1 << A1;					\
+      std::ostringstream oss2;				\
+      oss2 << A2;					\
+							\
+      std::string s(*Ident);				\
+      s += " is used with ";				\
+      s += oss1.str();					\
+      s += " arguments, but has an arity of ";		\
+      s += oss2.str();					\
+      PARSE_ERROR(Loc, s);				\
+      delete Ident;					\
+      YYERROR;						\
+    }							\
+  }
+
 }
 
 %parse-param {spot::eltl::nfamap& nmap}
+%parse-param {spot::eltl::aliasmap& amap}
 %parse-param {spot::eltl::parse_error_list_t &pe}
 %parse-param {spot::ltl::environment &parse_environment}
 %parse-param {spot::ltl::formula* &result}
@@ -68,6 +183,10 @@ namespace spot
   spot::ltl::nfa* nval;
   spot::ltl::automatop::vec* aval;
   spot::ltl::formula* fval;
+
+  /// To handle aliases.
+  spot::eltl::alias* pval;
+  spot::eltl::alias_nfa* bval;
 }
 
 %code {
@@ -81,40 +200,45 @@ using namespace spot::ltl;
 
 /* All tokens.  */
 
-%token <sval> ATOMIC_PROP "atomic proposition"
-	      IDENT "identifier"
+%token <sval>	ATOMIC_PROP "atomic proposition"
+		IDENT "identifier"
 
-%token <ival> ARG "argument"
-	      STATE "state"
-	      OP_OR "or operator"
-	      OP_XOR "xor operator"
-	      OP_AND "and operator"
-	      OP_IMPLIES "implication operator"
-	      OP_EQUIV "equivalent operator"
-	      OP_NOT "not operator"
+%token <ival>	ARG "argument"
+		STATE "state"
+		OP_OR "or operator"
+		OP_XOR "xor operator"
+		OP_AND "and operator"
+		OP_IMPLIES "implication operator"
+		OP_EQUIV "equivalent operator"
+		OP_NOT "not operator"
 
-%token ACC "accept"
-       EQ "="
-       LPAREN "("
-       RPAREN ")"
-       COMMA ","
-       END_OF_FILE "end of file"
-       CONST_TRUE "constant true"
-       CONST_FALSE "constant false"
+%token		ACC "accept"
+		EQ "="
+		LPAREN "("
+		RPAREN ")"
+		COMMA ","
+		END_OF_FILE "end of file"
+		CONST_TRUE "constant true"
+		CONST_FALSE "constant false"
 
 /* Priorities.  */
 
-/* Logical operators.  */
 %left OP_OR
 %left OP_XOR
 %left OP_AND
 %left OP_IMPLIES OP_EQUIV
+
+%left ATOMIC_PROP
 
 %nonassoc OP_NOT
 
 %type <nval> nfa_def
 %type <fval> subformula
 %type <aval> arg_list
+%type <ival> nfa_arg
+%type <pval> nfa_alias
+%type <pval> nfa_alias_arg
+%type <bval> nfa_alias_arg_list
 
 %destructor { delete $$; } "atomic proposition"
 %destructor { spot::ltl::destroy($$); } subformula
@@ -132,7 +256,7 @@ result: nfa_list subformula
 
 /* NFA definitions. */
 
-nfa_list: /* empty. */
+nfa_list: /* empty */
         | nfa_list nfa
 ;
 
@@ -142,34 +266,93 @@ nfa: IDENT "=" "(" nfa_def ")"
           nmap[*$1] = nfa::ptr($4);
 	  delete $1;
         }
+   | IDENT "=" nfa_alias
+        {
+	  amap[*$1] = alias_ptr($3);
+   	  delete $1;
+   	}
 ;
 
-nfa_def: /* empty. */
+nfa_def: /* empty */
         {
 	  $$ = new nfa();
         }
-        | nfa_def STATE STATE ARG
+        | nfa_def STATE STATE nfa_arg
         {
-	  if ($4 == -1 || $3 == -1 || $2 == -1)
-	  {
-	    std::string s = "out of range integer";
-	    PARSE_ERROR(@1, s);
-	    YYERROR;
-	  }
 	  $1->add_transition($2, $3, $4);
 	  $$ = $1;
         }
-        | nfa_def STATE STATE CONST_TRUE
-        {
-	  $1->add_transition($2, $3, -1);
-	  $$ = $1;
-	}
         | nfa_def ACC STATE
         {
  	  $1->set_final($3);
 	  $$ = $1;
         }
 ;
+
+nfa_alias: IDENT "(" nfa_alias_arg_list ")"
+	{
+	  aliasmap::iterator i = amap.find(*$1);
+	  if (i != amap.end())
+	    assert(0); // FIXME
+	  else
+	  {
+	    CHECK_EXISTING_NMAP(@1, $1);
+	    nfa::ptr np = nmap[*$1];
+
+	    CHECK_ARITY(@1, $1, $3->s.size(), np->arity());
+	    $3->nfa = np;
+	    $$ = $3;
+	  }
+	  delete $1;
+	}
+	| OP_NOT nfa_alias
+	{
+	  alias_not* a = new alias_not;
+	  a->s = alias_ptr($2);
+	  $$ = a;
+	}
+	// TODO: more complicated aliases like | IDENT "(" nfa_alias ")"
+
+nfa_alias_arg_list: nfa_alias_arg
+	{
+	  $$ = new alias_nfa;
+	  $$->s.push_back(alias_ptr($1));
+	}
+	| nfa_alias_arg_list "," nfa_alias_arg
+	{
+	  $1->s.push_back(alias_ptr($3));
+	  $$ = $1;
+	}
+;
+
+nfa_alias_arg: nfa_arg
+	{
+	  alias_arg* a = new alias_arg;
+	  a->i = $1;
+	  $$ = a;
+	}
+	| OP_NOT nfa_alias_arg
+	{
+	  alias_not* a = new alias_not;
+	  a->s = alias_ptr($2);
+	  $$ = a;
+	}
+	// TODO
+
+nfa_arg: ARG
+	{
+	  if ($1 == -1)
+	  {
+	    std::string s = "out of range integer";
+	    PARSE_ERROR(@1, s);
+	    YYERROR;
+	  }
+	  $$ = $1;
+	}
+	| CONST_TRUE
+	{ $$ = -1; }
+;
+
 
 /* Formulae. */
 
@@ -190,39 +373,49 @@ subformula: ATOMIC_PROP
 	   else
 	     delete $1;
 	}
+	  | subformula ATOMIC_PROP subformula
+	{
+	  aliasmap::iterator i = amap.find(*$2);
+	  if (i != amap.end())
+	  {
+	    CHECK_ARITY(@1, $2, 2, arity(i->second));
+	    automatop::vec* v = new automatop::vec;
+	    v->push_back($1);
+	    v->push_back($3);
+	    $$ = alias2formula(i->second, v);
+	    delete v;
+	  }
+	  else
+	  {
+	    CHECK_EXISTING_NMAP(@1, $2);
+	    nfa::ptr np = nmap[*$2];
+
+	    CHECK_ARITY(@1, $2, 2, np->arity());
+	    automatop::vec* v = new automatop::vec;
+	    v->push_back($1);
+	    v->push_back($3);
+	    $$ = automatop::instance(np, v);
+	  }
+	  delete $2;
+	}
 	  | ATOMIC_PROP "(" arg_list ")"
 	{
-	  nfamap::iterator i = nmap.find(*$1);
-	  if (i == nmap.end())
+	  aliasmap::iterator i = amap.find(*$1);
+	  if (i != amap.end())
 	  {
-	    std::string s = "unknown automaton operator `";
-	    s += *$1;
-	    s += "'";
-	    PARSE_ERROR(@1, s);
-	    delete $1;
-	    YYERROR;
-	  }
-
-	  automatop* res = automatop::instance(i->second, $3);
-	  if (res->size() != i->second->arity())
-	  {
-	    std::ostringstream oss1;
-	    oss1 << res->size();
-	    std::ostringstream oss2;
-	    oss2 << i->second->arity();
-
-	    std::string s(*$1);
-	    s += " is used with ";
-	    s += oss1.str();
-	    s += " arguments, but has an arity of ";
-	    s += oss2.str();
-	    PARSE_ERROR(@1, s);
-	    delete $1;
+	    CHECK_ARITY(@1, $1, $3->size(), arity(i->second));
+	    $$ = alias2formula(i->second, $3);
 	    delete $3;
-	    YYERROR;
+	  }
+	  else
+	  {
+	    CHECK_EXISTING_NMAP(@1, $1);
+	    nfa::ptr np = nmap[*$1];
+
+	    CHECK_ARITY(@1, $1, $3->size(), np->arity());
+	    $$ = automatop::instance(np, $3);
 	  }
 	  delete $1;
-	  $$ = res;
 	}
 	  | CONST_TRUE
 	{ $$ = constant::true_instance(); }
@@ -284,9 +477,10 @@ namespace spot
       }
       formula* result = 0;
       nfamap nmap;
+      aliasmap amap;
       parse_error_list_t pe;
       pe.file_ = name;
-      eltlyy::parser parser(nmap, pe, env, result);
+      eltlyy::parser parser(nmap, amap, pe, env, result);
       parser.set_debug_level(debug);
       parser.parse();
       error_list = pe.list_;
@@ -303,8 +497,9 @@ namespace spot
       flex_scan_string(eltl_string.c_str());
       formula* result = 0;
       nfamap nmap;
+      aliasmap amap;
       parse_error_list_t pe;
-      eltlyy::parser parser(nmap, pe, env, result);
+      eltlyy::parser parser(nmap, amap, pe, env, result);
       parser.set_debug_level(debug);
       parser.parse();
       error_list = pe.list_;

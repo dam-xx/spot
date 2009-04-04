@@ -102,7 +102,7 @@ namespace spot
       si_map si_;
 
       int arity_;
-      std::string name_; // FIXME.
+      std::string name_;
 
       state* init_;
       std::set<int> finals_;

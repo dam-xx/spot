@@ -58,18 +58,53 @@ eol      \n|\r|\n\r|\r\n
   yylloc->step();
 %}
 
+  /* Rules for the include part. */
+
+<incl>[ \t]*
+<incl>[^ \t\n]+		{
+			  FILE* tmp = fopen(yytext, "r");
+			  if (!tmp)
+			    ERROR(std::string("cannot open file ") + yytext);
+			  else
+			  {
+			    include.push(make_pair(YY_CURRENT_BUFFER, pe.file_));
+                            pe.file_ = std::string(yytext);
+			    yy_switch_to_buffer(yy_create_buffer(tmp, YY_BUF_SIZE));
+                          }
+			  BEGIN(INITIAL);
+			}
+
+  /* Global rules (1). */
+
+"("			return token::LPAREN;
+","			return token::COMMA;
+")"			return token::RPAREN;
+"!"			return token::OP_NOT;
+
+  /* & and | come from Spin.  && and || from LTL2BA.
+     /\, \/, and xor are from LBTT.
+  */
+"||"|"|"|"+"|"\\/" {
+			  return token::OP_OR;
+			}
+"&&"|"&"|"."|"*"|"/\\"	{
+			  return token::OP_AND;
+			}
+"^"|"xor"		return token::OP_XOR;
+"=>"|"->"		return token::OP_IMPLIES;
+"<=>"|"<->"		return token::OP_EQUIV;
+
   /* Rules for the automaton definitions part. */
+
+<INITIAL>"include"	BEGIN(incl);
+<INITIAL>"%"		BEGIN(formula);
 
 <INITIAL>"="		return token::EQ;
 <IINTIAL>"accept"	return token::ACC;
+
 <INITIAL>[tT][rR][uU][eE] {
 			  return token::CONST_TRUE;
 			}
-<INITIAL>"("		return token::LPAREN;
-<INITIAL>")"		return token::RPAREN;
-<INITIAL>"%"		BEGIN(formula);
-
-<INITIAL>"include"	BEGIN(incl);
 
 <INITIAL>[a-zA-Z][a-zA-Z0-9_]* {
 			  yylval->sval = new std::string(yytext, yyleng);
@@ -99,29 +134,7 @@ eol      \n|\r|\n\r|\r\n
 			  yy_switch_to_buffer(s.first);
 			}
 
-  /* Rules for the include part. */
-
-<incl>[ \t]*
-<incl>[^ \t\n]+		{
-			  FILE* tmp = fopen(yytext, "r");
-			  if (!tmp)
-			    ERROR(std::string("cannot open file ") + yytext);
-			  else
-			  {
-			    include.push(make_pair(YY_CURRENT_BUFFER, pe.file_));
-                            pe.file_ = std::string(yytext);
-			    yy_switch_to_buffer(yy_create_buffer(tmp, YY_BUF_SIZE));
-                          }
-			  BEGIN(INITIAL);
-			}
-
   /* Rules for the formula part. */
-
-<formula>"("		return token::LPAREN;
-<formula>")"		return token::RPAREN;
-<formula>"!"		return token::OP_NOT;
-<formula>","		return token::COMMA;
-
 
 <formula>"1"|[tT][rR][uU][eE] {
 			  return token::CONST_TRUE;
@@ -130,25 +143,12 @@ eol      \n|\r|\n\r|\r\n
 			  return token::CONST_FALSE;
 			}
 
-  /* & and | come from Spin.  && and || from LTL2BA.
-     /\, \/, and xor are from LBTT.
-  */
-<formula>"||"|"|"|"+"|"\\/" {
-			  return token::OP_OR;
-			}
-<formula>"&&"|"&"|"."|"*"|"/\\"	{
-			  return token::OP_AND;
-			}
-<formula>"^"|"xor"	return token::OP_XOR;
-<formula>"=>"|"->"	return token::OP_IMPLIES;
-<formula>"<=>"|"<->"	return token::OP_EQUIV;
-
 <formula>[a-zA-Z][a-zA-Z0-9_]* {
 			  yylval->sval = new std::string(yytext, yyleng);
 			  return token::ATOMIC_PROP;
 			}
 
-  /* Global rules. */
+  /* Global rules (2). */
 
 			/* discard whitespace */
 {eol}			yylloc->lines(yyleng); yylloc->step();

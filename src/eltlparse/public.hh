@@ -35,6 +35,11 @@
 # include <utility>
 # include <iosfwd>
 
+// namespace
+// {
+//   typedef std::map<std::string, spot::ltl::nfa::ptr> nfamap;
+// }
+
 namespace spot
 {
   using namespace ltl;
@@ -49,9 +54,6 @@ namespace spot
     typedef std::pair<eltlyy::location, spair> parse_error;
     /// \brief A list of parser diagnostics, as filled by parse.
     typedef std::list<parse_error> parse_error_list;
-
-    ///
-    typedef std::map<std::string, nfa::ptr> nfamap;
 
     /// \brief Build a formula from a text file.
     /// \param name The name of the file to parse.

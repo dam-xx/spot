@@ -27,7 +27,7 @@ namespace spot
   namespace ltl
   {
     nfa::nfa()
-      : is_(), si_(), arity_(0), name_(), init_(0), finals_()
+      : is_(), si_(), arity_(-1), name_(), init_(0), finals_()
     {
     }
 

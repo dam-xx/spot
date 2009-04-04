@@ -1,3 +1,18 @@
+2009-04-04  Damien Lefortier <dam@lrde.epita.fr>
+
+	Extend the ELTL parser to support basic aliases of automaton
+	operators such as F=U(true,$0) or R=!U(!$0,!$1), and infix
+	notation for binary automaton operators.
+
+	* README: Document the ELTL directories.
+	* src/eltlparse/eltlparse.yy, src/eltlparse/eltlscan.ll: Add
+	support for aliases and infix notation.
+	* src/eltlparse/public.hh, src/ltlast/nfa.cc, src/ltlast/nfa.hh:
+	Clean them.
+	* src/eltltest/acc.test, src/tgbatest/eltl2tgba.test: Add tests
+	for the ELTL parser's extensions.
+	* src/tgbatest/eltl2tgba.cc: Adjust.
+
 2009-03-26  Damien Lefortier <dam@lrde.epita.fr>
 
 	Add support for ELTL (AST & parser), and an adaptation of LaCIM

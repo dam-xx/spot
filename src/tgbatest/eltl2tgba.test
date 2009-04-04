@@ -36,6 +36,8 @@ U=(
 G=(
     0 0 \$0
   )
+F=U(true, \$0)
+R=!U(!\$0, !\$1)
 EOF
 
 cat >input <<EOF
@@ -51,7 +53,7 @@ check_true 'Ga'
 cat >input <<EOF
 include input1
 %
-U(a,b)
+a U b
 EOF
 
 check_construct input
@@ -62,7 +64,7 @@ check_false 'G(a&!b)'
 cat >input <<EOF
 include input1
 %
-!U(a,b)
+!(a U b)
 EOF
 
 check_construct input
@@ -101,6 +103,26 @@ EOF
 check_construct input
 check_true 'Ga'
 check_false '!Ga'
+
+cat >input <<EOF
+include input1
+%
+F(a)
+EOF
+
+check_construct input
+check_true 'Fa'
+check_false '!Fa'
+
+cat >input <<EOF
+include input1
+%
+a R b
+EOF
+
+check_construct input
+check_true 'a R b'
+check_false '!(a R b)'
 
 cat >input <<EOF
 T=(
