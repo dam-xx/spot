@@ -145,9 +145,7 @@ namespace spot
 	assert(op != -1);
 	unsigned s = node->size();
 	for (unsigned n = 0; n < s; ++n)
-	  {
-	    res_ = bdd_apply(res_, recurse(node->nth(n), root), op);
-	  }
+	  res_ = bdd_apply(res_, recurse(node->nth(n), root), op);
       }
 
       void
@@ -164,11 +162,9 @@ namespace spot
 			   bdd_ithvar(it->second.second + 1), bddop_biimp);
 	fact_.constrain_relation(bdd_apply(acc, tmp, bddop_imp));
 
-	if (!node->nfa()->is_loop())
-	  fact_.declare_acceptance_condition(acc, node);
-
-	bdd init = bdd_ithvar(vp.first);
-	res_ = node->negated_ ? bdd_not(init) : init;
+	fact_.declare_acceptance_condition(acc, node);
+	res_ = node->is_negated() ?
+	  bdd_nithvar(vp.first) : bdd_ithvar(vp.first);
       }
 
       bdd
@@ -193,6 +189,7 @@ namespace spot
       recurse_state(const automatop* n, const nfa::state* s, nmap& m, bdd& acc)
       {
 	const nfa::ptr nfa = n->nfa();
+	bool is_loop = nfa->is_loop();
 	nmap::iterator it;
 	it = m.find(s);
 
@@ -209,8 +206,7 @@ namespace spot
 
 	bdd tmp1 = bddfalse;
 	bdd tmp2 = bddfalse;
-	bdd tmpacc = !bdd_ithvar(v2);
-
+	bdd tmpacc = bddfalse;
 	for (nfa::iterator i = nfa->begin(s); i != nfa->end(s); ++i)
 	{
 	  bdd f = (*i)->label == -1 ? bddtrue : recurse(n->nth((*i)->label));
@@ -225,13 +221,22 @@ namespace spot
 	    std::pair<int, int> vp = recurse_state(n, (*i)->dst, m, acc);
 	    tmp1 |= (f & bdd_ithvar(vp.first + 1));
 	    tmp2 |= (f & bdd_ithvar(vp.second + 1));
+	    if (is_loop)
+	      tmpacc |= f;
 	  }
 	}
-	acc &= tmpacc;
 	fact_.constrain_relation(bdd_apply(bdd_ithvar(v1), tmp1, bddop_biimp));
-	fact_.constrain_relation(bdd_apply(bdd_ithvar(v2), tmp2, bddop_imp));
-	fact_.constrain_relation(
-	  bdd_apply(bdd_ithvar(v2), bdd_ithvar(v1), bddop_imp));
+	if (is_loop)
+	{
+	  fact_.constrain_relation(bdd_apply(bdd_ithvar(v2), tmp2, bddop_invimp));
+	  acc &= bdd_ithvar(v2) | !tmpacc;
+	}
+	else
+	{
+	  fact_.constrain_relation(bdd_apply(bdd_ithvar(v2), tmp2, bddop_imp));
+	  acc &= bdd_nithvar(v2) | tmpacc;
+	}
+
 	return m[s];
       }
     };

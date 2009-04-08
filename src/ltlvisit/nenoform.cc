@@ -154,16 +154,13 @@ namespace spot
 	void
 	visit(automatop* ao)
 	{
-	  if (negated_)
-	  {
-	    negated_ = false;
-	    ao->negated_ = true;
-	  }
+	  bool negated = negated_;
+	  negated_ = false;
 	  automatop::vec* res = new automatop::vec;
 	  unsigned aos = ao->size();
 	  for (unsigned i = 0; i < aos; ++i)
 	    res->push_back(recurse(ao->nth(i)));
-	  result_ = automatop::instance(ao->nfa(), res);
+	  result_ = automatop::instance(ao->nfa(), res, negated);
 	}
 
 	void

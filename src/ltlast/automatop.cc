@@ -27,10 +27,11 @@ namespace spot
 {
   namespace ltl
   {
-    automatop::automatop(const nfa::ptr nfa, vec* v)
-      : negated_(false), nfa_(nfa), children_(v)
+    automatop::automatop(const nfa::ptr nfa, vec* v, bool negated)
+      : nfa_(nfa), children_(v), negated_(negated)
     {
-      dump_= nfa->get_name();
+      dump_ = negated ? "!" : "";
+      dump_ += nfa->get_name();
       dump_ += "(";
       dump_ += (*v)[0]->dump();
       for (unsigned n = 1; n < v->size(); ++n)
@@ -42,7 +43,7 @@ namespace spot
     automatop::~automatop()
     {
       // Get this instance out of the instance map.
-      pair p(nfa(), children_);
+      triplet p(std::make_pair(nfa(), negated_), children_);
       map::iterator i = instances.find(p);
       assert (i != instances.end());
       instances.erase(i);
@@ -65,17 +66,17 @@ namespace spot
     automatop::map automatop::instances;
 
     automatop*
-    automatop::instance(const nfa::ptr nfa, vec* v)
+    automatop::instance(const nfa::ptr nfa, vec* v, bool negated)
     {
       assert(nfa != 0);
-      pair p(nfa, v);
+      triplet p(std::make_pair(nfa, negated), v);
       map::iterator i = instances.find(p);
       if (i != instances.end())
 	{
 	  delete v;
 	  return static_cast<automatop*>(i->second->ref());
 	}
-      automatop* res = new automatop(nfa, v);
+      automatop* res = new automatop(nfa, v, negated);
       instances[p] = res;
       return static_cast<automatop*>(res->ref());
     }
@@ -103,6 +104,12 @@ namespace spot
     {
       assert(nfa_ != 0);
       return nfa_;
+    }
+
+    bool
+    automatop::is_negated() const
+    {
+      return negated_;
     }
   }
 }

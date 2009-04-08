@@ -49,7 +49,7 @@ namespace spot
       /// (especially not destroy it) after it has been passed to
       /// spot::ltl::automatop.
       static automatop*
-      instance(const nfa::ptr nfa, vec* v);
+      instance(const nfa::ptr nfa, vec* v, bool negated);
 
       virtual void accept(visitor& v);
       virtual void accept(const_visitor& v) const;
@@ -68,29 +68,33 @@ namespace spot
       /// Get the NFA of this operator.
       const nfa::ptr nfa() const;
 
-      bool negated_;
+      bool is_negated() const;
+
     protected:
-      typedef std::pair<nfa::ptr, vec*> pair;
+      typedef std::pair<std::pair<nfa::ptr, bool>, vec*> triplet;
       /// Comparison functor used internally by ltl::automatop.
       struct paircmp
       {
 	bool
-	operator () (const pair& p1, const pair& p2) const
+	operator () (const triplet& p1, const triplet& p2) const
 	{
-	  if (p1.first != p2.first)
-	    return p1.first < p2.first;
+	  if (p1.first.first != p2.first.first)
+	    return p1.first.first < p2.first.first;
+	  if (p1.first.second != p2.first.second)
+	    return p1.first.second < p2.first.second;
 	  return *p1.second < *p2.second;
 	}
       };
-      typedef std::map<pair, formula*, paircmp> map;
+      typedef std::map<triplet, formula*, paircmp> map;
       static map instances;
 
-      automatop(const nfa::ptr nfa, vec* v);
+      automatop(const nfa::ptr nfa, vec* v, bool negated);
       virtual ~automatop();
 
     private:
       nfa::ptr nfa_;
       vec* children_;
+      bool negated_;
     };
   }
 }

@@ -32,14 +32,22 @@ namespace spot
     /// \addtogroup ltl_io
     /// @{
 
-    /// \brief Output a formula as a (parsable) string.
+    /// \brief Output a formula as a string which is parsable unless the formula
+    /// contains automaton operators (used in ELTL formulae).
     /// \param f The formula to translate.
     /// \param os The stream where it should be output.
-    std::ostream& to_string(const formula* f, std::ostream& os);
+    /// \param full_parent Whether or not the string should by fully
+    ///	                   parenthesized.
+    std::ostream&
+    to_string(const formula* f, std::ostream& os, bool full_parent = false);
 
-    /// \brief Convert a formula into a (parsable) string.
+    /// \brief Output a formula as a string which is parsable unless the formula
+    /// contains automaton operators (used in ELTL formulae).
     /// \param f The formula to translate.
-    std::string to_string(const formula* f);
+    /// \param full_parent Whether or not the string should by fully
+    ///	                   parenthesized.
+    std::string
+    to_string(const formula* f, bool full_parent = false);
 
     /// \brief Output a formula as a (parsable by Spin) string.
     /// \param f The formula to translate.

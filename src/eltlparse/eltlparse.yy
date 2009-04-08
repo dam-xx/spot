@@ -59,12 +59,19 @@ namespace spot
     {
       alias_ptr s;
     };
-    enum type { Xor, Implies, Equiv, Or, And };
     struct alias_binary : alias
     {
-      type ty;
+      virtual ~alias_binary() = 0; // Should not be instanciate
       alias_ptr lhs;
       alias_ptr rhs;
+    };
+    struct alias_binop : alias_binary
+    {
+      binop::type ty;
+    };
+    struct alias_multop : alias_binary
+    {
+      multop::type ty;
     };
     struct alias_nfa : alias
     {
@@ -100,9 +107,18 @@ namespace spot
 	std::list<alias_ptr>::const_iterator i = a->s.begin();
 	while (i != a->s.end())
 	  va->push_back(alias2formula(*i++, v));
-	return automatop::instance(a->nfa, va);
+	return automatop::instance(a->nfa, va, false);
       }
-      /// TODO.
+      if (alias_binop* a = dynamic_cast<alias_binop*>(ap.get()))
+	return binop::instance(a->ty,
+			       alias2formula(a->lhs, v),
+			       alias2formula(a->rhs, v));
+      if (alias_multop* a = dynamic_cast<alias_multop*>(ap.get()))
+	return multop::instance(a->ty,
+			       alias2formula(a->lhs, v),
+			       alias2formula(a->rhs, v));
+
+      /* Unreachable code.  */
       assert(0);
     }
 
@@ -122,9 +138,15 @@ namespace spot
 	  res = std::max(arity(*i++), res);
 	return res;
       }
-      /// TODO.
+      if (alias_binary* a = dynamic_cast<alias_binary*>(ap.get()))
+	return std::max(arity(a->lhs), arity(a->rhs));
+
+      /* Unreachable code.  */
       assert(0);
     }
+
+    /// Create a new alias from an existing one according to \a v.
+    /// TODO.
   }
 }
 
@@ -268,6 +290,17 @@ nfa: IDENT "=" "(" nfa_def ")"
         }
    | IDENT "=" nfa_alias
         {
+	  /// Recursivity issues of aliases are handled by a parse error.
+	  aliasmap::iterator i = amap.find(*$1);
+	  if (i != amap.end())
+	  {
+	    std::string s = "`";
+	    s += *$1;
+	    s += "' is already aliased";
+	    PARSE_ERROR(@1, s);
+	    delete $1;
+	    YYERROR;
+	  }
 	  amap[*$1] = alias_ptr($3);
    	  delete $1;
    	}
@@ -305,13 +338,17 @@ nfa_alias: IDENT "(" nfa_alias_arg_list ")"
 	  }
 	  delete $1;
 	}
+	/// TODO
+	// | IDENT "(" nfa_alias ")" // Should be a list
+	// {
+	//   assert(0);
+	// }
 	| OP_NOT nfa_alias
 	{
 	  alias_not* a = new alias_not;
 	  a->s = alias_ptr($2);
 	  $$ = a;
 	}
-	// TODO: more complicated aliases like | IDENT "(" nfa_alias ")"
 
 nfa_alias_arg_list: nfa_alias_arg
 	{
@@ -337,7 +374,7 @@ nfa_alias_arg: nfa_arg
 	  a->s = alias_ptr($2);
 	  $$ = a;
 	}
-	// TODO
+	// TODO: factoring with nfa_alias
 
 nfa_arg: ARG
 	{
@@ -394,7 +431,7 @@ subformula: ATOMIC_PROP
 	    automatop::vec* v = new automatop::vec;
 	    v->push_back($1);
 	    v->push_back($3);
-	    $$ = automatop::instance(np, v);
+	    $$ = automatop::instance(np, v, false);
 	  }
 	  delete $2;
 	}
@@ -413,7 +450,7 @@ subformula: ATOMIC_PROP
 	    nfa::ptr np = nmap[*$1];
 
 	    CHECK_ARITY(@1, $1, $3->size(), np->arity());
-	    $$ = automatop::instance(np, $3);
+	    $$ = automatop::instance(np, $3, false);
 	  }
 	  delete $1;
 	}

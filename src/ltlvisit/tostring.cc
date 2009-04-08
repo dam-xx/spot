@@ -59,8 +59,8 @@ namespace spot
       class to_string_visitor: public const_visitor
       {
       public:
-	to_string_visitor(std::ostream& os)
-	  : os_(os), top_level_(true)
+	to_string_visitor(std::ostream& os, bool full_parent = false)
+	  : os_(os), top_level_(true), full_parent_(full_parent)
 	{
 	}
 
@@ -147,17 +147,18 @@ namespace spot
 	    }
 
 	  top_level_ = false;
-	  if (need_parent)
+	  if (need_parent || full_parent_)
 	    os_ << "(";
 	  uo->child()->accept(*this);
-	  if (need_parent)
+	  if (need_parent || full_parent_)
 	    os_ << ")";
 	}
 
 	void
 	visit(const automatop* ao)
 	{
-	  // Warning: this string isn't parsable.
+	  // Warning: this string isn't parsable because the automaton
+	  // operators used may not be defined.
 	  bool top_level = top_level_;
 	  top_level_ = false;
 	  if (!top_level)
@@ -206,6 +207,7 @@ namespace spot
       protected:
 	std::ostream& os_;
 	bool top_level_;
+	bool full_parent_;
       };
 
       class to_spin_string_visitor : public to_string_visitor
@@ -308,7 +310,8 @@ namespace spot
 	void
 	visit(const automatop* ao)
 	{
-	  // Warning: this string isn't parsable.
+	  // Warning: this string isn't parsable because the automaton
+	  // operators used may not be defined.
 	  bool top_level = top_level_;
 	  top_level_ = false;
 	  if (!top_level)
@@ -359,18 +362,18 @@ namespace spot
     } // anonymous
 
     std::ostream&
-    to_string(const formula* f, std::ostream& os)
+    to_string(const formula* f, std::ostream& os, bool full_parent)
     {
-      to_string_visitor v(os);
+      to_string_visitor v(os, full_parent);
       f->accept(v);
       return os;
     }
 
     std::string
-    to_string(const formula* f)
+    to_string(const formula* f, bool full_parent)
     {
       std::ostringstream os;
-      to_string(f, os);
+      to_string(f, os, full_parent);
       return os.str();
     }
 

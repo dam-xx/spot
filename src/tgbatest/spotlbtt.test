@@ -62,6 +62,14 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- LaCIM), eltl"
+   Path = "${LBTT_TRANSLATE}"
+   Parameters = "--spot './eltl2tgba -L'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM)"
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot './ltl2tgba -F -f -t'"

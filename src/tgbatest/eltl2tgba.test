@@ -97,12 +97,12 @@ check_false '!XXa'
 cat >input <<EOF
 include input1
 %
-G(a)
+G(a|b&!c)
 EOF
 
 check_construct input
-check_true 'Ga'
-check_false '!Ga'
+check_true 'G (a|b&!c)'
+check_false '!G (a|b&!c)'
 
 cat >input <<EOF
 include input1

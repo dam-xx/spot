@@ -1,3 +1,19 @@
+2009-04-08  Damien Lefortier <dam@lrde.epita.fr>
+
+	Correct LaCIM for ELTL and make it work with LBTT.
+
+	* src/eltlparse/eltlparse.yy: Adjust.
+	* src/ltlast/automatop.cc, src/ltlast/automatop.hh,
+	src/ltlvisit/clone.cc, src/ltlvisit/nenoform.cc: Clean the way we
+	handle the negation of automaton operators.
+	* src/ltlvisit/tostring.cc, src/ltlvisit/tostring.hh: Add an
+	optional argument to output a fully parenthesized string.
+	* src/tgbaalgos/eltl2tgba_lacim.cc: Fix it.
+	* src/tgbatest/eltl2tgba.cc: Add a new option (-L) to read formulae
+	from an LBTT-compatible file.
+	* src/tgbatest/eltl2tgba.test: A new tests.
+	* src/tgbatest/spotlbtt.test: Add LaCIM for ELTL.
+
 2009-04-04  Damien Lefortier <dam@lrde.epita.fr>
 
 	Extend the ELTL parser to support basic aliases of automaton

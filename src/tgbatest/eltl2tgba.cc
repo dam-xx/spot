@@ -24,20 +24,26 @@
 #include <fstream>
 #include <cassert>
 #include <cstring>
+#include "ltlparse/public.hh"
 #include "eltlparse/public.hh"
 #include "tgbaalgos/eltl2tgba_lacim.hh"
 #include "tgbaalgos/dotty.hh"
+#include "tgbaalgos/lbtt.hh"
 #include "tgbaalgos/save.hh"
 #include "ltlvisit/destroy.hh"
+#include "ltlvisit/tostring.hh"
 
 void
 syntax(char* prog)
 {
-  std::cerr << "Usage: "<< prog << " [OPTIONS...] formula [file]" << std::endl
-	    << "       "<< prog << " -F [OPTIONS...] file [file]" << std::endl
+  std::cerr << "Usage: " << prog << " [OPTIONS...] formula [file]" << std::endl
+	    << "       " << prog << " -F [OPTIONS...] file [file]" << std::endl
+	    << "       " << prog << " -L [OPTIONS...] file [file]" << std::endl
 	    << std::endl
 	    << "Options:" << std::endl
 	    << "  -F    read the formula from the file (extended input format)"
+	    << std::endl
+	    << "  -L    read the formula from an LBTT-compatible file"
 	    << std::endl;
 }
 
@@ -76,11 +82,28 @@ main(int argc, char** argv)
     f = spot::eltl::parse_file(argv[2], p, env, false);
     formula_index = 2;
   }
-  else
+  if (strcmp(argv[1], "-L") == 0)
+  {
+    std::string input;
+    std::ifstream ifs(argv[2]);
+    std::getline(ifs, input, '\0');
+
+    spot::ltl::parse_error_list p_;
+    f = spot::ltl::parse(input, p_, env, false);
+    input = ltl_defs();
+    input += "%";
+    input += spot::ltl::to_string(f, true);
+    spot::ltl::destroy(f);
+
+    // std::cerr << input << std::endl;
+    f = spot::eltl::parse_string(input, p, env, false);
+    formula_index = 2;
+  }
+  if (formula_index == 0)
   {
     std::stringstream oss;
     oss << ltl_defs() << "%" << argv[1];
-      f = spot::eltl::parse_string(oss.str(), p, env, false);
+    f = spot::eltl::parse_string(oss.str(), p, env, false);
     formula_index = 1;
   }
 
@@ -97,12 +120,17 @@ main(int argc, char** argv)
   spot::bdd_dict* dict = new spot::bdd_dict();
   spot::tgba_bdd_concrete* concrete = spot::eltl_to_tgba_lacim(f, dict);
 
-  spot::dotty_reachable(std::cout, concrete);
-  if (argc >= formula_index + 1)
+  if (strcmp(argv[1], "-L") == 0)
+    spot::lbtt_reachable(std::cout, concrete);
+  else
   {
-    std::ofstream ofs(argv[formula_index + 1]);
-    spot::tgba_save_reachable(ofs, concrete);
-    ofs.close();
+    spot::dotty_reachable(std::cout, concrete);
+    if (formula_index + 1 < argc)
+    {
+      std::ofstream ofs(argv[formula_index + 1]);
+      spot::tgba_save_reachable(ofs, concrete);
+      ofs.close();
+    }
   }
 
   spot::ltl::destroy(f);
