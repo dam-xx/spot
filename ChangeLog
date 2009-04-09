@@ -1,3 +1,12 @@
+2009-04-09  Guillaume SADEGH  <sadegh@lrde.epita.fr>
+
+	Minor fixes to compile with GCC 4.4.
+
+	* src/eltlparse/eltlparse.yy (subformula): Avoid a comparaison
+	between a signed and an unsigned value.
+	* src/ltlast/automatop.hh, src/ltlast/automatop.cc (nfa): Avoid
+	a name clash with the `nfa' class.
+
 2009-04-08  Damien Lefortier <dam@lrde.epita.fr>
 
 	Correct LaCIM for ELTL and make it work with LBTT.

@@ -66,7 +66,7 @@ namespace spot
       formula* nth(unsigned n);
 
       /// Get the NFA of this operator.
-      const nfa::ptr nfa() const;
+      const spot::ltl::nfa::ptr nfa() const;
 
       bool is_negated() const;
 

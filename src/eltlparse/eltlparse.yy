@@ -75,7 +75,7 @@ namespace spot
     };
     struct alias_nfa : alias
     {
-      nfa::ptr nfa;
+      spot::ltl::nfa::ptr nfa;
       std::list<alias_ptr> s;
     };
     struct alias_arg : alias
@@ -332,7 +332,8 @@ nfa_alias: IDENT "(" nfa_alias_arg_list ")"
 	    CHECK_EXISTING_NMAP(@1, $1);
 	    nfa::ptr np = nmap[*$1];
 
-	    CHECK_ARITY(@1, $1, $3->s.size(), np->arity());
+	    CHECK_ARITY(@1, $1, $3->s.size(),
+                        static_cast<unsigned>(np->arity()));
 	    $3->nfa = np;
 	    $$ = $3;
 	  }
@@ -426,7 +427,6 @@ subformula: ATOMIC_PROP
 	  {
 	    CHECK_EXISTING_NMAP(@1, $2);
 	    nfa::ptr np = nmap[*$2];
-
 	    CHECK_ARITY(@1, $2, 2, np->arity());
 	    automatop::vec* v = new automatop::vec;
 	    v->push_back($1);
@@ -449,7 +449,8 @@ subformula: ATOMIC_PROP
 	    CHECK_EXISTING_NMAP(@1, $1);
 	    nfa::ptr np = nmap[*$1];
 
-	    CHECK_ARITY(@1, $1, $3->size(), np->arity());
+	    CHECK_ARITY(@1, $1, $3->size(),
+                        static_cast<unsigned>(np->arity()));
 	    $$ = automatop::instance(np, $3, false);
 	  }
 	  delete $1;

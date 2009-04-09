@@ -99,7 +99,7 @@ namespace spot
       return (*children_)[n];
     }
 
-    const nfa::ptr
+    const spot::ltl::nfa::ptr
     automatop::nfa() const
     {
       assert(nfa_ != 0);
