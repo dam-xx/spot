@@ -1,5 +1,12 @@
 2009-06-05  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
+	Remove generated files that git follows.
+
+        * INSTALL, lbtt/INSTALL, lbtt/doc/texinfo.tex: Do not track
+	anymore these generated files.
+
+2009-06-05  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
 	Add an algorithm to complement Büchi automata.
 
 	* src/tgba/tgbacomplement.hh, src/tgba/tgbacomplement.cc: New
