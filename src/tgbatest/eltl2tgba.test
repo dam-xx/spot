@@ -37,6 +37,7 @@ G=(
     0 0 \$0
   )
 F=U(true, \$0)
+Strong=G(F(\$0))->G(F(\$1))
 R=!U(!\$0, !\$1)
 EOF
 
@@ -113,6 +114,16 @@ EOF
 check_construct input
 check_true 'Fa'
 check_false '!Fa'
+
+cat >input <<EOF
+include input1
+%
+Strong(a,b)
+EOF
+
+check_construct input
+check_true 'G(F(a))->G(F(b))'
+check_false '!(G(F(a))->G(F(b)))'
 
 cat >input <<EOF
 include input1

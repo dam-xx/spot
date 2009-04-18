@@ -22,6 +22,9 @@
 #include <iostream>
 #include <cassert>
 #include "eltlparse/public.hh"
+#include "ltlvisit/destroy.hh"
+#include "ltlvisit/lunabbrev.hh"
+#include "ltlvisit/nenoform.hh"
 
 int
 main(int argc, char** argv)
@@ -37,6 +40,12 @@ main(int argc, char** argv)
     return 1;
   }
 
+  const spot::ltl::formula* f1 = spot::ltl::unabbreviate_logic(f);
+  const spot::ltl::formula* f2 = spot::ltl::negative_normal_form(f1);
+  spot::ltl::destroy(f1);
+
   assert(f != 0);
   std::cout << f->dump() << std::endl;
+  assert(f2 != 0);
+  std::cout << f2->dump() << std::endl;
 }

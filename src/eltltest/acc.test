@@ -23,6 +23,18 @@ EOF
 run 0 ./acc input || exit 1
 
 cat >input <<EOF
+include prelude
+A=(
+    0 1 \$2
+    1 2 \$0
+    accept 0
+  )
+%
+A(1,a)
+EOF
+run 1 ./acc input || exit 1
+
+cat >input <<EOF
 X=(
     0 1 true
     1 2 \$0

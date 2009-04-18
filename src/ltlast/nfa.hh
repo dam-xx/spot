@@ -74,7 +74,7 @@ namespace spot
       bool is_loop();
 
       /// \brief Get the `arity' i.e. max t.cost, for each transition t.
-      int arity();
+      unsigned arity();
 
       /// \brief Return an iterator on the first succesor (if any) of \a state.
       ///

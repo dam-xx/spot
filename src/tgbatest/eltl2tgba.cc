@@ -95,7 +95,6 @@ main(int argc, char** argv)
     input += spot::ltl::to_string(f, true);
     spot::ltl::destroy(f);
 
-    // std::cerr << input << std::endl;
     f = spot::eltl::parse_string(input, p, env, false);
     formula_index = 2;
   }

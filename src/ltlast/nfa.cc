@@ -27,7 +27,7 @@ namespace spot
   namespace ltl
   {
     nfa::nfa()
-      : is_(), si_(), arity_(-1), name_(), init_(0), finals_()
+      : is_(), si_(), arity_(0), name_(), init_(0), finals_()
     {
     }
 
@@ -68,8 +68,8 @@ namespace spot
       t->dst = add_state(dst);
       t->label = label;
       s->push_back(t);
-      if (label > arity_)
-	arity_ = label;
+      if (label >= arity_)
+	arity_ = label + 1;
     }
 
     void
@@ -96,10 +96,10 @@ namespace spot
       return finals_.empty();
     }
 
-    int
+    unsigned
     nfa::arity()
     {
-      return arity_ + 1;
+      return arity_;
     }
 
     const nfa::state*

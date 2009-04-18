@@ -105,6 +105,9 @@ eol      \n|\r|\n\r|\r\n
 <INITIAL>[tT][rR][uU][eE] {
 			  return token::CONST_TRUE;
 			}
+<INITIAL>[fF][aA][lL][sS][eE] {
+			  return token::CONST_FALSE;
+			}
 
 <INITIAL>[a-zA-Z][a-zA-Z0-9_]* {
 			  yylval->sval = new std::string(yytext, yyleng);

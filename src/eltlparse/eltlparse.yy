@@ -57,26 +57,24 @@ namespace spot
 
     struct alias_not : alias
     {
-      alias_ptr s;
+      alias_ptr child;
     };
-    struct alias_binary : alias
+    struct alias_binop : alias
     {
-      virtual ~alias_binary() = 0; // Should not be instanciate
+      binop::type op;
       alias_ptr lhs;
       alias_ptr rhs;
     };
-    struct alias_binop : alias_binary
+    struct alias_multop : alias
     {
-      binop::type ty;
-    };
-    struct alias_multop : alias_binary
-    {
-      multop::type ty;
+      multop::type op;
+      alias_ptr lhs;
+      alias_ptr rhs;
     };
     struct alias_nfa : alias
     {
+      std::vector<alias_ptr> children;
       spot::ltl::nfa::ptr nfa;
-      std::list<alias_ptr> s;
     };
     struct alias_arg : alias
     {
@@ -93,28 +91,32 @@ namespace spot
       std::string file_;
     };
 
+    /// TODO: maybe implementing a visitor could be better than
+    /// dynamic casting all the time here.
+
     /// Instanciate the formula corresponding to the given alias.
     static formula*
-    alias2formula(alias_ptr ap, spot::ltl::automatop::vec* v)
+    alias2formula(const alias_ptr ap, spot::ltl::automatop::vec* v)
     {
       if (alias_not* a = dynamic_cast<alias_not*>(ap.get()))
-	return unop::instance(unop::Not, alias2formula(a->s, v));
+	return unop::instance(unop::Not, alias2formula(a->child, v));
       if (alias_arg* a = dynamic_cast<alias_arg*>(ap.get()))
-	return a->i == -1 ? constant::true_instance() : v->at(a->i);
+	return a->i == -1 ? constant::true_instance() :
+	  a->i == -2 ? constant::false_instance() : v->at(a->i);
       if (alias_nfa* a = dynamic_cast<alias_nfa*>(ap.get()))
       {
 	automatop::vec* va = new automatop::vec;
-	std::list<alias_ptr>::const_iterator i = a->s.begin();
-	while (i != a->s.end())
+	std::vector<alias_ptr>::const_iterator i = a->children.begin();
+	while (i != a->children.end())
 	  va->push_back(alias2formula(*i++, v));
 	return automatop::instance(a->nfa, va, false);
       }
       if (alias_binop* a = dynamic_cast<alias_binop*>(ap.get()))
-	return binop::instance(a->ty,
+	return binop::instance(a->op,
 			       alias2formula(a->lhs, v),
 			       alias2formula(a->rhs, v));
       if (alias_multop* a = dynamic_cast<alias_multop*>(ap.get()))
-	return multop::instance(a->ty,
+	return multop::instance(a->op,
 			       alias2formula(a->lhs, v),
 			       alias2formula(a->rhs, v));
 
@@ -124,29 +126,74 @@ namespace spot
 
     /// Get the arity of a given alias.
     static size_t
-    arity(alias_ptr ap)
+    arity(const alias_ptr ap)
     {
       if (alias_not* a = dynamic_cast<alias_not*>(ap.get()))
-	return arity(a->s);
+	return arity(a->child);
       if (alias_arg* a = dynamic_cast<alias_arg*>(ap.get()))
-	return a->i + 1;
+	return std::max(a->i + 1, 0);
       if (alias_nfa* a = dynamic_cast<alias_nfa*>(ap.get()))
       {
 	size_t res = 0;
-	std::list<alias_ptr>::const_iterator i = a->s.begin();
-	while (i != a->s.end())
+	std::vector<alias_ptr>::const_iterator i = a->children.begin();
+	while (i != a->children.end())
 	  res = std::max(arity(*i++), res);
 	return res;
       }
-      if (alias_binary* a = dynamic_cast<alias_binary*>(ap.get()))
+      if (alias_binop* a = dynamic_cast<alias_binop*>(ap.get()))
+	return std::max(arity(a->lhs), arity(a->rhs));
+      if (alias_multop* a = dynamic_cast<alias_multop*>(ap.get()))
 	return std::max(arity(a->lhs), arity(a->rhs));
 
       /* Unreachable code.  */
       assert(0);
     }
 
-    /// Create a new alias from an existing one according to \a v.
-    /// TODO.
+    /// Alias an existing alias, as in Strong=G(F($0))->G(F($1)),
+    /// where F is an alias.
+    ///
+    /// \param ap The original alias.
+    /// \param v The arguments of the new alias.
+    static alias_ptr
+    realias(const alias_ptr ap, std::vector<alias_ptr> v)
+    {
+      if (alias_not* a = dynamic_cast<alias_not*>(ap.get()))
+      {
+	alias_not* res = new alias_not;
+	res->child = realias(a->child, v);
+	return alias_ptr(res);
+      }
+      if (alias_arg* a = dynamic_cast<alias_arg*>(ap.get())) // Do it.
+	return a->i < 0 ? ap : v.at(a->i);
+      if (alias_nfa* a = dynamic_cast<alias_nfa*>(ap.get()))
+      {
+	alias_nfa* res = new alias_nfa;
+	std::vector<alias_ptr>::const_iterator i = a->children.begin();
+	while (i != a->children.end())
+	  res->children.push_back(realias(*i++, v));
+	res->nfa = a->nfa;
+	return alias_ptr(res);
+      }
+      if (alias_binop* a = dynamic_cast<alias_binop*>(ap.get()))
+      {
+	alias_binop* res = new alias_binop;
+	res->op = a->op;
+	res->lhs = realias(a->lhs, v);
+	res->rhs = realias(a->rhs, v);
+	return alias_ptr(res);
+      }
+      if (alias_multop* a = dynamic_cast<alias_multop*>(ap.get()))
+      {
+	alias_multop* res = new alias_multop;
+	res->op = a->op;
+	res->lhs = realias(a->lhs, v);
+	res->rhs = realias(a->rhs, v);
+	return alias_ptr(res);
+      }
+
+      /* Unreachable code.  */
+      assert(0);
+    }
   }
 }
 
@@ -156,7 +203,7 @@ namespace spot
 
 #define CHECK_EXISTING_NMAP(Loc, Ident)			\
   {							\
-    nfamap::iterator i = nmap.find(*Ident);		\
+    nfamap::const_iterator i = nmap.find(*Ident);	\
     if (i == nmap.end())				\
     {							\
       std::string s = "unknown automaton operator `";	\
@@ -308,7 +355,7 @@ nfa: IDENT "=" "(" nfa_def ")"
 
 nfa_def: /* empty */
         {
-	  $$ = new nfa();
+	  $$ = new nfa;
         }
         | nfa_def STATE STATE nfa_arg
         {
@@ -324,58 +371,85 @@ nfa_def: /* empty */
 
 nfa_alias: IDENT "(" nfa_alias_arg_list ")"
 	{
-	  aliasmap::iterator i = amap.find(*$1);
+	  aliasmap::const_iterator i = amap.find(*$1);
 	  if (i != amap.end())
-	    assert(0); // FIXME
+	  {
+	    CHECK_ARITY(@1, $1, $3->children.size(), arity(i->second));
+
+	    // Hack to return the right type without screwing with the
+	    // boost::shared_ptr memory handling by using get for
+	    // example. FIXME: Wait for the next version of boost and
+	    // modify the %union to handle alias_ptr.
+	    alias_not* tmp1 = new alias_not;
+	    tmp1->child = realias(i->second, $3->children);
+	    alias_not* tmp2 = new alias_not;
+	    tmp2->child = alias_ptr(tmp1);
+	    $$ = tmp2;
+	    delete $3;
+	  }
 	  else
 	  {
 	    CHECK_EXISTING_NMAP(@1, $1);
 	    nfa::ptr np = nmap[*$1];
 
-	    CHECK_ARITY(@1, $1, $3->s.size(),
-                        static_cast<unsigned>(np->arity()));
+	    CHECK_ARITY(@1, $1, $3->children.size(), np->arity());
 	    $3->nfa = np;
 	    $$ = $3;
 	  }
 	  delete $1;
 	}
-	/// TODO
-	// | IDENT "(" nfa_alias ")" // Should be a list
-	// {
-	//   assert(0);
-	// }
 	| OP_NOT nfa_alias
 	{
-	  alias_not* a = new alias_not;
-	  a->s = alias_ptr($2);
-	  $$ = a;
+	  alias_not* res = new alias_not;
+	  res->child = alias_ptr($2);
+	  $$ = res;
 	}
+	| nfa_alias OP_IMPLIES nfa_alias
+	{
+	  alias_binop* res = new alias_binop;
+	  res->op = binop::Implies;
+	  res->lhs = alias_ptr($1);
+	  res->rhs = alias_ptr($3);
+	  $$ = res;
+	}
+	// More TBD here.
+
+nfa_alias_arg: nfa_arg
+	{
+	  alias_arg* res = new alias_arg;
+	  res->i = $1;
+	  $$ = res;
+	}
+        | CONST_FALSE
+	{
+	  alias_arg* res = new alias_arg;
+	  res->i = -2;
+	  $$ = res;
+	}
+	| OP_NOT nfa_alias_arg
+	{
+	  alias_not* res = new alias_not;
+	  res->child = alias_ptr($2);
+	  $$ = res;
+	}
+	// More TBD here.
 
 nfa_alias_arg_list: nfa_alias_arg
 	{
 	  $$ = new alias_nfa;
-	  $$->s.push_back(alias_ptr($1));
+	  $$->children.push_back(alias_ptr($1));
+	}
+	| nfa_alias // Cannot factorize because <pval> != <bval>.
+	{
+	  $$ = new alias_nfa;
+	  $$->children.push_back(alias_ptr($1));
 	}
 	| nfa_alias_arg_list "," nfa_alias_arg
 	{
-	  $1->s.push_back(alias_ptr($3));
+	  $1->children.push_back(alias_ptr($3));
 	  $$ = $1;
 	}
 ;
-
-nfa_alias_arg: nfa_arg
-	{
-	  alias_arg* a = new alias_arg;
-	  a->i = $1;
-	  $$ = a;
-	}
-	| OP_NOT nfa_alias_arg
-	{
-	  alias_not* a = new alias_not;
-	  a->s = alias_ptr($2);
-	  $$ = a;
-	}
-	// TODO: factoring with nfa_alias
 
 nfa_arg: ARG
 	{
@@ -449,8 +523,7 @@ subformula: ATOMIC_PROP
 	    CHECK_EXISTING_NMAP(@1, $1);
 	    nfa::ptr np = nmap[*$1];
 
-	    CHECK_ARITY(@1, $1, $3->size(),
-                        static_cast<unsigned>(np->arity()));
+	    CHECK_ARITY(@1, $1, $3->size(), np->arity());
 	    $$ = automatop::instance(np, $3, false);
 	  }
 	  delete $1;

@@ -228,13 +228,14 @@ namespace spot
 	fact_.constrain_relation(bdd_apply(bdd_ithvar(v1), tmp1, bddop_biimp));
 	if (is_loop)
 	{
-	  fact_.constrain_relation(bdd_apply(bdd_ithvar(v2), tmp2, bddop_invimp));
 	  acc &= bdd_ithvar(v2) | !tmpacc;
+	  fact_.constrain_relation(
+	    bdd_apply(bdd_ithvar(v2), tmp2, bddop_invimp));
 	}
 	else
 	{
-	  fact_.constrain_relation(bdd_apply(bdd_ithvar(v2), tmp2, bddop_imp));
 	  acc &= bdd_nithvar(v2) | tmpacc;
+	  fact_.constrain_relation(bdd_apply(bdd_ithvar(v2), tmp2, bddop_imp));
 	}
 
 	return m[s];

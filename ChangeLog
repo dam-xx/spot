@@ -1,3 +1,17 @@
+2009-04-18  Damien Lefortier <dam@lrde.epita.fr>
+
+	Extend the ELTL parser to support more complex aliases of
+	automaton operators such as Strong=G(F($0))->G(F($1)) and
+	G=R(false, $0).
+
+	* src/eltlparse/eltlparse.yy, src/eltlparse/eltlscan.ll: Add
+	support for more complex aliases.
+	* src/eltltest/acc.cc, src/eltltest/acc.test: Adjust.
+	* src/ltlast/nfa.cc, src/ltlast/nfa.hh (arity): Now returns an
+	unsigned value.
+	* src/tgbatest/eltl2tgba.test: Adjust.
+	* src/tgbalagos/eltl2tgba_lacim.cc: Fix sanity.
+
 2009-04-09  Guillaume SADEGH  <sadegh@lrde.epita.fr>
 
 	Minor fixes to compile with GCC 4.4.
