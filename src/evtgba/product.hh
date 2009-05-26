@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -42,7 +42,7 @@ namespace spot
     /// \brief Format the state as a string for printing.
     ///
     /// This formating is the responsability of the automata
-    /// who owns the state.
+    /// that owns the state.
     virtual std::string format_state(const state* state) const;
 
     /// \brief Return the set of all acceptance conditions used

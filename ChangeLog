@@ -1,3 +1,9 @@
+2009-05-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgba/tgba.hh (format_state): s/automata who/automata that/.
+	* src/evtgba/evtgba.hh (format_state): Likewise.
+	* src/evtgba/product.hh (format_state): Likewise.
+
 2009-04-18  Damien Lefortier <dam@lrde.epita.fr>
 
 	Extend the ELTL parser to support more complex aliases of
