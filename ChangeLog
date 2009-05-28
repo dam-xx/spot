@@ -1,5 +1,25 @@
 2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Number states using negative values and SCCs using nonnegative
+	values.
+
+	Before this change states were numbered using positive values and
+	SCCs using negative values.  That meant the user had to work with
+	negative values.  With this changes, the nonnegative values used
+	to label SCCs can also directly be used as index in the scc_map_.
+
+	* src/tgbaalgos/scc.hh (scc_map::scc_of_state,
+	scc_map::cond_set_of, scc_map::acc_set_of, scc_map::states_of,
+	scc_map::initial, scc_map::scc_type, scc_map::succ,
+	scc_map::accepting): Adjust prototypes to take or return unsigned
+	arguments.
+	* src/tgbaalgos/scc.cc: Adjust prototypes of the above functions.
+	(scc_map::build_map, scc_map::relabel_component): Number states
+	using negative values, and SCCs using nonnegative values.
+	(dump_scc_dot): Adjust to use nonnegative values.
+
+2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Store the scc_map_ as a vector instead of a std::map.  There is no
 	point in using a map since the SCC are numbered in sequence.
 

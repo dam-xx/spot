@@ -60,29 +60,31 @@ namespace spot
   class scc_map
   {
   public:
-    typedef std::map<int, bdd> succ_type;
+    typedef std::map<unsigned, bdd> succ_type;
     typedef std::set<bdd, bdd_less_than> cond_set;
 
     scc_map(const tgba* aut);
 
     void build_map();
-    int relabel_component();
-
-    int scc_of_state(const state* s) const;
-    const cond_set& cond_set_of(int n) const;
-    bdd acc_set_of(int n) const;
-    const std::list<const state*>& states_of(int n) const;
 
     const tgba* get_aut() const;
 
     unsigned scc_count() const;
 
-    int initial() const;
+    unsigned initial() const;
 
-    const succ_type& succ(int i) const;
-    bool accepting(int i) const;
+    const succ_type& succ(unsigned n) const;
+    bool accepting(unsigned n) const;
+    const cond_set& cond_set_of(unsigned n) const;
+    bdd acc_set_of(unsigned n) const;
+    const std::list<const state*>& states_of(unsigned n) const;
+
+    unsigned scc_of_state(const state* s) const;
 
   protected:
+
+    int relabel_component();
+
     struct scc
     {
     public:
@@ -109,8 +111,11 @@ namespace spot
 				// between each of these SCC.
     typedef Sgi::hash_map<const state*, int,
 			  state_ptr_hash, state_ptr_equal> hash_type;
-    hash_type h_;		// Map of visited states.
-    int num_;			// Number of visited nodes.
+    hash_type h_;		// Map of visited states.  Values >= 0
+                                // designate maximal SCC.  Values < 0
+                                // number states that are part of
+                                // incomplete SCCs being completed.
+    int num_;			// Number of visited nodes, negated.
     typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
     std::stack<pair_state_iter> todo_; // DFS stack.  Holds (STATE,
 				       // ITERATOR) pairs where
@@ -124,7 +129,7 @@ namespace spot
     typedef std::vector<scc> scc_map_type;
     scc_map_type scc_map_; // Map of constructed maximal SCC.
 			   // SCC number "n" in H_ corresponds to entry
-                           // "-n-1" in SCC_MAP_.
+                           // "n" in SCC_MAP_.
   };
 
   scc_stats build_scc_stats(const tgba* a);

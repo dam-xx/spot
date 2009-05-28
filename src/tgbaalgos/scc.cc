@@ -44,29 +44,26 @@ namespace spot
   {
   }
 
-  int
+  unsigned
   scc_map::initial() const
   {
     state* in = aut_->get_init_state();
-    hash_type::const_iterator i = h_.find(in);
-    assert(i != h_.end());
-    int val = i->second;
+    int val = scc_of_state(in);
     delete in;
     return val;
   }
 
   const scc_map::succ_type&
-  scc_map::succ(int i) const
+  scc_map::succ(unsigned n) const
   {
-    unsigned n = -i - 1;
     assert(scc_map_.size() > n);
     return scc_map_[n].succ;
   }
 
   bool
-  scc_map::accepting(int i) const
+  scc_map::accepting(unsigned n) const
   {
-    return acc_set_of(i) == aut_->all_acceptance_conditions();
+    return acc_set_of(n) == aut_->all_acceptance_conditions();
   }
 
   const tgba*
@@ -82,13 +79,12 @@ namespace spot
     assert(!root_.front().states.empty());
     std::list<const state*>::iterator i;
     int n = scc_map_.size();
-    n = -n - 1;
     for (i = root_.front().states.begin(); i != root_.front().states.end(); ++i)
       {
 	hash_type::iterator spi = h_.find(*i);
 	assert(spi != h_.end());
 	assert(spi->first == *i);
-	assert(spi->second > 0);
+	assert(spi->second < 0);
 	spi->second = n;
       }
     scc_map_.push_back(root_.front());
@@ -101,9 +97,9 @@ namespace spot
     // Setup depth-first search from the initial state.
     {
       state* init = aut_->get_init_state();
-      num_ = 1;
-      h_.insert(std::make_pair(init, 1));
-      root_.push_front(scc(1));
+      num_ = -1;
+      h_.insert(std::make_pair(init, num_));
+      root_.push_front(scc(num_));
       arc_acc_.push(bddfalse);
       arc_cond_.push(bddfalse);
       tgba_succ_iterator* iter = aut_->succ_iter(init);
@@ -176,7 +172,7 @@ namespace spot
 	  {
 	    // Yes.  Number it, stack it, and register its successors
 	    // for later processing.
-	    h_.insert(std::make_pair(dest, ++num_));
+	    h_.insert(std::make_pair(dest, --num_));
 	    root_.push_front(scc(num_));
 	    arc_acc_.push(acc);
 	    arc_cond_.push(cond);
@@ -187,7 +183,7 @@ namespace spot
 	  }
 
 	// Have we reached a maximal SCC?
-	if (spi->second < 0)
+	if (spi->second >= 0)
 	  {
 	    int dest = spi->second;
 	    // Record that there is a transition from this SCC to the
@@ -209,15 +205,15 @@ namespace spot
 	// this S1 and S2 into this SCC.
 	//
 	// This merge is easy to do because the order of the SCC in
-	// ROOT is ascending: we just have to merge all SCCs from the
-	// top of ROOT that have an index greater to the one of
+	// ROOT is descending: we just have to merge all SCCs from the
+	// top of ROOT that have an index lesser than the one of
 	// the SCC of S2 (called the "threshold").
 	int threshold = spi->second;
 	std::list<const state*> states;
 	succ_type succs;
 	cond_set conds;
 	conds.insert(cond);
-	while (threshold < root_.front().index)
+	while (threshold > root_.front().index)
 	  {
 	    assert(!root_.empty());
 	    assert(!arc_acc_.empty());
@@ -238,7 +234,7 @@ namespace spot
 	// Note that we do not always have
 	//  threshold == root_.front().index
 	// after this loop, the SCC whose index is threshold might have
-	// been merged with a lower SCC.
+	// been merged with a higher SCC.
 
 	// Accumulate all acceptance conditions, states, SCC
 	// successors, and conditions into the merged SCC.
@@ -249,30 +245,27 @@ namespace spot
       }
   }
 
-  int scc_map::scc_of_state(const state* s) const
+  unsigned scc_map::scc_of_state(const state* s) const
   {
     hash_type::const_iterator i = h_.find(s);
     assert(i != h_.end());
     return i->second;
   }
 
-  const scc_map::cond_set& scc_map::cond_set_of(int i) const
+  const scc_map::cond_set& scc_map::cond_set_of(unsigned n) const
   {
-    unsigned n = -i - 1;
     assert(scc_map_.size() > n);
     return scc_map_[n].conds;
   }
 
-  bdd scc_map::acc_set_of(int i) const
+  bdd scc_map::acc_set_of(unsigned n) const
   {
-    unsigned n = -i - 1;
     assert(scc_map_.size() > n);
     return scc_map_[n].acc;
   }
 
-  const std::list<const state*>& scc_map::states_of(int i) const
+  const std::list<const state*>& scc_map::states_of(unsigned n) const
   {
-    unsigned n = -i - 1;
     assert(scc_map_.size() > n);
     return scc_map_[n].states;
   }
@@ -363,9 +356,9 @@ namespace spot
   std::ostream&
   dump_scc_dot(const scc_map& m, std::ostream& out, bool verbose)
   {
-    out << "digraph G {\n  0 [label=\"\", style=invis, height=0]" << std::endl;
+    out << "digraph G {\n  i [label=\"\", style=invis, height=0]" << std::endl;
     int start = m.initial();
-    out << "  0 -> " << -start << std::endl;
+    out << "  i -> " << start << std::endl;
 
     typedef std::set<int> seen_map;
     seen_map seen;
@@ -381,7 +374,7 @@ namespace spot
 	const scc_map::cond_set& cs = m.cond_set_of(state);
 
 	std::ostringstream ostr;
-	ostr << -state;
+	ostr << state;
 	if (verbose)
 	  {
 	    size_t n = m.states_of(state).size();
@@ -402,7 +395,7 @@ namespace spot
 	    ostr << "]";
 	  }
 
-	std::cout << "  " << -state << " [shape=box,"
+	std::cout << "  " << state << " [shape=box,"
 		  << (m.accepting(state) ? "style=bold," : "")
 		  << "label=\"" << ostr.str() << "\"]" << std::endl;
 
@@ -414,7 +407,7 @@ namespace spot
 	    int dest = it->first;
 	    bdd label = it->second;
 
-	    out << "  " << -state << " -> " << -dest
+	    out << "  " << state << " -> " << dest
 		<< " [label=\"";
 	    bdd_print_formula(out, m.get_aut()->get_dict(), label);
 	    out << "\"]" << std::endl;
