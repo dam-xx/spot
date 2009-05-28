@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Laboratoire
+// Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Laboratoire
 // d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
 // Coopératifs (SRC), Université Pierre et Marie Curie.
 //
@@ -93,7 +93,8 @@ syntax(char* prog)
 	    << " (requires -e)" << std::endl
 	    << "  -k    display statistics on the TGBA instead of dumping it"
 	    << std::endl
-	    << "  -K    dump the graph of SCCs in dot"
+	    << "  -K    dump the graph of SCCs in dot format" << std::endl
+	    << "  -KV   verbosely dump the graph of SCCs in dot format"
 	    << std::endl
             << "  -L    fair-loop approximation (implies -f)" << std::endl
 	    << "  -m    try to reduce accepting runs, in a second pass"
@@ -331,6 +332,10 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-K"))
 	{
 	  output = 10;
+	}
+      else if (!strcmp(argv[formula_index], "-KV"))
+	{
+	  output = 11;
 	}
       else if (!strcmp(argv[formula_index], "-L"))
 	{
@@ -742,7 +747,10 @@ main(int argc, char** argv)
 	  build_scc_stats(a).dump(std::cout);
 	  break;
 	case 10:
-	  dump_scc_dot(a, std::cout);
+	  dump_scc_dot(a, std::cout, false);
+	  break;
+	case 11:
+	  dump_scc_dot(a, std::cout, true);
 	  break;
 	default:
 	  assert(!"unknown output option");

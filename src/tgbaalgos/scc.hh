@@ -26,6 +26,7 @@
 #include "tgba/tgba.hh"
 #include <iosfwd>
 #include "misc/hash.hh"
+#include "misc/bddlt.hh"
 
 namespace spot
 {
@@ -59,11 +60,17 @@ namespace spot
   {
   public:
     typedef std::map<int, bdd> succ_type;
+    typedef std::set<bdd, bdd_less_than> cond_set;
 
     scc_map(const tgba* aut);
 
     void build_map();
     void relabel_component(int n);
+
+    int scc_of_state(const state* s) const;
+    const cond_set& cond_set_of(int n) const;
+    bdd acc_set_of(int n) const;
+    const std::list<const state*>& states_of(int n) const;
 
     const tgba* get_aut() const;
 
@@ -86,6 +93,8 @@ namespace spot
       bdd acc;
       /// States of the component.
       std::list<const state*> states;
+      /// Set of conditions used in the SCC.
+      cond_set conds;
       /// Successor SCC.
       succ_type succ;
     };
@@ -113,14 +122,17 @@ namespace spot
 				       // but STATE should not because
 				       // it is used as a key in H.
 
-    std::map<int, scc> scc_map_; // Map of constructed maximal SCC.
+    typedef std::map<int, scc> scc_map_type;
+    scc_map_type scc_map_; // Map of constructed maximal SCC.
   };
 
   scc_stats build_scc_stats(const tgba* a);
   scc_stats build_scc_stats(const scc_map& m);
 
-  std::ostream& dump_scc_dot(const tgba* a, std::ostream& out);
-  std::ostream& dump_scc_dot(const scc_map& m, std::ostream& out);
+  std::ostream& dump_scc_dot(const tgba* a, std::ostream& out,
+			     bool verbose = false);
+  std::ostream& dump_scc_dot(const scc_map& m, std::ostream& out,
+			     bool verbose = false);
 }
 
 #endif // SPOT_TGBAALGOS_SCC_HH

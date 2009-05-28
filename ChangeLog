@@ -1,5 +1,21 @@
 2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Keep track of conditions in SCC, and add a more verbose dump.
+
+	* src/tgbaalgos/scc.hh (scc_map::scc_of_state,
+	scc_map::cond_set_of, scc_map::acc_set_of, scc_map::states_of):
+	New functions.
+	(scc_map::scc::conds): New attribute.
+	(dump_scc_dot): Take an optional VERBOSE argument.
+	* src/tgbaalgos/scc.cc (scc_map::scc_of_state,
+	scc_map::cond_set_of, scc_map::acc_set_of, scc_map::states_of):
+	Implement these new functions.
+	(dump_scc_dot): Display number of states, conditions and
+	acceptance conditions, with VERBOSE is set.
+	(build_map): Fill the new scc_map::scc::cond field.
+
+2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbaalgos/scc.cc (scc_map::relabel_component): Make sure
 	that the old label of each state is strictly positive.  The
 	previous assertion (inherited from gtec) of "!= -1" is wrong,

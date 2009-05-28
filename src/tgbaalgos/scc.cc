@@ -21,6 +21,7 @@
 #include <queue>
 #include <set>
 #include <iostream>
+#include <sstream>
 #include "scc.hh"
 #include "tgba/bddprint.hh"
 
@@ -160,8 +161,7 @@ namespace spot
 	  }
 
 	// We have a successor to look at.
-	// Fetch the values (destination state, acceptance conditions
-	// of the arc) we are interested in...
+	// Fetch the values we are interested in...
 	const state* dest = succ->current_state();
 	bdd acc = succ->current_acceptance_conditions();
 	bdd cond = succ->current_condition();
@@ -186,7 +186,7 @@ namespace spot
 	    continue;
 	  }
 
-	// Have we reached maximal SCC?
+	// Have we reached a maximal SCC?
 	if (spi->second < 0)
 	  {
 	    int dest = spi->second;
@@ -215,6 +215,8 @@ namespace spot
 	int threshold = spi->second;
 	std::list<const state*> states;
 	succ_type succs;
+	cond_set conds;
+	conds.insert(cond);
 	while (threshold < root_.front().index)
 	  {
 	    assert(!root_.empty());
@@ -225,21 +227,51 @@ namespace spot
 	    states.splice(states.end(), root_.front().states);
 	    succs.insert(root_.front().succ.begin(),
 			 root_.front().succ.end());
+	    conds.insert(arc_cond_.top());
+	    conds.insert(root_.front().conds.begin(),
+			 root_.front().conds.end());
 	    root_.pop_front();
 	    arc_acc_.pop();
 	    arc_cond_.pop();
 	  }
+
 	// Note that we do not always have
 	//  threshold == root_.front().index
 	// after this loop, the SCC whose index is threshold might have
 	// been merged with a lower SCC.
 
-	// Accumulate all acceptance conditions into the merged SCC.
+	// Accumulate all acceptance conditions, states, SCC
+	// successors, and conditions into the merged SCC.
 	root_.front().acc |= acc;
 	root_.front().states.splice(root_.front().states.end(), states);
-	// Likewise with SCC successors.
 	root_.front().succ.insert(succs.begin(), succs.end());
+	root_.front().conds.insert(conds.begin(), conds.end());
       }
+  }
+
+  int scc_map::scc_of_state(const state* s) const
+  {
+    hash_type::const_iterator i = h_.find(s);
+    assert(i != h_.end());
+    return i->second;
+  }
+
+  const scc_map::cond_set& scc_map::cond_set_of(int n) const
+  {
+    scc_map_type::const_iterator i = scc_map_.find(n);
+    return i->second.conds;
+  }
+
+  bdd scc_map::acc_set_of(int n) const
+  {
+    scc_map_type::const_iterator i = scc_map_.find(n);
+    return i->second.acc;
+  }
+
+  const std::list<const state*>& scc_map::states_of(int n) const
+  {
+    scc_map_type::const_iterator i = scc_map_.find(n);
+    return i->second.states;
   }
 
   int scc_map::scc_count() const
@@ -326,7 +358,7 @@ namespace spot
   }
 
   std::ostream&
-  dump_scc_dot(const scc_map& m, std::ostream& out)
+  dump_scc_dot(const scc_map& m, std::ostream& out, bool verbose)
   {
     out << "digraph G {\n  0 [label=\"\", style=invis, height=0]" << std::endl;
     int start = m.initial();
@@ -343,10 +375,33 @@ namespace spot
 	int state = q.front();
 	q.pop();
 
-	if (m.accepting(state))
-	  std::cout << "  " << -state << " [shape=doublecircle]" << std::endl;
-	else
-	  std::cout << "  " << -state << " [shape=circle]" << std::endl;
+	const scc_map::cond_set& cs = m.cond_set_of(state);
+
+	std::ostringstream ostr;
+	ostr << -state;
+	if (verbose)
+	  {
+	    size_t n = m.states_of(state).size();
+	    ostr << " (" << n << " state";
+	    if (n > 1)
+	      ostr << "s";
+	    ostr << ")\\naccs=";
+	    bdd_print_accset(ostr, m.get_aut()->get_dict(),
+			     m.acc_set_of(state));
+	    ostr << "\\nconds=[";
+	    for (scc_map::cond_set::const_iterator i = cs.begin();
+		 i != cs.end(); ++i)
+	      {
+		if (i != cs.begin())
+		  ostr << ", ";
+		bdd_print_formula(ostr, m.get_aut()->get_dict(), *i);
+	      }
+	    ostr << "]";
+	  }
+
+	std::cout << "  " << -state << " [shape=box,"
+		  << (m.accepting(state) ? "style=bold," : "")
+		  << "label=\"" << ostr.str() << "\"]" << std::endl;
 
 	const scc_map::succ_type& succ = m.succ(state);
 
@@ -357,9 +412,9 @@ namespace spot
 	    bdd label = it->second;
 
 	    out << "  " << -state << " -> " << -dest
-		<< " [label=\""
-		<< bdd_format_formula(m.get_aut()->get_dict(), label)
-		<< "\"]" << std::endl;
+		<< " [label=\"";
+	    bdd_print_formula(out, m.get_aut()->get_dict(), label);
+	    out << "\"]" << std::endl;
 
 	    seen_map::const_iterator it = seen.find(dest);
 	    if (it != seen.end())
@@ -376,11 +431,11 @@ namespace spot
   }
 
   std::ostream&
-  dump_scc_dot(const tgba* a, std::ostream& out)
+  dump_scc_dot(const tgba* a, std::ostream& out, bool verbose)
   {
     scc_map m(a);
     m.build_map();
-    return dump_scc_dot(m, out);
+    return dump_scc_dot(m, out, verbose);
   }
 
 }
