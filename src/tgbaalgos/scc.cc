@@ -1,4 +1,4 @@
-// Copyright (C) 2008  Laboratoire de Recherche et Developpement de
+// Copyright (C) 2008, 2009  Laboratoire de Recherche et Developpement de
 // l'Epita.
 //
 // This file is part of Spot, a model checking library.
@@ -87,7 +87,7 @@ namespace spot
 	hash_type::iterator spi = h_.find(*i);
 	assert(spi != h_.end());
 	assert(spi->first == *i);
-	assert(spi->second != -1);
+	assert(spi->second > 0);
 	spi->second = n;
       }
     scc_map_.insert(std::make_pair(n, root_.front()));
