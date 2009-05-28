@@ -23,6 +23,7 @@
 
 #include <map>
 #include <stack>
+#include <vector>
 #include "tgba/tgba.hh"
 #include <iosfwd>
 #include "misc/hash.hh"
@@ -65,7 +66,7 @@ namespace spot
     scc_map(const tgba* aut);
 
     void build_map();
-    void relabel_component(int n);
+    int relabel_component();
 
     int scc_of_state(const state* s) const;
     const cond_set& cond_set_of(int n) const;
@@ -74,7 +75,7 @@ namespace spot
 
     const tgba* get_aut() const;
 
-    int scc_count() const;
+    unsigned scc_count() const;
 
     int initial() const;
 
@@ -110,8 +111,6 @@ namespace spot
 			  state_ptr_hash, state_ptr_equal> hash_type;
     hash_type h_;		// Map of visited states.
     int num_;			// Number of visited nodes.
-    int scc_num_;		// Opposite of the number of
-				// maximal SCC constructed.
     typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
     std::stack<pair_state_iter> todo_; // DFS stack.  Holds (STATE,
 				       // ITERATOR) pairs where
@@ -122,8 +121,10 @@ namespace spot
 				       // but STATE should not because
 				       // it is used as a key in H.
 
-    typedef std::map<int, scc> scc_map_type;
+    typedef std::vector<scc> scc_map_type;
     scc_map_type scc_map_; // Map of constructed maximal SCC.
+			   // SCC number "n" in H_ corresponds to entry
+                           // "-n-1" in SCC_MAP_.
   };
 
   scc_stats build_scc_stats(const tgba* a);

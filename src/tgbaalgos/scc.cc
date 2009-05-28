@@ -58,17 +58,15 @@ namespace spot
   const scc_map::succ_type&
   scc_map::succ(int i) const
   {
-    std::map<int, scc>::const_iterator j = scc_map_.find(i);
-    assert (j != scc_map_.end());
-    return j->second.succ;
+    unsigned n = -i - 1;
+    assert(scc_map_.size() > n);
+    return scc_map_[n].succ;
   }
 
   bool
   scc_map::accepting(int i) const
   {
-    std::map<int, scc>::const_iterator j = scc_map_.find(i);
-    assert (j != scc_map_.end());
-    return j->second.acc == aut_->all_acceptance_conditions();
+    return acc_set_of(i) == aut_->all_acceptance_conditions();
   }
 
   const tgba*
@@ -78,11 +76,13 @@ namespace spot
   }
 
 
-  void
-  scc_map::relabel_component(int n)
+  int
+  scc_map::relabel_component()
   {
     assert(!root_.front().states.empty());
     std::list<const state*>::iterator i;
+    int n = scc_map_.size();
+    n = -n - 1;
     for (i = root_.front().states.begin(); i != root_.front().states.end(); ++i)
       {
 	hash_type::iterator spi = h_.find(*i);
@@ -91,7 +91,8 @@ namespace spot
 	assert(spi->second > 0);
 	spi->second = n;
       }
-    scc_map_.insert(std::make_pair(n, root_.front()));
+    scc_map_.push_back(root_.front());
+    return n;
   }
 
   void
@@ -101,7 +102,6 @@ namespace spot
     {
       state* init = aut_->get_init_state();
       num_ = 1;
-      scc_num_ = 0;
       h_.insert(std::make_pair(init, 1));
       root_.push_front(scc(1));
       arc_acc_.push(bddfalse);
@@ -146,13 +146,13 @@ namespace spot
 		bdd cond = arc_cond_.top();
 		arc_cond_.pop();
 		arc_acc_.pop();
-		relabel_component(--scc_num_);
+		int num = relabel_component();
 		root_.pop_front();
 
 		// Record the transition between the SCC being popped
 		// and the previous SCC.
 		if (!root_.empty())
-		  root_.front().succ.insert(std::make_pair(scc_num_, cond));
+		  root_.front().succ.insert(std::make_pair(num, cond));
 	      }
 
 	    delete succ;
@@ -256,27 +256,30 @@ namespace spot
     return i->second;
   }
 
-  const scc_map::cond_set& scc_map::cond_set_of(int n) const
+  const scc_map::cond_set& scc_map::cond_set_of(int i) const
   {
-    scc_map_type::const_iterator i = scc_map_.find(n);
-    return i->second.conds;
+    unsigned n = -i - 1;
+    assert(scc_map_.size() > n);
+    return scc_map_[n].conds;
   }
 
-  bdd scc_map::acc_set_of(int n) const
+  bdd scc_map::acc_set_of(int i) const
   {
-    scc_map_type::const_iterator i = scc_map_.find(n);
-    return i->second.acc;
+    unsigned n = -i - 1;
+    assert(scc_map_.size() > n);
+    return scc_map_[n].acc;
   }
 
-  const std::list<const state*>& scc_map::states_of(int n) const
+  const std::list<const state*>& scc_map::states_of(int i) const
   {
-    scc_map_type::const_iterator i = scc_map_.find(n);
-    return i->second.states;
+    unsigned n = -i - 1;
+    assert(scc_map_.size() > n);
+    return scc_map_[n].states;
   }
 
-  int scc_map::scc_count() const
+  unsigned scc_map::scc_count() const
   {
-    return -scc_num_;
+    return scc_map_.size();
   }
 
   namespace

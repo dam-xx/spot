@@ -1,5 +1,18 @@
 2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Store the scc_map_ as a vector instead of a std::map.  There is no
+	point in using a map since the SCC are numbered in sequence.
+
+	* src/tgbaalgos/scc.hh (scc_map::relabel_component): Return the
+	number of the SCC instead of taking it as argument.
+	(scc_map::scc_num_): Delete this variable.  scc_map_.size() gives
+	the same information.
+	(scc_map::scc_map_type): Define using std::vector instead of
+	std::map.
+	* src/tgbaalgos/scc.cc: Adjust all uses.
+
+2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Keep track of conditions in SCC, and add a more verbose dump.
 
 	* src/tgbaalgos/scc.hh (scc_map::scc_of_state,
