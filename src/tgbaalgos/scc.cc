@@ -360,9 +360,8 @@ namespace spot
     int start = m.initial();
     out << "  i -> " << start << std::endl;
 
-    typedef std::set<int> seen_map;
-    seen_map seen;
-    seen.insert(start);
+    std::vector<bool> seen(m.scc_count());
+    seen[start] = true;
 
     std::queue<int> q;
     q.push(start);
@@ -412,11 +411,10 @@ namespace spot
 	    bdd_print_formula(out, m.get_aut()->get_dict(), label);
 	    out << "\"]" << std::endl;
 
-	    seen_map::const_iterator it = seen.find(dest);
-	    if (it != seen.end())
+	    if (seen[dest])
 	      continue;
 
-	    seen.insert(dest);
+	    seen[dest] = true;
 	    q.push(dest);
 	  }
       }

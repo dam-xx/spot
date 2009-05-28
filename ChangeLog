@@ -1,5 +1,10 @@
 2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgbaalgos/scc.cc (dump_scc_dot): Use a bit vector instead of
+	a map to track visited SCC since they are sequentially numbered.
+
+2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Number states using negative values and SCCs using nonnegative
 	values.
 
