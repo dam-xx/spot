@@ -1,5 +1,14 @@
 2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Implement spot::future_conditions_collector.
+
+	* src/tgba/futurecondcol.hh, src/tgba/futurecondcol.cc:
+	New files.
+	* src/tgba/Makefile.am: Adjust.
+	* src/tgbatest/ltl2tgba.cc: Add option -FC.
+
+2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbaalgos/scc.cc (dump_scc_dot): Use a bit vector instead of
 	a map to track visited SCC since they are sequentially numbered.
 

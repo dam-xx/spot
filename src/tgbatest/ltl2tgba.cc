@@ -39,6 +39,7 @@
 #include "tgbaalgos/lbtt.hh"
 #include "tgba/tgbatba.hh"
 #include "tgba/tgbaproduct.hh"
+#include "tgba/futurecondcol.hh"
 #include "tgbaalgos/reducerun.hh"
 #include "tgbaparse/public.hh"
 #include "tgbaalgos/dupexp.hh"
@@ -87,6 +88,8 @@ syntax(char* prog)
 	    << "  -fr7  use -r7 (see below) at each step of FM" << std::endl
 	    << "  -fr8  use -r8 (see below) at each step of FM" << std::endl
             << "  -F    read the formula from the file" << std::endl
+            << "  -FC   dump the automaton showing future conditions on states"
+	    << std::endl
 	    << "  -g    graph the accepting run on the automaton (requires -e)"
 	    << std::endl
 	    << "  -G    graph the accepting run seen as an automaton "
@@ -189,6 +192,7 @@ main(int argc, char** argv)
   bool graph_run_tgba_opt = false;
   bool opt_reduce = false;
   bool containment = false;
+  bool show_fc = false;
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* unobservables = 0;
   spot::tgba_explicit* system = 0;
@@ -316,6 +320,10 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-F"))
 	{
 	  file_opt = true;
+	}
+      else if (!strcmp(argv[formula_index], "-FC"))
+	{
+	  show_fc = true;
 	}
       else if (!strcmp(argv[formula_index], "-g"))
 	{
@@ -695,6 +703,11 @@ main(int argc, char** argv)
 	    }
 	}
 
+      if (show_fc)
+	{
+	  a = new spot::future_conditions_collector(a, true);
+	}
+
       switch (output)
 	{
 	case -1:
@@ -864,6 +877,8 @@ main(int argc, char** argv)
 	  delete ec;
 	}
 
+      if (show_fc)
+	delete a;
       if (f)
         spot::ltl::destroy(f);
       delete product_degeneralized;
