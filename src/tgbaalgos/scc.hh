@@ -64,6 +64,7 @@ namespace spot
     typedef std::set<bdd, bdd_less_than> cond_set;
 
     scc_map(const tgba* aut);
+    ~scc_map();
 
     void build_map();
 

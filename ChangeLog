@@ -1,5 +1,15 @@
 2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Test "ltl2tgba -FC" and plug the memory leaks of scc_map.
+
+	* src/tgbaalgos/scc.hh (scc_map::~scc_map): Declare it.
+	* src/tgbaalgos/scc.cc (scc_map::~scc_map): Implement it.
+	(scc_map::build_map): Delete duplicate states.
+	* src/tbbatest/ltl2tgba.test: Run ltl2tgba -FV to catch
+	memory leaks with valgrind.
+
+2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Implement spot::future_conditions_collector.
 
 	* src/tgba/futurecondcol.hh, src/tgba/futurecondcol.cc:

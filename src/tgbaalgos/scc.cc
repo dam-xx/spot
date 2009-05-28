@@ -44,6 +44,19 @@ namespace spot
   {
   }
 
+  scc_map::~scc_map()
+  {
+    hash_type::iterator i = h_.begin();
+
+    while (i != h_.end())
+      {
+	// Advance the iterator before deleting the key.
+	const state* s = i->first;
+	++i;
+	delete s;
+      }
+  }
+
   unsigned
   scc_map::initial() const
   {
@@ -181,6 +194,10 @@ namespace spot
 	    todo_.push(pair_state_iter(dest, iter));
 	    continue;
 	  }
+
+	// If we now the state, reuse the previous object.
+	delete dest;
+	dest = spi->first;
 
 	// Have we reached a maximal SCC?
 	if (spi->second >= 0)
