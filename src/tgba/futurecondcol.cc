@@ -44,12 +44,11 @@ namespace spot
 
   future_conditions_collector::future_conditions_collector(const tgba* aut,
 							   bool show)
-    : aut_(aut), scc_map_(aut), show_(show)
+    : tgba_scc(aut, show),
+      // Initialize future_conds_ with as much empty
+      // "cond_set"s as there are SCCs.
+      future_conds_(scc_map_.scc_count())
   {
-    scc_map_.build_map();
-    // Initialize future_conds_ with as much empty "cond_set"s as
-    // there are SCCs.
-    future_conds_ = fc_map(scc_map_.scc_count());
     // Fill future_conds by recursively visiting the (acyclic) graph
     // of SCCs.
     map_builder_(scc_map_.initial());
@@ -68,26 +67,6 @@ namespace spot
     return future_conds_[s];
   }
 
-  state*
-  future_conditions_collector::get_init_state() const
-  {
-    return aut_->get_init_state();
-  }
-
-  tgba_succ_iterator*
-  future_conditions_collector::succ_iter(const state* local_state,
-					 const state* global_state,
-					 const tgba* global_automaton) const
-  {
-    return aut_->succ_iter(local_state, global_state, global_automaton);
-  }
-
-  bdd_dict*
-  future_conditions_collector::get_dict() const
-  {
-    return aut_->get_dict();
-  }
-
   std::string
   future_conditions_collector::format_state(const state* state) const
   {
@@ -95,7 +74,7 @@ namespace spot
       return aut_->format_state(state);
 
     std::ostringstream str;
-    str << aut_->format_state(state);
+    str << this->tgba_scc::format_state(state);
     str << "\\n[";
     const cond_set& c = future_conditions(state);
     for (cond_set::const_iterator i = c.begin(); i != c.end(); ++i)
@@ -106,45 +85,5 @@ namespace spot
       }
     str << "]";
     return str.str();
-  }
-
-  std::string
-  future_conditions_collector::transition_annotation
-    (const tgba_succ_iterator* t) const
-  {
-    return aut_->transition_annotation(t);
-  }
-
-  state*
-  future_conditions_collector::project_state(const state* s,
-					     const tgba* t) const
-  {
-    return aut_->project_state(s, t);
-  }
-
-  bdd
-  future_conditions_collector::all_acceptance_conditions() const
-  {
-    return aut_->all_acceptance_conditions();
-  }
-
-  bdd
-  future_conditions_collector::neg_acceptance_conditions() const
-  {
-    return aut_->neg_acceptance_conditions();
-  }
-
-  bdd
-  future_conditions_collector::compute_support_conditions
-    (const state* state) const
-  {
-    return aut_->support_conditions(state);
-  }
-
-  bdd
-  future_conditions_collector::compute_support_variables
-    (const state* state) const
-  {
-    return aut_->support_variables(state);
   }
 }

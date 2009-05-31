@@ -20,8 +20,7 @@
 #ifndef SPOT_TGBA_FUTURECONDCOL_HH
 # define SPOT_TGBA_FUTURECONDCOL_HH
 
-#include "tgbaexplicit.hh"
-#include "tgbaalgos/scc.hh"
+#include "tgbascc.hh"
 
 namespace spot
 {
@@ -32,10 +31,10 @@ namespace spot
   /// This class is a spot::tgba wrapper that simply add a new method,
   /// future_conditions(), to any spot::tgba.
   ///
-  /// This new methods returns a set of conditions that can be
+  /// This new method returns a set of conditions that can be
   /// seen on a transitions accessible (maybe indirectly) from
   /// the given state.
-  class future_conditions_collector : public tgba
+  class future_conditions_collector : public tgba_scc
   {
   public:
     typedef scc_map::cond_set cond_set;
@@ -49,6 +48,7 @@ namespace spot
     future_conditions_collector(const tgba* aut, bool show = false);
     virtual ~future_conditions_collector();
 
+    /// Returns the set of future conditions visible after \a s
     const cond_set& future_conditions(const spot::state* s) const;
 
     /// \brief Format a state for output.
@@ -58,34 +58,11 @@ namespace spot
     /// state by future_conditions() in the output string.
     virtual std::string format_state(const state* state) const;
 
-    // The following methods simply delegate their work to the wrapped
-    // tgba.
-
-    virtual state* get_init_state() const;
-    virtual tgba_succ_iterator*
-    succ_iter(const state* local_state,
-	      const state* global_state = 0,
-	      const tgba* global_automaton = 0) const;
-    virtual bdd_dict* get_dict() const;
-
-    virtual std::string
-    transition_annotation(const tgba_succ_iterator* t) const;
-    virtual state* project_state(const state* s, const tgba* t) const;
-    virtual bdd all_acceptance_conditions() const;
-    virtual bdd neg_acceptance_conditions() const;
-
-    virtual bdd compute_support_conditions(const state* state) const;
-    virtual bdd compute_support_variables(const state* state) const;
-
-  private:
+  protected:
     void map_builder_(unsigned s);
 
-    const tgba* aut_;		// The wrapped TGBA.
     fc_map future_conds_;	// The map of future conditions for each
 				// strongly connected component.
-    scc_map scc_map_;		// SCC informations.
-    bool show_;		        // Wether to show future conditions
-				// in the output of format_state().
   };
 
 }

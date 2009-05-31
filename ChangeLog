@@ -1,3 +1,12 @@
+2009-05-31  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Lift the SCC computation off future_condition_collectors, into
+	a new tgba_scc class.
+
+	* src/tgba/futurecondcol.cc, src/tgba/futurecondcol.hh: Move
+	all delegation functions and scc_map into ...
+	* src/tgba/tgbascc.cc, src/tgba/tgbascc.hh: ... these new files.
+
 2009-05-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Test "ltl2tgba -FC" and plug the memory leaks of scc_map.
