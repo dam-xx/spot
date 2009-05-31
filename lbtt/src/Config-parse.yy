@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
+ *  Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2009
  *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  This program is free software; you can redistribute it and/or
@@ -94,58 +94,7 @@ extern int yylex();                                 /* Reads the next token
 						     * the lexer).
 						     */
 
-
-
-/******************************************************************************
- *
- * Function for reporting parse errors.
- *
- *****************************************************************************/
-
-/* ========================================================================= */
-void yyerror(const char* error_message)
-/* ----------------------------------------------------------------------------
- *
- * Description:   Function for reporting parse errors.
- *
- * Arguments:     error_message  --  An error message.
- *
- * Returns:       Nothing. Instead, throws a
- *                Configuration::ConfigurationException initialized with the
- *                given error message.
- *
- * ------------------------------------------------------------------------- */
-{
-  const string unknown_token(yytext);
-  string msg;
-
-  switch (expected_token)
-  {
-    case CFG_BLOCK_ID :
-      msg = "`" + unknown_token + "' is not a valid block identifier";
-      break;
-    case CFG_OPTION_ID :
-      if (!unknown_token.empty())
-	msg = "`" + unknown_token + "' is not a valid option identifier";
-      else
-	msg = "'}' expected at the end of block";
-      break;
-    case CFG_LBRACE :
-      msg = "`{' expected after block identifier";
-      break;
-    case CFG_EQUALS :
-      msg = "`=' expected after option identifier";
-      break;
-    case CFG_VALUE :
-      msg = "value for option expected";
-      break;
-    default :
-      msg = error_message;
-      break;
-  }
-
-  throw Configuration::ConfigurationException(config_file_line_number, msg);
-}
+void yyerror(const char* error_message);    /* Fwd. definition.  See below. */
 
 %}
 
@@ -631,6 +580,57 @@ formula_option:            CFG_ABBREVIATEDOPERATORS equals_value
 %%
 
 
+
+/******************************************************************************
+ *
+ * Function for reporting parse errors.
+ *
+ *****************************************************************************/
+
+/* ========================================================================= */
+void yyerror(const char* error_message)
+/* ----------------------------------------------------------------------------
+ *
+ * Description:   Function for reporting parse errors.
+ *
+ * Arguments:     error_message  --  An error message.
+ *
+ * Returns:       Nothing. Instead, throws a
+ *                Configuration::ConfigurationException initialized with the
+ *                given error message.
+ *
+ * ------------------------------------------------------------------------- */
+{
+  const string unknown_token(yytext);
+  string msg;
+
+  switch (expected_token)
+  {
+    case CFG_BLOCK_ID :
+      msg = "`" + unknown_token + "' is not a valid block identifier";
+      break;
+    case CFG_OPTION_ID :
+      if (!unknown_token.empty())
+	msg = "`" + unknown_token + "' is not a valid option identifier";
+      else
+	msg = "'}' expected at the end of block";
+      break;
+    case CFG_LBRACE :
+      msg = "`{' expected after block identifier";
+      break;
+    case CFG_EQUALS :
+      msg = "`=' expected after option identifier";
+      break;
+    case CFG_VALUE :
+      msg = "value for option expected";
+      break;
+    default :
+      msg = error_message;
+      break;
+  }
+
+  throw Configuration::ConfigurationException(config_file_line_number, msg);
+}
 
 /******************************************************************************
  *
