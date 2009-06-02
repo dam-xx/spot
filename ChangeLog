@@ -1,5 +1,11 @@
 2009-06-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgbatest/scc.test: Redirect stdout into file `stdout'
+	instead of `out', to conform to other tests, and add a missing
+	call to diff.
+
+2009-06-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Introduce some experimental kripke classes to simplify writing
 	interfaces.
 
