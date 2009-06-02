@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -25,7 +25,8 @@ AUTOMAKE_OPTIONS = subdir-objects
 # Keep tests at the end.
 SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse eltlparse \
           tgba tgbaalgos tgbaparse \
-	  evtgba evtgbaalgos evtgbaparse . \
+	  evtgba evtgbaalgos evtgbaparse \
+          kripke . \
 	  ltltest eltltest tgbatest evtgbatest sanity
 
 lib_LTLIBRARIES = libspot.la
@@ -43,7 +44,8 @@ libspot_la_LIBADD =  \
   tgbaparse/libtgbaparse.la \
   evtgba/libevtgba.la \
   evtgbaalgos/libevtgbaalgos.la \
-  evtgbaparse/libevtgbaparse.la
+  evtgbaparse/libevtgbaparse.la \
+  kripke/libkripke.la
 
 # Dummy C++ source to cause C++ linking.
 nodist_EXTRA_libspot_la_SOURCES = _.cc

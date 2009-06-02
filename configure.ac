@@ -1,4 +1,4 @@
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Laboratoire
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Laboratoire
 # d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
 # Coopératifs (SRC), Université Pierre et Marie Curie.
 #
@@ -79,36 +79,37 @@ AC_CONFIG_FILES([
   bench/ltl2tgba/defs
   doc/Doxyfile
   doc/Makefile
-  iface/Makefile
-  iface/gspn/Makefile
   iface/gspn/defs
+  iface/gspn/Makefile
+  iface/Makefile
   iface/nips/Makefile
-  iface/nips/nips_vm/Makefile
-  iface/nips/nipstest/Makefile
   iface/nips/nipstest/defs
-  src/Makefile
+  iface/nips/nipstest/Makefile
+  iface/nips/nips_vm/Makefile
   src/eltlparse/Makefile
-  src/eltltest/Makefile
   src/eltltest/defs
-  src/evtgba/Makefile
+  src/eltltest/Makefile
   src/evtgbaalgos/Makefile
+  src/evtgba/Makefile
   src/evtgbaparse/Makefile
-  src/evtgbatest/Makefile
   src/evtgbatest/defs
+  src/evtgbatest/Makefile
+  src/kripke/Makefile
   src/ltlast/Makefile
   src/ltlenv/Makefile
   src/ltlparse/Makefile
-  src/ltltest/Makefile
   src/ltltest/defs
+  src/ltltest/Makefile
   src/ltlvisit/Makefile
+  src/Makefile
   src/misc/Makefile
   src/sanity/Makefile
-  src/tgba/Makefile
-  src/tgbaalgos/Makefile
   src/tgbaalgos/gtec/Makefile
+  src/tgbaalgos/Makefile
+  src/tgba/Makefile
   src/tgbaparse/Makefile
-  src/tgbatest/Makefile
   src/tgbatest/defs
+  src/tgbatest/Makefile
   wrap/Makefile
   wrap/python/Makefile
   wrap/python/cgi/Makefile

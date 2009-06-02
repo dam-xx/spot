@@ -1,5 +1,16 @@
 2009-06-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Introduce some experimental kripke classes to simplify writing
+	interfaces.
+
+	* src/kripke/Makefile.am, src/kripke/fairkripke.cc,
+	src/kripke/fairkripke.hh, src/kripke/kripke.cc,
+	src/kripke/kripke.hh: New files.
+	* src/Makefile.am: Recurse into kripke and link libkripke.la.
+	* configure.ac: Output src/kripke/Makefile.
+
+2009-06-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbatest/scc.test: New file.
 	* src/tgbatest/Makefile.am: Adjust.
 	* src/tgbaalgos/scc.hh: More documentation.
