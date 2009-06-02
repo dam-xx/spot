@@ -297,44 +297,50 @@ namespace spot
     struct scc_recurse_data
     {
       scc_recurse_data() : acc_scc(0), dead_scc(0) {};
-      typedef std::map<int, unsigned> graph_counter;
+      typedef std::map<unsigned, unsigned> graph_counter;
       graph_counter acc_paths;
       graph_counter dead_paths;
       unsigned acc_scc;
       unsigned dead_scc;
     };
 
-    bool scc_recurse(const scc_map& m, int state, scc_recurse_data& data)
+    bool scc_recurse(const scc_map& m, unsigned state, scc_recurse_data& data)
     {
+      // Don't recurse on previously visited states.
+      scc_recurse_data::graph_counter::const_iterator i =
+	data.acc_paths.find(state);
+      if (i != data.acc_paths.end())
+	return i->second > 0;
+
       const scc_map::succ_type& succ = m.succ(state);
 
       bool accepting = m.accepting(state);
       scc_map::succ_type::const_iterator it;
-      int acc_paths = 0;
-      int dead_paths = 0;
+      unsigned acc_paths = 0;
+      unsigned dead_paths = 0;
 
       bool paths_accepting = false;
       for (it = succ.begin(); it != succ.end(); ++it)
 	{
-	  int dest = it->first;
+	  unsigned dest = it->first;
 	  bool path_accepting = scc_recurse(m, dest, data);
 	  paths_accepting |= path_accepting;
 
-	  if (path_accepting)
-	    acc_paths += data.acc_paths[dest];
-	  else
-	    dead_paths += data.dead_paths[dest];
+	  acc_paths += data.acc_paths[dest];
+	  dead_paths += data.dead_paths[dest];
 	}
 
       if (accepting)
 	{
 	  ++data.acc_scc;
-	  if (!paths_accepting)
+	  if (acc_paths == 0)
 	    acc_paths = 1;
 	}
       else if (!paths_accepting)
 	{
 	  ++data.dead_scc;
+	  if (dead_paths == 0)
+	    dead_paths = 1;
 	}
 
       data.acc_paths[state] = acc_paths;
@@ -351,7 +357,7 @@ namespace spot
     res.scc_total = m.scc_count();
 
     scc_recurse_data d;
-    int init = m.initial();
+    unsigned init = m.initial();
     scc_recurse(m, init, d);
 
     res.acc_scc = d.acc_scc;

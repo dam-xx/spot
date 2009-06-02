@@ -44,10 +44,11 @@ namespace spot
     /// Note that an SCC can be neither dead nor accepting.
     unsigned dead_scc;
 
-    /// Number of path to a terminal accepting SCC.
+    /// Number of maximal accepting paths.
     ///
-    /// A terminal accepting SCC is an accepting SCC that has
-    /// only dead successors (or no successors at all).
+    /// An path is maximal and accepting if it ends in an accepting
+    /// SCC that is only dead (i.e. non accepting) successors, or no
+    /// successors at all.
     unsigned acc_paths;
     /// Number of paths to a terminal dead SCC.
     ///
@@ -57,29 +58,68 @@ namespace spot
     std::ostream& dump(std::ostream& out) const;
   };
 
+  /// Build a map of Strongly Connected components in in a TGBA.
   class scc_map
   {
   public:
     typedef std::map<unsigned, bdd> succ_type;
     typedef std::set<bdd, bdd_less_than> cond_set;
 
+    /// \brief Constructor.
+    ///
+    /// This will note compute the map initially.  You should call
+    /// build_map() to do so.
     scc_map(const tgba* aut);
+
     ~scc_map();
 
+    /// Actually compute the graph of strongly connected components.
     void build_map();
 
+    /// Get the automaton for which the map has been constructed.
     const tgba* get_aut() const;
 
+    /// \brief Get the number of SCC in the automaton.
+    ///
+    /// \pre This should only be called once build_map() has run.
     unsigned scc_count() const;
 
+    /// \brief Get number of the SCC containing the initial state.
+    ///
+    /// \pre This should only be called once build_map() has run.
     unsigned initial() const;
 
+    /// \brief Successor SCCs of a SCC.
+    ///
+    /// \pre This should only be called once build_map() has run.
     const succ_type& succ(unsigned n) const;
+
+    /// \brief Return whether an SCC is accepting.
+    ///
+    /// \pre This should only be called once build_map() has run.
     bool accepting(unsigned n) const;
+
+    /// \brief Return the set of conditions occurring in an SCC.
+    ///
+    /// \pre This should only be called once build_map() has run.
     const cond_set& cond_set_of(unsigned n) const;
+
+    /// \brief Return the set of acceptance conditions occurring in an SCC.
+    ///
+    /// \pre This should only be called once build_map() has run.
     bdd acc_set_of(unsigned n) const;
+
+    /// \brief Return the set of states of an SCC.
+    ///
+    /// The states in the returned list are still owned by the scc_map
+    /// instance.  They should NOT be deleted by the client code.
+    ///
+    /// \pre This should only be called once build_map() has run.
     const std::list<const state*>& states_of(unsigned n) const;
 
+    /// \brief Return the number of the SCC a state belongs too.
+    ///
+    /// \pre This should only be called once build_map() has run.
     unsigned scc_of_state(const state* s) const;
 
   protected:
