@@ -145,3 +145,37 @@ T(f)
 EOF
 
 check_construct input
+
+cat >input <<EOF
+include input1
+Fusion=
+  (
+   0 1 \$0 & !finish(\$0)
+   1 1 !finish(\$0)
+   1 2 \$1 & finish(\$0)
+   0 2 \$0 & \$1 & finish(\$0)
+   accept 2
+  )
+%
+Fusion(F(a),b)
+EOF
+
+check_construct input
+
+cat >input <<EOF
+Concat=
+  (
+   0 1 \$0 & !finish(\$0)
+   1 1 !finish(\$0)
+   1 2 finish(\$0)
+   0 2 \$0 & finish(\$0)
+   2 3 \$1
+   accept 3
+  )
+%
+Concat(a,b)
+EOF
+
+check_construct input
+check_true 'a&X(b)'
+check_false '!(a&X(b))'

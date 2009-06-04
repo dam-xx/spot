@@ -358,6 +358,8 @@ namespace spot
 	      res_ = bdd_ithvar(x);
 	      return;
 	    }
+	  case unop::Finish:
+	    assert(!"unsupported operator");
 	  }
 	/* Unreachable code.  */
 	assert(0);

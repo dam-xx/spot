@@ -39,6 +39,7 @@ namespace spot
     {
       switch (uo->op())
 	{
+	case unop::Finish:
 	case unop::X:
 	case unop::Not:
 	  this->super::visit(uo);

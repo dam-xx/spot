@@ -1,3 +1,25 @@
+2009-06-05  Damien Lefortier <dam@lrde.epita.fr>
+
+	Modify the ELTL parser to be able to support PSL operators.  Add a
+	new keyword in the ELTL format: finish, which applies to an
+	automaton operator and tells whether it just completed.
+
+	* src/eltlparse/eltlparse.yy: Clean it. Add finish.
+	* src/eltlparse/eltlscan.ll: Add finish.
+	* src/formula_tree.cc, src/formula_tree.hh: New files. Define a
+	small AST representing formulae where atomic props are unknown
+	which is used in the ELTL parser.
+	* src/ltlast/automatop.cc, ltlast/automatop.hh, ltlast/nfa.cc,
+	ltlast/nfa.hh: Adjust.
+	* src/ltlast/unop.cc, src/ltlast/unop.hh: Finish is an unop.
+	* src/ltlvisit/basicreduce.cc, src/ltlvisit/nenoform.cc,
+	src/ltlvisit/reduce.cc, src/ltlvisit/syntimpl.cc,
+	src/ltlvisit/tostring.cc, src/ltlvisit/tunabbrev.cc,
+	src/tgba/formula2bdd.cc, src/tgbaalgos/ltl2tgba_fm.cc,
+	src/tgbaalgos/ltl2tgba_lacim.cc: Handle finish in switches.
+	* src/tgbaalgos/eltl2tgba_lacim.cc: Translate finish.
+	* src/tgbatest/eltl2tgba.test: More tests.
+
 2009-06-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgbatest/scc.test: Redirect stdout into file `stdout'

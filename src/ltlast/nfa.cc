@@ -21,6 +21,7 @@
 
 #include <cassert>
 #include "nfa.hh"
+#include "formula_tree.hh"
 
 namespace spot
 {
@@ -61,15 +62,16 @@ namespace spot
     }
 
     void
-    nfa::add_transition(int src, int dst, int label)
+    nfa::add_transition(int src, int dst, const label lbl)
     {
       state* s = add_state(src);
       nfa::transition* t = new transition;
       t->dst = add_state(dst);
-      t->label = label;
+      t->lbl = lbl;
       s->push_back(t);
-      if (label >= arity_)
-	arity_ = label + 1;
+      size_t arity = formula_tree::arity(formula_tree::node_ptr(lbl));
+      if (arity >= arity_)
+	arity_ = arity;
     }
 
     void

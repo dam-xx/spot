@@ -31,6 +31,7 @@ ltlast_HEADERS = \
   binop.hh \
   constant.hh \
   formula.hh \
+  formula_tree.hh \
   multop.hh \
   nfa.hh \
   predecl.hh \
@@ -45,6 +46,7 @@ libltlast_la_SOURCES = \
   binop.cc \
   constant.cc \
   formula.cc \
+  formula_tree.cc \
   multop.cc \
   nfa.cc \
   refformula.cc \

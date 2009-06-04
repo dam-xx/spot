@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include "automatop.hh"
+#include "nfa.hh"
 #include "visitor.hh"
 
 namespace spot

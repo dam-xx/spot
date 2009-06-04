@@ -101,6 +101,7 @@ eol      \n|\r|\n\r|\r\n
 
 <INITIAL>"="		return token::EQ;
 <IINTIAL>"accept"	return token::ACC;
+<IINTIAL>"finish"	return token::FIN;
 
 <INITIAL>[tT][rR][uU][eE] {
 			  return token::CONST_TRUE;

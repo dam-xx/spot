@@ -21,6 +21,7 @@
 
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
+#include "ltlast/formula_tree.hh"
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/nenoform.hh"
 #include "ltlvisit/destroy.hh"
@@ -40,7 +41,7 @@ namespace spot
     {
     public:
       eltl_trad_visitor(tgba_bdd_concrete_factory& fact, bool root = false)
-	: fact_(fact), root_(root)
+	  : fact_(fact), root_(root), finish_()
       {
       }
 
@@ -85,6 +86,18 @@ namespace spot
 	  case unop::Not:
 	    {
 	      res_ = bdd_not(recurse(node->child()));
+	      return;
+	    }
+	  case unop::Finish:
+	    {
+	      // Ensure finish_[node->child()] has been computed if
+	      // node->child() is an automaton operator.
+	      bdd f = recurse(node->child());
+	      finish_map_::const_iterator it = finish_.find(node->child());
+	      if (it == finish_.end())
+		res_ = f;
+	      else
+		res_ = finish_[node->child()];
 	      return;
 	    }
 	  case unop::X:
@@ -149,12 +162,23 @@ namespace spot
       }
 
       void
-      visit (const automatop* node)
+      visit(const automatop* node)
       {
 	nmap m;
+	bdd finish = bddfalse;
 	bdd acc = bddtrue;
+
+	std::vector<formula*> v;
+	for (unsigned i = 0; i < node->size(); ++i)
+	  v.push_back(const_cast<formula*>(node->nth(i)));
+
 	std::pair<int, int> vp =
-	  recurse_state(node, node->nfa()->get_init_state(), m, acc);
+	  recurse_state(node->nfa(),
+			node->nfa()->get_init_state(), v, m, acc, finish);
+
+	// Update finish_ with finish(node).
+	// FIXME: when node is loop, it does not make sense; hence the bddtrue.
+	finish_[node] = !node->nfa()->is_loop() ? bddtrue : finish;
 
 	bdd tmp = bddtrue;
 	for (nmap::iterator it = m.begin(); it != m.end(); ++it)
@@ -180,15 +204,22 @@ namespace spot
       tgba_bdd_concrete_factory& fact_;
       bool root_;
 
+      /// BDD associated to each automatop A representing finish(A).
+      typedef Sgi::hash_map<const ltl::formula*, bdd,
+			    ltl::formula_ptr_hash> finish_map_;
+
+      finish_map_ finish_;
+
       // Table containing the two now variables associated with each state.
       // TODO: a little documentation about that.
       typedef Sgi::hash_map<
 	const nfa::state*, std::pair<int, int>, ptr_hash<nfa::state> > nmap;
 
       std::pair<int, int>&
-      recurse_state(const automatop* n, const nfa::state* s, nmap& m, bdd& acc)
+      recurse_state(const nfa::ptr& nfa, const nfa::state* s,
+		    const std::vector<formula*>& v,
+		    nmap& m, bdd& acc, bdd& finish)
       {
-	const nfa::ptr nfa = n->nfa();
 	bool is_loop = nfa->is_loop();
 	nmap::iterator it;
 	it = m.find(s);
@@ -209,16 +240,18 @@ namespace spot
 	bdd tmpacc = bddfalse;
 	for (nfa::iterator i = nfa->begin(s); i != nfa->end(s); ++i)
 	{
-	  bdd f = (*i)->label == -1 ? bddtrue : recurse(n->nth((*i)->label));
+	  bdd f = recurse(formula_tree::instanciate((*i)->lbl, v));
 	  if (nfa->is_final((*i)->dst))
 	  {
 	    tmp1 |= f;
 	    tmp2 |= f;
 	    tmpacc |= f;
+	    finish |= bdd_ithvar(v1) & f;
 	  }
 	  else
 	  {
-	    std::pair<int, int> vp = recurse_state(n, (*i)->dst, m, acc);
+	    std::pair<int, int> vp =
+	      recurse_state(nfa, (*i)->dst, v, m, acc, finish);
 	    tmp1 |= (f & bdd_ithvar(vp.first + 1));
 	    tmp2 |= (f & bdd_ithvar(vp.second + 1));
 	    if (is_loop)

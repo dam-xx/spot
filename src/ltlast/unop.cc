@@ -88,6 +88,8 @@ namespace spot
 	  return "F";
 	case G:
 	  return "G";
+	case Finish:
+	  return "Finish";
 	}
       // Unreachable code.
       assert(0);

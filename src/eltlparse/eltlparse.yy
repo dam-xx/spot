@@ -36,53 +36,22 @@
 #include <boost/shared_ptr.hpp>
 #include "public.hh"
 #include "ltlast/allnodes.hh"
+#include "ltlast/formula_tree.hh"
 #include "ltlvisit/destroy.hh"
+#include "ltlvisit/clone.hh"
 
 namespace spot
 {
   namespace eltl
   {
+    typedef std::map<std::string, nfa::ptr> nfamap;
+
     /// The following parser allows one to define aliases of automaton
     /// operators such as: F=U(true,$0). Internally it's handled by
     /// creating a small AST associated with each alias in order to
     /// instanciate the right automatop after: U(constant(1), AP(f))
     /// for the formula F(f).
-    ///
-    struct alias
-    {
-      virtual ~alias() {};
-    };
-    /// We use boost::shared_ptr to easily handle deletion.
-    typedef boost::shared_ptr<alias> alias_ptr;
-
-    struct alias_not : alias
-    {
-      alias_ptr child;
-    };
-    struct alias_binop : alias
-    {
-      binop::type op;
-      alias_ptr lhs;
-      alias_ptr rhs;
-    };
-    struct alias_multop : alias
-    {
-      multop::type op;
-      alias_ptr lhs;
-      alias_ptr rhs;
-    };
-    struct alias_nfa : alias
-    {
-      std::vector<alias_ptr> children;
-      spot::ltl::nfa::ptr nfa;
-    };
-    struct alias_arg : alias
-    {
-      int i;
-    };
-
-    typedef std::map<std::string, nfa::ptr> nfamap;
-    typedef std::map<std::string, alias_ptr> aliasmap;
+    typedef std::map<std::string, formula_tree::node_ptr> aliasmap;
 
     /// Implementation details for error handling.
     struct parse_error_list_t
@@ -91,104 +60,51 @@ namespace spot
       std::string file_;
     };
 
-    /// TODO: maybe implementing a visitor could be better than
-    /// dynamic casting all the time here.
-
-    /// Instanciate the formula corresponding to the given alias.
-    static formula*
-    alias2formula(const alias_ptr ap, spot::ltl::automatop::vec* v)
-    {
-      if (alias_not* a = dynamic_cast<alias_not*>(ap.get()))
-	return unop::instance(unop::Not, alias2formula(a->child, v));
-      if (alias_arg* a = dynamic_cast<alias_arg*>(ap.get()))
-	return a->i == -1 ? constant::true_instance() :
-	  a->i == -2 ? constant::false_instance() : v->at(a->i);
-      if (alias_nfa* a = dynamic_cast<alias_nfa*>(ap.get()))
-      {
-	automatop::vec* va = new automatop::vec;
-	std::vector<alias_ptr>::const_iterator i = a->children.begin();
-	while (i != a->children.end())
-	  va->push_back(alias2formula(*i++, v));
-	return automatop::instance(a->nfa, va, false);
-      }
-      if (alias_binop* a = dynamic_cast<alias_binop*>(ap.get()))
-	return binop::instance(a->op,
-			       alias2formula(a->lhs, v),
-			       alias2formula(a->rhs, v));
-      if (alias_multop* a = dynamic_cast<alias_multop*>(ap.get()))
-	return multop::instance(a->op,
-			       alias2formula(a->lhs, v),
-			       alias2formula(a->rhs, v));
-
-      /* Unreachable code.  */
-      assert(0);
-    }
-
-    /// Get the arity of a given alias.
-    static size_t
-    arity(const alias_ptr ap)
-    {
-      if (alias_not* a = dynamic_cast<alias_not*>(ap.get()))
-	return arity(a->child);
-      if (alias_arg* a = dynamic_cast<alias_arg*>(ap.get()))
-	return std::max(a->i + 1, 0);
-      if (alias_nfa* a = dynamic_cast<alias_nfa*>(ap.get()))
-      {
-	size_t res = 0;
-	std::vector<alias_ptr>::const_iterator i = a->children.begin();
-	while (i != a->children.end())
-	  res = std::max(arity(*i++), res);
-	return res;
-      }
-      if (alias_binop* a = dynamic_cast<alias_binop*>(ap.get()))
-	return std::max(arity(a->lhs), arity(a->rhs));
-      if (alias_multop* a = dynamic_cast<alias_multop*>(ap.get()))
-	return std::max(arity(a->lhs), arity(a->rhs));
-
-      /* Unreachable code.  */
-      assert(0);
-    }
+    using namespace spot::ltl::formula_tree;
 
     /// Alias an existing alias, as in Strong=G(F($0))->G(F($1)),
     /// where F is an alias.
     ///
     /// \param ap The original alias.
     /// \param v The arguments of the new alias.
-    static alias_ptr
-    realias(const alias_ptr ap, std::vector<alias_ptr> v)
+    static node_ptr
+    realias(const node_ptr ap, std::vector<node_ptr> v)
     {
-      if (alias_not* a = dynamic_cast<alias_not*>(ap.get()))
+      if (node_atomic* a = dynamic_cast<node_atomic*>(ap.get())) // Do it.
+    	return a->i < 0 ? ap : v.at(a->i);
+
+      // Traverse the tree.
+      if (node_unop* a = dynamic_cast<node_unop*>(ap.get()))
       {
-	alias_not* res = new alias_not;
-	res->child = realias(a->child, v);
-	return alias_ptr(res);
-      }
-      if (alias_arg* a = dynamic_cast<alias_arg*>(ap.get())) // Do it.
-	return a->i < 0 ? ap : v.at(a->i);
-      if (alias_nfa* a = dynamic_cast<alias_nfa*>(ap.get()))
-      {
-	alias_nfa* res = new alias_nfa;
-	std::vector<alias_ptr>::const_iterator i = a->children.begin();
-	while (i != a->children.end())
-	  res->children.push_back(realias(*i++, v));
-	res->nfa = a->nfa;
-	return alias_ptr(res);
-      }
-      if (alias_binop* a = dynamic_cast<alias_binop*>(ap.get()))
-      {
-	alias_binop* res = new alias_binop;
+    	node_unop* res = new node_unop;
 	res->op = a->op;
-	res->lhs = realias(a->lhs, v);
-	res->rhs = realias(a->rhs, v);
-	return alias_ptr(res);
+    	res->child = realias(a->child, v);
+    	return node_ptr(res);
       }
-      if (alias_multop* a = dynamic_cast<alias_multop*>(ap.get()))
+      if (node_nfa* a = dynamic_cast<node_nfa*>(ap.get()))
       {
-	alias_multop* res = new alias_multop;
-	res->op = a->op;
-	res->lhs = realias(a->lhs, v);
-	res->rhs = realias(a->rhs, v);
-	return alias_ptr(res);
+    	node_nfa* res = new node_nfa;
+    	std::vector<node_ptr>::const_iterator i = a->children.begin();
+    	while (i != a->children.end())
+    	  res->children.push_back(realias(*i++, v));
+    	res->nfa = a->nfa;
+    	return node_ptr(res);
+      }
+      if (node_binop* a = dynamic_cast<node_binop*>(ap.get()))
+      {
+    	node_binop* res = new node_binop;
+    	res->op = a->op;
+    	res->lhs = realias(a->lhs, v);
+    	res->rhs = realias(a->rhs, v);
+    	return node_ptr(res);
+      }
+      if (node_multop* a = dynamic_cast<node_multop*>(ap.get()))
+      {
+    	node_multop* res = new node_multop;
+    	res->op = a->op;
+    	res->lhs = realias(a->lhs, v);
+    	res->rhs = realias(a->rhs, v);
+    	return node_ptr(res);
       }
 
       /* Unreachable code.  */
@@ -197,8 +113,8 @@ namespace spot
   }
 }
 
-#define PARSE_ERROR(Loc, Msg)			\
-  pe.list_.push_back				\
+#define PARSE_ERROR(Loc, Msg)				\
+  pe.list_.push_back					\
     (parse_error(Loc, spair(pe.file_, Msg)))
 
 #define CHECK_EXISTING_NMAP(Loc, Ident)			\
@@ -235,6 +151,15 @@ namespace spot
     }							\
   }
 
+#define INSTANCIATE_OP(Name, TypeNode, TypeOp, L, R)	\
+  {							\
+    TypeNode* res = new TypeNode;			\
+    res->op = TypeOp;					\
+    res->lhs = formula_tree::node_ptr(L);		\
+    res->rhs = formula_tree::node_ptr(R);		\
+    Name = res;						\
+  }
+
 }
 
 %parse-param {spot::eltl::nfamap& nmap}
@@ -254,8 +179,8 @@ namespace spot
   spot::ltl::formula* fval;
 
   /// To handle aliases.
-  spot::eltl::alias* pval;
-  spot::eltl::alias_nfa* bval;
+  spot::ltl::formula_tree::node* pval;
+  spot::ltl::formula_tree::node_nfa* bval;
 }
 
 %code {
@@ -283,6 +208,7 @@ using namespace spot::ltl;
 
 %token		ACC "accept"
 		EQ "="
+		FIN "finish"
 		LPAREN "("
 		RPAREN ")"
 		COMMA ","
@@ -304,10 +230,8 @@ using namespace spot::ltl;
 %type <nval> nfa_def
 %type <fval> subformula
 %type <aval> arg_list
-%type <ival> nfa_arg
-%type <pval> nfa_alias
-%type <pval> nfa_alias_arg
-%type <bval> nfa_alias_arg_list
+%type <pval> nfa_arg
+%type <bval> nfa_arg_list
 
 %destructor { delete $$; } "atomic proposition"
 %destructor { spot::ltl::destroy($$); } subformula
@@ -335,7 +259,7 @@ nfa: IDENT "=" "(" nfa_def ")"
           nmap[*$1] = nfa::ptr($4);
 	  delete $1;
         }
-   | IDENT "=" nfa_alias
+   | IDENT "=" nfa_arg
         {
 	  /// Recursivity issues of aliases are handled by a parse error.
 	  aliasmap::iterator i = amap.find(*$1);
@@ -348,7 +272,7 @@ nfa: IDENT "=" "(" nfa_def ")"
 	    delete $1;
 	    YYERROR;
 	  }
-	  amap[*$1] = alias_ptr($3);
+	  amap.insert(make_pair(*$1, formula_tree::node_ptr($3)));
    	  delete $1;
    	}
 ;
@@ -359,7 +283,7 @@ nfa_def: /* empty */
         }
         | nfa_def STATE STATE nfa_arg
         {
-	  $1->add_transition($2, $3, $4);
+	  $1->add_transition($2, $3, formula_tree::node_ptr($4));
 	  $$ = $1;
         }
         | nfa_def ACC STATE
@@ -369,21 +293,94 @@ nfa_def: /* empty */
         }
 ;
 
-nfa_alias: IDENT "(" nfa_alias_arg_list ")"
+nfa_arg_list: nfa_arg
+	{
+	  $$ = new formula_tree::node_nfa;
+	  $$->children.push_back(formula_tree::node_ptr($1));
+	}
+	| nfa_arg_list "," nfa_arg
+	{
+	  $1->children.push_back(formula_tree::node_ptr($3));
+	  $$ = $1;
+	}
+;
+
+nfa_arg: ARG
+	{
+	  if ($1 == -1)
+	  {
+	    std::string s = "out of range integer";
+	    PARSE_ERROR(@1, s);
+	    YYERROR;
+	  }
+	  formula_tree::node_atomic* res = new formula_tree::node_atomic;
+	  res->i = $1;
+	  $$ = res;
+	}
+	| CONST_TRUE
+	{
+	  formula_tree::node_atomic* res = new formula_tree::node_atomic;
+	  res->i = formula_tree::True;
+	  $$ = res;
+	}
+        | CONST_FALSE
+	{
+	  formula_tree::node_atomic* res = new formula_tree::node_atomic;
+	  res->i = formula_tree::False;
+	  $$ = res;
+	}
+	| OP_NOT nfa_arg
+	{
+	  formula_tree::node_unop* res = new formula_tree::node_unop;
+	  res->op = unop::Not;
+	  res->child = formula_tree::node_ptr($2);
+	  $$ = res;
+	}
+	| FIN "(" nfa_arg ")"
+	{
+	  formula_tree::node_unop* res = new formula_tree::node_unop;
+	  res->op = unop::Finish;
+	  res->child = formula_tree::node_ptr($3);
+	  $$ = res;
+	}
+	| nfa_arg OP_AND nfa_arg
+	{
+	  INSTANCIATE_OP($$, formula_tree::node_multop, multop::And, $1, $3);
+	}
+	| nfa_arg OP_OR nfa_arg
+	{
+	  INSTANCIATE_OP($$, formula_tree::node_multop, multop::Or, $1, $3);
+	}
+	| nfa_arg OP_XOR nfa_arg
+	{
+	  INSTANCIATE_OP($$, formula_tree::node_binop, binop::Xor, $1, $3);
+	}
+	| nfa_arg OP_IMPLIES nfa_arg
+	{
+	  INSTANCIATE_OP($$, formula_tree::node_binop, binop::Implies, $1, $3);
+	}
+	| nfa_arg OP_EQUIV nfa_arg
+	{
+	  INSTANCIATE_OP($$, formula_tree::node_binop, binop::Equiv, $1, $3);
+	}
+        | IDENT "(" nfa_arg_list ")"
 	{
 	  aliasmap::const_iterator i = amap.find(*$1);
 	  if (i != amap.end())
 	  {
-	    CHECK_ARITY(@1, $1, $3->children.size(), arity(i->second));
+            int arity = formula_tree::arity(i->second);
+	    CHECK_ARITY(@1, $1, $3->children.size(), arity);
 
 	    // Hack to return the right type without screwing with the
 	    // boost::shared_ptr memory handling by using get for
 	    // example. FIXME: Wait for the next version of boost and
-	    // modify the %union to handle alias_ptr.
-	    alias_not* tmp1 = new alias_not;
+	    // modify the %union to handle formula_tree::node_ptr.
+	    formula_tree::node_unop* tmp1 = new formula_tree::node_unop;
+	    tmp1->op = unop::Not;
 	    tmp1->child = realias(i->second, $3->children);
-	    alias_not* tmp2 = new alias_not;
-	    tmp2->child = alias_ptr(tmp1);
+	    formula_tree::node_unop* tmp2 = new formula_tree::node_unop;
+	    tmp2->op = unop::Not;
+	    tmp2->child = formula_tree::node_ptr(tmp1);
 	    $$ = tmp2;
 	    delete $3;
 	  }
@@ -398,73 +395,6 @@ nfa_alias: IDENT "(" nfa_alias_arg_list ")"
 	  }
 	  delete $1;
 	}
-	| OP_NOT nfa_alias
-	{
-	  alias_not* res = new alias_not;
-	  res->child = alias_ptr($2);
-	  $$ = res;
-	}
-	| nfa_alias OP_IMPLIES nfa_alias
-	{
-	  alias_binop* res = new alias_binop;
-	  res->op = binop::Implies;
-	  res->lhs = alias_ptr($1);
-	  res->rhs = alias_ptr($3);
-	  $$ = res;
-	}
-	// More TBD here.
-
-nfa_alias_arg: nfa_arg
-	{
-	  alias_arg* res = new alias_arg;
-	  res->i = $1;
-	  $$ = res;
-	}
-        | CONST_FALSE
-	{
-	  alias_arg* res = new alias_arg;
-	  res->i = -2;
-	  $$ = res;
-	}
-	| OP_NOT nfa_alias_arg
-	{
-	  alias_not* res = new alias_not;
-	  res->child = alias_ptr($2);
-	  $$ = res;
-	}
-	// More TBD here.
-
-nfa_alias_arg_list: nfa_alias_arg
-	{
-	  $$ = new alias_nfa;
-	  $$->children.push_back(alias_ptr($1));
-	}
-	| nfa_alias // Cannot factorize because <pval> != <bval>.
-	{
-	  $$ = new alias_nfa;
-	  $$->children.push_back(alias_ptr($1));
-	}
-	| nfa_alias_arg_list "," nfa_alias_arg
-	{
-	  $1->children.push_back(alias_ptr($3));
-	  $$ = $1;
-	}
-;
-
-nfa_arg: ARG
-	{
-	  if ($1 == -1)
-	  {
-	    std::string s = "out of range integer";
-	    PARSE_ERROR(@1, s);
-	    YYERROR;
-	  }
-	  $$ = $1;
-	}
-	| CONST_TRUE
-	{ $$ = -1; }
-;
-
 
 /* Formulae. */
 
@@ -490,12 +420,11 @@ subformula: ATOMIC_PROP
 	  aliasmap::iterator i = amap.find(*$2);
 	  if (i != amap.end())
 	  {
-	    CHECK_ARITY(@1, $2, 2, arity(i->second));
-	    automatop::vec* v = new automatop::vec;
-	    v->push_back($1);
-	    v->push_back($3);
-	    $$ = alias2formula(i->second, v);
-	    delete v;
+	    CHECK_ARITY(@1, $2, 2, formula_tree::arity(i->second));
+	    automatop::vec v;
+	    v.push_back($1);
+	    v.push_back($3);
+	    $$ = instanciate(i->second, v);
 	  }
 	  else
 	  {
@@ -514,8 +443,8 @@ subformula: ATOMIC_PROP
 	  aliasmap::iterator i = amap.find(*$1);
 	  if (i != amap.end())
 	  {
-	    CHECK_ARITY(@1, $1, $3->size(), arity(i->second));
-	    $$ = alias2formula(i->second, $3);
+	    CHECK_ARITY(@1, $1, $3->size(), formula_tree::arity(i->second));
+	    $$ = instanciate(i->second, *$3);
 	    delete $3;
 	  }
 	  else

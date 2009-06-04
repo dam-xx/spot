@@ -241,6 +241,8 @@ namespace spot
 	      if (syntactic_implication(f, constant::false_instance()))
 		result_ = true;
 	      return;
+	    case unop::Finish:
+	      return;
 	    }
 	  /* Unreachable code.  */
 	  assert(0);
@@ -431,6 +433,8 @@ namespace spot
 		destroy(tmp);
 		return;
 	      }
+	    case unop::Finish:
+	      return;
 	    }
 	  /* Unreachable code.  */
 	  assert(0);

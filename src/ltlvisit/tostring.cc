@@ -144,6 +144,10 @@ namespace spot
 	    case unop::G:
 	      os_ << "G";
 	      break;
+	    case unop::Finish:
+	      os_ << "finish";
+	      need_parent = true;
+	      break;
 	    }
 
 	  top_level_ = false;
@@ -296,6 +300,10 @@ namespace spot
 	      break;
 	    case unop::G:
 	      os_ << "[]";
+	      break;
+	    case unop::Finish:
+	      os_ << "finish";
+	      need_parent = true;
 	      break;
 	    }
 

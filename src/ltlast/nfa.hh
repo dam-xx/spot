@@ -36,31 +36,39 @@ namespace spot
   {
     /// Forward declaration. See below.
     class succ_iterator;
+    /// Forward declaration. NFA's labels are reprensented by nodes
+    /// which are defined in formula_tree.hh, included in nfa.cc.
+    namespace formula_tree
+    {
+      class node;
+    }
 
     /// \brief Nondeterministic Finite Automata used by automata operators.
     ///
-    /// States & labels are represented by integers.
+    /// States are represented by integers.
+    /// Labels are represented by formula_tree's nodes.
     /// Currently, only one initial state is possible.
     class nfa
     {
     public:
-      struct				transition;
-      typedef std::list<transition*>	state;
+      struct transition;
+      typedef std::list<transition*> state;
+      typedef boost::shared_ptr<formula_tree::node> label;
       /// Iterator over the successors of a state.
-      typedef succ_iterator		iterator;
-      typedef boost::shared_ptr<nfa>	ptr;
+      typedef succ_iterator iterator;
+      typedef boost::shared_ptr<nfa> ptr;
 
       /// Explicit transitions.
       struct transition
       {
-	int label;
+	label lbl;
       	const state* dst;
       };
 
       nfa();
       ~nfa();
 
-      void add_transition(int src, int dst, int label);
+      void add_transition(int src, int dst, const label lbl);
       void set_init_state(int name);
       void set_final(int name);
 
@@ -101,7 +109,7 @@ namespace spot
       is_map is_;
       si_map si_;
 
-      int arity_;
+      size_t arity_;
       std::string name_;
 
       state* init_;

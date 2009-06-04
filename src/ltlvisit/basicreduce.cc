@@ -223,6 +223,10 @@ namespace spot
 
 	      result_ = unop::instance(unop::G, result_);
 	      return;
+
+	    case unop::Finish:
+	      result_ = unop::instance(unop::Finish, result_);
+	      return;
 	    }
 	  /* Unreachable code.  */
 	  assert(0);

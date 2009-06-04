@@ -146,6 +146,8 @@ namespace spot
 	      res_ = next;
 	      return;
 	    }
+	  case unop::Finish:
+	    assert(!"unsupported operator");
 	  }
 	/* Unreachable code.  */
 	assert(0);

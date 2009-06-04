@@ -102,6 +102,12 @@ namespace spot
 	      result_ = unop::instance(negated_ ? unop::F : unop::G,
 				       recurse(f));
 	      return;
+
+	    case unop::Finish:
+	      result_ = unop::instance(unop::Finish, recurse_(f, false));
+	      if (negated_)
+		result_ = unop::instance(unop::Not, result_);
+	      return;
 	    }
 	  /* Unreachable code.  */
 	  assert(0);

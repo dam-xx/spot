@@ -88,11 +88,11 @@ namespace spot
       typedef std::map<triplet, formula*, paircmp> map;
       static map instances;
 
-      automatop(const nfa::ptr nfa, vec* v, bool negated);
+      automatop(const nfa::ptr, vec* v, bool negated);
       virtual ~automatop();
 
     private:
-      nfa::ptr nfa_;
+      const nfa::ptr nfa_;
       vec* children_;
       bool negated_;
     };

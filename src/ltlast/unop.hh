@@ -37,7 +37,7 @@ namespace spot
     class unop : public ref_formula
     {
     public:
-      enum type { Not, X, F, G };
+      enum type { Not, X, F, G, Finish }; // Finish is used in ELTL formulae.
 
       /// Build an unary operator with operation \a op and
       /// child \a child.
