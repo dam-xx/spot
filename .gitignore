@@ -22,3 +22,4 @@ stdout
 *.rej
 *.old
 TAGS
+INSTALL

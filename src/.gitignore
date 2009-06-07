@@ -3,3 +3,4 @@ Makefile
 Makefile.in
 .libs
 libspot.la
+_.cc
