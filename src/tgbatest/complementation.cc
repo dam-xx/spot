@@ -137,19 +137,25 @@ int main(int argc, char* argv[])
     spot::tgba_statistics a_size =  spot::stats_reachable(a);
     std::cout << "Original: "
               << a_size.states << ", "
-              << a_size.transitions << std::endl;
+              << a_size.transitions << ", "
+              << a->number_of_acceptance_conditions()
+              << std::endl;
 
     spot::tgba *buchi = new spot::tgba_sba_proxy(a);
     a_size =  spot::stats_reachable(buchi);
     std::cout << "Buchi: "
               << a_size.states << ", "
-              << a_size.transitions << std::endl;
+              << a_size.transitions << ", "
+              << buchi->number_of_acceptance_conditions()
+              << std::endl;
     delete buchi;
 
     spot::tgba_statistics b_size =  spot::stats_reachable(complement);
     std::cout << "Complement: "
               << b_size.states << ", "
-              << b_size.transitions << std::endl;
+              << b_size.transitions << ", "
+              << complement->number_of_acceptance_conditions()
+              << std::endl;
 
     delete complement;
     delete a;
@@ -162,7 +168,9 @@ int main(int argc, char* argv[])
       spot::tgba_statistics a_size =  spot::stats_reachable(a2);
       std::cout << "Not Formula: "
                 << a_size.states << ", "
-                << a_size.transitions << std::endl;
+                << a_size.transitions << ", "
+                << a2->number_of_acceptance_conditions()
+                << std::endl;
 
       delete a2;
       spot::ltl::destroy(f1);
@@ -187,18 +195,20 @@ int main(int argc, char* argv[])
     spot::emptiness_check* ec = spot::couvreur99(prod);
     spot::emptiness_check_result* res = ec->check();
     spot::tgba_statistics a_size =  spot::stats_reachable(ec->automaton());
-    std::cout << std::right << std::setw(10)
-              << a_size.states << ", "
-              << std::right << std::setw(10)
-              << a_size.transitions << ", "
-              << ec->automaton()->number_of_acceptance_conditions();
+    std::cout << "States: "
+              << a_size.states << std::endl
+              << "Transitions: "
+              << a_size.transitions << std::endl
+              << "Acc Cond: "
+              << ec->automaton()->number_of_acceptance_conditions()
+              << std::endl;
     if (res)
     {
-      std::cout << ", FAIL";
+      std::cout << "FAIL";
       return_value = 1;
     }
     else
-      std::cout << ", OK";
+      std::cout << "OK";
     std::cout << std::endl;
 
     delete res;

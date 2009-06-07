@@ -901,7 +901,7 @@ namespace spot
     state_complement::state_complement(bitset_t L, bitset_t U,
                                        const safra_tree* tree,
                                        bool use_bitset)
-      : U(U), L(L), tree(tree), use_bitset(use_bitset)
+      : state(), U(U), L(L), tree(tree), use_bitset(use_bitset)
     {
     }
 
@@ -921,8 +921,11 @@ namespace spot
       const state_complement* s = dynamic_cast<const state_complement*>(other);
       if (s == 0)
         return 1;
+#if TRANSFORM_TO_TBA
+      // When we transform to TBA instead of TGBA, states depend on the U set.
       if (U != s->U)
         return (U < s->U) ? -1 : 1;
+#endif
       if (L != s->L)
         return (L < s->L) ? -1 : 1;
       if (use_bitset != s->use_bitset)
@@ -940,7 +943,9 @@ namespace spot
       for (unsigned i = 0; i < size_bitset; ++i)
       {
         hash ^= wang32_hash(L[i]);
-        hash ^= wang32_hash(U[i]); // \todo To not apply for TGBAs
+#if TRANSFORM_TO_TBA
+        hash ^= wang32_hash(U[i]);
+#endif
       }
 
       return hash;
@@ -964,7 +969,13 @@ namespace spot
       std::stringstream ss;
       ss << tree;
       if (use_bitset)
-        ss << " - I:" << U << " J:" << L;
+      {
+        ss << " - I:" << U;
+#if TRANSFORM_TO_TBA
+        ss << " J:" << L;
+#endif
+      }
+
       return ss.str();
     }
 
@@ -1102,7 +1113,25 @@ namespace spot
     // Let's call it Acc[True].
     int v = get_dict()
       ->register_acceptance_variable(ltl::constant::true_instance(), safra_);
+
+#if TRANSFORM_TO_TBA
     the_acceptance_cond_ = bdd_ithvar(v);
+#endif
+
+#if TRANSFORM_TO_TGBA
+    unsigned nb_acc = safra_->get_nb_acceptance_pairs();
+    all_acceptance_cond_ = bddfalse;
+    neg_acceptance_cond_ = bddtrue;
+    acceptance_cond_vec_.reserve(nb_acc);
+    for (unsigned i = 0; i < nb_acc; ++i)
+    {
+      int r = get_dict()->register_clone_acc(v, safra_);
+      all_acceptance_cond_ |= bdd_ithvar(r);
+      acceptance_cond_vec_[i] = r;
+      neg_acceptance_cond_ &= bdd_nithvar(r);
+    }
+#endif
+
   }
 
   tgba_complement::~tgba_complement()
@@ -1184,7 +1213,21 @@ namespace spot
             st = new state_complement(e, e, i->second, true);
             succ_list.insert(std::make_pair(i->first, st));
           }
+
+#if TRANSFORM_TO_TBA
           condition = the_acceptance_cond_;
+#else
+          for (unsigned i = 0; i < l.size(); ++i)
+          {
+            if (u[i])
+            {
+              if (condition == bddfalse)
+                condition = bdd_ithvar(acceptance_cond_vec_[i]);
+              else
+                condition &= bdd_ithvar(acceptance_cond_vec_[i]);
+            }
+          }
+#endif
         }
         else  // \delta'((q, I, J), a)
         {
@@ -1220,13 +1263,21 @@ namespace spot
   bdd
   tgba_complement::all_acceptance_conditions() const
   {
+#if TRANSFORM_TO_TBA
     return the_acceptance_cond_;
+#else
+    return all_acceptance_cond_;
+#endif
   }
 
   bdd
   tgba_complement::neg_acceptance_conditions() const
   {
+#if TRANSFORM_TO_TBA
     return !the_acceptance_cond_;
+#else
+    return neg_acceptance_cond_;
+#endif
   }
 
   bdd

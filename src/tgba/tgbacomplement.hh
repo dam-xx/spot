@@ -1,7 +1,13 @@
 #ifndef SPOT_TGBA_TGBACOMPLEMENT_HH
 # define SPOT_TGBA_TGBACOMPLEMENT_HH
 
+# include <vector>
 # include "tgba/tgba.hh"
+
+#ifndef TRANSFORM_TO_TBA
+# define TRANSFORM_TO_TBA 0
+#endif
+#define TRANSFORM_TO_TGBA (!TRANSFORM_TO_TBA)
 
 namespace spot
 {
@@ -53,7 +59,16 @@ namespace spot
   private:
     const tgba* automaton_;
     safra_tree_automaton* safra_;
+#if TRANSFORM_TO_TBA
     bdd the_acceptance_cond_;
+#endif
+#if TRANSFORM_TO_TGBA
+    bdd all_acceptance_cond_;
+    bdd neg_acceptance_cond_;
+    // Map to i the i-th acceptance condition of the final automaton.
+    std::vector<int> acceptance_cond_vec_;
+#endif
+
   };
 
   /// \brief Produce a dot output of the Safra automaton associated

@@ -1,6 +1,18 @@
+2009-06-10  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	During the complementation, transform the auxiliary Streett
+	automaton into a TGBA instead of a TBA.
+
+	* src/tgba/tgbacomplement.hh, src/tgba/tgbacomplement.cc:
+	Adjust the transformation from Streett to Büchi to support
+	generalized acceptance conditions.
+	* src/tgbatest/complementation.cc: Improve output messages.
+	* src/tgbatest/complementation.test: New tests.
+
 2009-06-09  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
-	* src/tgba/tgbacomplement.cc, src/tgbatest/complementation.cc: Fix style.
+	* src/tgba/tgbacomplement.cc, src/tgbatest/complementation.cc:
+	Fix style.
 
 2009-06-07  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
