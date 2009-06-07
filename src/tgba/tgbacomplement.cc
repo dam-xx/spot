@@ -106,6 +106,7 @@ namespace spot
 
       const safra_tree& operator=(const safra_tree& other);
       int compare(const safra_tree* other) const;
+      size_t hash() const;
 
       void add_node(const state* s);
       int max_name() const;
@@ -230,6 +231,24 @@ namespace spot
         return (marked) ? -1 : 1;
 
       return 0;
+    }
+
+
+    /// \brief Hash a safra tree.
+    size_t
+    safra_tree::hash() const
+    {
+      size_t hash = 0;
+      hash ^= wang32_hash(name);
+      hash ^= wang32_hash(marked);
+
+      for (subset_t::const_iterator i = nodes.begin(); i != nodes.end(); ++i)
+        hash ^= (*i)->hash();
+
+      for (child_list::const_iterator i = children.begin(); i != children.end(); ++i)
+        hash ^= (*i)->hash();
+
+      return hash;
     }
 
     void
@@ -912,7 +931,17 @@ namespace spot
     size_t
     state_complement::hash() const
     {
-      return 0; // \todo
+      size_t hash = tree->hash();
+      hash ^= wang32_hash(use_bitset);
+
+      size_t size_bitset = L.size();
+      for (unsigned i = 0; i < size_bitset; ++i)
+      {
+        hash ^= wang32_hash(L[i]);
+        hash ^= wang32_hash(U[i]); // \todo To not apply for TGBAs
+      }
+
+      return hash;
     }
 
     state_complement*

@@ -1,3 +1,8 @@
+2009-06-07  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	* src/tgba/tgbacomplement.cc (state_complement::hash): Improve
+	the hash function.
+
 2009-06-09  Damien Lefortier <dam@lrde.epita.fr>
 
 	* src/eltlparse/eltlparse.yy: Fix a memory leak.
