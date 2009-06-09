@@ -400,20 +400,20 @@ nfa_arg: ARG
 
 subformula: ATOMIC_PROP
 	{
-	   $$ = parse_environment.require(*$1);
-	   if (!$$)
-	   {
-	     std::string s = "unknown atomic proposition `";
-	     s += *$1;
-	     s += "' in environment `";
-	     s += parse_environment.name();
-	     s += "'";
-	     PARSE_ERROR(@1, s);
-	     delete $1;
-	     YYERROR;
-	   }
-	   else
-	     delete $1;
+	  $$ = parse_environment.require(*$1);
+	  if (!$$)
+	  {
+	    std::string s = "unknown atomic proposition `";
+	    s += *$1;
+	    s += "' in environment `";
+	    s += parse_environment.name();
+	    s += "'";
+	    PARSE_ERROR(@1, s);
+	    delete $1;
+	    YYERROR;
+	  }
+	  else
+	    delete $1;
 	}
 	  | subformula ATOMIC_PROP subformula
 	{
@@ -425,6 +425,8 @@ subformula: ATOMIC_PROP
 	    v.push_back($1);
 	    v.push_back($3);
 	    $$ = instanciate(i->second, v);
+	    spot::ltl::destroy($1);
+	    spot::ltl::destroy($3);
 	  }
 	  else
 	  {
@@ -445,6 +447,9 @@ subformula: ATOMIC_PROP
 	  {
 	    CHECK_ARITY(@1, $1, $3->size(), formula_tree::arity(i->second));
 	    $$ = instanciate(i->second, *$3);
+	    automatop::vec::iterator it = $3->begin();
+	    while (it != $3->end())
+	      spot::ltl::destroy(*it++);
 	    delete $3;
 	  }
 	  else

@@ -92,11 +92,9 @@ namespace spot
 	    {
 	      // Ensure finish_[node->child()] has been computed if
 	      // node->child() is an automaton operator.
-	      bdd f = recurse(node->child());
+	      res_ = recurse(node->child());
 	      finish_map_::const_iterator it = finish_.find(node->child());
-	      if (it == finish_.end())
-		res_ = f;
-	      else
+	      if (it != finish_.end())
 		res_ = finish_[node->child()];
 	      return;
 	    }
@@ -240,7 +238,9 @@ namespace spot
 	bdd tmpacc = bddfalse;
 	for (nfa::iterator i = nfa->begin(s); i != nfa->end(s); ++i)
 	{
-	  bdd f = recurse(formula_tree::instanciate((*i)->lbl, v));
+	  const formula* lbl = formula_tree::instanciate((*i)->lbl, v);
+	  bdd f = recurse(lbl);
+	  destroy(lbl);
 	  if (nfa->is_final((*i)->dst))
 	  {
 	    tmp1 |= f;
@@ -290,7 +290,7 @@ namespace spot
     // Traverse the formula and draft the automaton in a factory.
     tgba_bdd_concrete_factory fact(dict);
     eltl_trad_visitor v(fact, true);
-    f2->accept(v);
+    f->accept(v);
     ltl::destroy(f2);
     fact.finish();
 

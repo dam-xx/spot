@@ -1,3 +1,9 @@
+2009-06-09  Damien Lefortier <dam@lrde.epita.fr>
+
+	* src/eltlparse/eltlparse.yy: Fix a memory leak.
+	* src/eltltest/nfa.cc: Adjust.
+	* src/tgbaalgos/eltl2tgba_lacim.cc: Fix a memory leak.
+
 2009-06-05  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	Remove generated files that git follows.

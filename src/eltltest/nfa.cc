@@ -22,6 +22,7 @@
 #include <string>
 #include <set>
 #include <iostream>
+#include "ltlast/formula_tree.hh"
 #include "ltlast/nfa.hh"
 
 using namespace spot::ltl;
@@ -37,7 +38,7 @@ dfs(nfa& a, const nfa::state* s, mset& m)
 
   for (nfa::iterator i = a.begin(s); i != a.end(s); ++i)
   {
-    std::cout << (*i)->label << std::endl;
+    std::cout << (*i)->lbl << std::endl;
     dfs(a, (*i)->dst, m);
   }
 }
@@ -47,8 +48,13 @@ main()
 {
   nfa a;
 
-  a.add_transition(0, 1, 1);
-  a.add_transition(1, 2, 2);
+  formula_tree::node_atomic* n1 = new formula_tree::node_atomic;
+  formula_tree::node_atomic* n2 = new formula_tree::node_atomic;
+  n1->i = 1;
+  n2->i = 2;
+
+  a.add_transition(0, 1, formula_tree::node_ptr(n1));
+  a.add_transition(1, 2, formula_tree::node_ptr(n2));
 
   std::cout << "init: " << a.format_state(a.get_init_state()) << std::endl;
 
