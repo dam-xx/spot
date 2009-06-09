@@ -245,7 +245,9 @@ namespace spot
       for (subset_t::const_iterator i = nodes.begin(); i != nodes.end(); ++i)
         hash ^= (*i)->hash();
 
-      for (child_list::const_iterator i = children.begin(); i != children.end(); ++i)
+      for (child_list::const_iterator i = children.begin();
+           i != children.end();
+           ++i)
         hash ^= (*i)->hash();
 
       return hash;
@@ -332,7 +334,7 @@ namespace spot
         (*i)->branch_accepting(a);
 
       subset_t subset;
-      for(subset_t::const_iterator i = nodes.begin(); i != nodes.end(); ++i)
+      for (subset_t::const_iterator i = nodes.begin(); i != nodes.end(); ++i)
         if (a.state_is_accepting(*i))
           subset.insert(*i);
 
@@ -367,11 +369,11 @@ namespace spot
              t_it != transitions.end();
              ++t_it)
         {
-          if (((*t_it).first & condition) != bddfalse)
+          if ((t_it->first & condition) != bddfalse)
           {
-            if (new_subset.find((*t_it).second) == new_subset.end())
+            if (new_subset.find(t_it->second) == new_subset.end())
             {
-              const state* s = (*t_it).second->clone();
+              const state* s = t_it->second->clone();
               new_subset.insert(s);
             }
           }
@@ -795,7 +797,7 @@ namespace spot
         }
         std::cout << conditions;
         if (this_node->marked)
-          std::cout << "\",style=filled,fillcolor=\"gray";
+          std::cout << "\", style=filled, fillcolor=\"gray";
 
         std::cout << "\"];" << std::endl;
 
@@ -805,7 +807,7 @@ namespace spot
           print_safra_tree(*i, node_names, current_node,
                            nb_accepting_conditions);
           std::cout << "node" << this_node << " -> node" << *i
-                    << "[color=\"red\",arrowhead=\"none\"];"
+                    << "[color=\"red\", arrowhead=\"none\"];"
                     << std::endl;
         }
       }
@@ -1069,7 +1071,7 @@ namespace spot
     for (automaton_t::const_iterator i = automaton.begin();
          i != automaton.end();
          ++i)
-      max = std::max(max, (*i).first->max_name());
+      max = std::max(max, i->first->max_name());
     return max_nb_pairs_ = max + 1;
   }
 
@@ -1243,7 +1245,7 @@ namespace spot
     bdd res = bddtrue;
     trans_it i;
     for (i = node->second.begin(); i != node->second.end(); ++i)
-      res |= (*i).first;
+      res |= i->first;
     return res;
   }
 
@@ -1263,7 +1265,7 @@ namespace spot
     bdd res = bddtrue;
     trans_it i;
     for (i = node->second.begin(); i != node->second.end(); ++i)
-      res &= bdd_support((*i).first);
+      res &= bdd_support(i->first);
     return res;
   }
 

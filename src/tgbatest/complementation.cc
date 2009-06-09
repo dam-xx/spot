@@ -67,9 +67,12 @@ int main(int argc, char* argv[])
 
       switch (argv[i][1])
       {
-        case 's': print_safra = true; break;
-        case 'a': print_automaton = true; break;
-        case 'f': check = true; break;
+        case 's':
+          print_safra = true; break;
+        case 'a':
+          print_automaton = true; break;
+        case 'f':
+          check = true; break;
         default:
           std::cerr << "unrecognized option `-" << argv[i][1]
                     << "'" << std::endl;

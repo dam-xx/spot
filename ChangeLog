@@ -1,3 +1,7 @@
+2009-06-09  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	* src/tgba/tgbacomplement.cc, src/tgbatest/complementation.cc: Fix style.
+
 2009-06-07  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	* src/tgba/tgbacomplement.cc (state_complement::hash): Improve
