@@ -906,6 +906,7 @@ namespace spot
     }
 
     state_complement::state_complement(const state_complement& other)
+      : state()
     {
       U = other.U;
       L = other.L;

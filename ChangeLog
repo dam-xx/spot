@@ -1,3 +1,10 @@
+2009-06-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Kill a g++-4.2 warning.
+
+	* src/tgba/tgbacomplement.cc (state_complement::state_complement)
+	explicitly initialize the base class spot::state.
+
 2009-06-10  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	During the complementation, transform the auxiliary Streett
