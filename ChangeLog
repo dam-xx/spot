@@ -1,3 +1,11 @@
+2009-06-12  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	Adjust the build system for ICC.
+
+	* m4/intel.m4: Remove the `-W' option from CXXFLAGS since icpc
+	does not support it. Inhibit the warning ``method was declared
+	but never referenced''.
+
 2009-06-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Kill a g++-4.2 warning.
