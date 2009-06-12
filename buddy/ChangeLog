@@ -1,3 +1,10 @@
+2009-06-12  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	Adjust to support the Intel compiler (icc).
+
+	* configure.ac: Adjust to call...
+	* m4/intel.m4: ...this new macro.
+
 2008-03-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/bddtest.cxx: Include <cstdlib> to compile with g++-4.3.
