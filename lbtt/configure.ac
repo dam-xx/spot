@@ -17,7 +17,7 @@ AC_PROG_CXX
 AC_PROG_CXXCPP
 AM_PROG_LEX
 AC_PROG_YACC
-
+lbtt_INTEL
 
 
 # Check whether the user has explicitly disabled support for the GNU readline

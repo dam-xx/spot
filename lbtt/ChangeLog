@@ -1,3 +1,12 @@
+2009-06-12  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	Adjust to support the Intel compiler (icpc).
+
+	* configure.ac: Adjust to call...
+	* m4/intel.m4: ...this new macro.
+	* Makefile.am: Add the directory `m4' as an includedir of
+	autoconf's macros.
+
 2009-05-31  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	Adjust parser to Bison 2.4.1.
