@@ -113,7 +113,11 @@ while (1)
 my $model = shift @ARGV;
 
 # Find out the start of the never claim.
-my $neverstartline = 3 + `wc -l <"$model"`;
+# The line numbering changed in Spin 5.2.0.
+my $model_size = `wc -l <"$model"`;
+my $neverstartline_spin517 = 3 + $model_size;
+my $neverstartline_spin520 = 4 + $model_size;
+my $neverstartline = "($neverstartline_spin517|$neverstartline_spin520)";
 
 # Create the automaton
 open NEVER, ">never.$$";

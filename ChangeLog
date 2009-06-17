@@ -1,3 +1,7 @@
+2009-06-17  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* bench/emptchk/pml2tgba.pl: Adjust to work with Spin 5.2.0.
+
 2009-06-12  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	Adjust the build system for ICC.
