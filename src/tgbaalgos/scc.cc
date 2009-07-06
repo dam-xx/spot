@@ -109,6 +109,7 @@ namespace spot
   {
     // Setup depth-first search from the initial state.
     {
+      self_loops_ = 0;
       state* init = aut_->get_init_state();
       num_ = -1;
       h_.insert(std::make_pair(init, num_));
@@ -172,6 +173,8 @@ namespace spot
 	// We have a successor to look at.
 	// Fetch the values we are interested in...
 	const state* dest = succ->current_state();
+	if (!dest->compare(todo_.top().first))
+	  ++self_loops_;
 	bdd acc = succ->current_acceptance_conditions();
 	bdd cond = succ->current_condition();
 	// ... and point the iterator to the next successor, for
@@ -195,7 +198,7 @@ namespace spot
 	    continue;
 	  }
 
-	// If we now the state, reuse the previous object.
+	// If we know the state, reuse the previous object.
 	delete dest;
 	dest = spi->first;
 
@@ -281,6 +284,11 @@ namespace spot
     return scc_map_[n].acc;
   }
 
+  unsigned scc_map::self_loops() const
+  {
+    return self_loops_;
+  }
+
   const std::list<const state*>& scc_map::states_of(unsigned n) const
   {
     assert(scc_map_.size() > n);
@@ -354,6 +362,7 @@ namespace spot
   scc_stats build_scc_stats(const scc_map& m)
   {
     scc_stats res;
+    res.self_loops = m.self_loops();
     res.scc_total = m.scc_count();
 
     scc_recurse_data d;

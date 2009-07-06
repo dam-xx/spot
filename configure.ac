@@ -77,6 +77,8 @@ AC_CONFIG_FILES([
   bench/gspn-ssp/defs
   bench/ltl2tgba/Makefile
   bench/ltl2tgba/defs
+  bench/scc-stats/Makefile
+  bench/split-product/Makefile
   doc/Doxyfile
   doc/Makefile
   iface/gspn/defs

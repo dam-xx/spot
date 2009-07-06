@@ -54,6 +54,7 @@ namespace spot
     ///
     /// A terminal dead SCC is a dead SCC without successors.
     unsigned dead_paths;
+    unsigned self_loops;
 
     std::ostream& dump(std::ostream& out) const;
   };
@@ -122,6 +123,9 @@ namespace spot
     /// \pre This should only be called once build_map() has run.
     unsigned scc_of_state(const state* s) const;
 
+    /// \brief Return the number of self loops in the automaton.
+    unsigned self_loops() const;
+
   protected:
 
     int relabel_component();
@@ -171,6 +175,7 @@ namespace spot
     scc_map_type scc_map_; // Map of constructed maximal SCC.
 			   // SCC number "n" in H_ corresponds to entry
                            // "n" in SCC_MAP_.
+    unsigned self_loops_; // Self loops count.
   };
 
   scc_stats build_scc_stats(const tgba* a);

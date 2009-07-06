@@ -1,4 +1,4 @@
-## Copyright (C) 2005, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -19,4 +19,14 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-SUBDIRS = emptchk gspn-ssp ltl2tgba scc-stats split-product
+AM_CPPFLAGS = -I$(srcdir)/../../src $(BUDDY_CPPFLAGS)
+AM_CXXFLAGS = $(WARNING_CXXFLAGS)
+LDADD = ../../src/libspot.la
+
+noinst_PROGRAMS = \
+  stats
+
+stats_SOURCES = stats.cc
+
+bench: $(noinst_PROGRAMS)
+	./stats $(srcdir)/formulae.ltl
