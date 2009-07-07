@@ -976,7 +976,6 @@ namespace spot
         ss << " J:" << L;
 #endif
       }
-
       return ss.str();
     }
 
@@ -1153,7 +1152,7 @@ namespace spot
   /// @brief Compute successors of the state @a local_state, and returns an
   /// iterator on the successors collection.
   ///
-  /// This algorithm is a Deterministic Streett to nondeterministic Büchi
+  /// The old algorithm is a Deterministic Streett to nondeterministic Büchi
   /// transformation, presented by Christof Löding in his Diploma thesis.
   ///
   /// @MastersThesis{	  loding.98,
@@ -1162,6 +1161,24 @@ namespace spot
   ///   		  Complexity and Connection to Second Order Logic},
   ///   school	        = {University of Kiel},
   ///   year		= {1998}
+  /// }
+  ///
+  ///
+  /// The new algorithm produce a TGBA instead of a TBA. This algorithm
+  /// comes from:
+  ///
+  /// @InProceedings{   duret.09.atva,
+  ///   author        = {Alexandre Duret-Lutz and Denis Poitrenaud and Jean-Michel
+  ///                   Couvreur},
+  ///   title         = {On-the-fly Emptiness Check of Transition-based {S}treett
+  ///                   Automata},
+  ///   booktitle     = {Proceedings of the 7th International Symposium on
+  ///                   Automated Technology for Verification and Analysis
+  ///                   (ATVA'09)},
+  ///   year          = {2009},
+  ///   editor        = {Zhiming Liu and Anders P. Ravn},
+  ///   series        = {Lecture Notes in Computer Science},
+  ///   publisher     = {Springer-Verlag}
   /// }
   ///
   /// @param local_state
@@ -1203,9 +1220,11 @@ namespace spot
         u.flip();
         s->get_safra()->getL(l); // {i : q \in L_i}
         s->get_safra()->getU(u); // {j : q \in U_i}
+        state_complement* st;
+
+#if TRANSFORM_TO_TBA
         bitset_t newI = s->get_L() | l; // {I' = I \cup {i : q \in L_i}}
         bitset_t newJ = s->get_U() | u; // {J' = J \cup {j : q \in U_i}}
-        state_complement* st;
 
         if (newI.is_subset_of(newJ)) // \delta'((q, I, J), a) if I'\subseteq J'
         {
@@ -1214,21 +1233,7 @@ namespace spot
             st = new state_complement(e, e, i->second, true);
             succ_list.insert(std::make_pair(i->first, st));
           }
-
-#if TRANSFORM_TO_TBA
           condition = the_acceptance_cond_;
-#else
-          for (unsigned i = 0; i < l.size(); ++i)
-          {
-            if (u[i])
-            {
-              if (condition == bddfalse)
-                condition = bdd_ithvar(acceptance_cond_vec_[i]);
-              else
-                condition &= bdd_ithvar(acceptance_cond_vec_[i]);
-            }
-          }
-#endif
         }
         else  // \delta'((q, I, J), a)
         {
@@ -1238,11 +1243,32 @@ namespace spot
             succ_list.insert(std::make_pair(i->first, st));
           }
         }
+#else
+        bitset_t S = s->get_L();
+        bitset_t pending = (S | l) - u;  // {pending = S \cup {i : q \in L_i}
+                                          // \setminus {j : q \in U_j})}
+        for (trans_iter i = tr->second.begin(); i != tr->second.end(); ++i)
+        {
+          st = new state_complement(pending, e, i->second, true);
+          succ_list.insert(std::make_pair(i->first, st));
+        }
+
+        for (unsigned i = 0; i < l.size(); ++i)
+        {
+          if (!S[i])
+          {
+            if (condition == bddfalse)
+              condition = bdd_ithvar(acceptance_cond_vec_[i]);
+            else
+              condition &= bdd_ithvar(acceptance_cond_vec_[i]);
+          }
+        }
+#endif
       }
 
       return new tgba_complement_succ_iterator(succ_list, condition);
     }
-    assert("Safra automaton do not find this node");
+    assert("Safra automaton does not find this node");
     return 0;
   }
 

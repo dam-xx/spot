@@ -1,3 +1,9 @@
+2009-07-07  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	* src/tgba/tgbacomplement.cc: Fix the transformation from
+	Streett to TGBA.
+	* src/tgbatest/complementation.test: Modify tests.
+
 2009-06-17  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* bench/emptchk/pml2tgba.pl: Adjust to work with Spin 5.2.0.
