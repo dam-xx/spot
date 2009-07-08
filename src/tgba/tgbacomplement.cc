@@ -1168,10 +1168,10 @@ namespace spot
   /// comes from:
   ///
   /// @InProceedings{   duret.09.atva,
-  ///   author        = {Alexandre Duret-Lutz and Denis Poitrenaud and Jean-Michel
-  ///                   Couvreur},
-  ///   title         = {On-the-fly Emptiness Check of Transition-based {S}treett
-  ///                   Automata},
+  ///   author        = {Alexandre Duret-Lutz and Denis Poitrenaud and
+  ///                    Jean-Michel Couvreur},
+  ///   title         = {On-the-fly Emptiness Check of Transition-based
+  ///                    {S}treett Automata},
   ///   booktitle     = {Proceedings of the 7th International Symposium on
   ///                   Automated Technology for Verification and Analysis
   ///                   (ATVA'09)},
