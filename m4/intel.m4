@@ -32,10 +32,7 @@ AC_DEFUN([spot_INTEL],
 AC_CACHE_CHECK([to add extra CXXFLAGS for the INTEL C++ compiler],
 		[ac_cv_intel_cxxflags],
 [ dnl
-  if test x"$ac_compiler_intel" = x"yes"; then
-    # -W does not exist for icpc in CXXFLAGS.
-    CXXFLAGS=`echo "$CXXFLAGS" | sed 's/-W[[[:space:]]]//g;s/-W$//'`
-
+  if test x"$ac_cv_[]_AC_LANG_ABBREV[]_compiler_intel" = x"yes"; then
     disabled_warnings=''
     for warning in _INTEL_IGNORE_WARNINGS; do
       disabled_warnings="$disabled_warnings,$warning"
@@ -46,13 +43,18 @@ AC_CACHE_CHECK([to add extra CXXFLAGS for the INTEL C++ compiler],
 
     INTEL_CXXFLAGS="-w1 -Werror -wd${disabled_warnings}"
 
-    # Even if the icpc preprocessor defines __GNUC__, it is not a GNU compiler.
-    GXX=
-    CXXFLAGS="$CXXFLAGS $INTEL_CXXFLAGS"
-
     [ac_cv_intel_cxxflags="$INTEL_CXXFLAGS"]
   else
-    [ac_cv_intel_cxxflags="no extra flags"]
+    [ac_cv_intel_cxxflags=""]
   fi])
+
+  if test x"$ac_cv_[]_AC_LANG_ABBREV[]_compiler_intel" = x"yes"; then
+    # -W does not exist for icpc in CXXFLAGS.
+    CXXFLAGS=`echo "$CXXFLAGS" | sed 's/-W[[[:space:]]]//g;s/-W$//'`
+
+    # Even if the icpc preprocessor defines __GNUC__, it is not a GNU compiler.
+    GXX=
+    CXXFLAGS="$CXXFLAGS $ac_cv_intel_cxxflags"
+  fi
   AC_SUBST([INTEL_CXXFLAGS])
 ]) # spot_INTEL

@@ -25,7 +25,7 @@ AC_DEFUN([buddy_INTEL],
 AC_CACHE_CHECK([to add extra CFLAGS for the INTEL C compiler],
 		[ac_cv_intel_cflags],
 [ dnl
-  if test x"$ac_compiler_intel" = x"yes"; then
+  if test x"$ac_cv_[]_AC_LANG_ABBREV[]_compiler_intel" = x"yes"; then
     # -W does not exist for icc in CFLAGS.
     CFLAGS=`echo "$CFLAGS" | sed 's/-W[[[:space:]]]//g;s/-W$//'`
 
@@ -39,12 +39,16 @@ AC_CACHE_CHECK([to add extra CFLAGS for the INTEL C compiler],
 
     INTEL_CFLAGS="-w1 -Werror -wd${disabled_warnings}"
 
-    CFLAGS="$CFLAGS $INTEL_CFLAGS"
-    CXXFLAGS="$CFLAGS $INTEL_CFLAGS"
-
     [ac_cv_intel_cflags="$INTEL_CFLAGS"]
   else
-    [ac_cv_intel_cflags="no extra flags"]
+    [ac_cv_intel_cflags=""]
   fi])
   AC_SUBST([INTEL_CFLAGS])
+
+  if test x"$ac_cv_[]_AC_LANG_ABBREV[]_compiler_intel" = x"yes"; then
+    # -W does not exist for icc in CFLAGS.
+    CFLAGS=`echo "$CFLAGS" | sed 's/-W[[[:space:]]]//g;s/-W$//'`
+    CFLAGS="$CFLAGS $ac_cv_intel_cflags"
+    CXXFLAGS="$CFLAGS $ac_cv_intel_cflags"
+  fi
 ]) # buddy_INTEL
