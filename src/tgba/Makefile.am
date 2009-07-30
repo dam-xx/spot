@@ -46,7 +46,8 @@ tgba_HEADERS = \
   tgbaproduct.hh \
   tgbatba.hh \
   tgbareduc.hh \
-  tgbafromfile.hh
+  tgbafromfile.hh \
+  tgbaunion.hh
 
 noinst_LTLIBRARIES = libtgba.la
 libtgba_la_SOURCES = \
@@ -67,4 +68,5 @@ libtgba_la_SOURCES = \
   tgbaproduct.cc \
   tgbatba.cc \
   tgbareduc.cc \
-  tgbafromfile.cc
+  tgbafromfile.cc \
+  tgbaunion.cc

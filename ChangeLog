@@ -1,3 +1,11 @@
+2009-07-30  Felix Abecassis <abecassis@lrde.epita.fr>
+
+	Add TGBA union implementation.
+
+	* src/tgba/tgbaunion.cc, src/tgba/tgbaunion.hh: New files.
+	Union of two TGBAs.
+	* src/tgba/Makefile.am: Adjust.
+
 2009-07-09  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	* m4/intel.m4: Fix to support the cache.
@@ -5,7 +13,7 @@
 2009-07-08  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	* src/tgba/tgbacomplement.cc: Stay on 80 columns.
-
+	
 2009-07-08  Félix Abecassis <abecassis@lrde.epita.fr>
 
 	Add 2 benchmarks directories.
