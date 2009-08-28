@@ -22,6 +22,7 @@
 AC_PREREQ([2.61])
 AC_INIT([spot], [0.4a])
 AC_CONFIG_AUX_DIR([tools])
+AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.10 gnits nostdinc tar-ustar])
 
 # If the user didn't supplied a CFLAGS value,
@@ -48,8 +49,7 @@ AX_BOOST_BASE([1.34])
 
 AC_CHECK_FUNCS([srand48 drand48])
 
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
+LT_INIT([win32-dll])
 
 spot_INTEL
 CF_GXX_WARNINGS

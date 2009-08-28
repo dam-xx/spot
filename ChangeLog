@@ -1,3 +1,9 @@
+2009-08-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* configure.ac: Switch from Libtool 1.5.x to Libtool 2.x, and
+	add an AC_CONFIG_MACRO_DIR call.
+	* m4/libtool.m4, tools/ltmain.sh: Remove.
+
 2009-07-30  Felix Abecassis <abecassis@lrde.epita.fr>
 
 	Add TGBA union implementation.
@@ -13,7 +19,7 @@
 2009-07-08  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	* src/tgba/tgbacomplement.cc: Stay on 80 columns.
-	
+
 2009-07-08  Félix Abecassis <abecassis@lrde.epita.fr>
 
 	Add 2 benchmarks directories.
