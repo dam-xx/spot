@@ -1,3 +1,8 @@
+2009-08-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* configure.ac: Switch from Libtool 1.5.x to Libtool 2.x, and
+	add an AC_CONFIG_MACRO_DIR call.
+
 2009-06-12  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	Adjust to support the Intel compiler (icc).

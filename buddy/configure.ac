@@ -1,6 +1,7 @@
 AC_PREREQ([2.57])
 AC_INIT([buddy], [2.3a])
 AC_CONFIG_AUX_DIR([tools])
+AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign nostdinc no-define 1.7.3])
 
 AC_PROG_CC
@@ -10,8 +11,7 @@ AC_PROG_YACC
 
 AC_PROG_CXX
 
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
+LT_INIT([win32-dll])
 
 buddy_INTEL
 buddy_DEBUG_FLAGS
