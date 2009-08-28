@@ -1,5 +1,9 @@
 2009-08-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* configure.ac: Switch to Automake 1.11 and enable color-tests.
+
+2009-08-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* configure.ac: Switch from Libtool 1.5.x to Libtool 2.x, and
 	add an AC_CONFIG_MACRO_DIR call.
 	* m4/libtool.m4, tools/ltmain.sh: Remove.
