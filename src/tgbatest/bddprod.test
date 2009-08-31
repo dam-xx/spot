@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -28,11 +28,11 @@ set -e
 # We don't check the output, but just running these might be enough to
 # trigger assertions.
 
-run 0 ./bddprod a b
-run 0 ./bddprod a a
-run 0 ./bddprod 'a U b' 'X f'
-run 0 ./bddprod 'X a' 'X a'
-run 0 ./bddprod 'X a' 'a U b'
-run 0 ./bddprod 'a & b & c' 'b & d & c'
-run 0 ./bddprod 'a | b | (c U (d & (g U (h ^ i))))' 'h ^ i'
-run 0 ./bddprod 'Xa & (b U !a) & (b U !a)' '(b U !a) & f'
+run 0 ../bddprod a b
+run 0 ../bddprod a a
+run 0 ../bddprod 'a U b' 'X f'
+run 0 ../bddprod 'X a' 'X a'
+run 0 ../bddprod 'X a' 'a U b'
+run 0 ../bddprod 'a & b & c' 'b & d & c'
+run 0 ../bddprod 'a | b | (c U (d & (g U (h ^ i))))' 'h ^ i'
+run 0 ../bddprod 'Xa & (b U !a) & (b U !a)' '(b U !a) & f'

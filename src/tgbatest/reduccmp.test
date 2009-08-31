@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -35,8 +35,8 @@ s1, "s2", "a", c;
 "3", s2, "a",;
 EOF
 
-run 0 ./reduccmp 0 input
-run 0 ./reduccmp 0 input > stdout
+run 0 ../reduccmp 0 input
+run 0 ../reduccmp 0 input > stdout
 
 cat >expected <<EOF
 digraph G {

@@ -27,9 +27,9 @@ set -e
 
 check ()
 {
-  run 0 ./ltl2tgba "$1"
-  run 0 ./ltl2tgba -f "$1"
-  run 0 ./ltl2tgba -f -FC "$1"
+  run 0 ../ltl2tgba "$1"
+  run 0 ../ltl2tgba -f "$1"
+  run 0 ../ltl2tgba -f -FC "$1"
 }
 
 # We don't check the output, but just running these might be enough to

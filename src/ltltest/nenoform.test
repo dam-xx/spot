@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -28,39 +28,39 @@
 set -e
 
 # A few things that do not change
-run 0 ./nenoform 'a' 'a'
-run 0 ./nenoform '1' '1'
-run 0 ./nenoform '0' '0'
-run 0 ./nenoform '!a' '!a'
-run 0 ./nenoform 'a U b' 'a U b'
-run 0 ./nenoform 'a & b' 'a & b'
-run 0 ./nenoform 'a & b' 'b & a'
-run 0 ./nenoform 'a & !b & c' 'c & a & !b'
-run 0 ./nenoform 'a & b & c' 'b & c & a'
-run 0 ./nenoform 'Xa & b & Xa' 'b & Xa & b'
-run 0 ./nenoform 'a & b' 'b & a & b'
-run 0 ./nenoform 'a & !b' '!b & a & a'
-run 0 ./nenoform 'a & b & (Xc |(f U !g)| e)' \
-                 'b & a & a & (Xc | e |(f U !g)| e | Xc) & b'
-run 0 ./nenoform 'GFa => FGb' 'GFa => FGb'
+run 0 ../nenoform 'a' 'a'
+run 0 ../nenoform '1' '1'
+run 0 ../nenoform '0' '0'
+run 0 ../nenoform '!a' '!a'
+run 0 ../nenoform 'a U b' 'a U b'
+run 0 ../nenoform 'a & b' 'a & b'
+run 0 ../nenoform 'a & b' 'b & a'
+run 0 ../nenoform 'a & !b & c' 'c & a & !b'
+run 0 ../nenoform 'a & b & c' 'b & c & a'
+run 0 ../nenoform 'Xa & b & Xa' 'b & Xa & b'
+run 0 ../nenoform 'a & b' 'b & a & b'
+run 0 ../nenoform 'a & !b' '!b & a & a'
+run 0 ../nenoform 'a & b & (Xc |(f U !g)| e)' \
+                  'b & a & a & (Xc | e |(f U !g)| e | Xc) & b'
+run 0 ../nenoform 'GFa => FGb' 'GFa => FGb'
 
 # Basic rewritings
-run 0 ./nenoform '!!a' 'a'
-run 0 ./nenoform '!!!!!a' '!a'
-run 0 ./nenoform '!Xa' 'X!a'
-run 0 ./nenoform '!Fa' 'G!a'
-run 0 ./nenoform '!Ga' 'F!a'
-run 0 ./nenoform '!(a ^ b)' 'a <=> b'
-run 0 ./nenoform '!(a <=> b)' '(((a) ^ (b)))'
-run 0 ./nenoform '!(a => b)' 'a&!b'
-run 0 ./nenoform '!(!a => !b)' '!a&b'
-run 0 ./nenoform '!(a U b)' '!a R !b'
-run 0 ./nenoform '!(a R b)' '!a U !b'
-run 0 ./nenoform '!(!a R !b)' 'a U b'
-run 0 ./nenoform '!(a & b & c & d & b)' '!a | !b | !c | !d'
-run 0 ./nenoform '!(a | b | c | d)' '!a & !b & !c & !d'
+run 0 ../nenoform '!!a' 'a'
+run 0 ../nenoform '!!!!!a' '!a'
+run 0 ../nenoform '!Xa' 'X!a'
+run 0 ../nenoform '!Fa' 'G!a'
+run 0 ../nenoform '!Ga' 'F!a'
+run 0 ../nenoform '!(a ^ b)' 'a <=> b'
+run 0 ../nenoform '!(a <=> b)' '(((a) ^ (b)))'
+run 0 ../nenoform '!(a => b)' 'a&!b'
+run 0 ../nenoform '!(!a => !b)' '!a&b'
+run 0 ../nenoform '!(a U b)' '!a R !b'
+run 0 ../nenoform '!(a R b)' '!a U !b'
+run 0 ../nenoform '!(!a R !b)' 'a U b'
+run 0 ../nenoform '!(a & b & c & d & b)' '!a | !b | !c | !d'
+run 0 ../nenoform '!(a | b | c | d)' '!a & !b & !c & !d'
 
 # Nested rewritings
-run 0 ./nenoform '!(a U (!b U ((a & b & c) R d)))' \
-                 '!a R (b R ((!a | !b | !c) U !d))'
-run 0 ./nenoform '!(GF a => FG b)' 'GFa & GF!b'
+run 0 ../nenoform '!(a U (!b U ((a & b & c) R d)))' \
+                  '!a R (b R ((!a | !b | !c) U !d))'
+run 0 ../nenoform '!(GF a => FG b)' 'GFa & GF!b'

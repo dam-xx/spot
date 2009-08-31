@@ -95,16 +95,5 @@ TESTS = \
 
 EXTRA_DIST = $(TESTS)
 
-CLEANFILES = \
-  blue_counter \
-  blue_last \
-  config \
-  expected \
-  input \
-  input1 \
-  input2 \
-  input3 \
-  output1 \
-  output2 \
-  red \
-  stdout
+distclean-local:
+	rm -rf $(TESTS:.test=.dir)

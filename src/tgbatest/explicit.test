@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004, 2005, 2008 Laboratoire d'Informatique de
+# Copyright (C) 2003, 2004, 2005, 2008, 2009 Laboratoire d'Informatique de
 # Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 # Université Pierre et Marie Curie.
 #
@@ -25,7 +25,7 @@
 
 set -e
 
-run 0 ./explicit | sed 's/c & b/b \& c/' > stdout
+run 0 ../explicit | sed 's/c & b/b \& c/' > stdout
 
 cat >expected <<EOF
 digraph G {

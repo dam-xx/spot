@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2006, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -43,7 +43,7 @@ acc = "p1$1" "p1";
 "s1 * s1", "s1 * s1", "!a", "p1$1";
 EOF
 
-run 0 ./explprod input1 input2 > stdout
+run 0 ../explprod input1 input2 > stdout
 cat stdout
 diff stdout expected
 rm input1 input2 stdout expected

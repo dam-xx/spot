@@ -1,3 +1,37 @@
+2009-08-31  Alexandre Duret-Lutz  <adl@va-et-vient.net>
+
+	Use Automake 1.11's parallel-tests feature.
+
+	* configure.ac: Enable parallel-tests.
+	* src/eltltest/defs.in, src/evtgbatest/defs.in,
+	src/ltltest/defs.in, src/tgbatest/defs.in: Always output verbose
+	tests.  Make a subdirectory for each test case.
+	* src/ltltest/Makefile.am, src/eltltest/Makefile.am,
+	src/tgbatest/Makefile.am, src/evtgbatest/Makefile.am: Remove
+	CLEANFILES and clean the test subdirectories in a distclean-local
+	rule instead.
+	* src/eltltest/acc.test, src/eltltest/nfa.test,
+	src/evtgbatest/explicit.test, src/evtgbatest/ltl2evtgba.test,
+	src/evtgbatest/product.test, src/evtgbatest/readsave.test,
+	src/ltltest/equals.test, src/ltltest/lunabbrev.test,
+	src/ltltest/nenoform.test, src/ltltest/parse.test,
+	src/ltltest/parseerr.test, src/ltltest/reduc.test,
+	src/ltltest/reduccmp.test, src/ltltest/syntimpl.test,
+	src/ltltest/tostring.test, src/ltltest/tunabbrev.test,
+	src/ltltest/tunenoform.test, src/tgbatest/bddprod.test,
+	src/tgbatest/complementation.test, src/tgbatest/dfs.test,
+	src/tgbatest/dupexp.test, src/tgbatest/eltl2tgba.test,
+	src/tgbatest/emptchk.test, src/tgbatest/emptchke.test,
+	src/tgbatest/emptchkr.test, src/tgbatest/explicit.test,
+	src/tgbatest/explpro2.test, src/tgbatest/explpro3.test,
+	src/tgbatest/explpro4.test, src/tgbatest/explprod.test,
+	src/tgbatest/ltl2neverclaim.test, src/tgbatest/ltl2tgba.test,
+	src/tgbatest/ltlprod.test, src/tgbatest/mixprod.test,
+	src/tgbatest/readsave.test, src/tgbatest/reduccmp.test,
+	src/tgbatest/reductgba.test, src/tgbatest/scc.test,
+	src/tgbatest/spotlbtt.test, src/tgbatest/tgbaread.test,
+	src/tgbatest/tripprod.test: Adjust to run from a subdirectory.
+
 2009-08-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* configure.ac: Switch to Automake 1.11 and enable color-tests.

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -27,8 +27,8 @@ set -e
 
 check ()
 {
-  run 0 ./ltl2evtgba "$1"
-  run 0 ./ltl2evtgba -Uun1,un2,un3 "$1"
+  run 0 ../ltl2evtgba "$1"
+  run 0 ../ltl2evtgba -Uun1,un2,un3 "$1"
 }
 
 # We don't check the output, but just running these might be enough to

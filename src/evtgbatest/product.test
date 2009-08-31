@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -47,7 +47,7 @@ u1, u2, c, Acc1;
 u2, u1, b, Acc2;
 EOF
 
-run 0 ./product input1 input2 input3 >stdout
+run 0 ../product input1 input2 input3 >stdout
 
 cat >expected <<\EOF
 acc = Acc1 Acc2 Acc3;

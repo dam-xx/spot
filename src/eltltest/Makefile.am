@@ -1,4 +1,4 @@
-## Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+## Copyright (C) 2003, 2004, 2005, 2006, 2009 Laboratoire d'Informatique de
 ## Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 ## Université Pierre et Marie Curie.
 ##
@@ -39,6 +39,5 @@ TESTS = \
   acc.test \
   nfa.test
 
-CLEANFILES = \
-  input \
-  prelude
+distclean-local:
+	rm -rf $(TESTS:.test=.dir)

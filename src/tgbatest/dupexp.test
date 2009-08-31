@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -27,12 +27,12 @@ set -e
 
 dorun()
 {
-  run 0 ./ltl2tgba -f -s "$1" >output1
-  run 0 ./ltl2tgba -f -S "$1" >output2
+  run 0 ../ltl2tgba -f -s "$1" >output1
+  run 0 ../ltl2tgba -f -S "$1" >output2
   test `wc -l <output1` = `wc -l <output2`
 
-  run 0 ./ltl2tgba -s "$1" >output1
-  run 0 ./ltl2tgba -S "$1" >output2
+  run 0 ../ltl2tgba -s "$1" >output1
+  run 0 ../ltl2tgba -S "$1" >output2
   test `wc -l <output1` = `wc -l <output2`
 }
 

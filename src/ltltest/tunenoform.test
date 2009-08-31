@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -27,10 +27,10 @@
 
 set -e
 
-run 0 ./tunenoform '!(a ^ b)' '(a|!b) & (!a|b)'
-run 0 ./tunenoform '!(a <=> b)' '(a|b) & (!a|!b)'
-run 0 ./tunenoform '!(a => b)' 'a&!b'
-run 0 ./tunenoform '!(!a => !b)' '!a&b'
-run 0 ./tunenoform '!Fa' 'false R !a'
-run 0 ./tunenoform '!G!a' 'true U a'
-run 0 ./tunenoform '!(GF a => FG b)' '(0 R (1 U a)) & (0 R (1 U !b))'
+run 0 ../tunenoform '!(a ^ b)' '(a|!b) & (!a|b)'
+run 0 ../tunenoform '!(a <=> b)' '(a|b) & (!a|!b)'
+run 0 ../tunenoform '!(a => b)' 'a&!b'
+run 0 ../tunenoform '!(!a => !b)' '!a&b'
+run 0 ../tunenoform '!Fa' 'false R !a'
+run 0 ../tunenoform '!G!a' 'true U a'
+run 0 ../tunenoform '!(GF a => FG b)' '(0 R (1 U a)) & (0 R (1 U !b))'

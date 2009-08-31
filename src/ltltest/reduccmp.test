@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2004, 2006, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -25,7 +25,7 @@
 
 . ./defs || exit 1
 
-for x in ./reduccmp ./reductaustr; do
+for x in ../reduccmp ../reductaustr; do
 
   # No reduction
   run 0 $x 'a U b' 'a U b'

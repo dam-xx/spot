@@ -1,7 +1,7 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004, 2005, 2006, 2007 Laboratoire d'Informatique de
-# Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
-# Université Pierre et Marie Curie.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009 Laboratoire
+# d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
+# Coopératifs (SRC), Université Pierre et Marie Curie.
 #
 # This file is part of Spot, a model checking library.
 #
@@ -32,7 +32,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- LaCIM)"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -t'"
+   Parameters = "--spot '../ltl2tgba -F -t'"
    Enabled = yes
 }
 
@@ -40,7 +40,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- LaCIM), reduction of formula"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -r4 -F -t'"
+   Parameters = "--spot '../ltl2tgba -r4 -F -t'"
    Enabled = yes
 }
 
@@ -48,7 +48,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- LaCIM), degeneralized"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -t -D'"
+   Parameters = "--spot '../ltl2tgba -F -t -D'"
    Enabled = yes
 }
 
@@ -56,7 +56,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- LaCIM), fake"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -T'"
+   Parameters = "--spot '../ltl2tgba -F -T'"
    Enabled = no
 }
 
@@ -64,7 +64,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- LaCIM), eltl"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './eltl2tgba -L'"
+   Parameters = "--spot '../eltl2tgba -L'"
    Enabled = yes
 }
 
@@ -72,7 +72,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM)"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -F -f -t'"
    Enabled = yes
 }
 
@@ -80,7 +80,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), basic reduction of formula"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -r1 -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -r1 -F -f -t'"
    Enabled = no
 }
 
@@ -88,7 +88,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), reduction of formula using class of formula"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -r2 -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -r2 -F -f -t'"
    Enabled = no
 }
 
@@ -96,7 +96,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), reduction of formula using implies relation"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -r3 -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -r3 -F -f -t'"
    Enabled = no
 }
 
@@ -104,7 +104,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), reduction of formula (pre reduction)"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -r4 -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -r4 -F -f -t'"
    Enabled = yes
 }
 
@@ -112,7 +112,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), reduction7 of formula (pre reduction)"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -r7 -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -r7 -F -f -t'"
    Enabled = yes
 }
 
@@ -120,7 +120,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), reduction of formula in FM"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -fr4 -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -fr4 -F -f -t'"
    Enabled = no
 }
 
@@ -128,7 +128,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM) reduction7 of formula in FM"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -fr7 -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -fr7 -F -f -t'"
    Enabled = no
 }
 
@@ -138,7 +138,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), post reduction with direct simulation"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -R1q -R1t -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -R1q -R1t -F -f -t'"
    Enabled = yes
 }
 
@@ -146,7 +146,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), post reduction with delayed simulation"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -R2q -R2t -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -R2q -R2t -F -f -t'"
    Enabled = yes
 }
 
@@ -154,7 +154,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), post reduction with scc"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -R3 -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -R3 -F -f -t'"
    Enabled = yes
 }
 
@@ -162,7 +162,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), pre + post reduction"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -r4 -R1q -R1t -R3 -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -r4 -R1q -R1t -R3 -F -f -t'"
    Enabled = yes
 }
 
@@ -170,7 +170,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), pre + allpost reduction"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -r4 -R1q -R1t -R2q -R2t -R3 -F -f -t'"
+   Parameters = "--spot '../ltl2tgba -r4 -R1q -R1t -R2q -R2t -R3 -F -f -t'"
    Enabled = no
 }
 
@@ -178,7 +178,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), without symb_merge"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -y -t'"
+   Parameters = "--spot '../ltl2tgba -F -f -y -t'"
    Enabled = yes
 }
 
@@ -186,7 +186,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), degeneralized"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -t -D'"
+   Parameters = "--spot '../ltl2tgba -F -f -t -D'"
    Enabled = yes
 }
 
@@ -194,7 +194,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM), degeneralized, via never claim"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spin './ltl2tgba -F -f -N'"
+   Parameters = "--spin '../ltl2tgba -F -f -N'"
    Enabled = yes
 }
 
@@ -202,7 +202,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM exprop)"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -x -t'"
+   Parameters = "--spot '../ltl2tgba -F -f -x -t'"
    Enabled = yes
 }
 
@@ -210,7 +210,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM exprop), without symb_merge"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -x -y -t'"
+   Parameters = "--spot '../ltl2tgba -F -f -x -y -t'"
    Enabled = yes
 }
 
@@ -218,7 +218,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM exprop), degeneralized"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -x -t -D'"
+   Parameters = "--spot '../ltl2tgba -F -f -x -t -D'"
    Enabled = yes
 }
 
@@ -226,7 +226,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM post_branch + exprop)"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -x -p -t'"
+   Parameters = "--spot '../ltl2tgba -F -f -x -p -t'"
    Enabled = yes
 }
 
@@ -234,7 +234,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM post_branch + exprop + flapprox)"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -x -p -L -t'"
+   Parameters = "--spot '../ltl2tgba -F -f -x -p -L -t'"
    Enabled = yes
 }
 
@@ -242,7 +242,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM post_branch + exprop), degeneralized"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -p -x -t -D'"
+   Parameters = "--spot '../ltl2tgba -F -f -p -x -t -D'"
    Enabled = yes
 }
 
@@ -250,7 +250,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- FM post_branch + exprop + flapprox), degeneralized"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot './ltl2tgba -F -f -p -x -t -L -D'"
+   Parameters = "--spot '../ltl2tgba -F -f -p -x -t -L -D'"
    Enabled = yes
 }
 

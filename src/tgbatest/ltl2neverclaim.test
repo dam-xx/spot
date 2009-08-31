@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -28,14 +28,14 @@ set -e
 # We don't check the output, but just running these might be enough to
 # trigger assertions.
 
-run 0 ./ltl2tgba -N -x a
-run 0 ./ltl2tgba -N -x  'a U b'
-run 0 ./ltl2tgba -N -x 'X a'
-run 0 ./ltl2tgba -N -x 'a & b & c'
-run 0 ./ltl2tgba -N -x 'a | b | (c U (d & (g U (h ^ i))))'
-run 0 ./ltl2tgba -N -x 'Xa & (b U !a) & (b U !a)'
-run 0 ./ltl2tgba -N -x 'Fa & Xb & GFc & Gd'
-run 0 ./ltl2tgba -N -x 'Fa & Xa & GFc & Gc'
-run 0 ./ltl2tgba -N -x 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
-run 0 ./ltl2tgba -N -x 'a R (b R c)'
-run 0 ./ltl2tgba -N -x '(a U b) U (c U d)'
+run 0 ../ltl2tgba -N -x a
+run 0 ../ltl2tgba -N -x  'a U b'
+run 0 ../ltl2tgba -N -x 'X a'
+run 0 ../ltl2tgba -N -x 'a & b & c'
+run 0 ../ltl2tgba -N -x 'a | b | (c U (d & (g U (h ^ i))))'
+run 0 ../ltl2tgba -N -x 'Xa & (b U !a) & (b U !a)'
+run 0 ../ltl2tgba -N -x 'Fa & Xb & GFc & Gd'
+run 0 ../ltl2tgba -N -x 'Fa & Xa & GFc & Gc'
+run 0 ../ltl2tgba -N -x 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
+run 0 ../ltl2tgba -N -x 'a R (b R c)'
+run 0 ../ltl2tgba -N -x '(a U b) U (c U d)'

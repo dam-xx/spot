@@ -1,5 +1,5 @@
 # -*- shell-script -*-
-# Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2006, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -26,9 +26,8 @@ test -f ./defs || {
    exit 1
 }
 
-# If srcdir is not set, then we are not running from `make check', be verbose.
+# If srcdir is not set, then we are not running from `make check'.
 if test -z "$srcdir"; then
-   test -z "$VERBOSE" && VERBOSE=x
    # compute $srcdir.
    srcdir=`echo "$0" | sed -e 's,/[^\\/]*$,,'`
    test $srcdir = $0 && srcdir=.
@@ -40,10 +39,15 @@ test -f $srcdir/defs.in || {
    exit 1
 }
 
-# User can set VERBOSE to see all output.
-test -z "$VERBOSE" && exec >/dev/null 2>&1
-
 echo "== Running test $0"
+
+me=`echo "$0" | sed -e 's,.*[\\/],,;s/\.test$//'`
+
+testSubDir=$me.dir
+chmod -R a+rwx $testSubDir > /dev/null 2>&1
+rm -rf $testSubDir > /dev/null 2>&1
+mkdir $testSubDir
+cd $testSubDir
 
 DOT='@DOT@'
 top_builddir='@top_builddir@'
@@ -71,9 +75,4 @@ run()
   test $exitcode = $expected_exitcode || exit 1
 }
 
-# Turn on shell traces when VERBOSE=x.
-if test "x$VERBOSE" = xx; then
-  set -x
-else
-  :
-fi
+set -x

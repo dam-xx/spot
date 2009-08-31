@@ -20,7 +20,7 @@ A=(
 %
 A(1,a,a|b)&X(!f)
 EOF
-run 0 ./acc input || exit 1
+run 0 ../acc input || exit 1
 
 cat >input <<EOF
 include prelude
@@ -32,7 +32,7 @@ A=(
 %
 A(1,a)
 EOF
-run 1 ./acc input || exit 1
+run 1 ../acc input || exit 1
 
 cat >input <<EOF
 X=(
@@ -50,7 +50,7 @@ R=!U(!\$0, !\$1)
 %
 a U b | a R b | F(true) | U(a,b) -> R(a,b)
 EOF
-run 0 ./acc input || exit 1
+run 0 ../acc input || exit 1
 
 cat >input <<EOF
 U=(
@@ -62,7 +62,7 @@ T=U(true,true)
 %
 T()|1
 EOF
-run 1 ./acc input || exit 1
+run 1 ../acc input || exit 1
 
 cat >input <<EOF
 A=(
@@ -70,4 +70,4 @@ A=(
 %
 1
 EOF
-run 0 ./acc input || exit 1
+run 0 ../acc input || exit 1

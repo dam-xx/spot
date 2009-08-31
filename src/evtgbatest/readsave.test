@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -33,7 +33,7 @@ s1, "s2", e1, c;
 "state 3", "s1",e4,;
 EOF
 
-./readsave input > stdout
+../readsave input > stdout
 
 cat >expected <<\EOF
 acc = c d;
@@ -46,7 +46,7 @@ EOF
 diff stdout expected
 
 mv stdout input
-run 0 ./readsave input > stdout
+run 0 ../readsave input > stdout
 
 diff input stdout
 

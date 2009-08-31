@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -32,7 +32,7 @@ s1, "s2", "a & !b", c d;
 "state 3", s1,,;
 EOF
 
-run 0 ./tgbaread input > stdout
+run 0 ../tgbaread input > stdout
 
 cat >expected <<EOF
 digraph G {

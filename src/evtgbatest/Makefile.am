@@ -46,4 +46,6 @@ TESTS = \
   ltl2evtgba.test
 
 EXTRA_DIST = $(TESTS)
-CLEANFILES = input1 input2 input3 stdout expected
+
+distclean-local:
+	rm -rf $(TESTS:.test=.dir)

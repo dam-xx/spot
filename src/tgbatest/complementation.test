@@ -1,6 +1,6 @@
 #!/bin/sh
 # Copyright (C) 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
-# dÃ©partement SystÃ¨mes RÃ©partis CoopÃ©ratifs (SRC), UniversitÃ© Pierre
+# département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
 # This file is part of Spot, a model checking library.
@@ -25,7 +25,7 @@
 set -e
 
 while read f; do
-    run 0 ./complement -f "$f"
+    run 0 ../complement -f "$f"
 done <<EOF
 GFa
 FGa
