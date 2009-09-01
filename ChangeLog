@@ -1,3 +1,11 @@
+2009-09-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix path to libtool in test suites.
+
+	* src/ltltest/defs.in, src/eltltest/defs.in, src/tgbatest/defs.in,
+	src/evtgbatest/defs.in (run): Use ../../../libtool instead of
+	../../libtool, now that testcases have been moved down one directory.
+
 2009-08-31  Alexandre Duret-Lutz  <adl@va-et-vient.net>
 
 	Use Automake 1.11's parallel-tests feature.
