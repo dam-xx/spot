@@ -50,7 +50,7 @@ mkdir $testSubDir
 cd $testSubDir
 
 DOT='@DOT@'
-top_builddir='@top_builddir@'
+top_builddir='../@top_builddir@'
 LBTT="@LBTT@"
 LBTT_TRANSLATE="@LBTT_TRANSLATE@"
 VALGRIND='@VALGRIND@'

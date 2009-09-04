@@ -142,6 +142,13 @@ namespace spot
     /// \brief Update the variable sets to take a new acceptance condition
     /// into account.
     void declare_acceptance_condition(bdd prom);
+
+    /// \brief Delete SCCs (Strongly Connected Components) from the
+    /// relation which cannot be accepting.
+    void delete_unaccepting_scc(bdd init);
+
+  private:
+    bdd infinitely_often(bdd s, bdd acc, bdd er);
   };
 }
 

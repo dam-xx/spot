@@ -79,6 +79,10 @@ namespace spot
     virtual bdd all_acceptance_conditions() const;
     virtual bdd neg_acceptance_conditions() const;
 
+    /// \brief Delete SCCs (Strongly Connected Components) from the
+    /// TGBA which cannot be accepting.
+    void delete_unaccepting_scc();
+
   protected:
     virtual bdd compute_support_conditions(const state* state) const;
     virtual bdd compute_support_variables(const state* state) const;

@@ -36,14 +36,18 @@
 void
 syntax(char* prog)
 {
-  std::cerr << "Usage: " << prog << " [OPTIONS...] formula [file]" << std::endl
-	    << "       " << prog << " -F [OPTIONS...] file [file]" << std::endl
-	    << "       " << prog << " -L [OPTIONS...] file [file]" << std::endl
+  std::cerr << "Usage: " << prog << " [OPTIONS...]  formula [file]" << std::endl
+	    << "       " << prog << " -F  [OPTIONS...] file [file]" << std::endl
+	    << "       " << prog << " -L  [OPTIONS...] file [file]" << std::endl
+	    << "       " << prog << " -LW [OPTIONS...] file [file]" << std::endl
 	    << std::endl
 	    << "Options:" << std::endl
 	    << "  -F    read the formula from the file (extended input format)"
 	    << std::endl
 	    << "  -L    read the formula from an LBTT-compatible file"
+	    << std::endl
+	    << "  -LW   read the formula from an LBTT-compatible file"
+	    << " (with no reduction)"
 	    << std::endl;
 }
 
@@ -76,14 +80,16 @@ main(int argc, char** argv)
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::formula* f = 0;
   int formula_index = 0;
+  int reduce = 1;
 
   if (strcmp(argv[1], "-F") == 0)
   {
     f = spot::eltl::parse_file(argv[2], p, env, false);
     formula_index = 2;
   }
-  if (strcmp(argv[1], "-L") == 0)
+  if (strcmp(argv[1], "-L") == 0 || strcmp(argv[1], "-LW") == 0)
   {
+    reduce = strcmp(argv[1], "-LW") == 0 ? 0 : 1;
     std::string input;
     std::ifstream ifs(argv[2]);
     std::getline(ifs, input, '\0');
@@ -118,8 +124,10 @@ main(int argc, char** argv)
 
   spot::bdd_dict* dict = new spot::bdd_dict();
   spot::tgba_bdd_concrete* concrete = spot::eltl_to_tgba_lacim(f, dict);
+  if (reduce == 1)
+    concrete->delete_unaccepting_scc();
 
-  if (strcmp(argv[1], "-L") == 0)
+  if (strcmp(argv[1], "-L") == 0 || strcmp(argv[1], "-LW") == 0)
     spot::lbtt_reachable(std::cout, concrete);
   else
   {

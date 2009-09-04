@@ -40,6 +40,7 @@ LBTT_TRANSLATE="@LBTT_TRANSLATE@"
 LTL2BA='@LTL2BA@'
 LTL2NBA='@LTL2NBA@'
 LTL2TGBA='@top_builddir@/src/tgbatest/ltl2tgba@EXEEXT@'
+ELTL2TGBA='@top_builddir@/src/tgbatest/eltl2tgba@EXEEXT@'
 MODELLA='@MODELLA@'
 SPIN='@SPIN@'
 WRING2LBTT='@WRING2LBTT@'

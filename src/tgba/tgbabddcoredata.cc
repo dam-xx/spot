@@ -130,4 +130,67 @@ namespace spot
     acc_set &= acc;
     negacc_set &= !acc;
   }
+
+  void
+  tgba_bdd_core_data::delete_unaccepting_scc(bdd init)
+  {
+    bdd er = bdd_exist(relation, var_set); /// existsRelation
+    bdd s0 = bddfalse;
+    bdd s1 = bdd_exist(bdd_exist(init & relation, var_set), now_set);
+    s1 = bdd_replace(s1, dict->next_to_now);
+
+    /// Find all reachable states
+    while (s0 != s1)
+    {
+      s0 = s1;
+      /// Compute s1 = succ(s0) | s
+      s1 = bdd_replace(bdd_exist(s0 & er, now_set), dict->next_to_now) | s0;
+    }
+
+    /// Find states which can be visited infinitely often while seeing
+    /// all acceptance conditions
+    s0 = bddfalse;
+    while (s0 != s1)
+    {
+      s0 = s1;
+      bdd all = all_acceptance_conditions;
+      while (all != bddfalse)
+      {
+	bdd next = bdd_satone(all);
+	all -= next;
+	s1 = infinitely_often(s1, next, er);
+      }
+    }
+
+    relation = s0 & (relation & bdd_replace(s0, dict->now_to_next));
+  }
+
+  bdd
+  tgba_bdd_core_data::infinitely_often(bdd s, bdd acc, bdd er)
+  {
+    bdd ar = acc & (relation & acceptance_conditions); /// accRelation
+    bdd s0 = bddfalse;
+    bdd s1 = s;
+
+    while (s0 != s1)
+    {
+      s0 = s1;
+      bdd as = bdd_replace(s0, dict->now_to_next) & ar;
+      as = bdd_exist(bdd_exist(as, next_set), var_set) & s0;
+
+      /// Do predStar
+      bdd s0_ = bddfalse;
+      bdd s1_ = bdd_exist(as, acc_set);
+      while (s0_ != s1_)
+      {
+	s0_ = s1_;
+	/// Compute s1_ = pred(s0_) | s0_
+	s1_ = bdd_exist(er & bdd_replace(s0_, dict->now_to_next), next_set);
+	s1_ = (s1_ & s0) | s0_;
+      }
+      s1 = s0_;
+    }
+
+    return s0;
+  }
 }

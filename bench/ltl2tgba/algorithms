@@ -33,6 +33,22 @@ Algorithm
 
 Algorithm
 {
+   Name = "LACIM, eltl"
+   Path = "$LBTT_TRANSLATE"
+   Parameters = "--spot '$ELTL2TGBA -LW'"
+   Enabled = yes
+}
+
+Algorithm
+{
+   Name = "LACIM, eltl, +delete_unaccepting_scc"
+   Path = "$LBTT_TRANSLATE"
+   Parameters = "--spot '$ELTL2TGBA -L'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "FM, degen, +symb_merge, +exprop, LTLopt"
    Path = "$LBTT_TRANSLATE"
    Parameters = "--spot '$srcdir/ltl2baw.pl --spot=\"-f -t -x -D\" -F'"

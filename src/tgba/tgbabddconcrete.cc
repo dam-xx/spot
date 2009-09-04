@@ -164,4 +164,11 @@ namespace spot
     return data_;
   }
 
+  void
+  tgba_bdd_concrete::delete_unaccepting_scc()
+  {
+    data_.delete_unaccepting_scc(init_);
+    set_init_state(init_);
+  }
+
 }

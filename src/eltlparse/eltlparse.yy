@@ -368,7 +368,7 @@ nfa_arg: ARG
 	  aliasmap::const_iterator i = amap.find(*$1);
 	  if (i != amap.end())
 	  {
-            int arity = formula_tree::arity(i->second);
+            unsigned arity = formula_tree::arity(i->second);
 	    CHECK_ARITY(@1, $1, $3->children.size(), arity);
 
 	    // Hack to return the right type without screwing with the
