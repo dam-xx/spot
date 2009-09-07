@@ -457,7 +457,17 @@ subformula: ATOMIC_PROP
 	    CHECK_EXISTING_NMAP(@1, $1);
 	    nfa::ptr np = nmap[*$1];
 
-	    CHECK_ARITY(@1, $1, $3->size(), np->arity());
+	    /// Easily handle deletion of $3 when CHECK_ARITY fails.
+	    int i = $3->size();
+	    if ($3->size() != np->arity())
+	    {
+	      automatop::vec::iterator it = $3->begin();
+	      while (it != $3->end())
+		spot::ltl::destroy(*it++);
+	      delete $3;
+	    }
+
+	    CHECK_ARITY(@1, $1, i, np->arity());
 	    $$ = automatop::instance(np, $3, false);
 	  }
 	  delete $1;
@@ -484,7 +494,6 @@ subformula: ATOMIC_PROP
 
 arg_list: subformula
 	{
-	  // TODO: delete it whenever a parse error occurs on a subformula.
 	  $$ = new automatop::vec;
 	  $$->push_back($1);
 	}

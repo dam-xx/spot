@@ -36,7 +36,10 @@ main(int argc, char** argv)
   if (spot::eltl::format_parse_errors(std::cerr, p))
   {
     if (f != 0)
+    {
       std::cout << f->dump() << std::endl;
+      spot::ltl::destroy(f);
+    }
     return 1;
   }
 
@@ -46,6 +49,9 @@ main(int argc, char** argv)
 
   assert(f != 0);
   std::cout << f->dump() << std::endl;
+  spot::ltl::destroy(f);
+
   assert(f2 != 0);
   std::cout << f2->dump() << std::endl;
+  spot::ltl::destroy(f2);
 }

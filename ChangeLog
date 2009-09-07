@@ -1,3 +1,11 @@
+2009-09-07  Damien Lefortier <dam@lrde.epita.fr>
+
+	Fix some memory leaks.
+
+	* src/eltlparse/eltlparse.yy: Free the automatop::vec when
+	CHECK_ARITY fails while parsing an automatop.
+	* src/eltltest/acc.cc: Free all constructed formulae.
+
 2009-09-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix a memory leak in reduce_tau03().
