@@ -1,4 +1,4 @@
-// Copyright (C) 2006, 2007 Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2006, 2007, 2009 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -331,6 +331,7 @@ namespace spot
 	  for (unsigned i = 0; i < mos; ++i)
 	    if ((*res)[i])
 	      destroy((*res)[i]);
+	  delete res;
 	}
 
 	formula*

@@ -1,5 +1,12 @@
 2009-09-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix a memory leak in reduce_tau03().
+
+	* src/ltlvisit/contain.cc (reduce_tau03_visitor::visit): Free
+	the operand array when a multop reduces to a constant.
+
+2009-09-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix a memory leak in randltl.
 
 	* src/ltltest/randltl.cc: Free the atomic properties from AP
