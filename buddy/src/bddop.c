@@ -244,8 +244,8 @@ void bdd_operator_varresize(void)
 
    if ((quantvarset=NEW(int,bddvarnum)) == NULL)
       bdd_error(BDD_MEMORY);
-
-   memset(quantvarset, 0, sizeof(int)*bddvarnum);
+   else
+     memset(quantvarset, 0, sizeof(int)*bddvarnum);
    quantvarsetID = 0;
 }
 
