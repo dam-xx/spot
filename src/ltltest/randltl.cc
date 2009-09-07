@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2005, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2005, 2008, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -216,6 +216,14 @@ main(int argc, char** argv)
 	      exit(2);
 	    }
 	}
+    }
+
+  spot::ltl::atomic_prop_set::const_iterator i = ap->begin();
+  while (i != ap->end())
+    {
+      spot::ltl::atomic_prop_set::const_iterator j = i;
+      ++i;
+      spot::ltl::destroy(*j);
     }
   delete ap;
 }

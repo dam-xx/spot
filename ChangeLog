@@ -1,3 +1,10 @@
+2009-09-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix a memory leak in randltl.
+
+	* src/ltltest/randltl.cc: Free the atomic properties from AP
+	before exit.
+
 2009-09-04  Damien Lefortier <dam@lrde.epita.fr>
 
 	Add an algorithm (from Couvreur) working on BDDs to reduce the
