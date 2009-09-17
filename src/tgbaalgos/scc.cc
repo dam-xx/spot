@@ -104,6 +104,28 @@ namespace spot
     return n;
   }
 
+  // recursively update supp rec
+  bdd
+  scc_map::update_supp_rec(unsigned state)
+  {
+    assert(scc_map_.size() > state);
+
+    bdd& res = scc_map_[state].supp_rec;
+
+    if (res == bddtrue)
+      {
+	const succ_type& s = succ(state);
+	succ_type::const_iterator it;
+
+	for (it = s.begin(); it != s.end(); ++it)
+	  res &= update_supp_rec(it->first);
+
+	res &= scc_map_[state].supp;
+      }
+
+    return res;
+  }
+
   void
   scc_map::build_map()
   {
@@ -266,6 +288,9 @@ namespace spot
 	root_.front().conds.insert(conds.begin(), conds.end());
 	root_.front().supp &= supp;
       }
+
+    // recursively update supp_rec
+    (void) update_supp_rec(initial());
   }
 
   unsigned scc_map::scc_of_state(const state* s) const
@@ -285,6 +310,13 @@ namespace spot
   {
     assert(scc_map_.size() > n);
     return scc_map_[n].supp;
+  }
+
+
+  bdd scc_map::aprec_set_of(unsigned n) const
+  {
+    assert(scc_map_.size() > n);
+    return scc_map_[n].supp_rec;
   }
 
 
@@ -433,9 +465,12 @@ namespace spot
 		  ostr << ", ";
 		bdd_print_formula(ostr, m.get_aut()->get_dict(), *i);
 	      }
-	    ostr << "]\\n APs=[";
+	    ostr << "]\\n AP=[";
 	    bdd_print_sat(ostr, m.get_aut()->get_dict(),
-			  m.ap_set_of(state)) << "]";
+			  m.ap_set_of(state));
+	    ostr << "]\\n APrec=[";
+	    bdd_print_sat(ostr, m.get_aut()->get_dict(),
+			  m.aprec_set_of(state)) << "]";
 	  }
 
 	std::cout << "  " << state << " [shape=box,"

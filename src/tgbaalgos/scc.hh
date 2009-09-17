@@ -113,6 +113,14 @@ namespace spot
     /// \pre This should only be called once build_map() has run.
     bdd ap_set_of(unsigned n) const;
 
+    /// \brief Return the set of atomic properties reachable from this SCC.
+    ///
+    /// \return a BDD that is a conjuction of all atomic properties
+    /// occurring on the transitions reachable from this SCC n.
+    ///
+    /// \pre This should only be called once build_map() has run.
+    bdd aprec_set_of(unsigned n) const;
+
     /// \brief Return the set of acceptance conditions occurring in an SCC.
     ///
     /// \pre This should only be called once build_map() has run.
@@ -135,13 +143,14 @@ namespace spot
     unsigned self_loops() const;
 
   protected:
-
+    bdd update_supp_rec(unsigned state);
     int relabel_component();
 
     struct scc
     {
     public:
-      scc(int index) : index(index), acc(bddfalse), supp(bddtrue) {};
+      scc(int index) : index(index), acc(bddfalse),
+		       supp(bddtrue), supp_rec(bddtrue) {};
       /// Index of the SCC.
       int index;
       /// The union of all acceptance conditions of transitions which
@@ -153,6 +162,8 @@ namespace spot
       cond_set conds;
       /// Conjunction of atomic propositions used in the SCC.
       bdd supp;
+      /// Conjunction of atomic propositions used in the SCC.
+      bdd supp_rec;
       /// Successor SCC.
       succ_type succ;
     };
@@ -186,7 +197,7 @@ namespace spot
 			   // SCC number "n" in H_ corresponds to entry
                            // "n" in SCC_MAP_.
     unsigned self_loops_; // Self loops count.
-  };
+ };
 
   scc_stats build_scc_stats(const tgba* a);
   scc_stats build_scc_stats(const scc_map& m);
