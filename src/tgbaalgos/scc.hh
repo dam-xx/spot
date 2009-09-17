@@ -105,6 +105,14 @@ namespace spot
     /// \pre This should only be called once build_map() has run.
     const cond_set& cond_set_of(unsigned n) const;
 
+    /// \brief Return the set of atomic properties occurring in an SCC.
+    ///
+    /// \return a BDD that is a conjuction of all atomic properties
+    /// occurring on the transitions in the SCC n.
+    ///
+    /// \pre This should only be called once build_map() has run.
+    bdd ap_set_of(unsigned n) const;
+
     /// \brief Return the set of acceptance conditions occurring in an SCC.
     ///
     /// \pre This should only be called once build_map() has run.
@@ -133,7 +141,7 @@ namespace spot
     struct scc
     {
     public:
-      scc(int index) : index(index), acc(bddfalse) {};
+      scc(int index) : index(index), acc(bddfalse), supp(bddtrue) {};
       /// Index of the SCC.
       int index;
       /// The union of all acceptance conditions of transitions which
@@ -143,6 +151,8 @@ namespace spot
       std::list<const state*> states;
       /// Set of conditions used in the SCC.
       cond_set conds;
+      /// Conjunction of atomic propositions used in the SCC.
+      bdd supp;
       /// Successor SCC.
       succ_type succ;
     };

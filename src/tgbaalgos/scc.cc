@@ -233,6 +233,7 @@ namespace spot
 	succ_type succs;
 	cond_set conds;
 	conds.insert(cond);
+	bdd supp = bdd_support(cond);
 	while (threshold > root_.front().index)
 	  {
 	    assert(!root_.empty());
@@ -246,6 +247,7 @@ namespace spot
 	    conds.insert(arc_cond_.top());
 	    conds.insert(root_.front().conds.begin(),
 			 root_.front().conds.end());
+	    supp &= root_.front().supp;
 	    root_.pop_front();
 	    arc_acc_.pop();
 	    arc_cond_.pop();
@@ -262,6 +264,7 @@ namespace spot
 	root_.front().states.splice(root_.front().states.end(), states);
 	root_.front().succ.insert(succs.begin(), succs.end());
 	root_.front().conds.insert(conds.begin(), conds.end());
+	root_.front().supp &= supp;
       }
   }
 
@@ -277,6 +280,13 @@ namespace spot
     assert(scc_map_.size() > n);
     return scc_map_[n].conds;
   }
+
+  bdd scc_map::ap_set_of(unsigned n) const
+  {
+    assert(scc_map_.size() > n);
+    return scc_map_[n].supp;
+  }
+
 
   bdd scc_map::acc_set_of(unsigned n) const
   {
@@ -423,7 +433,9 @@ namespace spot
 		  ostr << ", ";
 		bdd_print_formula(ostr, m.get_aut()->get_dict(), *i);
 	      }
-	    ostr << "]";
+	    ostr << "]\\n APs=[";
+	    bdd_print_sat(ostr, m.get_aut()->get_dict(),
+			  m.ap_set_of(state)) << "]";
 	  }
 
 	std::cout << "  " << state << " [shape=box,"

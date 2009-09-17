@@ -1,3 +1,12 @@
+2009-09-17  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Have scc_map keep track of APs that are occurring in a SCC.
+
+	* src/tgbaalgos/scc.hh (scc_map::scc): Add a supp member to hold APs.
+	* src/tgbaalgos/scc.cc (scc_map::build_map): Update supp.
+	(scc_map::ap_set_of): New function.
+	(dump_scc_dot): Show the output of ap_set_of().
+
 2009-09-07  Damien Lefortier <dam@lrde.epita.fr>
 
 	Fix some memory leaks.
