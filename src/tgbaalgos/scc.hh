@@ -150,7 +150,7 @@ namespace spot
     {
     public:
       scc(int index) : index(index), acc(bddfalse),
-		       supp(bddtrue), supp_rec(bddtrue) {};
+		       supp(bddtrue), supp_rec(bddfalse) {};
       /// Index of the SCC.
       int index;
       /// The union of all acceptance conditions of transitions which

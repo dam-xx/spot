@@ -112,15 +112,15 @@ namespace spot
 
     bdd& res = scc_map_[state].supp_rec;
 
-    if (res == bddtrue)
+    if (res == bddfalse)
       {
 	const succ_type& s = succ(state);
 	succ_type::const_iterator it;
 
+	res = scc_map_[state].supp;
+
 	for (it = s.begin(); it != s.end(); ++it)
 	  res &= update_supp_rec(it->first);
-
-	res &= scc_map_[state].supp;
       }
 
     return res;
