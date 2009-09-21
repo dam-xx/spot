@@ -1,5 +1,5 @@
-#ifndef SPOT_TGBA_TGBACOMPLEMENT_HH
-# define SPOT_TGBA_TGBACOMPLEMENT_HH
+#ifndef SPOT_TGBA_TGBASAFRACOMPLEMENT_HH
+# define SPOT_TGBA_TGBASAFRACOMPLEMENT_HH
 
 # include <vector>
 # include "tgba/tgba.hh"
@@ -30,11 +30,11 @@ namespace spot
   ///  is done on-the-fly when successors are called.
   ///
   /// \sa safra_determinisation, tgba_complement::succ_iter.
-  class tgba_complement : public tgba
+  class tgba_safra_complement : public tgba
   {
   public:
-    tgba_complement(const tgba* a);
-    virtual ~tgba_complement();
+    tgba_safra_complement(const tgba* a);
+    virtual ~tgba_safra_complement();
 
     safra_tree_automaton* get_safra() const
     {
@@ -77,7 +77,7 @@ namespace spot
   /// @param a The \c tgba_complement with an intermediate Safra
   /// automaton to display
   ///
-  void display_safra(const tgba_complement* a);
+  void display_safra(const tgba_safra_complement* a);
 }
 
-#endif  // SPOT_TGBA_TGBACOMPLEMENT_HH
+#endif  // SPOT_TGBA_TGBASAFRACOMPLEMENT_HH

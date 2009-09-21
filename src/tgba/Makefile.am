@@ -41,7 +41,7 @@ tgba_HEADERS = \
   tgbabddcoredata.hh \
   tgbabddfactory.hh \
   tgbascc.hh \
-  tgbacomplement.hh \
+  tgbasafracomplement.hh \
   tgbaexplicit.hh \
   tgbaproduct.hh \
   tgbatba.hh \
@@ -63,7 +63,7 @@ libtgba_la_SOURCES = \
   tgbabddconcreteproduct.cc \
   tgbabddcoredata.cc \
   tgbascc.cc \
-  tgbacomplement.cc \
+  tgbasafracomplement.cc \
   tgbaexplicit.cc \
   tgbaproduct.cc \
   tgbatba.cc \

@@ -1,3 +1,14 @@
+2009-09-21  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	Rename files related to Safra complementation.
+
+	* src/tgba/tgbacomplement.cc, src/tgba/tgbacomplement.hh: Rename
+	as...
+	* src/tgba/tgbasafracomplement.cc,
+	src/tgba/tgbasafracomplement.hh: ... these, and adjust class name.
+	* src/tgba/Makefile.am, src/tgbatest/Makefile.am: Adjust.
+	* src/tgbatest/complementation.cc: Adjust.
+
 2009-09-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix previous patch.

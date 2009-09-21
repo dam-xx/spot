@@ -15,7 +15,7 @@
 #include "ltlvisit/clone.hh"
 #include "tgba/tgbatba.hh"
 
-#include "tgba/tgbacomplement.hh"
+#include "tgba/tgbasafracomplement.hh"
 
 void usage(const char* prog)
 {
@@ -98,7 +98,8 @@ int main(int argc, char* argv[])
     if (spot::format_tgba_parse_errors(std::cerr, file, pel))
       return 2;
 
-    spot::tgba_complement* complement = new spot::tgba_complement(a);
+    spot::tgba_safra_complement* complement =
+      new spot::tgba_safra_complement(a);
 
     if (print_automaton)
       spot::dotty_reachable(std::cout, complement);
@@ -132,7 +133,8 @@ int main(int argc, char* argv[])
         return 2;
     }
 
-    spot::tgba_complement* complement = new spot::tgba_complement(a);
+    spot::tgba_safra_complement* complement =
+      new spot::tgba_safra_complement(a);
 
     spot::tgba_statistics a_size =  spot::stats_reachable(a);
     std::cout << "Original: "
@@ -189,8 +191,8 @@ int main(int argc, char* argv[])
     spot::ltl::formula* nf1 = spot::ltl::unop::instance(spot::ltl::unop::Not,
                                                         spot::ltl::clone(f1));
     spot::tgba* Anf = spot::ltl_to_tgba_fm(nf1, dict);
-    spot::tgba_complement* nAf = new spot::tgba_complement(Af);
-    spot::tgba_complement* nAnf = new spot::tgba_complement(Anf);
+    spot::tgba_safra_complement* nAf = new spot::tgba_safra_complement(Af);
+    spot::tgba_safra_complement* nAnf = new spot::tgba_safra_complement(Anf);
     spot::tgba* prod = new spot::tgba_product(nAf, nAnf);
     spot::emptiness_check* ec = spot::couvreur99(prod);
     spot::emptiness_check_result* res = ec->check();

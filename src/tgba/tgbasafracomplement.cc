@@ -34,7 +34,7 @@
 #include "ltlast/formula.hh"
 #include "ltlast/constant.hh"
 #include "tgbaalgos/dotty.hh"
-#include "tgba/tgbacomplement.hh"
+#include "tgba/tgbasafracomplement.hh"
 
 namespace spot
 {
@@ -848,7 +848,7 @@ namespace spot
     ////////////////////////////////////////
     // state_complement
 
-    /// States used by spot::tgba_complement.
+    /// States used by spot::tgba_safra_complement.
     /// \ingroup tgba_representation
     class state_complement : public state
     {
@@ -979,21 +979,21 @@ namespace spot
       return ss.str();
     }
 
-    /// Successor iterators used by spot::tgba_complement.
+    /// Successor iterators used by spot::tgba_safra_complement.
     /// \ingroup tgba_representation
-    class tgba_complement_succ_iterator: public tgba_succ_iterator
+    class tgba_safra_complement_succ_iterator: public tgba_succ_iterator
     {
     public:
       typedef std::multimap<bdd, state_complement*, bdd_less_than> succ_list_t;
 
-      tgba_complement_succ_iterator(const succ_list_t& list,
-                                    bdd the_acceptance_cond)
+      tgba_safra_complement_succ_iterator(const succ_list_t& list,
+                                          bdd the_acceptance_cond)
         : list_(list), the_acceptance_cond_(the_acceptance_cond)
       {
       }
 
       virtual
-      ~tgba_complement_succ_iterator()
+      ~tgba_safra_complement_succ_iterator()
       {
         for (succ_list_t::iterator i = list_.begin(); i != list_.end(); ++i)
           delete i->second;
@@ -1012,39 +1012,39 @@ namespace spot
     };
 
     void
-    tgba_complement_succ_iterator::first()
+    tgba_safra_complement_succ_iterator::first()
     {
       it_ = list_.begin();
     }
 
     void
-    tgba_complement_succ_iterator::next()
+    tgba_safra_complement_succ_iterator::next()
     {
       ++it_;
     }
 
     bool
-    tgba_complement_succ_iterator::done() const
+    tgba_safra_complement_succ_iterator::done() const
     {
       return it_ == list_.end();
     }
 
     state_complement*
-    tgba_complement_succ_iterator::current_state() const
+    tgba_safra_complement_succ_iterator::current_state() const
     {
       assert(!done());
       return new state_complement(*(it_->second));
     }
 
     bdd
-    tgba_complement_succ_iterator::current_condition() const
+    tgba_safra_complement_succ_iterator::current_condition() const
     {
       assert(!done());
       return it_->first;
     }
 
     bdd
-    tgba_complement_succ_iterator::current_acceptance_conditions() const
+    tgba_safra_complement_succ_iterator::current_acceptance_conditions() const
     {
       assert(!done());
       return the_acceptance_cond_;
@@ -1101,10 +1101,10 @@ namespace spot
   // End of the safra construction
   //////////////////////////////////////////
 
-  // tgba_complement
+  // tgba_safra_complement
   //////////////////////////
 
-  tgba_complement::tgba_complement(const tgba* a)
+  tgba_safra_complement::tgba_safra_complement(const tgba* a)
     : automaton_(a), safra_(safra_determinisation::create_safra_automaton(a))
   {
     assert(safra_ || "safra construction fails");
@@ -1134,14 +1134,14 @@ namespace spot
 
   }
 
-  tgba_complement::~tgba_complement()
+  tgba_safra_complement::~tgba_safra_complement()
   {
     get_dict()->unregister_all_my_variables(safra_);
     delete safra_;
   }
 
   state*
-  tgba_complement::get_init_state() const
+  tgba_safra_complement::get_init_state() const
   {
     bitset_t empty(safra_->get_nb_acceptance_pairs());
     return new state_complement(empty, empty, safra_->get_initial_state(),
@@ -1184,7 +1184,7 @@ namespace spot
   /// @param local_state
   ///
   tgba_succ_iterator*
-  tgba_complement::succ_iter(const state* local_state,
+  tgba_safra_complement::succ_iter(const state* local_state,
                              const state* /* = 0 */,
                              const tgba* /* = 0 */) const
   {
@@ -1199,7 +1199,7 @@ namespace spot
     if (tr != safra_->automaton.end())
     {
       bdd condition = bddfalse;
-      tgba_complement_succ_iterator::succ_list_t succ_list;
+      tgba_safra_complement_succ_iterator::succ_list_t succ_list;
       int nb_acceptance_pairs = safra_->get_nb_acceptance_pairs();
       bitset_t e(nb_acceptance_pairs);
 
@@ -1266,20 +1266,20 @@ namespace spot
 #endif
       }
 
-      return new tgba_complement_succ_iterator(succ_list, condition);
+      return new tgba_safra_complement_succ_iterator(succ_list, condition);
     }
     assert("Safra automaton does not find this node");
     return 0;
   }
 
   bdd_dict*
-  tgba_complement::get_dict() const
+  tgba_safra_complement::get_dict() const
   {
     return automaton_->get_dict();
   }
 
   std::string
-  tgba_complement::format_state(const state* state) const
+  tgba_safra_complement::format_state(const state* state) const
   {
     const state_complement* s =
       dynamic_cast<const state_complement*>(state);
@@ -1288,7 +1288,7 @@ namespace spot
   }
 
   bdd
-  tgba_complement::all_acceptance_conditions() const
+  tgba_safra_complement::all_acceptance_conditions() const
   {
 #if TRANSFORM_TO_TBA
     return the_acceptance_cond_;
@@ -1298,7 +1298,7 @@ namespace spot
   }
 
   bdd
-  tgba_complement::neg_acceptance_conditions() const
+  tgba_safra_complement::neg_acceptance_conditions() const
   {
 #if TRANSFORM_TO_TBA
     return !the_acceptance_cond_;
@@ -1308,7 +1308,7 @@ namespace spot
   }
 
   bdd
-  tgba_complement::compute_support_conditions(const state* state) const
+  tgba_safra_complement::compute_support_conditions(const state* state) const
   {
     const state_complement* s = dynamic_cast<const state_complement*>(state);
     assert(s);
@@ -1328,7 +1328,7 @@ namespace spot
   }
 
   bdd
-  tgba_complement::compute_support_variables(const state* state) const
+  tgba_safra_complement::compute_support_variables(const state* state) const
   {
     const state_complement* s = dynamic_cast<const state_complement*>(state);
     assert(s);
@@ -1349,7 +1349,7 @@ namespace spot
 
   // display_safra: debug routine.
   //////////////////////////////
-  void display_safra(const tgba_complement* a)
+  void display_safra(const tgba_safra_complement* a)
   {
     test::print_safra_automaton(a->get_safra());
   }
