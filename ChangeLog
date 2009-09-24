@@ -1,3 +1,13 @@
+2009-09-24  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	A wrapper around tgba to produce state-labeled automata.
+
+	* src/tgba/tgbasgba.hh, src/tgba/tgbasgba.hh: Here.
+	* src/tgbatest/ltl2tgba.cc: New option `-lS' for state-labeled
+	automata.
+	* src/tgba/Makefile.am: Adjust and sort files in tgba_HEADERS
+	and libtgba_la_SOURCES.
+
 2009-09-21  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	Rename files related to Safra complementation.

@@ -38,6 +38,7 @@
 #include "tgbaalgos/dotty.hh"
 #include "tgbaalgos/lbtt.hh"
 #include "tgba/tgbatba.hh"
+#include "tgba/tgbasgba.hh"
 #include "tgba/tgbaproduct.hh"
 #include "tgba/futurecondcol.hh"
 #include "tgbaalgos/reducerun.hh"
@@ -100,6 +101,7 @@ syntax(char* prog)
 	    << "  -KV   verbosely dump the graph of SCCs in dot format"
 	    << std::endl
             << "  -L    fair-loop approximation (implies -f)" << std::endl
+            << "  -lS   label acceptance conditions on states" << std::endl
 	    << "  -m    try to reduce accepting runs, in a second pass"
 	    << std::endl
 	    << "  -N    display the never clain for Spin "
@@ -169,6 +171,7 @@ main(int argc, char** argv)
   bool debug_opt = false;
   bool paper_opt = false;
   enum { NoDegen, DegenTBA, DegenSBA } degeneralize_opt = NoDegen;
+  enum { TransitionLabeled, StateLabeled } labeling_opt = TransitionLabeled;
   bool fm_opt = false;
   int fm_red = spot::ltl::Reduce_None;
   bool fm_exprop_opt = false;
@@ -349,6 +352,10 @@ main(int argc, char** argv)
 	{
 	  fair_loop_approx = true;
 	  fm_opt = true;
+	}
+      else if (!strcmp(argv[formula_index], "-lS"))
+	{
+	  labeling_opt = StateLabeled;
 	}
       else if (!strcmp(argv[formula_index], "-m"))
 	{
@@ -581,6 +588,7 @@ main(int argc, char** argv)
 	}
 
       spot::tgba_tba_proxy* degeneralized = 0;
+      spot::tgba_sgba_proxy* state_labeled = 0;
 
       unsigned int n_acc = a->number_of_acceptance_conditions();
       if (echeck_inst
@@ -592,6 +600,10 @@ main(int argc, char** argv)
 	a = degeneralized = new spot::tgba_tba_proxy(a);
       else if (degeneralize_opt == DegenSBA)
 	a = degeneralized = new spot::tgba_sba_proxy(a);
+      else if (labeling_opt == StateLabeled)
+      {
+        a = state_labeled = new spot::tgba_sgba_proxy(a);
+      }
 
       spot::tgba_reduc* aut_red = 0;
       if (reduc_aut != spot::Reduce_None)
@@ -887,6 +899,7 @@ main(int argc, char** argv)
       delete expl;
       delete aut_red;
       delete degeneralized;
+      delete state_labeled;
       delete to_free;
       delete echeck_inst;
     }

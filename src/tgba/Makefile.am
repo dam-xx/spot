@@ -40,13 +40,14 @@ tgba_HEADERS = \
   tgbabddconcreteproduct.hh \
   tgbabddcoredata.hh \
   tgbabddfactory.hh \
-  tgbascc.hh \
-  tgbasafracomplement.hh \
   tgbaexplicit.hh \
-  tgbaproduct.hh \
-  tgbatba.hh \
-  tgbareduc.hh \
   tgbafromfile.hh \
+  tgbascc.hh \
+  tgbaproduct.hh \
+  tgbareduc.hh \
+  tgbasgba.hh \
+  tgbasafracomplement.hh \
+  tgbatba.hh \
   tgbaunion.hh
 
 noinst_LTLIBRARIES = libtgba.la
@@ -55,18 +56,19 @@ libtgba_la_SOURCES = \
   bddprint.cc \
   formula2bdd.cc \
   futurecondcol.cc \
-  statebdd.cc \
   succiterconcrete.cc \
+  statebdd.cc \
   tgba.cc \
   tgbabddconcrete.cc \
   tgbabddconcretefactory.cc \
   tgbabddconcreteproduct.cc \
   tgbabddcoredata.cc \
-  tgbascc.cc \
-  tgbasafracomplement.cc \
+  tgbafromfile.cc \
   tgbaexplicit.cc \
   tgbaproduct.cc \
-  tgbatba.cc \
   tgbareduc.cc \
-  tgbafromfile.cc \
+  tgbasafracomplement.cc \
+  tgbascc.cc \
+  tgbasgba.cc \
+  tgbatba.cc \
   tgbaunion.cc
