@@ -120,7 +120,7 @@ namespace spot
 	res = scc_map_[state].supp;
 
 	for (it = s.begin(); it != s.end(); ++it)
-	  res &= update_supp_rec(it->first);
+	  res &= update_supp_rec(it->first) & bdd_support(it->second);
       }
 
     return res;
