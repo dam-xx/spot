@@ -1,3 +1,8 @@
+2009-09-29  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	* src/ltltest/randltl.cc, src/ltltest/reduc.test,
+	src/tgbatest/dfs.test: Adjust headers to 80 columns.
+
 2009-09-24  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	A wrapper around tgba to produce state-labeled automata.
