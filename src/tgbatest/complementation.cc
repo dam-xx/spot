@@ -16,18 +16,22 @@
 #include "tgba/tgbatba.hh"
 
 #include "tgba/tgbasafracomplement.hh"
+#include "tgba/tgbacomplement.hh"
 
 void usage(const char* prog)
 {
   std::cout << "usage: " << prog << " [options]" << std::endl;
   std::cout << "with options" << std::endl
+            << "-S                      Use safra complementation"
+            << std::endl
             << "-s     buchi_automaton  display the safra automaton"
             << std::endl
             << "-a     buchi_automaton  display the complemented automaton"
             << std::endl
             << "-astat buchi_automaton  statistics for !a" << std::endl
             << "-fstat formula          statistics for !A_f" << std::endl
-            << "-f     formula          test !A_f and !A_!f" << std::endl;
+            << "-f     formula          test !A_f and !A_!f" << std::endl
+            << "-p     formula          print the automaton for f" << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -40,6 +44,8 @@ int main(int argc, char* argv[])
   bool stats = false;
   bool formula = false;
   bool automaton = false;
+  bool safra = false;
+  bool print_formula = false;
 
   if (argc < 3)
   {
@@ -67,12 +73,16 @@ int main(int argc, char* argv[])
 
       switch (argv[i][1])
       {
+        case 'S':
+          safra = true; break;
         case 's':
-          print_safra = true; break;
+          safra = true; print_safra = true; break;
         case 'a':
           print_automaton = true; break;
         case 'f':
           check = true; break;
+        case 'p':
+          print_formula = true; break;
         default:
           std::cerr << "unrecognized option `-" << argv[i][1]
                     << "'" << std::endl;
@@ -98,14 +108,46 @@ int main(int argc, char* argv[])
     if (spot::format_tgba_parse_errors(std::cerr, file, pel))
       return 2;
 
-    spot::tgba_safra_complement* complement =
-      new spot::tgba_safra_complement(a);
+    spot::tgba* complement = 0;
+
+    if (safra)
+      complement = new spot::tgba_safra_complement(a);
+    else
+      complement = new spot::tgba_complement(a);
 
     if (print_automaton)
       spot::dotty_reachable(std::cout, complement);
 
     if (print_safra)
-      spot::display_safra(complement);
+    {
+      spot::tgba_safra_complement* safra_complement =
+        dynamic_cast<spot::tgba_safra_complement*>(complement);
+      spot::display_safra(safra_complement);
+    }
+    delete complement;
+    delete a;
+  }
+  else if (print_formula)
+  {
+    spot::tgba* a;
+    spot::ltl::formula* f1 = 0;
+
+    spot::ltl::parse_error_list p1;
+    f1 = spot::ltl::parse(file, p1);
+
+    if (spot::ltl::format_parse_errors(std::cerr, file, p1))
+      return 2;
+
+    a = spot::ltl_to_tgba_fm(f1, dict);
+
+    spot::tgba* complement = 0;
+    if (safra)
+      complement = new spot::tgba_safra_complement(a);
+    else
+      complement = new spot::tgba_complement(a);
+
+    spot::dotty_reachable(std::cout, complement);
+    spot::ltl::destroy(f1);
     delete complement;
     delete a;
   }
@@ -133,7 +175,7 @@ int main(int argc, char* argv[])
         return 2;
     }
 
-    spot::tgba_safra_complement* complement =
+    spot::tgba_safra_complement* safra_complement =
       new spot::tgba_safra_complement(a);
 
     spot::tgba_statistics a_size =  spot::stats_reachable(a);
@@ -152,8 +194,18 @@ int main(int argc, char* argv[])
               << std::endl;
     delete buchi;
 
-    spot::tgba_statistics b_size =  spot::stats_reachable(complement);
-    std::cout << "Complement: "
+    spot::tgba_statistics b_size =  spot::stats_reachable(safra_complement);
+    std::cout << "Safra Complement: "
+              << b_size.states << ", "
+              << b_size.transitions << ", "
+              << safra_complement->number_of_acceptance_conditions()
+              << std::endl;
+
+    spot::tgba_complement* complement =
+      new spot::tgba_complement(a);
+
+    b_size =  spot::stats_reachable(complement);
+    std::cout << "GBA Complement: "
               << b_size.states << ", "
               << b_size.transitions << ", "
               << complement->number_of_acceptance_conditions()
@@ -191,8 +243,19 @@ int main(int argc, char* argv[])
     spot::ltl::formula* nf1 = spot::ltl::unop::instance(spot::ltl::unop::Not,
                                                         spot::ltl::clone(f1));
     spot::tgba* Anf = spot::ltl_to_tgba_fm(nf1, dict);
-    spot::tgba_safra_complement* nAf = new spot::tgba_safra_complement(Af);
-    spot::tgba_safra_complement* nAnf = new spot::tgba_safra_complement(Anf);
+
+    spot::tgba* nAf;
+    spot::tgba* nAnf;
+    if (safra)
+    {
+      nAf = new spot::tgba_safra_complement(Af);
+      nAnf = new spot::tgba_safra_complement(Anf);
+    }
+    else
+    {
+      nAf = new spot::tgba_complement(Af);
+      nAnf = new spot::tgba_complement(Anf);
+    }
     spot::tgba* prod = new spot::tgba_product(nAf, nAnf);
     spot::emptiness_check* ec = spot::couvreur99(prod);
     spot::emptiness_check_result* res = ec->check();

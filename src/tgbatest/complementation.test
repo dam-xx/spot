@@ -26,6 +26,7 @@ set -e
 
 while read f; do
     run 0 ../complement -f "$f"
+    run 0 ../complement -S -f "$f"
 done <<EOF
 GFa
 FGa

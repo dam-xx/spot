@@ -40,6 +40,7 @@ tgba_HEADERS = \
   tgbabddconcreteproduct.hh \
   tgbabddcoredata.hh \
   tgbabddfactory.hh \
+  tgbacomplement.hh \
   tgbaexplicit.hh \
   tgbafromfile.hh \
   tgbascc.hh \
@@ -63,8 +64,9 @@ libtgba_la_SOURCES = \
   tgbabddconcretefactory.cc \
   tgbabddconcreteproduct.cc \
   tgbabddcoredata.cc \
-  tgbafromfile.cc \
+  tgbacomplement.cc \
   tgbaexplicit.cc \
+  tgbafromfile.cc \
   tgbaproduct.cc \
   tgbareduc.cc \
   tgbasafracomplement.cc \

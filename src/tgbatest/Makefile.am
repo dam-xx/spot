@@ -31,7 +31,7 @@ check_SCRIPTS = defs
 # Keep this sorted alphabetically.
 check_PROGRAMS = \
   bddprod \
-  safracomplement \
+  complement \
   explicit \
   expldot \
   explprod \
