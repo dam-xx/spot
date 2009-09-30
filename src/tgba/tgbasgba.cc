@@ -93,15 +93,20 @@ namespace spot
       bdd acc_;
     };
 
-
     /// \brief Iterate over the successors of tgba_sgba_proxy computed
     /// on the fly.
     class tgba_sgba_proxy_succ_iterator: public tgba_succ_iterator
     {
     public:
       tgba_sgba_proxy_succ_iterator(tgba_succ_iterator* it)
-	: it_(it)
+	: it_(it), emulate_acc_cond_(false)
       {
+      }
+
+      tgba_sgba_proxy_succ_iterator(tgba_succ_iterator* it, bdd acc)
+	: it_(it), emulate_acc_cond_(true)
+      {
+        acceptance_condition_ = acc;
       }
 
       virtual
@@ -136,7 +141,7 @@ namespace spot
       current_state() const
       {
 	return new state_sgba_proxy(it_->current_state(),
-                                   it_->current_acceptance_conditions());
+                                    it_->current_acceptance_conditions());
       }
 
       bdd
@@ -148,19 +153,32 @@ namespace spot
       bdd
       current_acceptance_conditions() const
       {
+        if (emulate_acc_cond_)
+          return acceptance_condition_;
 	return it_->current_acceptance_conditions();
       }
 
     protected:
       tgba_succ_iterator* it_;
-      friend class ::spot::tgba_sgba_proxy;
+      // If the automaton has no acceptance condition,
+      // every state is accepting.
+      bool emulate_acc_cond_;
+      bdd acceptance_condition_;
     };
 
   } // anonymous
 
-  tgba_sgba_proxy::tgba_sgba_proxy(const tgba* a)
-    : a_(a)
+  tgba_sgba_proxy::tgba_sgba_proxy(const tgba* a, bool no_zero_acc)
+    : a_(a), emulate_acc_cond_(false)
   {
+    if (no_zero_acc && a_->number_of_acceptance_conditions() == 0)
+    {
+      emulate_acc_cond_ = true;
+      int v = get_dict()
+        ->register_acceptance_variable(ltl::constant::true_instance(), this);
+      acceptance_condition_ = bdd_ithvar(v);
+    }
+
     get_dict()->register_all_variables_of(a, this);
   }
 
@@ -201,7 +219,11 @@ namespace spot
   {
     const state_sgba_proxy* s = dynamic_cast<const state_sgba_proxy*>(state);
     assert(s);
-    std::string a = bdd_format_accset(get_dict(), s->acceptance_cond());
+    std::string a;
+    if (!emulate_acc_cond_)
+      a = bdd_format_accset(get_dict(), s->acceptance_cond());
+    else
+      a = bdd_format_accset(get_dict(), acceptance_condition_);
     if (a != "")
       a = " " + a;
     return a_->format_state(s->real_state()) + a;
@@ -210,12 +232,16 @@ namespace spot
   bdd
   tgba_sgba_proxy::all_acceptance_conditions() const
   {
+    if (emulate_acc_cond_)
+      return acceptance_condition_;
     return a_->all_acceptance_conditions();
   }
 
   bdd
   tgba_sgba_proxy::neg_acceptance_conditions() const
   {
+    if (emulate_acc_cond_)
+      return bdd_nithvar(bdd_var(acceptance_condition_));
     return a_->neg_acceptance_conditions();
   }
 
@@ -225,6 +251,8 @@ namespace spot
     const state_sgba_proxy* s =
       dynamic_cast<const state_sgba_proxy*>(state);
     assert(s);
+    if (emulate_acc_cond_)
+      return acceptance_condition_;
     return s->acceptance_cond();
   }
 
@@ -234,6 +262,9 @@ namespace spot
     const state_sgba_proxy* s =
       dynamic_cast<const state_sgba_proxy*>(state);
     assert(s);
+
+    if (emulate_acc_cond_)
+      return acceptance_condition_;
     return a_->support_conditions(s->real_state());
   }
 
@@ -243,6 +274,9 @@ namespace spot
     const state_sgba_proxy* s =
       dynamic_cast<const state_sgba_proxy*>(state);
     assert(s);
+
+    if (emulate_acc_cond_)
+      return bdd_support(acceptance_condition_);
     return a_->support_variables(s->real_state());
   }
 

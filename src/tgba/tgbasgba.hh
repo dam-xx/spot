@@ -38,7 +38,7 @@ namespace spot
   class tgba_sgba_proxy : public tgba
   {
   public:
-    tgba_sgba_proxy(const tgba* a);
+    tgba_sgba_proxy(const tgba* a, bool no_zero_acc = true);
 
     virtual ~tgba_sgba_proxy();
 
@@ -64,6 +64,10 @@ namespace spot
 
   private:
     const tgba* a_;
+    // If the automaton has no acceptance condition,
+    // every state is accepting.
+    bool emulate_acc_cond_;
+    bdd acceptance_condition_;
     // Disallow copy.
     tgba_sgba_proxy(const tgba_sgba_proxy&);
     tgba_sgba_proxy& operator=(const tgba_sgba_proxy&);

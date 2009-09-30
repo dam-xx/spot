@@ -1,3 +1,12 @@
+2009-10-01  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	The sgba proxy adds an acceptance condition to every states when
+	the original automaton has no acceptance condition.
+
+	* src/tgba/tgbasgba.cc, src/tgba/tgbasgba.hh: New option:
+	when the original automaton has no accepting condition, it
+	explicitly considers that every state is accepting.
+
 2009-09-30  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	* src/tgba/tgbacomplement.cc: Move functions related to
