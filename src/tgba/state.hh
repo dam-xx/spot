@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6
+// (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
+// Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -26,6 +26,7 @@
 #include <bdd.h>
 #include <cassert>
 #include <functional>
+#include <boost/shared_ptr.hpp>
 
 namespace spot
 {
@@ -142,6 +143,92 @@ namespace spot
   {
     size_t
     operator()(const state* that) const
+    {
+      assert(that);
+      return that->hash();
+    }
+  };
+
+  // Functions related to shared_ptr.
+  //////////////////////////////////////////////////
+
+  typedef boost::shared_ptr<const state> shared_state;
+
+  /// \brief Strict Weak Ordering for \c shared_state
+  /// (shared_ptr<const state*>).
+  /// \ingroup tgba_essentials
+  ///
+  /// This is meant to be used as a comparison functor for
+  /// STL \c map whose key are of type \c shared_state.
+  ///
+  /// For instance here is how one could declare
+  /// a map of \c shared_state.
+  /// \code
+  ///   // Remember how many times each state has been visited.
+  ///   std::map<shared_state, int, spot::state_shared_ptr_less_than> seen;
+  /// \endcode
+  struct state_shared_ptr_less_than:
+    public std::binary_function<shared_state,
+                                shared_state, bool>
+  {
+    bool
+    operator()(shared_state left,
+               shared_state right) const
+    {
+      assert(left);
+      return left->compare(right.get()) < 0;
+    }
+  };
+
+  /// \brief An Equivalence Relation for \c shared_state
+  /// (shared_ptr<const state*>).
+  /// \ingroup tgba_essentials
+  ///
+  /// This is meant to be used as a comparison functor for
+  /// Sgi \c hash_map whose key are of type \c shared_state.
+  ///
+  /// For instance here is how one could declare
+  /// a map of \c shared_state
+  /// \code
+  ///   // Remember how many times each state has been visited.
+  ///   Sgi::hash_map<shared_state, int,
+  ///                 spot::state_shared_ptr_hash,
+  ///                 spot::state_shared_ptr_equal> seen;
+  /// \endcode
+  struct state_shared_ptr_equal:
+    public std::binary_function<shared_state,
+                                shared_state, bool>
+  {
+    bool
+    operator()(shared_state left,
+               shared_state right) const
+    {
+      assert(left);
+      return 0 == left->compare(right.get());
+    }
+  };
+
+  /// \brief Hash Function for \c shared_state (shared_ptr<const state*>).
+  /// \ingroup tgba_essentials
+  /// \ingroup hash_funcs
+  ///
+  /// This is meant to be used as a hash functor for
+  /// Sgi's \c hash_map whose key are of type
+  /// \c shared_state.
+  ///
+  /// For instance here is how one could declare
+  /// a map of \c shared_state.
+  /// \code
+  ///   // Remember how many times each state has been visited.
+  ///   Sgi::hash_map<shared_state, int,
+  ///                 spot::state_shared_ptr_hash,
+  ///                 spot::state_shared_ptr_equal> seen;
+  /// \endcode
+  struct state_shared_ptr_hash:
+    public std::unary_function<shared_state, size_t>
+  {
+    size_t
+    operator()(shared_state that) const
     {
       assert(that);
       return that->hash();

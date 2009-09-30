@@ -1,3 +1,11 @@
+2009-09-30  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	* src/tgba/tgbacomplement.cc: Move functions related to
+	shared_ptr on states...
+	* src/tgba/state.hh: ... here.
+	* src/tgbatest/complementation.test: Do not apply some tests on
+	the new algorithm because it takes to much time to run.
+
 2009-09-29  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	A new complementation construction based on ranking.

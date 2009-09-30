@@ -1,8 +1,8 @@
 #include <vector>
 #include <cassert>
 #include <sstream>
-#include <boost/shared_ptr.hpp>
 #include "bdd.h"
+#include "bddprint.hh"
 #include "state.hh"
 #include "tgbacomplement.hh"
 #include "misc/hash.hh"
@@ -10,64 +10,10 @@
 #include "misc/hashfunc.hh"
 #include "ltlast/formula.hh"
 #include "ltlast/constant.hh"
+#include "tgbaalgos/stats.hh"
 
 namespace spot
 {
-  /// \brief An Equivalence Relation for \c boost::shared_ptr<const state>.
-  /// \ingroup tgba_essentials
-  ///
-  /// This is meant to be used as a comparison functor for
-  /// Sgi \c hash_map whose key are of type \c boost::shared_ptr<const state>.
-  ///
-  /// For instance here is how one could declare
-  /// a map of \c boost::shared_ptr<const state>
-  /// \code
-  ///   // Remember how many times each state has been visited.
-  ///   Sgi::hash_map<boost::shared_ptr<const state>, int,
-  ///                 spot::state_shared_ptr_hash,
-  ///                 spot::state_shared_ptr_equal> seen;
-  /// \endcode
-  struct state_shared_ptr_equal:
-    public std::binary_function<boost::shared_ptr<const state>,
-                                boost::shared_ptr<const state>, bool>
-  {
-    bool
-    operator()(boost::shared_ptr<const state> left,
-               boost::shared_ptr<const state> right) const
-    {
-      assert(left);
-      return 0 == left->compare(right.get());
-    }
-  };
-
-
-  /// \brief Hash Function for \c boost::shared_ptr<const state>.
-  /// \ingroup tgba_essentials
-  /// \ingroup hash_funcs
-  ///
-  /// This is meant to be used as a hash functor for
-  /// Sgi's \c hash_map whose key are of type
-  /// \c boost::shared_ptr<const state>.
-  ///
-  /// For instance here is how one could declare
-  /// a map of \c boost::shared_ptr<const state>.
-  /// \code
-  ///   // Remember how many times each state has been visited.
-  ///   Sgi::hash_map<boost::shared_ptr<const state>, int,
-  ///                 spot::state_shared_ptr_hash,
-  ///                 spot::state_shared_ptr_equal> seen;
-  /// \endcode
-  struct state_shared_ptr_hash:
-    public std::unary_function<boost::shared_ptr<const state>, size_t>
-  {
-    size_t
-    operator()(boost::shared_ptr<const state> that) const
-    {
-      assert(that);
-      return that->hash();
-    }
-  };
-
   namespace
   {
     ////////////////////////////////////////
@@ -107,14 +53,15 @@ namespace spot
         return hash;
       }
 
-      std::string format() const
+      std::string format(const tgba* a) const
       {
         std::ostringstream ss;
         ss << "{rank: " << rank;
         if (rank & 1)
         {
-          ss << ", bdd: {" << condition.order() << ", " <<
-            bddset << condition.get_bdd() << "} ";
+          ss << ", bdd: {" << condition.order() << ", "
+             << bdd_format_accset(a->get_dict(), condition.get_bdd())
+             << "} ";
         }
         ss << "}";
         return ss.str();
@@ -122,54 +69,12 @@ namespace spot
     };
 
     // typedefs.
-    typedef boost::shared_ptr<const state> shared_state;
     typedef Sgi::hash_map<shared_state, rank_t,
                           state_shared_ptr_hash,
                           state_shared_ptr_equal> state_rank_map;
     typedef Sgi::hash_set<shared_state,
                           state_shared_ptr_hash,
                           state_shared_ptr_equal> state_set;
-
-    ////////////////////////////////////////
-    // count_states
-
-    /// \brief Count the number of states in a tgba.
-    class count_states : public bfs_steps
-    {
-    public:
-      count_states(const tgba* a)
-        : bfs_steps(a)
-      {
-        shared_state s(a->get_init_state());
-        states_.insert(s);
-
-        tgba_run::steps l;
-        search(s.get(), l);
-      }
-
-      virtual const state* filter(const state* s)
-      {
-        shared_state _s(s);
-        if (states_.find(_s) == states_.end())
-        {
-          states_.insert(_s);
-          return s;
-        }
-        return 0;
-      }
-
-      virtual bool match(tgba_run::step&, const state*)
-      {
-        return false;
-      }
-
-      size_t size() const
-      {
-        return states_.size();
-      }
-    private:
-      state_set states_;
-    };
 
     ////////////////////////////////////////
     // state_complement
@@ -459,6 +364,7 @@ namespace spot
             return false;
         }
       }
+
       return true;
     }
 
@@ -685,8 +591,8 @@ namespace spot
       ->register_acceptance_variable(ltl::constant::true_instance(), this);
     the_acceptance_cond_ = bdd_ithvar(v);
     {
-      count_states count(automaton_);
-      nb_states_ = count.size();
+      spot::tgba_statistics a_size =  spot::stats_reachable(automaton_);
+      nb_states_ = a_size.states;
     }
     get_acc_list();
   }
@@ -742,17 +648,14 @@ namespace spot
          ++i)
     {
       ss << "  {" << automaton_->format_state(i->first.get())
-         << ", " << i->second.format() << "}" << std::endl;
+         << ", " << i->second.format(this) << "}" << std::endl;
     }
     ss << "} odd-less: {";
 
     for (state_set::const_iterator i = state_filter.begin();
          i != state_filter.end();
          ++i)
-    {
       ss << "  " << automaton_->format_state(i->get()) << std::endl;
-    }
-
     ss << "} }";
     return ss.str();
   }
