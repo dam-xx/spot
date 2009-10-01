@@ -393,7 +393,7 @@ static BddTree *reorder_swapwin3(BddTree *this, BddTree **first)
 
 static BddTree *reorder_win3(BddTree *t)
 {
-   BddTree *this, *first=t;
+   BddTree *this=t, *first=t;
 
    if (t == NULL)
       return t;
@@ -423,7 +423,7 @@ static BddTree *reorder_win3(BddTree *t)
 
 static BddTree *reorder_win3ite(BddTree *t)
 {
-   BddTree *this=t, *first=t;
+   BddTree *this, *first=t;
    int lastsize;
 
    if (t == NULL)

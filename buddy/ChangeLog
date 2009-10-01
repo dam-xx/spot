@@ -1,3 +1,12 @@
+2009-10-01  Alexandre Duret-Lutz  <adl@lrde.epita.net>
+
+	Fix the previous patch in reorder.c: I missread the
+	function name in the Clang report...
+
+	* src/reorder.c (reorder_win3): Do initialize THIS.
+	(reorder_win3ite): Do not initialize THIS, its
+	initial value is never read.
+
 2009-09-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix some issues reported by LLVM/Clang's static analyser.
