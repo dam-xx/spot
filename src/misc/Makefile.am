@@ -28,6 +28,7 @@ misc_HEADERS = \
   bareword.hh \
   bddalloc.hh \
   bddlt.hh \
+  bddop.hh \
   escape.hh \
   freelist.hh \
   hash.hh \
@@ -45,6 +46,7 @@ noinst_LTLIBRARIES = libmisc.la
 libmisc_la_SOURCES = \
   bareword.cc \
   bddalloc.cc \
+  bddop.cc \
   escape.cc \
   freelist.cc \
   memusage.cc \

@@ -1,3 +1,15 @@
+2009-10-04  Damien Lefortier <dam@lrde.epita.fr>
+
+	Add a class to represent Transition-based Alternating Automata (TAA).
+
+	* misc/Makefile.am, misc/bbop.cc, misc/bddop.hh: Factorize some
+	code on BDDs to compute all_acceptance_conditions from
+	neg_acceptance_condition.
+	* src/tgba/Makefile.am, src/tgbatest/Makefile.am: Adjust.
+	* src/tgba/taa.cc, src/tgba/taa.hh: The TAA class.
+	* src/tgba/tgbaexplicit.hh: Use the factorized code in bddop.hh.
+	* src/tgbatest/taa.cc, src/tgbatest/taa.test: Some test cases.
+
 2009-10-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* AUTHORS: Add Damien Lefortier, Guillaume Sadegh, and Félix

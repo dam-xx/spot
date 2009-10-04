@@ -24,6 +24,7 @@
 #include "ltlvisit/destroy.hh"
 #include "tgbaexplicit.hh"
 #include "tgba/formula2bdd.hh"
+#include "misc/bddop.hh"
 #include <cassert>
 
 namespace spot
@@ -383,25 +384,8 @@ namespace spot
   {
     if (!all_acceptance_conditions_computed_)
       {
-	bdd all = bddfalse;
-
-	// Build all_acceptance_conditions_ from neg_acceptance_conditions_
-	// I.e., transform !A & !B & !C into
-	//        A & !B & !C
-	//     + !A &  B & !C
-	//     + !A & !B &  C
-	bdd cur = neg_acceptance_conditions_;
-	while (cur != bddtrue)
-	  {
-	    assert(cur != bddfalse);
-
-	    bdd v = bdd_ithvar(bdd_var(cur));
-	    all |= v & bdd_exist(neg_acceptance_conditions_, v);
-
-	    assert(bdd_high(cur) != bddtrue);
-	    cur = bdd_low(cur);
-	  }
-	all_acceptance_conditions_ = all;
+	all_acceptance_conditions_ =
+	  compute_all_acceptance_conditions(neg_acceptance_conditions_);
 	all_acceptance_conditions_computed_ = true;
       }
     return all_acceptance_conditions_;
