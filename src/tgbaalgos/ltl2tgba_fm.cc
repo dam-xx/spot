@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2008 Laboratoire
+// Copyright (C) 2003, 2004, 2005, 2006, 2008, 2009 Laboratoire
 // d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
 // Coopératifs (SRC), Université Pierre et Marie Curie.
 //
@@ -904,10 +904,9 @@ namespace spot
 	  }
 
 	// Check for an arc going to 1 (True).  Register it first, that
-	// way it will be explored before the other during the model
-	// checking.
+	// way it will be explored before others during model checking.
 	dest_map::const_iterator i = dests.find(constant::true_instance());
-	// COND_FOR_TRUE is the conditions of the True arc, so when
+	// COND_FOR_TRUE is the conditions of the True arc, so we
 	// can remove them from all other arcs.  It might sounds that
 	// this is not needed when exprop is used, but in fact it is
 	// complementary.
@@ -915,8 +914,8 @@ namespace spot
 	// Consider
 	//   f = r(X(1) R p) = p.(1 + r(X(1) R p))
 	// with exprop the two outgoing arcs would be
-        //         p                  p
-	//     f ----> 1       f ----------> 1
+        //         p               p
+	//     f ----> 1       f ----> f
 	//
 	// where in fact we could output
         //         p
