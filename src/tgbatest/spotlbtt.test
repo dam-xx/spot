@@ -73,7 +73,7 @@ Algorithm
    Name = "Spot (Couvreur -- LaCIM), eltl + delete_unaccepting_scc"
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot '../eltl2tgba -L'"
-   Enabled = yes
+   Enabled = no
 }
 
 Algorithm
@@ -259,6 +259,14 @@ Algorithm
    Name = "Spot (Couvreur -- FM post_branch + exprop + flapprox), degeneralized"
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot '../ltl2tgba -F -f -p -x -t -L -D'"
+   Enabled = yes
+}
+
+Algorithm
+{
+   Name = "Spot (Tauriainen -- TAA)"
+   Path = "${LBTT_TRANSLATE}"
+   Parameters = "--spot '../ltl2tgba -F -taa -t'"
    Enabled = yes
 }
 

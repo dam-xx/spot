@@ -1,3 +1,15 @@
+2009-10-16  Damien Lefortier <dam@lrde.epita.fr>
+
+	Add a new algorithm (from Tauriainen) to translate LTL formulae to
+	TGBA which uses TAA as an intermediate representation.  This is a
+	basic version, optimizations and enhancements will come later.
+
+	* src/tgbaalgos/ltl2taa.cc, src/tgbaalgos/ltl2taa.hh: The algortihm.
+	* src/tgbaalgos/Makefile.am: Adjust.
+	* src/tgbatest/ltl2tgba: New option: -taa, which uses this new
+	translation algorithm.
+	* src/tgbatest/spotlbtt.test: Add ltl2tgba -taa.
+
 2009-10-04  Damien Lefortier <dam@lrde.epita.fr>
 
 	Add a class to represent Transition-based Alternating Automata (TAA).

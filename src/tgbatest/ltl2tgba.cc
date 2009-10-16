@@ -33,6 +33,7 @@
 #include "ltlparse/public.hh"
 #include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"
+#include "tgbaalgos/ltl2taa.hh"
 #include "tgba/bddprint.hh"
 #include "tgbaalgos/save.hh"
 #include "tgbaalgos/dotty.hh"
@@ -79,6 +80,7 @@ syntax(char* prog)
 	    << "  -E[ALGO]  emptiness-check, expect no accepting run"
 	    << std::endl
             << "  -f    use Couvreur's FM algorithm for translation"
+            << "  -taa  use Tauriainen's TAA-based algorithm for translation"
 	    << std::endl
 	    << "  -fr1  use -r1 (see below) at each step of FM" << std::endl
 	    << "  -fr2  use -r2 (see below) at each step of FM" << std::endl
@@ -172,6 +174,7 @@ main(int argc, char** argv)
   bool paper_opt = false;
   enum { NoDegen, DegenTBA, DegenSBA } degeneralize_opt = NoDegen;
   enum { TransitionLabeled, StateLabeled } labeling_opt = TransitionLabeled;
+  bool taa_opt = false;
   bool fm_opt = false;
   int fm_red = spot::ltl::Reduce_None;
   bool fm_exprop_opt = false;
@@ -279,6 +282,10 @@ main(int argc, char** argv)
           expect_counter_example = false;
           output = -1;
         }
+      else if (!strcmp(argv[formula_index], "-taa"))
+	{
+	  taa_opt = true;
+	}
       else if (!strcmp(argv[formula_index], "-f"))
 	{
 	  fm_opt = true;
@@ -584,7 +591,10 @@ main(int argc, char** argv)
 					       fair_loop_approx, unobservables,
 					       fm_red, containment);
 	  else
-	    to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
+	    if (taa_opt)
+	      to_free = a = spot::ltl_to_taa(f, dict);
+	    else
+	      to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 	}
 
       spot::tgba_tba_proxy* degeneralized = 0;
