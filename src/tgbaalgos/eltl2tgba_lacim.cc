@@ -37,7 +37,7 @@ namespace spot
     using namespace ltl;
 
     /// \brief Recursively translate a formula into a BDD.
-    class eltl_trad_visitor: public const_visitor
+    class eltl_trad_visitor : public const_visitor
     {
     public:
       eltl_trad_visitor(tgba_bdd_concrete_factory& fact, bool root = false)
@@ -290,7 +290,7 @@ namespace spot
     // Traverse the formula and draft the automaton in a factory.
     tgba_bdd_concrete_factory fact(dict);
     eltl_trad_visitor v(fact, true);
-    f->accept(v);
+    f2->accept(v);
     ltl::destroy(f2);
     fact.finish();
 

@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_MISC_BDDOP_HH_
-# define SPOT_MISC_BDDOP_HH_
+#ifndef SPOT_MISC_BDDOP_HH
+# define SPOT_MISC_BDDOP_HH
 
 #include "bdd.h"
 
@@ -31,4 +31,4 @@ namespace spot
   bdd compute_all_acceptance_conditions(bdd neg_acceptance_conditions);
 }
 
-#endif /* !SPOT_MISC_BDDOP_HH_ */
+#endif // SPOT_MISC_BDDOP_HH

@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_TAAALGOS_LTL2TAA_HH_
-# define SPOT_TAAALGOS_LTL2TAA_HH_
+#ifndef SPOT_TGBAALGOS_LTL2TAA_HH
+# define SPOT_TGBAALGOS_LTL2TAA_HH
 
 #include "ltlast/formula.hh"
 #include "tgba/taa.hh"
@@ -51,4 +51,4 @@ namespace spot
   taa* ltl_to_taa(const ltl::formula* f, bdd_dict* dict);
 }
 
-#endif /* !SPOT_TAAALGOS_LTL2TAA_HH_ */
+#endif // SPOT_TGBAALGOS_LTL2TAA_HH

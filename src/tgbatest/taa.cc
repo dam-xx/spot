@@ -24,28 +24,8 @@
 #include "misc/hash.hh"
 #include "ltlenv/defaultenv.hh"
 #include "ltlast/allnodes.hh"
+#include "tgbaalgos/dotty.hh"
 #include "tgba/taa.hh"
-
-typedef Sgi::hash_set<
-  const spot::state*, spot::state_ptr_hash, spot::state_ptr_equal
-  > mset;
-
-void
-dfs(spot::taa* a, const spot::state* s, mset& m)
-{
-  if (m.find(s) != m.end())
-    return;
-  m.insert(s);
-
-  spot::tgba_succ_iterator* i = a->succ_iter(s);
-  assert(i);
-  for (i->first(); !i->done(); i->next())
-  {
-    std::cout << a->format_state(i->current_state()) << std::endl;
-    dfs(a, i->current_state(), m);
-  }
-  delete i;
-}
 
 int
 main()
@@ -70,11 +50,12 @@ main()
   a->add_condition(t2, e.require("b"));
   a->add_condition(t3, e.require("c"));
 
-  mset m;
-  spot::state* init = a->get_init_state();
-  dfs(a, init, m);
+  spot::dotty_reachable(std::cout, a);
 
-  delete init;
   delete a;
   delete dict;
+  assert(spot::ltl::atomic_prop::instance_count() == 0);
+  assert(spot::ltl::unop::instance_count() == 0);
+  assert(spot::ltl::binop::instance_count() == 0);
+  assert(spot::ltl::multop::instance_count() == 0);
 }

@@ -1,5 +1,16 @@
 2009-10-16  Damien Lefortier <dam@lrde.epita.fr>
 
+	Minor fixes.
+
+	* src/misc/bddop.hh, src/tgba/taa.hh, src/tgbaalgos/ltl2taa.hh:
+	Fix sanity (incorrect include guard).
+	* src/tgba/tgbacomplement.cc, src/tgba/tgbacomplement.hh:
+	Copyright 2009.
+	* src/tgbaalgos/eltl2tgba_lacim.cc: Use abbreviations.
+	* src/tgbatest/taa.cc: Fix it.
+
+2009-10-16  Damien Lefortier <dam@lrde.epita.fr>
+
 	Add a new algorithm (from Tauriainen) to translate LTL formulae to
 	TGBA which uses TAA as an intermediate representation.  This is a
 	basic version, optimizations and enhancements will come later.

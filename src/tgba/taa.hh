@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_TGBA_TAA_HH_
-# define SPOT_TGBA_TAA_HH_
+#ifndef SPOT_TGBA_TAA_HH
+# define SPOT_TGBA_TAA_HH
 
 #include <set>
 #include <vector>
@@ -172,4 +172,4 @@ namespace spot
   };
 }
 
-#endif /* !SPOT_TGBA_TAAEXPLICIT_HH_ */
+#endif // SPOT_TGBA_TAA_HH
