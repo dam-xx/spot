@@ -86,6 +86,7 @@ TESTS = \
   tripprod.test \
   mixprod.test \
   dupexp.test \
+  kv.test \
   reduccmp.test \
   reductgba.test \
   scc.test \

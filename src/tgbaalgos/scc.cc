@@ -24,6 +24,7 @@
 #include <sstream>
 #include "scc.hh"
 #include "tgba/bddprint.hh"
+#include "misc/escape.hh"
 
 namespace spot
 {
@@ -455,22 +456,24 @@ namespace spot
 	    if (n > 1)
 	      ostr << "s";
 	    ostr << ")\\naccs=";
-	    bdd_print_accset(ostr, m.get_aut()->get_dict(),
-			     m.acc_set_of(state));
+	    escape_str(ostr, bdd_format_accset(m.get_aut()->get_dict(),
+					       m.acc_set_of(state)));
 	    ostr << "\\nconds=[";
 	    for (scc_map::cond_set::const_iterator i = cs.begin();
 		 i != cs.end(); ++i)
 	      {
 		if (i != cs.begin())
 		  ostr << ", ";
-		bdd_print_formula(ostr, m.get_aut()->get_dict(), *i);
+		escape_str(ostr,
+			   bdd_format_formula(m.get_aut()->get_dict(), *i));
 	      }
 	    ostr << "]\\n AP=[";
-	    bdd_print_sat(ostr, m.get_aut()->get_dict(),
-			  m.ap_set_of(state));
+	    escape_str(ostr,
+		       bdd_format_sat(m.get_aut()->get_dict(),
+				      m.ap_set_of(state)));
 	    ostr << "]\\n APrec=[";
-	    bdd_print_sat(ostr, m.get_aut()->get_dict(),
-			  m.aprec_set_of(state)) << "]";
+	    escape_str(ostr, bdd_format_sat(m.get_aut()->get_dict(),
+					    m.aprec_set_of(state))) << "]";
 	  }
 
 	std::cout << "  " << state << " [shape=box,"
@@ -487,7 +490,7 @@ namespace spot
 
 	    out << "  " << state << " -> " << dest
 		<< " [label=\"";
-	    bdd_print_formula(out, m.get_aut()->get_dict(), label);
+	    escape_str(out, bdd_format_formula(m.get_aut()->get_dict(), label));
 	    out << "\"]" << std::endl;
 
 	    if (seen[dest])
