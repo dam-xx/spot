@@ -156,7 +156,7 @@ namespace spot
 
     state_set::const_iterator i1 = ss->begin();
     sn_map::const_iterator i2;
-    if (ss->size() == 0)
+    if (ss->empty())
       return std::string("{}");
     if (ss->size() == 1)
     {
@@ -346,7 +346,7 @@ namespace spot
       {
 	if (std::distance(its_[i], bounds_[i].second) > 1)
 	{
-	  its_[i]++;
+	  ++its_[i];
 	  break;
 	}
 	else
@@ -370,7 +370,7 @@ namespace spot
     for (unsigned i = 0; i < its_.size(); ++i)
       if (its_[i] == bounds_[i].second)
 	return true;
-    return its_.size() == 0 ? true : false;
+    return its_.empty() ? true : false;
   }
 
   spot::state_set*

@@ -108,7 +108,7 @@ namespace spot
 	switch (node->op())
 	{
 	  case unop::X:
-	    if (v.succ_.size() == 0) // Handle X(0)
+	    if (v.succ_.empty()) // Handle X(0)
 	      return;
 	    dst.push_back(v.init_);
 	    res_->create_transition(init_, dst);
@@ -197,7 +197,7 @@ namespace spot
 	for (unsigned n = 0; n < node->size(); ++n)
 	{
 	  vs.push_back(recurse(node->nth(n)));
-	  if (vs[n].succ_.size() == 0) // Handle 0
+	  if (vs[n].succ_.empty()) // Handle 0
 	    ok = false;
 	}
 
@@ -281,7 +281,7 @@ namespace spot
 	  formula* f = constant::true_instance();
 	  for (unsigned i = 0; i < vs.size(); ++i)
 	  {
-	    if (vs[i].succ_.size() == 0)
+	    if (vs[i].succ_.empty())
 	      continue;
 	    const succ_state& ss(vs[i].succ_[pos[i] - 1]);
 	    std::copy(ss.first.begin(), ss.first.end(), ii(u, u.begin()));
@@ -292,7 +292,7 @@ namespace spot
 
 	  for (int i = vs.size() - 1; i >= 0; --i)
 	  {
-	    if (vs[i].succ_.size() == 0)
+	    if (vs[i].succ_.empty())
 	      continue;
 	    if (pos[i] > 1 || (i == 0 && pos[0] == 1))
 	    {

@@ -1,3 +1,9 @@
+2009-10-17  Damien Lefortier <dam@lrde.epita.fr>
+
+	Fix make check in sanity.
+
+	* src/tgba/taa.cc, src/tgbaalgos/ltl2taa.cc: Fix style.
+
 2009-10-16  Damien Lefortier <dam@lrde.epita.fr>
 
 	Minor fixes.
