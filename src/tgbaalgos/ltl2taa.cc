@@ -28,6 +28,7 @@
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/clone.hh"
+#include "ltlvisit/contain.hh"
 #include "ltl2taa.hh"
 
 namespace spot
@@ -40,8 +41,10 @@ namespace spot
     class ltl2taa_visitor : public const_visitor
     {
     public:
-      ltl2taa_visitor(taa* res, bool negated = false)
-	: res_(res), negated_(negated), init_(), succ_(), to_free_()
+      ltl2taa_visitor(taa* res, language_containment_checker* lcc,
+		      bool refined = false, bool negated = false)
+	: res_(res), refined_(refined), negated_(negated),
+	  lcc_(lcc), init_(), succ_(), to_free_()
       {
       }
 
@@ -74,8 +77,8 @@ namespace spot
 	dst.push_back(std::string("well"));
 	taa::transition* t = res_->create_transition(init_, dst);
 	res_->add_condition(t, clone(f));
-
-	succ_.push_back(std::make_pair(dst, f));
+	succ_state ss = { dst, f, constant::true_instance() };
+	succ_.push_back(ss);
       }
 
       void
@@ -86,10 +89,13 @@ namespace spot
 	switch (node->val())
 	{
 	  case constant::True:
+	  {
 	    dst.push_back(std::string("well"));
 	    res_->create_transition(init_, dst);
-	    succ_.push_back(std::make_pair(dst, node));
+	    succ_state ss = { dst, node, constant::true_instance() };
+	    succ_.push_back(ss);
 	    return;
+	  }
 	  case constant::False:
 	    return;
 	}
@@ -108,12 +114,16 @@ namespace spot
 	switch (node->op())
 	{
 	  case unop::X:
+	  {
 	    if (v.succ_.empty()) // Handle X(0)
 	      return;
 	    dst.push_back(v.init_);
 	    res_->create_transition(init_, dst);
-	    succ_.push_back(std::make_pair(dst, constant::true_instance()));
+	    succ_state ss =
+	      { dst, constant::true_instance(), constant::true_instance() };
+	    succ_.push_back(ss);
 	    return;
+	  }
 	  case unop::F:
 	  case unop::G:
 	    assert(0); // TBD
@@ -139,44 +149,65 @@ namespace spot
 	std::vector<succ_state>::iterator i1;
 	std::vector<succ_state>::iterator i2;
 	taa::transition* t = 0;
+	bool contained = false;
 	switch (node->op())
 	{
 	  case binop::U: // Strong
+	    if (refined_)
+	      contained = lcc_->contained(node->second(), node->first());
 	    for (i1 = v1.succ_.begin(); i1 != v1.succ_.end(); ++i1)
 	    {
-	      i1->first.push_back(init_); // Add the initial state
-	      t = res_->create_transition(init_, i1->first);
-	      res_->add_condition(t, clone(i1->second));
+	      // Refined rule
+	      if (refined_ && contained)
+		i1->Q.erase
+		  (remove(i1->Q.begin(), i1->Q.end(), v1.init_), i1->Q.end());
+
+	      i1->Q.push_back(init_); // Add the initial state
+	      i1->acc = node;
+	      t = res_->create_transition(init_, i1->Q);
+	      res_->add_condition(t, clone(i1->condition));
 	      res_->add_acceptance_condition(t, clone(node));
 	      succ_.push_back(*i1);
 	    }
 	    for (i2 = v2.succ_.begin(); i2 != v2.succ_.end(); ++i2)
 	    {
-	      t = res_->create_transition(init_, i2->first);
-	      res_->add_condition(t, clone(i2->second));
+	      t = res_->create_transition(init_, i2->Q);
+	      res_->add_condition(t, clone(i2->condition));
 	      succ_.push_back(*i2);
 	    }
 	    return;
 	  case binop::R: // Weak
+	    if (refined_)
+	      contained = lcc_->contained(node->first(), node->second());
 	    for (i2 = v2.succ_.begin(); i2 != v2.succ_.end(); ++i2)
 	    {
 	      for (i1 = v1.succ_.begin(); i1 != v1.succ_.end(); ++i1)
 	      {
 		std::vector<std::string> u; // Union
-		std::copy(i1->first.begin(), i1->first.end(), ii(u, u.begin()));
-		std::copy(i2->first.begin(), i2->first.end(), ii(u, u.begin()));
-		const formula* f = multop::instance
-		  (multop::And, clone(i1->second), clone(i2->second));
+		std::copy(i1->Q.begin(), i1->Q.end(), ii(u, u.begin()));
+		formula* f = clone(i1->condition); // Refined rule
+		if (!refined_ || !contained)
+		{
+		  std::copy(i2->Q.begin(), i2->Q.end(), ii(u, u.begin()));
+		  f = multop::instance(multop::And, f, clone(i2->condition));
+		}
 		to_free_.push_back(f);
 
 		t = res_->create_transition(init_, u);
 		res_->add_condition(t, clone(f));
-		succ_.push_back(std::make_pair(u, f));
+		succ_state ss = { u, f, constant::true_instance() };
+		succ_.push_back(ss);
 	      }
 
-	      i2->first.push_back(init_); // Add the initial state
-	      t = res_->create_transition(init_, i2->first);
-	      res_->add_condition(t, clone(i2->second));
+	      if (refined_) // Refined rule
+		i2->Q.erase
+		  (remove(i2->Q.begin(), i2->Q.end(), v2.init_), i2->Q.end());
+
+	      i2->Q.push_back(init_); // Add the initial state
+	      t = res_->create_transition(init_, i2->Q);
+	      res_->add_condition(t, clone(i2->condition));
+	      if (refined_ && i2->acc != constant::true_instance())
+		res_->add_acceptance_condition(t, clone(i2->acc));
 	      succ_.push_back(*i2);
 	    }
 	    return;
@@ -211,8 +242,35 @@ namespace spot
 	    std::vector<succ_state> p = all_n_tuples(vs);
 	    for (unsigned n = 0; n < p.size() && ok; ++n)
 	    {
-	      t = res_->create_transition(init_, p[n].first);
-	      res_->add_condition(t, clone(p[n].second));
+	      if (refined_)
+	      {
+		std::vector<std::string> v; // All sub initial states.
+		sort(p[n].Q.begin(), p[n].Q.end());
+		for (unsigned m = 0; m < node->size(); ++m)
+		{
+		  if (!binary_search(p[n].Q.begin(), p[n].Q.end(), vs[m].init_))
+		    break;
+		  v.push_back(vs[m].init_);
+		}
+
+		if (v.size() == node->size())
+		{
+		  std::vector<std::string> Q;
+		  sort(v.begin(), v.end());
+		  for (unsigned m = 0; m < p[n].Q.size(); ++m)
+		    if (!binary_search(v.begin(), v.end(), p[n].Q[m]))
+		      Q.push_back(p[n].Q[m]);
+		  Q.push_back(init_);
+		  t = res_->create_transition(init_, Q);
+		  res_->add_condition(t, clone(p[n].condition));
+		  if (p[n].acc != constant::true_instance())
+		    res_->add_acceptance_condition(t, clone(p[n].acc));
+		  succ_.push_back(p[n]);
+		  return;
+		}
+	      }
+	      t = res_->create_transition(init_, p[n].Q);
+	      res_->add_condition(t, clone(p[n].condition));
 	      succ_.push_back(p[n]);
 	    }
 	    return;
@@ -221,8 +279,8 @@ namespace spot
 	    for (unsigned n = 0; n < node->size(); ++n)
 	      for (i = vs[n].succ_.begin(); i != vs[n].succ_.end(); ++i)
 	      {
-		t = res_->create_transition(init_, i->first);
-		res_->add_condition(t, clone(i->second));
+		t = res_->create_transition(init_, i->Q);
+		res_->add_condition(t, clone(i->condition));
 		succ_.push_back(*i);
 	      }
 	    return;
@@ -241,7 +299,7 @@ namespace spot
       ltl2taa_visitor
       recurse(const formula* f)
       {
-	ltl2taa_visitor v(res_, negated_);
+	ltl2taa_visitor v(res_, lcc_, refined_, negated_);
 	f->accept(v);
 	for (unsigned i = 0; i < v.to_free_.size(); ++i)
 	  to_free_.push_back(v.to_free_[i]);
@@ -250,15 +308,20 @@ namespace spot
 
     private:
       taa* res_;
+      bool refined_;
       bool negated_;
+      language_containment_checker* lcc_;
 
       typedef std::insert_iterator<
 	std::vector<std::string>
       > ii;
 
-      typedef std::pair<
-        std::vector<std::string>, const formula*
-      > succ_state;
+      struct succ_state
+      {
+	std::vector<std::string> Q; // States
+	const formula* condition;
+	const formula* acc;
+      };
 
       std::string init_;
       std::vector<succ_state> succ_;
@@ -279,16 +342,20 @@ namespace spot
 	{
 	  std::vector<std::string> u; // Union
 	  formula* f = constant::true_instance();
+	  formula* a = constant::true_instance();
 	  for (unsigned i = 0; i < vs.size(); ++i)
 	  {
 	    if (vs[i].succ_.empty())
 	      continue;
 	    const succ_state& ss(vs[i].succ_[pos[i] - 1]);
-	    std::copy(ss.first.begin(), ss.first.end(), ii(u, u.begin()));
-	    f = multop::instance(multop::And, clone(ss.second), f);
+	    std::copy(ss.Q.begin(), ss.Q.end(), ii(u, u.begin()));
+	    f = multop::instance(multop::And, clone(ss.condition), f);
+	    a = multop::instance(multop::And, clone(ss.acc), a);
 	  }
 	  to_free_.push_back(f);
-	  product.push_back(std::make_pair(u, f));
+	  to_free_.push_back(a);
+	  succ_state ss = { u, f, a };
+	  product.push_back(ss);
 
 	  for (int i = vs.size() - 1; i >= 0; --i)
 	  {
@@ -309,7 +376,7 @@ namespace spot
   } // anonymous
 
   taa*
-  ltl_to_taa(const ltl::formula* f, bdd_dict* dict)
+  ltl_to_taa(const ltl::formula* f, bdd_dict* dict, bool refined_rules)
   {
     // TODO: s/unabbreviate_ltl/unabbreviate_logic/
     const ltl::formula* f1 = ltl::unabbreviate_ltl(f);
@@ -318,10 +385,16 @@ namespace spot
 
     std::cerr << ltl::to_string(f2) << std::endl;
 
-    taa* res = new spot::taa(dict);
-    ltl2taa_visitor v(res);
+    spot::taa* res = new spot::taa(dict);
+    language_containment_checker* lcc =
+      new language_containment_checker(dict, false, false, false, false);
+    ltl2taa_visitor v(res, lcc, refined_rules);
     f2->accept(v);
     ltl::destroy(f2);
+    delete lcc;
+
+    // TODO: temporary.
+    res->output(std::cerr);
 
     return v.result();
   }

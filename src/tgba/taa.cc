@@ -19,6 +19,7 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+#include <map>
 #include <algorithm>
 #include <iostream>
 #include "ltlvisit/destroy.hh"
@@ -120,6 +121,23 @@ namespace spot
     t->acceptance_conditions |= v & bdd_exist(neg_acceptance_conditions_, v);
   }
 
+  void
+  taa::output(std::ostream& os) const
+  {
+    ns_map::const_iterator i;
+    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+    {
+      taa::state::const_iterator i2;
+      os << "State: " << i->first << std::endl;
+      for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+      {
+	os << " " << format_state_set((*i2)->dst)
+	   << ", C:" << (*i2)->condition
+	   << ", A:" << (*i2)->acceptance_conditions << std::endl;
+      }
+    }
+  }
+
   state*
   taa::get_init_state() const
   {
@@ -153,30 +171,7 @@ namespace spot
     const spot::state_set* se = dynamic_cast<const spot::state_set*>(s);
     assert(se);
     const state_set* ss = se->get_state();
-
-    state_set::const_iterator i1 = ss->begin();
-    sn_map::const_iterator i2;
-    if (ss->empty())
-      return std::string("{}");
-    if (ss->size() == 1)
-    {
-      i2 = state_name_map_.find(*i1);
-      assert(i2 != state_name_map_.end());
-      return i2->second;
-    }
-    else
-    {
-      std::string res("{");
-      while (i1 != ss->end())
-      {
-	i2 = state_name_map_.find(*i1++);
-	assert(i2 != state_name_map_.end());
-	res += i2->second;
-	res += ",";
-      }
-      res[res.size() - 1] = '}';
-      return res;
-    }
+    return format_state_set(ss);
   }
 
   bdd
@@ -259,6 +254,34 @@ namespace spot
     return ss;
   }
 
+  std::string
+  taa::format_state_set(const taa::state_set* ss) const
+  {
+    state_set::const_iterator i1 = ss->begin();
+    sn_map::const_iterator i2;
+    if (ss->empty())
+      return std::string("{}");
+    if (ss->size() == 1)
+    {
+      i2 = state_name_map_.find(*i1);
+      assert(i2 != state_name_map_.end());
+      return "{" + i2->second + "}";
+    }
+    else
+    {
+      std::string res("{");
+      while (i1 != ss->end())
+      {
+	i2 = state_name_map_.find(*i1++);
+	assert(i2 != state_name_map_.end());
+	res += i2->second;
+	res += ",";
+      }
+      res[res.size() - 1] = '}';
+      return res;
+    }
+  }
+
   /*----------.
   | state_set |
   `----------*/
@@ -317,96 +340,130 @@ namespace spot
   `--------------*/
 
   taa_succ_iterator::taa_succ_iterator(const taa::state_set* s, bdd all_acc)
-    : bounds_(), its_(), all_acceptance_conditions_(all_acc),
-      empty_(s->empty())
+    : all_acceptance_conditions_(all_acc), seen_()
   {
+    if (s->empty())
+    {
+      taa::transition* t = new taa::transition;
+      t->condition = bddtrue;
+      t->acceptance_conditions = bddfalse;
+      t->dst = new taa::state_set;
+      succ_.push_back(t);
+      return;
+    }
+
+    std::vector<iterator> pos;
+    std::vector<std::pair<iterator, iterator> > bounds;
     for (taa::state_set::const_iterator i = s->begin(); i != s->end(); ++i)
     {
-      bounds_.push_back(std::make_pair((*i)->begin(), (*i)->end()));
-      its_.push_back((*i)->begin());
+      pos.push_back((*i)->begin());
+      bounds.push_back(std::make_pair((*i)->begin(), (*i)->end()));
     }
+
+    while (pos[0] != bounds[0].second)
+    {
+      taa::transition* t = new taa::transition;
+      t->condition = bddtrue;
+      t->acceptance_conditions = bddfalse;
+      taa::state_set* ss = new taa::state_set;
+      for (unsigned i = 0; i < pos.size(); ++i)
+      {
+	taa::state_set::const_iterator j;
+	for (j = (*pos[i])->dst->begin(); j != (*pos[i])->dst->end(); ++j)
+	  if ((*j)->size() > 0) // Remove well states.
+	    ss->insert(*j);
+
+	// Fill the new transition.
+	t->dst = ss;
+	t->condition &= (*pos[i])->condition;
+	t->acceptance_conditions |= (*pos[i])->acceptance_conditions;
+      }
+      // Look for another transition to merge with.
+      seen_map::iterator i;
+      for (i = seen_.find(*ss); i != seen_.end(); ++i)
+      {
+	if (*i->second->dst == *t->dst
+	    && i->second->condition == t->condition)
+	{
+	  i->second->acceptance_conditions &= t->acceptance_conditions;
+	  break;
+	}
+	if (*i->second->dst == *t->dst
+	    && i->second->acceptance_conditions == t->acceptance_conditions)
+	{
+	  i->second->condition |= t->condition;
+	  break;
+	}
+      }
+      // Mark this transition as seen and keep it, or delete it.
+      if (i == seen_.end() && t->condition != bddfalse)
+      {
+	seen_.insert(std::make_pair(*ss, t));
+	succ_.push_back(t);
+      }
+      else
+      {
+	delete t->dst;
+	delete t;
+      }
+
+      for (int i = pos.size() - 1; i >= 0; --i)
+      {
+	if (std::distance(pos[i], bounds[i].second) > 1 ||
+	    (i == 0 && std::distance(pos[i], bounds[i].second) == 1))
+	{
+	  ++pos[i];
+	  break;
+	}
+	else
+	  pos[i] = bounds[i].first;
+      }
+    }
+  }
+
+  taa_succ_iterator::~taa_succ_iterator()
+  {
+    for (unsigned i = 0; i < succ_.size(); ++i)
+      delete succ_[i];
   }
 
   void
   taa_succ_iterator::first()
   {
-    if (!done() && current_condition() == bddfalse)
-      next();
+    i_ = succ_.begin();
   }
 
   void
   taa_succ_iterator::next()
   {
-    if (empty_)
-      empty_ = false;
-
-    do
-    {
-      for (unsigned i = 0; i < its_.size(); ++i)
-      {
-	if (std::distance(its_[i], bounds_[i].second) > 1)
-	{
-	  ++its_[i];
-	  break;
-	}
-	else
-	{
-	  if (i + 1 == its_.size())
-	    its_[0] = bounds_[0].second; // We are done.
-	  else
-	    its_[i] = bounds_[i].first;
-	}
-      }
-    }
-    while (!done() && current_condition() == bddfalse);
+    ++i_;
   }
 
   bool
   taa_succ_iterator::done() const
   {
-    if (empty_)
-      return false;
-
-    for (unsigned i = 0; i < its_.size(); ++i)
-      if (its_[i] == bounds_[i].second)
-	return true;
-    return its_.empty() ? true : false;
+    return i_ == succ_.end();
   }
 
   spot::state_set*
   taa_succ_iterator::current_state() const
   {
     assert(!done());
-    taa::state_set::const_iterator i;
-    taa::state_set* res = new taa::state_set;
-    for (unsigned p = 0; p < its_.size(); ++p)
-      for (i = (*its_[p])->dst->begin(); i != (*its_[p])->dst->end(); ++i)
-	if ((*i)->size() > 0) // Remove well states.
-	  res->insert(*i);
-
-    return new spot::state_set(res);
+    return new spot::state_set((*i_)->dst);
   }
 
   bdd
   taa_succ_iterator::current_condition() const
   {
     assert(!done());
-    bdd res = bddtrue;
-    for (unsigned i = 0; i < its_.size(); ++i)
-      res &= (*its_[i])->condition;
-    return res;
+    return (*i_)->condition;
   }
 
   bdd
   taa_succ_iterator::current_acceptance_conditions() const
   {
-    if (empty_)
-      return all_acceptance_conditions_;
-
     assert(!done());
-    bdd res = bddfalse;
-    for (unsigned i = 0; i < its_.size(); ++i)
-      res |= (*its_[i])->acceptance_conditions;
-    return all_acceptance_conditions_ - (res & all_acceptance_conditions_);
+    return all_acceptance_conditions_ -
+      ((*i_)->acceptance_conditions & all_acceptance_conditions_);
   }
 }

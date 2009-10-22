@@ -1,3 +1,16 @@
+2009-10-22  Damien Lefortier <dam@lrde.epita.fr>
+
+	Improve ltl_to_taa.
+
+	* src/tgba/taa.cc, src/tgba/taa.hh: taa_succ_iterator is not
+	on-the-fly anymore allowing some redundant transitions to be
+	removed. Also a new function to output a TAA.
+	* src/tgbaalgos/ltl2taa.cc, src/tgbaalgos/ltl2taa.hh: Add the
+	refined rules from Tauriainen.
+	* src/tgbatest/ltl2tgba.cc: Use -c to activate refined rules in
+	ltl_to_taa.
+	* src/tgbatest/spotlbtt.test: More tests.
+
 2009-10-17  Damien Lefortier <dam@lrde.epita.fr>
 
 	Fix make check in sanity.
@@ -23,7 +36,7 @@
 
 	* src/tgbaalgos/ltl2taa.cc, src/tgbaalgos/ltl2taa.hh: The algortihm.
 	* src/tgbaalgos/Makefile.am: Adjust.
-	* src/tgbatest/ltl2tgba: New option: -taa, which uses this new
+	* src/tgbatest/ltl2tgba.cc: New option: -taa, which uses this new
 	translation algorithm.
 	* src/tgbatest/spotlbtt.test: Add ltl2tgba -taa.
 

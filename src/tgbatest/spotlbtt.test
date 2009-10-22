@@ -140,8 +140,6 @@ Algorithm
    Enabled = no
 }
 
-
-
 Algorithm
 {
    Name = "Spot (Couvreur -- FM), post reduction with direct simulation"
@@ -267,6 +265,22 @@ Algorithm
    Name = "Spot (Tauriainen -- TAA)"
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot '../ltl2tgba -F -taa -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
+   Name = "Spot (Tauriainen -- TAA) pre reduction"
+   Path = "${LBTT_TRANSLATE}"
+   Parameters = "--spot '../ltl2tgba -F -taa -t -r7'"
+   Enabled = yes
+}
+
+Algorithm
+{
+   Name = "Spot (Tauriainen -- TAA) pre reduction + refined rules"
+   Path = "${LBTT_TRANSLATE}"
+   Parameters = "--spot '../ltl2tgba -F -taa -t -r7 -c'"
    Enabled = yes
 }
 

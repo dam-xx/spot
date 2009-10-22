@@ -47,8 +47,10 @@ namespace spot
   ///
   /// \param f The formula to translate into an automaton.
   /// \param dict The spot::bdd_dict the constructed automata should use.
+  /// \param refined_rules If this parameter is set, refined rules are used.
   /// \return A spot::taa that recognizes the language of \a f.
-  taa* ltl_to_taa(const ltl::formula* f, bdd_dict* dict);
+  taa* ltl_to_taa(const ltl::formula* f, bdd_dict* dict,
+		  bool refined_rules = false);
 }
 
 #endif // SPOT_TGBAALGOS_LTL2TAA_HH

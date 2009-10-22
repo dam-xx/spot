@@ -232,7 +232,8 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-c"))
 	{
 	  containment = true;
-	  fm_opt = true;
+	  if (!taa_opt)
+	    fm_opt = true;
 	}
       else if (!strcmp(argv[formula_index], "-d"))
 	{
@@ -592,7 +593,7 @@ main(int argc, char** argv)
 					       fm_red, containment);
 	  else
 	    if (taa_opt)
-	      to_free = a = spot::ltl_to_taa(f, dict);
+	      to_free = a = spot::ltl_to_taa(f, dict, containment);
 	    else
 	      to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
 	}

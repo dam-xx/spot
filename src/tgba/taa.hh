@@ -23,6 +23,7 @@
 # define SPOT_TGBA_TAA_HH
 
 #include <set>
+#include <iosfwd>
 #include <vector>
 #include "misc/hash.hh"
 #include "ltlast/formula.hh"
@@ -59,6 +60,9 @@ namespace spot
 
     void add_condition(transition* t, const ltl::formula* f);
     void add_acceptance_condition(transition* t, const ltl::formula* f);
+
+    /// \brief Output a TAA.
+    void output(std::ostream& os) const;
 
     /// TGBA interface.
     virtual ~taa();
@@ -117,6 +121,9 @@ namespace spot
 
     /// \brief Return the taa::state_set for \a names.
     taa::state_set* add_state_set(const std::vector<std::string>& names);
+
+    /// \brief Format a taa::state_set as a string for printing.
+    std::string format_state_set(const taa::state_set* ss) const;
   };
 
   /// Set of states deriving from spot::state.
@@ -149,10 +156,7 @@ namespace spot
   {
   public:
     taa_succ_iterator(const taa::state_set* s, bdd all_acc);
-
-    virtual ~taa_succ_iterator()
-    {
-    }
+    virtual ~taa_succ_iterator();
 
     virtual void first();
     virtual void next();
@@ -164,11 +168,12 @@ namespace spot
 
   private:
     typedef taa::state::const_iterator iterator;
+    typedef std::multimap<taa::state_set, taa::transition*> seen_map;
 
-    std::vector<std::pair<iterator, iterator> > bounds_;
-    std::vector<iterator> its_;
+    std::vector<taa::transition*>::const_iterator i_;
+    std::vector<taa::transition*> succ_;
     bdd all_acceptance_conditions_;
-    mutable bool empty_;
+    seen_map seen_;
   };
 }
 
