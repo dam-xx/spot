@@ -1,3 +1,7 @@
+2009-10-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbatest/kv.test: Don't run valgrind on dot!
+
 2009-10-16  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Escape labels in -KV output.
