@@ -1,5 +1,12 @@
 2009-10-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgba/tgbacomplement.cc (state_complement): Remove the copy
+	constructor.  It does the same thing as the default copy
+	constructor, and g++ 4.2.3 complained that the copy constructor
+	of spot::state was not called.  Reported by Denis Poitrenaud.
+
+2009-10-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/ltlast/formula_tree.cc (instanciate, arity): Add a useless
 	return 0 at the end to prevent g++ 4.2.3 from complaining about
 	a missing return.  Reported by Denis Poitrenaud.

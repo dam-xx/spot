@@ -108,7 +108,6 @@ namespace spot
     {
     public:
       state_complement();
-      state_complement(const state_complement& other);
       state_complement(state_rank_map state_map, state_set state_filter);
       virtual ~state_complement() {}
 
@@ -133,12 +132,6 @@ namespace spot
                                        state_set state_filter)
       : state_map_(state_map), state_filter_(state_filter)
     {
-    }
-
-    state_complement::state_complement(const state_complement& other)
-    {
-      state_map_ = other.state_map_;
-      state_filter_ = other.state_filter_;
     }
 
     int
