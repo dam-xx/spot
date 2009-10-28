@@ -1,3 +1,9 @@
+2009-10-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/ltlast/formula_tree.cc (instanciate, arity): Add a useless
+	return 0 at the end to prevent g++ 4.2.3 from complaining about
+	a missing return.  Reported by Denis Poitrenaud.
+
 2009-10-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgbatest/kv.test: Don't run valgrind on dot!

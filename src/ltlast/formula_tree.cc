@@ -58,6 +58,7 @@ namespace spot
 
 	/* Unreachable code.  */
 	assert(0);
+	return 0;
       }
 
       size_t
@@ -82,6 +83,7 @@ namespace spot
 
 	/* Unreachable code.  */
 	assert(0);
+	return 0;
       }
     }
   }
