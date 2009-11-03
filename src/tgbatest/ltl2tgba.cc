@@ -80,6 +80,7 @@ syntax(char* prog)
 	    << "  -E[ALGO]  emptiness-check, expect no accepting run"
 	    << std::endl
             << "  -f    use Couvreur's FM algorithm for translation"
+	    << std::endl
             << "  -taa  use Tauriainen's TAA-based algorithm for translation"
 	    << std::endl
 	    << "  -fr1  use -r1 (see below) at each step of FM" << std::endl
@@ -89,7 +90,6 @@ syntax(char* prog)
 	    << "  -fr5  use -r5 (see below) at each step of FM" << std::endl
 	    << "  -fr6  use -r6 (see below) at each step of FM" << std::endl
 	    << "  -fr7  use -r7 (see below) at each step of FM" << std::endl
-	    << "  -fr8  use -r8 (see below) at each step of FM" << std::endl
             << "  -F    read the formula from the file" << std::endl
             << "  -FC   dump the automaton showing future conditions on states"
 	    << std::endl
@@ -115,14 +115,13 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -r1   reduce formula using basic rewriting" << std::endl
 	    << "  -r2   reduce formula using class of eventuality and "
-	    << "and universality" << std::endl
+	    << "universality" << std::endl
 	    << "  -r3   reduce formula using implication between "
 	    << "sub-formulae" << std::endl
 	    << "  -r4   reduce formula using all above rules" << std::endl
 	    << "  -r5   reduce formula using tau03" << std::endl
 	    << "  -r6   reduce formula using tau03+" << std::endl
-	    << "  -r7   reduce formula using tau03+ and -r1" << std::endl
-	    << "  -r8   reduce formula using tau03+ and -r4" << std::endl
+	    << "  -r7   reduce formula using tau03+ and -r4" << std::endl
 	    << "  -rd   display the reduce formula" << std::endl
 	    << "  -R    same as -r, but as a set" << std::endl
 	    << "  -R1q  merge states using direct simulation "
