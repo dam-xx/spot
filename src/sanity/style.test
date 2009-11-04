@@ -1,4 +1,3 @@
-
 #! /bin/sh
 
 # Ensure consistent style by catching common improper constructs.
@@ -180,9 +179,9 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
 	;;
     esac
 
-
     $fail && echo "$file" >>failures
-  done
+
+  done || : # Make sure sh does not abort when read exits with false.
 done
 
 if test -f failures; then
@@ -191,3 +190,5 @@ if test -f failures; then
    rm failures
    exit 1;
 fi
+
+exit 0
