@@ -1,3 +1,14 @@
+2009-11-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix a longstanding bug reported by Kristin Y. Rozier..
+
+	* src/ltlast/formula.hh (formula_ptr_less_than::operator()):
+	Fix a typo where `l' was typed as `1'.
+	* src/tgbatest/ltlcounter/: New files from Kristin Y. Rozier.
+	* src/tgbatest/ltlcounter.test: New
+	* src/tgbatest/Makefile.am (TESTS): Add ltlcounter.test.
+	(EXTRA_DIST): Add files in ltlcounter/.
+
 2009-11-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix the help text of ltl2tgba.

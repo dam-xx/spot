@@ -94,10 +94,14 @@ TESTS = \
   emptchke.test \
   dfs.test \
   emptchkr.test \
+  ltlcounter.test \
   spotlbtt.test \
   complementation.test
 
-EXTRA_DIST = $(TESTS)
+EXTRA_DIST = $(TESTS) ltlcounter/LTLcounter.pl				\
+  ltlcounter/LTLcounterCarry.pl ltlcounter/LTLcounterCarryLinear.pl	\
+  ltlcounter/LTLcounterLinear.pl ltlcounter/README			\
+  ltlcounter/software_agreement.txt
 
 distclean-local:
 	rm -rf $(TESTS:.test=.dir)
