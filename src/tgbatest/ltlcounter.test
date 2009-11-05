@@ -31,13 +31,15 @@ lcl=$lcdir/LTLcounterLinear.pl
 lcc=$lcdir/LTLcounterCarry.pl
 lccl=$lcdir/LTLcounterCarryLinear.pl
 
+run='run 0'
+
 check_formula()
 {
   # First, check the satisfiability of the formula with Spot
-  run 0 ../ltl2tgba -e -x -f "$1" >/dev/null
+  $run ../ltl2tgba -e -x -f "$1" >/dev/null
   # Also check the satisfiability of the degeneralized formula
-  run 0 ../ltl2tgba -e -D -x -f "$1" >/dev/null
-  run 0 ../ltl2tgba -e -DS -x -f "$1" >/dev/null
+  $run ../ltl2tgba -e -D -x -f "$1" >/dev/null
+  $run ../ltl2tgba -e -DS -x -f "$1" >/dev/null
 }
 
 # Kristin Y. Rozier reported that the formulae with n=10 were badly
@@ -59,4 +61,10 @@ do
   check_formula "$f"
   f=`"$lccl" $i`
   check_formula "$f"
+  
+  # Only run the first two formulae under valgrind, 
+  # it is too slow otherwise.
+  if test $i = 2; then
+     run=:
+  fi
 done
