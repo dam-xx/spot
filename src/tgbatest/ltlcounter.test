@@ -25,7 +25,7 @@
 
 set -e
 
-lcdir=$srcdir/../ltlcounter
+lcdir=$srcdir/ltlcounter
 lc=$lcdir/LTLcounter.pl
 lcl=$lcdir/LTLcounterLinear.pl
 lcc=$lcdir/LTLcounterCarry.pl
@@ -50,21 +50,21 @@ check_formula()
 # so the translation of the formula stopped midway, on a formula it
 # thought it had already seen.
 
-for i in 1 2 3 4 5 6 7 8 9 10 11 12
+for n in 1 2 3 4 5 6 7 8 9 10 11 12
 do
-  :;:;: "========== $i counters ==========" ;:;:  # only visible with "set -x"
-  f=`"$lc" $i`
+  :;:;: "========== $n counters ==========" ;:;:  # only visible with "set -x"
+  f=`"$lc" $n`
   check_formula "$f"
-  f=`"$lcl" $i`
+  f=`"$lcl" $n`
   check_formula "$f"
-  f=`"$lcc" $i`
+  f=`"$lcc" $n`
   check_formula "$f"
-  f=`"$lccl" $i`
+  f=`"$lccl" $n`
   check_formula "$f"
-  
-  # Only run the first two formulae under valgrind, 
+
+  # Only run the first two formulae under valgrind,
   # it is too slow otherwise.
-  if test $i = 2; then
-     run=:
+  if test $n = 2; then
+     run=
   fi
 done

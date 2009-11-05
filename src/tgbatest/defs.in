@@ -49,6 +49,15 @@ rm -rf $testSubDir > /dev/null 2>&1
 mkdir $testSubDir
 cd $testSubDir
 
+# Adjust srcdir now that we are in a subdirectory.  We still want to
+# source directory corresponding to the build directory that contains
+# $testSubDir.
+case $srcdir in
+  # I
+  [\\/$]* | ?:[\\/]* );;
+  *) srcdir=../$srcdir
+esac
+
 DOT='@DOT@'
 top_builddir='../@top_builddir@'
 LBTT="@LBTT@"

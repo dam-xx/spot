@@ -1,5 +1,15 @@
 2009-11-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix ltlcounter.test for VPATH builds and n > 2.
+
+	* src/tgbatest/defs.in (srcdir): Adjust from VPATH builds.
+	* src/tgbatest/ltlcounter.test (lcdir): Adjust definition to
+	new value of $srcdir.
+	(run): Fix setting of $run after $n = 2.  Using run=: would in
+	fact disable all the big tests...
+
+2009-11-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbatest/ltlcounter.test (run): Only construct small
 	formulae (i.e. n<=2) under valgrind.  The test case is too
 	slow otherwise.
