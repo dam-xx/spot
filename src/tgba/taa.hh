@@ -170,6 +170,21 @@ namespace spot
     typedef taa::state::const_iterator iterator;
     typedef std::multimap<taa::state_set, taa::transition*> seen_map;
 
+    typedef std::pair<iterator, iterator> iterator_pair;
+    typedef std::vector<iterator_pair> bounds_t;
+
+    struct distance_sort:
+	public std::binary_function<const iterator_pair&,
+                                    const iterator_pair&, bool>
+    {
+      bool
+      operator()(const iterator_pair& left, const iterator_pair& right) const
+      {
+	return (std::distance(left.first, left.second) <
+		std::distance(right.first, right.second));
+      }
+    };
+
     std::vector<taa::transition*>::const_iterator i_;
     std::vector<taa::transition*> succ_;
     bdd all_acceptance_conditions_;
