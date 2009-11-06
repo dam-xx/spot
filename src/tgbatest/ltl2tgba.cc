@@ -48,6 +48,7 @@
 #include "tgbaalgos/reductgba_sim.hh"
 #include "tgbaalgos/replayrun.hh"
 #include "tgbaalgos/rundotdec.hh"
+#include "misc/timer.hh"
 
 #include "tgbaalgos/stats.hh"
 #include "tgbaalgos/scc.hh"
@@ -140,6 +141,8 @@ syntax(char* prog)
 	    << "  -S    convert to explicit automata, and number states "
 	    << "in BFS order" << std::endl
 	    << "  -t    display reachable states in LBTT's format" << std::endl
+            << "  -T    time the different phases of the translation"
+	    << std::endl
             << "  -U[PROPS]  consider atomic properties of the formula as "
 	    << "exclusive events, and" << std::endl
 	    << "        PROPS as unobservables events (implies -f)"
@@ -203,6 +206,8 @@ main(int argc, char** argv)
   spot::tgba* product = 0;
   spot::tgba* product_to_free = 0;
   spot::bdd_dict* dict = new spot::bdd_dict();
+  spot::timer_map tm;
+  bool use_timer = false;
 
   for (;;)
     {
@@ -472,6 +477,10 @@ main(int argc, char** argv)
 	{
 	  output = 6;
 	}
+      else if (!strcmp(argv[formula_index], "-T"))
+	{
+	  use_timer = true;
+	}
       else if (!strncmp(argv[formula_index], "-U", 2))
 	{
 	  unobservables = new spot::ltl::atomic_prop_set;
@@ -520,6 +529,7 @@ main(int argc, char** argv)
 
   if (file_opt)
     {
+      tm.start("reading formula");
       if (strcmp(argv[formula_index], "-"))
 	{
 	  std::ifstream fin(argv[formula_index]);
@@ -539,6 +549,7 @@ main(int argc, char** argv)
 	{
 	  std::getline(std::cin, input, '\0');
 	}
+      tm.stop("reading formula");
     }
   else
     {
@@ -549,7 +560,9 @@ main(int argc, char** argv)
   if (!from_file)
     {
       spot::ltl::parse_error_list pel;
+      tm.start("parsing formula");
       f = spot::ltl::parse(input, pel, env, debug_opt);
+      tm.stop("parsing formula");
       exit_code = spot::ltl::format_parse_errors(std::cerr, input, pel);
     }
   if (f || from_file)
@@ -562,8 +575,10 @@ main(int argc, char** argv)
 	{
 	  spot::tgba_parse_error_list pel;
 	  spot::tgba_explicit* e;
+	  tm.start("parsing automaton");
 	  to_free = a = e = spot::tgba_parse(input, pel, dict,
 					     env, env, debug_opt);
+	  tm.stop("parsing automaton");
 	  if (spot::format_tgba_parse_errors(std::cerr, input, pel))
 	    {
 	      delete to_free;
@@ -576,13 +591,16 @@ main(int argc, char** argv)
 	{
 	  if (redopt != spot::ltl::Reduce_None)
 	    {
+	      tm.start("reducing formula");
 	      spot::ltl::formula* t = spot::ltl::reduce(f, redopt);
 	      f->destroy();
+	      tm.stop("reducing formula");
 	      f = t;
 	      if (display_reduce_form)
 		std::cout << spot::ltl::to_string(f) << std::endl;
 	    }
 
+	  tm.start("translating formula");
 	  if (fm_opt)
 	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt,
 					       fm_symb_merge_opt,
@@ -594,6 +612,7 @@ main(int argc, char** argv)
 	      to_free = a = spot::ltl_to_taa(f, dict, containment);
 	    else
 	      to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
+	  tm.stop("translating formula");
 	}
 
       spot::tgba_tba_proxy* degeneralized = 0;
@@ -617,6 +636,7 @@ main(int argc, char** argv)
       spot::tgba_reduc* aut_red = 0;
       if (reduc_aut != spot::Reduce_None)
 	{
+	  tm.start("reducing formula automaton");
 	  a = aut_red = new spot::tgba_reduc(a);
 
 	  if (reduc_aut & spot::Reduce_Scc)
@@ -671,6 +691,7 @@ main(int argc, char** argv)
 	      if (rel_del)
 		spot::free_relation_simulation(rel_del);
 	    }
+	  tm.stop("reducing formula automaton");
 	}
 
       spot::tgba_explicit* expl = 0;
@@ -729,65 +750,67 @@ main(int argc, char** argv)
 	  a = new spot::future_conditions_collector(a, true);
 	}
 
-      switch (output)
+      if (output != -1)
 	{
-	case -1:
-	  /* No output.  */
-	  break;
-	case 0:
-	  spot::dotty_reachable(std::cout, a);
-	  break;
-	case 1:
-	  if (concrete)
-	    spot::bdd_print_dot(std::cout, concrete->get_dict(),
-				concrete->get_core_data().relation);
-	  break;
-	case 2:
-	  if (concrete)
-	    spot::bdd_print_dot(std::cout, concrete->get_dict(),
-				concrete->
-				get_core_data().acceptance_conditions);
-	  break;
-	case 3:
-	  if (concrete)
-	    spot::bdd_print_set(std::cout, concrete->get_dict(),
-				concrete->get_core_data().relation);
-	  break;
-	case 4:
-	  if (concrete)
-	    spot::bdd_print_set(std::cout, concrete->get_dict(),
-				concrete->
-				get_core_data().acceptance_conditions);
-	  break;
-	case 5:
-	  a->get_dict()->dump(std::cout);
-	  break;
-	case 6:
-	  spot::lbtt_reachable(std::cout, a);
-	  break;
-	case 7:
-	  spot::tgba_save_reachable(std::cout, a);
-	  break;
-	case 8:
-	  {
-	    assert(degeneralize_opt == DegenSBA);
-	    const spot::tgba_sba_proxy* s =
-	      static_cast<const spot::tgba_sba_proxy*>(degeneralized);
-	    spot::never_claim_reachable(std::cout, s, f);
-	    break;
-	  }
-	case 9:
-	  stats_reachable(a).dump(std::cout);
-	  build_scc_stats(a).dump(std::cout);
-	  break;
-	case 10:
-	  dump_scc_dot(a, std::cout, false);
-	  break;
-	case 11:
-	  dump_scc_dot(a, std::cout, true);
-	  break;
-	default:
-	  assert(!"unknown output option");
+	  tm.start("producing output");
+	  switch (output)
+	    {
+	    case 0:
+	      spot::dotty_reachable(std::cout, a);
+	      break;
+	    case 1:
+	      if (concrete)
+		spot::bdd_print_dot(std::cout, concrete->get_dict(),
+				    concrete->get_core_data().relation);
+	      break;
+	    case 2:
+	      if (concrete)
+		spot::bdd_print_dot(std::cout, concrete->get_dict(),
+				    concrete->
+				    get_core_data().acceptance_conditions);
+	      break;
+	    case 3:
+	      if (concrete)
+		spot::bdd_print_set(std::cout, concrete->get_dict(),
+				    concrete->get_core_data().relation);
+	      break;
+	    case 4:
+	      if (concrete)
+		spot::bdd_print_set(std::cout, concrete->get_dict(),
+				    concrete->
+				    get_core_data().acceptance_conditions);
+	      break;
+	    case 5:
+	      a->get_dict()->dump(std::cout);
+	      break;
+	    case 6:
+	      spot::lbtt_reachable(std::cout, a);
+	      break;
+	    case 7:
+	      spot::tgba_save_reachable(std::cout, a);
+	      break;
+	    case 8:
+	      {
+		assert(degeneralize_opt == DegenSBA);
+		const spot::tgba_sba_proxy* s =
+		  static_cast<const spot::tgba_sba_proxy*>(degeneralized);
+		spot::never_claim_reachable(std::cout, s, f);
+		break;
+	      }
+	    case 9:
+	      stats_reachable(a).dump(std::cout);
+	      build_scc_stats(a).dump(std::cout);
+	      break;
+	    case 10:
+	      dump_scc_dot(a, std::cout, false);
+	      break;
+	    case 11:
+	      dump_scc_dot(a, std::cout, true);
+	      break;
+	    default:
+	      assert(!"unknown output option");
+	    }
+	  tm.stop("producing output");
 	}
 
       if (echeck_inst)
@@ -797,7 +820,10 @@ main(int argc, char** argv)
 	  assert(ec);
 	  do
 	    {
+	      tm.start("running emptiness check");
 	      spot::emptiness_check_result* res = ec->check();
+	      tm.stop("running emptiness check");
+
               if (paper_opt)
                 {
                   std::ios::fmtflags old = std::cout.flags();
@@ -856,7 +882,10 @@ main(int argc, char** argv)
                   else
                     {
 
+		      tm.start("computing accepting run");
                       spot::tgba_run* run = res->accepting_run();
+		      tm.stop("computing accepting run");
+
                       if (!run)
                         {
                           std::cout << "an accepting run exists" << std::endl;
@@ -865,11 +894,14 @@ main(int argc, char** argv)
                         {
                           if (opt_reduce)
                             {
+			      tm.start("reducing accepting run");
                               spot::tgba_run* redrun =
                                 spot::reduce_run(res->automaton(), run);
+			      tm.stop("reducing accepting run");
                               delete run;
                               run = redrun;
                             }
+			  tm.start("printing accepting run");
                           if (graph_run_opt)
                             {
                               spot::tgba_run_dotty_decorator deco(run);
@@ -889,6 +921,7 @@ main(int argc, char** argv)
                                 exit_code = 1;
                             }
                           delete run;
+			  tm.stop("printing accepting run");
                         }
                     }
                 }
@@ -916,6 +949,9 @@ main(int argc, char** argv)
     {
       exit_code = 1;
     }
+
+  if (use_timer)
+    tm.print(std::cout);
 
   if (unobservables)
     {
