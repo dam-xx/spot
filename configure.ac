@@ -75,6 +75,8 @@ AC_CONFIG_FILES([
   bench/emptchk/defs
   bench/gspn-ssp/Makefile
   bench/gspn-ssp/defs
+  bench/ltlcounter/Makefile
+  bench/ltlcounter/defs
   bench/ltl2tgba/Makefile
   bench/ltl2tgba/defs
   bench/scc-stats/Makefile

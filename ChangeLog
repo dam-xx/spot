@@ -1,5 +1,16 @@
 2009-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Add a benchmark using Kristin Y. Rozier's LTLcounter scripts.
+
+	* bench/ltlcounter/README, bench/ltlcounter/run,
+	bench/ltlcounter/plot.gnu, bench/ltlcounter/defs.in,
+	bench/ltlcounter/Makefile.am: New files.
+	* bench/Makefile.am (SUBDIRS): Add ltlcounter.
+	* configure.ac (AC_CONFIG_FILES): Adjust.
+	* THANKS: Add her.
+
+2009-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Use a timer to clock the different phases of the translation.
 
 	* src/tgbatest/ltl2tgba.cc: Add option -T.
@@ -168,7 +179,7 @@
 
 2009-11-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
-	Fix a longstanding bug reported by Kristin Y. Rozier..
+	Fix a longstanding bug reported by Kristin Y. Rozier.
 
 	* src/ltlast/formula.hh (formula_ptr_less_than::operator()):
 	Fix a typo where `l' was typed as `1'.

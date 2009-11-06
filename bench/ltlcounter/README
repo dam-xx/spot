@@ -1,0 +1,6 @@
+This benchmark uses the ltlcounter scripts of Kristin Y. Rozier (See
+src/tgbatest/ltlcounter/) to plot the performance of the ltl2tgba_fm
+algorithm.
+
+Execute "./run" to compute the raw numbers, then execture
+"gnuplot plot.gnu" to plot the figures.
