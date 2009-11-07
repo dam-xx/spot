@@ -61,7 +61,7 @@ namespace spot
 
     protected:
       typedef std::pair<type, formula*> pair;
-      typedef std::map<pair, formula*> map;
+      typedef std::map<pair, unop*> map;
       static map instances;
 
       unop(type op, formula* child);

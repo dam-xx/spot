@@ -108,7 +108,7 @@ namespace spot
 	  return *p1.second < *p2.second;
 	}
       };
-      typedef std::map<pair, formula*, paircmp> map;
+      typedef std::map<pair, multop*, paircmp> map;
       static map instances;
 
       multop(type op, vec* v);

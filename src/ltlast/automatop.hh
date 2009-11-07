@@ -75,7 +75,7 @@ namespace spot
     protected:
       typedef std::pair<std::pair<nfa::ptr, bool>, vec*> triplet;
       /// Comparison functor used internally by ltl::automatop.
-      struct paircmp
+      struct tripletcmp
       {
 	bool
 	operator () (const triplet& p1, const triplet& p2) const
@@ -87,7 +87,7 @@ namespace spot
 	  return *p1.second < *p2.second;
 	}
       };
-      typedef std::map<triplet, formula*, paircmp> map;
+      typedef std::map<triplet, automatop*, tripletcmp> map;
       static map instances;
 
       automatop(const nfa::ptr, vec* v, bool negated);

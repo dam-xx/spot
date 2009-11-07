@@ -1,5 +1,15 @@
 2009-11-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Better types for instance maps.
+
+	* src/ltlast/unop.hh (map): Use unop* as values.
+	* src/ltlast/binop.hh (map): Use binop* as values.
+	* src/ltlast/multop.hh (map): Use multop* as values.
+	* src/ltlast/automatop.hh (paircmp): Rename as tripletcmp.
+	(map): Use automaton* as values, not formula*.
+
+2009-11-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add missing instance_count() in automatop and eltl2tgba.
 
 	* src/ltlast/automatop.hh, src/ltlast/automatop.cc: Add missing

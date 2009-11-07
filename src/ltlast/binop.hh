@@ -73,7 +73,7 @@ namespace spot
     protected:
       typedef std::pair<formula*, formula*> pairf;
       typedef std::pair<type, pairf> pair;
-      typedef std::map<pair, formula*> map;
+      typedef std::map<pair, binop*> map;
       static map instances;
 
       binop(type op, formula* first, formula* second);
