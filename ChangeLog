@@ -1,5 +1,9 @@
 2009-11-07  Damien Lefortier <dam@lrde.epita.fr>
 
+	* src/tgba/taa.cc, src/tgbatest/taa.cc: Adjust.
+
+2009-11-07  Damien Lefortier <dam@lrde.epita.fr>
+
 	* src/tgba/taa.cc, src/tgba/taa.hh: Speed up the cartesian product
 	in taa_succ_iterator and allow multiple initial states in taa.
 	* src/tgba/ltl2taa.cc: Remove temporary printing.

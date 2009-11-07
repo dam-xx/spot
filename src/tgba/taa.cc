@@ -62,8 +62,8 @@ namespace spot
   void
   taa::set_init_state(const std::string& s)
   {
-    std::vector<std::string> v;
-    v.push_back(s);
+    std::vector<std::string> v(1);
+    v[0] = s;
     set_init_state(v);
   }
 
@@ -150,7 +150,9 @@ namespace spot
   state*
   taa::get_init_state() const
   {
-    return new spot::state_set(init_);
+    assert(init_);
+    taa::state_set* ss = new taa::state_set(*init_);
+    return new spot::state_set(ss);
   }
 
   tgba_succ_iterator*

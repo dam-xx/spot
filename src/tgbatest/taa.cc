@@ -50,6 +50,7 @@ main()
   a->add_condition(t2, e.require("b"));
   a->add_condition(t3, e.require("c"));
 
+  a->set_init_state("state 1");
   spot::dotty_reachable(std::cout, a);
 
   delete a;
