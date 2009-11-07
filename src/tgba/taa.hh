@@ -51,6 +51,7 @@ namespace spot
     };
 
     void set_init_state(const std::string& state);
+    void set_init_state(const std::vector<std::string>& state);
 
     transition*
     create_transition(const std::string& src,
@@ -106,7 +107,7 @@ namespace spot
     mutable bdd all_acceptance_conditions_;
     mutable bool all_acceptance_conditions_computed_;
     bdd neg_acceptance_conditions_;
-    taa::state* init_;
+    taa::state_set* init_;
     ss_vec state_set_vec_;
 
   private:
@@ -167,8 +168,26 @@ namespace spot
     virtual bdd current_acceptance_conditions() const;
 
   private:
+    /// Those typedefs are used to generate all possible successors in
+    /// the constructor using a cartesian product.
     typedef taa::state::const_iterator iterator;
-    typedef std::multimap<taa::state_set, taa::transition*> seen_map;
+    typedef std::pair<iterator, iterator> iterator_pair;
+    typedef std::vector<iterator_pair> bounds_t;
+    typedef Sgi::hash_multimap<
+      const taa::state_set*, taa::transition*, ptr_hash<taa::state_set>
+      > seen_map;
+
+    struct distance_sort :
+      public std::binary_function<const iterator_pair&,
+				  const iterator_pair&, bool>
+    {
+      bool
+      operator()(const iterator_pair& lhs, const iterator_pair& rhs) const
+      {
+	return std::distance(lhs.first, lhs.second) <
+	       std::distance(rhs.first, rhs.second);
+      }
+    };
 
     std::vector<taa::transition*>::const_iterator i_;
     std::vector<taa::transition*> succ_;

@@ -1,3 +1,9 @@
+2009-11-07  Damien Lefortier <dam@lrde.epita.fr>
+
+	* src/tgba/taa.cc, src/tgba/taa.hh: Speed up the cartesian product
+	in taa_succ_iterator and allow multiple initial states in taa.
+	* src/tgba/ltl2taa.cc: Remove temporary printing.
+
 2009-11-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix ltlcounter.test for VPATH builds and n > 2.

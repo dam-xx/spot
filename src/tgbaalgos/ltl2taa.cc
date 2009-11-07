@@ -74,7 +74,7 @@ namespace spot
 	init_ = to_string(f);
 	std::vector<std::string> dst;
 
-	dst.push_back(std::string("well"));
+	dst.push_back(std::string("sink"));
 	taa::transition* t = res_->create_transition(init_, dst);
 	res_->add_condition(t, clone(f));
 	succ_state ss = { dst, f, constant::true_instance() };
@@ -90,7 +90,7 @@ namespace spot
 	{
 	  case constant::True:
 	  {
-	    dst.push_back(std::string("well"));
+	    dst.push_back(std::string("sink"));
 	    res_->create_transition(init_, dst);
 	    succ_state ss = { dst, node, constant::true_instance() };
 	    succ_.push_back(ss);
@@ -383,8 +383,6 @@ namespace spot
     const ltl::formula* f2 = ltl::negative_normal_form(f1);
     ltl::destroy(f1);
 
-    std::cerr << ltl::to_string(f2) << std::endl;
-
     spot::taa* res = new spot::taa(dict);
     language_containment_checker* lcc =
       new language_containment_checker(dict, false, false, false, false);
@@ -392,9 +390,6 @@ namespace spot
     f2->accept(v);
     ltl::destroy(f2);
     delete lcc;
-
-    // TODO: temporary.
-    res->output(std::cerr);
 
     return v.result();
   }

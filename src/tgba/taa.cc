@@ -21,6 +21,7 @@
 
 #include <map>
 #include <algorithm>
+#include <iterator>
 #include <iostream>
 #include "ltlvisit/destroy.hh"
 #include "tgba/formula2bdd.hh"
@@ -61,7 +62,15 @@ namespace spot
   void
   taa::set_init_state(const std::string& s)
   {
-    init_ = add_state(s);
+    std::vector<std::string> v;
+    v.push_back(s);
+    set_init_state(v);
+  }
+
+  void
+  taa::set_init_state(const std::vector<std::string>& s)
+  {
+    init_ = add_state_set(s);
   }
 
   taa::transition*
@@ -141,9 +150,7 @@ namespace spot
   state*
   taa::get_init_state() const
   {
-    taa::state_set* s = new taa::state_set;
-    s->insert(init_);
-    return new spot::state_set(s);
+    return new spot::state_set(init_);
   }
 
   tgba_succ_iterator*
@@ -233,12 +240,6 @@ namespace spot
       taa::state* s = new taa::state;
       name_state_map_[name] = s;
       state_name_map_[s] = name;
-
-      // The first state we add is the inititial state.
-      // It can also be overridden with set_init_state().
-      if (!init_)
-	init_ = s;
-
       return s;
     }
     return i->second;
@@ -352,13 +353,18 @@ namespace spot
       return;
     }
 
-    std::vector<iterator> pos;
-    std::vector<std::pair<iterator, iterator> > bounds;
+    bounds_t bounds;
     for (taa::state_set::const_iterator i = s->begin(); i != s->end(); ++i)
-    {
-      pos.push_back((*i)->begin());
       bounds.push_back(std::make_pair((*i)->begin(), (*i)->end()));
-    }
+
+    /// Sorting might make the cartesian product faster by not
+    /// exploring all possibilities.
+    std::sort(bounds.begin(), bounds.end(), distance_sort());
+
+    std::vector<iterator> pos;
+    pos.reserve(bounds.size());
+    for (bounds_t::const_iterator i = bounds.begin(); i != bounds.end(); ++i)
+      pos.push_back(i->first);
 
     while (pos[0] != bounds[0].second)
     {
@@ -366,39 +372,50 @@ namespace spot
       t->condition = bddtrue;
       t->acceptance_conditions = bddfalse;
       taa::state_set* ss = new taa::state_set;
-      for (unsigned i = 0; i < pos.size(); ++i)
+
+      unsigned p;
+      for (p = 0; p < pos.size() && t->condition != bddfalse; ++p)
       {
 	taa::state_set::const_iterator j;
-	for (j = (*pos[i])->dst->begin(); j != (*pos[i])->dst->end(); ++j)
-	  if ((*j)->size() > 0) // Remove well states.
+	for (j = (*pos[p])->dst->begin(); j != (*pos[p])->dst->end(); ++j)
+	  if ((*j)->size() > 0) // Remove sink states.
 	    ss->insert(*j);
 
 	// Fill the new transition.
 	t->dst = ss;
-	t->condition &= (*pos[i])->condition;
-	t->acceptance_conditions |= (*pos[i])->acceptance_conditions;
+	t->condition &= (*pos[p])->condition;
+	t->acceptance_conditions |= (*pos[p])->acceptance_conditions;
       }
-      // Look for another transition to merge with.
+      // If p != pos.size() we have found a contradiction
+      assert(p > 0);
+
+      // If no contradiction, then look for another transition to
+      // merge with the new one.
       seen_map::iterator i;
-      for (i = seen_.find(*ss); i != seen_.end(); ++i)
+      if (t->condition != bddfalse)
       {
-	if (*i->second->dst == *t->dst
-	    && i->second->condition == t->condition)
+	for (i = seen_.find(ss); i != seen_.end(); ++i)
 	{
-	  i->second->acceptance_conditions &= t->acceptance_conditions;
-	  break;
-	}
-	if (*i->second->dst == *t->dst
-	    && i->second->acceptance_conditions == t->acceptance_conditions)
-	{
-	  i->second->condition |= t->condition;
-	  break;
+	  if (*i->second->dst == *t->dst
+	      && i->second->condition == t->condition)
+	  {
+	    i->second->acceptance_conditions &= t->acceptance_conditions;
+	    break;
+	  }
+	  if (*i->second->dst == *t->dst
+	      && i->second->acceptance_conditions == t->acceptance_conditions)
+	  {
+	    i->second->condition |= t->condition;
+	    break;
+	  }
 	}
       }
-      // Mark this transition as seen and keep it, or delete it.
-      if (i == seen_.end() && t->condition != bddfalse)
+      // Mark the new transition as seen and keep it if we have not
+      // found any contraction and no other transition to merge with,
+      // or delete it otherwise.
+      if (t->condition != bddfalse && i == seen_.end())
       {
-	seen_.insert(std::make_pair(*ss, t));
+	seen_.insert(std::make_pair(ss, t));
 	succ_.push_back(t);
       }
       else
@@ -409,8 +426,9 @@ namespace spot
 
       for (int i = pos.size() - 1; i >= 0; --i)
       {
-	if (std::distance(pos[i], bounds[i].second) > 1 ||
-	    (i == 0 && std::distance(pos[i], bounds[i].second) == 1))
+	if ((i < int(p))
+	    && (std::distance(pos[i], bounds[i].second) > 1
+		|| (i == 0 && std::distance(pos[i], bounds[i].second) == 1)))
 	{
 	  ++pos[i];
 	  break;
