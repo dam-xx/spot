@@ -930,6 +930,7 @@ main(int argc, char** argv)
   assert(spot::ltl::unop::instance_count() == 0);
   assert(spot::ltl::binop::instance_count() == 0);
   assert(spot::ltl::multop::instance_count() == 0);
+  assert(spot::ltl::automatop::instance_count() == 0);
   delete dict;
   return exit_code;
 }

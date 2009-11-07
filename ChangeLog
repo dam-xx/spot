@@ -1,3 +1,15 @@
+2009-11-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add missing instance_count() in automatop and eltl2tgba.
+
+	* src/ltlast/automatop.hh, src/ltlast/automatop.cc: Add missing
+	instance_count() functions.
+	* src/tgbatests/eltl2tgba.cc: Add missing instance_count()
+	assertions at the end.
+	* src/tgbatests/ltl2tgba.cc: Also call automatop::instance_count(),
+	even if automatop are not used in ltl2tgba yet.  This way we won't
+	forget once eltl2tgba and ltl2tgba are merged.
+
 2009-11-07  Damien Lefortier <dam@lrde.epita.fr>
 
 	* src/tgba/taa.cc, src/tgbatest/taa.cc: Adjust.

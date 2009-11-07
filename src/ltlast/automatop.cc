@@ -1,6 +1,5 @@
-// Copyright (C) 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2008, 2009 Laboratoire de Recherche et Developpement
+// de l'Epita (LRDE)
 //
 // This file is part of Spot, a model checking library.
 //
@@ -111,6 +110,12 @@ namespace spot
     automatop::is_negated() const
     {
       return negated_;
+    }
+
+    unsigned
+    automatop::instance_count()
+    {
+      return instances.size();
     }
   }
 }

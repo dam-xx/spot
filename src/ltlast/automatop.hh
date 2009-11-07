@@ -1,6 +1,5 @@
-// Copyright (C) 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2008, 2009 Laboratoire de Recherche et Developpement
+// de l'Epita (LRDE)
 //
 // This file is part of Spot, a model checking library.
 //
@@ -69,6 +68,9 @@ namespace spot
       const spot::ltl::nfa::ptr nfa() const;
 
       bool is_negated() const;
+
+      /// Number of instantiated multop operators.  For debugging.
+      static unsigned instance_count();
 
     protected:
       typedef std::pair<std::pair<nfa::ptr, bool>, vec*> triplet;
