@@ -44,6 +44,9 @@ namespace spot
       map::iterator i = instances.find(p);
       assert (i != instances.end());
       instances.erase(i);
+
+      // Dereference child.
+      formula::unref(child());
     }
 
     void
@@ -106,6 +109,8 @@ namespace spot
       map::iterator i = instances.find(p);
       if (i != instances.end())
 	{
+	  // This instance already exists.
+	  formula::unref(child);
 	  return static_cast<unop*>(i->second->ref());
 	}
       unop* ap = new unop(op, child);

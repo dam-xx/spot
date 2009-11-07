@@ -48,6 +48,10 @@ namespace spot
       assert (i != instances.end());
       instances.erase(i);
 
+      // Dereference children.
+      for (unsigned n = 0; n < size(); ++n)
+	formula::unref(nth(n));
+
       delete children_;
     }
 
@@ -73,6 +77,9 @@ namespace spot
       map::iterator i = instances.find(p);
       if (i != instances.end())
 	{
+	  // The instance already exists.
+	  for (vec::iterator vi = v->begin(); vi != v->end(); ++vi)
+	    formula::unref(*vi);
 	  delete v;
 	  return static_cast<automatop*>(i->second->ref());
 	}

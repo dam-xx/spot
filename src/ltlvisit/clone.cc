@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -93,9 +93,8 @@ namespace spot
     formula*
     clone(const formula* f)
     {
-      clone_visitor v;
-      const_cast<formula*>(f)->accept(v);
-      return v.result();
+      formula* res = const_cast<formula*>(f)->ref();
+      return res;
     }
   }
 }

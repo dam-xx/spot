@@ -26,7 +26,6 @@
 #include "multop.hh"
 #include "constant.hh"
 #include "visitor.hh"
-#include "ltlvisit/destroy.hh"
 
 namespace spot
 {
@@ -53,6 +52,10 @@ namespace spot
       map::iterator i = instances.find(p);
       assert (i != instances.end());
       instances.erase(i);
+
+      // Dereference children.
+      for (unsigned n = 0; n < size(); ++n)
+	formula::unref(nth(n));
 
       delete children_;
     }
@@ -113,9 +116,10 @@ namespace spot
     formula*
     multop::instance(type op, vec* v)
     {
-      pair p(op, v);
-
       // Inline children of same kind.
+      //
+      // When we construct a formula such as Multop(Op,X,Multop(Op,Y,Z))
+      // we will want to inline it as Multop(Op,X,Y,Z).
       {
 	vec inlined;
 	vec::iterator i = v->begin();
@@ -126,10 +130,7 @@ namespace spot
 	      {
 		unsigned ps = p->size();
 		for (unsigned n = 0; n < ps; ++n)
-		  inlined.push_back(p->nth(n));
-		// That sub-formula is now useless, drop it.
-		// Note that we use unref(), not destroy(), because we've
-		// adopted its children and don't want to destroy these.
+		  inlined.push_back(p->nth(n)->ref());
 		formula::unref(*i);
 		i = v->erase(i);
 	      }
@@ -144,7 +145,7 @@ namespace spot
       std::sort(v->begin(), v->end(), formula_ptr_less_than());
 
       // Remove duplicates.  We can't use std::unique(), because we
-      // must destroy() any formula we drop.
+      // must unref() any formula we drop.
       {
 	formula* last = 0;
 	vec::iterator i = v->begin();
@@ -152,7 +153,7 @@ namespace spot
 	  {
 	    if (*i == last)
 	      {
-		destroy(*i);
+		formula::unref(*i);
 		i = v->erase(i);
 	      }
 	    else
@@ -160,7 +161,7 @@ namespace spot
 		last = *i++;
 	      }
 	  }
-	}
+      }
 
       vec::size_type s = v->size();
       if (s == 0)
@@ -178,21 +179,31 @@ namespace spot
 	}
       else if (s == 1)
 	{
+	  // Simply replace Multop(Op,X) by X.
 	  formula* res = (*v)[0];
 	  delete v;
 	  return res;
 	}
 
+      // The hash key.
+      pair p(op, v);
+
       map::iterator i = instances.find(p);
       if (i != instances.end())
 	{
+	  // The instance already exists.
+	  for (vec::iterator vi = v->begin(); vi != v->end(); ++vi)
+	    formula::unref(*vi);
 	  delete v;
 	  return static_cast<multop*>(i->second->ref());
 	}
+
+      // This is the first instance of this formula.
+
+      // Record the instance in the map,
       multop* ap = new multop(op, v);
       instances[p] = ap;
-      return static_cast<multop*>(ap->ref());
-
+      return ap->ref();
     }
 
     formula*
