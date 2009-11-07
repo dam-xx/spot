@@ -1,5 +1,16 @@
 2009-11-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Make it easier to debug reference counts in LTL nodes.
+
+	* src/ltlast/automatop.cc, src/ltlast/automatop.hh,
+	src/ltlast/binop.cc, src/ltlast/binop.hh, src/ltlast/multop.cc,
+	src/ltlast/multop.hh, src/ltlast/unop.cc, src/ltlast/unop.hh:
+	Add a dump_instance() static method to all class.
+	* src/ltltest/readltl.cc: Add option -r to dump all instances
+	with their reference count, after parsing and after deletion.
+
+2009-11-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Better types for instance maps.
 
 	* src/ltlast/unop.hh (map): Use unop* as values.

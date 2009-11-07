@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2009 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -22,6 +22,7 @@
 #include <cassert>
 #include <utility>
 #include <algorithm>
+#include <iostream>
 #include "multop.hh"
 #include "constant.hh"
 #include "visitor.hh"
@@ -208,5 +209,19 @@ namespace spot
     {
       return instances.size();
     }
+
+    std::ostream&
+    multop::dump_instances(std::ostream& os)
+    {
+      for (map::iterator i = instances.begin(); i != instances.end(); ++i)
+	{
+	  os << i->second << " = "
+	     << i->second->ref_count_() << " * "
+	     << i->second->dump()
+	     << std::endl;
+	}
+      return os;
+    }
+
   }
 }

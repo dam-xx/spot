@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2008 Laboratoire d'Informatique de Paris 6
+// Copyright (C) 2003, 2008, 2009 Laboratoire d'Informatique de Paris 6
 // (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
 // Pierre et Marie Curie.
 //
@@ -36,6 +36,16 @@ syntax(char* prog)
   exit(2);
 }
 
+void
+dump_instances(const std::string& label)
+{
+  std::cerr << "=== " << label << " ===" << std::endl;
+  spot::ltl::atomic_prop::dump_instances(std::cerr);
+  spot::ltl::unop::dump_instances(std::cerr);
+  spot::ltl::binop::dump_instances(std::cerr);
+  spot::ltl::multop::dump_instances(std::cerr);
+}
+
 int
 main(int argc, char** argv)
 {
@@ -45,11 +55,19 @@ main(int argc, char** argv)
     syntax(argv[0]);
 
   bool debug = false;
+  bool debug_ref = false;
   int formula_index = 1;
 
   if (!strcmp(argv[1], "-d"))
     {
       debug = true;
+      if (argc < 3)
+	syntax(argv[0]);
+      formula_index = 2;
+    }
+  else if (!strcmp(argv[1], "-r"))
+    {
+      debug_ref = true;
       if (argc < 3)
 	syntax(argv[0]);
       formula_index = 2;
@@ -63,8 +81,12 @@ main(int argc, char** argv)
   exit_code =
     spot::ltl::format_parse_errors(std::cerr, argv[formula_index], pel);
 
+
   if (f)
     {
+      if (debug_ref)
+	dump_instances("before");
+
 #ifdef DOTTY
       spot::ltl::dotty(std::cout, f);
 #else
@@ -72,6 +94,9 @@ main(int argc, char** argv)
       std::cout << std::endl;
 #endif
       spot::ltl::destroy(f);
+
+      if (debug_ref)
+	dump_instances("after");
     }
   else
     {

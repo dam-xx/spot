@@ -24,6 +24,7 @@
 # define SPOT_LTLAST_AUTOMATOP_HH
 
 # include <vector>
+# include <iosfwd>
 # include <map>
 # include "nfa.hh"
 # include "refformula.hh"
@@ -71,6 +72,10 @@ namespace spot
 
       /// Number of instantiated multop operators.  For debugging.
       static unsigned instance_count();
+
+      /// Dump all instances.  For debugging.
+      static std::ostream& dump_instances(std::ostream& os);
+
 
     protected:
       typedef std::pair<std::pair<nfa::ptr, bool>, vec*> triplet;

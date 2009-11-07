@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2009 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -28,6 +28,7 @@
 # define SPOT_LTLAST_BINOP_HH
 
 #include <map>
+#include <iosfwd>
 #include "refformula.hh"
 
 namespace spot
@@ -69,6 +70,9 @@ namespace spot
 
       /// Number of instantiated binary operators.  For debugging.
       static unsigned instance_count();
+
+      /// Dump all instances.  For debugging.
+      static std::ostream& dump_instances(std::ostream& os);
 
     protected:
       typedef std::pair<formula*, formula*> pairf;

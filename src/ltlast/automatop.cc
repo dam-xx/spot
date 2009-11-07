@@ -117,5 +117,19 @@ namespace spot
     {
       return instances.size();
     }
+
+    std::ostream&
+    automatop::dump_instances(std::ostream& os)
+    {
+      for (map::iterator i = instances.begin(); i != instances.end(); ++i)
+	{
+	  os << i->second << " = "
+	     << i->second->ref_count_() << " * "
+	     << i->second->dump()
+	     << std::endl;
+	}
+      return os;
+    }
+
   }
 }
