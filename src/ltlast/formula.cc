@@ -27,10 +27,10 @@ namespace spot
   namespace ltl
   {
     formula*
-    formula::clone()
+    formula::clone() const
     {
-      ref_();
-      return this;
+      const_cast<formula*>(this)->ref_();
+      return const_cast<formula*>(this);
     }
 
     formula::~formula()

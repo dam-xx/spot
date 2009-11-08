@@ -80,7 +80,7 @@ namespace spot
       ///
       /// This increments the reference counter of this node (if one is
       /// used).
-      formula* clone();
+      formula* clone() const;
       /// \brief release this node
       ///
       /// This decrements the reference counter of this node (if one is

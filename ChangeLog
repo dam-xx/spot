@@ -1,5 +1,12 @@
 2009-11-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Make it possible to clone const formulae.
+
+	* src/ltlast/formula.hh, src/ltlast/formula.cc (clone): Declare
+	as const.
+
+2009-11-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Rename formula::ref and formula::unref as formula::clone
 	and formula::destroy.
 
