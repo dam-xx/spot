@@ -46,7 +46,7 @@ namespace spot
       instances.erase(i);
 
       // Dereference child.
-      formula::unref(child());
+      formula::destroy(child());
     }
 
     void
@@ -110,12 +110,12 @@ namespace spot
       if (i != instances.end())
 	{
 	  // This instance already exists.
-	  formula::unref(child);
-	  return static_cast<unop*>(i->second->ref());
+	  formula::destroy(child);
+	  return static_cast<unop*>(i->second->clone());
 	}
       unop* ap = new unop(op, child);
       instances[p] = ap;
-      return static_cast<unop*>(ap->ref());
+      return static_cast<unop*>(ap->clone());
     }
 
     unsigned

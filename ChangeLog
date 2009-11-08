@@ -1,3 +1,16 @@
+2009-11-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Rename formula::ref and formula::unref as formula::clone
+	and formula::destroy.
+
+	* src/ltlast/atomic_prop.cc, src/ltlast/automatop.cc,
+	src/ltlast/binop.cc, src/ltlast/formula.hh, src/ltlast/formula.cc,
+	src/ltlast/multop.cc, src/ltlast/unop.cc, src/ltlenv/declenv.cc,
+	src/ltlvisit/basicreduce.cc, src/ltlvisit/clone.cc,
+	src/ltlvisit/destroy.cc, src/ltlvisit/nenoform.cc,
+	src/ltlvisit/randomltl.cc, src/ltlvisit/reduce.cc,
+	src/tgbatest/randtgba.cc: Adjust.
+
 2009-11-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Change the way references are counted to speedup cloning.

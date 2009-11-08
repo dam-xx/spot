@@ -48,8 +48,8 @@ namespace spot
       instances.erase(i);
 
       // Dereference children.
-      formula::unref(first());
-      formula::unref(second());
+      formula::destroy(first());
+      formula::destroy(second());
     }
 
     void
@@ -143,13 +143,13 @@ namespace spot
       if (i != instances.end())
 	{
 	  // This instance already exists.
-	  formula::unref(first);
-	  formula::unref(second);
-	  return static_cast<binop*>(i->second->ref());
+	  formula::destroy(first);
+	  formula::destroy(second);
+	  return static_cast<binop*>(i->second->clone());
 	}
       binop* ap = new binop(op, first, second);
       instances[p] = ap;
-      return static_cast<binop*>(ap->ref());
+      return static_cast<binop*>(ap->clone());
     }
 
     unsigned

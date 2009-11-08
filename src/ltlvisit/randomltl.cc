@@ -1,4 +1,4 @@
-// Copyright (C) 2005, 2008 Laboratoire d'Informatique de Paris 6
+// Copyright (C) 2005, 2008, 2009 Laboratoire d'Informatique de Paris 6
 // (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
 // Pierre et Marie Curie.
 //
@@ -40,7 +40,7 @@ namespace spot
 	(void) n;
 	atomic_prop_set::const_iterator i = rl->ap()->begin();
 	std::advance(i, mrand(rl->ap()->size()));
-	return (*i)->ref();
+	return (*i)->clone();
       }
 
       formula*

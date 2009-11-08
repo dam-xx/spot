@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -51,8 +51,7 @@ namespace spot
       prop_map::iterator i = props_.find(prop_str);
       if (i == props_.end())
 	return 0;
-      // It's an atomic_prop, so we do not have to use the clone() visitor.
-      return i->second->ref();
+      return i->second->clone();
     }
 
     const std::string&

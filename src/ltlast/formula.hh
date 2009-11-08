@@ -79,17 +79,13 @@ namespace spot
       /// \brief clone this node
       ///
       /// This increments the reference counter of this node (if one is
-      /// used).  You should almost never use this method directly as
-      /// it doesn't touch the children.  If you want to clone a
-      /// whole formula, use spot::ltl::clone() instead.
-      formula* ref();
+      /// used).
+      formula* clone();
       /// \brief release this node
       ///
       /// This decrements the reference counter of this node (if one is
-      /// used) and can free the object.  You should almost never use
-      /// this method directly as it doesn't touch the children.  If you
-      /// want to release a whole formula, use spot::ltl::destroy() instead.
-      static void unref(formula* f);
+      /// used) and can free the object.
+      static void destroy(formula* f);
 
       /// Return a canonic representation of the formula
       const std::string& dump() const;

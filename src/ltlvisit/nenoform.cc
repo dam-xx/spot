@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -50,7 +50,7 @@ namespace spot
 	void
 	visit(atomic_prop* ap)
 	{
-	  formula* f = ap->ref();
+	  formula* f = ap->clone();
 	  if (negated_)
 	    result_ = unop::instance(unop::Not, f);
 	  else

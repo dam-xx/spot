@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005, 2008 Laboratoire d'Informatique de Paris
+// Copyright (C) 2004, 2005, 2008, 2009 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -876,7 +876,8 @@ main(int argc, char** argv)
 		spot::ltl::atomic_prop_collect(f);
               for (spot::ltl::atomic_prop_set::iterator i = tmp->begin();
 		   i != tmp->end(); ++i)
-		apf->insert(dynamic_cast<spot::ltl::atomic_prop*>((*i)->ref()));
+		apf->insert(dynamic_cast<spot::ltl::atomic_prop*>
+			    ((*i)->clone()));
               spot::ltl::destroy(f);
               delete tmp;
             }
@@ -890,7 +891,7 @@ main(int argc, char** argv)
 
       for (spot::ltl::atomic_prop_set::iterator i = ap->begin();
 	   i != ap->end(); ++i)
-	apf->insert(dynamic_cast<spot::ltl::atomic_prop*>((*i)->ref()));
+	apf->insert(dynamic_cast<spot::ltl::atomic_prop*>((*i)->clone()));
 
       if (!opt_S)
 	{

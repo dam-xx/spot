@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2005, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -27,7 +27,7 @@ namespace spot
   namespace ltl
   {
     formula*
-    formula::ref()
+    formula::clone()
     {
       ref_();
       return this;
@@ -38,7 +38,7 @@ namespace spot
     }
 
     void
-    formula::unref(formula* f)
+    formula::destroy(formula* f)
     {
       if (f->unref_())
 	delete f;

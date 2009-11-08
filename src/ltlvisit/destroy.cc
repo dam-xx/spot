@@ -28,7 +28,7 @@ namespace spot
     void
     destroy(const formula* f)
     {
-      formula::unref(const_cast<formula*>(f));
+      formula::destroy(const_cast<formula*>(f));
     }
   }
 }

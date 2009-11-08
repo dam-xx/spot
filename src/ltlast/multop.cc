@@ -55,7 +55,7 @@ namespace spot
 
       // Dereference children.
       for (unsigned n = 0; n < size(); ++n)
-	formula::unref(nth(n));
+	formula::destroy(nth(n));
 
       delete children_;
     }
@@ -130,8 +130,8 @@ namespace spot
 	      {
 		unsigned ps = p->size();
 		for (unsigned n = 0; n < ps; ++n)
-		  inlined.push_back(p->nth(n)->ref());
-		formula::unref(*i);
+		  inlined.push_back(p->nth(n)->clone());
+		formula::destroy(*i);
 		i = v->erase(i);
 	      }
 	    else
@@ -145,7 +145,7 @@ namespace spot
       std::sort(v->begin(), v->end(), formula_ptr_less_than());
 
       // Remove duplicates.  We can't use std::unique(), because we
-      // must unref() any formula we drop.
+      // must destroy() any formula we drop.
       {
 	formula* last = 0;
 	vec::iterator i = v->begin();
@@ -153,7 +153,7 @@ namespace spot
 	  {
 	    if (*i == last)
 	      {
-		formula::unref(*i);
+		formula::destroy(*i);
 		i = v->erase(i);
 	      }
 	    else
@@ -193,9 +193,9 @@ namespace spot
 	{
 	  // The instance already exists.
 	  for (vec::iterator vi = v->begin(); vi != v->end(); ++vi)
-	    formula::unref(*vi);
+	    formula::destroy(*vi);
 	  delete v;
-	  return static_cast<multop*>(i->second->ref());
+	  return static_cast<multop*>(i->second->clone());
 	}
 
       // This is the first instance of this formula.
@@ -203,7 +203,7 @@ namespace spot
       // Record the instance in the map,
       multop* ap = new multop(op, v);
       instances[p] = ap;
-      return ap->ref();
+      return ap->clone();
     }
 
     formula*

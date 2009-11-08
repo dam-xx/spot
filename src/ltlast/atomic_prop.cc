@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2005, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -78,11 +78,11 @@ namespace spot
       map::iterator i = instances.find(p);
       if (i != instances.end())
 	{
-	  return static_cast<atomic_prop*>(i->second->ref());
+	  return static_cast<atomic_prop*>(i->second->clone());
 	}
       atomic_prop* ap = new atomic_prop(name, env);
       instances[p] = ap;
-      return static_cast<atomic_prop*>(ap->ref());
+      return static_cast<atomic_prop*>(ap->clone());
     }
 
     unsigned

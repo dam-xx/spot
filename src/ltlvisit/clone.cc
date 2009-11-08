@@ -43,13 +43,13 @@ namespace spot
     void
     clone_visitor::visit(atomic_prop* ap)
     {
-      result_ = ap->ref();
+      result_ = ap->clone();
     }
 
     void
     clone_visitor::visit(constant* c)
     {
-      result_ = c->ref();
+      result_ = c->clone();
     }
 
     void
@@ -93,7 +93,7 @@ namespace spot
     formula*
     clone(const formula* f)
     {
-      formula* res = const_cast<formula*>(f)->ref();
+      formula* res = const_cast<formula*>(f)->clone();
       return res;
     }
   }
