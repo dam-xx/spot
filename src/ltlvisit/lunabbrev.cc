@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -20,7 +20,6 @@
 // 02111-1307, USA.
 
 #include "ltlast/allnodes.hh"
-#include "ltlvisit/clone.hh"
 #include "lunabbrev.hh"
 #include <cassert>
 
@@ -48,10 +47,10 @@ namespace spot
 	  /* f1 ^ f2  ==  (f1 & !f2) | (f2 & !f1) */
 	case binop::Xor:
 	  result_ = multop::instance(multop::Or,
-				     multop::instance(multop::And, clone(f1),
+				     multop::instance(multop::And, f1->clone(),
 						      unop::instance(unop::Not,
 								     f2)),
-				     multop::instance(multop::And, clone(f2),
+				     multop::instance(multop::And, f2->clone(),
 						      unop::instance(unop::Not,
 								     f1)));
 	  return;
@@ -64,7 +63,7 @@ namespace spot
 	case binop::Equiv:
 	  result_ = multop::instance(multop::Or,
 				     multop::instance(multop::And,
-						      clone(f1), clone(f2)),
+						      f1->clone(), f2->clone()),
 				     multop::instance(multop::And,
 						      unop::instance(unop::Not,
 								     f1),

@@ -22,7 +22,6 @@
 #include <cassert>
 #include "formula_tree.hh"
 #include "allnodes.hh"
-#include "ltlvisit/clone.hh"
 
 namespace spot
 {
@@ -35,7 +34,7 @@ namespace spot
       {
 	if (node_atomic* n = dynamic_cast<node_atomic*>(np.get()))
 	  return n->i == True ? constant::true_instance() :
-	    n->i == False ? constant::false_instance() : clone(v.at(n->i));
+	    n->i == False ? constant::false_instance() : v.at(n->i)->clone();
 
 	if (node_unop* n = dynamic_cast<node_unop*>(np.get()))
 	  return unop::instance(n->op, instanciate(n->child, v));

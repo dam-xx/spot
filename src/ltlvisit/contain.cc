@@ -21,7 +21,6 @@
 
 #include "contain.hh"
 #include "destroy.hh"
-#include "clone.hh"
 #include "tunabbrev.hh"
 #include "ltlast/unop.hh"
 #include "ltlast/binop.hh"
@@ -88,7 +87,7 @@ namespace spot
     language_containment_checker::contained(const formula* l, const formula* g)
     {
       record_* rl = register_formula_(l);
-      const formula* ng = unop::instance(unop::Not, clone(g));
+      const formula* ng = unop::instance(unop::Not, g->clone());
       record_* rng = register_formula_(ng);
       destroy(ng);
       return incompatible_(rl, rng);
@@ -99,9 +98,9 @@ namespace spot
     language_containment_checker::neg_contained(const formula* l,
 						const formula* g)
     {
-      const formula* nl = unop::instance(unop::Not, clone(l));
+      const formula* nl = unop::instance(unop::Not, l->clone());
       record_* rnl = register_formula_(nl);
-      const formula* ng = unop::instance(unop::Not, clone(g));
+      const formula* ng = unop::instance(unop::Not, g->clone());
       record_* rng = register_formula_(ng);
       destroy(nl);
       destroy(ng);
@@ -135,7 +134,7 @@ namespace spot
       const tgba_explicit* e = ltl_to_tgba_fm(f, dict_, exprop_, symb_merge_,
 					      branching_postponement_,
 					      fair_loop_approx_);
-      record_& r = translated_[clone(f)];
+      record_& r = translated_[f->clone()];
       r.translation = e;
       return &r;
     }

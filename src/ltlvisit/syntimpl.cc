@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -404,7 +404,7 @@ namespace spot
 		/* F(a) = true U a */
 		const formula* tmp = binop::instance(binop::U,
 						     constant::true_instance(),
-						     clone(f1));
+						     f1->clone());
 		if (special_case(tmp))
 		  {
 		    result_ = true;
@@ -421,7 +421,7 @@ namespace spot
 		/* G(a) = false R a */
 		const formula* tmp = binop::instance(binop::R,
 						     constant::false_instance(),
-						     clone(f1));
+						     f1->clone());
 		if (special_case(tmp))
 		  {
 		    result_ = true;
@@ -573,8 +573,8 @@ namespace spot
     bool
     syntactic_implication_neg(const formula* f1, const formula* f2, bool right)
     {
-      formula* l = clone(f1);
-      formula* r = clone(f2);
+      formula* l = f1->clone();
+      formula* r = f2->clone();
       if (right)
 	r = unop::instance(unop::Not, r);
       else

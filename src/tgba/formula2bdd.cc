@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2009 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -24,7 +24,6 @@
 #include "ltlast/allnodes.hh"
 #include "ltlast/visitor.hh"
 #include "misc/minato.hh"
-#include "ltlvisit/clone.hh"
 
 namespace spot
 {
@@ -171,7 +170,7 @@ namespace spot
 	  int var = bdd_var(b);
 	  bdd_dict::vf_map::const_iterator isi = d->var_formula_map.find(var);
 	  assert(isi != d->var_formula_map.end());
-	  formula* res = clone(isi->second);
+	  formula* res = isi->second->clone();
 
 	  bdd high = bdd_high(b);
 	  if (high == bddfalse)

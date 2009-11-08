@@ -87,7 +87,7 @@ namespace spot
     formula*
     clone_visitor::recurse(formula* f)
     {
-      return clone(f);
+      return f->clone();
     }
 
     formula*

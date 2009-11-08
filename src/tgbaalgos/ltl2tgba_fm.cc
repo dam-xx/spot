@@ -110,7 +110,7 @@ namespace spot
 	  }
 	else
 	  {
-	    f = clone(f);
+	    f = f->clone();
 	    num = dict->register_anonymous_variables(1, this);
 	    next_map[f] = num;
 	    next_formula_map[num] = f;
@@ -139,13 +139,13 @@ namespace spot
       {
 	vf_map::const_iterator isi = next_formula_map.find(var);
 	if (isi != next_formula_map.end())
-	  return clone(isi->second);
+	  return isi->second->clone();
 	isi = dict->acc_formula_map.find(var);
 	if (isi != dict->acc_formula_map.end())
-	  return clone(isi->second);
+	  return isi->second->clone();
 	isi = dict->var_formula_map.find(var);
 	if (isi != dict->var_formula_map.end())
-	  return clone(isi->second);
+	  return isi->second->clone();
 	assert(0);
 	// Never reached, but some GCC versions complain about
 	// a missing return otherwise.
@@ -213,7 +213,7 @@ namespace spot
 		formula* ac = var_to_formula(var);
 
 		if (!a->has_acceptance_condition(ac))
-		  a->declare_acceptance_condition(clone(ac));
+		  a->declare_acceptance_condition(ac->clone());
 		a->add_acceptance_condition(t, ac);
 		b = high;
 	      }
@@ -604,7 +604,7 @@ namespace spot
 	      res &= all_promises_;
 	  }
 
-	f2b_[clone(f)] = res;
+	f2b_[f->clone()] = res;
 
 	// Register the reverse mapping if it is not already done.
 	if (b2f_.find(res) == b2f_.end())
@@ -627,7 +627,7 @@ namespace spot
 	  {
 	    // The translated bdd maps to an already seen formula.
 	    destroy(f);
-	    f = clone(i->second);
+	    f = i->second->clone();
 	  }
 	else if (new_variable && lcc_)
 	  {
@@ -641,7 +641,7 @@ namespace spot
 		  f2b_[f] = j->second;
 		  i->second = j->first;
 		  destroy(f);
-		  f = clone(i->second);
+		  f = i->second->clone();
 		  break;
 		}
 	  }

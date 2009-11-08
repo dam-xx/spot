@@ -314,7 +314,7 @@ namespace spot
 	    }
 	  else
 	    {
-	      prev = clone(f);
+	      prev = f->clone();
 	    }
 	  f1 = unabbreviate_logic(f);
 	  f2 = simplify_f_g(f1);

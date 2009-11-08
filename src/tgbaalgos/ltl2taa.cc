@@ -27,7 +27,6 @@
 #include "ltlvisit/nenoform.hh"
 #include "ltlvisit/destroy.hh"
 #include "ltlvisit/tostring.hh"
-#include "ltlvisit/clone.hh"
 #include "ltlvisit/contain.hh"
 #include "ltl2taa.hh"
 
@@ -68,7 +67,7 @@ namespace spot
 	const formula* f = node; // Handle negation
 	if (negated_)
 	{
-	  f = unop::instance(unop::Not, clone(node));
+	  f = unop::instance(unop::Not, node->clone());
 	  to_free_.push_back(f);
 	}
 	init_ = to_string(f);
@@ -76,7 +75,7 @@ namespace spot
 
 	dst.push_back(std::string("sink"));
 	taa::transition* t = res_->create_transition(init_, dst);
-	res_->add_condition(t, clone(f));
+	res_->add_condition(t, f->clone());
 	succ_state ss = { dst, f, constant::true_instance() };
 	succ_.push_back(ss);
       }
@@ -165,14 +164,14 @@ namespace spot
 	      i1->Q.push_back(init_); // Add the initial state
 	      i1->acc = node;
 	      t = res_->create_transition(init_, i1->Q);
-	      res_->add_condition(t, clone(i1->condition));
-	      res_->add_acceptance_condition(t, clone(node));
+	      res_->add_condition(t, i1->condition->clone());
+	      res_->add_acceptance_condition(t, node->clone());
 	      succ_.push_back(*i1);
 	    }
 	    for (i2 = v2.succ_.begin(); i2 != v2.succ_.end(); ++i2)
 	    {
 	      t = res_->create_transition(init_, i2->Q);
-	      res_->add_condition(t, clone(i2->condition));
+	      res_->add_condition(t, i2->condition->clone());
 	      succ_.push_back(*i2);
 	    }
 	    return;
@@ -185,16 +184,16 @@ namespace spot
 	      {
 		std::vector<std::string> u; // Union
 		std::copy(i1->Q.begin(), i1->Q.end(), ii(u, u.begin()));
-		formula* f = clone(i1->condition); // Refined rule
+		formula* f = i1->condition->clone(); // Refined rule
 		if (!refined_ || !contained)
 		{
 		  std::copy(i2->Q.begin(), i2->Q.end(), ii(u, u.begin()));
-		  f = multop::instance(multop::And, f, clone(i2->condition));
+		  f = multop::instance(multop::And, f, i2->condition->clone());
 		}
 		to_free_.push_back(f);
 
 		t = res_->create_transition(init_, u);
-		res_->add_condition(t, clone(f));
+		res_->add_condition(t, f->clone());
 		succ_state ss = { u, f, constant::true_instance() };
 		succ_.push_back(ss);
 	      }
@@ -205,9 +204,9 @@ namespace spot
 
 	      i2->Q.push_back(init_); // Add the initial state
 	      t = res_->create_transition(init_, i2->Q);
-	      res_->add_condition(t, clone(i2->condition));
+	      res_->add_condition(t, i2->condition->clone());
 	      if (refined_ && i2->acc != constant::true_instance())
-		res_->add_acceptance_condition(t, clone(i2->acc));
+		res_->add_acceptance_condition(t, i2->acc->clone());
 	      succ_.push_back(*i2);
 	    }
 	    return;
@@ -262,15 +261,15 @@ namespace spot
 		      Q.push_back(p[n].Q[m]);
 		  Q.push_back(init_);
 		  t = res_->create_transition(init_, Q);
-		  res_->add_condition(t, clone(p[n].condition));
+		  res_->add_condition(t, p[n].condition->clone());
 		  if (p[n].acc != constant::true_instance())
-		    res_->add_acceptance_condition(t, clone(p[n].acc));
+		    res_->add_acceptance_condition(t, p[n].acc->clone());
 		  succ_.push_back(p[n]);
 		  return;
 		}
 	      }
 	      t = res_->create_transition(init_, p[n].Q);
-	      res_->add_condition(t, clone(p[n].condition));
+	      res_->add_condition(t, p[n].condition->clone());
 	      succ_.push_back(p[n]);
 	    }
 	    return;
@@ -280,7 +279,7 @@ namespace spot
 	      for (i = vs[n].succ_.begin(); i != vs[n].succ_.end(); ++i)
 	      {
 		t = res_->create_transition(init_, i->Q);
-		res_->add_condition(t, clone(i->condition));
+		res_->add_condition(t, i->condition->clone());
 		succ_.push_back(*i);
 	      }
 	    return;
@@ -349,8 +348,8 @@ namespace spot
 	      continue;
 	    const succ_state& ss(vs[i].succ_[pos[i] - 1]);
 	    std::copy(ss.Q.begin(), ss.Q.end(), ii(u, u.begin()));
-	    f = multop::instance(multop::And, clone(ss.condition), f);
-	    a = multop::instance(multop::And, clone(ss.acc), a);
+	    f = multop::instance(multop::And, ss.condition->clone(), f);
+	    a = multop::instance(multop::And, ss.acc->clone(), a);
 	  }
 	  to_free_.push_back(f);
 	  to_free_.push_back(a);

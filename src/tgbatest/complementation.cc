@@ -12,7 +12,6 @@
 #include "tgbaalgos/stats.hh"
 #include "tgbaalgos/emptiness_stats.hh"
 #include "ltlvisit/destroy.hh"
-#include "ltlvisit/clone.hh"
 #include "tgba/tgbatba.hh"
 
 #include "tgba/tgbasafracomplement.hh"
@@ -217,7 +216,7 @@ int main(int argc, char* argv[])
     {
       spot::ltl::formula* nf1 =
         spot::ltl::unop::instance(spot::ltl::unop::Not,
-                                  spot::ltl::clone(f1));
+                                  f1->clone());
       spot::tgba* a2 = spot::ltl_to_tgba_fm(nf1, dict);
       spot::tgba_statistics a_size =  spot::stats_reachable(a2);
       std::cout << "Not Formula: "
@@ -241,7 +240,7 @@ int main(int argc, char* argv[])
 
     spot::tgba* Af = spot::ltl_to_tgba_fm(f1, dict);
     spot::ltl::formula* nf1 = spot::ltl::unop::instance(spot::ltl::unop::Not,
-                                                        spot::ltl::clone(f1));
+                                                        f1->clone());
     spot::tgba* Anf = spot::ltl_to_tgba_fm(nf1, dict);
 
     spot::tgba* nAf;

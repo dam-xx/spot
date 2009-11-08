@@ -24,7 +24,6 @@
 #include "ltlast/allnodes.hh"
 #include <cassert>
 
-#include "clone.hh"
 #include "destroy.hh"
 
 namespace spot
@@ -95,9 +94,9 @@ namespace spot
 	  unsigned mos = mo->size();
 	  for (unsigned i = 0; i < mos; ++i)
 	    if (is_GF(mo->nth(i)))
-	      resGF->push_back(clone(mo->nth(i)));
+	      resGF->push_back(mo->nth(i)->clone());
 	    else
-	      res1->push_back(clone(mo->nth(i)));
+	      res1->push_back(mo->nth(i)->clone());
 	  destroy(mo);
 	  multop::vec* res3 = new multop::vec;
 	  if (!res1->empty())
@@ -330,17 +329,17 @@ namespace spot
 		      if (uo && uo->op() == unop::X)
 			{
 			  // Xa & Xb = X(a & b)
-			  tmpX->push_back(clone(uo->child()));
+			  tmpX->push_back(uo->child()->clone());
 			}
 		      else if (is_FG(*i))
 			{
 			  // FG(a) & FG(b) = FG(a & b)
 			  unop* uo2 = dynamic_cast<unop*>(uo->child());
-			  tmpFG->push_back(clone(uo2->child()));
+			  tmpFG->push_back(uo2->child()->clone());
 			}
 		      else
 			{
-			  tmpOther->push_back(clone(*i));
+			  tmpOther->push_back((*i)->clone());
 			}
 		    }
 		  else if (bo)
@@ -360,7 +359,7 @@ namespace spot
 				  && ftmp == bo2->second())
 				{
 				  tmpUright
-				    ->push_back(clone(bo2->first()));
+				    ->push_back(bo2->first()->clone());
 				  if (j != i)
 				    {
 				      destroy(*j);
@@ -374,7 +373,7 @@ namespace spot
 							instance(multop::
 								 And,
 								 tmpUright),
-							clone(ftmp)));
+							ftmp->clone()));
 			}
 		      else if (bo->op() == binop::R)
 			{
@@ -391,7 +390,7 @@ namespace spot
 				  && ftmp == bo2->first())
 				{
 				  tmpRright
-				    ->push_back(clone(bo2->second()));
+				    ->push_back(bo2->second()->clone());
 				  if (j != i)
 				    {
 				      destroy(*j);
@@ -401,19 +400,19 @@ namespace spot
 			    }
 			  tmpR
 			    ->push_back(binop::instance(binop::R,
-							clone(ftmp),
+							ftmp->clone(),
 							multop::
 							instance(multop::And,
 								 tmpRright)));
 			}
 		      else
 			{
-			  tmpOther->push_back(clone(*i));
+			  tmpOther->push_back((*i)->clone());
 			}
 		    }
 		  else
 		    {
-		      tmpOther->push_back(clone(*i));
+		      tmpOther->push_back((*i)->clone());
 		    }
 		  destroy(*i);
 		}
@@ -436,22 +435,22 @@ namespace spot
 		      if (uo && uo->op() == unop::X)
 			{
 			  // Xa | Xb = X(a | b)
-			  tmpX->push_back(clone(uo->child()));
+			  tmpX->push_back(uo->child()->clone());
 			}
 		      else if (is_GF(*i))
 			{
 			  // GF(a) | GF(b) = GF(a | b)
 			  unop* uo2 = dynamic_cast<unop*>(uo->child());
-			  tmpGF->push_back(clone(uo2->child()));
+			  tmpGF->push_back(uo2->child()->clone());
 			}
 		      else if (is_FG(*i))
 			{
 			  // FG(a) | FG(b) = F(Ga | Gb)
-			  tmpFG->push_back(clone(uo->child()));
+			  tmpFG->push_back(uo->child()->clone());
 			}
 		      else
 			{
-			  tmpOther->push_back(clone(*i));
+			  tmpOther->push_back((*i)->clone());
 			}
 		    }
 		  else if (bo)
@@ -471,7 +470,7 @@ namespace spot
 				  && ftmp == bo2->first())
 				{
 				  tmpUright
-				    ->push_back(clone(bo2->second()));
+				    ->push_back(bo2->second()->clone());
 				  if (j != i)
 				    {
 				      destroy(*j);
@@ -480,7 +479,7 @@ namespace spot
 				}
 			    }
 			  tmpU->push_back(binop::instance(binop::U,
-							  clone(ftmp),
+							  ftmp->clone(),
 							  multop::
 							  instance(multop::Or,
 								   tmpUright)));
@@ -500,7 +499,7 @@ namespace spot
 				  && ftmp == bo2->second())
 				{
 				  tmpRright
-				    ->push_back(clone(bo2->first()));
+				    ->push_back(bo2->first()->clone());
 				  if (j != i)
 				    {
 				      destroy(*j);
@@ -513,16 +512,16 @@ namespace spot
 							multop::
 							instance(multop::Or,
 								 tmpRright),
-							clone(ftmp)));
+							ftmp->clone()));
 			}
 		      else
 			{
-			  tmpOther->push_back(clone(*i));
+			  tmpOther->push_back((*i)->clone());
 			}
 		    }
 		  else
 		    {
-		      tmpOther->push_back(clone(*i));
+		      tmpOther->push_back((*i)->clone());
 		    }
 		  destroy(*i);
 		}

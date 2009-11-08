@@ -1,5 +1,5 @@
 # -*- mode: python; coding: iso-8859-1 -*-
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -23,8 +23,6 @@
 import ltihooks
 import spot
 
-clone = spot.clone
-
 e = spot.default_environment.instance()
 
 #----------------------------------------------------------------------
@@ -36,7 +34,7 @@ c2 = e.require('c')
 assert c == c2
 assert spot.atomic_prop.instance_count() == 3
 
-op  = spot.multop.instance(spot.multop.And, clone(a), clone(b))
+op  = spot.multop.instance(spot.multop.And, a.clone(), b.clone())
 op2 = spot.multop.instance(spot.multop.And, op, c)
 
 # The symbol for a subformula which hasn't been cloned is better
@@ -75,9 +73,9 @@ c = e.require('c')
 T = spot.constant.true_instance()
 F = spot.constant.false_instance()
 
-f1 = spot.binop.instance(spot.binop.Equiv, T, clone(a))
-f2 = spot.binop.instance(spot.binop.Implies, F, clone(b))
-f3 = spot.binop.instance(spot.binop.Xor, F, clone(c))
+f1 = spot.binop.instance(spot.binop.Equiv, T, a.clone())
+f2 = spot.binop.instance(spot.binop.Implies, F, b.clone())
+f3 = spot.binop.instance(spot.binop.Xor, F, c.clone())
 f4 = spot.unop.instance(spot.unop.Not, f3); del f3
 
 assert spot.atomic_prop.instance_count() == 3

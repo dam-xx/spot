@@ -1,5 +1,20 @@
 2009-11-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Deprecate ltl::clone(f) in favor of f->clone().
+
+	* src/ltlvisit/clone.hh (clone): Document and declare as deprecated.
+	* src/ltlast/formula_tree.cc, src/ltlvisit/basicreduce.cc,
+	src/ltlvisit/clone.cc, src/ltlvisit/contain.cc,
+	src/ltlvisit/lunabbrev.cc, src/ltlvisit/reduce.cc,
+	src/ltlvisit/syntimpl.cc, src/tgba/bdddict.cc,
+	src/tgba/formula2bdd.cc, src/tgba/tgbabddconcretefactory.cc,
+	src/tgbaalgos/ltl2taa.cc, src/tgbaalgos/ltl2tgba_fm.cc,
+	src/tgbatest/complementation.cc, wrap/python/tests/ltlsimple.py:
+	Adjust clone() usage, and remove the #include "clone.hh" when
+	appropriate.
+
+2009-11-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Make it possible to clone const formulae.
 
 	* src/ltlast/formula.hh, src/ltlast/formula.cc (clone): Declare

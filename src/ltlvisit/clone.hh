@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -35,7 +35,7 @@ namespace spot
     /// This visitor is public, because it's convenient
     /// to derive from it and override part of its methods.
     /// But if you just want the functionality, consider using
-    /// spot::ltl::clone instead.
+    /// spot::ltl::formula::clone instead, it is way faster.
     class clone_visitor : public visitor
     {
     public:
@@ -57,9 +57,17 @@ namespace spot
       formula* result_;
     };
 
+#if __GNUC__
     /// \brief Clone a formula.
     /// \ingroup ltl_essential
+    /// \deprecated Use f->clone() instead.
+    formula* clone(const formula* f) __attribute__ ((deprecated));
+#else
+    /// \brief Clone a formula.
+    /// \ingroup ltl_essential
+    /// \deprecated Use f->clone() instead.
     formula* clone(const formula* f);
+#endif
   }
 }
 

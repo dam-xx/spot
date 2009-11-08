@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2005, 2006, 2009 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -22,7 +22,6 @@
 #include <ostream>
 #include <sstream>
 #include <cassert>
-#include <ltlvisit/clone.hh>
 #include <ltlvisit/destroy.hh>
 #include <ltlvisit/tostring.hh>
 #include <ltlvisit/tostring.hh>
@@ -59,7 +58,7 @@ namespace spot
       }
     else
       {
-	f = clone(f);
+	f = f->clone();
 	num = allocate_variables(1);
 	var_map[f] = num;
 	var_formula_map[num] = f;
@@ -94,7 +93,7 @@ namespace spot
       }
     else
       {
-	f = ltl::clone(f);
+	f = f->clone();
 	num = allocate_variables(2);
 	now_map[f] = num;
 	now_formula_map[num] = f;
@@ -120,7 +119,7 @@ namespace spot
       }
     else
       {
-	f = clone(f);
+	f = f->clone();
 	num = allocate_variables(1);
 	acc_map[f] = num;
 	acc_formula_map[num] = f;

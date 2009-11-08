@@ -1,4 +1,4 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -19,7 +19,6 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include "ltlvisit/clone.hh"
 #include "ltlvisit/destroy.hh"
 #include "tgbabddconcretefactory.hh"
 namespace spot
@@ -79,7 +78,7 @@ namespace spot
     acc_map_::iterator ai = acc_.find(a);
     if (ai == acc_.end())
       {
-	a = clone(a);
+	a = a->clone();
 	acc_[a] = b;
       }
     else
