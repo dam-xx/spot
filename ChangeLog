@@ -1,5 +1,11 @@
 2009-11-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Do not use the Boost macro from the Autoconf macro archive.
+
+	* m4/boost.m4: Rewrite like I already did in Vaucanson.
+
+2009-11-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbatest/ltlcounter.test (run): Do not run with n=12, as
 	the test case might become too slow for the autobuilder.
 
