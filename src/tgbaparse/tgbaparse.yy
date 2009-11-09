@@ -54,7 +54,6 @@ typedef std::map<std::string, bdd> formula_cache;
 %code
 {
 #include "ltlast/constant.hh"
-#include "ltlvisit/destroy.hh"
   /* Unfortunately Bison 2.3 uses the same guards in all parsers :( */
 #undef BISON_POSITION_HH
 #undef BISON_LOCATION_HH
@@ -87,7 +86,7 @@ typedef std::pair<bool, spot::ltl::formula*> pair;
 %destructor {
   for (std::list<spot::ltl::formula*>::iterator i = $$->begin();
        i != $$->end(); ++i)
-    spot::ltl::destroy(*i);
+    (*i)->destroy();
   delete $$;
   } acc_list
 
@@ -192,7 +191,7 @@ acc_list:
 	       {
 		 error_list.push_back(spot::tgba_parse_error(@2,
 			 "undeclared acceptance condition `" + *$2 + "'"));
-		 destroy(f);
+		 f->destroy();
 		 // $2 will be destroyed on error recovery.
 		 YYERROR;
 	       }

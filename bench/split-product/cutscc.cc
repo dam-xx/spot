@@ -25,7 +25,6 @@
 #include "tgbaalgos/scc.hh"
 #include "tgba/tgbafromfile.hh"
 #include "tgbaalgos/dotty.hh"
-#include "ltlvisit/destroy.hh"
 #include "tgbaalgos/randomgraph.hh"
 #include "tgbaalgos/emptiness.hh"
 #include "tgba/tgbaproduct.hh"

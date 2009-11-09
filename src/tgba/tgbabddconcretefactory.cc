@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include "ltlvisit/destroy.hh"
 #include "tgbabddconcretefactory.hh"
+
 namespace spot
 {
   tgba_bdd_concrete_factory::tgba_bdd_concrete_factory(bdd_dict* dict)
@@ -32,7 +32,7 @@ namespace spot
   {
     acc_map_::iterator ai;
     for (ai = acc_.begin(); ai != acc_.end(); ++ai)
-      destroy(ai->first);
+      ai->first->destroy();
     get_dict()->unregister_all_my_variables(this);
   }
 

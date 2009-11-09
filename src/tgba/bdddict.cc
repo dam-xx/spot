@@ -22,7 +22,6 @@
 #include <ostream>
 #include <sstream>
 #include <cassert>
-#include <ltlvisit/destroy.hh>
 #include <ltlvisit/tostring.hh>
 #include <ltlvisit/tostring.hh>
 #include <ltlast/atomic_prop.hh>
@@ -156,7 +155,7 @@ namespace spot
       ltl::atomic_prop::instance(s.str(),
 				 ltl::default_environment::instance());
     int res = register_acceptance_variable(f, for_me);
-    ltl::destroy(f);
+    f->destroy();
     return res;
   }
 
@@ -278,7 +277,7 @@ namespace spot
     // formula itself.
     release_variables(var, n);
     if (f)
-      ltl::destroy(f);
+      f->destroy();
     var_refs.erase(cur);
   }
 

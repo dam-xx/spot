@@ -25,7 +25,6 @@
 #include <fstream>
 #include <string>
 #include <cstdlib>
-#include "ltlvisit/destroy.hh"
 #include "ltlvisit/contain.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/apcollect.hh"
@@ -578,7 +577,7 @@ main(int argc, char** argv)
 	  if (redopt != spot::ltl::Reduce_None)
 	    {
 	      spot::ltl::formula* t = spot::ltl::reduce(f, redopt);
-	      spot::ltl::destroy(f);
+	      f->destroy();
 	      f = t;
 	      if (display_reduce_form)
 		std::cout << spot::ltl::to_string(f) << std::endl;
@@ -902,7 +901,7 @@ main(int argc, char** argv)
       if (show_fc)
 	delete a;
       if (f)
-        spot::ltl::destroy(f);
+        f->destroy();
       delete product_degeneralized;
       delete product_to_free;
       delete system;
@@ -922,7 +921,7 @@ main(int argc, char** argv)
     {
       for (spot::ltl::atomic_prop_set::iterator i =
 	     unobservables->begin(); i != unobservables->end(); ++i)
-	spot::ltl::destroy(*i);
+	(*i)->destroy();
       delete unobservables;
     }
 

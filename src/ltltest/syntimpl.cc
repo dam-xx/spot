@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2008 Laboratoire d'Informatique de Paris 6
+// Copyright (C) 2004, 2008, 2009 Laboratoire d'Informatique de Paris 6
 // (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
 // Pierre et Marie Curie.
 //
@@ -26,7 +26,6 @@
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/tunabbrev.hh"
 #include "ltlvisit/dump.hh"
-#include "ltlvisit/destroy.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/syntimpl.hh"
 #include "ltlast/allnodes.hh"
@@ -102,10 +101,10 @@ main(int argc, char** argv)
   spot::ltl::dump(std::cout, f1) << std::endl;
   spot::ltl::dump(std::cout, f2) << std::endl;
 
-  spot::ltl::destroy(f1);
-  spot::ltl::destroy(f2);
-  spot::ltl::destroy(ftmp1);
-  spot::ltl::destroy(ftmp2);
+  f1->destroy();
+  f2->destroy();
+  ftmp1->destroy();
+  ftmp2->destroy();
   assert(spot::ltl::atomic_prop::instance_count() == 0);
   assert(spot::ltl::unop::instance_count() == 0);
   assert(spot::ltl::binop::instance_count() == 0);

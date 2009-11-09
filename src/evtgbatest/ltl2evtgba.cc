@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2008 Laboratoire d'Informatique de Paris 6
+// Copyright (C) 2004, 2008, 2009 Laboratoire d'Informatique de Paris 6
 // (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
 // Pierre et Marie Curie.
 //
@@ -23,7 +23,6 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
-#include "ltlvisit/destroy.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
 #include "evtgbaparse/public.hh"
@@ -114,7 +113,7 @@ main(int argc, char** argv)
 					   post_branching,
 					   fair_loop_approx, unobservables);
 
-      spot::ltl::destroy(f);
+      f->destroy();
       spot::evtgba* e = spot::tgba_to_evtgba(a);
 
       if (dotty_opt)
@@ -128,7 +127,7 @@ main(int argc, char** argv)
 
   for (spot::ltl::atomic_prop_set::iterator i = unobservables->begin();
        i != unobservables->end(); ++i)
-    spot::ltl::destroy(*i);
+    (*i)->destroy();
   delete unobservables;
 
   delete dict;

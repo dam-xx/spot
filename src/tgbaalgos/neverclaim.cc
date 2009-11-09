@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -28,7 +28,6 @@
 #include "reachiter.hh"
 #include "ltlvisit/tostring.hh"
 #include "tgba/formula2bdd.hh"
-#include "ltlvisit/destroy.hh"
 
 namespace spot
 {
@@ -167,7 +166,7 @@ namespace spot
 	    const ltl::formula* f = bdd_to_formula(si->current_condition(),
 						   automata_->get_dict());
 	    to_spin_string(f, os_);
-	    destroy(f);
+	    f->destroy();
 	    state* current = si->current_state();
 	    os_ << ") -> goto " << get_state_label(current, out) << std::endl;
 	    delete current;

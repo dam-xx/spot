@@ -38,10 +38,10 @@ namespace spot
     }
 
     void
-    formula::destroy(formula* f)
+    formula::destroy() const
     {
-      if (f->unref_())
-	delete f;
+      if (const_cast<formula*>(this)->unref_())
+	delete this;
     }
 
     void

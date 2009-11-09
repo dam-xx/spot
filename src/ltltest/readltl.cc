@@ -26,7 +26,6 @@
 #include "ltlparse/public.hh"
 #include "ltlvisit/dump.hh"
 #include "ltlvisit/dotty.hh"
-#include "ltlvisit/destroy.hh"
 #include "ltlast/allnodes.hh"
 
 void
@@ -93,7 +92,7 @@ main(int argc, char** argv)
       spot::ltl::dump(std::cout, f);
       std::cout << std::endl;
 #endif
-      spot::ltl::destroy(f);
+      f->destroy();
 
       if (debug_ref)
 	dump_instances("after");

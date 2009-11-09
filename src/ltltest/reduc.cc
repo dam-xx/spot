@@ -1,6 +1,6 @@
-// Copyright (C) 2004, 2006, 2007, 2008 Laboratoire d'Informatique de Paris
-// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
-// Université Pierre et Marie Curie.
+// Copyright (C) 2004, 2006, 2007, 2008, 2009 Laboratoire
+// d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
+// Coopératifs (SRC), Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -27,7 +27,6 @@
 #include "ltlvisit/tunabbrev.hh"
 #include "ltlvisit/dump.hh"
 #include "ltlvisit/nenoform.hh"
-#include "ltlvisit/destroy.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/reduce.hh"
 #include "ltlvisit/length.hh"
@@ -135,8 +134,8 @@ main(int argc, char** argv)
   f1 = unabbreviate_logic(f1);
   ftmp2 = f1;
   f1 = negative_normal_form(f1);
-  spot::ltl::destroy(ftmp1);
-  spot::ltl::destroy(ftmp2);
+  ftmp1->destroy();
+  ftmp2->destroy();
 
 
   int length_f1_before = spot::ltl::length(f1);
@@ -146,8 +145,8 @@ main(int argc, char** argv)
   f1 = spot::ltl::reduce(f1, o);
   ftmp2 = f1;
   f1 = spot::ltl::unabbreviate_logic(f1);
-  spot::ltl::destroy(ftmp1);
-  spot::ltl::destroy(ftmp2);
+  ftmp1->destroy();
+  ftmp2->destroy();
 
   int length_f1_after = spot::ltl::length(f1);
   std::string f1s_after = spot::ltl::to_string(f1);
@@ -160,11 +159,11 @@ main(int argc, char** argv)
       f2 = unabbreviate_logic(f2);
       ftmp2 = f2;
       f2 = negative_normal_form(f2);
-      spot::ltl::destroy(ftmp1);
-      spot::ltl::destroy(ftmp2);
+      ftmp1->destroy();
+      ftmp2->destroy();
       ftmp1 = f2;
       f2 = unabbreviate_logic(f2);
-      spot::ltl::destroy(ftmp1);
+      ftmp1->destroy();
       f2s = spot::ltl::to_string(f2);
     }
 
@@ -204,9 +203,9 @@ main(int argc, char** argv)
 	exit_code = 0;
     }
 
-  spot::ltl::destroy(f1);
+  f1->destroy();
   if (f2)
-    spot::ltl::destroy(f2);
+    f2->destroy();
 
 
   assert(spot::ltl::atomic_prop::instance_count() == 0);

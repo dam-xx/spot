@@ -28,7 +28,6 @@
 #include "lunabbrev.hh"
 #include "simpfg.hh"
 #include "nenoform.hh"
-#include "ltlvisit/destroy.hh"
 #include "contain.hh"
 
 namespace spot
@@ -137,14 +136,14 @@ namespace spot
 		  if (syntactic_implication(f1, f2))
 		    {
 		      result_ = f2;
-		      destroy(f1);
+		      f1->destroy();
 		      return;
 		    }
 		  /* !b < a => a U b = Fb */
 		  if (syntactic_implication_neg(f2, f1, false))
 		    {
 		      result_ = unop::instance(unop::F, f2);
-		      destroy(f1);
+		      f1->destroy();
 		      return;
 		    }
 		  /* a < b => a U (b U c) = (b U c) */
@@ -154,7 +153,7 @@ namespace spot
 			&& syntactic_implication(f1, bo->first()))
 		      {
 			result_ = f2;
-			destroy(f1);
+			f1->destroy();
 			return;
 		      }
 		  }
@@ -165,14 +164,14 @@ namespace spot
 		  if (syntactic_implication(f2, f1))
 		    {
 		      result_ = f2;
-		      destroy(f1);
+		      f1->destroy();
 		      return;
 		    }
 		  /* b < !a => a R b = Gb */
 		  if (syntactic_implication_neg(f2, f1, true))
 		    {
 		      result_ = unop::instance(unop::G, f2);
-		      destroy(f1);
+		      f1->destroy();
 		      return;
 		    }
 		  /* b < a => a R (b R c) = b R c */
@@ -182,7 +181,7 @@ namespace spot
 			&& syntactic_implication(bo->first(), f1))
 		      {
 			result_ = f2;
-			destroy(f1);
+			f1->destroy();
 			return;
 		      }
 		  }
@@ -230,7 +229,7 @@ namespace spot
 			   (mo->op() == multop::And)))
 			{
 			  // We keep f2
-			  destroy(*f1);
+			  (*f1)->destroy();
 			  res->erase(f1);
 			  removed = true;
 			  break;
@@ -241,7 +240,7 @@ namespace spot
 				(mo->op() == multop::And)))
 			{
 			  // We keep f1
-			  destroy(*f2);
+			  (*f2)->destroy();
 			  res->erase(f2);
 			  removed = true;
 			  break;
@@ -261,7 +260,7 @@ namespace spot
 		    {
 		      for (multop::vec::iterator j = res->begin();
 			   j != res->end(); j++)
-			destroy(*j);
+			(*j)->destroy();
 		      res->clear();
 		      delete res;
 		      if (mo->op() == multop::Or)
@@ -309,7 +308,7 @@ namespace spot
 	  assert(n < 100);
 	  if (prev)
 	    {
-	      destroy(prev);
+	      prev->destroy();
 	      prev = const_cast<formula*>(f);
 	    }
 	  else
@@ -318,15 +317,15 @@ namespace spot
 	    }
 	  f1 = unabbreviate_logic(f);
 	  f2 = simplify_f_g(f1);
-	  destroy(f1);
+	  f1->destroy();
 	  f1 = negative_normal_form(f2);
-	  destroy(f2);
+	  f2->destroy();
 	  f2 = f1;
 
 	  if (opt & Reduce_Basics)
 	    {
 	      f1 = basic_reduce(f2);
-	      destroy(f2);
+	      f2->destroy();
 	      f2 = f1;
 	    }
 
@@ -336,7 +335,7 @@ namespace spot
 	      reduce_visitor v(opt);
 	      f2->accept(v);
 	      f1 = v.result();
-	      destroy(f2);
+	      f2->destroy();
 	      f2 = f1;
 	    }
 
@@ -347,12 +346,12 @@ namespace spot
 	      formula* f1 =
 		reduce_tau03(f2,
 			     opt & Reduce_Containment_Checks_Stronger);
-	      destroy(f2);
+	      f2->destroy();
 	      f2 = f1;
 	    }
 	  f = f2;
 	}
-      destroy(prev);
+      prev->destroy();
       return const_cast<formula*>(f);
     }
   }

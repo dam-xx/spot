@@ -27,7 +27,6 @@
 #include "ltlast/allnodes.hh"
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/nenoform.hh"
-#include "ltlvisit/destroy.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/postfix.hh"
 #include "ltlvisit/apcollect.hh"
@@ -66,7 +65,7 @@ namespace spot
       {
 	fv_map::iterator i;
 	for (i = next_map.begin(); i != next_map.end(); ++i)
-	  destroy(i->first);
+	  i->first->destroy();
 	dict->unregister_all_my_variables(this);
       }
 
@@ -574,7 +573,7 @@ namespace spot
 	    formula_to_bdd_map::iterator i = f2b_.begin();
 	    const formula* f = i->first;
 	    f2b_.erase(i);
-	    destroy(f);
+	    f->destroy();
 	  }
       }
 
@@ -626,7 +625,7 @@ namespace spot
 	if (i->second != f)
 	  {
 	    // The translated bdd maps to an already seen formula.
-	    destroy(f);
+	    f->destroy();
 	    f = i->second->clone();
 	  }
 	else if (new_variable && lcc_)
@@ -640,7 +639,7 @@ namespace spot
 		{
 		  f2b_[f] = j->second;
 		  i->second = j->first;
-		  destroy(f);
+		  f->destroy();
 		  f = i->second->clone();
 		  break;
 		}
@@ -687,7 +686,7 @@ namespace spot
     else
       {
 	i->second[promises] |= conds;
-	destroy(dest);
+	dest->destroy();
       }
   }
 
@@ -706,13 +705,13 @@ namespace spot
     // would involve negations at the BDD level.
     formula* f1 = unabbreviate_logic(f);
     formula* f2 = negative_normal_form(f1);
-    destroy(f1);
+    f1->destroy();
 
     // Simplify the formula, if requested.
     if (reduce_ltl)
       {
 	formula* tmp = reduce(f2, reduce_ltl);
-	destroy(f2);
+	f2->destroy();
 	f2 = tmp;
       }
 
@@ -864,7 +863,7 @@ namespace spot
 		if (reduce_ltl)
 		  {
 		    formula* tmp = reduce(dest, reduce_ltl);
-		    destroy(dest);
+		    dest->destroy();
 		    dest = tmp;
 		    // Ignore the arc if the destination reduces to false.
 		    if (dest == constant::false_instance())
@@ -982,7 +981,7 @@ namespace spot
 	      }
 	    else
 	      {
-		destroy(dest);
+		dest->destroy();
 	      }
 	  }
       }
@@ -990,7 +989,7 @@ namespace spot
     // Free all formulae.
     for (std::set<const formula*>::iterator i = formulae_seen.begin();
 	 i != formulae_seen.end(); ++i)
-      destroy(*i);
+      (*i)->destroy();
 
     // Turn all promises into real acceptance conditions.
     a->complement_all_acceptance_conditions();

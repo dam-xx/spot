@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2006, 2008 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2006, 2008, 2009 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -28,7 +28,6 @@
 #include "ltlvisit/tunabbrev.hh"
 #include "ltlvisit/dump.hh"
 #include "ltlvisit/nenoform.hh"
-#include "ltlvisit/destroy.hh"
 #include "ltlvisit/contain.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlvisit/reduce.hh"
@@ -74,21 +73,21 @@ main(int argc, char** argv)
 #ifdef LUNABBREV
   tmp = f1;
   f1 = spot::ltl::unabbreviate_logic(f1);
-  spot::ltl::destroy(tmp);
+  tmp->destroy();
   spot::ltl::dump(std::cout, f1);
   std::cout << std::endl;
 #endif
 #ifdef TUNABBREV
   tmp = f1;
   f1 = spot::ltl::unabbreviate_ltl(f1);
-  spot::ltl::destroy(tmp);
+  tmp->destroy();
   spot::ltl::dump(std::cout, f1);
   std::cout << std::endl;
 #endif
 #ifdef NENOFORM
   tmp = f1;
   f1 = spot::ltl::negative_normal_form(f1);
-  spot::ltl::destroy(tmp);
+  tmp->destroy();
   spot::ltl::dump(std::cout, f1);
   std::cout << std::endl;
 #endif
@@ -96,28 +95,28 @@ main(int argc, char** argv)
   spot::ltl::formula* tmp;
   tmp = f1;
   f1 = spot::ltl::reduce(f1);
-  spot::ltl::destroy(tmp);
+  tmp->destroy();
   spot::ltl::dump(std::cout, f1);
 #endif
 #ifdef REDUC_TAU
   spot::ltl::formula* tmp;
   tmp = f1;
   f1 = spot::ltl::reduce_tau03(f1, false);
-  spot::ltl::destroy(tmp);
+  tmp->destroy();
   spot::ltl::dump(std::cout, f1);
 #endif
 #ifdef REDUC_TAUSTR
   spot::ltl::formula* tmp;
   tmp = f1;
   f1 = spot::ltl::reduce_tau03(f1, true);
-  spot::ltl::destroy(tmp);
+  tmp->destroy();
   spot::ltl::dump(std::cout, f1);
 #endif
 
   int exit_code = f1 != f2;
 
-  spot::ltl::destroy(f1);
-  spot::ltl::destroy(f2);
+  f1->destroy();
+  f2->destroy();
   assert(spot::ltl::atomic_prop::instance_count() == 0);
   assert(spot::ltl::unop::instance_count() == 0);
   assert(spot::ltl::binop::instance_count() == 0);

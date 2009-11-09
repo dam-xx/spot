@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2008, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -24,7 +24,6 @@
 #include <cstdlib>
 #include "ltlparse/public.hh"
 #include "ltlvisit/tostring.hh"
-#include "ltlvisit/destroy.hh"
 #include "ltlast/allnodes.hh"
 
 void
@@ -70,8 +69,8 @@ main(int argc, char **argv)
   if (f2s != f1s)
     return 1;
 
-  spot::ltl::destroy(f1);
-  spot::ltl::destroy(f2);
+  f1->destroy();
+  f2->destroy();
   assert(spot::ltl::atomic_prop::instance_count() == 0);
   assert(spot::ltl::unop::instance_count() == 0);
   assert(spot::ltl::binop::instance_count() == 0);

@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2008 Laboratoire d'Informatique de Paris
+// Copyright (C) 2003, 2004, 2008, 2009 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -22,7 +22,6 @@
 #include <iostream>
 #include <cassert>
 #include <cstdlib>
-#include "ltlvisit/destroy.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
 #include "tgbaalgos/ltl2tgba_lacim.hh"
@@ -62,7 +61,7 @@ main(int argc, char** argv)
 
   {
     spot::tgba_bdd_concrete* a1 = spot::ltl_to_tgba_lacim(f1, dict);
-    spot::ltl::destroy(f1);
+    f1->destroy();
     spot::tgba_product p(a1, a2);
     spot::tgba_save_reachable(std::cout, &p);
     delete a1;

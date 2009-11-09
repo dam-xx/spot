@@ -1,6 +1,5 @@
-// Copyright (C) 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2008, 2009 Laboratoire de Recherche et Developpement
+// de l'Epita (LRDE)
 //
 // This file is part of Spot, a model checking library.
 //
@@ -22,7 +21,6 @@
 #include <iostream>
 #include <cassert>
 #include "eltlparse/public.hh"
-#include "ltlvisit/destroy.hh"
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/nenoform.hh"
 
@@ -38,20 +36,20 @@ main(int argc, char** argv)
     if (f != 0)
     {
       std::cout << f->dump() << std::endl;
-      spot::ltl::destroy(f);
+      f->destroy();
     }
     return 1;
   }
 
   const spot::ltl::formula* f1 = spot::ltl::unabbreviate_logic(f);
   const spot::ltl::formula* f2 = spot::ltl::negative_normal_form(f1);
-  spot::ltl::destroy(f1);
+  f1->destroy();
 
   assert(f != 0);
   std::cout << f->dump() << std::endl;
-  spot::ltl::destroy(f);
+  f->destroy();
 
   assert(f2 != 0);
   std::cout << f2->dump() << std::endl;
-  spot::ltl::destroy(f2);
+  f2->destroy();
 }

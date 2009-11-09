@@ -1,5 +1,39 @@
 2009-11-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Deprecate ltl::destroy(f) in favor of f->destroy()
+
+	* src/ltlast/formula.cc, src/ltlast/formula.hh (formula::clone):
+	Transform this static function into a member function.
+	* src/ltlvisit/destroy.hh (destroy): Document and declare as
+	deprecated.
+	* bench/split-product/cutscc.cc, iface/gspn/ltlgspn.cc,
+	src/eltlparse/eltlparse.yy, src/eltltest/acc.cc,
+	src/evtgbaalgos/tgba2evtgba.cc, src/evtgbatest/ltl2evtgba.cc,
+	src/ltlast/automatop.cc, src/ltlast/binop.cc,
+	src/ltlast/multop.cc, src/ltlast/unop.cc, src/ltlenv/declenv.cc,
+	src/ltlenv/declenv.hh, src/ltlparse/ltlparse.yy,
+	src/ltltest/equals.cc, src/ltltest/randltl.cc,
+	src/ltltest/readltl.cc, src/ltltest/reduc.cc,
+	src/ltltest/syntimpl.cc, src/ltltest/tostring.cc,
+	src/ltlvisit/destroy.cc src/ltlvisit/basicreduce.cc,
+	src/ltlvisit/contain.cc, src/ltlvisit/reduce.cc,
+	src/ltlvisit/syntimpl.cc, src/tgba/bdddict.cc,
+	src/tgba/bddprint.cc, src/tgba/taa.cc,
+	src/tgba/tgbabddconcretefactory.cc, src/tgba/tgbaexplicit.cc,
+	src/tgba/tgbafromfile.cc, src/tgbaalgos/eltl2tgba_lacim.cc,
+	src/tgbaalgos/ltl2taa.cc, src/tgbaalgos/ltl2tgba_fm.cc,
+	src/tgbaalgos/ltl2tgba_lacim.cc, src/tgbaalgos/neverclaim.cc,
+	src/tgbaalgos/randomgraph.cc, src/tgbaparse/tgbaparse.yy,
+	src/tgbatest/complementation.cc, src/tgbatest/eltl2tgba.cc,
+	src/tgbatest/ltl2tgba.cc, src/tgbatest/ltlprod.cc,
+	src/tgbatest/mixprod.cc, src/tgbatest/randtgba.cc,
+	src/tgbatest/reductgba.cc, wrap/python/cgi/ltl2tgba.in,
+	wrap/python/tests/ltl2tgba.py, wrap/python/tests/ltlparse.py,
+	wrap/python/tests/ltlsimple.py: Adjust destroy() usage, and remove
+	the #include "destroy.hh" when appropriate.
+
+2009-11-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Deprecate ltl::clone(f) in favor of f->clone().
 
 	* src/ltlvisit/clone.hh (clone): Document and declare as deprecated.

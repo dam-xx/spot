@@ -21,7 +21,6 @@
 
 #include "tgba/public.hh"
 #include "tgbafromfile.hh"
-#include "ltlvisit/destroy.hh"
 
 namespace spot
 {
@@ -56,7 +55,7 @@ namespace spot
   {
     if (f_)
     {
-      ltl::destroy(f_);
+      f_->destroy();
       f_ = 0;
     }
     std::string line = "";
@@ -94,4 +93,3 @@ namespace spot
     return formula_;
   }
 }
-

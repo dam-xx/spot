@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -21,7 +21,6 @@
 
 #include "ltlast/atomic_prop.hh"
 #include "ltlast/constant.hh"
-#include "ltlvisit/destroy.hh"
 #include "tgbaexplicit.hh"
 #include "tgba/formula2bdd.hh"
 #include "misc/bddop.hh"
@@ -187,7 +186,7 @@ namespace spot
   tgba_explicit::add_condition(transition* t, const ltl::formula* f)
   {
     t->condition &= formula_to_bdd(f, dict_, this);
-    ltl::destroy(f);
+    f->destroy();
   }
 
   void
@@ -201,7 +200,7 @@ namespace spot
   tgba_explicit::declare_acceptance_condition(const ltl::formula* f)
   {
     int v = dict_->register_acceptance_variable(f, this);
-    ltl::destroy(f);
+    f->destroy();
     bdd neg = bdd_nithvar(v);
     neg_acceptance_conditions_ &= neg;
 
@@ -287,7 +286,7 @@ namespace spot
     /* If this second assert fails and the first doesn't,
        things are badly broken.  This has already happened. */
     assert(i != dict_->acc_map.end());
-    ltl::destroy(f);
+    f->destroy();
     bdd v = bdd_ithvar(i->second);
     v &= bdd_exist(neg_acceptance_conditions_, v);
     return v;

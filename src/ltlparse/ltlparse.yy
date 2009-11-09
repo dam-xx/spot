@@ -31,7 +31,6 @@
 #include <string>
 #include "public.hh"
 #include "ltlast/allnodes.hh"
-#include "ltlvisit/destroy.hh"
 }
 
 %parse-param {spot::ltl::parse_error_list &error_list}
@@ -68,7 +67,7 @@ using namespace spot::ltl;
 #define missing_right_binop(res, left, op, str)	\
   do						\
     {						\
-      destroy(left);				\
+      left->destroy();				\
       missing_right_op(res, op, str);		\
     }						\
   while (0);
@@ -114,7 +113,7 @@ using namespace spot::ltl;
    proposition"), then the %destructor should refer to that name.
    References to ATOMIC_PROP are silently ignored.  */
 %destructor { delete $$; } "atomic proposition"
-%destructor { spot::ltl::destroy($$); } subformula
+%destructor { $$->destroy(); } subformula
 
 %printer { debug_stream() << *$$; } "atomic proposition"
 

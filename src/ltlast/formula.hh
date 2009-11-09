@@ -85,7 +85,7 @@ namespace spot
       ///
       /// This decrements the reference counter of this node (if one is
       /// used) and can free the object.
-      static void destroy(formula* f);
+      void destroy() const;
 
       /// Return a canonic representation of the formula
       const std::string& dump() const;

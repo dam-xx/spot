@@ -55,7 +55,7 @@ namespace spot
 
       // Dereference children.
       for (unsigned n = 0; n < size(); ++n)
-	formula::destroy(nth(n));
+	nth(n)->destroy();
 
       delete children_;
     }
@@ -131,7 +131,7 @@ namespace spot
 		unsigned ps = p->size();
 		for (unsigned n = 0; n < ps; ++n)
 		  inlined.push_back(p->nth(n)->clone());
-		formula::destroy(*i);
+		(*i)->destroy();
 		i = v->erase(i);
 	      }
 	    else
@@ -153,7 +153,7 @@ namespace spot
 	  {
 	    if (*i == last)
 	      {
-		formula::destroy(*i);
+		(*i)->destroy();
 		i = v->erase(i);
 	      }
 	    else
@@ -193,7 +193,7 @@ namespace spot
 	{
 	  // The instance already exists.
 	  for (vec::iterator vi = v->begin(); vi != v->end(); ++vi)
-	    formula::destroy(*vi);
+	    (*vi)->destroy();
 	  delete v;
 	  return static_cast<multop*>(i->second->clone());
 	}

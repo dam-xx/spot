@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -25,7 +25,6 @@
 #include "bddprint.hh"
 #include "ltlvisit/tostring.hh"
 #include "formula2bdd.hh"
-#include "ltlvisit/destroy.hh"
 
 namespace spot
 {
@@ -202,7 +201,7 @@ namespace spot
   {
     const ltl::formula* f = bdd_to_formula(b, d);
     to_string(f, os);
-    destroy(f);
+    f->destroy();
     return os;
   }
 

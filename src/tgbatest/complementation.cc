@@ -11,7 +11,6 @@
 #include "ltlast/unop.hh"
 #include "tgbaalgos/stats.hh"
 #include "tgbaalgos/emptiness_stats.hh"
-#include "ltlvisit/destroy.hh"
 #include "tgba/tgbatba.hh"
 
 #include "tgba/tgbasafracomplement.hh"
@@ -146,7 +145,7 @@ int main(int argc, char* argv[])
       complement = new spot::tgba_complement(a);
 
     spot::dotty_reachable(std::cout, complement);
-    spot::ltl::destroy(f1);
+    f1->destroy();
     delete complement;
     delete a;
   }
@@ -226,8 +225,8 @@ int main(int argc, char* argv[])
                 << std::endl;
 
       delete a2;
-      spot::ltl::destroy(f1);
-      spot::ltl::destroy(nf1);
+      f1->destroy();
+      nf1->destroy();
     }
   }
   else
@@ -283,8 +282,8 @@ int main(int argc, char* argv[])
     delete nAnf;
     delete Anf;
 
-    spot::ltl::destroy(nf1);
-    spot::ltl::destroy(f1);
+    nf1->destroy();
+    f1->destroy();
 
   }
 

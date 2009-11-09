@@ -60,7 +60,7 @@ del op2, op3
 assert spot.atomic_prop.instance_count() == 3
 assert spot.multop.instance_count() == 1
 
-spot.destroy(op4)
+op4.destroy()
 del op4
 
 assert spot.atomic_prop.instance_count() == 0
@@ -83,11 +83,11 @@ assert spot.binop.instance_count() == 3
 assert spot.unop.instance_count() == 1
 assert spot.multop.instance_count() == 0
 
-spot.destroy(a)
+a.destroy()
 del a
-spot.destroy(b)
+b.destroy()
 del b
-spot.destroy(c)
+c.destroy()
 del c
 
 assert spot.atomic_prop.instance_count() == 3
@@ -95,7 +95,7 @@ assert spot.binop.instance_count() == 3
 assert spot.unop.instance_count() == 1
 assert spot.multop.instance_count() == 0
 
-spot.destroy(f1)
+f1.destroy()
 del f1
 
 assert spot.atomic_prop.instance_count() == 2
@@ -103,7 +103,7 @@ assert spot.binop.instance_count() == 2
 assert spot.unop.instance_count() == 1
 assert spot.multop.instance_count() == 0
 
-spot.destroy(f4)
+f4.destroy()
 del f4
 
 assert spot.atomic_prop.instance_count() == 1
@@ -111,7 +111,7 @@ assert spot.binop.instance_count() == 1
 assert spot.unop.instance_count() == 0
 assert spot.multop.instance_count() == 0
 
-spot.destroy(f2)
+f2.destroy()
 del f2
 
 assert spot.atomic_prop.instance_count() == 0

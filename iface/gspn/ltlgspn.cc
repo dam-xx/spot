@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2006, 2007, 2008 Laboratoire
+// Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009 Laboratoire
 // d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
 // Coopératifs (SRC), Université Pierre et Marie Curie.
 //
@@ -29,7 +29,6 @@
 #include "tgbaparse/public.hh"
 #endif
 #include "ltlparse/public.hh"
-#include "ltlvisit/destroy.hh"
 #include "tgba/tgbatba.hh"
 #include "tgba/tgbaproduct.hh"
 #include "tgbaalgos/ltl2tgba_lacim.hh"
@@ -265,7 +264,7 @@ main(int argc, char **argv)
 	  a_f = spot::ltl_to_tgba_lacim(f, dict);
 	  break;
 	}
-      spot::ltl::destroy(f);
+      f->destroy();
 
 #ifndef SSP
       spot::tgba* model        = gspn.automaton();

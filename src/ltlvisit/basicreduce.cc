@@ -1,6 +1,6 @@
-// Copyright (C) 2004, 2007, 2008, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2004, 2007, 2008, 2009 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -23,8 +23,6 @@
 #include "ltlast/visitor.hh"
 #include "ltlast/allnodes.hh"
 #include <cassert>
-
-#include "destroy.hh"
 
 namespace spot
 {
@@ -97,7 +95,7 @@ namespace spot
 	      resGF->push_back(mo->nth(i)->clone());
 	    else
 	      res1->push_back(mo->nth(i)->clone());
-	  destroy(mo);
+	  mo->destroy();
 	  multop::vec* res3 = new multop::vec;
 	  if (!res1->empty())
 	    res3->push_back(unop::instance(op,
@@ -162,10 +160,10 @@ namespace spot
 		    unop::instance(unop::X,
 				   unop::instance(unop::F,
 						  basic_reduce(u->child())));
-		  destroy(u);
+		  u->destroy();
 		  // FXX(a) = XXF(a) ...
 		  result_ = basic_reduce(res);
-		  destroy(res);
+		  res->destroy();
 		  return;
 		}
 
@@ -192,7 +190,7 @@ namespace spot
 		{
 		  result_ = unop::instance(unop::G,
 					   basic_reduce(bo->second()));
-		  destroy(bo);
+		  bo->destroy();
 		  return;
 		}
 
@@ -204,11 +202,11 @@ namespace spot
 		    unop::instance(unop::X,
 				   unop::instance(unop::G,
 						  basic_reduce(u->child())));
-		  destroy(u);
+		  u->destroy();
 		  // GXX(a) = XXG(a) ...
 		  // GXF(a) = XGF(a) = GF(a) ...
 		  result_ = basic_reduce(res);
-		  destroy(res);
+		  res->destroy();
 		  return;
 		}
 
@@ -275,9 +273,9 @@ namespace spot
 						  basic_reduce(fu1->child()),
 						  basic_reduce(fu2->child()));
 		  result_ = unop::instance(unop::X, basic_reduce(ftmp));
-		  destroy(f1);
-		  destroy(f2);
-		  destroy(ftmp);
+		  f1->destroy();
+		  f2->destroy();
+		  ftmp->destroy();
 		  return;
 	      }
 
@@ -362,7 +360,7 @@ namespace spot
 				    ->push_back(bo2->first()->clone());
 				  if (j != i)
 				    {
-				      destroy(*j);
+				      (*j)->destroy();
 				      *j = 0;
 				    }
 				}
@@ -393,7 +391,7 @@ namespace spot
 				    ->push_back(bo2->second()->clone());
 				  if (j != i)
 				    {
-				      destroy(*j);
+				      (*j)->destroy();
 				      *j = 0;
 				    }
 				}
@@ -414,7 +412,7 @@ namespace spot
 		    {
 		      tmpOther->push_back((*i)->clone());
 		    }
-		  destroy(*i);
+		  (*i)->destroy();
 		}
 
 	      delete tmpGF;
@@ -473,7 +471,7 @@ namespace spot
 				    ->push_back(bo2->second()->clone());
 				  if (j != i)
 				    {
-				      destroy(*j);
+				      (*j)->destroy();
 				      *j = 0;
 				    }
 				}
@@ -502,7 +500,7 @@ namespace spot
 				    ->push_back(bo2->first()->clone());
 				  if (j != i)
 				    {
-				      destroy(*j);
+				      (*j)->destroy();
 				      *j = 0;
 				    }
 				}
@@ -523,7 +521,7 @@ namespace spot
 		    {
 		      tmpOther->push_back((*i)->clone());
 		    }
-		  destroy(*i);
+		  (*i)->destroy();
 		}
 
 	      break;

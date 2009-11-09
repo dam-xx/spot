@@ -20,7 +20,6 @@
 // 02111-1307, USA.
 
 #include "contain.hh"
-#include "destroy.hh"
 #include "tunabbrev.hh"
 #include "ltlast/unop.hh"
 #include "ltlast/binop.hh"
@@ -51,7 +50,7 @@ namespace spot
 	  delete i->second.translation;
 	  const formula* f = i->first;
 	  translated_.erase(i);
-	  destroy(f);
+	  f->destroy();
 	}
     }
 
@@ -89,7 +88,7 @@ namespace spot
       record_* rl = register_formula_(l);
       const formula* ng = unop::instance(unop::Not, g->clone());
       record_* rng = register_formula_(ng);
-      destroy(ng);
+      ng->destroy();
       return incompatible_(rl, rng);
     }
 
@@ -102,8 +101,8 @@ namespace spot
       record_* rnl = register_formula_(nl);
       const formula* ng = unop::instance(unop::Not, g->clone());
       record_* rng = register_formula_(ng);
-      destroy(nl);
-      destroy(ng);
+      nl->destroy();
+      ng->destroy();
       return incompatible_(rnl, rng);
     }
 
@@ -181,19 +180,19 @@ namespace spot
 	      // if (a U b) => b, then keep b !
 	      if (stronger && lcc->contained(bo, b))
 		{
-		  destroy(a);
+		  a->destroy();
 		  result_ = b;
 		}
 	      // if a => b,  then a U b = b.
 	      else if ((!stronger) && lcc->contained(a, b))
 		{
-		  destroy(a);
+		  a->destroy();
 		  result_ = b;
 		}
 	      // if !a => b, then  a U b = Fb
 	      else if (lcc->neg_contained(a, b))
 		{
-		  destroy(a);
+		  a->destroy();
 		  result_ = unop::instance(unop::F, b);
 		}
 	      else
@@ -205,19 +204,19 @@ namespace spot
 	      // if (a R b) => b, then keep b !
 	      if (stronger && lcc->contained(b, bo))
 		{
-		  destroy(a);
+		  a->destroy();
 		  result_ = b;
 		}
 	      // if b => a,  then a R b = b.
 	      else if ((!stronger) && lcc->contained(b, a))
 		{
-		  destroy(a);
+		  a->destroy();
 		  result_ = b;
 		}
 	      // if a => !b, then  a R b = Gb
 	      else if (lcc->contained_neg(a, b))
 		{
-		  destroy(a);
+		  a->destroy();
 		  result_ = unop::instance(unop::G, b);
 		}
 	      else
@@ -266,7 +265,7 @@ namespace spot
 		      // if i => j, then i|j = j
 		      else if (lcc->contained((*res)[i], (*res)[j]))
 			{
-			  destroy((*res)[i]);
+			  (*res)[i]->destroy();
 			  (*res)[i] = 0;
 			  changed = true;
 			  break;
@@ -274,7 +273,7 @@ namespace spot
 		      // if j => i, then i|j = i
 		      else if (lcc->contained((*res)[j], (*res)[i]))
 			{
-			  destroy((*res)[j]);
+			  (*res)[j]->destroy();
 			  (*res)[j] = 0;
 			  changed = true;
 			}
@@ -299,14 +298,14 @@ namespace spot
 		      // if i => j, then i&j = i
 		      else if (lcc->contained((*res)[i], (*res)[j]))
 			{
-			  destroy((*res)[j]);
+			  (*res)[j]->destroy();
 			  (*res)[j] = 0;
 			  changed = true;
 			}
 		      // if j => i, then i&j = j
 		      else if (lcc->contained((*res)[j], (*res)[i]))
 			{
-			  destroy((*res)[i]);
+			  (*res)[i]->destroy();
 			  (*res)[i] = 0;
 			  changed = true;
 			  break;
@@ -329,7 +328,7 @@ namespace spot
 	constant_:
 	  for (unsigned i = 0; i < mos; ++i)
 	    if ((*res)[i])
-	      destroy((*res)[i]);
+	      (*res)[i]->destroy();
 	  delete res;
 	}
 
@@ -354,7 +353,7 @@ namespace spot
       // reduce_tau03_visitor does not handle Xor, Implies, and Equiv.
       f = unabbreviate_ltl(f);
       const_cast<formula*>(f)->accept(v);
-      destroy(f);
+      f->destroy();
       delete v.lcc;
       return v.result();
     }

@@ -33,7 +33,7 @@ namespace spot
     declarative_environment::~declarative_environment()
     {
       for (prop_map::iterator i = props_.begin(); i != props_.end(); ++i)
-	ltl::destroy(i->second);
+	i->second->destroy();
     }
 
     bool

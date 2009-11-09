@@ -26,7 +26,6 @@
 #include "lunabbrev.hh"
 #include "simpfg.hh"
 #include "nenoform.hh"
-#include "ltlvisit/destroy.hh"
 
 namespace spot
 {
@@ -408,12 +407,12 @@ namespace spot
 		if (special_case(tmp))
 		  {
 		    result_ = true;
-		    destroy(tmp);
+		    tmp->destroy();
 		    return;
 		  }
 		if (syntactic_implication(tmp, f))
 		  result_ = true;
-		destroy(tmp);
+		tmp->destroy();
 		return;
 	      }
 	    case unop::G:
@@ -425,12 +424,12 @@ namespace spot
 		if (special_case(tmp))
 		  {
 		    result_ = true;
-		    destroy(tmp);
+		    tmp->destroy();
 		    return;
 		  }
 		if (syntactic_implication(tmp, f))
 		  result_ = true;
-		destroy(tmp);
+		tmp->destroy();
 		return;
 	      }
 	    case unop::Finish:
@@ -581,24 +580,24 @@ namespace spot
 	l = unop::instance(unop::Not, l);
 
       formula* tmp = unabbreviate_logic(l);
-      destroy(l);
+      l->destroy();
       l = simplify_f_g(tmp);
-      destroy(tmp);
+      tmp->destroy();
       tmp = negative_normal_form(l);
-      destroy(l);
+      l->destroy();
       l = tmp;
 
       tmp = unabbreviate_logic(r);
-      destroy(r);
+      r->destroy();
       r = simplify_f_g(tmp);
-      destroy(tmp);
+      tmp->destroy();
       tmp = negative_normal_form(r);
-      destroy(r);
+      r->destroy();
       r = tmp;
 
       bool result = syntactic_implication(l, r);
-      destroy(l);
-      destroy(r);
+      l->destroy();
+      r->destroy();
       return result;
     }
   }

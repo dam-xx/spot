@@ -32,7 +32,6 @@
 #include <vector>
 #include "ltlparse/public.hh"
 #include "ltlvisit/apcollect.hh"
-#include "ltlvisit/destroy.hh"
 #include "ltlvisit/randomltl.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/length.hh"
@@ -505,10 +504,10 @@ generate_formula(const spot::ltl::random_ltl& rl, int opt_f, int opt_s,
           if (opt_l)
             {
               spot::ltl::formula* g = reduce(f);
-              spot::ltl::destroy(f);
+              f->destroy();
               if (spot::ltl::length(g) < opt_l)
                 {
-                  spot::ltl::destroy(g);
+                  g->destroy();
                   continue;
                 }
               f = g;
@@ -531,7 +530,7 @@ generate_formula(const spot::ltl::random_ltl& rl, int opt_f, int opt_s,
         {
           return f;
         }
-      spot::ltl::destroy(f);
+      f->destroy();
     }
   assert(opt_u);
   std::cerr << "Failed to generate another unique formula."
@@ -853,7 +852,7 @@ main(int argc, char** argv)
           if (!f)
             exit(1);
           formula = spot::ltl_to_tgba_fm(f, dict, true);
-          spot::ltl::destroy(f);
+          f->destroy();
         }
       else if (opt_i)
         {
@@ -878,7 +877,7 @@ main(int argc, char** argv)
 		   i != tmp->end(); ++i)
 		apf->insert(dynamic_cast<spot::ltl::atomic_prop*>
 			    ((*i)->clone()));
-              spot::ltl::destroy(f);
+              f->destroy();
               delete tmp;
             }
           else
@@ -1157,7 +1156,7 @@ main(int argc, char** argv)
       opt_ec = init_opt_ec;
       for (spot::ltl::atomic_prop_set::iterator i = apf->begin();
 	   i != apf->end(); ++i)
-        spot::ltl::destroy(*i);
+        (*i)->destroy();
       apf->clear();
     }
   while (opt_F || opt_i);
@@ -1304,7 +1303,7 @@ main(int argc, char** argv)
 
   for (spot::ltl::atomic_prop_set::iterator i = ap->begin();
        i != ap->end(); ++i)
-    spot::ltl::destroy(*i);
+    (*i)->destroy();
 
   if (opt_i && strcmp(opt_i, "-"))
     {

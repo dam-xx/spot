@@ -29,7 +29,6 @@
 #include "tgbaalgos/dotty.hh"
 #include "tgbaalgos/lbtt.hh"
 #include "tgbaalgos/save.hh"
-#include "ltlvisit/destroy.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlast/allnodes.hh"
 
@@ -99,7 +98,7 @@ main(int argc, char** argv)
     input = ltl_defs();
     input += "%";
     input += spot::ltl::to_string(f, true);
-    spot::ltl::destroy(f);
+    f->destroy();
 
     f = spot::eltl::parse_string(input, p, env, false);
     formula_index = 2;
@@ -140,7 +139,7 @@ main(int argc, char** argv)
     }
   }
 
-  spot::ltl::destroy(f);
+  f->destroy();
   delete concrete;
 
   assert(spot::ltl::atomic_prop::instance_count() == 0);

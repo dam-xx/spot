@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2008  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2008, 2009 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -22,7 +22,6 @@
 #include <iostream>
 #include <cassert>
 #include <cstdlib>
-#include "ltlvisit/destroy.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
 #include "tgbaalgos/ltl2tgba_lacim.hh"
@@ -63,8 +62,8 @@ main(int argc, char** argv)
   {
     spot::tgba_bdd_concrete* a1 = spot::ltl_to_tgba_lacim(f1, dict);
     spot::tgba_bdd_concrete* a2 = spot::ltl_to_tgba_lacim(f2, dict);
-    spot::ltl::destroy(f1);
-    spot::ltl::destroy(f2);
+    f1->destroy();
+    f2->destroy();
 
 #ifdef BDD_CONCRETE_PRODUCT
     spot::tgba_bdd_concrete* p = spot::product(a1, a2);

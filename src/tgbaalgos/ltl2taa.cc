@@ -25,7 +25,6 @@
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/tunabbrev.hh"
 #include "ltlvisit/nenoform.hh"
-#include "ltlvisit/destroy.hh"
 #include "ltlvisit/tostring.hh"
 #include "ltlvisit/contain.hh"
 #include "ltl2taa.hh"
@@ -56,7 +55,7 @@ namespace spot
       result()
       {
 	for (unsigned i = 0; i < to_free_.size(); ++i)
-	  destroy(to_free_[i]);
+	  to_free_[i]->destroy();
 	res_->set_init_state(init_);
 	return res_;
       }
@@ -380,14 +379,14 @@ namespace spot
     // TODO: s/unabbreviate_ltl/unabbreviate_logic/
     const ltl::formula* f1 = ltl::unabbreviate_ltl(f);
     const ltl::formula* f2 = ltl::negative_normal_form(f1);
-    ltl::destroy(f1);
+    f1->destroy();
 
     spot::taa* res = new spot::taa(dict);
     language_containment_checker* lcc =
       new language_containment_checker(dict, false, false, false, false);
     ltl2taa_visitor v(res, lcc, refined_rules);
     f2->accept(v);
-    ltl::destroy(f2);
+    f2->destroy();
     delete lcc;
 
     return v.result();

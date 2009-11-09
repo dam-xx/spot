@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <iterator>
 #include <iostream>
-#include "ltlvisit/destroy.hh"
 #include "tgba/formula2bdd.hh"
 #include "misc/bddop.hh"
 #include "taa.hh"
@@ -99,7 +98,7 @@ namespace spot
   taa::add_condition(transition* t, const ltl::formula* f)
   {
     t->condition &= formula_to_bdd(f, dict_, this);
-    ltl::destroy(f);
+    f->destroy();
   }
 
   void
@@ -125,7 +124,7 @@ namespace spot
 
     bdd_dict::fv_map::iterator i = dict_->acc_map.find(f);
     assert(i != dict_->acc_map.end());
-    ltl::destroy(f);
+    f->destroy();
     bdd v = bdd_ithvar(i->second);
     t->acceptance_conditions |= v & bdd_exist(neg_acceptance_conditions_, v);
   }

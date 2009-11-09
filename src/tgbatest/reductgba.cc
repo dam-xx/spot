@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2006, 2008 Laboratoire d'Informatique de
+// Copyright (C) 2003, 2004, 2006, 2008, 2009 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -25,7 +25,6 @@
 #include "tgbaalgos/reductgba_sim.hh"
 #include "tgba/tgbareduc.hh"
 
-#include "ltlvisit/destroy.hh"
 #include "ltlvisit/reduce.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlparse/public.hh"
@@ -166,7 +165,7 @@ main(int argc, char** argv)
     delete automatareduc;
 #ifndef REDUCCMP
   if (f != 0)
-    spot::ltl::destroy(f);
+    f->destroy();
 #endif
 
   assert(spot::ltl::atomic_prop::instance_count() == 0);

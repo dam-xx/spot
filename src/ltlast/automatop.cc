@@ -50,7 +50,7 @@ namespace spot
 
       // Dereference children.
       for (unsigned n = 0; n < size(); ++n)
-	formula::destroy(nth(n));
+	nth(n)->destroy();
 
       delete children_;
     }
@@ -79,7 +79,7 @@ namespace spot
 	{
 	  // The instance already exists.
 	  for (vec::iterator vi = v->begin(); vi != v->end(); ++vi)
-	    formula::destroy(*vi);
+	    (*vi)->destroy();
 	  delete v;
 	  return static_cast<automatop*>(i->second->clone());
 	}

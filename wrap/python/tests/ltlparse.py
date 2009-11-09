@@ -1,5 +1,5 @@
 # -*- mode: python; coding: iso-8859-1 -*-
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -34,14 +34,14 @@ for str1 in l:
     if spot.format_parse_errors(spot.get_cout(), str1, p):
         sys.exit(1)
     str2 = str(f)
-    spot.destroy(f)
+    f.destroy()
     print str2
     # Try to reparse the stringified formula
     f = spot.parse(str2, p, e)
     if spot.format_parse_errors(spot.get_cout(), str2, p):
         sys.exit(1)
     print f
-    spot.destroy(f)
+    f.destroy()
 
 assert spot.atomic_prop.instance_count() == 0
 assert spot.binop.instance_count() == 0

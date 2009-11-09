@@ -28,7 +28,6 @@
 #include "ltlast/atomic_prop.hh"
 #include "ltlvisit/randomltl.hh"
 #include "ltlvisit/tostring.hh"
-#include "ltlvisit/destroy.hh"
 #include "ltlvisit/length.hh"
 #include "ltlvisit/reduce.hh"
 #include "ltlenv/defaultenv.hh"
@@ -179,10 +178,10 @@ main(int argc, char** argv)
 		  if (opt_r)
 		    {
 		      spot::ltl::formula* g = reduce(f);
-		      spot::ltl::destroy(f);
+		      f->destroy();
 		      if (spot::ltl::length(g) < opt_r)
 			{
-			  spot::ltl::destroy(g);
+			  g->destroy();
 			  continue;
 			}
 		      f = g;
@@ -201,7 +200,7 @@ main(int argc, char** argv)
 		  exit(2);
 		}
 	      std::string txt = spot::ltl::to_string(f);
-	      spot::ltl::destroy(f);
+	      f->destroy();
 	      if (!opt_u || unique.insert(txt).second)
 		{
 		  std::cout << txt << std::endl;
@@ -223,7 +222,7 @@ main(int argc, char** argv)
     {
       spot::ltl::atomic_prop_set::const_iterator j = i;
       ++i;
-      spot::ltl::destroy(*j);
+      (*j)->destroy();
     }
   delete ap;
 }

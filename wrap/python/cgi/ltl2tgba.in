@@ -1,6 +1,6 @@
 #!@PYTHON@
 # -*- mode: python; coding: iso-8859-1 -*-
-# Copyright (C) 2003, 2004, 2006, 2007 Laboratoire d'Informatique de
+# Copyright (C) 2003, 2004, 2006, 2007, 2009 Laboratoire d'Informatique de
 # Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 # Université Pierre et Marie Curie.
 #
@@ -453,7 +453,7 @@ if reduce_eventuniv:
     opt = opt + spot.Reduce_Eventuality_And_Universality
 if opt != spot.Reduce_None:
     f2 = spot.reduce(f, opt)
-    spot.destroy(f)
+    f.destroy()
     f = f2
     print "<p>Reduced formula is<code>", f, "</code></p>"
 
@@ -626,7 +626,7 @@ if draw_acc_run or print_acc_run:
 
 sys.stdout.flush()
 
-spot.destroy(f)
+f.destroy()
 # Make sure degen is cleared before automaton.
 del degen
 del automaton

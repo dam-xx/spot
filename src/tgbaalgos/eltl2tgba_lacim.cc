@@ -1,4 +1,4 @@
-// Copyright (C) 2008 Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2008, 2009 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -24,7 +24,6 @@
 #include "ltlast/formula_tree.hh"
 #include "ltlvisit/lunabbrev.hh"
 #include "ltlvisit/nenoform.hh"
-#include "ltlvisit/destroy.hh"
 #include "tgba/tgbabddconcretefactory.hh"
 #include <cassert>
 
@@ -240,7 +239,7 @@ namespace spot
 	{
 	  const formula* lbl = formula_tree::instanciate((*i)->lbl, v);
 	  bdd f = recurse(lbl);
-	  destroy(lbl);
+	  lbl->destroy();
 	  if (nfa->is_final((*i)->dst))
 	  {
 	    tmp1 |= f;
@@ -285,13 +284,13 @@ namespace spot
     // would involve negations at the BDD level.
     const ltl::formula* f1 = ltl::unabbreviate_logic(f);
     const ltl::formula* f2 = ltl::negative_normal_form(f1);
-    ltl::destroy(f1);
+    f1->destroy();
 
     // Traverse the formula and draft the automaton in a factory.
     tgba_bdd_concrete_factory fact(dict);
     eltl_trad_visitor v(fact, true);
     f2->accept(v);
-    ltl::destroy(f2);
+    f2->destroy();
     fact.finish();
 
     // Finally setup the resulting automaton.

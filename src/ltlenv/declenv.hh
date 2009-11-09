@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -25,7 +25,6 @@
 # include "environment.hh"
 # include <string>
 # include <map>
-# include "ltlvisit/destroy.hh"
 # include "ltlast/atomic_prop.hh"
 
 namespace spot

@@ -1,4 +1,4 @@
-/* Copyright (C) 2008 Laboratoire d'Informatique de
+/* Copyright (C) 2008, 2009 Laboratoire d'Informatique de
 ** Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 ** Université Pierre et Marie Curie.
 **
@@ -37,8 +37,6 @@
 #include "public.hh"
 #include "ltlast/allnodes.hh"
 #include "ltlast/formula_tree.hh"
-#include "ltlvisit/destroy.hh"
-#include "ltlvisit/clone.hh"
 
 namespace spot
 {
@@ -234,7 +232,7 @@ using namespace spot::ltl;
 %type <bval> nfa_arg_list
 
 %destructor { delete $$; } "atomic proposition"
-%destructor { spot::ltl::destroy($$); } subformula
+%destructor { $$->destroy(); } subformula
 
 %printer { debug_stream() << *$$; } "atomic proposition"
 
@@ -425,8 +423,8 @@ subformula: ATOMIC_PROP
 	    v.push_back($1);
 	    v.push_back($3);
 	    $$ = instanciate(i->second, v);
-	    spot::ltl::destroy($1);
-	    spot::ltl::destroy($3);
+	    $1->destroy();
+	    $3->destroy();
 	  }
 	  else
 	  {
@@ -449,7 +447,7 @@ subformula: ATOMIC_PROP
 	    $$ = instanciate(i->second, *$3);
 	    automatop::vec::iterator it = $3->begin();
 	    while (it != $3->end())
-	      spot::ltl::destroy(*it++);
+	      (*it++)->destroy();
 	    delete $3;
 	  }
 	  else
@@ -463,7 +461,7 @@ subformula: ATOMIC_PROP
 	    {
 	      automatop::vec::iterator it = $3->begin();
 	      while (it != $3->end())
-		spot::ltl::destroy(*it++);
+		(*it++)->destroy();
 	      delete $3;
 	    }
 
