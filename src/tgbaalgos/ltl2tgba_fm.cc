@@ -195,7 +195,7 @@ namespace spot
       }
 
       void
-      conj_bdd_to_acc(tgba_explicit_string* a, bdd b,
+      conj_bdd_to_acc(tgba_explicit_formula* a, bdd b,
 		      tgba_explicit::transition* t)
       {
 	assert(b != bddfalse);
@@ -717,7 +717,6 @@ namespace spot
       }
 
     typedef std::set<const formula*, formula_ptr_less_than> set_type;
-    set_type formulae_seen;
     set_type formulae_to_translate;
 
     translate_dict d(dict);
@@ -773,31 +772,28 @@ namespace spot
       }
     bdd all_events = observable_events | unobservable_events;
 
-    formulae_seen.insert(f2);
+
+    tgba_explicit_formula* a = new tgba_explicit_formula(dict);
+
     formulae_to_translate.insert(f2);
-
-    tgba_explicit_string* a = new tgba_explicit_string(dict);
-
-    a->set_init_state(to_string(f2));
+    a->set_init_state(f2);
 
     while (!formulae_to_translate.empty())
       {
 	// Pick one formula.
-	const formula* f = *formulae_to_translate.begin();
+	const formula* now = *formulae_to_translate.begin();
 	formulae_to_translate.erase(formulae_to_translate.begin());
 
 	// Translate it into a BDD to simplify it.
-	bdd res = fc.translate(f);
+	bdd res = fc.translate(now);
 
 	// Handle exclusive events.
 	if (unobs)
 	  {
 	    res &= observable_events;
-	    int n = d.register_next_variable(f);
+	    int n = d.register_next_variable(now);
 	    res |= unobservable_events & bdd_ithvar(n) & all_promises;
 	  }
-
-	std::string now = to_string(f);
 
 	// We used to factor only Next and A variables while computing
 	// prime implicants, with
@@ -940,8 +936,10 @@ namespace spot
 		assert(fair_loop_approx || j->first == bddtrue);
 		cond_for_true = j->second;
 	      }
+	    if (!a->has_state(constant::true_instance()))
+	      formulae_to_translate.insert(constant::true_instance());
 	    tgba_explicit::transition* t =
-	      a->create_transition(now, constant::true_instance()->val_name());
+	      a->create_transition(now, constant::true_instance());
 	    a->add_condition(t, d.bdd_to_formula(cond_for_true));
 	  }
 	// Register other transitions.
@@ -953,9 +951,11 @@ namespace spot
 	    // whether a formula is actually reachable.
 	    bool reachable = false;
 
+	    // Will this be a new state?
+	    bool seen = a->has_state(dest);
+
 	    if (dest != constant::true_instance())
 	      {
-		std::string next = to_string(dest);
 		for (prom_map::const_iterator j = i->second.begin();
 		     j != i->second.end(); ++j)
 		  {
@@ -963,7 +963,7 @@ namespace spot
 		    if (cond == bddfalse) // Skip false transitions.
 		      continue;
 		    tgba_explicit::transition* t =
-		      a->create_transition(now, next);
+		      a->create_transition(now, dest);
 		    a->add_condition(t, d.bdd_to_formula(cond));
 		    d.conj_bdd_to_acc(a, j->first, t);
 		    reachable = true;
@@ -974,23 +974,12 @@ namespace spot
 		// "1" is reachable.
 		reachable = true;
 	      }
-	    if (reachable
-		&& formulae_seen.find(dest) == formulae_seen.end())
-	      {
-		formulae_seen.insert(dest);
-		formulae_to_translate.insert(dest);
-	      }
+	    if (reachable && !seen)
+	      formulae_to_translate.insert(dest);
 	    else
-	      {
-		dest->destroy();
-	      }
+	      dest->destroy();
 	  }
       }
-
-    // Free all formulae.
-    for (std::set<const formula*>::iterator i = formulae_seen.begin();
-	 i != formulae_seen.end(); ++i)
-      (*i)->destroy();
 
     // Turn all promises into real acceptance conditions.
     a->complement_all_acceptance_conditions();

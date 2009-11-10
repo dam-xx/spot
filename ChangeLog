@@ -1,5 +1,17 @@
 2009-11-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Use tgba_explicit_formula instead of tgba_explicit_string in FM.
+
+	This gives a nice speedup (>1.4) in the ltlcounter benchmark,
+	because we no longer have to generate a copy the string
+	representations of the LTL formulae.
+
+	* src/tgbaalgos/ltl2tgba_fm.cc: Adjust.  Also get rid of the
+	formulae_seen map, since we can now ask the tgba_explicit_formula
+	if it knows the state.
+
+2009-11-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Ease debugging of LTL formulae leaks.
 
 	* src/tgbatest/ltl2tgba.cc: Dump all LTLinstances with their
