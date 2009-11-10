@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005, 2008 Laboratoire d'Informatique de Paris
+// Copyright (C) 2004, 2005, 2008, 2009 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -31,7 +31,7 @@ namespace spot
 
   tgba_reduc::tgba_reduc(const tgba* a,
 			 const numbered_state_heap_factory* nshf)
-    : tgba_explicit(a->get_dict()),
+    : tgba_explicit_string(a->get_dict()),
       tgba_reachable_iterator_breadth_first(a),
       h_(nshf->build())
   {
@@ -203,10 +203,8 @@ namespace spot
     const std::string ss = automata_->format_state(source);
     const std::string sd = automata_->format_state(dest);
 
-    tgba_explicit::state* s
-      = tgba_explicit::add_state(ss);
-    tgba_explicit::state* d
-      = tgba_explicit::add_state(sd);
+    tgba_explicit::state* s = tgba_explicit_string::add_state(ss);
+    tgba_explicit::state* d = tgba_explicit_string::add_state(sd);
 
     transition* t = new transition();
     t->dest = d;
@@ -241,9 +239,9 @@ namespace spot
     bdd acc_simul;
     std::list<state*> ltmp;
     const tgba_explicit::state* s1 =
-      name_state_map_[tgba_explicit::format_state(s)];
+      name_state_map_[tgba_explicit_string::format_state(s)];
     const tgba_explicit::state* s2 =
-      name_state_map_[tgba_explicit::format_state(simul)];
+      name_state_map_[tgba_explicit_string::format_state(simul)];
 
     sp_map::iterator i = state_predecessor_map_.find(s1);
     if (i == state_predecessor_map_.end()) // 0 predecessor
@@ -323,12 +321,12 @@ namespace spot
     // predecessor in state_predecessor_map_.
 
     ns_map::iterator k =
-      name_state_map_.find(tgba_explicit::format_state(s));
+      name_state_map_.find(tgba_explicit_string::format_state(s));
     if (k == name_state_map_.end()) // 0 predecessor
 	return;
 
     tgba_explicit::state* st =
-      name_state_map_[tgba_explicit::format_state(s)];
+      name_state_map_[tgba_explicit_string::format_state(s)];
 
     // for all successor q of s, we remove s of the predecessor of q.
     // Note that the initial node can't be removed.
@@ -370,9 +368,9 @@ namespace spot
   tgba_reduc::merge_state(const spot::state* sim1, const spot::state* sim2)
   {
     const tgba_explicit::state* s1 =
-      name_state_map_[tgba_explicit::format_state(sim1)];
+      name_state_map_[tgba_explicit_string::format_state(sim1)];
     const tgba_explicit::state* s2 =
-      name_state_map_[tgba_explicit::format_state(sim2)];
+      name_state_map_[tgba_explicit_string::format_state(sim2)];
     const tgba_explicit::state* stmp = s1;
     const spot::state* simtmp = sim1;
 
@@ -612,7 +610,7 @@ namespace spot
 
 	if (sm->second == n)
 	  {
-	    s1 = name_state_map_[tgba_explicit::format_state(s)];
+	    s1 = name_state_map_[tgba_explicit_string::format_state(s)];
 	    s1 = const_cast<tgba_explicit::state*>(s1);
 	    for (state::iterator i = s1->begin();
 		 i != s1->end(); ++i)

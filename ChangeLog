@@ -1,3 +1,22 @@
+2009-11-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Introduce tgba_explicit_labelled<label> so that we can build
+	tgba_explicit instances labelled by other objects than strings.
+
+	* src/tgba/tgbaexplicit.cc, src/tgba/tgbaexplicit.hh:
+	Split tgba_explicit in two levels: tgba_explicit with unlabelled
+	states, and tgba_explicit_labelled templated by the type of
+	the label.  Define tgba_explicit_string (with the interface
+	of the former tgba_explicit class) and tgba_explicit_formula
+	for future use in ltl2tgba.cc.
+	* src/tgba/tgbareduc.cc, src/tgba/tgbareduc.hh,
+	src/tgbaalgos/cutscc.cc, src/tgbaalgos/dupexp.cc,
+	src/tgbaalgos/emptiness.cc, src/tgbaalgos/ltl2tgba_fm.cc,
+	src/tgbaalgos/powerset.cc, src/tgbaalgos/randomgraph.cc,
+	src/tgbaparse/public.hh, src/tgbaparse/tgbaparse.yy,
+	src/tgbatest/explicit.cc, src/tgbatest/ltl2tgba.cc: Adjust to
+	use tgba_explicit_string when appropriate.
+
 2009-11-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Do not use the Boost macro from the Autoconf macro archive.

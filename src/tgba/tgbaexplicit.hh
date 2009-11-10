@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2006, 2009 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -26,12 +26,14 @@
 #include <list>
 #include "tgba.hh"
 #include "ltlast/formula.hh"
+#include <cassert>
 
 namespace spot
 {
   // Forward declarations.  See below.
   class state_explicit;
   class tgba_explicit_succ_iterator;
+  class tgba_explicit;
 
   /// Explicit representation of a spot::tgba.
   /// \ingroup tgba_representation
@@ -51,17 +53,15 @@ namespace spot
       const state* dest;
     };
 
-    state* set_init_state(const std::string& state);
+    /// Add a default initial state.
+    virtual state* add_default_init() = 0;
 
-    transition*
-    create_transition(const std::string& source, const std::string& dest);
     transition*
     create_transition(state* source, const state* dest);
 
     void add_condition(transition* t, const ltl::formula* f);
     /// This assumes that all variables in \a f are known from dict.
     void add_conditions(transition* t, bdd f);
-    void declare_acceptance_condition(const ltl::formula* f);
 
     /// \brief Copy the acceptance conditions of a tgba.
     ///
@@ -73,12 +73,6 @@ namespace spot
     void add_acceptance_condition(transition* t, const ltl::formula* f);
     /// This assumes that all acceptance conditions in \a f are known from dict.
     void add_acceptance_conditions(transition* t, bdd f);
-    void complement_all_acceptance_conditions();
-    void merge_transitions();
-
-    /// Return the tgba_explicit::state for \a name, creating the state if
-    /// it does not exist.
-    state* add_state(const std::string& name);
 
     // tgba interface
     virtual ~tgba_explicit();
@@ -88,10 +82,11 @@ namespace spot
 	      const spot::state* global_state = 0,
 	      const tgba* global_automaton = 0) const;
     virtual bdd_dict* get_dict() const;
-    virtual std::string format_state(const spot::state* state) const;
 
     virtual bdd all_acceptance_conditions() const;
     virtual bdd neg_acceptance_conditions() const;
+
+    virtual std::string format_state(const spot::state* s) const = 0;
 
   protected:
     virtual bdd compute_support_conditions(const spot::state* state) const;
@@ -99,12 +94,6 @@ namespace spot
 
     bdd get_acceptance_condition(const ltl::formula* f);
 
-    typedef Sgi::hash_map<const std::string, tgba_explicit::state*,
-			  string_hash> ns_map;
-    typedef Sgi::hash_map<const tgba_explicit::state*, std::string,
-			  ptr_hash<tgba_explicit::state> > sn_map;
-    ns_map name_state_map_;
-    sn_map state_name_map_;
     bdd_dict* dict_;
     tgba_explicit::state* init_;
     mutable bdd all_acceptance_conditions_;
@@ -116,6 +105,7 @@ namespace spot
     tgba_explicit(const tgba_explicit& other);
     tgba_explicit& operator=(const tgba_explicit& other);
   };
+
 
 
   /// States used by spot::tgba_explicit.
@@ -168,6 +158,177 @@ namespace spot
     bdd all_acceptance_conditions_;
   };
 
+  /// A tgba_explicit instance with states labeled by a given type.
+  template<typename label, typename label_hash>
+  class tgba_explicit_labelled: public tgba_explicit
+  {
+  protected:
+    typedef label label_t;
+    typedef Sgi::hash_map<label, tgba_explicit::state*,
+			  label_hash> ns_map;
+    typedef Sgi::hash_map<const tgba_explicit::state*, label,
+			  ptr_hash<tgba_explicit::state> > sn_map;
+    ns_map name_state_map_;
+    sn_map state_name_map_;
+  public:
+    tgba_explicit_labelled(bdd_dict* dict) : tgba_explicit(dict) {};
+
+    bool has_state(const label& name)
+    {
+      return name_state_map_.find(name) != name_state_map_.end();
+    }
+
+    /// Return the tgba_explicit::state for \a name, creating the state if
+    /// it does not exist.
+    state* add_state(const label& name)
+    {
+      typename ns_map::iterator i = name_state_map_.find(name);
+      if (i == name_state_map_.end())
+	{
+	  tgba_explicit::state* s = new tgba_explicit::state;
+	  name_state_map_[name] = s;
+	  state_name_map_[s] = name;
+
+	  // The first state we add is the inititial state.
+	  // It can also be overridden with set_init_state().
+	  if (!init_)
+	    init_ = s;
+
+	  return s;
+	}
+      return i->second;
+    }
+
+    state*
+    set_init_state(const label& state)
+    {
+      tgba_explicit::state* s = add_state(state);
+      init_ = s;
+      return s;
+    }
+
+
+    transition*
+    create_transition(state* source, const state* dest)
+    {
+      return tgba_explicit::create_transition(source, dest);
+    }
+
+    transition*
+    create_transition(const label& source, const label& dest)
+    {
+      // It's important that the source be created before the
+      // destination, so the first source encountered becomes the
+      // default initial state.
+      state* s = add_state(source);
+      return tgba_explicit::create_transition(s, add_state(dest));
+    }
+
+    void
+    complement_all_acceptance_conditions()
+    {
+      bdd all = all_acceptance_conditions();
+      typename ns_map::iterator i;
+      for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+	{
+	  tgba_explicit::state::iterator i2;
+	  for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	    {
+	      (*i2)->acceptance_conditions = all - (*i2)->acceptance_conditions;
+	    }
+	}
+    }
+
+    void
+    declare_acceptance_condition(const ltl::formula* f)
+    {
+      int v = dict_->register_acceptance_variable(f, this);
+      f->destroy();
+      bdd neg = bdd_nithvar(v);
+      neg_acceptance_conditions_ &= neg;
+
+      // Append neg to all acceptance conditions.
+      typename ns_map::iterator i;
+      for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+	{
+	  tgba_explicit::state::iterator i2;
+	  for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	    (*i2)->acceptance_conditions &= neg;
+	}
+
+      all_acceptance_conditions_computed_ = false;
+    }
+
+
+    void
+    merge_transitions()
+    {
+      typename ns_map::iterator i;
+      for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+	{
+	  state::iterator t1;
+	  for (t1 = i->second->begin(); t1 != i->second->end(); ++t1)
+	    {
+	      bdd acc = (*t1)->acceptance_conditions;
+	      const state* dest = (*t1)->dest;
+
+	      // Find another transition with the same destination and
+	      // acceptance conditions.
+	      state::iterator t2 = t1;
+	      ++t2;
+	      while (t2 != i->second->end())
+		{
+		  state::iterator t2copy = t2++;
+		  if ((*t2copy)->acceptance_conditions == acc
+		      && (*t2copy)->dest == dest)
+		    {
+		      (*t1)->condition |= (*t2copy)->condition;
+		      delete *t2copy;
+		      i->second->erase(t2copy);
+		    }
+		}
+	    }
+	}
+    }
+
+
+    virtual
+    ~tgba_explicit_labelled()
+    {
+      typename ns_map::iterator i;
+      for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+	{
+	  tgba_explicit::state::iterator i2;
+	  for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	    delete *i2;
+	  delete i->second;
+	}
+    }
+
+  };
+
+  class tgba_explicit_string:
+    public tgba_explicit_labelled<std::string, string_hash>
+  {
+  public:
+    tgba_explicit_string(bdd_dict* dict):
+      tgba_explicit_labelled<std::string, string_hash>(dict)
+    {};
+    virtual state* add_default_init();
+    virtual std::string format_state(const spot::state* s) const;
+  };
+
+  class tgba_explicit_formula:
+    public tgba_explicit_labelled<const ltl::formula*, ltl::formula_ptr_hash>
+  {
+  public:
+    tgba_explicit_formula(bdd_dict* dict):
+      tgba_explicit_labelled<const ltl::formula*, ltl::formula_ptr_hash>(dict)
+    {};
+    virtual ~tgba_explicit_formula();
+    virtual state* add_default_init();
+    virtual std::string format_state(const spot::state* s) const;
+  };
 }
 
 #endif // SPOT_TGBA_TGBAEXPLICIT_HH

@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -34,12 +34,12 @@ namespace spot
     {
     public:
       dupexp_iter(const tgba* a)
-	: T(a), out_(new tgba_explicit(a->get_dict()))
+	: T(a), out_(new tgba_explicit_string(a->get_dict()))
       {
 	out_->copy_acceptance_conditions_of(a);
       }
 
-      tgba_explicit*
+      tgba_explicit_string*
       result()
       {
 	return out_;
@@ -62,7 +62,7 @@ namespace spot
       }
 
     private:
-      tgba_explicit* out_;
+      tgba_explicit_string* out_;
     };
 
   } // anonymous

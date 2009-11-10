@@ -202,7 +202,7 @@ main(int argc, char** argv)
   bool show_fc = false;
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* unobservables = 0;
-  spot::tgba_explicit* system = 0;
+  spot::tgba_explicit_string* system = 0;
   spot::tgba* product = 0;
   spot::tgba* product_to_free = 0;
   spot::bdd_dict* dict = new spot::bdd_dict();
@@ -574,7 +574,7 @@ main(int argc, char** argv)
       if (from_file)
 	{
 	  spot::tgba_parse_error_list pel;
-	  spot::tgba_explicit* e;
+	  spot::tgba_explicit_string* e;
 	  tm.start("parsing automaton");
 	  to_free = a = e = spot::tgba_parse(input, pel, dict,
 					     env, env, debug_opt);

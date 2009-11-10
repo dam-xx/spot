@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
-// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
-// Université Pierre et Marie Curie.
+// Copyright (C) 2003, 2004, 2005, 2006, 2009 Laboratoire
+// d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
+// Coopératifs (SRC), Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -62,14 +62,14 @@ namespace spot
   /// was parsed succesfully, check \a error_list for emptiness.
   ///
   /// \warning This function is not reentrant.
-  tgba_explicit* tgba_parse(const std::string& filename,
-			    tgba_parse_error_list& error_list,
-			    bdd_dict* dict,
-			    ltl::environment& env
-			    = ltl::default_environment::instance(),
-			    ltl::environment& envacc
-			    = ltl::default_environment::instance(),
-			    bool debug = false);
+  tgba_explicit_string* tgba_parse(const std::string& filename,
+				   tgba_parse_error_list& error_list,
+				   bdd_dict* dict,
+				   ltl::environment& env
+				   = ltl::default_environment::instance(),
+				   ltl::environment& envacc
+				   = ltl::default_environment::instance(),
+				   bool debug = false);
 
   /// \brief Format diagnostics produced by spot::tgba_parse.
   /// \param os Where diagnostics should be output.

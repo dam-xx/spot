@@ -41,7 +41,7 @@ typedef std::map<std::string, bdd> formula_cache;
 %parse-param {spot::tgba_parse_error_list& error_list}
 %parse-param {spot::ltl::environment& parse_environment}
 %parse-param {spot::ltl::environment& parse_envacc}
-%parse-param {spot::tgba_explicit*& result}
+%parse-param {spot::tgba_explicit_string*& result}
 %parse-param {formula_cache& fcache}
 %union
 {
@@ -233,7 +233,7 @@ tgbayy::parser::error(const location_type& location,
 
 namespace spot
 {
-  tgba_explicit*
+  tgba_explicit_string*
   tgba_parse(const std::string& name,
 	     tgba_parse_error_list& error_list,
 	     bdd_dict* dict,
@@ -249,7 +249,7 @@ namespace spot
 	return 0;
       }
     formula_cache fcache;
-    tgba_explicit* result = new tgba_explicit(dict);
+    tgba_explicit_string* result = new tgba_explicit_string(dict);
     tgbayy::parser parser(error_list, env, envacc, result, fcache);
     parser.set_debug_level(debug);
     parser.parse();

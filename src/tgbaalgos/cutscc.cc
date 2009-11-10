@@ -39,7 +39,7 @@ namespace spot
   tgba* cut_scc(const tgba* a, const scc_map& m,
 		const std::set<unsigned>* s)
   {
-    tgba_explicit* sub_a = new tgba_explicit(a->get_dict());
+    tgba_explicit_string* sub_a = new tgba_explicit_string(a->get_dict());
     state* cur = a->get_init_state();
     std::queue<state*> tovisit;
     typedef Sgi::hash_set<const state*,
@@ -418,4 +418,3 @@ namespace spot
     return iter_count;
   }
 }
-

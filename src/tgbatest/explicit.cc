@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -33,7 +33,7 @@ main()
 
   spot::ltl::default_environment& e =
     spot::ltl::default_environment::instance();
-  spot::tgba_explicit* a = new spot::tgba_explicit(dict);
+  spot::tgba_explicit_string* a = new spot::tgba_explicit_string(dict);
 
   typedef spot::tgba_explicit::transition trans;
 

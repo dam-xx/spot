@@ -95,7 +95,7 @@ namespace spot
 	       ltl::environment* env)
   {
     assert(n > 0);
-    tgba_explicit* res = new tgba_explicit(dict);
+    tgba_explicit_string* res = new tgba_explicit_string(dict);
 
     int props_n = ap->size();
     int* props = new int[props_n];

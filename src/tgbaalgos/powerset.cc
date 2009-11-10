@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -40,7 +40,7 @@ namespace spot
 
     power_set seen;
     todo_list todo;
-    tgba_explicit* res = new tgba_explicit(aut->get_dict());
+    tgba_explicit_string* res = new tgba_explicit_string(aut->get_dict());
 
     state_set states;
 

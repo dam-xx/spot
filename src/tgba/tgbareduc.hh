@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005, 2006, 2008 Laboratoire d'Informatique de
+// Copyright (C) 2004, 2005, 2006, 2008, 2009 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -51,7 +51,7 @@ namespace spot
   /// Explicit automata used in reductions.
   /// \ingroup tgba_representation
   class tgba_reduc:
-    public tgba_explicit, public tgba_reachable_iterator_breadth_first
+    public tgba_explicit_string, public tgba_reachable_iterator_breadth_first
   {
   public:
     tgba_reduc(const tgba* a,

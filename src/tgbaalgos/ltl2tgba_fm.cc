@@ -195,7 +195,8 @@ namespace spot
       }
 
       void
-      conj_bdd_to_acc(tgba_explicit* a, bdd b, tgba_explicit::transition* t)
+      conj_bdd_to_acc(tgba_explicit_string* a, bdd b,
+		      tgba_explicit::transition* t)
       {
 	assert(b != bddfalse);
 	while (b != bddtrue)
@@ -775,7 +776,7 @@ namespace spot
     formulae_seen.insert(f2);
     formulae_to_translate.insert(f2);
 
-    tgba_explicit* a = new tgba_explicit(dict);
+    tgba_explicit_string* a = new tgba_explicit_string(dict);
 
     a->set_init_state(to_string(f2));
 

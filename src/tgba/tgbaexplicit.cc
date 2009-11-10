@@ -25,6 +25,7 @@
 #include "tgba/formula2bdd.hh"
 #include "misc/bddop.hh"
 #include <cassert>
+#include "ltlvisit/tostring.hh"
 
 namespace spot
 {
@@ -121,43 +122,7 @@ namespace spot
 
   tgba_explicit::~tgba_explicit()
   {
-    ns_map::iterator i;
-    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
-      {
-	tgba_explicit::state::iterator i2;
-	for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	  delete *i2;
-	delete i->second;
-      }
     dict_->unregister_all_my_variables(this);
-  }
-
-  tgba_explicit::state*
-  tgba_explicit::add_state(const std::string& name)
-  {
-    ns_map::iterator i = name_state_map_.find(name);
-    if (i == name_state_map_.end())
-      {
-	tgba_explicit::state* s = new tgba_explicit::state;
-	name_state_map_[name] = s;
-	state_name_map_[s] = name;
-
-	// The first state we add is the inititial state.
-	// It can also be overridden with set_init_state().
-	if (!init_)
-	  init_ = s;
-
-	return s;
-      }
-    return i->second;
-  }
-
-  tgba_explicit::state*
-  tgba_explicit::set_init_state(const std::string& state)
-  {
-    tgba_explicit::state* s = add_state(state);
-    init_ = s;
-    return s;
   }
 
   tgba_explicit::transition*
@@ -170,18 +135,6 @@ namespace spot
     source->push_back(t);
     return t;
   }
-
-  tgba_explicit::transition*
-  tgba_explicit::create_transition(const std::string& source,
-				   const std::string& dest)
-  {
-    // It's important that the source be created before the
-    // destination, so the first encountered source becomes the
-    // default initial state.
-    state* s = add_state(source);
-    return create_transition(s, add_state(dest));
-  }
-
   void
   tgba_explicit::add_condition(transition* t, const ltl::formula* f)
   {
@@ -197,26 +150,6 @@ namespace spot
   }
 
   void
-  tgba_explicit::declare_acceptance_condition(const ltl::formula* f)
-  {
-    int v = dict_->register_acceptance_variable(f, this);
-    f->destroy();
-    bdd neg = bdd_nithvar(v);
-    neg_acceptance_conditions_ &= neg;
-
-    // Append neg to all acceptance conditions.
-    ns_map::iterator i;
-    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
-      {
-	tgba_explicit::state::iterator i2;
-	for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	  (*i2)->acceptance_conditions &= neg;
-      }
-
-    all_acceptance_conditions_computed_ = false;
-  }
-
-  void
   tgba_explicit::copy_acceptance_conditions_of(const tgba *a)
   {
     assert(neg_acceptance_conditions_ == bddtrue);
@@ -224,52 +157,6 @@ namespace spot
     bdd f = a->neg_acceptance_conditions();
     dict_->register_acceptance_variables(f, this);
     neg_acceptance_conditions_ = f;
-  }
-
-  void
-  tgba_explicit::complement_all_acceptance_conditions()
-  {
-    bdd all = all_acceptance_conditions();
-    ns_map::iterator i;
-    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
-      {
-	tgba_explicit::state::iterator i2;
-	for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	  {
-	    (*i2)->acceptance_conditions = all - (*i2)->acceptance_conditions;
-	  }
-      }
-  }
-
-  void
-  tgba_explicit::merge_transitions()
-  {
-    ns_map::iterator i;
-    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
-      {
-	state::iterator t1;
-	for (t1 = i->second->begin(); t1 != i->second->end(); ++t1)
-	  {
-	    bdd acc = (*t1)->acceptance_conditions;
-	    const state* dest = (*t1)->dest;
-
-	    // Find another transition with the same destination and
-	    // acceptance conditions.
-	    state::iterator t2 = t1;
-	    ++t2;
-	    while (t2 != i->second->end())
-	      {
-		state::iterator t2copy = t2++;
-		if ((*t2copy)->acceptance_conditions == acc
-		    && (*t2copy)->dest == dest)
-		  {
-		    (*t1)->condition |= (*t2copy)->condition;
-		    delete *t2copy;
-		    i->second->erase(t2copy);
-		  }
-	      }
-	  }
-      }
   }
 
   bool
@@ -317,7 +204,7 @@ namespace spot
   {
     // Fix empty automata by adding a lone initial state.
     if (!init_)
-      const_cast<tgba_explicit*>(this)->add_state("empty");
+      const_cast<tgba_explicit*>(this)->add_default_init();
     return new state_explicit(init_);
   }
 
@@ -368,16 +255,6 @@ namespace spot
     return dict_;
   }
 
-  std::string
-  tgba_explicit::format_state(const spot::state* s) const
-  {
-    const state_explicit* se = dynamic_cast<const state_explicit*>(s);
-    assert(se);
-    sn_map::const_iterator i = state_name_map_.find(se->get_state());
-    assert(i != state_name_map_.end());
-    return i->second;
-  }
-
   bdd
   tgba_explicit::all_acceptance_conditions() const
   {
@@ -394,6 +271,44 @@ namespace spot
   tgba_explicit::neg_acceptance_conditions() const
   {
     return neg_acceptance_conditions_;
+  }
+
+  tgba_explicit::state*
+  tgba_explicit_string::add_default_init()
+  {
+    return add_state("empty");
+  }
+
+  std::string
+  tgba_explicit_string::format_state(const spot::state* s) const
+  {
+    const state_explicit* se = dynamic_cast<const state_explicit*>(s);
+    assert(se);
+    sn_map::const_iterator i = state_name_map_.find(se->get_state());
+    assert(i != state_name_map_.end());
+    return i->second;
+  }
+
+  tgba_explicit_formula::~tgba_explicit_formula()
+  {
+    ns_map::iterator i;
+    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+      i->first->destroy();
+  }
+
+  tgba_explicit::state* tgba_explicit_formula::add_default_init()
+  {
+    return add_state(ltl::constant::true_instance());
+  }
+
+  std::string
+  tgba_explicit_formula::format_state(const spot::state* s) const
+  {
+    const state_explicit* se = dynamic_cast<const state_explicit*>(s);
+    assert(se);
+    sn_map::const_iterator i = state_name_map_.find(se->get_state());
+    assert(i != state_name_map_.end());
+    return ltl::to_string(i->second);
   }
 
 }
