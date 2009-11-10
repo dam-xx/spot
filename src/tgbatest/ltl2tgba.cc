@@ -106,8 +106,10 @@ syntax(char* prog)
             << "  -lS   label acceptance conditions on states" << std::endl
 	    << "  -m    try to reduce accepting runs, in a second pass"
 	    << std::endl
-	    << "  -N    display the never clain for Spin "
-	    << "(implies -D)" << std::endl
+	    << "  -N    display the never clain for Spin (implies -D)"
+	    << std::endl
+	    << "  -NN   display the never clain for Spin, with commented states"
+	    << " (implies -D)" << std::endl
             << "  -p    branching postponement (implies -f)" << std::endl
 	    << "  -Pfile  multiply the formula with the automaton from `file'."
 	    << std::endl
@@ -200,6 +202,7 @@ main(int argc, char** argv)
   bool opt_reduce = false;
   bool containment = false;
   bool show_fc = false;
+  bool spin_comments = false;
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* unobservables = 0;
   spot::tgba_explicit_string* system = 0;
@@ -376,6 +379,12 @@ main(int argc, char** argv)
 	{
 	  degeneralize_opt = DegenSBA;
 	  output = 8;
+	}
+      else if (!strcmp(argv[formula_index], "-NN"))
+	{
+	  degeneralize_opt = DegenSBA;
+	  output = 8;
+	  spin_comments = true;
 	}
       else if (!strcmp(argv[formula_index], "-p"))
 	{
@@ -794,7 +803,7 @@ main(int argc, char** argv)
 		assert(degeneralize_opt == DegenSBA);
 		const spot::tgba_sba_proxy* s =
 		  static_cast<const spot::tgba_sba_proxy*>(degeneralized);
-		spot::never_claim_reachable(std::cout, s, f);
+		spot::never_claim_reachable(std::cout, s, f, spin_comments);
 		break;
 	      }
 	    case 9:

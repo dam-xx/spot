@@ -1,3 +1,16 @@
+2009-11-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Do not comment states in the never claim by default.  It takes too
+	much time when the formula is large, and it is useless when the
+	purpose is model-checking with Spin.
+
+	* src/tgbaalgos/neverclaim.hh (never_claim_reachable): Add the
+	comments option.
+	* src/tgbaalgos/neverclaim.cc (never_claim_bfs,
+	never_claim_reachable): Honor the comment option.
+	* src/tgba/tests/ltl2tgba.cc (-N): Do not comment states.
+	(-NN) New option to output a commented never claim.
+
 2009-11-10  Damien Lefortier <dam@lrde.epita.fr>
 
 	* src/tgba/taa.cc, src/tgba/taa.hh: Fix it.

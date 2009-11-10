@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -35,9 +35,12 @@ namespace spot
   /// \param g The degeneralized automaton to output.
   /// \param f The (optional) formula associated to the automaton.  If given
   ///          it will be output as a comment.
+  /// \param comments Whether to comment each state of the never clause
+  ///          with the label of the \a g automaton.
   std::ostream& never_claim_reachable(std::ostream& os,
 				      const tgba_sba_proxy* g,
-				      const ltl::formula* f = 0);
+				      const ltl::formula* f = 0,
+				      bool comments = false);
 }
 
 #endif // SPOT_TGBAALGOS_NEVERCLAIM_HH
