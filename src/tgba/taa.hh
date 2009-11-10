@@ -131,11 +131,8 @@ namespace spot
   class state_set : public spot::state
   {
   public:
-    /// The taa::state_set has been allocated with \c new.  It is the
-    /// responsability of the state_set to \c delete it when no longer
-    /// needed (cf. dtor).
-    state_set(const taa::state_set* s)
-       : s_(s)
+    state_set(const taa::state_set* s, bool delete_me = false)
+      : s_(s), delete_me_(delete_me)
     {
     }
 
@@ -145,12 +142,14 @@ namespace spot
 
     virtual ~state_set()
     {
-      delete s_;
+      if (delete_me_)
+	delete s_;
     }
 
     const taa::state_set* get_state() const;
   private:
     const taa::state_set* s_;
+    bool delete_me_;
   };
 
   class taa_succ_iterator : public tgba_succ_iterator
@@ -174,7 +173,7 @@ namespace spot
     typedef std::pair<iterator, iterator> iterator_pair;
     typedef std::vector<iterator_pair> bounds_t;
     typedef Sgi::hash_multimap<
-      const taa::state_set*, taa::transition*, ptr_hash<taa::state_set>
+      const spot::state_set*, taa::transition*, state_ptr_hash, state_ptr_equal
       > seen_map;
 
     struct distance_sort :

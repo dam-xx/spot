@@ -382,8 +382,9 @@ namespace spot
     f1->destroy();
 
     spot::taa* res = new spot::taa(dict);
+    bdd_dict b;
     language_containment_checker* lcc =
-      new language_containment_checker(dict, false, false, false, false);
+      new language_containment_checker(&b, false, false, false, false);
     ltl2taa_visitor v(res, lcc, refined_rules);
     f2->accept(v);
     f2->destroy();

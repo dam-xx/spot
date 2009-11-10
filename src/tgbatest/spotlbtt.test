@@ -270,17 +270,17 @@ Algorithm
 
 Algorithm
 {
-   Name = "Spot (Tauriainen -- TAA) pre reduction"
+   Name = "Spot (Tauriainen -- TAA) refined rules"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '../ltl2tgba -F -taa -t -r7'"
+   Parameters = "--spot '../ltl2tgba -F -taa -t -c'"
    Enabled = yes
 }
 
 Algorithm
 {
-   Name = "Spot (Tauriainen -- TAA) pre reduction + refined rules"
+   Name = "Spot (Tauriainen -- TAA) refined rules + pre + post reduction"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '../ltl2tgba -F -taa -t -r7 -c'"
+   Parameters = "--spot '../ltl2tgba -F -taa -t -c -r7 -R3'"
    Enabled = yes
 }
 

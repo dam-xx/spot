@@ -1,3 +1,10 @@
+2009-11-10  Damien Lefortier <dam@lrde.epita.fr>
+
+	* src/tgba/taa.cc, src/tgba/taa.hh: Fix it.
+	* src/tgbaalgos/ltl2taa.cc: Do NOT use the same bdd_dict for both
+	the translation and the language containment checker.
+	* src/tgbatest/spotlbtt.test: Update TAA related tests.
+
 2009-11-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Use tgba_explicit_formula instead of tgba_explicit_string in FM.

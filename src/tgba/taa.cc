@@ -150,8 +150,7 @@ namespace spot
   taa::get_init_state() const
   {
     assert(init_);
-    taa::state_set* ss = new taa::state_set(*init_);
-    return new spot::state_set(ss);
+    return new spot::state_set(init_);
   }
 
   tgba_succ_iterator*
@@ -163,8 +162,7 @@ namespace spot
     assert(s);
     (void) global_state;
     (void) global_automaton;
-    return new taa_succ_iterator(s->get_state(),
-				 all_acceptance_conditions());
+    return new taa_succ_iterator(s->get_state(), all_acceptance_conditions());
   }
 
   bdd_dict*
@@ -303,29 +301,29 @@ namespace spot
     const taa::state_set* s1 = get_state();
     const taa::state_set* s2 = o->get_state();
 
-    if (*s1 == *s2)
-      return 0;
+    if (s1->size() != s2->size())
+      return s1->size() - s2->size();
 
     taa::state_set::const_iterator it1 = s1->begin();
     taa::state_set::const_iterator it2 = s2->begin();
-    while (it2 != s2->end() && it1 != s1->end())
+    while (it2 != s2->end())
     {
       int i = *it1++ - *it2++;
       if (i != 0)
 	return i;
     }
-    return s1->size() - s2->size();
+    return 0;
   }
 
   size_t
   state_set::hash() const
   {
-    size_t res = wang32_hash(0);
+    size_t res = 0;
     taa::state_set::const_iterator it = s_->begin();
     while (it != s_->end())
     {
-      res += reinterpret_cast<const char*>(*it++) - static_cast<char*>(0);
-      res ^= wang32_hash(res);
+      res ^= reinterpret_cast<const char*>(*it++) - static_cast<char*>(0);
+      res = wang32_hash(res);
     }
     return res;
   }
@@ -333,8 +331,10 @@ namespace spot
   state_set*
   state_set::clone() const
   {
-    taa::state_set* s = new taa::state_set(*s_);
-    return new spot::state_set(s);
+    if (delete_me_ && s_)
+      return new spot::state_set(new taa::state_set(*s_), true);
+    else
+      return new spot::state_set(s_, false);
   }
 
   /*--------------.
@@ -383,19 +383,20 @@ namespace spot
 	    ss->insert(*j);
 
 	// Fill the new transition.
-	t->dst = ss;
 	t->condition &= (*pos[p])->condition;
 	t->acceptance_conditions |= (*pos[p])->acceptance_conditions;
-      }
-      // If p != pos.size() we have found a contradiction
+      } // If p != pos.size() we have found a contradiction
       assert(p > 0);
+      t->dst = ss;
+      // Boxing to be able to insert ss in the map directly.
+      spot::state_set* b = new spot::state_set(ss);
 
       // If no contradiction, then look for another transition to
       // merge with the new one.
       seen_map::iterator i;
       if (t->condition != bddfalse)
       {
-	for (i = seen_.find(ss); i != seen_.end(); ++i)
+	for (i = seen_.find(b); i != seen_.end(); ++i)
 	{
 	  if (*i->second->dst == *t->dst
 	      && i->second->condition == t->condition)
@@ -416,13 +417,14 @@ namespace spot
       // or delete it otherwise.
       if (t->condition != bddfalse && i == seen_.end())
       {
-	seen_.insert(std::make_pair(ss, t));
+	seen_.insert(std::make_pair(b, t));
 	succ_.push_back(t);
       }
       else
       {
 	delete t->dst;
 	delete t;
+	delete b;
       }
 
       for (int i = pos.size() - 1; i >= 0; --i)
@@ -443,7 +445,12 @@ namespace spot
   taa_succ_iterator::~taa_succ_iterator()
   {
     for (unsigned i = 0; i < succ_.size(); ++i)
+    {
+      delete succ_[i]->dst;
       delete succ_[i];
+    }
+    for (seen_map::iterator i = seen_.begin(); i != seen_.end(); ++i)
+      delete i->first;
   }
 
   void
@@ -468,7 +475,7 @@ namespace spot
   taa_succ_iterator::current_state() const
   {
     assert(!done());
-    return new spot::state_set((*i_)->dst);
+    return new spot::state_set(new taa::state_set(*(*i_)->dst), true);
   }
 
   bdd
