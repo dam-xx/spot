@@ -1,5 +1,12 @@
 2009-11-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Ease debugging of LTL formulae leaks.
+
+	* src/tgbatest/ltl2tgba.cc: Dump all LTLinstances with their
+	reference count.
+
+2009-11-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Introduce tgba_explicit_labelled<label> so that we can build
 	tgba_explicit instances labelled by other objects than strings.
 
