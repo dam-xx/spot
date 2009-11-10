@@ -924,7 +924,7 @@ namespace spot
 	    // When translating LTL for an event-based logic with
 	    // unobservable events, the 1 state should accept all events,
 	    // even unobservable events.
-	    if (unobs && f == constant::true_instance())
+	    if (unobs && now == constant::true_instance())
 	      cond_for_true = all_events;
 	    else
 	      {

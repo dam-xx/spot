@@ -1,5 +1,12 @@
 2009-11-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Typo from a previous patch.
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_to_tgba_fm): Fix a typo
+	introduced three patches ago in the handling of unobserved events.
+
+2009-11-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Do not comment states in the never claim by default.  It takes too
 	much time when the formula is large, and it is useless when the
 	purpose is model-checking with Spin.
