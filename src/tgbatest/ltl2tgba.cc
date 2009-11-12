@@ -57,31 +57,48 @@
 void
 syntax(char* prog)
 {
-  std::cerr << "Usage: "<< prog << " [OPTIONS...] formula" << std::endl
-            << "       "<< prog << " -F [OPTIONS...] file" << std::endl
+  // Display the supplied name unless it appears to be a libtool wrapper.
+  char* slash = strrchr(prog, '/');
+  if (slash && (strncmp(slash + 1, "lt-", 3) == 0))
+    prog = slash + 4;
+
+  std::cerr << "Usage: "<< prog << " [-f|-l|-taa] [OPTIONS...] formula"
+	    << std::endl
+            << "       "<< prog << " [-f|-l|-taa] -F [OPTIONS...] file"
+	    << std::endl
             << "       "<< prog << " -X [OPTIONS...] file" << std::endl
 	    << std::endl
-	    << "Options:" << std::endl
-	    << "  -0    produce minimal output dedicated to the paper"
+
+            << "Translate an LTL into an automaton, or read the automaton "
+	    << "from a file." << std::endl
+	    << "Optionally multiply this automaton by another"
+	    << " automaton read from a file." << std::endl
+            << "Output the result in various formats, or perform an emptiness "
+            << "check." << std::endl
 	    << std::endl
-	    << "  -a    display the acceptance_conditions BDD, not the "
-	    << "reachability graph"
+
+            << "Input options:" << std::endl
+            << "  -F    read the formula from a file, not from the command line"
 	    << std::endl
-	    << "  -A    same as -a, but as a set" << std::endl
-	    << "  -b    display the automaton in the format of spot"
-            << std::endl
-	    << "  -c    enable language containment checks (implies -f)"
+	    << "  -X    do not compute an automaton, read it from a file"
 	    << std::endl
-	    << "  -d    turn on traces during parsing" << std::endl
-	    << "  -D    degeneralize the automaton as a TBA" << std::endl
-	    << "  -DS   degeneralize the automaton as an SBA" << std::endl
-	    << "  -e[ALGO]  emptiness-check, expect and compute an "
-	    << "accepting run" << std::endl
-	    << "  -E[ALGO]  emptiness-check, expect no accepting run"
+	    << "  -Pfile  multiply the formula automaton with the automaton"
+	    << " from `file'"
 	    << std::endl
+	    << std::endl
+
+	    << "Translation algorithm:" << std::endl
             << "  -f    use Couvreur's FM algorithm for translation"
 	    << std::endl
+            << "  -l    use Couvreur's LaCIM algorithm for translation "
+	    << "(default)"
+	    << std::endl
             << "  -taa  use Tauriainen's TAA-based algorithm for translation"
+	    << std::endl
+	    << std::endl
+
+	    << "Options for Couvreur's FM algorithm (-f):" << std::endl
+	    << "  -c    enable language containment checks (implies -f)"
 	    << std::endl
 	    << "  -fr1  use -r1 (see below) at each step of FM" << std::endl
 	    << "  -fr2  use -r2 (see below) at each step of FM" << std::endl
@@ -90,32 +107,34 @@ syntax(char* prog)
 	    << "  -fr5  use -r5 (see below) at each step of FM" << std::endl
 	    << "  -fr6  use -r6 (see below) at each step of FM" << std::endl
 	    << "  -fr7  use -r7 (see below) at each step of FM" << std::endl
-            << "  -F    read the formula from the file" << std::endl
-            << "  -FC   dump the automaton showing future conditions on states"
-	    << std::endl
-	    << "  -g    graph the accepting run on the automaton (requires -e)"
-	    << std::endl
-	    << "  -G    graph the accepting run seen as an automaton "
-	    << " (requires -e)" << std::endl
-	    << "  -k    display statistics on the TGBA instead of dumping it"
-	    << std::endl
-	    << "  -K    dump the graph of SCCs in dot format" << std::endl
-	    << "  -KV   verbosely dump the graph of SCCs in dot format"
-	    << std::endl
-            << "  -l    use Couvreur's LaCIM algorithm for translation"
-	    << std::endl
             << "  -L    fair-loop approximation (implies -f)" << std::endl
-            << "  -lS   label acceptance conditions on states" << std::endl
-	    << "  -m    try to reduce accepting runs, in a second pass"
-	    << std::endl
-	    << "  -N    display the never clain for Spin (implies -D)"
-	    << std::endl
-	    << "  -NN   display the never clain for Spin, with commented states"
-	    << " (implies -D)" << std::endl
             << "  -p    branching postponement (implies -f)" << std::endl
-	    << "  -Pfile  multiply the formula with the automaton from `file'."
+            << "  -U[PROPS]  consider atomic properties of the formula as "
+	    << "exclusive events, and" << std::endl
+	    << "        PROPS as unobservables events (implies -f)"
 	    << std::endl
+            << "  -x    try to produce a more deterministic automaton "
+	    << "(implies -f)" << std::endl
+	    << "  -y    do not merge states with same symbolic representation "
+	    << "(implies -f)" << std::endl
+	    << std::endl
+
+	    << "Options for Couvreur's LaCIM algorithm (-l):" << std::endl
+	    << "  -a    display the acceptance_conditions BDD, not the "
+	    << "reachability graph"
+	    << std::endl
+	    << "  -A    same as -a, but as a set" << std::endl
 	    << "  -r    display the relation BDD, not the reachability graph"
+	    << std::endl
+	    << "  -R    same as -r, but as a set" << std::endl
+	    << std::endl
+
+	    << "Options for Tauriainen's TAA-based algorithm (-taa):"
+	    << std::endl
+	    << "  -c    enable language containment checks" << std::endl
+	    << std::endl
+
+	    << "Formula simplification (before translation):"
 	    << std::endl
 	    << "  -r1   reduce formula using basic rewriting" << std::endl
 	    << "  -r2   reduce formula using class of eventuality and "
@@ -126,8 +145,20 @@ syntax(char* prog)
 	    << "  -r5   reduce formula using tau03" << std::endl
 	    << "  -r6   reduce formula using tau03+" << std::endl
 	    << "  -r7   reduce formula using tau03+ and -r4" << std::endl
-	    << "  -rd   display the reduce formula" << std::endl
-	    << "  -R    same as -r, but as a set" << std::endl
+	    << "  -rd   display the reduced formula" << std::endl
+	    << std::endl
+
+	    << "Automaton degeneralization (after translation):"
+	    << std::endl
+            << "  -lS   move generalized acceptance conditions to states "
+	    << "(SGBA)" << std::endl
+	    << "  -D    degeneralize the automaton as a TBA" << std::endl
+	    << "  -DS   degeneralize the automaton as an SBA" << std::endl
+	    << std::endl
+
+
+	    << "Automaton simplifications (after translation):"
+	    << std::endl
 	    << "  -R1q  merge states using direct simulation "
 	    << "(use -L for more reduction)"
 	    << std::endl
@@ -140,25 +171,18 @@ syntax(char* prog)
 	    << "  -R3   use SCC to reduce the automata" << std::endl
 	    << "  -Rd   display the simulation relation" << std::endl
 	    << "  -RD   display the parity game (dot format)" << std::endl
-	    << "  -s    convert to explicit automata, and number states "
-	    << "in DFS order" << std::endl
-	    << "  -S    convert to explicit automata, and number states "
-	    << "in BFS order" << std::endl
-	    << "  -t    display reachable states in LBTT's format" << std::endl
-            << "  -T    time the different phases of the translation"
 	    << std::endl
-            << "  -U[PROPS]  consider atomic properties of the formula as "
-	    << "exclusive events, and" << std::endl
-	    << "        PROPS as unobservables events (implies -f)"
+
+	    << "Options for performing emptiness checks:" << std::endl
+	    << "  -e[ALGO]  run emptiness check, expect and compute an "
+	    << "accepting run" << std::endl
+	    << "  -E[ALGO]  run emptiness check, expect no accepting run"
 	    << std::endl
-	    << "  -v    display the BDD variables used by the automaton"
+	    << "  -g    graph the accepting run on the automaton (requires -e)"
 	    << std::endl
-            << "  -x    try to produce a more deterministic automata "
-	    << "(implies -f)" << std::endl
-	    << "  -X    do not compute an automaton, read it from a file"
-	    << std::endl
-	    << "  -y    do not merge states with same symbolic representation "
-	    << "(implies -f)" << std::endl
+	    << "  -G    graph the accepting run seen as an automaton "
+	    << " (requires -e)" << std::endl
+	    << "  -m    try to reduce accepting runs, in a second pass"
 	    << std::endl
 	    << "Where ALGO should be one of:" << std::endl
 	    << "  Cou99(OPTIONS) (the default)" << std::endl
@@ -166,7 +190,43 @@ syntax(char* prog)
 	    << "  GV04(OPTIONS)" << std::endl
 	    << "  SE05(OPTIONS)" << std::endl
 	    << "  Tau03(OPTIONS)" << std::endl
-	    << "  Tau03_opt(OPTIONS)" << std::endl;
+	    << "  Tau03_opt(OPTIONS)" << std::endl
+	    << std::endl
+
+	    << "If no emptiness check is run, the automaton will be output "
+	    << "in dot format" << std::endl << "by default.  This can be "
+	    << "changed with the following options." << std::endl
+	    << std::endl
+
+	    << "Output options (if no emptiness check):" << std::endl
+	    << "  -b    output the automaton in the format of spot"
+            << std::endl
+            << "  -FC   dump the automaton showing future conditions on states"
+	    << std::endl
+	    << "  -k    display statistics on the automaton of dumping it"
+	    << std::endl
+	    << "  -K    dump the graph of SCCs in dot format" << std::endl
+	    << "  -KV   verbosely dump the graph of SCCs in dot format"
+	    << std::endl
+	    << "  -N    output the never clain for Spin (implies -D)"
+	    << std::endl
+	    << "  -NN   output the never clain for Spin, with commented states"
+	    << " (implies -D)" << std::endl
+	    << "  -t    output automaton in LBTT's format" << std::endl
+	    << std::endl
+
+	    << "Miscellaneous options:" << std::endl
+	    << "  -0    produce minimal output dedicated to the paper"
+	    << std::endl
+	    << "  -d    turn on traces during parsing" << std::endl
+	    << "  -s    convert to explicit automata, and number states "
+	    << "in DFS order" << std::endl
+	    << "  -S    convert to explicit automata, and number states "
+	    << "in BFS order" << std::endl
+            << "  -T    time the different phases of the translation"
+	    << std::endl
+	    << "  -v    display the BDD variables used by the automaton"
+	    << std::endl;
   exit(2);
 }
 

@@ -1,5 +1,13 @@
 2009-11-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Cleanup the help of ltl2tgba.
+
+	* src/tgbatest/ltl2tgba.cc (syntax): Reorganize the help text, so
+	that we can find options without resorting to grep...  Also
+	cleanup the program name if it is a libtool wrapper.
+
+2009-11-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbatest/ltl2tgba.cc (-l): New option to select the lacim
 	translation.  It still is the default translation.
 	(opt_fm, opt_taa): Replace these two variables by ...
