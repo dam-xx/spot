@@ -102,6 +102,8 @@ syntax(char* prog)
 	    << "  -K    dump the graph of SCCs in dot format" << std::endl
 	    << "  -KV   verbosely dump the graph of SCCs in dot format"
 	    << std::endl
+            << "  -l    use Couvreur's LaCIM algorithm for translation"
+	    << std::endl
             << "  -L    fair-loop approximation (implies -f)" << std::endl
             << "  -lS   label acceptance conditions on states" << std::endl
 	    << "  -m    try to reduce accepting runs, in a second pass"
@@ -177,8 +179,7 @@ main(int argc, char** argv)
   bool paper_opt = false;
   enum { NoDegen, DegenTBA, DegenSBA } degeneralize_opt = NoDegen;
   enum { TransitionLabeled, StateLabeled } labeling_opt = TransitionLabeled;
-  bool taa_opt = false;
-  bool fm_opt = false;
+  enum { TransFM, TransLaCIM, TransTAA } translation = TransLaCIM;
   int fm_red = spot::ltl::Reduce_None;
   bool fm_exprop_opt = false;
   bool fm_symb_merge_opt = true;
@@ -238,8 +239,8 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-c"))
 	{
 	  containment = true;
-	  if (!taa_opt)
-	    fm_opt = true;
+	  if (translation != TransTAA)
+	    translation = TransFM;
 	}
       else if (!strcmp(argv[formula_index], "-d"))
 	{
@@ -291,47 +292,47 @@ main(int argc, char** argv)
         }
       else if (!strcmp(argv[formula_index], "-taa"))
 	{
-	  taa_opt = true;
+	  translation = TransTAA;
 	}
       else if (!strcmp(argv[formula_index], "-f"))
 	{
-	  fm_opt = true;
+	  translation = TransFM;
 	}
       else if (!strcmp(argv[formula_index], "-fr1"))
 	{
-	  fm_opt = true;
+	  translation = TransFM;
 	  fm_red |= spot::ltl::Reduce_Basics;
 	}
       else if (!strcmp(argv[formula_index], "-fr2"))
 	{
-	  fm_opt = true;
+	  translation = TransFM;
 	  fm_red |= spot::ltl::Reduce_Eventuality_And_Universality;
 	}
       else if (!strcmp(argv[formula_index], "-fr3"))
 	{
-	  fm_opt = true;
+	  translation = TransFM;
 	  fm_red |= spot::ltl::Reduce_Syntactic_Implications;
 	}
       else if (!strcmp(argv[formula_index], "-fr4"))
 	{
-	  fm_opt = true;
+	  translation = TransFM;
  	  fm_red |= spot::ltl::Reduce_Basics
 	    | spot::ltl::Reduce_Eventuality_And_Universality
 	    | spot::ltl::Reduce_Syntactic_Implications;
 	}
       else if (!strcmp(argv[formula_index], "-fr5"))
 	{
-	  fm_opt = true;
+	  translation = TransFM;
 	  fm_red |= spot::ltl::Reduce_Containment_Checks;
 	}
       else if (!strcmp(argv[formula_index], "-fr6"))
 	{
-	  fm_opt = true;
+	  translation = TransFM;
 	  fm_red |= spot::ltl::Reduce_Containment_Checks_Stronger;
 	}
       else if (!strcmp(argv[formula_index], "-fr7"))
 	{
-	  fm_opt = true;
+	  translation = TransFM;
 	  fm_red |= spot::ltl::Reduce_All;
 	}
       else if (!strcmp(argv[formula_index], "-F"))
@@ -362,10 +363,14 @@ main(int argc, char** argv)
 	{
 	  output = 11;
 	}
+      else if (!strcmp(argv[formula_index], "-l"))
+	{
+	  translation = TransLaCIM;
+	}
       else if (!strcmp(argv[formula_index], "-L"))
 	{
 	  fair_loop_approx = true;
-	  fm_opt = true;
+	  translation = TransFM;
 	}
       else if (!strcmp(argv[formula_index], "-lS"))
 	{
@@ -389,7 +394,7 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-p"))
 	{
 	  post_branching = true;
-	  fm_opt = true;
+	  translation = TransFM;
 	}
       else if (!strncmp(argv[formula_index], "-P", 2))
 	{
@@ -493,7 +498,7 @@ main(int argc, char** argv)
       else if (!strncmp(argv[formula_index], "-U", 2))
 	{
 	  unobservables = new spot::ltl::atomic_prop_set;
-	  fm_opt = true;
+	  translation = TransFM;
 	  // Parse -U's argument.
 	  const char* tok = strtok(argv[formula_index] + 2, ", \t;");
 	  while (tok)
@@ -509,7 +514,7 @@ main(int argc, char** argv)
 	}
       else if (!strcmp(argv[formula_index], "-x"))
 	{
-	  fm_opt = true;
+	  translation = TransFM;
 	  fm_exprop_opt = true;
 	}
       else if (!strcmp(argv[formula_index], "-X"))
@@ -518,7 +523,7 @@ main(int argc, char** argv)
 	}
       else if (!strcmp(argv[formula_index], "-y"))
 	{
-	  fm_opt = true;
+	  translation = TransFM;
 	  fm_symb_merge_opt = false;
 	}
       else
@@ -610,18 +615,25 @@ main(int argc, char** argv)
 	    }
 
 	  tm.start("translating formula");
-	  if (fm_opt)
-	    to_free = a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt,
-					       fm_symb_merge_opt,
-					       post_branching,
-					       fair_loop_approx, unobservables,
-					       fm_red, containment);
-	  else
-	    if (taa_opt)
-	      to_free = a = spot::ltl_to_taa(f, dict, containment);
-	    else
-	      to_free = a = concrete = spot::ltl_to_tgba_lacim(f, dict);
+	  switch (translation)
+	    {
+	    case TransFM:
+	      a = spot::ltl_to_tgba_fm(f, dict, fm_exprop_opt,
+				       fm_symb_merge_opt,
+				       post_branching,
+				       fair_loop_approx,
+				       unobservables,
+				       fm_red, containment);
+	      break;
+	    case TransTAA:
+	      a = spot::ltl_to_taa(f, dict, containment);
+	      break;
+	    case TransLaCIM:
+	      a = concrete = spot::ltl_to_tgba_lacim(f, dict);
+	      break;
+	    }
 	  tm.stop("translating formula");
+	  to_free = a;
 	}
 
       spot::tgba_tba_proxy* degeneralized = 0;
