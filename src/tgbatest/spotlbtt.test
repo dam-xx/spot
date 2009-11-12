@@ -32,7 +32,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- LaCIM)"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '../ltl2tgba -F -t'"
+   Parameters = "--spot '../ltl2tgba -F -l -t'"
    Enabled = yes
 }
 
@@ -40,7 +40,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- LaCIM), reduction of formula"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '../ltl2tgba -r4 -F -t'"
+   Parameters = "--spot '../ltl2tgba -r4 -l -F -t'"
    Enabled = yes
 }
 
@@ -48,7 +48,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- LaCIM), degeneralized"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '../ltl2tgba -F -t -D'"
+   Parameters = "--spot '../ltl2tgba -l -F -t -D'"
    Enabled = yes
 }
 

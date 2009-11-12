@@ -31,8 +31,8 @@ dorun()
   run 0 ../ltl2tgba -f -S "$1" >output2
   test `wc -l <output1` = `wc -l <output2`
 
-  run 0 ../ltl2tgba -s "$1" >output1
-  run 0 ../ltl2tgba -S "$1" >output2
+  run 0 ../ltl2tgba -l -s "$1" >output1
+  run 0 ../ltl2tgba -l -S "$1" >output2
   test `wc -l <output1` = `wc -l <output2`
 }
 

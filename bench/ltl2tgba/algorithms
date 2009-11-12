@@ -3,7 +3,7 @@ Algorithm
 {
    Name = "LaCIM, degen"
    Path = "$LBTT_TRANSLATE"
-   Parameters = "--spot '$LTL2TGBA -t -D -F'"
+   Parameters = "--spot '$LTL2TGBA -l -t -D -F'"
    Enabled = yes
 }
 
@@ -11,7 +11,7 @@ Algorithm
 {
    Name = "LaCIM, gen"
    Path = "$LBTT_TRANSLATE"
-   Parameters = "--spot '$LTL2TGBA -t -F'"
+   Parameters = "--spot '$LTL2TGBA -l -t -F'"
    Enabled = yes
 }
 
@@ -19,7 +19,7 @@ Algorithm
 {
    Name = "LaCIM, degen, +pre"
    Path = "$LBTT_TRANSLATE"
-   Parameters = "--spot '$LTL2TGBA -t -D -r4 -F'"
+   Parameters = "--spot '$LTL2TGBA -l -t -D -r4 -F'"
    Enabled = yes
 }
 
@@ -27,7 +27,7 @@ Algorithm
 {
    Name = "LaCIM, gen, +pre"
    Path = "$LBTT_TRANSLATE"
-   Parameters = "--spot '$LTL2TGBA -t -r4 -F'"
+   Parameters = "--spot '$LTL2TGBA -l -t -r4 -F'"
    Enabled = yes
 }
 

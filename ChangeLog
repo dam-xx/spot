@@ -1,5 +1,13 @@
 2009-11-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Use -l wherever we where expecting ltl2tgba to default to LaCIM.
+
+	* bench/ltl2tgba/algorithms: Use -l for all LaCIM invocations.
+	* src/tgbatest/dupexp.test, src/tgbatest/emptchk.test,
+	src/tgbatest/spotlbtt.test: Likewise.
+
+2009-11-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Cleanup the help of ltl2tgba.
 
 	* src/tgbatest/ltl2tgba.cc (syntax): Reorganize the help text, so
