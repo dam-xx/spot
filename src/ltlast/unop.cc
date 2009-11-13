@@ -31,10 +31,6 @@ namespace spot
     unop::unop(type op, formula* child)
       : op_(op), child_(child)
     {
-      dump_ = "unop(";
-      dump_ += op_name();
-      dump_ += ", " + child->dump() + ")";
-      set_key_();
     }
 
     unop::~unop()
@@ -47,6 +43,12 @@ namespace spot
 
       // Dereference child.
       child()->destroy();
+    }
+
+    std::string
+    unop::dump() const
+    {
+      return std::string("unop(") + op_name() + ", " + child()->dump() + ")";
     }
 
     void

@@ -32,8 +32,6 @@ namespace spot
     atomic_prop::atomic_prop(const std::string& name, environment& env)
       : name_(name), env_(&env)
     {
-      dump_ = "AP(" + name + ")";
-      set_key_();
     }
 
     atomic_prop::~atomic_prop()
@@ -43,6 +41,12 @@ namespace spot
       map::iterator i = instances.find(p);
       assert (i != instances.end());
       instances.erase(i);
+    }
+
+    std::string
+    atomic_prop::dump() const
+    {
+      return "AP(" + name() + ")";
     }
 
     void

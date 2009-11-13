@@ -57,6 +57,9 @@ namespace spot
       /// Get the type of this operator, as a string.
       const char* op_name() const;
 
+      /// Return a canonic representation of the atomic proposition
+      virtual std::string dump() const;
+
       /// Number of instantiated unary operators.  For debugging.
       static unsigned instance_count();
 

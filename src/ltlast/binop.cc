@@ -32,10 +32,6 @@ namespace spot
     binop::binop(type op, formula* first, formula* second)
       : op_(op), first_(first), second_(second)
     {
-      dump_ = "binop(";
-      dump_ += op_name();
-      dump_ += ", " + first->dump() + ", " + second->dump() + ")";
-      set_key_();
     }
 
     binop::~binop()
@@ -50,6 +46,14 @@ namespace spot
       // Dereference children.
       first()->destroy();
       second()->destroy();
+    }
+
+    std::string
+    binop::dump() const
+    {
+      return (std::string("binop(") + op_name()
+	      + ", " + first()->dump()
+	      + ", " + second()->dump() + ")");
     }
 
     void

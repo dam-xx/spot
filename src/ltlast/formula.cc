@@ -26,6 +26,8 @@ namespace spot
 {
   namespace ltl
   {
+    size_t formula::max_count = 0;
+
     formula*
     formula::clone() const
     {
@@ -56,19 +58,5 @@ namespace spot
       // Not reference counted by default.
       return false;
     }
-
-    const std::string&
-    formula::dump() const
-    {
-      return dump_;
-    }
-
-    void
-    formula::set_key_()
-    {
-      string_hash sh;
-      hash_key_ = sh(dump_);
-    }
-
   }
 }

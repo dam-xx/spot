@@ -68,7 +68,11 @@ namespace spot
       /// Get the NFA of this operator.
       const spot::ltl::nfa::ptr nfa() const;
 
+      /// Whether the automaton is negated.
       bool is_negated() const;
+
+      /// Return a canonic representation of the atomic proposition
+      std::string dump() const;
 
       /// Number of instantiated multop operators.  For debugging.
       static unsigned instance_count();

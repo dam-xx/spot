@@ -1,3 +1,34 @@
+2009-11-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Replace the hash key construction of LTL formulae by a simple
+	counter updated each time we create a new (unique) formula.
+
+	Doing so saves a lot of memory during the translation of the
+	ltlcounter formulae, because the formulae are quite big and
+	storing a string representation of each formula on its node was a
+	bad idea.  For instance with n=12, the translation now uses 40MB
+	where it used 290MB.  (Note: in both cases, 20MB is being used by
+	the BDD cache.)
+
+	* src/ltlast/formula.hh (hash_key_): Rename as ...
+	(count_): ... this.
+	(hash): Adjust.
+	(max_count): New static variable to count the number of
+	formulae created.
+	(formula): Update max_count and set count_.
+	(dump): Make it a virtual pure method.
+	(set_key_): Remove.
+	(formula_ptr_less_than): Speed up and return false when
+	the two formula pointer are equal.
+	* src/ltlast/formula.cc (set_key_, dump): Remove.
+	* src/ltlast/atomic_prop.cc, src/ltlast/atomic_prop.hh,
+	src/ltlast/automatop.cc, src/ltlast/automatop.hh,
+	src/ltlast/binop.cc, src/ltlast/binop.hh, src/ltlast/constant.cc,
+	src/ltlast/constant.hh, src/ltlast/multop.cc,
+	src/ltlast/multop.hh, src/ltlast/unop.cc, src/ltlast/unop.hh:
+	Empty the constructor (do not precompute the dump_ anymore),
+	and add a dump() implementation.
+
 2009-11-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Use -l wherever we where expecting ltl2tgba to default to LaCIM.

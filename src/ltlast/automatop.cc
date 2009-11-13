@@ -30,14 +30,6 @@ namespace spot
     automatop::automatop(const nfa::ptr nfa, vec* v, bool negated)
       : nfa_(nfa), children_(v), negated_(negated)
     {
-      dump_ = negated ? "!" : "";
-      dump_ += nfa->get_name();
-      dump_ += "(";
-      dump_ += (*v)[0]->dump();
-      for (unsigned n = 1; n < v->size(); ++n)
-	dump_ += ", " + (*v)[n]->dump();
-      dump_ += ")";
-      set_key_();
     }
 
     automatop::~automatop()
@@ -53,6 +45,19 @@ namespace spot
 	nth(n)->destroy();
 
       delete children_;
+    }
+
+    std::string
+    automatop::dump() const
+    {
+      std::string r = is_negated() ? "!" : "";
+      r += nfa()->get_name();
+      r += "(";
+      r += nth(0)->dump();
+      for (unsigned n = 1; n < size(); ++n)
+	r += ", " + nth(n)->dump();
+      r += ")";
+      return r;
     }
 
     void

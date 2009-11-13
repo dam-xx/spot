@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -44,6 +44,8 @@ namespace spot
       type val() const;
       /// Return the value of the constant as a string.
       const char* val_name() const;
+
+      virtual std::string dump() const;
 
       /// Get the sole instance of spot::ltl::constant::constant(True).
       static constant* true_instance();

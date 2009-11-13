@@ -34,15 +34,6 @@ namespace spot
     multop::multop(type op, vec* v)
       : op_(op), children_(v)
     {
-      dump_ = "multop(";
-      dump_ += op_name();
-      unsigned max = v->size();
-      for (unsigned n = 0; n < max; ++n)
-	{
-	  dump_ += ", " + (*v)[n]->dump();
-	}
-      dump_ += ")";
-      set_key_();
     }
 
     multop::~multop()
@@ -58,6 +49,18 @@ namespace spot
 	nth(n)->destroy();
 
       delete children_;
+    }
+
+    std::string
+    multop::dump() const
+    {
+      std::string r = "multop(";
+      r += op_name();
+      unsigned max = size();
+      for (unsigned n = 0; n < max; ++n)
+	r += ", " + nth(n)->dump();
+      r += ")";
+      return r;
     }
 
     void

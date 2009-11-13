@@ -71,6 +71,8 @@ namespace spot
     class formula
     {
     public:
+      formula() : count_(++max_count) {}
+
       /// Entry point for vspot::ltl::visitor instances.
       virtual void accept(visitor& v) = 0;
       /// Entry point for vspot::ltl::const_visitor instances.
@@ -88,13 +90,13 @@ namespace spot
       void destroy() const;
 
       /// Return a canonic representation of the formula
-      const std::string& dump() const;
+      virtual std::string dump() const = 0;
 
-      /// Return a hash_key for the formula.
+      /// Return a hash key for the formula.
       size_t
       hash() const
       {
-	return hash_key_;
+	return count_;
       }
     protected:
       virtual ~formula();
@@ -105,16 +107,12 @@ namespace spot
       /// the instance must be deleted (usually when the counter hits 0).
       virtual bool unref_();
 
-      /// \brief Compute key_ from dump_.
-      ///
-      /// Should be called once in each object, after dump_ has been set.
-      void set_key_();
-      /// The canonic representation of the formula
-      std::string dump_;
       /// \brief The hash key of this formula.
-      ///
-      /// Initialized by set_key_().
-      size_t hash_key_;
+      size_t count_;
+
+    private:
+      /// \brief Number of formulae created so far.
+      static size_t max_count;
     };
 
     /// \brief Strict Weak Ordering for <code>const formula*</code>.
@@ -138,10 +136,22 @@ namespace spot
       {
 	assert(left);
 	assert(right);
+	if (left == right)
+	  return false;
 	size_t l = left->hash();
 	size_t r = right->hash();
 	if (l != r)
 	  return l < r;
+	// Because the hash code assigned to each formula is the
+	// number of formulae constructed so far, it is very unlikely
+	// that we will ever reach a case were two different formulae
+	// have the same hash.  This will happen only ever with have
+	// produced 256**sizeof(size_t) formulae (i.e. max_count has
+	// looped back to 0 and started over).  In that case we can
+	// order two formulae by looking at their text representation.
+	// We could be more efficient and look at their AST, but it's
+	// not worth the burden.  (Also ordering pointers is ruled out
+	// because it breaks the determinism of the implementation.)
 	return left->dump() < right->dump();
       }
     };
