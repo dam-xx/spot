@@ -1,3 +1,10 @@
+2009-11-17  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbaalgos/cutscc.cc (cut_scc): Pass `s' by reference instead
+	of by pointer.
+	* src/tgbaalgos/cutscc.cc, src/tgbaalgos/cutscc.hh: Fix copyright
+	header.
+
 2009-11-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Replace the hash key construction of LTL formulae by a simple

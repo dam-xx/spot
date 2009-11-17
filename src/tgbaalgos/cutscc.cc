@@ -1,6 +1,5 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Laboratoire
-// d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
-// Coopératifs (SRC), Université Pierre et Marie Curie.
+// Copyright (C) 2009 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
 //
@@ -20,24 +19,15 @@
 // 02111-1307, USA.
 
 #include <iostream>
-#include <algorithm>
-#include <set>
-#include <fstream>
-#include <sstream>
 #include <string>
 #include <queue>
-#include <limits>
-#include <math.h>
-#include <sys/time.h>
-#include <stdio.h>
-#include "tgbaalgos/scc.hh"
 #include "tgba/tgbaexplicit.hh"
 #include "cutscc.hh"
 
 namespace spot
 {
   tgba* cut_scc(const tgba* a, const scc_map& m,
-		const std::set<unsigned>* s)
+		const std::set<unsigned>& s)
   {
     tgba_explicit_string* sub_a = new tgba_explicit_string(a->get_dict());
     state* cur = a->get_init_state();
@@ -50,15 +40,15 @@ namespace spot
     std::string cur_format = a->format_state(cur);
     std::set<unsigned>::iterator it;
     // Check if we have at least one accepting SCC.
-    for (it = s->begin(); it != s->end() && !m.accepting(*it); it++)
+    for (it = s.begin(); it != s.end() && !m.accepting(*it); it++)
       continue;
-    assert(it != s->end());
+    assert(it != s.end());
     tovisit.push(cur);
     seen.insert(cur);
     sub_a->add_state(cur_format);
     sub_a->copy_acceptance_conditions_of(a);
     // If the initial is not part of one of the desired SCC, exit
-    assert(s->find(m.scc_of_state(cur)) != s->end());
+    assert(s.find(m.scc_of_state(cur)) != s.end());
 
     // Perform BFS to visit each state.
     while (!tovisit.empty())
@@ -73,7 +63,7 @@ namespace spot
 	std::string dst_format = a->format_state(dst);
 	scc_number= m.scc_of_state(dst);
 	// Is the successor included in one of the desired SCC ?
-	if (s->find(scc_number) != s->end())
+	if (s.find(scc_number) != s.end())
 	{
 	  if (seen.find(dst) == seen.end())
 	  {
@@ -358,7 +348,7 @@ namespace spot
       if (is_valid[i] == true)
       {
 	//print_set((*final_sets)[i]);
-	result.push_back(cut_scc(a, m, &(*final_sets)[i]->sccs));
+	result.push_back(cut_scc(a, m, (*final_sets)[i]->sccs));
       }
 
     // Free everything.
