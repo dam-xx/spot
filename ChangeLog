@@ -1,3 +1,14 @@
+2009-11-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Make it easy to filter states while iterating over an automaton.
+
+	* src/tgbaalgos/reachiter.hh (tgba_reachable_iterator::want_state):
+	New method.
+	* src/tgbaalgos/reachiter.cc (tgba_reachable_iterator::want_state):
+	Implement it.
+	(tgba_reachable_iterator::run): Call want_state before processing
+	a state.
+
 2009-11-17  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgbaalgos/cutscc.cc (cut_scc): Pass `s' by reference instead

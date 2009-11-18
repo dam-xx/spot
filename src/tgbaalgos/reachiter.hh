@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004, 2008  Laboratoire d'Informatique de Paris 6
+// Copyright (C) 2003, 2004, 2008, 2009  Laboratoire d'Informatique de Paris 6
 // (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
 // Pierre et Marie Curie.
 //
@@ -55,6 +55,10 @@ namespace spot
     /// \brief Called by run() to obtain the next state to process.
     virtual const state* next_state() = 0;
     /// \}
+
+    /// Called by add_state or next_states implementations to filter
+    /// states.  Default implementation always return true.
+    virtual bool want_state(const state* s) const;
 
     /// Called by run() before starting its iteration.
     virtual void start();

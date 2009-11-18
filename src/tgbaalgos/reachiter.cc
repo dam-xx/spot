@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -50,7 +50,8 @@ namespace spot
     int n = 0;
     start();
     state* i = automata_->get_init_state();
-    add_state(i);
+    if (want_state(i))
+      add_state(i);
     seen[i] = ++n;
     const state* t;
     while ((t = next_state()))
@@ -63,21 +64,32 @@ namespace spot
 	  {
 	    const state* current = si->current_state();
 	    seen_map::const_iterator s = seen.find(current);
+	    bool ws = want_state(current);
 	    if (s == seen.end())
 	      {
 		seen[current] = ++n;
-		add_state(current);
-		process_link(t, tn, current, n, si);
+		if (ws)
+		  {
+		    add_state(current);
+		    process_link(t, tn, current, n, si);
+		  }
 	      }
 	    else
 	      {
-		process_link(t, tn, s->first, s->second, si);
+		if (ws)
+		  process_link(t, tn, s->first, s->second, si);
 		delete current;
 	      }
 	  }
 	delete si;
       }
     end();
+  }
+
+  bool
+  tgba_reachable_iterator::want_state(const state*) const
+  {
+    return true;
   }
 
   void
