@@ -48,3 +48,27 @@ accepting paths: 2
 dead paths: 1
 EOF
 diff stdout expected
+
+run 0 ../ltl2tgba -f -R3 -k '(b U a) | (GFa & XG!a)' >stdout
+cat >expected <<EOF
+transitions: 5
+states: 3
+total SCCs: 3
+accepting SCCs: 1
+dead SCCs: 0
+accepting paths: 2
+dead paths: 0
+EOF
+diff stdout expected
+
+run 0 ../ltl2tgba -f -R3 -k 'XXXX(0)' >stdout
+cat >expected <<EOF
+transitions: 0
+states: 1
+total SCCs: 1
+accepting SCCs: 0
+dead SCCs: 1
+accepting paths: 0
+dead paths: 1
+EOF
+diff stdout expected

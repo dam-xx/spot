@@ -1,6 +1,6 @@
-// Copyright (C) 2004, 2005, 2007  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2004, 2005, 2007, 2009 Laboratoire d'Informatique de
+// Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -21,6 +21,7 @@
 
 #include "reductgba_sim.hh"
 #include "tgba/bddprint.hh"
+#include "sccfilter.hh"
 
 namespace spot
 {
@@ -663,10 +664,23 @@ namespace spot
     return false;
   }
 
-  tgba*
+  const tgba*
   reduc_tgba_sim(const tgba* f, int opt)
   {
+    if (opt & Reduce_Scc)
+      {
+	f = scc_filter(f);
+
+	// No more reduction requested? Return the automaton as-is.
+	if (opt == Reduce_Scc)
+	  return f;
+      }
+
     spot::tgba_reduc* automatareduc = new  spot::tgba_reduc(f);
+
+    // Destroy the automaton created by scc_filter.
+    if (opt & Reduce_Scc)
+      delete f;
 
     if (opt & (Reduce_quotient_Dir_Sim | Reduce_transition_Dir_Sim))
       {
@@ -695,11 +709,6 @@ namespace spot
 
 	  free_relation_simulation(rel);
 	}
-
-    if (opt & Reduce_Scc)
-      {
-	automatareduc->prune_scc();
-      }
 
     return automatareduc;
   }

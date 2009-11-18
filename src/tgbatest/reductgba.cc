@@ -40,6 +40,7 @@
 #include "tgbaparse/public.hh"
 #include "tgbaalgos/dupexp.hh"
 #include "tgbaalgos/neverclaim.hh"
+#include "tgbaalgos/sccfilter.hh"
 
 #include "misc/escape.hh"
 
@@ -148,21 +149,18 @@ main(int argc, char** argv)
       spot::free_relation_simulation(rel_del);
     }
 
+  spot::tgba* res = automatareduc;
+
   if (o & spot::Reduce_Scc)
     {
-      automatareduc->prune_scc();
-      //automatareduc->display_scc(std::cout);
+      res = spot::scc_filter(automatareduc);
+      delete automatareduc;
     }
 
-  if (automatareduc != 0)
-    {
-      spot::dotty_reachable(std::cout, automatareduc);
-    }
+  spot::dotty_reachable(std::cout, res);
 
-  if (automata != 0)
-    delete automata;
-  if (automatareduc != 0)
-    delete automatareduc;
+  delete automata;
+  delete res;
 #ifndef REDUCCMP
   if (f != 0)
     f->destroy();

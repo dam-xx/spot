@@ -1,5 +1,21 @@
 2009-11-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Replace prune_scc() by scc_filter().
+
+	prune_scc() leaked memory and failed to remove chains of useless SCCs.
+
+	* src/tgbaalgos/reductgba_sim.cc (reduc_tgba_sim): Call
+	scc_filter() instead of prune_scc(), and do it before running
+	any simulation-based reduction.
+	* src/tgbaalgos/reductgba_sim.hh (reduc_tgba_sim): Return a const
+	tgba*.
+	* src/tgbatest/ltl2tgba.cc, src/tgbatest/reductgba.cc: Call
+	scc_filter() instead of prune_scc().
+	* src/tgbatest/scc.test: Add two more tests that failed with
+	prune_scc().
+
+2009-11-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Quick implementation of a "useless SCC" filter using scc_map.
 
 	* src/tgbaalgos/sccfilter.hh, src/tgbaalgos/sccfilter.cc: New

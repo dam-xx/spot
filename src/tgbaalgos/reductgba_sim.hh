@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -61,7 +61,7 @@ namespace spot
   /// \param opt a conjonction of spot::reduce_tgba_options specifying
   ///             which optimizations to apply.
   /// \return the reduced automata.
-  tgba* reduc_tgba_sim(const tgba* a, int opt = Reduce_All);
+  const tgba* reduc_tgba_sim(const tgba* a, int opt = Reduce_All);
 
   /// \brief Compute a direct simulation relation on state of tgba \a f.
   direct_simulation_relation* get_direct_relation_simulation(const tgba* a,
