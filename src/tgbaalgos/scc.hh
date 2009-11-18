@@ -56,6 +56,9 @@ namespace spot
     unsigned dead_paths;
     unsigned self_loops;
 
+    /// A map of the useless SCCs.
+    std::vector<bool> useless_scc_map;
+
     std::ostream& dump(std::ostream& out) const;
   };
 
@@ -150,7 +153,8 @@ namespace spot
     {
     public:
       scc(int index) : index(index), acc(bddfalse),
-		       supp(bddtrue), supp_rec(bddfalse) {};
+		       supp(bddtrue), supp_rec(bddfalse),
+		       trivial(true) {};
       /// Index of the SCC.
       int index;
       /// The union of all acceptance conditions of transitions which
@@ -166,6 +170,8 @@ namespace spot
       bdd supp_rec;
       /// Successor SCC.
       succ_type succ;
+      /// Trivial SCC have one state and no self-loops.
+      bool trivial;
     };
 
     const tgba* aut_;		// Automata to decompose.

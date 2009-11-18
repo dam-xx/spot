@@ -1,5 +1,17 @@
 2009-11-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix acceptance check in scc_map: trivial SCCs are not accepting.
+	Also compute useless SCCs.
+
+	* src/tgbaalgos/scc.cc (scc_map::scc::trivial): New field.
+	(scc_stats::useless_scc_map): New field.
+	* src/tgbaalgos/scc.cc (scc_map::build_map): Mark SCCs that are
+	not trivial.
+	(scc_map::accepting): Always return false for trivial SCC.
+	(build_scc_stats): Fill in useless_scc_map.
+
+2009-11-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Make it easy to filter states while iterating over an automaton.
 
 	* src/tgbaalgos/reachiter.hh (tgba_reachable_iterator::want_state):

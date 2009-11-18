@@ -77,6 +77,8 @@ namespace spot
   bool
   scc_map::accepting(unsigned n) const
   {
+    if (scc_map_[n].trivial)
+      return false;
     return acc_set_of(n) == aut_->all_acceptance_conditions();
   }
 
@@ -288,6 +290,8 @@ namespace spot
 	root_.front().succ.insert(succs.begin(), succs.end());
 	root_.front().conds.insert(conds.begin(), conds.end());
 	root_.front().supp &= supp;
+	// This SCC is no longer trivial.
+	root_.front().trivial = false;
       }
 
     // recursively update supp_rec
@@ -416,6 +420,10 @@ namespace spot
     res.dead_scc = d.dead_scc;
     res.acc_paths = d.acc_paths[init];
     res.dead_paths = d.dead_paths[init];
+
+    res.useless_scc_map.reserve(res.scc_total);
+    for (unsigned n = 0; n < res.scc_total; ++n)
+      res.useless_scc_map[n] = !d.acc_paths[n];
 
     return res;
   }
