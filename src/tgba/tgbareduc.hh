@@ -24,8 +24,6 @@
 
 #include "tgbaexplicit.hh"
 #include "tgbaalgos/reachiter.hh"
-#include "tgbaalgos/gtec/explscc.hh"
-#include "tgbaalgos/gtec/nsheap.hh"
 
 #include <list>
 #include <vector>
@@ -54,9 +52,7 @@ namespace spot
     public tgba_explicit_string, public tgba_reachable_iterator_breadth_first
   {
   public:
-    tgba_reduc(const tgba* a,
-	       const numbered_state_heap_factory* nshf
-	       = numbered_state_heap_hash_map_factory::instance());
+    tgba_reduc(const tgba* a);
 
     ~tgba_reduc();
 
@@ -72,15 +68,6 @@ namespace spot
     /// relation.
     void delete_transitions(simulation_relation* rel);
 
-    /// Remove all state which not lead to an accepting cycle.
-    void prune_scc();
-
-    /// Remove some useless acceptance condition.
-    void prune_acc();
-
-    /// Compute the maximal SCC of the automata.
-    void compute_scc();
-
     /// Add the SCC index to the display of the state \a state.
     virtual std::string format_state(const spot::state* state) const;
 
@@ -89,24 +76,10 @@ namespace spot
     void display_scc(std::ostream& os);
 
   protected:
-    bool scc_computed_;
-    scc_stack root_;
-    numbered_state_heap* h_;
-
-    std::stack<const spot::state*> state_scc_;
-    Sgi::hash_map<int, const spot::state*> state_scc_v_;
-
     typedef Sgi::hash_map<const tgba_explicit::state*,
 			  std::list<state*>*,
 			  ptr_hash<tgba_explicit::state> > sp_map;
     sp_map state_predecessor_map_;
-
-    // For reduction using scc.
-    typedef Sgi::hash_map<const spot::state*, int,
-			  state_ptr_hash, state_ptr_equal> seen_map;
-    seen_map si_;
-    seen_map* seen_;
-    bdd acc_;
 
     // Interface of tgba_reachable_iterator_breadth_first
     void start();

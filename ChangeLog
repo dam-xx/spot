@@ -1,5 +1,15 @@
 2009-11-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Remove prune_scc(), prune_acc(), and related fonctions.
+
+	* src/tgba/tgbareduc.cc, src/tgba/tgbareduc.hh (prune_scc,
+	prune_acc, remove_component, compute_scc, remove_acc,
+	is_not_accepting, delete_scc, is_terminal, remove_scc,
+	display_scc): Remove anything related to the simplification of
+	SCCs.
+
+2009-11-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Replace prune_scc() by scc_filter().
 
 	prune_scc() leaked memory and failed to remove chains of useless SCCs.

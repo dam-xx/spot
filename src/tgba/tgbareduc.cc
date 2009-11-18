@@ -29,19 +29,15 @@ namespace spot
     typedef std::pair<const spot::state*, tgba_succ_iterator*> pair_state_iter;
   }
 
-  tgba_reduc::tgba_reduc(const tgba* a,
-			 const numbered_state_heap_factory* nshf)
+  tgba_reduc::tgba_reduc(const tgba* a)
     : tgba_explicit_string(a->get_dict()),
-      tgba_reachable_iterator_breadth_first(a),
-      h_(nshf->build())
+      tgba_reachable_iterator_breadth_first(a)
   {
     dict_->register_all_variables_of(a, this);
 
     run();
     all_acceptance_conditions_ = a->all_acceptance_conditions();
     all_acceptance_conditions_computed_ = true;
-    seen_ = 0;
-    scc_computed_ = false;
   }
 
   tgba_reduc::~tgba_reduc()
@@ -52,8 +48,6 @@ namespace spot
       {
 	delete i->second;
       }
-
-    delete h_;
   }
 
   void
@@ -130,17 +124,6 @@ namespace spot
     this->merge_transitions();
   }
 
-  void
-  tgba_reduc::prune_scc()
-  {
-    if (!scc_computed_)
-      this->compute_scc();
-    this->prune_acc();
-    this->delete_scc();
-
-    this->merge_transitions();
-  }
-
   std::string
   tgba_reduc::format_state(const spot::state* s) const
   {
@@ -148,15 +131,8 @@ namespace spot
     const state_explicit* se = dynamic_cast<const state_explicit*>(s);
     assert(se);
     sn_map::const_iterator i = state_name_map_.find(se->get_state());
-    seen_map::const_iterator j = si_.find(s);
     assert(i != state_name_map_.end());
-    if (j != si_.end()) // SCC have been computed
-      {
-	os << ", SCC " << j->second;
-	return i->second + std::string(os.str());
-      }
-    else
-      return i->second;
+    return i->second;
   }
 
   ////////////////////////////////////////////
@@ -443,381 +419,6 @@ namespace spot
     // TO DO
   }
 
-  /////////////////////////////////////////
-  /////////////////////////////////////////
-  // Compute SCC
-
-  // From gtec.cc
-  void
-  tgba_reduc::remove_component(const spot::state* from)
-  {
-    std::stack<tgba_succ_iterator*> to_remove;
-
-    numbered_state_heap::state_index_p spi = h_->index(from);
-    assert(spi.first);
-    assert(*spi.second != -1);
-    *spi.second = -1;
-    tgba_succ_iterator* i = this->succ_iter(from);
-
-    for (;;)
-      {
-	for (i->first(); !i->done(); i->next())
-	  {
-	    spot::state* s = i->current_state();
-	    numbered_state_heap::state_index_p spi = h_->index(s);
-
-	    if (!spi.first)
-	      continue;
-
-	    if (*spi.second != -1)
-	      {
-		*spi.second = -1;
-		to_remove.push(this->succ_iter(spi.first));
-	      }
-	  }
-	delete i;
-	if (to_remove.empty())
-	  break;
-	i = to_remove.top();
-	to_remove.pop();
-      }
-  }
-
-  // From gtec.cc
-  void
-  tgba_reduc::compute_scc()
-  {
-    std::stack<bdd> arc;
-    int num = 1;
-    std::stack<pair_state_iter> todo;
-
-
-    {
-      spot::state* init = this->get_init_state();
-      h_->insert(init, 1);
-      si_[init] = 1;
-      state_scc_.push(init);
-      root_.push(1);
-      arc.push(bddfalse);
-      tgba_succ_iterator* iter = this->succ_iter(init);
-      iter->first();
-      todo.push(pair_state_iter(init, iter));
-    }
-
-    while (!todo.empty())
-      {
-	assert(root_.size() == arc.size());
-
-	tgba_succ_iterator* succ = todo.top().second;
-
-	if (succ->done())
-	  {
-	    const spot::state* curr = todo.top().first;
-
-	    todo.pop();
-
-	    numbered_state_heap::state_index_p spi = h_->index(curr);
-	    assert(spi.first);
-	    assert(!root_.empty());
-	    if (root_.top().index == *spi.second)
-	      {
-		assert(!arc.empty());
-		arc.pop();
-		root_.pop();
-		remove_component(curr);
-	      }
-
-	    delete succ;
-
-	    continue;
-	  }
-
-	const spot::state* dest = succ->current_state();
-	bdd acc = succ->current_acceptance_conditions();
-	succ->next();
-
-	numbered_state_heap::state_index_p spi = h_->find(dest);
-	if (!spi.first)
-	  {
-	    h_->insert(dest, ++num);
-	    si_[dest] = num;
-	    state_scc_.push(dest);
-	    root_.push(num);
-	    arc.push(acc);
-	    tgba_succ_iterator* iter = this->succ_iter(dest);
-	    iter->first();
-	    todo.push(pair_state_iter(dest, iter));
-	    continue;
-	  }
-
-	if (*spi.second == -1)
-	  continue;
-
-	int threshold = *spi.second;
-	while (threshold < root_.top().index)
-	  {
-	    assert(!root_.empty());
-	    assert(!arc.empty());
-	    acc |= root_.top().condition;
-	    acc |= arc.top();
-	    root_.pop();
-	    arc.pop();
-
-	    si_[state_scc_.top()] = threshold;
-	    state_scc_.pop();
-	  }
-
-	root_.top().condition |= acc;
-
-      }
-
-    seen_map::iterator i;
-    for (i = si_.begin(); i != si_.end(); ++i)
-      {
-	state_scc_v_[i->second] = i->first;
-      }
-
-    scc_computed_ = true;
-  }
-
-  ///////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////
-
-  void
-  tgba_reduc::prune_acc()
-  {
-    if (!scc_computed_)
-      this->compute_scc();
-
-    Sgi::hash_map<int, const spot::state*>::iterator i;
-    for (i = state_scc_v_.begin(); i != state_scc_v_.end(); ++i)
-      {
-	if (is_not_accepting(i->second))
-	    remove_acc(i->second);
-      }
-  }
-
-  void
-  tgba_reduc::remove_acc(const spot::state* s)
-  {
-    tgba_explicit::state* s1;
-    seen_map::iterator sm = si_.find(s);
-    sm = si_.find(s);
-    int n = sm->second;
-
-    for (sm == si_.begin(); sm != si_.end(); ++sm)
-      {
-
-	if (sm->second == n)
-	  {
-	    s1 = name_state_map_[tgba_explicit_string::format_state(s)];
-	    s1 = const_cast<tgba_explicit::state*>(s1);
-	    for (state::iterator i = s1->begin();
-		 i != s1->end(); ++i)
-	      (*i)->acceptance_conditions = bddfalse;
-	  }
-      }
-  }
-
-  bool
-  tgba_reduc::is_not_accepting(const spot::state* s,
-			       int n)
-  {
-    bool b = false;
-
-    // First call of is_terminal //
-    seen_map::const_iterator i;
-    if (n == -1)
-      {
-	acc_ = bddfalse;
-	b = true;
-	assert(seen_ == 0);
-	seen_ = new seen_map();
-	i = si_.find(s);
-	assert(i->first != 0);
-	n = i->second;
-      }
-    ///////////////////////////////
-
-    seen_map::const_iterator sm = seen_->find(s);
-    if (sm == seen_->end())
-      {
-	// this state is visited for the first time.
-	seen_->insert(std::pair<const spot::state*, int>(s, 1));
-	i = si_.find(s);
-	assert(i->first != 0);
-	if (n != i->second)
-	    return true;
-      }
-    else
-      // This state is already visited.
-      {
-	delete s;
-	s = 0;
-	return true;
-      }
-
-    spot::state* s2;
-    tgba_succ_iterator* j = this->succ_iter(s);
-    for (j->first(); !j->done(); j->next())
-      {
-	s2 = j->current_state();
-	i = si_.find(s2);
-	assert(i->first != 0);
-	if (n == i->second)
-	  {
-	    acc_ |= j->current_acceptance_conditions();
-	    this->is_not_accepting(s2, n);
-	  }
-      }
-    delete j;
-
-    // First call of is_terminal //
-    if (b)
-      {
-	for (seen_map::iterator i = seen_->begin();
-	     i != seen_->end(); ++i)
-	  {
-	    s2 = const_cast<spot::state*>(i->first);
-	    assert(s2 != 0);
-	    delete dynamic_cast<tgba_explicit*>(s2);
-	  }
-	seen_->clear();
-	delete seen_;
-	seen_ = 0;
-	return acc_ != this->all_acceptance_conditions();
-      }
-    ///////////////////////////////
-
-    return true;
-  }
-
-  void
-  tgba_reduc::delete_scc()
-  {
-    bool change = true;
-    Sgi::hash_map<int, const spot::state*>::iterator i;
-    spot::state* s;
-
-    // we check if there is a terminal SCC we can be remove while
-    // they have been one removed, because a terminal SCC removed
-    // can generate a new terminal SCC
-    while (change)
-      {
-	change = false;
-	for (i = state_scc_v_.begin(); i != state_scc_v_.end(); ++i)
-	  {
-	    s = (i->second)->clone();
-
-	    if (is_terminal(s))
-	      {
-		change = true;
-		remove_scc(const_cast<spot::state*>(i->second));
-		state_scc_v_.erase(i);
-		break;
-	      }
-	    delete s;
-	  }
-      }
-  }
-
-  bool
-  tgba_reduc::is_terminal(const spot::state* s, int n)
-  {
-    // a SCC is terminal if there are no transition
-    // leaving the SCC AND she doesn't contain all
-    // the acceptance condition.
-    // So we can remove it safely without change the
-    // automaton language.
-
-    bool b = false;
-
-    // First call of is_terminal //
-    seen_map::const_iterator i;
-    if (n == -1)
-      {
-	acc_ = bddfalse;
-	b = true;
-	assert(seen_ == 0);
-	seen_ = new seen_map();
-	i = si_.find(s);
-	assert(i->first != 0);
-	n = i->second;
-      }
-    ///////////////////////////////
-
-    seen_map::const_iterator sm = seen_->find(s);
-    if (sm == seen_->end())
-      {
-	// this state is visited for the first time.
-	seen_->insert(std::pair<const spot::state*, int>(s, 1));
-	i = si_.find(s);
-	assert(i->first != 0);
-	if (n != i->second)
-	    return false;
-      }
-    else
-      {
-	// This state is already visited.
-	delete s;
-	s = 0;
-	return true;
-      }
-
-    bool ret = true;
-    spot::state* s2;
-    tgba_succ_iterator* j = this->succ_iter(s);
-    for (j->first(); !j->done(); j->next())
-      {
-	s2 = j->current_state();
-	acc_ |= j->current_acceptance_conditions();
-	ret &= this->is_terminal(s2, n);
-	if (!ret)
-	  break;
-      }
-    delete j;
-
-    // First call of is_terminal //
-    if (b)
-      {
-	for (seen_map::iterator i = seen_->begin();
-	     i != seen_->end(); ++i)
-	  {
-	    s2 = const_cast<spot::state*>(i->first);
-	    assert(s2 != 0);
-	    delete dynamic_cast<tgba_explicit*>(s2);
-	  }
-	seen_->clear();
-	delete seen_;
-	seen_ = 0;
-	if (acc_ == this->all_acceptance_conditions())
-	  ret = false;
-      }
-    ///////////////////////////////
-
-    return ret;
-  }
-
-  void
-  tgba_reduc::remove_scc(spot::state* s)
-  {
-    // To remove a scc, we remove all its states.
-
-    seen_map::iterator sm = si_.find(s);
-    sm = si_.find(s);
-    int n = sm->second;
-
-    for (sm == si_.begin(); sm != si_.end(); ++sm)
-      {
-	if (sm->second == n)
-	  {
-	    this->remove_state(const_cast<spot::state*>(sm->first));
-	    sm->second = -1;
-	  }
-      }
-
-  }
-
   int
   tgba_reduc::nb_set_acc_cond() const
   {
@@ -856,43 +457,6 @@ namespace spot
 	     << std::endl
 	     << std::endl;
       }
-  }
-
-  void
-  tgba_reduc::display_scc(std::ostream& os)
-  {
-
-
-    while (!root_.empty())
-      {
-	os << "index : " << root_.top().index << std::endl;
-	root_.pop();
-      }
-
-    seen_map::iterator i;
-    for (i = si_.begin(); i != si_.end(); ++i)
-      {
-	os << " [label=\""
-	   << this->format_state(i->first)
-	   << "\"]"
-	   << " scc : "
-	   << i->second
-	   << std::endl;
-      }
-
-    os << " Root of each SCC :"
-       << std::endl;
-
-    Sgi::hash_map<int, const spot::state*>::iterator j;
-    for (j = state_scc_v_.begin(); j != state_scc_v_.end(); ++j)
-      {
-	os << " [label=\""
-	   << this->format_state(j->second)
-	   << "\"]"
-	   << std::endl;
-	state_scc_.pop();
-      }
-
   }
 
 }
