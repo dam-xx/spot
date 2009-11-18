@@ -52,6 +52,7 @@ tgbaalgos_HEADERS = \
   rundotdec.hh \
   save.hh \
   scc.hh \
+  sccfilter.hh \
   se05.hh \
   stats.hh \
   tau03.hh \
@@ -85,6 +86,7 @@ libtgbaalgos_la_SOURCES = \
   rundotdec.cc \
   save.cc \
   scc.cc \
+  sccfilter.cc \
   se05.cc \
   stats.cc \
   tau03.cc \

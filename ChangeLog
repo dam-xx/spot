@@ -1,5 +1,13 @@
 2009-11-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Quick implementation of a "useless SCC" filter using scc_map.
+
+	* src/tgbaalgos/sccfilter.hh, src/tgbaalgos/sccfilter.cc: New
+	files.
+	* src/tgbaalgos/Makefile.am: Add them.
+
+2009-11-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix acceptance check in scc_map: trivial SCCs are not accepting.
 	Also compute useless SCCs.
 
