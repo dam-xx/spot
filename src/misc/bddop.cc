@@ -48,4 +48,19 @@ namespace spot
 
     return all;
   }
+
+  bdd
+  compute_neg_acceptance_conditions(bdd all_acceptance_conditions)
+  {
+    bdd cur = bdd_support(all_acceptance_conditions);
+    bdd neg = bddtrue;
+    while (cur != bddtrue)
+      {
+	neg &= bdd_nithvar(bdd_var(cur));
+	assert(bdd_low(cur) != bddtrue);
+	cur = bdd_high(cur);
+      }
+    return neg;
+  }
+
 }

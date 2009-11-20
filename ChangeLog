@@ -1,3 +1,24 @@
+2009-11-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Strip useless acceptance conditions in scc_filter().
+
+	A useless acceptance conditions is one that is always implied by
+	another.
+
+	* src/misc/bddop.hh, src/misc/bddop.cc
+	(compute_neg_acceptance_conditions): New function.
+	* src/tgba/tgbaexplicit.hh, src/tgba/tgbaexplicit.cc
+	(set_acceptance_conditions): New function.
+	* src/tgbaalgos/scc.cc (build_map, build_scc_stats, dump_scc_dot):
+	Keep track of useful acceptance conditions.
+	(useful_acc_of): New function.
+	* src/tgbaalgos/scc.hh (scc_stats, scc_map::scc::useful_scc): New
+	attributes.
+	* src/tgbaalgos/sccfilter.cc (filter_iter): Adjust to filter
+	useless acceptance conditions.
+	(scc_filter): Compute useful acceptance conditions and pass them
+	to filter_iter.
+
 2009-11-20  Alexandre Duret-Lutz  <adl@va-et-vient.net>
 
 	* src/tgbaalgos/sccfilter.cc (scc_filter): Merge transitions

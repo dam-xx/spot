@@ -29,6 +29,10 @@ namespace spot
   /// \brief Compute all acceptance conditions from all neg acceptance
   /// conditions.
   bdd compute_all_acceptance_conditions(bdd neg_acceptance_conditions);
+
+  /// \brief Compute neg acceptance conditions from all acceptance
+  /// conditions.
+  bdd compute_neg_acceptance_conditions(bdd all_acceptance_conditions);
 }
 
 #endif // SPOT_MISC_BDDOP_HH

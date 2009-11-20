@@ -159,6 +159,17 @@ namespace spot
     neg_acceptance_conditions_ = f;
   }
 
+  void
+  tgba_explicit::set_acceptance_conditions(bdd acc)
+  {
+    assert(neg_acceptance_conditions_ == bddtrue);
+    assert(all_acceptance_conditions_computed_ == false);
+    dict_->register_acceptance_variables(bdd_support(acc), this);
+    neg_acceptance_conditions_ = compute_neg_acceptance_conditions(acc);
+    all_acceptance_conditions_computed_ = true;
+    all_acceptance_conditions_ = acc;
+  }
+
   bool
   tgba_explicit::has_acceptance_condition(const ltl::formula* f) const
   {

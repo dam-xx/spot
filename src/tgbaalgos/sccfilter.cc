@@ -33,14 +33,16 @@ namespace spot
     public:
       filter_iter(const tgba* a,
 		  const scc_map& sm,
-		  const std::vector<bool>& useless)
+		  const std::vector<bool>& useless,
+		  bdd useful, bdd strip)
 	: tgba_reachable_iterator_depth_first(a),
 	  out_(new tgba_explicit_string(a->get_dict())),
 	  sm_(sm),
-	  useless_(useless)
-
+	  useless_(useless),
+	  useful_(useful),
+	  strip_(strip)
       {
-	out_->copy_acceptance_conditions_of(a);
+	out_->set_acceptance_conditions(useful);
       }
 
       tgba_explicit_string*
@@ -73,14 +75,17 @@ namespace spot
 	// the destination state do not belong to an accepting state.
 	if (sm_.accepting(sm_.scc_of_state(in_s))
 	    && sm_.accepting(sm_.scc_of_state(out_s)))
-	  out_->add_acceptance_conditions(t,
-					  si->current_acceptance_conditions());
+	  out_->add_acceptance_conditions
+	    (t, (bdd_exist(si->current_acceptance_conditions(), strip_)
+		 & useful_));
       }
 
     private:
       tgba_explicit_string* out_;
       const scc_map& sm_;
       const std::vector<bool>& useless_;
+      bdd useful_;
+      bdd strip_;
     };
   } // anonymous
 
@@ -91,7 +96,33 @@ namespace spot
     sm.build_map();
     scc_stats ss = build_scc_stats(sm);
 
-    filter_iter fi(aut, sm, ss.useless_scc_map);
+    bdd useful = ss.useful_acc;
+    if (useful == bddfalse)
+      // Even if no acceptance conditions are useful in a SCC,
+      // we need to keep at least one acceptance conditions
+      useful = bdd_satone(aut->all_acceptance_conditions());
+
+    bdd positive = bddtrue;
+    bdd cur = useful;
+    while (cur != bddfalse)
+      {
+	bdd a = bdd_satone(cur);
+	cur -= a;
+	for (;;)
+	  {
+	    if (bdd_low(a) == bddfalse)
+	      {
+		positive &= bdd_ithvar(bdd_var(a));
+		break;
+	      }
+	    a = bdd_low(a);
+	  }
+      }
+
+    bdd strip = bdd_exist(bdd_support(aut->all_acceptance_conditions()),
+			  positive);
+    useful = bdd_exist(useful, strip);
+    filter_iter fi(aut, sm, ss.useless_scc_map, useful, strip);
     fi.run();
     tgba_explicit_string* res = fi.result();
     res->merge_transitions();

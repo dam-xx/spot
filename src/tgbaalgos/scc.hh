@@ -59,6 +59,11 @@ namespace spot
     /// A map of the useless SCCs.
     std::vector<bool> useless_scc_map;
 
+    /// The set of useful acceptance conditions (i.e. acceptance
+    /// conditions that are not always implied by other acceptance
+    /// conditions).
+    bdd useful_acc;
+
     std::ostream& dump(std::ostream& out) const;
   };
 
@@ -129,6 +134,12 @@ namespace spot
     /// \pre This should only be called once build_map() has run.
     bdd acc_set_of(unsigned n) const;
 
+    /// \brief Return the set of useful acceptance conditions if SCC \a n.
+    ///
+    /// Useless acceptances conditions are always implied by other acceptances
+    /// conditions.  This returns all the other acceptance conditions.
+    bdd useful_acc_of(unsigned n) const;
+
     /// \brief Return the set of states of an SCC.
     ///
     /// The states in the returned list are still owned by the scc_map
@@ -154,7 +165,7 @@ namespace spot
     public:
       scc(int index) : index(index), acc(bddfalse),
 		       supp(bddtrue), supp_rec(bddfalse),
-		       trivial(true) {};
+		       trivial(true), useful_acc(bddfalse) {};
       /// Index of the SCC.
       int index;
       /// The union of all acceptance conditions of transitions which
@@ -172,6 +183,8 @@ namespace spot
       succ_type succ;
       /// Trivial SCC have one state and no self-loops.
       bool trivial;
+      /// Useful acceptance conditions.
+      bdd useful_acc;
     };
 
     const tgba* aut_;		// Automata to decompose.

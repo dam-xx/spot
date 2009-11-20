@@ -69,6 +69,9 @@ namespace spot
     /// transition.
     void copy_acceptance_conditions_of(const tgba *a);
 
+    /// The the acceptance conditions.
+    void set_acceptance_conditions(bdd acc);
+
     bool has_acceptance_condition(const ltl::formula* f) const;
     void add_acceptance_condition(transition* t, const ltl::formula* f);
     /// This assumes that all acceptance conditions in \a f are known from dict.

@@ -259,13 +259,17 @@ namespace spot
 	cond_set conds;
 	conds.insert(cond);
 	bdd supp = bdd_support(cond);
+	bdd all = aut_->all_acceptance_conditions();
+	bdd useful = all - acc;
 	while (threshold > root_.front().index)
 	  {
 	    assert(!root_.empty());
 	    assert(!arc_acc_.empty());
 	    assert(arc_acc_.size() == arc_cond_.size());
 	    acc |= root_.front().acc;
-	    acc |= arc_acc_.top();
+	    bdd lacc = arc_acc_.top();
+	    acc |= lacc;
+	    useful |= (all - lacc) | root_.front().useful_acc;
 	    states.splice(states.end(), root_.front().states);
 	    succs.insert(root_.front().succ.begin(),
 			 root_.front().succ.end());
@@ -292,6 +296,7 @@ namespace spot
 	root_.front().supp &= supp;
 	// This SCC is no longer trivial.
 	root_.front().trivial = false;
+	root_.front().useful_acc |= useful;
       }
 
     // recursively update supp_rec
@@ -345,6 +350,13 @@ namespace spot
   unsigned scc_map::scc_count() const
   {
     return scc_map_.size();
+  }
+
+  bdd
+  scc_map::useful_acc_of(unsigned n) const
+  {
+    assert(scc_map_.size() > n);
+    return scc_map_[n].useful_acc;
   }
 
   namespace
@@ -422,8 +434,14 @@ namespace spot
     res.dead_paths = d.dead_paths[init];
 
     res.useless_scc_map.reserve(res.scc_total);
+    bdd useful_acc = bddfalse;
     for (unsigned n = 0; n < res.scc_total; ++n)
-      res.useless_scc_map[n] = !d.acc_paths[n];
+      {
+	res.useless_scc_map[n] = !d.acc_paths[n];
+	if (m.accepting(n))
+	  useful_acc |= m.useful_acc_of(n);
+      }
+    res.useful_acc = useful_acc;
 
     return res;
   }
@@ -481,7 +499,10 @@ namespace spot
 				      m.ap_set_of(state)));
 	    ostr << "]\\n APrec=[";
 	    escape_str(ostr, bdd_format_sat(m.get_aut()->get_dict(),
-					    m.aprec_set_of(state))) << "]";
+					    m.aprec_set_of(state)));
+	    ostr << "]\\n useful=[";
+	    escape_str(ostr, bdd_format_accset(m.get_aut()->get_dict(),
+					       m.useful_acc_of(state))) << "]";
 	  }
 
 	std::cout << "  " << state << " [shape=box,"
