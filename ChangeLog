@@ -1,3 +1,8 @@
+2009-11-20  Alexandre Duret-Lutz  <adl@va-et-vient.net>
+
+	* src/tgbaalgos/sccfilter.cc (scc_filter): Merge transitions
+	after removing acceptance conditions.
+
 2009-11-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Remove prune_scc(), prune_acc(), and related fonctions.

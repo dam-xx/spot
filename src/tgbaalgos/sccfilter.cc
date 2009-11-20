@@ -93,7 +93,9 @@ namespace spot
 
     filter_iter fi(aut, sm, ss.useless_scc_map);
     fi.run();
-    return fi.result();
+    tgba_explicit_string* res = fi.result();
+    res->merge_transitions();
+    return res;
   }
 
 
