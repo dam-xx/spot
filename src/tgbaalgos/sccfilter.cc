@@ -52,7 +52,7 @@ namespace spot
       const ltl::formula* out_f = a->get_label(out_s);
       if (!out_aut->has_state(in_f))
 	in_f->clone();
-      if (!out_aut->has_state(out_f))
+      if ((in_f != out_f) && !out_aut->has_state(out_f))
 	out_f->clone();
       return out_aut->create_transition(in_f, out_f);
     }

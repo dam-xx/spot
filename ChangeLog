@@ -1,5 +1,10 @@
 2009-11-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgbaalgos/sccfilter.cc (create_transition): Do not clone
+	the same node twice when dealing with loops.
+
+2009-11-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Use bdd_satprefix() to speedup minato on BDDs that are almost cubes.
 
 	* src/misc/minato.cc (minato_isop::minato_isop): Call bdd_satprefix.
