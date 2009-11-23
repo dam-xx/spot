@@ -1,6 +1,6 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2003, 2004, 2009 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -20,7 +20,6 @@
 // 02111-1307, USA.
 
 #include "minato.hh"
-#include <utility>
 #include <cassert>
 
 namespace spot
@@ -30,15 +29,22 @@ namespace spot
     : ret_(bddfalse)
 
   {
+    // If INPUT has the form a&b&c&(binary function) we want to
+    // compute the ISOP of the only binary and prepend a&b&c latter.
+    //
+    // Calling bdd_satprefix (it returns a&b&c and modify input to
+    // point to function) this way is an optimization to the
+    // original algorithm, because in many cases we are trying to
+    // build ISOPs out of formulae that are already cubes.
+    cube_.push(bdd_satprefix(input));
     todo_.push(local_vars(input, input, bdd_support(input)));
-    cube_.push(bddtrue);
   }
 
   minato_isop::minato_isop(bdd input, bdd vars)
     : ret_(bddfalse)
   {
+    cube_.push(bdd_satprefix(input));
     todo_.push(local_vars(input, input, vars));
-    cube_.push(bddtrue);
   }
 
   bdd
@@ -138,10 +144,8 @@ namespace spot
 	    l.g1 = ret_;
 	    cube_.pop();
 	    {
-	      bdd f0s_min = l.f0_min - l.g0;
-	      bdd f1s_min = l.f1_min - l.g1;
 	      bdd fs_max = l.f0_max & l.f1_max;
-	      bdd fs_min = fs_max & (f0s_min | f1s_min);
+	      bdd fs_min = fs_max & ((l.f0_min - l.g0) | (l.f1_min - l.g1));
 	      todo_.push(local_vars(fs_min, fs_max, l.vars));
 	    }
 	    continue;

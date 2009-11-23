@@ -1,5 +1,13 @@
 2009-11-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Use bdd_satprefix() to speedup minato on BDDs that are almost cubes.
+
+	* src/misc/minato.cc (minato_isop::minato_isop): Call bdd_satprefix.
+	(minato_isop::next): Avoid useless intermediate variables.
+	* src/misc/minato.hh: Typo in comments.
+
+2009-11-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Specialize scc_filter when handling tgba_explicit_formula automata.
 
 	If the input is a tgba_explicit_formula we can output a

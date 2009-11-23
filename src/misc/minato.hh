@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -65,17 +65,17 @@ namespace spot
     /// Internal variables for minato_isop.
     struct local_vars
     {
-      // If you are following the paper, f_min and f_max corresponds
-      // to the pair of BDD function used to encode the ternary function `f'
+      // If you are following the paper, f_min and f_max correspond
+      // to the pair of BDD functions used to encode the ternary function f
       // (see Section 3.4).
       // Also note that f0, f0', and f0'' all share the same _max function.
       // Likewise for f1, f1', and f1''.
       bdd f_min, f_max;
       // Because we need a non-recursive version of the algorithm,
-      // we had to split it in four step (each step is separated
+      // we had to split it in four steps (each step is separated
       // from the other by a call to ISOP in the original algorithm).
       enum { FirstStep, SecondStep, ThirdStep, FourthStep } step;
-      // The list of variable to factorize.  This is an addition to
+      // The list of variables to factorize.  This is an addition to
       // the original algorithm.
       bdd vars;
       bdd v1;
