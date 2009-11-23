@@ -308,6 +308,7 @@ extern BDD      bdd_support(BDD);
 extern BDD      bdd_satone(BDD);
 extern BDD      bdd_satoneset(BDD, BDD, BDD);
 extern BDD      bdd_fullsatone(BDD);
+extern BDD	bdd_satprefix(BDD *);
 extern void     bdd_allsat(BDD r, bddallsathandler handler);
 extern double   bdd_satcount(BDD);
 extern double   bdd_satcountset(BDD, BDD);
@@ -513,6 +514,7 @@ private:
    friend bdd      bdd_satone(const bdd &);
    friend bdd      bdd_satoneset(const bdd &, const bdd &, const bdd &);
    friend bdd      bdd_fullsatone(const bdd &);
+   friend bdd      bdd_satprefix(bdd &);
    friend void     bdd_allsat(const bdd &r, bddallsathandler handler);
    friend double   bdd_satcount(const bdd &);
    friend double   bdd_satcountset(const bdd &, const bdd &);
@@ -697,6 +699,9 @@ inline bdd bdd_satoneset(const bdd &r, const bdd &var, const bdd &pol)
 
 inline bdd bdd_fullsatone(const bdd &r)
 { return bdd_fullsatone(r.root); }
+
+inline bdd bdd_satprefix(bdd &r)
+{ int ro = r.root; bdd res = bdd_satprefix(&ro); r = bdd(ro); return res; }
 
 inline void bdd_allsat(const bdd &r, bddallsathandler handler)
 { bdd_allsat(r.root, handler); }

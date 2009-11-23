@@ -142,6 +142,7 @@ static void   support_rec(int, int*);
 static BDD    satone_rec(BDD);
 static BDD    satoneset_rec(BDD, BDD);
 static int    fullsatone_rec(int);
+static BDD    satprefix_rec(BDD*);
 static void   allsat_rec(BDD r);
 static double satcount_rec(int);
 static double satcountln_rec(int);
@@ -2124,7 +2125,7 @@ PROTO   {* BDD bdd_satone(BDD r) *}
 DESCR   {* Finds a BDD with at most one variable at each level. This BDD
 	   implies {\tt r} and is not false unless {\tt r} is
 	   false. *}
-ALSO    {* bdd\_allsat bdd\_satoneset, bdd\_fullsatone, bdd\_satcount, bdd\_satcountln *}
+ALSO    {* bdd\_allsat, bdd\_satoneset, bdd\_satprefix, bdd\_fullsatone, bdd\_satcount, bdd\_satcountln *}
 RETURN  {* The result of the operation. *}
 */
 BDD bdd_satone(BDD r)
@@ -2166,6 +2167,60 @@ static BDD satone_rec(BDD r)
 
 
 /*
+NAME    {* bdd\_satprefix *}
+SECTION {* operator *}
+SHORT   {* quickly remove a conjunction common to all satisfying assignments *}
+PROTO   {* BDD bdd_satprefix(BDD* r) *}
+DESCR   {* Recursively descend into the top of the BDD and return the
+           prefix common to all satisfying paths.  Adjust r to point to
+	   the rest of the BDD. *}
+ALSO    {* bdd\_allsat, bdd\_satone, bdd\_satoneset, bdd\_fullsatone, bdd\_satcount, bdd\_satcountln *}
+RETURN  {* The result of the operation. *}
+*/
+BDD bdd_satprefix(BDD* r)
+{
+   BDD res;
+
+   CHECKa(*r, bddfalse);
+   if (*r < 2)
+      return *r;
+
+   bdd_disable_reorder();
+
+   INITREF;
+   res = satprefix_rec(r);
+
+   bdd_enable_reorder();
+
+   checkresize();
+   return res;
+
+}
+
+static BDD satprefix_rec(BDD* r)
+{
+   if (ISCONST(*r))
+      return *r;
+
+   if (ISZERO(LOW(*r)))
+     {
+       int lr = LEVEL(*r);
+       *r = HIGH(*r);
+       return PUSHREF(bdd_makenode(lr, BDDZERO, satprefix_rec(r)));
+     }
+   else if (ISZERO(HIGH(*r)))
+     {
+       int lr = LEVEL(*r);
+       *r = LOW(*r);
+       return PUSHREF(bdd_makenode(lr, satprefix_rec(r), BDDZERO));
+     }
+   else
+     {
+       return BDDONE;
+     }
+}
+
+/*
 NAME    {* bdd\_satoneset *}
 SECTION {* operator *}
 SHORT   {* finds one satisfying variable assignment *}
@@ -2177,7 +2232,7 @@ DESCR   {* Finds a minterm in {\tt r}. The {\tt var} argument is a
 	   by the {\tt pol} parameter. If {\tt pol} is the false BDD then
 	   the variables will be in negative form, and otherwise they will
 	   be in positive form. *}
-ALSO    {* bdd\_allsat bdd\_satone, bdd\_fullsatone, bdd\_satcount, bdd\_satcountln *}
+ALSO    {* bdd\_allsat, bdd\_satone, bdd\_satprefix, bdd\_fullsatone, bdd\_satcount, bdd\_satcountln *}
 RETURN  {* The result of the operation. *}
 */
 BDD bdd_satoneset(BDD r, BDD var, BDD pol)
@@ -2259,7 +2314,7 @@ PROTO   {* BDD bdd_fullsatone(BDD r) *}
 DESCR   {* Finds a BDD with exactly one variable at all levels. This BDD
 	   implies {\tt r} and is not false unless {\tt r} is
 	   false. *}
-ALSO    {* bdd\_allsat bdd\_satone, bdd\_satoneset, bdd\_satcount, bdd\_satcountln *}
+ALSO    {* bdd\_allsat, bdd\_satone, bdd\_satprefix, bdd\_satoneset, bdd\_satcount, bdd\_satcountln *}
 RETURN  {* The result of the operation. *}
 */
 BDD bdd_fullsatone(BDD r)

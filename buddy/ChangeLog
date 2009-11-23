@@ -1,3 +1,10 @@
+2009-11-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Introduce bdd_satprefix, to speedup spot::minato().
+
+	* src/bdd.h (bdd_satprefix): New function.
+	* src/bddop.c (bdd_satprefix, bdd_sat_prefixrec): New functions.
+
 2009-10-01  Alexandre Duret-Lutz  <adl@lrde.epita.net>
 
 	Fix the previous patch in reorder.c: I missread the
