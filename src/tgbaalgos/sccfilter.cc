@@ -28,6 +28,36 @@ namespace spot
 {
   namespace
   {
+    static
+    tgba_explicit::transition*
+    create_transition(const tgba* aut, tgba_explicit_string* out_aut,
+		      const state* in_s, int in,
+		      const state* out_s, int out)
+    {
+      std::ostringstream in_name;
+      in_name << "(#" << in << ") " << aut->format_state(in_s);
+      std::ostringstream out_name;
+      out_name << "(#" << out << ") " << aut->format_state(out_s);
+      return out_aut->create_transition(in_name.str(), out_name.str());
+    }
+
+    static
+    tgba_explicit::transition*
+    create_transition(const tgba* aut, tgba_explicit_formula* out_aut,
+		      const state* in_s, int, const state* out_s, int)
+    {
+      const tgba_explicit_formula* a =
+	static_cast<const tgba_explicit_formula*>(aut);
+      const ltl::formula* in_f = a->get_label(in_s);
+      const ltl::formula* out_f = a->get_label(out_s);
+      if (!out_aut->has_state(in_f))
+	in_f->clone();
+      if (!out_aut->has_state(out_f))
+	out_f->clone();
+      return out_aut->create_transition(in_f, out_f);
+    }
+
+    template<class T>
     class filter_iter: public tgba_reachable_iterator_depth_first
     {
     public:
@@ -36,7 +66,7 @@ namespace spot
 		  const std::vector<bool>& useless,
 		  bdd useful, bdd strip)
 	: tgba_reachable_iterator_depth_first(a),
-	  out_(new tgba_explicit_string(a->get_dict())),
+	  out_(new T(a->get_dict())),
 	  sm_(sm),
 	  useless_(useless),
 	  useful_(useful),
@@ -45,7 +75,7 @@ namespace spot
 	out_->set_acceptance_conditions(useful);
       }
 
-      tgba_explicit_string*
+      T*
       result()
       {
 	return out_;
@@ -62,13 +92,8 @@ namespace spot
 		   const state* out_s, int out,
 		   const tgba_succ_iterator* si)
       {
-	std::ostringstream in_name;
-	in_name << "(#" << in << ") " << this->automata_->format_state(in_s);
-	std::ostringstream out_name;
-	out_name << "(#" << out << ") " << this->automata_->format_state(out_s);
-
 	tgba_explicit::transition* t =
-	  out_->create_transition(in_name.str(), out_name.str());
+	  create_transition(this->automata_, out_, in_s, in, out_s, out);
 	out_->add_conditions(t, si->current_condition());
 
 	// Do not output any acceptance condition if either the source or
@@ -81,12 +106,13 @@ namespace spot
       }
 
     private:
-      tgba_explicit_string* out_;
+      T* out_;
       const scc_map& sm_;
       const std::vector<bool>& useless_;
       bdd useful_;
       bdd strip_;
     };
+
   } // anonymous
 
 
@@ -122,11 +148,33 @@ namespace spot
     bdd strip = bdd_exist(bdd_support(aut->all_acceptance_conditions()),
 			  positive);
     useful = bdd_exist(useful, strip);
-    filter_iter fi(aut, sm, ss.useless_scc_map, useful, strip);
-    fi.run();
-    tgba_explicit_string* res = fi.result();
-    res->merge_transitions();
-    return res;
+
+    // In most cases we will create a tgba_explicit_string copy of the
+    // initial tgba, but this is not very space efficient as the
+    // labels are built using the "format_state()" string output of
+    // the original automaton.  In the case where the source automaton is
+    // a tgba_explicit_formula (typically after calling ltl2tgba_fm())
+    // we can create another tgba_explicit_formula instead.
+    const tgba_explicit_formula* af =
+      dynamic_cast<const tgba_explicit_formula*>(aut);
+    if (af)
+      {
+	filter_iter<tgba_explicit_formula> fi(af, sm, ss.useless_scc_map,
+					     useful, strip);
+	fi.run();
+	tgba_explicit_formula* res = fi.result();
+	res->merge_transitions();
+	return res;
+      }
+    else
+      {
+	filter_iter<tgba_explicit_string> fi(aut, sm, ss.useless_scc_map,
+					      useful, strip);
+	fi.run();
+	tgba_explicit_string* res = fi.result();
+	res->merge_transitions();
+	return res;
+      }
   }
 
 

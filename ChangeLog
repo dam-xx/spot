@@ -1,3 +1,21 @@
+2009-11-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Specialize scc_filter when handling tgba_explicit_formula automata.
+
+	If the input is a tgba_explicit_formula we can output a
+	tgba_explicit_formula too, and we want to do that because it is
+	more space efficient.
+
+	* src/tgba/tgbaexplicit.hh (get_label): New method.
+	* src/tgbaalgos/sccfilter.cc (create_transition): New function,
+	to handle tgba_explicit_formula and tgba_explicit_string output
+	differently.
+	(filter_iter): Template it on the output tgba type, and adjust
+	to call create_transition.
+	(scc_filter): Use filter_iter<tgba_explicit_formula> or
+	filter_iter<tgba_explicit_string> depending on the input tgba
+	type.
+
 2009-11-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Strip useless acceptance conditions in scc_filter().

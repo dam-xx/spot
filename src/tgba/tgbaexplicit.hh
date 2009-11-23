@@ -181,6 +181,20 @@ namespace spot
       return name_state_map_.find(name) != name_state_map_.end();
     }
 
+    const label& get_label(const tgba_explicit::state* s) const
+    {
+      typename sn_map::const_iterator i = state_name_map_.find(s);
+      assert(i != state_name_map_.end());
+      return i->second;
+    }
+
+    const label& get_label(const spot::state* s) const
+    {
+      const state_explicit* se = dynamic_cast<const state_explicit*>(s);
+      assert(se);
+      return get_label(se->get_state());
+    }
+
     /// Return the tgba_explicit::state for \a name, creating the state if
     /// it does not exist.
     state* add_state(const label& name)
