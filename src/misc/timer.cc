@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2005, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -56,20 +56,22 @@ namespace spot
 	  name.erase(22);
 
 	const spot::timer& t = i->second.first;
-	os << std::setw(22) << name << " |"
+	const char* sep = t.is_running() ? "+|" : " |";
+
+	os << std::setw(22) << name << sep
 	   << std::setw(6) << t.utime() << " "
 	   << std::setw(8) << (total.utime ?
 			       100.0 * t.utime() / total.utime : 0.)
-	   << " |"
+	   << sep
 	   << std::setw(6) << t.stime() << " "
 	   << std::setw(8) << (total.stime ?
 			       100.0 * t.stime() / total.stime : 0.)
-	   << " |"
+	   << sep
 	   << std::setw(6) << t.utime() + t.stime() << " "
 	   << std::setw(8) << (grand_total ?
 			       (100.0 * (t.utime() + t.stime()) /
 				grand_total) : 0.)
-	   << " |"
+	   << sep
 	   << std::setw(4) << i->second.second
 	   << std::endl;
       }

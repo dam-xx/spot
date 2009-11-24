@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -53,6 +53,8 @@ namespace spot
     void
     start()
     {
+      assert(!running);
+      running = true;
       struct tms tmp;
       times(&tmp);
       start_.utime = tmp.tms_utime;
@@ -67,6 +69,8 @@ namespace spot
       times(&tmp);
       total_.utime += tmp.tms_utime - start_.utime;
       total_.stime += tmp.tms_stime - start_.stime;
+      assert(running);
+      running = false;
     }
 
     /// \brief Return the user time of all accumulated interval.
@@ -89,9 +93,18 @@ namespace spot
       return total_.stime;
     }
 
+
+    /// \brief Whether the timer is running.
+    bool
+    is_running() const
+    {
+      return running;
+    }
+
   protected:
     time_info start_;
     time_info total_;
+    bool running;
   };
 
   /// \brief A map of timer, where each timer has a name.

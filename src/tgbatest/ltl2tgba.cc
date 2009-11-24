@@ -722,14 +722,14 @@ main(int argc, char** argv)
 
 	  if (reduc_aut & spot::Reduce_Scc)
 	    {
-	      tm.start("reducing formula aut. w/ SCC");
+	      tm.start("reducing A_f w/ SCC");
 	      a = aut_scc = spot::scc_filter(a);
-	      tm.start("reducing formula aut. w/ SCC");
+	      tm.start("reducing A_f w/ SCC");
 	    }
 
 	  if (reduc_aut & !spot::Reduce_Scc)
 	    {
-	      tm.start("reducing formula aut. w/ sim.");
+	      tm.start("reducing A_f w/ sim.");
 	      a = aut_red = new spot::tgba_reduc(a);
 
 	      if (reduc_aut & (spot::Reduce_quotient_Dir_Sim |
@@ -779,7 +779,7 @@ main(int argc, char** argv)
 		  if (rel_del)
 		    spot::free_relation_simulation(rel_del);
 		}
-	      tm.stop("reducing formula aut. w/ sim.");
+	      tm.stop("reducing A_f w/ sim.");
 	    }
 	}
 
