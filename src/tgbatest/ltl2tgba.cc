@@ -724,7 +724,7 @@ main(int argc, char** argv)
 	    {
 	      tm.start("reducing A_f w/ SCC");
 	      a = aut_scc = spot::scc_filter(a);
-	      tm.start("reducing A_f w/ SCC");
+	      tm.stop("reducing A_f w/ SCC");
 	    }
 
 	  if (reduc_aut & !spot::Reduce_Scc)
