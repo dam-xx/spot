@@ -40,25 +40,25 @@
  * Definitions for ranges of certain integer-valued configuration options.
  *
  *****************************************************************************/
- 
+
 const struct Configuration::IntegerRange Configuration::DEFAULT_RANGE
   = {0, ULONG_MAX, "value out of range"};
 
 const struct Configuration::IntegerRange Configuration::VERBOSITY_RANGE
   = {0, 5, "verbosity must be between 0 and 5 (inclusive)"};
- 
+
 const struct Configuration::IntegerRange Configuration::ROUND_COUNT_RANGE
   = {1, ULONG_MAX, "number of rounds must be positive"};
 
 const struct Configuration::IntegerRange Configuration::RANDOM_SEED_RANGE
   = {0, UINT_MAX, "random seed out of range"};
- 
+
 const struct Configuration::IntegerRange Configuration::ATOMIC_PRIORITY_RANGE
   = {0, INT_MAX / 3, "priority out of range"};
 
 const struct Configuration::IntegerRange Configuration::OPERATOR_PRIORITY_RANGE
   = {0, INT_MAX / 14, "priority out of range"};
- 
+
 
 
 /******************************************************************************
@@ -381,7 +381,7 @@ void Configuration::read(int argc, char* argv[])
 	  global_options.interactive = NEVER;
 	  break;
 
-	/* 
+	/*
 	 *  Options corresponding to the GlobalOptions section in the
 	 *  configuration file.
 	 */
@@ -428,7 +428,7 @@ void Configuration::read(int argc, char* argv[])
 		      VERBOSITY_RANGE);
 	  break;
 
-	/* 
+	/*
 	 *  Options corresponding to the StatespaceOptions section in the
 	 *  configuration file.
 	 */
@@ -441,7 +441,7 @@ void Configuration::read(int argc, char* argv[])
         case OPT_ENUMERATEDPATH :
 	  readStateSpaceMode("enumeratedpath");
 	  break;
-	
+
         case OPT_RANDOMCONNECTEDGRAPH :
 	  readStateSpaceMode("randomconnectedgraph");
 	  break;
@@ -481,7 +481,7 @@ void Configuration::read(int argc, char* argv[])
 			  parameter->second);
 	  break;
 
-	/* 
+	/*
 	 *  Options corresponding to the FormulaOptions section in the
 	 *  configuration file.
 	 */
@@ -782,8 +782,8 @@ void Configuration::read(int argc, char* argv[])
       it->second = formula_options.default_operator_priority;
 
     if (it->second > 0 && !unary_operator_allowed)
-      unary_operator_allowed = 
-	(it->first == ::Ltl::LTL_NEGATION || it->first == ::Ltl::LTL_NEXT 
+      unary_operator_allowed =
+	(it->first == ::Ltl::LTL_NEGATION || it->first == ::Ltl::LTL_NEXT
 	 || it->first == ::Ltl::LTL_FINALLY
          || it->first == ::Ltl::LTL_GLOBALLY);
   }
@@ -982,7 +982,7 @@ void Configuration::print(ostream& stream, int indent) const
   estream << '\n' + string(indent + 2, ' ') + "Implementations:\n";
 
   vector<AlgorithmInformation>::size_type algorithm_number = 0;
-  
+
   for (vector<AlgorithmInformation>::const_iterator a = algorithms.begin();
        a != algorithms.end();
        ++a)
@@ -1659,7 +1659,7 @@ void Configuration::registerAlgorithm
 	     != algorithm_names.end())
     error = "multiple definitions for implementation `"
             + algorithm_information.name + "'";
-  else if (path.empty())
+  else if (path.empty() && enabled)
     error = "missing path to executable for implementation `"
             + algorithm_information.name + "'";
 
@@ -2004,7 +2004,7 @@ void Configuration::readTranslatorTimeout(const string& value)
  *                time specification.
  *
  * ------------------------------------------------------------------------- */
-{ 
+{
   unsigned long int hours, minutes, seconds;
   try
   {
