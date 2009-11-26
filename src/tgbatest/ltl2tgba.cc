@@ -727,7 +727,7 @@ main(int argc, char** argv)
 	      tm.stop("reducing A_f w/ SCC");
 	    }
 
-	  if (reduc_aut & !spot::Reduce_Scc)
+	  if (reduc_aut & ~spot::Reduce_Scc)
 	    {
 	      tm.start("reducing A_f w/ sim.");
 	      a = aut_red = new spot::tgba_reduc(a);
