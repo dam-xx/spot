@@ -1,3 +1,18 @@
+2009-11-27  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	Rename the class taa as taa_tgba.
+
+	* src/tgba/taa.cc, src/tgba/taa.hh: Rename as ...
+	* src/tgba/taatgba.cc, src/tgba/taatgba.hh: ... these, and
+	rename the class taa as taa_tgba.
+	* src/tgbaalgos/ltl2taa.cc, src/tgbaalgos/ltl2taa.hh,
+	src/tgbaalgos/Makefile.am: Adjust.
+	* src/tgbatest/ltl2tgba.cc, src/tgbatest/Makefile.am: Adjust.
+	* src/tgbatest/taa.test: Rename as ...
+	* src/tgbatest/taatgba.test ... this.
+	* src/tgbatest/taa.cc: Rename as ...
+	* src/tgbatest/taatgba.cc ... this, and adjust.
+
 2009-11-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgbatest/ltl2tgba.cc (main): Fix typo to re-enable

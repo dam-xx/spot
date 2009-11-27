@@ -19,8 +19,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_TGBA_TAA_HH
-# define SPOT_TGBA_TAA_HH
+#ifndef SPOT_TGBA_TAATGBA_HH
+# define SPOT_TGBA_TAATGBA_HH
 
 #include <set>
 #include <iosfwd>
@@ -33,10 +33,10 @@
 namespace spot
 {
   /// \brief A Transition-based Alternating Automaton (TAA).
-  class taa : public tgba
+  class taa_tgba : public tgba
   {
   public:
-    taa(bdd_dict* dict);
+    taa_tgba(bdd_dict* dict);
 
     struct transition;
     typedef std::list<transition*> state;
@@ -66,7 +66,7 @@ namespace spot
     void output(std::ostream& os) const;
 
     /// TGBA interface.
-    virtual ~taa();
+    virtual ~taa_tgba();
     virtual spot::state* get_init_state() const;
     virtual tgba_succ_iterator*
     succ_iter(const spot::state* local_state,
@@ -92,14 +92,14 @@ namespace spot
     virtual bdd compute_support_variables(const spot::state* state) const;
 
     typedef Sgi::hash_map<
-      const std::string, taa::state*, string_hash
+      const std::string, taa_tgba::state*, string_hash
       > ns_map;
 
     typedef Sgi::hash_map<
-      const taa::state*, std::string, ptr_hash<taa::state>
+      const taa_tgba::state*, std::string, ptr_hash<taa_tgba::state>
       > sn_map;
 
-    typedef std::vector<taa::state_set*> ss_vec;
+    typedef std::vector<taa_tgba::state_set*> ss_vec;
 
     ns_map name_state_map_;
     sn_map state_name_map_;
@@ -107,31 +107,31 @@ namespace spot
     mutable bdd all_acceptance_conditions_;
     mutable bool all_acceptance_conditions_computed_;
     bdd neg_acceptance_conditions_;
-    taa::state_set* init_;
+    taa_tgba::state_set* init_;
     ss_vec state_set_vec_;
 
   private:
     // Disallow copy.
-    taa(const taa& other);
-    taa& operator=(const taa& other);
+    taa_tgba(const taa_tgba& other);
+    taa_tgba& operator=(const taa_tgba& other);
 
-    /// \brief Return the taa::state for \a name, creating it if it
+    /// \brief Return the taa_tgba::state for \a name, creating it if it
     /// does not exist.  The first state added is the initial state
     /// which can be overridden with set_init_state.
-    taa::state* add_state(const std::string& name);
+    taa_tgba::state* add_state(const std::string& name);
 
     /// \brief Return the taa::state_set for \a names.
-    taa::state_set* add_state_set(const std::vector<std::string>& names);
+    taa_tgba::state_set* add_state_set(const std::vector<std::string>& names);
 
     /// \brief Format a taa::state_set as a string for printing.
-    std::string format_state_set(const taa::state_set* ss) const;
+    std::string format_state_set(const taa_tgba::state_set* ss) const;
   };
 
   /// Set of states deriving from spot::state.
   class state_set : public spot::state
   {
   public:
-    state_set(const taa::state_set* s, bool delete_me = false)
+    state_set(const taa_tgba::state_set* s, bool delete_me = false)
       : s_(s), delete_me_(delete_me)
     {
     }
@@ -146,16 +146,16 @@ namespace spot
 	delete s_;
     }
 
-    const taa::state_set* get_state() const;
+    const taa_tgba::state_set* get_state() const;
   private:
-    const taa::state_set* s_;
+    const taa_tgba::state_set* s_;
     bool delete_me_;
   };
 
   class taa_succ_iterator : public tgba_succ_iterator
   {
   public:
-    taa_succ_iterator(const taa::state_set* s, bdd all_acc);
+    taa_succ_iterator(const taa_tgba::state_set* s, bdd all_acc);
     virtual ~taa_succ_iterator();
 
     virtual void first();
@@ -169,12 +169,12 @@ namespace spot
   private:
     /// Those typedefs are used to generate all possible successors in
     /// the constructor using a cartesian product.
-    typedef taa::state::const_iterator iterator;
+    typedef taa_tgba::state::const_iterator iterator;
     typedef std::pair<iterator, iterator> iterator_pair;
     typedef std::vector<iterator_pair> bounds_t;
     typedef Sgi::hash_multimap<
-      const spot::state_set*, taa::transition*, state_ptr_hash, state_ptr_equal
-      > seen_map;
+      const spot::state_set*, taa_tgba::transition*, state_ptr_hash,
+      state_ptr_equal> seen_map;
 
     struct distance_sort :
       public std::binary_function<const iterator_pair&,
@@ -188,11 +188,11 @@ namespace spot
       }
     };
 
-    std::vector<taa::transition*>::const_iterator i_;
-    std::vector<taa::transition*> succ_;
+    std::vector<taa_tgba::transition*>::const_iterator i_;
+    std::vector<taa_tgba::transition*> succ_;
     bdd all_acceptance_conditions_;
     seen_map seen_;
   };
 }
 
-#endif // SPOT_TGBA_TAA_HH
+#endif // SPOT_TGBA_TAATGBA_HH

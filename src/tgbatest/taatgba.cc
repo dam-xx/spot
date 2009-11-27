@@ -25,7 +25,7 @@
 #include "ltlenv/defaultenv.hh"
 #include "ltlast/allnodes.hh"
 #include "tgbaalgos/dotty.hh"
-#include "tgba/taa.hh"
+#include "tgba/taatgba.hh"
 
 int
 main()
@@ -34,11 +34,11 @@ main()
 
   spot::ltl::default_environment& e =
     spot::ltl::default_environment::instance();
-  spot::taa* a = new spot::taa(dict);
+  spot::taa_tgba* a = new spot::taa_tgba(dict);
 
-  typedef spot::taa::transition trans;
-  typedef spot::taa::state state;
-  typedef spot::taa::state_set state_set;
+  typedef spot::taa_tgba::transition trans;
+  typedef spot::taa_tgba::state state;
+  typedef spot::taa_tgba::state_set state_set;
 
   std::string ss1_values[] = { "state 2", "state 3" };
   std::vector<std::string> ss1_vector(ss1_values, ss1_values + 2);

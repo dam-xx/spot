@@ -39,7 +39,7 @@ namespace spot
     class ltl2taa_visitor : public const_visitor
     {
     public:
-      ltl2taa_visitor(taa* res, language_containment_checker* lcc,
+      ltl2taa_visitor(taa_tgba* res, language_containment_checker* lcc,
 		      bool refined = false, bool negated = false)
 	: res_(res), refined_(refined), negated_(negated),
 	  lcc_(lcc), init_(), succ_(), to_free_()
@@ -51,7 +51,7 @@ namespace spot
       {
       }
 
-      taa*
+      taa_tgba*
       result()
       {
 	for (unsigned i = 0; i < to_free_.size(); ++i)
@@ -73,7 +73,7 @@ namespace spot
 	std::vector<std::string> dst;
 
 	dst.push_back(std::string("sink"));
-	taa::transition* t = res_->create_transition(init_, dst);
+	taa_tgba::transition* t = res_->create_transition(init_, dst);
 	res_->add_condition(t, f->clone());
 	succ_state ss = { dst, f, constant::true_instance() };
 	succ_.push_back(ss);
@@ -146,7 +146,7 @@ namespace spot
 	init_ = to_string(node);
 	std::vector<succ_state>::iterator i1;
 	std::vector<succ_state>::iterator i2;
-	taa::transition* t = 0;
+	taa_tgba::transition* t = 0;
 	bool contained = false;
 	switch (node->op())
 	{
@@ -232,7 +232,7 @@ namespace spot
 
 	init_ = to_string(node);
 	std::vector<succ_state>::iterator i;
-	taa::transition* t = 0;
+	taa_tgba::transition* t = 0;
 	switch (node->op())
 	{
 	  case multop::And:
@@ -305,7 +305,7 @@ namespace spot
       }
 
     private:
-      taa* res_;
+      taa_tgba* res_;
       bool refined_;
       bool negated_;
       language_containment_checker* lcc_;
@@ -373,7 +373,7 @@ namespace spot
     };
   } // anonymous
 
-  taa*
+  taa_tgba*
   ltl_to_taa(const ltl::formula* f, bdd_dict* dict, bool refined_rules)
   {
     // TODO: s/unabbreviate_ltl/unabbreviate_logic/
@@ -381,7 +381,7 @@ namespace spot
     const ltl::formula* f2 = ltl::negative_normal_form(f1);
     f1->destroy();
 
-    spot::taa* res = new spot::taa(dict);
+    spot::taa_tgba* res = new spot::taa_tgba(dict);
     bdd_dict b;
     language_containment_checker* lcc =
       new language_containment_checker(&b, false, false, false, false);

@@ -25,15 +25,15 @@
 #include <iostream>
 #include "tgba/formula2bdd.hh"
 #include "misc/bddop.hh"
-#include "taa.hh"
+#include "taatgba.hh"
 
 namespace spot
 {
-  /*----.
-  | taa |
-  `----*/
+  /*--------.
+  | taa_tgba |
+  `--------*/
 
-  taa::taa(bdd_dict* dict)
+  taa_tgba::taa_tgba(bdd_dict* dict)
     : name_state_map_(), state_name_map_(), dict_(dict),
       all_acceptance_conditions_(bddfalse),
       all_acceptance_conditions_computed_(false),
@@ -42,12 +42,12 @@ namespace spot
   {
   }
 
-  taa::~taa()
+  taa_tgba::~taa_tgba()
   {
     ns_map::iterator i;
     for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
     {
-      taa::state::iterator i2;
+      taa_tgba::state::iterator i2;
       for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
 	delete *i2;
       delete i->second;
@@ -59,7 +59,7 @@ namespace spot
   }
 
   void
-  taa::set_init_state(const std::string& s)
+  taa_tgba::set_init_state(const std::string& s)
   {
     std::vector<std::string> v(1);
     v[0] = s;
@@ -67,14 +67,14 @@ namespace spot
   }
 
   void
-  taa::set_init_state(const std::vector<std::string>& s)
+  taa_tgba::set_init_state(const std::vector<std::string>& s)
   {
     init_ = add_state_set(s);
   }
 
-  taa::transition*
-  taa::create_transition(const std::string& s,
-			 const std::vector<std::string>& d)
+  taa_tgba::transition*
+  taa_tgba::create_transition(const std::string& s,
+                             const std::vector<std::string>& d)
   {
     state* src = add_state(s);
     state_set* dst = add_state_set(d);
@@ -86,8 +86,8 @@ namespace spot
     return t;
   }
 
-  taa::transition*
-  taa::create_transition(const std::string& s, const std::string& d)
+  taa_tgba::transition*
+  taa_tgba::create_transition(const std::string& s, const std::string& d)
   {
     std::vector<std::string> vec;
     vec.push_back(d);
@@ -95,14 +95,14 @@ namespace spot
   }
 
   void
-  taa::add_condition(transition* t, const ltl::formula* f)
+  taa_tgba::add_condition(transition* t, const ltl::formula* f)
   {
     t->condition &= formula_to_bdd(f, dict_, this);
     f->destroy();
   }
 
   void
-  taa::add_acceptance_condition(transition* t, const ltl::formula* f)
+  taa_tgba::add_acceptance_condition(transition* t, const ltl::formula* f)
   {
     if (dict_->acc_map.find(f) == dict_->acc_map.end())
     {
@@ -114,7 +114,7 @@ namespace spot
       ns_map::iterator i;
       for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
       {
-	taa::state::iterator i2;
+	taa_tgba::state::iterator i2;
 	for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
 	  (*i2)->acceptance_conditions &= neg;
       }
@@ -130,12 +130,12 @@ namespace spot
   }
 
   void
-  taa::output(std::ostream& os) const
+  taa_tgba::output(std::ostream& os) const
   {
     ns_map::const_iterator i;
     for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
     {
-      taa::state::const_iterator i2;
+      taa_tgba::state::const_iterator i2;
       os << "State: " << i->first << std::endl;
       for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
       {
@@ -147,16 +147,16 @@ namespace spot
   }
 
   state*
-  taa::get_init_state() const
+  taa_tgba::get_init_state() const
   {
     assert(init_);
     return new spot::state_set(init_);
   }
 
   tgba_succ_iterator*
-  taa::succ_iter(const spot::state* state,
-		 const spot::state* global_state,
-		 const tgba* global_automaton) const
+  taa_tgba::succ_iter(const spot::state* state,
+                     const spot::state* global_state,
+                     const tgba* global_automaton) const
   {
     const spot::state_set* s = dynamic_cast<const spot::state_set*>(state);
     assert(s);
@@ -166,13 +166,13 @@ namespace spot
   }
 
   bdd_dict*
-  taa::get_dict() const
+  taa_tgba::get_dict() const
   {
     return dict_;
   }
 
   std::string
-  taa::format_state(const spot::state* s) const
+  taa_tgba::format_state(const spot::state* s) const
   {
     const spot::state_set* se = dynamic_cast<const spot::state_set*>(s);
     assert(se);
@@ -181,7 +181,7 @@ namespace spot
   }
 
   bdd
-  taa::all_acceptance_conditions() const
+  taa_tgba::all_acceptance_conditions() const
   {
     if (!all_acceptance_conditions_computed_)
     {
@@ -193,21 +193,21 @@ namespace spot
   }
 
   bdd
-  taa::neg_acceptance_conditions() const
+  taa_tgba::neg_acceptance_conditions() const
   {
     return neg_acceptance_conditions_;
   }
 
   bdd
-  taa::compute_support_conditions(const spot::state* s) const
+  taa_tgba::compute_support_conditions(const spot::state* s) const
   {
     const spot::state_set* se = dynamic_cast<const spot::state_set*>(s);
     assert(se);
     const state_set* ss = se->get_state();
 
     bdd res = bddtrue;
-    taa::state_set::const_iterator i;
-    taa::state::const_iterator j;
+    taa_tgba::state_set::const_iterator i;
+    taa_tgba::state::const_iterator j;
     for (i = ss->begin(); i != ss->end(); ++i)
       for (j = (*i)->begin(); j != (*i)->end(); ++j)
 	res |= (*j)->condition;
@@ -215,28 +215,28 @@ namespace spot
   }
 
   bdd
-  taa::compute_support_variables(const spot::state* s) const
+  taa_tgba::compute_support_variables(const spot::state* s) const
   {
     const spot::state_set* se = dynamic_cast<const spot::state_set*>(s);
     assert(se);
     const state_set* ss = se->get_state();
 
     bdd res = bddtrue;
-    taa::state_set::const_iterator i;
-    taa::state::const_iterator j;
+    taa_tgba::state_set::const_iterator i;
+    taa_tgba::state::const_iterator j;
     for (i = ss->begin(); i != ss->end(); ++i)
       for (j = (*i)->begin(); j != (*i)->end(); ++j)
 	res &= bdd_support((*j)->condition);
     return res;
   }
 
-  taa::state*
-  taa::add_state(const std::string& name)
+  taa_tgba::state*
+  taa_tgba::add_state(const std::string& name)
   {
     ns_map::iterator i = name_state_map_.find(name);
     if (i == name_state_map_.end())
     {
-      taa::state* s = new taa::state;
+      taa_tgba::state* s = new taa_tgba::state;
       name_state_map_[name] = s;
       state_name_map_[s] = name;
       return s;
@@ -244,8 +244,8 @@ namespace spot
     return i->second;
   }
 
-  taa::state_set*
-  taa::add_state_set(const std::vector<std::string>& names)
+  taa_tgba::state_set*
+  taa_tgba::add_state_set(const std::vector<std::string>& names)
   {
     state_set* ss = new state_set;
     for (unsigned i = 0; i < names.size(); ++i)
@@ -255,7 +255,7 @@ namespace spot
   }
 
   std::string
-  taa::format_state_set(const taa::state_set* ss) const
+  taa_tgba::format_state_set(const taa_tgba::state_set* ss) const
   {
     state_set::const_iterator i1 = ss->begin();
     sn_map::const_iterator i2;
@@ -286,7 +286,7 @@ namespace spot
   | state_set |
   `----------*/
 
-  const taa::state_set*
+  const taa_tgba::state_set*
   state_set::get_state() const
   {
     return s_;
@@ -298,14 +298,14 @@ namespace spot
     const state_set* o = dynamic_cast<const state_set*>(other);
     assert(o);
 
-    const taa::state_set* s1 = get_state();
-    const taa::state_set* s2 = o->get_state();
+    const taa_tgba::state_set* s1 = get_state();
+    const taa_tgba::state_set* s2 = o->get_state();
 
     if (s1->size() != s2->size())
       return s1->size() - s2->size();
 
-    taa::state_set::const_iterator it1 = s1->begin();
-    taa::state_set::const_iterator it2 = s2->begin();
+    taa_tgba::state_set::const_iterator it1 = s1->begin();
+    taa_tgba::state_set::const_iterator it2 = s2->begin();
     while (it2 != s2->end())
     {
       int i = *it1++ - *it2++;
@@ -319,7 +319,7 @@ namespace spot
   state_set::hash() const
   {
     size_t res = 0;
-    taa::state_set::const_iterator it = s_->begin();
+    taa_tgba::state_set::const_iterator it = s_->begin();
     while (it != s_->end())
     {
       res ^= reinterpret_cast<const char*>(*it++) - static_cast<char*>(0);
@@ -332,7 +332,7 @@ namespace spot
   state_set::clone() const
   {
     if (delete_me_ && s_)
-      return new spot::state_set(new taa::state_set(*s_), true);
+      return new spot::state_set(new taa_tgba::state_set(*s_), true);
     else
       return new spot::state_set(s_, false);
   }
@@ -341,21 +341,22 @@ namespace spot
   | taa_succ_iter |
   `--------------*/
 
-  taa_succ_iterator::taa_succ_iterator(const taa::state_set* s, bdd all_acc)
+  taa_succ_iterator::taa_succ_iterator(const taa_tgba::state_set* s,
+                                       bdd all_acc)
     : all_acceptance_conditions_(all_acc), seen_()
   {
     if (s->empty())
     {
-      taa::transition* t = new taa::transition;
+      taa_tgba::transition* t = new taa_tgba::transition;
       t->condition = bddtrue;
       t->acceptance_conditions = bddfalse;
-      t->dst = new taa::state_set;
+      t->dst = new taa_tgba::state_set;
       succ_.push_back(t);
       return;
     }
 
     bounds_t bounds;
-    for (taa::state_set::const_iterator i = s->begin(); i != s->end(); ++i)
+    for (taa_tgba::state_set::const_iterator i = s->begin(); i != s->end(); ++i)
       bounds.push_back(std::make_pair((*i)->begin(), (*i)->end()));
 
     /// Sorting might make the cartesian product faster by not
@@ -369,15 +370,15 @@ namespace spot
 
     while (pos[0] != bounds[0].second)
     {
-      taa::transition* t = new taa::transition;
+      taa_tgba::transition* t = new taa_tgba::transition;
       t->condition = bddtrue;
       t->acceptance_conditions = bddfalse;
-      taa::state_set* ss = new taa::state_set;
+      taa_tgba::state_set* ss = new taa_tgba::state_set;
 
       unsigned p;
       for (p = 0; p < pos.size() && t->condition != bddfalse; ++p)
       {
-	taa::state_set::const_iterator j;
+	taa_tgba::state_set::const_iterator j;
 	for (j = (*pos[p])->dst->begin(); j != (*pos[p])->dst->end(); ++j)
 	  if ((*j)->size() > 0) // Remove sink states.
 	    ss->insert(*j);
@@ -475,7 +476,7 @@ namespace spot
   taa_succ_iterator::current_state() const
   {
     assert(!done());
-    return new spot::state_set(new taa::state_set(*(*i_)->dst), true);
+    return new spot::state_set(new taa_tgba::state_set(*(*i_)->dst), true);
   }
 
   bdd

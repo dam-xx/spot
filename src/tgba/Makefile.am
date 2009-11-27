@@ -34,7 +34,7 @@ tgba_HEADERS = \
   statebdd.hh \
   succiter.hh \
   succiterconcrete.hh \
-  taa.hh \
+  taatgba.hh \
   tgba.hh \
   tgbabddconcrete.hh \
   tgbabddconcretefactory.hh \
@@ -60,7 +60,7 @@ libtgba_la_SOURCES = \
   futurecondcol.cc \
   succiterconcrete.cc \
   statebdd.cc \
-  taa.cc \
+  taatgba.cc \
   tgba.cc \
   tgbabddconcrete.cc \
   tgbabddconcretefactory.cc \

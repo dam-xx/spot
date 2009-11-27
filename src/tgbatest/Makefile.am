@@ -41,7 +41,7 @@ check_PROGRAMS = \
   readsave \
   reductgba \
   reduccmp \
-  taa \
+  taatgba \
   tgbaread \
   tripprod
 
@@ -63,7 +63,7 @@ readsave_SOURCES = readsave.cc
 reductgba_SOURCES = reductgba.cc
 reduccmp_SOURCES = reductgba.cc
 reduccmp_CXXFLAGS = -DREDUCCMP
-taa_SOURCES = taa.cc
+taatgba_SOURCES = taatgba.cc
 tgbaread_SOURCES = tgbaread.cc
 tripprod_SOURCES = tripprod.cc
 
@@ -72,7 +72,7 @@ tripprod_SOURCES = tripprod.cc
 TESTS = \
   eltl2tgba.test \
   explicit.test \
-  taa.test \
+  taatgba.test \
   tgbaread.test \
   readsave.test \
   ltl2tgba.test \

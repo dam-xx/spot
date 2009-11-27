@@ -3,4 +3,4 @@
 . ./defs || exit -1
 set -e
 
-run 0 ../taa || exit 1
+run 0 ../taatgba || exit 1
