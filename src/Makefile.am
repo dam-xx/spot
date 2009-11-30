@@ -23,11 +23,10 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 # List directories in the order they must be built.
 # Keep tests at the end.
-SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse eltlparse \
-          tgba tgbaalgos tgbaparse \
-	  evtgba evtgbaalgos evtgbaparse \
-          kripke . \
-	  ltltest eltltest tgbatest evtgbatest sanity
+SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse eltlparse tgba		\
+          tgbaalgos tgbaparse evtgba evtgbaalgos evtgbaparse kripke	\
+          saba sabaalgos ltltest eltltest tgbatest evtgbatest sabatest	\
+          sanity
 
 lib_LTLIBRARIES = libspot.la
 libspot_la_SOURCES =
@@ -45,6 +44,8 @@ libspot_la_LIBADD =  \
   evtgba/libevtgba.la \
   evtgbaalgos/libevtgbaalgos.la \
   evtgbaparse/libevtgbaparse.la \
+  saba/libsaba.la \
+  sabaalgos/libsabaalgos.la \
   kripke/libkripke.la
 
 # Dummy C++ source to cause C++ linking.

@@ -1,3 +1,23 @@
+2009-11-30  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	Add a new type of automata: State-labeled Alternating Büchi
+	Automata (SABA).
+
+	* src/saba/saba.hh, src/saba/saba.cc, src/saba/sabastate.hh,
+	src/saba/sabasucciter.hh: New.  Interface for
+	SABA (State-labeled Alternating Büchi Automata).
+	* src/saba/explicitstateconjunction.cc,
+	src/saba/explicitstateconjunction.hh: New.  Default
+	implementation for a conjunction of states.
+	* src/saba/Makefile.am: New.
+	* src/Makefile.am, configure.ac: Adjust.
+	* src/sabaalgos/sabareachiter.cc,
+	src/sabaalgos/sabareachiter.hh: New.  Iterate over all reachable
+	states of a spot::saba.
+	* src/sabaalgos/sabadotty.cc, src/sabaalgos/sabadotty.hh: New.
+	Print reachable states in dot format.
+	* src/sabaalgos/Makefile.am: New.
+
 2009-11-27  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	Rename the class taa as taa_tgba.

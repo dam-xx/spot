@@ -108,6 +108,10 @@ AC_CONFIG_FILES([
   src/Makefile
   src/misc/Makefile
   src/sanity/Makefile
+  src/saba/Makefile
+  src/sabaalgos/Makefile
+  src/sabatest/defs
+  src/sabatest/Makefile
   src/tgbaalgos/gtec/Makefile
   src/tgbaalgos/Makefile
   src/tgba/Makefile
