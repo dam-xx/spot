@@ -1,5 +1,17 @@
 2009-11-30  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
+	An algorithm to complement TGBA into SABA.
+
+	* src/saba/sabacomplementtgba.hh,
+	src/saba/sabacomplementtgba.cc: New.  The algorithm.
+	* src/saba/Makefile.am: Adjust.
+	* src/sabatest/sabacomplementtgba.cc, src/sabatest/Makefile.am,
+	src/sabatest/defs.in: New.  Test the algorithm.
+	* configure.ac, src/Makefile.am: Adjust to the new directory
+	`sabatest'.
+
+2009-11-30  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
 	Add a new type of automata: State-labeled Alternating Büchi
 	Automata (SABA).
 
