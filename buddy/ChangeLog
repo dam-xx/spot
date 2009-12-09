@@ -1,3 +1,13 @@
+2009-12-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Inline bdd_addref() and bdd_delref() to speedup BDD operations.
+
+	* src/kernel.c, src/kernel.h (bdd_addref, bdd_delref): Move these
+	functions and there associated global variables...
+	* src/bdd.c (bdd_error): ... and this function ...
+	* src/bdd.h (bdd_addref, bdd_delref, bdd_error): ...here so that
+	they can be inlined.
+
 2009-11-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Introduce bdd_satprefix, to speedup spot::minato().

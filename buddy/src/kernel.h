@@ -1,5 +1,5 @@
 /*========================================================================
-	       Copyright (C) 1996-2002 by Jorn Lind-Nielsen
+	       Copyright (C) 1996-2002, 2009 by Jorn Lind-Nielsen
 			    All rights reserved
 
     Permission is hereby granted, without written agreement and without
@@ -77,31 +77,15 @@
      { bdd_error(BDD_ILLBDD); return; }
 
 
-/*=== SEMI-INTERNAL TYPES ==============================================*/
-
-typedef struct s_BddNode /* Node table entry */
-{
-   unsigned int refcou : 10;
-   unsigned int level  : 22;
-   int low;
-   int high;
-   int hash;
-   int next;
-} BddNode;
-
-
 /*=== KERNEL VARIABLES =================================================*/
 
 #ifdef CPLUSPLUS
 extern "C" {
 #endif
 
-extern int       bddrunning;         /* Flag - package initialized */
 extern int       bdderrorcond;       /* Some error condition was met */
-extern int       bddnodesize;        /* Number of allocated nodes */
 extern int       bddmaxnodesize;     /* Maximum allowed number of nodes */
 extern int       bddmaxnodeincrease; /* Max. # of nodes used to inc. table */
-extern BddNode*  bddnodes;           /* All of the bdd nodes */
 extern int       bddvarnum;          /* Number of defined BDD variables */
 extern int*      bddrefstack;        /* Internal node reference stack */
 extern int*      bddrefstacktop;     /* Internal node reference stack top */
@@ -119,16 +103,6 @@ extern bddCacheStat bddcachestats;
 
 /*=== KERNEL DEFINITIONS ===============================================*/
 
-#define MAXVAR 0x1FFFFF
-#define MAXREF 0x3FF
-
-   /* Reference counting */
-#define DECREF(n) if (bddnodes[n].refcou!=MAXREF && bddnodes[n].refcou>0) bddnodes[n].refcou--
-#define INCREF(n) if (bddnodes[n].refcou<MAXREF) bddnodes[n].refcou++
-#define DECREFp(n) if (n->refcou!=MAXREF && n->refcou>0) n->refcou--
-#define INCREFp(n) if (n->refcou<MAXREF) n->refcou++
-#define HASREF(n) (bddnodes[n].refcou > 0)
-
    /* Marking BDD nodes */
 #define MARKON   0x200000    /* Bit used to mark a node (1) */
 #define MARKOFF  0x1FFFFF    /* - unmark */
@@ -145,18 +119,6 @@ extern bddCacheStat bddcachestats;
 #define PAIR(a,b)      ((unsigned int)((((unsigned int)a)+((unsigned int)b))*(((unsigned int)a)+((unsigned int)b)+((unsigned int)1))/((unsigned int)2)+((unsigned int)a)))
 #define TRIPLE(a,b,c)  ((unsigned int)(PAIR((unsigned int)c,PAIR(a,b))))
 
-
-   /* Inspection of BDD nodes */
-#define ISCONST(a) ((a) < 2)
-#define ISNONCONST(a) ((a) >= 2)
-#define ISONE(a)   ((a) == 1)
-#define ISZERO(a)  ((a) == 0)
-#define LEVEL(a)   (bddnodes[a].level)
-#define LOW(a)     (bddnodes[a].low)
-#define HIGH(a)    (bddnodes[a].high)
-#define LEVELp(p)   ((p)->level)
-#define LOWp(p)     ((p)->low)
-#define HIGHp(p)    ((p)->high)
 
    /* Stacking for garbage collector */
 #define INITREF    bddrefstacktop = bddrefstack
@@ -189,7 +151,6 @@ extern bddCacheStat bddcachestats;
 extern "C" {
 #endif
 
-extern int    bdd_error(int);
 extern int    bdd_makenode(unsigned int, int, int);
 extern int    bdd_noderesize(int);
 extern void   bdd_checkreorder(void);

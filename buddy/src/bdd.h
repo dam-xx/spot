@@ -80,6 +80,158 @@ typedef struct s_bddPair
    struct s_bddPair *next;
 } bddPair;
 
+/*=== Reordering algorithms ============================================*/
+
+#define BDD_REORDER_NONE     0
+#define BDD_REORDER_WIN2     1
+#define BDD_REORDER_WIN2ITE  2
+#define BDD_REORDER_SIFT     3
+#define BDD_REORDER_SIFTITE  4
+#define BDD_REORDER_WIN3     5
+#define BDD_REORDER_WIN3ITE  6
+#define BDD_REORDER_RANDOM   7
+
+#define BDD_REORDER_FREE     0
+#define BDD_REORDER_FIXED    1
+
+
+/*=== Error codes ======================================================*/
+
+#define BDD_MEMORY (-1)   /* Out of memory */
+#define BDD_VAR (-2)      /* Unknown variable */
+#define BDD_RANGE (-3)    /* Variable value out of range (not in domain) */
+#define BDD_DEREF (-4)    /* Removing external reference to unknown node */
+#define BDD_RUNNING (-5)  /* Called bdd_init() twice whithout bdd_done() */
+#define BDD_FILE (-6)     /* Some file operation failed */
+#define BDD_FORMAT (-7)   /* Incorrect file format */
+#define BDD_ORDER (-8)    /* Vars. not in order for vector based functions */
+#define BDD_BREAK (-9)    /* User called break */
+#define BDD_VARNUM (-10)  /* Different number of vars. for vector pair */
+#define BDD_NODES (-11)   /* Tried to set max. number of nodes to be fewer */
+			  /* than there already has been allocated */
+#define BDD_OP (-12)      /* Unknown operator */
+#define BDD_VARSET (-13)  /* Illegal variable set */
+#define BDD_VARBLK (-14)  /* Bad variable block operation */
+#define BDD_DECVNUM (-15) /* Trying to decrease the number of variables */
+#define BDD_REPLACE (-16) /* Replacing to already existing variables */
+#define BDD_NODENUM (-17) /* Number of nodes reached user defined maximum */
+#define BDD_ILLBDD (-18)  /* Illegal bdd argument */
+#define BDD_SIZE (-19)    /* Illegal size argument */
+
+#define BVEC_SIZE (-20)    /* Mismatch in bitvector size */
+#define BVEC_SHIFT (-21)   /* Illegal shift-left/right parameter */
+#define BVEC_DIVZERO (-22) /* Division by zero */
+
+#define BDD_INVMERGE (-23) /* Merging clashing rewriting rules */
+
+#define BDD_ERRNUM 25
+
+#ifdef CPLUSPLUS
+extern "C" {
+#endif
+
+/* In kernel.c */
+extern int    bdd_error(int);
+
+
+/*=== SEMI-INTERNAL TYPES ==============================================*/
+
+typedef struct s_BddNode /* Node table entry */
+{
+   unsigned int refcou : 10;
+   unsigned int level  : 22;
+   int low;
+   int high;
+   int hash;
+   int next;
+} BddNode;
+
+#define MAXVAR 0x1FFFFF
+#define MAXREF 0x3FF
+
+   /* Reference counting */
+#define DECREF(n) if (bddnodes[n].refcou!=MAXREF && bddnodes[n].refcou>0) bddnodes[n].refcou--
+#define INCREF(n) if (bddnodes[n].refcou<MAXREF) bddnodes[n].refcou++
+#define DECREFp(n) if (n->refcou!=MAXREF && n->refcou>0) n->refcou--
+#define INCREFp(n) if (n->refcou<MAXREF) n->refcou++
+#define HASREF(n) (bddnodes[n].refcou > 0)
+
+extern int       bddrunning;         /* Flag - package initialized */
+extern int       bddnodesize;        /* Number of allocated nodes */
+extern BddNode*  bddnodes;           /* All of the bdd nodes */
+
+   /* Inspection of BDD nodes */
+#define ISCONST(a) ((a) < 2)
+#define ISNONCONST(a) ((a) >= 2)
+#define ISONE(a)   ((a) == 1)
+#define ISZERO(a)  ((a) == 0)
+#define LEVEL(a)   (bddnodes[a].level)
+#define LOW(a)     (bddnodes[a].low)
+#define HIGH(a)    (bddnodes[a].high)
+#define LEVELp(p)   ((p)->level)
+#define LOWp(p)     ((p)->low)
+#define HIGHp(p)    ((p)->high)
+
+/*
+NAME    {* bdd\_addref *}
+SECTION {* kernel *}
+SHORT   {* increases the reference count on a node *}
+PROTO   {* BDD bdd_addref(BDD r) *}
+DESCR   {* Reference counting is done on externaly referenced nodes only
+	   and the count for a specific node {\tt r} can and must be
+	   increased using this function to avoid loosing the node in the next
+	   garbage collection. *}
+ALSO    {* bdd\_delref *}
+RETURN  {* The BDD node {\tt r}. *}
+*/
+static inline
+BDD bdd_addref(BDD root)
+{
+   if (root < 2 || !bddrunning)
+      return root;
+   if (root >= bddnodesize)
+      return bdd_error(BDD_ILLBDD);
+   if (LOW(root) == -1)
+      return bdd_error(BDD_ILLBDD);
+
+   INCREF(root);
+   return root;
+}
+
+
+/*
+NAME    {* bdd\_delref *}
+SECTION {* kernel *}
+SHORT   {* decreases the reference count on a node *}
+PROTO   {* BDD bdd_delref(BDD r) *}
+DESCR   {* Reference counting is done on externaly referenced nodes only
+	   and the count for a specific node {\tt r} can and must be
+	   decreased using this function to make it possible to reclaim the
+	   node in the next garbage collection. *}
+ALSO    {* bdd\_addref *}
+RETURN  {* The BDD node {\tt r}. *}
+*/
+static inline
+BDD bdd_delref(BDD root)
+{
+   if (root < 2  ||  !bddrunning)
+      return root;
+   if (root >= bddnodesize)
+      return bdd_error(BDD_ILLBDD);
+   if (LOW(root) == -1)
+      return bdd_error(BDD_ILLBDD);
+
+   /* if the following line is present, fails there much earlier */
+   if (!HASREF(root)) bdd_error(BDD_BREAK); /* distinctive */
+
+   DECREF(root);
+   return root;
+}
+
+#ifdef CPLUSPLUS
+}
+#endif
+
 
 /*=== Status information ===============================================*/
 
@@ -258,8 +410,6 @@ extern int      bdd_var(BDD);
 extern BDD      bdd_low(BDD);
 extern BDD      bdd_high(BDD);
 extern int      bdd_varlevel(int);
-extern BDD      bdd_addref(BDD);
-extern BDD      bdd_delref(BDD);
 extern void     bdd_gbc(void);
 extern int      bdd_scanset(BDD, int**, int*);
 extern BDD      bdd_makeset(int *, int);
@@ -375,52 +525,6 @@ extern const BDD bddtrue;
 
 #endif /* CPLUSPLUS */
 
-
-/*=== Reordering algorithms ============================================*/
-
-#define BDD_REORDER_NONE     0
-#define BDD_REORDER_WIN2     1
-#define BDD_REORDER_WIN2ITE  2
-#define BDD_REORDER_SIFT     3
-#define BDD_REORDER_SIFTITE  4
-#define BDD_REORDER_WIN3     5
-#define BDD_REORDER_WIN3ITE  6
-#define BDD_REORDER_RANDOM   7
-
-#define BDD_REORDER_FREE     0
-#define BDD_REORDER_FIXED    1
-
-
-/*=== Error codes ======================================================*/
-
-#define BDD_MEMORY (-1)   /* Out of memory */
-#define BDD_VAR (-2)      /* Unknown variable */
-#define BDD_RANGE (-3)    /* Variable value out of range (not in domain) */
-#define BDD_DEREF (-4)    /* Removing external reference to unknown node */
-#define BDD_RUNNING (-5)  /* Called bdd_init() twice whithout bdd_done() */
-#define BDD_FILE (-6)     /* Some file operation failed */
-#define BDD_FORMAT (-7)   /* Incorrect file format */
-#define BDD_ORDER (-8)    /* Vars. not in order for vector based functions */
-#define BDD_BREAK (-9)    /* User called break */
-#define BDD_VARNUM (-10)  /* Different number of vars. for vector pair */
-#define BDD_NODES (-11)   /* Tried to set max. number of nodes to be fewer */
-			  /* than there already has been allocated */
-#define BDD_OP (-12)      /* Unknown operator */
-#define BDD_VARSET (-13)  /* Illegal variable set */
-#define BDD_VARBLK (-14)  /* Bad variable block operation */
-#define BDD_DECVNUM (-15) /* Trying to decrease the number of variables */
-#define BDD_REPLACE (-16) /* Replacing to already existing variables */
-#define BDD_NODENUM (-17) /* Number of nodes reached user defined maximum */
-#define BDD_ILLBDD (-18)  /* Illegal bdd argument */
-#define BDD_SIZE (-19)    /* Illegal size argument */
-
-#define BVEC_SIZE (-20)    /* Mismatch in bitvector size */
-#define BVEC_SHIFT (-21)   /* Illegal shift-left/right parameter */
-#define BVEC_DIVZERO (-22) /* Division by zero */
-
-#define BDD_INVMERGE (-23) /* Merging clashing rewriting rules */
-
-#define BDD_ERRNUM 25
 
 /*************************************************************************
    If this file is included from a C++ compiler then the following
