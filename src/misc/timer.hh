@@ -48,6 +48,10 @@ namespace spot
   class timer
   {
   public:
+    timer()
+      : running(false)
+    {
+    }
 
     /// Start a time interval.
     void
