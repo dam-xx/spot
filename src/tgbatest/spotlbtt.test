@@ -73,7 +73,7 @@ Algorithm
    Name = "Spot (Couvreur -- LaCIM), eltl + delete_unaccepting_scc"
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot '../eltl2tgba -L'"
-   Enabled = no
+   Enabled = yes
 }
 
 Algorithm

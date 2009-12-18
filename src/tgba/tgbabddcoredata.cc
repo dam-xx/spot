@@ -162,7 +162,7 @@ namespace spot
       }
     }
 
-    relation = s0 & (relation & bdd_replace(s0, dict->now_to_next));
+    relation = (relation & bdd_replace(s0, dict->now_to_next));
   }
 
   bdd
