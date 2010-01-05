@@ -1,3 +1,14 @@
+2010-01-05  Damien Lefortier <dam@lrde.epita.fr>
+
+	Merge eltl2tgba.cc into ltl2tgba.cc.
+
+	* src/tgbatest/eltl2tgba.cc: Remove.
+	* src/tgbatest/Makefile.am: Adjust.
+	* src/tgbatest/ltl2tgba.cc: New option: -xltl to translate an
+	extended LTL instead of an LTL, a feature previously offered by
+	eltl2tgba.cc. Also: -R3b to use delete_unaccepting_scc.
+	* src/tgbatest/spotlbtt.test: Adjust.
+
 2009-11-10  Damien Lefortier <dam@lrde.epita.fr>
 
 	* src/tgba/tgbabddcoredata.cc (delete_unaccepting_scc): Fix a bug.

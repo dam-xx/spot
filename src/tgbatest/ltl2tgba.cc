@@ -49,11 +49,29 @@
 #include "tgbaalgos/replayrun.hh"
 #include "tgbaalgos/rundotdec.hh"
 #include "tgbaalgos/sccfilter.hh"
+#include "tgbaalgos/eltl2tgba_lacim.hh"
+#include "eltlparse/public.hh"
 #include "misc/timer.hh"
 
 #include "tgbaalgos/stats.hh"
 #include "tgbaalgos/scc.hh"
 #include "tgbaalgos/emptiness_stats.hh"
+
+std::string
+ltl_defs()
+{
+  std::string s = "\
+X=(0 1 true	   \
+   1 2 $0	   \
+   accept 2)	   \
+U=(0 0 $0	   \
+   0 1 $1	   \
+   accept 1)	   \
+G=(0 0 $0)	   \
+F=U(true, $0)	   \
+R=!U(!$0, !$1)";
+  return s;
+}
 
 void
 syntax(char* prog)
@@ -125,6 +143,7 @@ syntax(char* prog)
 	    << "reachability graph"
 	    << std::endl
 	    << "  -A    same as -a, but as a set" << std::endl
+	    << "  -xltl translate an extended LTL, not an LTL" << std::endl
 	    << "  -r    display the relation BDD, not the reachability graph"
 	    << std::endl
 	    << "  -R    same as -r, but as a set" << std::endl
@@ -170,6 +189,7 @@ syntax(char* prog)
 	    << "  -R2t  remove transitions using delayed simulation"
 	    << std::endl
 	    << "  -R3   use SCC to reduce the automata" << std::endl
+	    << "  -R3b  delete unaccepting SCC directly on the BDD" << std::endl
 	    << "  -Rd   display the simulation relation" << std::endl
 	    << "  -RD   display the parity game (dot format)" << std::endl
 	    << std::endl
@@ -254,6 +274,8 @@ main(int argc, char** argv)
   bool from_file = false;
   int reduc_aut = spot::Reduce_None;
   int redopt = spot::ltl::Reduce_None;
+  bool eltl = false;
+  bool delete_unaccepting_scc = false;
   bool display_reduce_form = false;
   bool display_rel_sim = false;
   bool display_parity_game = false;
@@ -351,6 +373,10 @@ main(int argc, char** argv)
           expect_counter_example = false;
           output = -1;
         }
+      else if (!strcmp(argv[formula_index], "-xltl"))
+	{
+	  eltl = true;
+	}
       else if (!strcmp(argv[formula_index], "-taa"))
 	{
 	  translation = TransTAA;
@@ -528,6 +554,10 @@ main(int argc, char** argv)
 	{
 	  reduc_aut |= spot::Reduce_Scc;
 	}
+      else if (!strcmp(argv[formula_index], "-R3b"))
+	{
+	  delete_unaccepting_scc = true;
+	}
       else if (!strcmp(argv[formula_index], "-rd"))
 	{
 	  display_reduce_form = true;
@@ -634,11 +664,40 @@ main(int argc, char** argv)
   spot::ltl::formula* f = 0;
   if (!from_file)
     {
-      spot::ltl::parse_error_list pel;
-      tm.start("parsing formula");
-      f = spot::ltl::parse(input, pel, env, debug_opt);
-      tm.stop("parsing formula");
-      exit_code = spot::ltl::format_parse_errors(std::cerr, input, pel);
+      if (!eltl)
+        {
+          spot::ltl::parse_error_list pel;
+	  tm.start("parsing formula");
+	  f = spot::ltl::parse(input, pel, env, debug_opt);
+	  tm.stop("parsing formula");
+	  exit_code = spot::ltl::format_parse_errors(std::cerr, input, pel);
+	}
+      else if (!file_opt || output == 6)
+        {
+	  // Call the LTL parser first to handle abbreviations such as
+	  // [] when the formula is not given in a file or when the
+	  // output in done in LBTT's format. The ELTL parser is then
+	  // called with usual LTL operators.
+	  spot::ltl::parse_error_list pel;
+	  tm.start("parsing formula");
+	  f = spot::ltl::parse(input, pel, env, debug_opt);
+	  input = ltl_defs();
+	  input += "%";
+	  input += spot::ltl::to_string(f, true);
+	  f->destroy();
+	  spot::eltl::parse_error_list p;
+	  f = spot::eltl::parse_string(input, p, env, debug_opt);
+	  tm.stop("parsing formula");
+	  exit_code = spot::eltl::format_parse_errors(std::cerr, p);
+        }
+      else
+        {
+	  spot::eltl::parse_error_list p;
+	  tm.start("parsing formula");
+	  f = spot::eltl::parse_string(input, p, env, false);
+	  tm.stop("parsing formula");
+	  exit_code = spot::eltl::format_parse_errors(std::cerr, p);
+	}
     }
   if (f || from_file)
     {
@@ -690,7 +749,10 @@ main(int argc, char** argv)
 	      a = spot::ltl_to_taa(f, dict, containment);
 	      break;
 	    case TransLaCIM:
-	      a = concrete = spot::ltl_to_tgba_lacim(f, dict);
+	      if (!eltl)
+		a = concrete = spot::ltl_to_tgba_lacim(f, dict);
+	      else
+		a = concrete = spot::eltl_to_tgba_lacim(f, dict);
 	      break;
 	    }
 	  tm.stop("translating formula");
@@ -725,6 +787,15 @@ main(int argc, char** argv)
 	      tm.start("reducing A_f w/ SCC");
 	      a = aut_scc = spot::scc_filter(a);
 	      tm.stop("reducing A_f w/ SCC");
+	    }
+
+	  if (delete_unaccepting_scc)
+	    {
+	      tm.start("reducing A_f w/ SCC on BDD");
+	      if (spot::tgba_bdd_concrete* bc =
+		  dynamic_cast<spot::tgba_bdd_concrete*>(a))
+		bc->delete_unaccepting_scc();
+	      tm.stop("reducing A_f w/ SCC on BDD");
 	    }
 
 	  if (reduc_aut & ~spot::Reduce_Scc)

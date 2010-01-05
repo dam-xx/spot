@@ -6,7 +6,7 @@ set -e
 # Check if the TGBA was corretly constructed.
 check_construct()
 {
-  run 0 ../eltl2tgba -F "$1" input
+  run 0 ../ltl2tgba -F -l -xltl -b "$1" > output
 }
 
 # Check if the TGBA behaves correctly by doing an emptiness check on
@@ -14,11 +14,11 @@ check_construct()
 # translated using FM.
 check_true()
 {
-  run 0 ../ltl2tgba -e -Pinput -f "$1"
+  run 0 ../ltl2tgba -e -Poutput -f "$1"
 }
 check_false()
 {
-  run 1 ../ltl2tgba -e -Pinput -f "$1"
+  run 1 ../ltl2tgba -e -Poutput -f "$1"
 }
 
 # Create the prelude file.

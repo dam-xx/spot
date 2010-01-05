@@ -32,7 +32,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- LaCIM)"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '../ltl2tgba -F -l -t'"
+   Parameters = "--spot '../ltl2tgba -l -F -t'"
    Enabled = yes
 }
 
@@ -40,7 +40,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- LaCIM), reduction of formula"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '../ltl2tgba -r4 -l -F -t'"
+   Parameters = "--spot '../ltl2tgba -l -F -t -r4'"
    Enabled = yes
 }
 
@@ -49,7 +49,7 @@ Algorithm
    Name = "Spot (Couvreur -- LaCIM), degeneralized"
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot '../ltl2tgba -l -F -t -D'"
-   Enabled = yes
+   Enabled = no
 }
 
 Algorithm
@@ -64,7 +64,7 @@ Algorithm
 {
    Name = "Spot (Couvreur -- LaCIM), eltl"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '../eltl2tgba -LW'"
+   Parameters = "--spot '../ltl2tgba -F -l -t -xltl'"
    Enabled = yes
 }
 
@@ -72,8 +72,16 @@ Algorithm
 {
    Name = "Spot (Couvreur -- LaCIM), eltl + delete_unaccepting_scc"
    Path = "${LBTT_TRANSLATE}"
-   Parameters = "--spot '../eltl2tgba -L'"
+   Parameters = "--spot '../ltl2tgba -F -l -t -xltl -R3b'"
    Enabled = yes
+}
+
+Algorithm
+{
+   Name = "Spot (Couvreur -- LaCIM), eltl + post reduction with scc"
+   Path = "${LBTT_TRANSLATE}"
+   Parameters = "--spot '../ltl2tgba -F -l -t -xltl -R3'"
+   Enabled = no
 }
 
 Algorithm
@@ -278,10 +286,18 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Tauriainen -- TAA), refined rules + post reduction with scc"
+   Path = "${LBTT_TRANSLATE}"
+   Parameters = "--spot '../ltl2tgba -F -taa -t -c -R3'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Tauriainen -- TAA) refined rules + pre + post reduction"
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot '../ltl2tgba -F -taa -t -c -r7 -R3'"
-   Enabled = yes
+   Enabled = no
 }
 
 GlobalOptions
