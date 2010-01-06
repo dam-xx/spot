@@ -100,8 +100,8 @@ eol      \n|\r|\n\r|\r\n
 <INITIAL>"%"		BEGIN(formula);
 
 <INITIAL>"="		return token::EQ;
-<IINTIAL>"accept"	return token::ACC;
-<IINTIAL>"finish"	return token::FIN;
+<INITIAL>"accept"	return token::ACC;
+<INITIAL>"finish"	return token::FIN;
 
 <INITIAL>[tT][rR][uU][eE] {
 			  return token::CONST_TRUE;

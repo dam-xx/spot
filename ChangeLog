@@ -1,3 +1,9 @@
+2010-01-06  Damien Lefortier <dam@lrde.epita.fr>
+
+	Fix a longstanding bug reported by Guillaume Sadegh.
+
+	* src/eltlparse/eltlscan.ll: Fix a typo.
+
 2010-01-05  Damien Lefortier <dam@lrde.epita.fr>
 
 	Merge eltl2tgba.cc into ltl2tgba.cc.
@@ -7,7 +13,7 @@
 	* src/tgbatest/ltl2tgba.cc: New option: -xltl to translate an
 	extended LTL instead of an LTL, a feature previously offered by
 	eltl2tgba.cc. Also: -R3b to use delete_unaccepting_scc.
-	* src/tgbatest/spotlbtt.test: Adjust.
+	* src/tgbatest/spotlbtt.test, src/tgbatest/eltl2tgba.test: Adjust.
 
 2009-11-10  Damien Lefortier <dam@lrde.epita.fr>
 
