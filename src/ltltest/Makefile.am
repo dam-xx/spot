@@ -28,6 +28,7 @@ LDADD = ../libspot.la
 check_SCRIPTS = defs
 # Keep this sorted alphabetically.
 check_PROGRAMS = \
+  consterm \
   equals \
   ltl2dot \
   ltl2text \
@@ -46,6 +47,7 @@ noinst_PROGRAMS = \
   genltl \
   randltl
 
+consterm_SOURCES = consterm.cc
 equals_SOURCES = equals.cc
 genltl_SOURCES = genltl.cc
 ltl2dot_SOURCES = readltl.cc
@@ -83,6 +85,7 @@ TESTS = \
   tunabbrev.test \
   nenoform.test \
   tunenoform.test \
+  consterm.test \
   syntimpl.test \
   reduc.test \
   reduccmp.test

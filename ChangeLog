@@ -1,5 +1,14 @@
 2010-01-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Add a constant_term() visitor to decide wether #e is accepted.
+
+	* src/ltlvisit/Makefile.am: Add consterm.cc and consterm.hh.
+	* src/ltlvisit/consterm.hh, src/ltlvisit/consterm.cc: New files.
+	* src/ltltest/Makefile.am: Add consterm.cc and consterm.test.
+	* src/ltltest/consterm.cc, src/ltltest/consterm.test: New files.
+
+2010-01-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Introduce rational operators, and update instantiation methods
 	with trivial simplifications rules (such as "FFa=Fa" or "x&1=x").
 
