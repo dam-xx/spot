@@ -1,3 +1,51 @@
+2010-01-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Introduce rational operators, and update instantiation methods
+	with trivial simplifications rules (such as "FFa=Fa" or "x&1=x").
+
+	* src/ltlast/constant.hh, src/ltlast/constant.cc
+	(true_instance, true_instance_): Declare the true_instance_ as a
+	static member, and move true_instance() into the .hh so it gets
+	inlined.  Have true_instance_ as a class variable will ensure that
+	it is the first formula instantiated.  Binop simplifications rely
+	on this to order arguments.
+	(false_instance, false_instance_): Likewise.
+	(empty_word_instance, empty_word_instance_): New method and static
+	member.
+	* src/ltlast/formula.hh (formula::formula): If max_count_ ever
+	loops, skip the first three values so that constants always have
+	smaller hash codes.
+	* src/ltlast/binop.hh, src/ltlast/binop.cc (instance): Add
+	simplifications and document them.
+	* src/ltlast/multop.hh (multop::Concat): New operator.
+	* src/ltlast/multop.cc (op_name): Handle Concat.
+	(instance): Inline Concat arguments without reordering.  Handle
+	absorbent and neutral elements for all operators.
+	* src/ltlast/unop.hh (unop::Star): New operator.
+	* src/ltlast/unop.cc (op_name): Handle Star.
+	(instance): Handle Star, and add trivial simplifications for
+	other unary operators.
+	* src/ltlparse/ltlparse.yy (OP_CONCAT, OP_STAR, CONST_EMPTYWORD):
+	Declare these new operators and add rules for them.
+	* src/ltlparse/ltlscan.ll (OP_CONCAT, OP_STAR, CONST_EMPTYWORD):
+	Output these new operators.
+	* src/ltltest/equals.test: New tests.
+	* src/ltltest/parse.test: Remove redundant test.
+	* src/ltltest/tunabbrev.test, src/tgbatest/emptchk.test: Adjust tests.
+	* src/ltlvisit/basicreduce.cc, src/ltlvisit/contain.cc,
+	src/ltlvisit/nenoform.cc, src/ltlvisit/reduce.cc,
+	src/ltlvisit/syntimpl.cc, src/ltlvisit/tostring.cc,
+	src/ltlvisit/tunabbrev.cc: Complete visitors to handle new
+	operators.
+	* src/ltltest/nenoform.test: More tests.
+	* src/ltlvisit/lunabbrev.cc (unabbreviate_logic_visitor::visit):
+	Clone formulae before instance() function actually have a chance
+	to destroy them.
+	* src/tgba/formula2bdd.cc, src/tgbaalgos/eltl2tgba_lacim.cc,
+	src/tgbaalgos/ltl2taa.cc, src/tgbaalgos/ltl2tgba_fm.cc,
+	src/tgbaalgos/ltl2tgba_lacim.cc: Adjust switches to assert on new
+	operators.
+
 2009-12-24  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Apply ACI rules to multop formulae.

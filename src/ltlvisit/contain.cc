@@ -353,6 +353,8 @@ namespace spot
 		    }
 		}
 	      break;
+	    case multop::Concat:
+	      break;
 	    }
 	  if (changed)
 	    {
