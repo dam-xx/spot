@@ -1,4 +1,4 @@
-// Copyright (C) 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2009, 2010  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -227,6 +227,9 @@ namespace spot
 
         // Make the conjunction with ranks.
         std::vector<int> current_ranks(state_list.size(), max_rank);
+
+        if (state_list.empty())
+          return;
 
         do
         {

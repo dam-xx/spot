@@ -1,3 +1,7 @@
+2010-01-16  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	* src/saba/sabacomplementtgba.cc: Fix a bug.
+
 2010-01-16  Damien Lefortier <dam@lrde.epita.fr>
 
 	Use taa_tgba_formula instead of taa_tgba_string in ltl_to_taa to
