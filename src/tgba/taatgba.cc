@@ -350,7 +350,7 @@ namespace spot
   `----------------*/
 
   std::string
-  taa_tgba_string::label_to_string(const std::string& label) const
+  taa_tgba_string::label_to_string(const std::string label) const
   {
     return label;
   }

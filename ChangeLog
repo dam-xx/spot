@@ -1,5 +1,14 @@
 2010-01-16  Damien Lefortier <dam@lrde.epita.fr>
 
+	Use taa_tgba_formula instead of taa_tgba_string in ltl_to_taa to
+	speed up a little the translation.
+
+	* src/tgbaalgos/ltl2taa.cc: Adjust.  Also fix a bug with
+	acceptance conditions in all_n_tuples.
+	* src/tgba/taatgba.cc, src/tgba/taatgba.hh: Adjust.
+
+2010-01-16  Damien Lefortier <dam@lrde.epita.fr>
+
 	Introduce taa_tgba_labelled<label> so that we can build
 	taa_tgba instances labelled by other objects than strings
 	in the same way Alexandre did for tgba_explicit.

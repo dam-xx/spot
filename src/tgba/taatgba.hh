@@ -338,7 +338,7 @@ namespace spot
     taa_tgba_string(bdd_dict* dict) :
       taa_tgba_labelled<std::string, string_hash>(dict) {};
   protected:
-    std::string label_to_string(const std::string& label) const;
+    virtual std::string label_to_string(const std::string label) const;
   };
 
   class taa_tgba_formula :
@@ -348,7 +348,7 @@ namespace spot
     taa_tgba_formula(bdd_dict* dict):
       taa_tgba_labelled<const ltl::formula*, ltl::formula_ptr_hash>(dict) {};
   protected:
-    std::string label_to_string(const ltl::formula* label) const;
+    virtual std::string label_to_string(const ltl::formula* label) const;
   };
 }
 
