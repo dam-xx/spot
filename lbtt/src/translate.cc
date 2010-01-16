@@ -19,6 +19,7 @@
 
 #include <config.h>
 #include <csignal>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include "Exception.h"

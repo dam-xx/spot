@@ -1,3 +1,9 @@
+2010-01-16  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	Add a missing include.
+
+	* src/translate.cc: exit(2) requires cstdlib.
+
 2009-11-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix generation of random formulae on 64bits systems.
