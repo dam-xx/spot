@@ -32,7 +32,8 @@
 
 namespace spot
 {
-  /// \brief A Transition-based Alternating Automaton (TAA).
+  /// \brief A self-loop Transition-based Alternating Automaton (TAA)
+  /// which is seen as a TGBA (abstract class, see below).
   class taa_tgba : public tgba
   {
   public:
@@ -50,20 +51,7 @@ namespace spot
       const state_set* dst;
     };
 
-    void set_init_state(const std::string& state);
-    void set_init_state(const std::vector<std::string>& state);
-
-    transition*
-    create_transition(const std::string& src,
-		      const std::vector<std::string>& dst);
-    transition*
-    create_transition(const std::string& src, const std::string& dst);
-
     void add_condition(transition* t, const ltl::formula* f);
-    void add_acceptance_condition(transition* t, const ltl::formula* f);
-
-    /// \brief Output a TAA.
-    void output(std::ostream& os) const;
 
     /// TGBA interface.
     virtual ~taa_tgba();
@@ -73,17 +61,7 @@ namespace spot
 	      const spot::state* global_state = 0,
 	      const tgba* global_automaton = 0) const;
     virtual bdd_dict* get_dict() const;
-
-    /// \brief Format the state as a string for printing.
-    ///
-    /// If state is a spot::state_set of only one element, then the
-    /// string corresponding to state->get_state() is returned.
-    ///
-    /// Otherwise a string composed of each string corresponding to
-    /// each state->get_state() in the spot::state_set is returned,
-    /// e.g. like {string_1,...,string_n}.
-    virtual std::string format_state(const spot::state* state) const;
-
+    virtual std::string format_state(const spot::state* state) const = 0;
     virtual bdd all_acceptance_conditions() const;
     virtual bdd neg_acceptance_conditions() const;
 
@@ -91,18 +69,8 @@ namespace spot
     virtual bdd compute_support_conditions(const spot::state* state) const;
     virtual bdd compute_support_variables(const spot::state* state) const;
 
-    typedef Sgi::hash_map<
-      const std::string, taa_tgba::state*, string_hash
-      > ns_map;
-
-    typedef Sgi::hash_map<
-      const taa_tgba::state*, std::string, ptr_hash<taa_tgba::state>
-      > sn_map;
-
     typedef std::vector<taa_tgba::state_set*> ss_vec;
 
-    ns_map name_state_map_;
-    sn_map state_name_map_;
     bdd_dict* dict_;
     mutable bdd all_acceptance_conditions_;
     mutable bool all_acceptance_conditions_computed_;
@@ -114,17 +82,6 @@ namespace spot
     // Disallow copy.
     taa_tgba(const taa_tgba& other);
     taa_tgba& operator=(const taa_tgba& other);
-
-    /// \brief Return the taa_tgba::state for \a name, creating it if it
-    /// does not exist.  The first state added is the initial state
-    /// which can be overridden with set_init_state.
-    taa_tgba::state* add_state(const std::string& name);
-
-    /// \brief Return the taa::state_set for \a names.
-    taa_tgba::state_set* add_state_set(const std::vector<std::string>& names);
-
-    /// \brief Format a taa::state_set as a string for printing.
-    std::string format_state_set(const taa_tgba::state_set* ss) const;
   };
 
   /// Set of states deriving from spot::state.
@@ -192,6 +149,206 @@ namespace spot
     std::vector<taa_tgba::transition*> succ_;
     bdd all_acceptance_conditions_;
     seen_map seen_;
+  };
+
+  /// A taa_tgba instance with states labeled by a given type.
+  /// Still an abstract class, see below.
+  template<typename label, typename label_hash>
+  class taa_tgba_labelled : public taa_tgba
+  {
+  public:
+    taa_tgba_labelled(bdd_dict* dict) : taa_tgba(dict) {};
+
+    virtual ~taa_tgba_labelled()
+    {
+      typename ns_map::iterator i;
+      for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+      {
+	taa_tgba::state::iterator i2;
+	for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	  delete *i2;
+	delete i->second;
+      }
+    }
+
+    void set_init_state(const label& s)
+    {
+      std::vector<label> v(1);
+      v[0] = s;
+      set_init_state(v);
+    }
+    void set_init_state(const std::vector<label>& s)
+    {
+      init_ = add_state_set(s);
+    }
+
+    transition*
+    create_transition(const label& s,
+		      const std::vector<label>& d)
+    {
+      state* src = add_state(s);
+      state_set* dst = add_state_set(d);
+      transition* t = new transition;
+      t->dst = dst;
+      t->condition = bddtrue;
+      t->acceptance_conditions = bddfalse;
+      src->push_back(t);
+      return t;
+    }
+    transition*
+    create_transition(const label& s, const label& d)
+    {
+      std::vector<std::string> vec;
+      vec.push_back(d);
+      return create_transition(s, vec);
+    }
+
+    void add_acceptance_condition(transition* t, const ltl::formula* f)
+    {
+      if (dict_->acc_map.find(f) == dict_->acc_map.end())
+      {
+	int v = dict_->register_acceptance_variable(f, this);
+	bdd neg = bdd_nithvar(v);
+	neg_acceptance_conditions_ &= neg;
+
+	// Append neg to all acceptance conditions.
+	typename ns_map::iterator i;
+	for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+	{
+	  taa_tgba::state::iterator i2;
+	  for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	    (*i2)->acceptance_conditions &= neg;
+	}
+
+	all_acceptance_conditions_computed_ = false;
+      }
+
+      bdd_dict::fv_map::iterator i = dict_->acc_map.find(f);
+      assert(i != dict_->acc_map.end());
+      f->destroy();
+      bdd v = bdd_ithvar(i->second);
+      t->acceptance_conditions |= v & bdd_exist(neg_acceptance_conditions_, v);
+    }
+
+    /// \brief Format the state as a string for printing.
+    ///
+    /// If state is a spot::state_set of only one element, then the
+    /// string corresponding to state->get_state() is returned.
+    ///
+    /// Otherwise a string composed of each string corresponding to
+    /// each state->get_state() in the spot::state_set is returned,
+    /// e.g. like {string_1,...,string_n}.
+    virtual std::string format_state(const spot::state* s) const
+    {
+      const spot::state_set* se = dynamic_cast<const spot::state_set*>(s);
+      assert(se);
+      const state_set* ss = se->get_state();
+      return format_state_set(ss);
+    }
+
+    /// \brief Output a TAA in a stream.
+    void output(std::ostream& os) const
+    {
+      typename ns_map::const_iterator i;
+      for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+      {
+	taa_tgba::state::const_iterator i2;
+	os << "State: " << label_to_string(i->first) << std::endl;
+	for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	{
+	  os << " " << format_state_set((*i2)->dst)
+	     << ", C:" << (*i2)->condition
+	     << ", A:" << (*i2)->acceptance_conditions << std::endl;
+	}
+      }
+    }
+
+  protected:
+    typedef Sgi::hash_map<
+      const label, taa_tgba::state*, label_hash
+    > ns_map;
+    typedef Sgi::hash_map<
+      const taa_tgba::state*, label, ptr_hash<taa_tgba::state>
+    > sn_map;
+
+    ns_map name_state_map_;
+    sn_map state_name_map_;
+
+    /// \brief Return a label as a string.
+    virtual std::string label_to_string(const label lbl) const = 0;
+
+  private:
+    /// \brief Return the taa_tgba::state for \a name, creating it
+    /// when it does not exist already.
+    taa_tgba::state* add_state(const label& name)
+    {
+      typename ns_map::iterator i = name_state_map_.find(name);
+      if (i == name_state_map_.end())
+      {
+	taa_tgba::state* s = new taa_tgba::state;
+	name_state_map_[name] = s;
+	state_name_map_[s] = name;
+	return s;
+      }
+      return i->second;
+    }
+
+    /// \brief Return the taa::state_set for \a names.
+    taa_tgba::state_set* add_state_set(const std::vector<label>& names)
+    {
+      state_set* ss = new state_set;
+      for (unsigned i = 0; i < names.size(); ++i)
+	ss->insert(add_state(names[i]));
+      state_set_vec_.push_back(ss);
+      return ss;
+    }
+
+    std::string format_state_set(const taa_tgba::state_set* ss) const
+    {
+      state_set::const_iterator i1 = ss->begin();
+      typename sn_map::const_iterator i2;
+      if (ss->empty())
+	return std::string("{}");
+      if (ss->size() == 1)
+      {
+	i2 = state_name_map_.find(*i1);
+	assert(i2 != state_name_map_.end());
+	return "{" + label_to_string(i2->second) + "}";
+      }
+      else
+      {
+	std::string res("{");
+	while (i1 != ss->end())
+	{
+	  i2 = state_name_map_.find(*i1++);
+	  assert(i2 != state_name_map_.end());
+	  res += label_to_string(i2->second);
+	  res += ",";
+	}
+	res[res.size() - 1] = '}';
+	return res;
+      }
+    }
+  };
+
+  class taa_tgba_string :
+    public taa_tgba_labelled<std::string, string_hash>
+  {
+  public:
+    taa_tgba_string(bdd_dict* dict) :
+      taa_tgba_labelled<std::string, string_hash>(dict) {};
+  protected:
+    std::string label_to_string(const std::string& label) const;
+  };
+
+  class taa_tgba_formula :
+    public taa_tgba_labelled<const ltl::formula*, ltl::formula_ptr_hash>
+  {
+  public:
+    taa_tgba_formula(bdd_dict* dict):
+      taa_tgba_labelled<const ltl::formula*, ltl::formula_ptr_hash>(dict) {};
+  protected:
+    std::string label_to_string(const ltl::formula* label) const;
   };
 }
 

@@ -24,6 +24,7 @@
 #include <iterator>
 #include <iostream>
 #include "tgba/formula2bdd.hh"
+#include "ltlvisit/tostring.hh"
 #include "misc/bddop.hh"
 #include "taatgba.hh"
 
@@ -34,7 +35,7 @@ namespace spot
   `--------*/
 
   taa_tgba::taa_tgba(bdd_dict* dict)
-    : name_state_map_(), state_name_map_(), dict_(dict),
+    : dict_(dict),
       all_acceptance_conditions_(bddfalse),
       all_acceptance_conditions_computed_(false),
       neg_acceptance_conditions_(bddtrue),
@@ -44,14 +45,6 @@ namespace spot
 
   taa_tgba::~taa_tgba()
   {
-    ns_map::iterator i;
-    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
-    {
-      taa_tgba::state::iterator i2;
-      for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	delete *i2;
-      delete i->second;
-    }
     ss_vec::iterator j;
     for (j = state_set_vec_.begin(); j != state_set_vec_.end(); ++j)
       delete *j;
@@ -59,91 +52,10 @@ namespace spot
   }
 
   void
-  taa_tgba::set_init_state(const std::string& s)
-  {
-    std::vector<std::string> v(1);
-    v[0] = s;
-    set_init_state(v);
-  }
-
-  void
-  taa_tgba::set_init_state(const std::vector<std::string>& s)
-  {
-    init_ = add_state_set(s);
-  }
-
-  taa_tgba::transition*
-  taa_tgba::create_transition(const std::string& s,
-                             const std::vector<std::string>& d)
-  {
-    state* src = add_state(s);
-    state_set* dst = add_state_set(d);
-    transition* t = new transition;
-    t->dst = dst;
-    t->condition = bddtrue;
-    t->acceptance_conditions = bddfalse;
-    src->push_back(t);
-    return t;
-  }
-
-  taa_tgba::transition*
-  taa_tgba::create_transition(const std::string& s, const std::string& d)
-  {
-    std::vector<std::string> vec;
-    vec.push_back(d);
-    return create_transition(s, vec);
-  }
-
-  void
   taa_tgba::add_condition(transition* t, const ltl::formula* f)
   {
     t->condition &= formula_to_bdd(f, dict_, this);
     f->destroy();
-  }
-
-  void
-  taa_tgba::add_acceptance_condition(transition* t, const ltl::formula* f)
-  {
-    if (dict_->acc_map.find(f) == dict_->acc_map.end())
-    {
-      int v = dict_->register_acceptance_variable(f, this);
-      bdd neg = bdd_nithvar(v);
-      neg_acceptance_conditions_ &= neg;
-
-      // Append neg to all acceptance conditions.
-      ns_map::iterator i;
-      for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
-      {
-	taa_tgba::state::iterator i2;
-	for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	  (*i2)->acceptance_conditions &= neg;
-      }
-
-      all_acceptance_conditions_computed_ = false;
-    }
-
-    bdd_dict::fv_map::iterator i = dict_->acc_map.find(f);
-    assert(i != dict_->acc_map.end());
-    f->destroy();
-    bdd v = bdd_ithvar(i->second);
-    t->acceptance_conditions |= v & bdd_exist(neg_acceptance_conditions_, v);
-  }
-
-  void
-  taa_tgba::output(std::ostream& os) const
-  {
-    ns_map::const_iterator i;
-    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
-    {
-      taa_tgba::state::const_iterator i2;
-      os << "State: " << i->first << std::endl;
-      for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-      {
-	os << " " << format_state_set((*i2)->dst)
-	   << ", C:" << (*i2)->condition
-	   << ", A:" << (*i2)->acceptance_conditions << std::endl;
-      }
-    }
   }
 
   state*
@@ -169,15 +81,6 @@ namespace spot
   taa_tgba::get_dict() const
   {
     return dict_;
-  }
-
-  std::string
-  taa_tgba::format_state(const spot::state* s) const
-  {
-    const spot::state_set* se = dynamic_cast<const spot::state_set*>(s);
-    assert(se);
-    const state_set* ss = se->get_state();
-    return format_state_set(ss);
   }
 
   bdd
@@ -228,58 +131,6 @@ namespace spot
       for (j = (*i)->begin(); j != (*i)->end(); ++j)
 	res &= bdd_support((*j)->condition);
     return res;
-  }
-
-  taa_tgba::state*
-  taa_tgba::add_state(const std::string& name)
-  {
-    ns_map::iterator i = name_state_map_.find(name);
-    if (i == name_state_map_.end())
-    {
-      taa_tgba::state* s = new taa_tgba::state;
-      name_state_map_[name] = s;
-      state_name_map_[s] = name;
-      return s;
-    }
-    return i->second;
-  }
-
-  taa_tgba::state_set*
-  taa_tgba::add_state_set(const std::vector<std::string>& names)
-  {
-    state_set* ss = new state_set;
-    for (unsigned i = 0; i < names.size(); ++i)
-      ss->insert(add_state(names[i]));
-    state_set_vec_.push_back(ss);
-    return ss;
-  }
-
-  std::string
-  taa_tgba::format_state_set(const taa_tgba::state_set* ss) const
-  {
-    state_set::const_iterator i1 = ss->begin();
-    sn_map::const_iterator i2;
-    if (ss->empty())
-      return std::string("{}");
-    if (ss->size() == 1)
-    {
-      i2 = state_name_map_.find(*i1);
-      assert(i2 != state_name_map_.end());
-      return "{" + i2->second + "}";
-    }
-    else
-    {
-      std::string res("{");
-      while (i1 != ss->end())
-      {
-	i2 = state_name_map_.find(*i1++);
-	assert(i2 != state_name_map_.end());
-	res += i2->second;
-	res += ",";
-      }
-      res[res.size() - 1] = '}';
-      return res;
-    }
   }
 
   /*----------.
@@ -492,5 +343,25 @@ namespace spot
     assert(!done());
     return all_acceptance_conditions_ -
       ((*i_)->acceptance_conditions & all_acceptance_conditions_);
+  }
+
+  /*----------------.
+  | taa_tgba_string |
+  `----------------*/
+
+  std::string
+  taa_tgba_string::label_to_string(const std::string& label) const
+  {
+    return label;
+  }
+
+  /*-----------------.
+  | taa_tgba_formula |
+  `-----------------*/
+
+  std::string
+  taa_tgba_formula::label_to_string(const ltl::formula* label) const
+  {
+    return ltl::to_string(label);
   }
 }

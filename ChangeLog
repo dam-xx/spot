@@ -1,3 +1,17 @@
+2010-01-16  Damien Lefortier <dam@lrde.epita.fr>
+
+	Introduce taa_tgba_labelled<label> so that we can build
+	taa_tgba instances labelled by other objects than strings
+	in the same way Alexandre did for tgba_explicit.
+
+	* src/tgba/taatgba.cc, src/tgba/taatgba.hh: Split taa_tgba in two
+	levels: taa_tgba with no label and taa_tgba_labelled templated by
+	the type of the label.  Define taa_tgba_string (with the interface
+	of the former taa_tgba class) and taa_tgba_formula for future use
+	in ltl2taa.cc.
+	* src/tgbaalgos/ltl2taa.cc, src/tgbatest/taatgba.cc: Adjust to use
+	taa_tgba_string.
+
 2010-01-06  Damien Lefortier <dam@lrde.epita.fr>
 
 	Fix a longstanding bug reported by Guillaume Sadegh.

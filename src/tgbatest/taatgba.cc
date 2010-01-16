@@ -34,7 +34,7 @@ main()
 
   spot::ltl::default_environment& e =
     spot::ltl::default_environment::instance();
-  spot::taa_tgba* a = new spot::taa_tgba(dict);
+  spot::taa_tgba_string* a = new spot::taa_tgba_string(dict);
 
   typedef spot::taa_tgba::transition trans;
   typedef spot::taa_tgba::state state;

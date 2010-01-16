@@ -39,7 +39,7 @@ namespace spot
     class ltl2taa_visitor : public const_visitor
     {
     public:
-      ltl2taa_visitor(taa_tgba* res, language_containment_checker* lcc,
+      ltl2taa_visitor(taa_tgba_string* res, language_containment_checker* lcc,
 		      bool refined = false, bool negated = false)
 	: res_(res), refined_(refined), negated_(negated),
 	  lcc_(lcc), init_(), succ_(), to_free_()
@@ -51,7 +51,7 @@ namespace spot
       {
       }
 
-      taa_tgba*
+      taa_tgba_string*
       result()
       {
 	for (unsigned i = 0; i < to_free_.size(); ++i)
@@ -305,7 +305,7 @@ namespace spot
       }
 
     private:
-      taa_tgba* res_;
+      taa_tgba_string* res_;
       bool refined_;
       bool negated_;
       language_containment_checker* lcc_;
@@ -381,7 +381,7 @@ namespace spot
     const ltl::formula* f2 = ltl::negative_normal_form(f1);
     f1->destroy();
 
-    spot::taa_tgba* res = new spot::taa_tgba(dict);
+    spot::taa_tgba_string* res = new spot::taa_tgba_string(dict);
     bdd_dict b;
     language_containment_checker* lcc =
       new language_containment_checker(&b, false, false, false, false);
