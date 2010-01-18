@@ -264,6 +264,8 @@ namespace spot
     }
 
   protected:
+    typedef label label_t;
+
     typedef Sgi::hash_map<
       const label, taa_tgba::state*, label_hash
     > ns_map;
@@ -275,7 +277,11 @@ namespace spot
     sn_map state_name_map_;
 
     /// \brief Return a label as a string.
-    virtual std::string label_to_string(const label lbl) const = 0;
+    virtual std::string label_to_string(const label_t& lbl) const = 0;
+
+    /// \brief Clone the label if necessary to assure it is owned by
+    /// this, avoiding memory issues when label is a pointer.
+    virtual label_t clone_if(const label_t& lbl) const = 0;
 
   private:
     /// \brief Return the taa_tgba::state for \a name, creating it
@@ -285,9 +291,10 @@ namespace spot
       typename ns_map::iterator i = name_state_map_.find(name);
       if (i == name_state_map_.end())
       {
+	const label& name_ = clone_if(name);
 	taa_tgba::state* s = new taa_tgba::state;
-	name_state_map_[name] = s;
-	state_name_map_[s] = name;
+	name_state_map_[name_] = s;
+	state_name_map_[s] = name_;
 	return s;
       }
       return i->second;
@@ -338,17 +345,21 @@ namespace spot
     taa_tgba_string(bdd_dict* dict) :
       taa_tgba_labelled<std::string, string_hash>(dict) {};
   protected:
-    virtual std::string label_to_string(const std::string label) const;
+    virtual std::string label_to_string(const std::string& label) const;
+    virtual std::string clone_if(const std::string& label) const;
   };
 
   class taa_tgba_formula :
     public taa_tgba_labelled<const ltl::formula*, ltl::formula_ptr_hash>
   {
   public:
-    taa_tgba_formula(bdd_dict* dict):
+    taa_tgba_formula(bdd_dict* dict) :
       taa_tgba_labelled<const ltl::formula*, ltl::formula_ptr_hash>(dict) {};
+    // Labels are pointers here and must be destroyed eventually.
+    ~taa_tgba_formula();
   protected:
-    virtual std::string label_to_string(const ltl::formula* label) const;
+    virtual std::string label_to_string(const label_t& label) const;
+    virtual ltl::formula* clone_if(const label_t& label) const;
   };
 }
 

@@ -25,6 +25,7 @@
 #include <iostream>
 #include "tgba/formula2bdd.hh"
 #include "ltlvisit/tostring.hh"
+#include "ltlvisit/clone.hh"
 #include "misc/bddop.hh"
 #include "taatgba.hh"
 
@@ -350,7 +351,13 @@ namespace spot
   `----------------*/
 
   std::string
-  taa_tgba_string::label_to_string(const std::string label) const
+  taa_tgba_string::label_to_string(const label_t& label) const
+  {
+    return label;
+  }
+
+  std::string
+  taa_tgba_string::clone_if(const label_t& label) const
   {
     return label;
   }
@@ -359,9 +366,22 @@ namespace spot
   | taa_tgba_formula |
   `-----------------*/
 
+  taa_tgba_formula::~taa_tgba_formula()
+  {
+    ns_map::iterator i;
+    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+      i->first->destroy();
+  }
+
   std::string
-  taa_tgba_formula::label_to_string(const ltl::formula* label) const
+  taa_tgba_formula::label_to_string(const label_t& label) const
   {
     return ltl::to_string(label);
+  }
+
+  ltl::formula*
+  taa_tgba_formula::clone_if(const label_t& label) const
+  {
+    return label->clone();
   }
 }

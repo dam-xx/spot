@@ -95,10 +95,10 @@ namespace spot
 	    // A little hack to define a sink
 	    dst.push_back(unop::instance(unop::Finish,
 					 constant::true_instance()));
-	    to_free_.push_back(dst[0]);
 	    res_->create_transition(init_, dst);
 	    succ_state ss = { dst, node, a };
 	    succ_.push_back(ss);
+	    to_free_.push_back(dst[0]);
 	    return;
 	  }
 	  case constant::False:
@@ -169,7 +169,7 @@ namespace spot
 		  (remove(i1->Q.begin(), i1->Q.end(), v1.init_), i1->Q.end());
 
 	      i1->Q.push_back(init_); // Add the initial state
-	      i1->acc.push_back(node);
+	      i1->acc.push_back(node->second());
 	      t = res_->create_transition(init_, i1->Q);
 	      res_->add_condition(t, i1->condition->clone());
 	      res_->add_acceptance_condition(t, node->second()->clone());
@@ -231,14 +231,9 @@ namespace spot
       void
       visit(const multop* node)
       {
-	bool ok = true;
 	std::vector<ltl2taa_visitor> vs;
 	for (unsigned n = 0; n < node->size(); ++n)
-	{
 	  vs.push_back(recurse(node->nth(n)));
-	  if (vs[n].succ_.empty()) // Handle 0
-	    ok = false;
-	}
 
 	init_ = node;
 	std::vector<succ_state>::iterator i;
@@ -248,7 +243,7 @@ namespace spot
 	  case multop::And:
 	  {
 	    std::vector<succ_state> p = all_n_tuples(vs);
-	    for (unsigned n = 0; n < p.size() && ok; ++n)
+	    for (unsigned n = 0; n < p.size(); ++n)
 	    {
 	      if (refined_)
 	      {
@@ -274,7 +269,7 @@ namespace spot
 		  for (unsigned i = 0; i < p[n].acc.size(); ++i)
 		    res_->add_acceptance_condition(t, p[n].acc[i]->clone());
 		  succ_.push_back(p[n]);
-		  return;
+		  continue;
 		}
 	      }
 	      t = res_->create_transition(init_, p[n].Q);
@@ -342,9 +337,9 @@ namespace spot
       {
 	std::vector<succ_state> product;
 
-	std::vector<int> pos;
+	std::vector<int> pos(vs.size());
 	for (unsigned i = 0; i < vs.size(); ++i)
-	  pos.push_back(vs[i].succ_.size());
+	  pos[i] = vs[i].succ_.size();
 
 	while (pos[0] != 0)
 	{

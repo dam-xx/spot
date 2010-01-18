@@ -777,6 +777,15 @@ main(int argc, char** argv)
         a = state_labeled = new spot::tgba_sgba_proxy(a);
       }
 
+      if (delete_unaccepting_scc)
+        {
+	  tm.start("reducing A_f w/ SCC on BDD");
+	  if (spot::tgba_bdd_concrete* bc =
+	      dynamic_cast<spot::tgba_bdd_concrete*>(a))
+	      bc->delete_unaccepting_scc();
+	  tm.stop("reducing A_f w/ SCC on BDD");
+	}
+
       spot::tgba_reduc* aut_red = 0;
       spot::tgba* aut_scc = 0;
       if (reduc_aut != spot::Reduce_None)
@@ -787,15 +796,6 @@ main(int argc, char** argv)
 	      tm.start("reducing A_f w/ SCC");
 	      a = aut_scc = spot::scc_filter(a);
 	      tm.stop("reducing A_f w/ SCC");
-	    }
-
-	  if (delete_unaccepting_scc)
-	    {
-	      tm.start("reducing A_f w/ SCC on BDD");
-	      if (spot::tgba_bdd_concrete* bc =
-		  dynamic_cast<spot::tgba_bdd_concrete*>(a))
-		bc->delete_unaccepting_scc();
-	      tm.stop("reducing A_f w/ SCC on BDD");
 	    }
 
 	  if (reduc_aut & ~spot::Reduce_Scc)

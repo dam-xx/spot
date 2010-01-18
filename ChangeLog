@@ -1,3 +1,10 @@
+2010-01-18  Damien Lefortier <dam@lrde.epita.fr>
+
+	* src/tgba/taatgba.cc, src/tgba/taatgba.hh: Fix memory issues
+	occuring when labels are pointers.
+	* src/tgbaalgos/ltl2taa.cc: Fix a bug.
+	* src/tgbatest/ltl2tgba.cc: Fix a bug.
+
 2010-01-16  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	* src/saba/sabacomplementtgba.cc: Fix a bug.
