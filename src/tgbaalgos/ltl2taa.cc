@@ -231,9 +231,14 @@ namespace spot
       void
       visit(const multop* node)
       {
+	bool ok = true;
 	std::vector<ltl2taa_visitor> vs;
 	for (unsigned n = 0; n < node->size(); ++n)
+	{
 	  vs.push_back(recurse(node->nth(n)));
+	  if (vs[n].succ_.empty()) // Handle 0
+	    ok = false;
+	}
 
 	init_ = node;
 	std::vector<succ_state>::iterator i;
@@ -242,6 +247,8 @@ namespace spot
 	{
 	  case multop::And:
 	  {
+	    if (!ok)
+	      return;
 	    std::vector<succ_state> p = all_n_tuples(vs);
 	    for (unsigned n = 0; n < p.size(); ++n)
 	    {
@@ -397,9 +404,9 @@ namespace spot
       new language_containment_checker(&b, false, false, false, false);
     ltl2taa_visitor v(res, lcc, refined_rules);
     f2->accept(v);
+    taa_tgba* taa = v.result(); // Careful: before the destroy!
     f2->destroy();
     delete lcc;
-
-    return v.result();
+    return taa;
   }
 }

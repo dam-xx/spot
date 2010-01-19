@@ -1,5 +1,9 @@
 2010-01-18  Damien Lefortier <dam@lrde.epita.fr>
 
+	* src/tgbaalgos/ltl2taa.cc: Fix the previous patch.
+
+2010-01-18  Damien Lefortier <dam@lrde.epita.fr>
+
 	* src/tgba/taatgba.cc, src/tgba/taatgba.hh: Fix memory issues
 	occuring when labels are pointers.
 	* src/tgbaalgos/ltl2taa.cc: Fix a bug.
