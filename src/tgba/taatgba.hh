@@ -159,18 +159,6 @@ namespace spot
   public:
     taa_tgba_labelled(bdd_dict* dict) : taa_tgba(dict) {};
 
-    virtual ~taa_tgba_labelled()
-    {
-      typename ns_map::iterator i;
-      for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
-      {
-	taa_tgba::state::iterator i2;
-	for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	  delete *i2;
-	delete i->second;
-      }
-    }
-
     void set_init_state(const label& s)
     {
       std::vector<label> v(1);
@@ -344,6 +332,7 @@ namespace spot
   public:
     taa_tgba_string(bdd_dict* dict) :
       taa_tgba_labelled<std::string, string_hash>(dict) {};
+    ~taa_tgba_string();
   protected:
     virtual std::string label_to_string(const std::string& label) const;
     virtual std::string clone_if(const std::string& label) const;
@@ -355,7 +344,6 @@ namespace spot
   public:
     taa_tgba_formula(bdd_dict* dict) :
       taa_tgba_labelled<const ltl::formula*, ltl::formula_ptr_hash>(dict) {};
-    // Labels are pointers here and must be destroyed eventually.
     ~taa_tgba_formula();
   protected:
     virtual std::string label_to_string(const label_t& label) const;

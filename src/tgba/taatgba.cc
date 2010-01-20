@@ -302,8 +302,13 @@ namespace spot
       delete succ_[i]->dst;
       delete succ_[i];
     }
-    for (seen_map::iterator i = seen_.begin(); i != seen_.end(); ++i)
-      delete i->first;
+    for (seen_map::iterator i = seen_.begin(); i != seen_.end();)
+    {
+      // Advance the iterator before deleting the formula.
+      const spot::state_set* s = i->first;
+      ++i;
+      delete s;
+    }
   }
 
   void
@@ -350,6 +355,18 @@ namespace spot
   | taa_tgba_string |
   `----------------*/
 
+  taa_tgba_string::~taa_tgba_string()
+  {
+    ns_map::iterator i;
+    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+    {
+      taa_tgba::state::iterator i2;
+      for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	delete *i2;
+      delete i->second;
+    }
+  }
+
   std::string
   taa_tgba_string::label_to_string(const label_t& label) const
   {
@@ -370,7 +387,16 @@ namespace spot
   {
     ns_map::iterator i;
     for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
-      i->first->destroy();
+    {
+      taa_tgba::state::iterator i2;
+      for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	delete *i2;
+      // Advance the iterator before deleting the formula.
+      const ltl::formula* s = i->first;
+      delete i->second;
+      ++i;
+      s->destroy();
+    }
   }
 
   std::string

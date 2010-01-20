@@ -1,5 +1,13 @@
 2010-01-20  Damien Lefortier <dam@lrde.epita.fr>
 
+	When iterating a hash_map, be careful not to delete i->first
+	before doing ++i to avoid memory issues.
+
+	* src/tgba/taatgba.cc, src/tgba/taatgba.hh,
+	src/tgba/tgbaexplicit.cc, src/tgba/tgbaexplicit.hh: Fix them.
+
+2010-01-20  Damien Lefortier <dam@lrde.epita.fr>
+
 	Minor fixes to compile with GCC 3.3
 
 	* src/ltlast/automatop.cc, src/ltlast/automatop.hh: Rename nfa as

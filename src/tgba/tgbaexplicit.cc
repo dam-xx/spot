@@ -284,6 +284,18 @@ namespace spot
     return neg_acceptance_conditions_;
   }
 
+  tgba_explicit_string::~tgba_explicit_string()
+  {
+    ns_map::iterator i;
+    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+    {
+      tgba_explicit::state::iterator i2;
+      for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	delete *i2;
+      delete i->second;
+    }
+  }
+
   tgba_explicit::state*
   tgba_explicit_string::add_default_init()
   {
@@ -302,9 +314,18 @@ namespace spot
 
   tgba_explicit_formula::~tgba_explicit_formula()
   {
-    ns_map::iterator i;
-    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
-      i->first->destroy();
+    ns_map::iterator i = name_state_map_.begin();
+    while (i != name_state_map_.end())
+    {
+      tgba_explicit::state::iterator i2;
+      for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	delete *i2;
+      // Advance the iterator before deleting the formula.
+      const ltl::formula* s = i->first;
+      delete i->second;
+      ++i;
+      s->destroy();
+    }
   }
 
   tgba_explicit::state* tgba_explicit_formula::add_default_init()

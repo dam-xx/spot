@@ -142,11 +142,6 @@ namespace spot
   public:
     tgba_explicit_succ_iterator(const tgba_explicit::state* s, bdd all_acc);
 
-    virtual
-    ~tgba_explicit_succ_iterator()
-    {
-    }
-
     virtual void first();
     virtual void next();
     virtual bool done() const;
@@ -312,14 +307,6 @@ namespace spot
     virtual
     ~tgba_explicit_labelled()
     {
-      typename ns_map::iterator i;
-      for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
-	{
-	  tgba_explicit::state::iterator i2;
-	  for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	    delete *i2;
-	  delete i->second;
-	}
     }
 
   };
@@ -331,6 +318,7 @@ namespace spot
     tgba_explicit_string(bdd_dict* dict):
       tgba_explicit_labelled<std::string, string_hash>(dict)
     {};
+    virtual ~tgba_explicit_string();
     virtual state* add_default_init();
     virtual std::string format_state(const spot::state* s) const;
   };
