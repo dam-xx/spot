@@ -1,4 +1,4 @@
-// Copyright (C) 2004, 2005, 2007, 2008, 2009 Laboratoire d'Informatique de
+// Copyright (C) 2004, 2005, 2007, 2008, 2009, 2010 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -125,32 +125,29 @@ namespace spot
     // Using Sgi::hash_set instead of std::set for these sets is 3
     // times slower (tested on a 50000 nodes example).  Use an int
     // (the index into states[]), not the tgba_explicit::state*
-    // directly, because the later would yield different graph
+    // directly, because the later would yield different graphs
     // depending on the memory layout.
-    typedef std::set<tgba_explicit::state*> node_set;
+    typedef std::set<int> node_set;
     node_set nodes_to_process;
     node_set unreachable_nodes;
 
-    {
-      tgba_explicit::state* init = res->add_state(st(0));
-      states[0] = init;
-      nodes_to_process.insert(init);
-    }
+    states[0] = res->add_state(st(0));
+    nodes_to_process.insert(0);
 
     for (int i = 1; i < n; ++i)
       {
-	tgba_explicit::state* s = res->add_state(st(i));
-	states[i] = s;
-	unreachable_nodes.insert(s);
+	states[i] = res->add_state(st(i));
+	unreachable_nodes.insert(i);
       }
 
     // We want to connect each node to a number of successors between
-    // 1 and n (with probability d).  This follow
+    // 1 and n.  If the probability to connect to each successor is d,
+    // the number of connected successors follows a binomial distribution.
     barand<nrand> bin(n - 1, d);
 
     while (!nodes_to_process.empty())
       {
-	tgba_explicit::state* src = *nodes_to_process.begin();
+	tgba_explicit::state* src = states[*nodes_to_process.begin()];
 	nodes_to_process.erase(nodes_to_process.begin());
 
 	// Choose a random number of successors (at least one), using
@@ -174,7 +171,7 @@ namespace spot
 		std::advance(i, index);
 
 		// Link it from src.
-		random_labels(res, src, *i, props, props_n, t, accs, a);
+		random_labels(res, src, states[*i], props, props_n, t, accs, a);
 		nodes_to_process.insert(*i);
 		unreachable_nodes.erase(i);
 		break;
@@ -192,10 +189,10 @@ namespace spot
 
 		random_labels(res, src, dest, props, props_n, t, accs, a);
 
-		node_set::iterator j = unreachable_nodes.find(dest);
+		node_set::iterator j = unreachable_nodes.find(possibilities);
 		if (j != unreachable_nodes.end())
 		  {
-		    nodes_to_process.insert(dest);
+		    nodes_to_process.insert(possibilities);
 		    unreachable_nodes.erase(j);
 		    saw_unreachable = true;
 		  }
