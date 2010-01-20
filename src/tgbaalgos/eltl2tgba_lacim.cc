@@ -170,12 +170,12 @@ namespace spot
 	  v.push_back(const_cast<formula*>(node->nth(i)));
 
 	std::pair<int, int> vp =
-	  recurse_state(node->nfa(),
-			node->nfa()->get_init_state(), v, m, acc, finish);
+	  recurse_state(node->get_nfa(),
+			node->get_nfa()->get_init_state(), v, m, acc, finish);
 
 	// Update finish_ with finish(node).
 	// FIXME: when node is loop, it does not make sense; hence the bddtrue.
-	finish_[node] = !node->nfa()->is_loop() ? bddtrue : finish;
+	finish_[node] = !node->get_nfa()->is_loop() ? bddtrue : finish;
 
 	bdd tmp = bddtrue;
 	for (nmap::iterator it = m.begin(); it != m.end(); ++it)

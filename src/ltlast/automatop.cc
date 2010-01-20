@@ -35,7 +35,7 @@ namespace spot
     automatop::~automatop()
     {
       // Get this instance out of the instance map.
-      triplet p(std::make_pair(nfa(), negated_), children_);
+      triplet p(std::make_pair(get_nfa(), negated_), children_);
       map::iterator i = instances.find(p);
       assert (i != instances.end());
       instances.erase(i);
@@ -51,7 +51,7 @@ namespace spot
     automatop::dump() const
     {
       std::string r = is_negated() ? "!" : "";
-      r += nfa()->get_name();
+      r += get_nfa()->get_name();
       r += "(";
       r += nth(0)->dump();
       for (unsigned n = 1; n < size(); ++n)
@@ -112,7 +112,7 @@ namespace spot
     }
 
     const spot::ltl::nfa::ptr
-    automatop::nfa() const
+    automatop::get_nfa() const
     {
       assert(nfa_ != 0);
       return nfa_;

@@ -815,7 +815,7 @@ namespace spot
       void print_safra_automaton(safra_tree_automaton* a)
       {
         safra_tree_automaton::automaton_t node_list = a->automaton;
-        typedef safra_tree_automaton::automaton_t::const_reverse_iterator
+        typedef safra_tree_automaton::automaton_t::reverse_iterator
           automaton_cit;
         typedef safra_tree_automaton::transition_list::const_iterator
           trans_cit;
@@ -825,6 +825,8 @@ namespace spot
 
         std::cout << "digraph A {" << std::endl;
 
+	/// GCC 3.3 complains if a const_reverse_iterator is used.
+	/// error: no match for 'operator!='
         for (automaton_cit i = a->automaton.rbegin();
              i != a->automaton.rend();
              ++i)

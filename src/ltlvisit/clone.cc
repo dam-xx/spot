@@ -71,7 +71,7 @@ namespace spot
       automatop::vec* res = new automatop::vec;
       for (unsigned i = 0; i < ao->size(); ++i)
         res->push_back(recurse(ao->nth(i)));
-      result_ = automatop::instance(ao->nfa(), res, ao->is_negated());
+      result_ = automatop::instance(ao->get_nfa(), res, ao->is_negated());
     }
 
     void

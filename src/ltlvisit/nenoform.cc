@@ -166,7 +166,7 @@ namespace spot
 	  unsigned aos = ao->size();
 	  for (unsigned i = 0; i < aos; ++i)
 	    res->push_back(recurse(ao->nth(i)));
-	  result_ = automatop::instance(ao->nfa(), res, negated);
+	  result_ = automatop::instance(ao->get_nfa(), res, negated);
 	}
 
 	void

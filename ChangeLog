@@ -1,3 +1,15 @@
+2010-01-20  Damien Lefortier <dam@lrde.epita.fr>
+
+	Minor fixes to compile with GCC 3.3
+
+	* src/ltlast/automatop.cc, src/ltlast/automatop.hh: Rename nfa as
+	get_nfa to avoid a name clash with the `nfa' class.
+	* src/ltlvisit/clone.cc, src/ltlvisit/nenoform.cc,
+	src/ltlvisit/tostring.cc, src/tgbaalgos/eltl2tgba_lacim.cc: Use
+	get_nfa instead of nfa.
+	* src/tgba/tgbasafracomplement.cc: Don't use a
+	const_reverse_iterator.
+
 2010-01-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Remove some non-determinism in random_graph()
@@ -8,7 +20,7 @@
 	some non-determinism because of the memory layout.  It was almost
 	impossible to reproduce bugs found by tests based on randtgba.
 
-2010-01-18  Damien Lefortier <dam@lrde.epita.fr>
+2010-01-19  Damien Lefortier <dam@lrde.epita.fr>
 
 	* src/tgbaalgos/ltl2taa.cc: Fix the previous patch.
 

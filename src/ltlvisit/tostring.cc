@@ -167,7 +167,7 @@ namespace spot
 	  top_level_ = false;
 	  if (!top_level)
 	    os_ << "(";
-	  os_ << ao->nfa()->get_name() << "(";
+	  os_ << ao->get_nfa()->get_name() << "(";
 	  unsigned max = ao->size();
 	  ao->nth(0)->accept(*this);
 	  for (unsigned n = 1; n < max; ++n)
@@ -324,7 +324,7 @@ namespace spot
 	  top_level_ = false;
 	  if (!top_level)
 	    os_ << "(";
-	  os_ << ao->nfa()->get_name() << "(";
+	  os_ << ao->get_nfa()->get_name() << "(";
 	  unsigned max = ao->size();
 	  ao->nth(0)->accept(*this);
 	  for (unsigned n = 1; n < max; ++n)
