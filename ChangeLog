@@ -1,5 +1,13 @@
 2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix a memory leak in Cou99 statistics.
+
+	* src/tgbaalgos/gtec/ce.cc (couvreur99_check_result::acss_states):
+	Delete the iterator after using it.
+	* src/tgbatest/emptchkr.test: Run 'randtgba -z' with valgrind too.
+
+2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix a longstanding bug in our implementation of GV04.
 
 	* src/tgbaalgos/gv04.cc (push): Fix the tracking of the accepting
