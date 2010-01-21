@@ -1,5 +1,10 @@
 2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/ltltest/reduc.cc (main): Fix harmless memory leak introduced
+	today.
+
+2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix taa_tgba_formula's destructor.
 
 	* src/tgba/taatgba.cc (taa_tgba_formula::~taa_tgba_formula):

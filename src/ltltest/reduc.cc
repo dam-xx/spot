@@ -284,6 +284,7 @@ main(int argc, char** argv)
       float after = sum_after;
       std::cout << "gain: "
 		<< (1 - (after / before)) * 100 << "%" << std::endl;
+      delete fin;
     }
 
   assert(spot::ltl::atomic_prop::instance_count() == 0);
