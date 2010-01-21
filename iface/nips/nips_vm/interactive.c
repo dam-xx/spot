@@ -132,7 +132,7 @@ void interactive_simulate( nipsvm_bytecode_t *bytecode,
     }
     else
     {
-      
+
       // show successor states
       printf( "\n=== %ld successor state%s ===\n", cnt, cnt == 1 ? "" : "s" );
       for( i = 0; i < cnt; i++ )
@@ -176,7 +176,7 @@ void interactive_simulate( nipsvm_bytecode_t *bytecode,
       else
         printf( "enter state number (1..%ld) or anything else to quit: ", cnt );
       fflush( stdout );
-      scanf( "%lu", &sel );
+      (void) scanf( "%lu", &sel );
       printf( "\n" );
       sel--; // convert to 0 based index
 
@@ -191,7 +191,7 @@ void interactive_simulate( nipsvm_bytecode_t *bytecode,
 
     // keep flag register of selected state (just for testing)
     flag_reg = states[sel].flag_reg;
-    
+
     // move selected state to beginning of buffer and use it as current state
     len = nipsvm_state_size( states[sel].p_state );
     memmove( p_buffer, states[sel].p_state, len );
