@@ -1,5 +1,14 @@
 2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Speedup reduc.test by not spawning one process per formula.
+
+	* src/ltltest/reduc.cc: Add an option -f to read a lost of
+	formulae from a file.  Running a process for each formula was
+	too slow.  Also add an option -h to hide reduced formulae.
+	* src/ltltest/reduc.test: Simplify accordingly.
+
+2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Move the last test from emptchk.test to emptchke.test.
 
 	* src/tgbatest/emptchk.test: Move the newly added test ...
