@@ -1,5 +1,13 @@
 2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Move the last test from emptchk.test to emptchke.test.
+
+	* src/tgbatest/emptchk.test: Move the newly added test ...
+	* src/tgbatest/emptchke.test: ... here, with other explicit test.
+	Also test more algorithms.
+
+2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix a memory leak in Cou99 statistics.
 
 	* src/tgbaalgos/gtec/ce.cc (couvreur99_check_result::acss_states):

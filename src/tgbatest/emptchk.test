@@ -1,9 +1,9 @@
 #!/bin/sh
+# Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
+# Développement de l'Epita (LRDE).
 # Copyright (C) 2003, 2004, 2005 Laboratoire d'Informatique de
 # Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 # Université Pierre et Marie Curie.
-# Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
-# Développement de l'Epita (LRDE).
 #
 # This file is part of Spot, a model checking library.
 #
@@ -97,43 +97,3 @@ expect_ce '!((FF a) <=> (F x))' 3
 expect_no '!((FF a) <=> (F a))' 4
 expect_no 'Xa && (!a U b) && !b && X!b' 4
 expect_no '(a U !b) && Gb' 3
-
-
-# This graph was randomly generated, and contains one accepting path.
-# It triggered a bug in our implementation of GV04 (that didn't see any
-# accepting path).
-cat >state-space <<EOF
-acc = "a0";
-"S0", "S12", "1",;
-"S12", "S17", "1",;
-"S12", "S8", "1",;
-"S17", "S6", "1",;
-"S17", "S9", "1", "a0";
-"S17", "S2", "1",;
-"S8", "S14", "1",;
-"S8", "S2", "1",;
-"S6", "S1", "1",;
-"S9", "S18", "1",;
-"S2", "S17", "1",;
-"S14", "S19", "1",;
-"S14", "S10", "1",;
-"S1", "S15", "1",;
-"S18", "S5", "1",;
-"S19", "S5", "1",;
-"S19", "S7", "1",;
-"S19", "S11", "1",;
-"S10", "S17", "1",;
-"S15", "S8", "1",;
-"S5", "S4", "1",;
-"S11", "S6", "1",;
-"S4", "S13", "1",;
-"S13", "S3", "1",;
-"S3", "S16", "1",;
-"S3", "S19", "1",;
-EOF
-
-run 0 ../ltl2tgba -eCou99 -X state-space
-run 0 ../ltl2tgba -eCVWY90 -X state-space
-run 0 ../ltl2tgba -eGV04 -X state-space
-run 0 ../ltl2tgba -eSE05 -X state-space
-run 0 ../ltl2tgba -eTau03 -X state-space
