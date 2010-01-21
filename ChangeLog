@@ -1,5 +1,12 @@
 2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Please the style checks...
+
+	* src/tgbaalgos/randomgraph.cc: Fix the copyright and make it fit
+	on 80 columns.
+
+2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/ltltest/reduc.cc (main): Fix harmless memory leak introduced
 	today.
 
