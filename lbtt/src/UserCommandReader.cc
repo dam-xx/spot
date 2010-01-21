@@ -207,7 +207,7 @@ void executeUserCommands()
 	round_info.cout << '\n';
 	round_info.cout.flush();
       }
-      
+
       if (!input_tokens.empty())
       {
         token = parseCommand(input_tokens[0]);
@@ -221,7 +221,7 @@ void executeUserCommands()
           rounds_to_continue = (input_tokens.size() > 1
                                 ? parseNumber(input_tokens[1])
                                 : 1);
-          
+
           if (rounds_to_continue == 0)
             throw CommandErrorException("Argument of the command must be "
                                         "positive.");
@@ -320,7 +320,7 @@ void executeUserCommands()
 				      "the current test round was skipped.");
 
         /*
-         *  If the command expects a formula identifier as a parameter, 
+         *  If the command expects a formula identifier as a parameter,
          *  determine the type of the formula to which the command refers.
          */
 
@@ -536,7 +536,7 @@ void executeUserCommands()
       }
       else if (!external_command.empty())
       {
-	system(external_command.c_str());
+	(void) system(external_command.c_str());
 	round_info.cout << '\n';
 	round_info.cout.flush();
       }
@@ -825,7 +825,7 @@ pair<string, bool> parseRedirection(vector<string>& input_tokens)
 /* ----------------------------------------------------------------------------
  *
  * Description:   Tests whether the last argument to a user command specifies
- *                output redirection. If redirection is requested, the 
+ *                output redirection. If redirection is requested, the
  *                "argument" specifying the redirection is removed from the
  *                vector of strings forming the command.
  *

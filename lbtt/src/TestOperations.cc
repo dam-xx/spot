@@ -288,7 +288,7 @@ void printFileContents
 	first_line_printed = true;
 	estream << string(indent, ' ') + message + '\n';
       }
-                    
+
       estream << string(indent, ' ') + line_prefix + message_line + '\n';
     }
   }
@@ -400,7 +400,7 @@ void generateStateSpace()
 		    2,
 		    6);
 	}
-	else 
+	else
 	{
 	  current_size = configuration.statespace_generator.min_size;
 	  printText("[All state spaces have been enumerated. Staring over]\n",
@@ -488,7 +488,7 @@ void generateStateSpace()
 
     printText(" ok\n", 4);
 
-    if (configuration.statespace_generator.max_size 
+    if (configuration.statespace_generator.max_size
  	  > configuration.statespace_generator.min_size)
       printText("number of states: "
 		+ toString(round_info.statespace->size())
@@ -653,7 +653,7 @@ void generateFormulae(istream* formula_input_stream)
 
   if (printText(" ok\n", 4))
     printText("<negating formula>", 4, 6);
-  
+
   round_info.formulae[3] = &(::Ltl::Not::construct(*round_info.formulae[2]));
 
   if (printText(" ok\n", 4))
@@ -941,8 +941,8 @@ void generateBuchiAutomaton
 	    /* setsid, dup2 or exec failed: write the value of errno to
 	     * error_pipe */
 
-	    write(error_pipe[1], static_cast<const void*>(&errno),
-		  sizeof(int));
+	    (void) write(error_pipe[1], static_cast<const void*>(&errno),
+			 sizeof(int));
 	    close(error_pipe[1]);
 	    exit(0);
 
@@ -1027,7 +1027,7 @@ void generateBuchiAutomaton
 	      times(&timing_information_end);
 	      translator_process = 0;
 
-	      /*  
+	      /*
 	       *  If there is something to be read from error_pipe, then there
 	       *  was an error in replacing the child process with the external
 	       *  program (and the pipe contains the value of errno in this
@@ -1199,7 +1199,7 @@ void generateBuchiAutomaton
 	  printText("[User break]", 1,
 		    configuration.global_options.verbosity <= 2 ? 0 : 10);
 	printText("\n\n", 1);
-       
+
 	if (round_info.transcript_file.is_open())
 	  writeToTranscript("User break while generating Büchi automaton ("
 			    + configuration.algorithmString(algorithm_id)
@@ -1347,7 +1347,7 @@ void generateBuchiAutomaton
       += automaton_stats.number_of_buchi_transitions;
     final_statistics[algorithm_id].total_number_of_acceptance_sets[f]
       += automaton_stats.number_of_acceptance_sets;
-		  
+
     if (final_statistics[algorithm_id].total_buchi_generation_time[f] < 0.0
 	|| automaton_stats.buchi_generation_time < 0.0)
       final_statistics[algorithm_id].total_buchi_generation_time[f] = -1.0;
@@ -1415,10 +1415,10 @@ void performEmptinessCheck
 	product_stats =  product.globalEmptinessCheck
 	                   (automaton_stats.buchi_automaton->initialState(),
 			    automaton_stats.emptiness_check_result,
-			    round_info.real_emptiness_check_size);	 
+			    round_info.real_emptiness_check_size);
 
       printText(" ok\n", 4);
-    
+
       automaton_stats.number_of_product_states = product_stats.first;
       automaton_stats.number_of_product_transitions = product_stats.second;
 
@@ -1450,7 +1450,7 @@ void performEmptinessCheck
 	printText("[User break]", 1,
 		  configuration.global_options.verbosity <= 2 ? 0 : 10);
       printText("\n\n", 1);
-       
+
       if (round_info.transcript_file.is_open())
 	writeToTranscript("User break while generating product automaton ("
 			  + configuration.algorithmString(algorithm_id)
@@ -1558,10 +1558,10 @@ void performConsistencyCheck
   }
 
   printText((result ? " ok\n" : " failed\n"), 4);
-  
+
   if (configuration.global_options.verbosity >= 2)
     printConsistencyCheckStats(cout, 8, algorithm_id);
-}      
+}
 
 /* ========================================================================= */
 void compareResults()
