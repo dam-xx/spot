@@ -1,5 +1,12 @@
 2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix taa_tgba_formula's destructor.
+
+	* src/tgba/taatgba.cc (taa_tgba_formula::~taa_tgba_formula):
+	Really destroy all formulae, not only half of them.
+
+2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbatest/randtgba.cc: Do not include <string> twice.
 
 2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

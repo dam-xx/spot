@@ -1,6 +1,5 @@
-// Copyright (C) 2009 Laboratoire d'Informatique de Paris
-// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
-// Université Pierre et Marie Curie.
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et D�veloppement
+// de l'Epita (LRDE)
 //
 // This file is part of Spot, a model checking library.
 //
@@ -304,7 +303,7 @@ namespace spot
     }
     for (seen_map::iterator i = seen_.begin(); i != seen_.end();)
     {
-      // Advance the iterator before deleting the formula.
+      // Advance the iterator before deleting the state set.
       const spot::state_set* s = i->first;
       ++i;
       delete s;
@@ -386,12 +385,12 @@ namespace spot
   taa_tgba_formula::~taa_tgba_formula()
   {
     ns_map::iterator i;
-    for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
+    for (i = name_state_map_.begin(); i != name_state_map_.end();)
     {
       taa_tgba::state::iterator i2;
       for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
 	delete *i2;
-      // Advance the iterator before deleting the formula.
+      // Advance the iterator before destroying the formula.
       const ltl::formula* s = i->first;
       delete i->second;
       ++i;
