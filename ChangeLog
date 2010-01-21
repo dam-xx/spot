@@ -1,3 +1,13 @@
+2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix a longstanding bug in our implementation of GV04.
+
+	* src/tgbaalgos/gv04.cc (push): Fix the tracking of the accepting
+	link.  This bug was discovered on a random generated graph with
+	a complex accepting cycle.
+	* src/tgbatest/emptchk.test: Add the troublesome graph as
+	test case.
+
 2010-01-20  Damien Lefortier <dam@lrde.epita.fr>
 
 	When iterating a hash_map, be careful not to delete i->first

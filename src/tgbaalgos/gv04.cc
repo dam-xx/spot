@@ -1,6 +1,8 @@
-// Copyright (C) 2004, 2005, 2008 Laboratoire d'Informatique de Paris
-// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
-// Université Pierre et Marie Curie.
+// Copyright (C) 2004, 2005 Laboratoire d'Informatique de Paris 6
+// (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
+// Pierre et Marie Curie.
+// Copyright (C) 2008, 2010 Laboratoire de recherche et développement
+// de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
 //
@@ -175,13 +177,14 @@ namespace spot
 	stack_entry ss = { s, 0, top, dftop, 0 };
 
 	if (accepting)
-	  ss.acc = dftop;	// This differs from GV04 to support TBA.
+	  ss.acc = top - 1;	// This differs from GV04 to support TBA.
 	else if (dftop >= 0)
 	  ss.acc = stack[dftop].acc;
 	else
 	  ss.acc = -1;
 
-	trace << "    s.lowlink = " << top << std::endl;
+	trace << "    s.lowlink = " << top << std::endl
+	      << "    s.acc = " << ss.acc << std::endl;
 
 	stack.push_back(ss);
 	dftop = top;
@@ -216,7 +219,8 @@ namespace spot
 	trace << "  lowlinkupdate(f = " << f << ", t = " << t
 	      << ")" << std::endl
 	      << "    t.lowlink = " << stack[t].lowlink << std::endl
-	      << "    f.lowlink = " << stack[f].lowlink << std::endl;
+	      << "    f.lowlink = " << stack[f].lowlink << std::endl
+	      << "    f.acc = " << stack[f].acc << std::endl;
 	int stack_t_lowlink = stack[t].lowlink;
 	if (stack_t_lowlink <= stack[f].lowlink)
 	  {
