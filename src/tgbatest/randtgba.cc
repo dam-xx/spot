@@ -1,4 +1,6 @@
-// Copyright (C) 2004, 2005, 2008, 2009 Laboratoire d'Informatique de Paris
+// Copyright (C) 2008, 2009 Laboratoire de Recherche et Développement
+// de l'Epita (LRDE).
+// Copyright (C) 2004, 2005 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
 //
@@ -28,7 +30,6 @@
 #include <string>
 #include <utility>
 #include <set>
-#include <string>
 #include <vector>
 #include "ltlparse/public.hh"
 #include "ltlvisit/apcollect.hh"

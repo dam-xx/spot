@@ -1,5 +1,9 @@
 2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgbatest/randtgba.cc: Do not include <string> twice.
+
+2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Speedup reduc.test by not spawning one process per formula.
 
 	* src/ltltest/reduc.cc: Add an option -f to read a lost of
