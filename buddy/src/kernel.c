@@ -1100,6 +1100,60 @@ void bdd_gbc(void)
 }
 
 
+/*
+NAME    {* bdd\_addref *}
+SECTION {* kernel *}
+SHORT   {* increases the reference count on a node *}
+PROTO   {* BDD bdd_addref(BDD r) *}
+DESCR   {* Reference counting is done on externaly referenced nodes only
+	   and the count for a specific node {\tt r} can and must be
+	   increased using this function to avoid loosing the node in the next
+	   garbage collection. *}
+ALSO    {* bdd\_delref *}
+RETURN  {* The BDD node {\tt r}. *}
+*/
+BDD bdd_addref(BDD root)
+{
+   if (root < 2  ||  !bddrunning)
+      return root;
+   if (root >= bddnodesize)
+      return bdd_error(BDD_ILLBDD);
+   if (LOW(root) == -1)
+      return bdd_error(BDD_ILLBDD);
+
+   INCREF(root);
+   return root;
+}
+
+
+/*
+NAME    {* bdd\_delref *}
+SECTION {* kernel *}
+SHORT   {* decreases the reference count on a node *}
+PROTO   {* BDD bdd_delref(BDD r) *}
+DESCR   {* Reference counting is done on externaly referenced nodes only
+	   and the count for a specific node {\tt r} can and must be
+	   decreased using this function to make it possible to reclaim the
+	   node in the next garbage collection. *}
+ALSO    {* bdd\_addref *}
+RETURN  {* The BDD node {\tt r}. *}
+*/
+BDD bdd_delref(BDD root)
+{
+   if (root < 2  ||  !bddrunning)
+      return root;
+   if (root >= bddnodesize)
+      return bdd_error(BDD_ILLBDD);
+   if (LOW(root) == -1)
+      return bdd_error(BDD_ILLBDD);
+
+   /* if the following line is present, fails there much earlier */
+   if (!HASREF(root)) bdd_error(BDD_BREAK); /* distinctive */
+
+   DECREF(root);
+   return root;
+}
+
 
 /*=== RECURSIVE MARK / UNMARK ==========================================*/
 
