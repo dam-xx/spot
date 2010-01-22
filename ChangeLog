@@ -1,3 +1,11 @@
+2010-01-22  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix the computation of the length of multops.
+
+	* src/ltlvisit/length.cc (visit(multop*)): New function. "a & b &
+	c" has length 5, not 4, even though it is stored as And(a,b,c).
+	This caused reduc.test to fail on some formulae.
+
 2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Please the style checks...

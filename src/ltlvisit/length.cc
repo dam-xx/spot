@@ -1,3 +1,5 @@
+// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// l'Epita (LRDE).
 // Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -21,6 +23,7 @@
 
 #include "length.hh"
 #include "ltlvisit/postfix.hh"
+#include "ltlast/multop.hh"
 
 namespace spot
 {
@@ -40,6 +43,17 @@ namespace spot
 	result() const
 	{
 	  return result_;
+	}
+
+	virtual void
+	visit(multop* mo)
+	{
+	  unsigned s = mo->size();
+	  for (unsigned i = 0; i < s; ++i)
+	    mo->nth(i)->accept(*this);
+	  // "a & b & c" should count for 5, even though it is
+	  // stored as And(a,b,c).
+	  mo += s - 1;
 	}
 
 	virtual void
