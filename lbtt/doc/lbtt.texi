@@ -816,7 +816,7 @@ is given by the equation
 @iftex
 @tex
 $$
-\it{pri}(\it{op}) / \sum_{\rm{op}' \in \{\neg, \bf{X}, \bf{F}, \bf{G}\}}\it{pri}\it(op')
+\it{pri}(\it{op}) / \sum_{\rm{op}^\prime \in \{\neg, \bf{X}, \bf{F}, \bf{G}\}}\it{pri}(\it{op}^\prime)
 $$
 @end tex
 @end iftex
@@ -828,7 +828,7 @@ $$
 where
 @iftex
 @tex
-$\it{op}'$
+$\it{op}^\prime$
 @end tex
 @end iftex
 @ifnottex
@@ -851,7 +851,7 @@ into the formula is
 @iftex
 @tex
 $$
-\it{pri}(\it{op}) / \sum_{\rm{op}' \in \{\neg, \vee, \wedge, \rightarrow, \leftrightarrow, \oplus, \bf{X}, \bf{U}, \bf{W}, \bf{F}, \bf{B}, \bf{V}, \bf{M}, \bf{G}\}}\it{pri}\it(op')
+\it{pri}(\it{op}) / \sum_{\rm{op}^\prime \in \{\neg, \vee, \wedge, \rightarrow, \leftrightarrow, \oplus, \bf{X}, \bf{U}, \bf{W}, \bf{F}, \bf{B}, \bf{V}, \bf{M}, \bf{G}\}}\it{pri}(\it{op}^\prime)
 $$
 @end tex
 @end iftex
@@ -863,7 +863,7 @@ $$
 where
 @iftex
 @tex
-$\it{op}'$
+$\it{op}^\prime$
 @end tex
 @end iftex
 @ifnottex
@@ -1743,7 +1743,7 @@ The following table illustrates the effects of the
   -------------------------------------------------------------
   (p1 V ! p0)       @r{Yes}       Normal@r{/}NNF@r{:} (p1 V ! p0)
 
-  [] p0 -> <> p1    @r{Yes*}      Nor@r{:} [] p0 -> <> p1  
+  [] p0 -> <> p1    @r{Yes*}      Nor@r{:} [] p0 -> <> p1
                               NNF@r{:} (true U ! p0) \/ (true U p1)
 
   ! <> p0            @r{No}       Nor@r{:} ! <> p0
@@ -2168,7 +2168,7 @@ encountered during testing. By default no log will be created.
 @cindex enabling and disabling tests
 @cindex tests, profiling LTL-to-B@"uchi translators
 This option can be used as a shorthand for disabling all B@"uchi automata
-correctness tests. 
+correctness tests.
 The test report generated at the end of testing then shows
 only the running times of each tested LTL-to-B@"uchi translator and the sizes
 of the generated automata.
