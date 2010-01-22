@@ -27,14 +27,14 @@ struct token         /* BISON token data */
 #define yywrap() (1)
 
 extern YYSTYPE yylval;            /* Declare for flex user */
-extern void yyerror(char *,...);  /* Declare for flex and bison */
+extern void yyerror(const char *,...);  /* Declare for flex and bison */
 extern FILE *yyin;
 extern int yylex(void);           /* Declare for bison */
 extern int yyparse(void);         /* Declare for bison user */
 extern int linenum;               /* Declare for error handler */
 
    /* Use this instead of strdup() to avoid malloc() */
-inline char *sdup(const char *s) 
+inline char *sdup(const char *s)
 {
    return strcpy(new char[strlen(s)+1], s);
 }

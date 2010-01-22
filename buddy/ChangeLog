@@ -1,3 +1,12 @@
+2010-01-22  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Get rid of some "deprecated conversion from string constant to
+	`char*'" warnings.
+
+	* examples/bddcalc/parser_.h (yyerror): Declare the format
+	as a "const char*".
+	* examples/bddcalc/parser.yxx (yyerror): Likewise.
+
 2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/bddio.c (bdd_load): Check the return value of fscanf() to
