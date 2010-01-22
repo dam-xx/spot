@@ -2,3 +2,13 @@ Makefile.in
 Makefile
 *.info*
 texinfo.tex
+*.cp
+*.cps
+*.fn
+*.fns
+*.ky
+*.kys
+*.pg
+*.vr
+*.vrs
+*.tp

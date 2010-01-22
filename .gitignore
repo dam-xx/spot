@@ -23,3 +23,13 @@ stdout
 *.old
 TAGS
 INSTALL
+*.log
+callgrind.*
+ms_print.*
+pan.*
+*.dvi
+*.aux
+*.ps
+*.pdf
+*.toc
+*.S
