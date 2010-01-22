@@ -1,3 +1,5 @@
+// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
@@ -40,11 +42,15 @@ namespace spot
     /// \addtogroup ltl_io
     /// @{
 
+#ifndef SWIG
     /// \brief A parse diagnostic with its location.
     typedef std::pair<ltlyy::location, std::string> parse_error;
     /// \brief A list of parser diagnostics, as filled by parse.
     typedef std::list<parse_error> parse_error_list;
-
+#else
+    // Turn parse_error_list into an opaque type for Swig.
+    struct parse_error_list {};
+#endif
 
     /// \brief Build a formula from an LTL string.
     /// \param ltl_string The string to parse.

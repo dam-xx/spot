@@ -1,5 +1,14 @@
 2010-01-22  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Turn parse_error_list into an opaque type for Swig.  This
+	kills a memory leak warning from swig/python.
+
+	* src/ltlparse/public.hh (parse_error_list): Declare
+	as an empty struct for Swig.
+	* wrap/python/tests/ltlparse.py: Fix copyright.
+
+2010-01-22  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix the computation of the length of multops.
 
 	* src/ltlvisit/length.cc (visit(multop*)): New function. "a & b &
