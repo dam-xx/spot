@@ -1,5 +1,13 @@
 2010-01-24  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Check that all directories are documented.
+
+	* src/sanity/readme.test: For each AC_OUTPUT Makefile, check that
+	the directory is documented in README.  Also skip non distributed
+	directories in readme.test.
+	* README: Fit on 80 columns.
+
+2010-01-24  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 	* README: Typo.
 
 2010-01-24  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
