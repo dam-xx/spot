@@ -1,4 +1,6 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2008, 2009 Laboratoire
+// Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
+// Développement de l'Epita (LRDE).
+// Copyright (C) 2003, 2004, 2005, 2006 Laboratoire
 // d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
 // Coopératifs (SRC), Université Pierre et Marie Curie.
 //
@@ -848,6 +850,20 @@ namespace spot
 	    typedef std::map<bdd, const formula*, bdd_less_than> succ_map;
 	    succ_map succs;
 
+	    // Compute prime implicants.
+	    // The reason we use prime implicants and not bdd_satone()
+	    // is that we do not want to get any negation in front of Next
+	    // or Acc variables.  We wouldn't know what to do with these.
+	    // We never added negations in front of these variables when
+	    // we built the BDD, so prime implicants will not "invent" them.
+	    //
+	    // FIXME: minato_isop is quite expensive, and I (=adl)
+	    // don't think we really care that much about getting the
+	    // smalled sum of products that minato_isop strives to
+	    // compute.  Given that Next and Acc variables should
+	    // always be positive, maybe there is a faster way to
+	    // compute the successors?  E.g. using bdd_satone() and
+	    // ignoring negated Next and Acc variables.
 	    minato_isop isop(res & one_prop_set);
 	    bdd cube;
 	    while ((cube = isop.next()) != bddfalse)
