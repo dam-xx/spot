@@ -120,7 +120,7 @@ bench/            Benchmarks for ...
    emptchk/       ... emptiness-check algorithms,
    gspn-ssp/      ... various symmetry-based methods with GreatSPN,
    ltl2tgba/      ... LTL-to-Büchi translation algorithms,
-   ltlcouter/     ... translation of a class of LTL formulae,
+   ltlcounter/    ... translation of a class of LTL formulae,
    scc-stats/     ... SCC statistics after translation of LTL formulae,
    split-product/ ... parallelizing gain after splitting LTL automata.
 wrap/	          Wrappers for other languages.
