@@ -1,4 +1,4 @@
-## Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2004, 2010  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -47,4 +47,4 @@ installcheck-local:
 
 
 CLEANFILES = failures incltest.*
-EXTRA_DIST = includes.test 80columns.test style.test
+EXTRA_DIST = includes.test 80columns.test style.test readme.test
