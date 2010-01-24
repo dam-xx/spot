@@ -107,6 +107,9 @@ src/            Sources for libspot.
    evtgba*/     Ignore these for now.
    eltlparse/	Parser for ELTL formulae.
    eltltest/    Tests for ELTL nodes in ltlast/ and eltlparse/.
+   saba/        SABA (State-labeled Alternating Büchi Automata) objects.
+   sabaalgos/   Algorithms on SABA.
+   sabatest/    Tests for saba/, sabaalgos/.
 doc/	        Documentation for libspot.
    spot.html/   HTML reference manual.
    spot.latex/  Sources for the PDF manual.  (Not distributed, can be rebuilt.)
@@ -121,14 +124,18 @@ wrap/	        Wrappers for other languages.
 iface/	        Interfaces to other libraries.
    gspn/        GreatSPN interface.
       examples/ Supporting models used by the test cases.
-
+   nips/        NIPS interface (to use Promela models).
+      nipstest/ Tests for NIPS.
 
 Third party software
 --------------------
 
-buddy/   A patched version of BuDDy 2.3 (a BDD library).
-lbtt/    lbtt 1.2.0 (an LTL to Büchi automata test bench).
-
+buddy/            A patched version of BuDDy 2.3 (a BDD library).
+lbtt/             lbtt 1.2.0 (an LTL to Büchi automata test bench).
+iface/            Interfaces to other libraries.
+   nips/          NIPS interface (to use Promela models).
+      nips_vm/    NIPS VM 1.2.7 (New Implementation of Promela Semantics
+                  Virtual Machine).
 
 Build-system stuff
 ------------------

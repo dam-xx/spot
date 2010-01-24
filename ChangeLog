@@ -1,3 +1,10 @@
+2010-01-24  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
+	Update the README.
+
+	* README: Reference src/saba/, src/sabaalgos/, src/sabatest/,
+	iface/nips/, iface/nips/nipstest/ and iface/nips/nips_vm/.
+
 2010-01-22  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Turn parse_error_list into an opaque type for Swig.  This
