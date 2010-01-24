@@ -34,6 +34,8 @@ check-local:
 	$(SHELL) $(srcdir)/80columns.test $(TESTHEADER)
 	INCDIR='$(top_srcdir)/src' \
 	$(SHELL) $(srcdir)/style.test $(TESTHEADER)
+	top_srcdir='$(top_srcdir)' \
+	$(PERL) $(srcdir)/readme.test
 
 # Ensure we have not forgotten to include an header.
 installcheck-local:

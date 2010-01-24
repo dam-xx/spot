@@ -1,5 +1,12 @@
 2010-01-24  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
+	* src/sanity/readme.test: A script to check whether all the
+	directories referenced in README exist.
+	* src/sanity/Makefile.am: Adjust to call `readme.test' when make
+	check is invoked.
+
+2010-01-24  Guillaume Sadegh  <sadegh@lrde.epita.fr>
+
 	Update the README.
 
 	* README: Reference src/saba/, src/sabaalgos/, src/sabatest/,

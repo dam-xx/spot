@@ -1,0 +1,57 @@
+#! /usr/bin/perl -w
+# -*- cperl -*-
+
+# Check that all the directories in the README exist.
+# Also has an option --list to print directories which are
+# documented in the README.
+
+use strict;
+use warnings;
+
+local $\ = "\n";
+my $top_srcdir = $ENV{top_srcdir} || "../../";
+my $list_mode = ($#ARGV != -1 && $ARGV[0] eq "--list");
+
+unless (-f "$top_srcdir/README")
+{
+  print STDERR "$top_srcdir/README not found";
+  exit 2;
+}
+
+open(FD, "$top_srcdir/README");
+my @directory = ();
+my $exit_status = 0;
+
+while (<FD>)
+{
+  # We consider Third party software?
+  # last if (/^Third party software$/);
+  next unless (m{^(\s*)(\S+/)\s+});
+  my $level = length($1) / 3;
+  my $name = $2;
+
+  $directory[$level] = $name;
+  $#directory = $level;
+  my $filename = join "", @directory;
+
+  # Use globbing on the filename.
+  for my $directory (glob("$top_srcdir/$filename"))
+  {
+    if ($list_mode)
+    {
+      print "$directory";
+    }
+    else
+    {
+      unless (-d $directory || -f $directory)
+      {
+        print STDERR "$directory does not exist.";
+        $exit_status = 1;
+      }
+    }
+  }
+}
+
+close(FD);
+
+exit $exit_status;
