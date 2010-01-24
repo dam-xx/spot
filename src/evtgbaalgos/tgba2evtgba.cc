@@ -1,4 +1,6 @@
-// Copyright (C) 2004, 2009  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// de l'Epita (LRDE).
+// Copyright (C) 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
