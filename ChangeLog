@@ -1,3 +1,9 @@
+2010-01-25  Damien Lefortier <dam@lrde.epita.fr>
+
+	* wrap/python/cgi/ltl2tgba.in: Use the uuid Python module instead
+	of the UNIQUE_ID environment variable to avoid being
+	Apache-specific.
+
 2010-01-24  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
 	Fix copyrights.
@@ -107,6 +113,7 @@
 	* README: Fit on 80 columns.
 
 2010-01-24  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* README: Typo.
 
 2010-01-24  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

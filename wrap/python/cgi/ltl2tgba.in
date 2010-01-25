@@ -28,6 +28,7 @@ import os
 import cgi
 import cgitb; cgitb.enable()
 import signal
+import uuid
 
 print "Content-Type: text/html"
 print
@@ -107,8 +108,7 @@ os.system('find ' + imgdir + ' -type f -amin +15 -print | xargs rm -f')
 myself = os.environ['SCRIPT_NAME'];
 form = cgi.FieldStorage()
 filled = form.has_key('formula')
-# FIXME: This assumes Apache.
-uid = os.environ['UNIQUE_ID'];
+uid = str(uuid.uuid1())
 imgprefix = imgdir + '/' + uid
 
 def escaped_print_set(dict, what):
