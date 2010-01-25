@@ -1,5 +1,10 @@
 2010-01-25  Damien Lefortier <dam@lrde.epita.fr>
 
+	* wrap/python/cgi/ltl2tgba.in, wrap/python/spot.i: Add a new
+	translation algorithm: Tauriainen/TAA.
+
+2010-01-25  Damien Lefortier <dam@lrde.epita.fr>
+
 	* wrap/python/cgi/ltl2tgba.in: Use the uuid Python module instead
 	of the UNIQUE_ID environment variable to avoid being
 	Apache-specific.

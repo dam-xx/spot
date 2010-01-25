@@ -69,6 +69,7 @@
 #include "tgba/succiter.hh"
 #include "tgba/tgba.hh"
 #include "tgba/statebdd.hh"
+#include "tgba/taatgba.hh"
 #include "tgba/tgbabddcoredata.hh"
 #include "tgba/succiterconcrete.hh"
 #include "tgba/tgbabddconcrete.hh"
@@ -78,6 +79,7 @@
 
 #include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"
+#include "tgbaalgos/ltl2taa.hh"
 #include "tgbaalgos/dottydec.hh"
 #include "tgbaalgos/dotty.hh"
 #include "tgbaalgos/dupexp.hh"
@@ -135,6 +137,7 @@ using namespace spot;
 
 %feature("new") spot::ltl_to_tgba_lacim;
 %feature("new") spot::ltl_to_tgba_fm;
+%feature("new") spot::ltl_to_taa;
 %feature("new") spot::tgba::get_init_state;
 %feature("new") spot::tgba::succ_iter;
 %feature("new") spot::tgba_succ_iterator::current_state;
@@ -156,6 +159,7 @@ using namespace spot;
 %include "tgba/succiter.hh"
 %include "tgba/tgba.hh"
 %include "tgba/statebdd.hh"
+%include "tgba/taatgba.hh"
 %include "tgba/tgbabddcoredata.hh"
 %include "tgba/succiterconcrete.hh"
 %include "tgba/tgbabddconcrete.hh"
@@ -165,6 +169,7 @@ using namespace spot;
 
 %include "tgbaalgos/ltl2tgba_lacim.hh"
 %include "tgbaalgos/ltl2tgba_fm.hh"
+%include "tgbaalgos/ltl2taa.hh"
 %include "tgbaalgos/dottydec.hh"
 %include "tgbaalgos/dotty.hh"
 %include "tgbaalgos/dupexp.hh"

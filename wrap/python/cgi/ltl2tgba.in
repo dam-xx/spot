@@ -197,6 +197,7 @@ formula = form.getfirst('formula', '')
 
 color_fm = "#DFC6F8"
 color_lacim = "#F8C6DF"
+color_taa = "#D8C6FF"
 
 options_common = [
     ('show_formula_png',    'draw the formula',                            0),
@@ -231,11 +232,16 @@ options_trans_lacim = [
     ('show_acceptance_png',
      'draw the acceptance relation',                                       0),
     ]
+options_trans_taa = [
+    ('refined_rules',
+     'refined rules',                                                      1)
+    ]
 
 default_translator = 'trans_fm';
 translators = [
     ('trans_fm',    'Couvreur/FM',    color_fm),
     ('trans_lacim', 'Couvreur/LaCIM', color_lacim),
+    ('trans_taa',   'Tauriainen/TAA', color_taa),
     ]
 
 options_accepting_run = [
@@ -495,6 +501,8 @@ elif trans_fm:
     automaton = spot.ltl_to_tgba_fm(f, dict,
                                     exprop, symb_merge, branching_postponement,
                                     fair_loop_approx)
+elif trans_taa:
+    automaton = spot.ltl_to_taa(f, dict, refined_rules)
 
 print 'done.</p>'
 sys.stdout.flush()
