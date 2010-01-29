@@ -128,9 +128,9 @@ namespace spot
     typedef taa_tgba::state::const_iterator iterator;
     typedef std::pair<iterator, iterator> iterator_pair;
     typedef std::vector<iterator_pair> bounds_t;
-    typedef Sgi::hash_multimap<
-      const spot::state_set*, taa_tgba::transition*, state_ptr_hash,
-      state_ptr_equal> seen_map;
+    typedef Sgi::hash_map<
+      const spot::state_set*, std::vector<taa_tgba::transition*>,
+      state_ptr_hash, state_ptr_equal> seen_map;
 
     struct distance_sort :
       public std::binary_function<const iterator_pair&,

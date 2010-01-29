@@ -1,3 +1,8 @@
+2010-01-29  Felix Abecassis <felix.abecassis@lrde.epita.fr>
+
+	* src/tgba/taatgba.cc, src/tgba/taatbga.hh: Fix a memory issue on
+	Darwin.
+
 2010-01-25  Damien Lefortier <dam@lrde.epita.fr>
 
 	* wrap/python/cgi/ltl2tgba.in, wrap/python/spot.i: Add a new

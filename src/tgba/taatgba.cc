@@ -246,30 +246,35 @@ namespace spot
       // If no contradiction, then look for another transition to
       // merge with the new one.
       seen_map::iterator i;
+      std::vector<taa_tgba::transition*>::iterator j;
       if (t->condition != bddfalse)
       {
-	for (i = seen_.find(b); i != seen_.end(); ++i)
-	{
-	  if (*i->second->dst == *t->dst
-	      && i->second->condition == t->condition)
+	i = seen_.find(b);
+	if (i != seen_.end())
+	  for (j = i->second.begin(); j != i->second.end(); ++j)
 	  {
-	    i->second->acceptance_conditions &= t->acceptance_conditions;
-	    break;
-	  }
-	  if (*i->second->dst == *t->dst
-	      && i->second->acceptance_conditions == t->acceptance_conditions)
-	  {
-	    i->second->condition |= t->condition;
-	    break;
-	  }
+	    taa_tgba::transition* current = *j;
+	    if (*current->dst == *t->dst
+		&& current->condition == t->condition)
+	    {
+	      current->acceptance_conditions &= t->acceptance_conditions;
+	      break;
+	    }
+	    if (*current->dst == *t->dst
+		&& current->acceptance_conditions == t->acceptance_conditions)
+	    {
+	      current->condition |= t->condition;
+	      break;
+	    }
 	}
       }
       // Mark the new transition as seen and keep it if we have not
-      // found any contraction and no other transition to merge with,
-      // or delete it otherwise.
-      if (t->condition != bddfalse && i == seen_.end())
+      // found any contradiction and no other transition to merge
+      // with, or delete it otherwise.
+      if (t->condition != bddfalse
+	  && (i == seen_.end() || j == i->second.end()))
       {
-	seen_.insert(std::make_pair(b, t));
+	seen_[b].push_back(t);
 	succ_.push_back(t);
       }
       else
@@ -296,17 +301,17 @@ namespace spot
 
   taa_succ_iterator::~taa_succ_iterator()
   {
-    for (unsigned i = 0; i < succ_.size(); ++i)
-    {
-      delete succ_[i]->dst;
-      delete succ_[i];
-    }
     for (seen_map::iterator i = seen_.begin(); i != seen_.end();)
     {
       // Advance the iterator before deleting the state set.
       const spot::state_set* s = i->first;
       ++i;
       delete s;
+    }
+    for (unsigned i = 0; i < succ_.size(); ++i)
+    {
+      delete succ_[i]->dst;
+      delete succ_[i];
     }
   }
 
