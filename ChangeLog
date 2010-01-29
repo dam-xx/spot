@@ -1,5 +1,15 @@
 2010-01-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Update some text files for upcoming 0.5.
+
+	* NEWS: Update for upcoming 0.5.
+	* HACKING: Update Automake requirement.
+	* README: Mention the mailing list.
+	* bench/ltlcounter/README: More text.
+	* configure.ac: Report bugs to spot@lrde.epita.fr.
+
+2010-01-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Rename wrap/python/cgi/ as wrap/python/cgi-bin/.
 
 	* wrap/python/cgi/: Rename as ...

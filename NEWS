@@ -1,4 +1,70 @@
-New in spot 0.4a:
+New in spot 0.5 (2010-01-31):
+
+  * We have setup two mailing lists:
+    - <spot-announce@lrde.epita.fr> is read-only and will be used to
+      announce new releases.  You may subscribe at
+      https://www.lrde.epita.fr/mailman/listinfo/spot-announce
+    - <spot@lrde.epita.fr> can be used to discusse anything related
+      to Spot.  You may subscribe at
+      https://www.lrde.epita.fr/mailman/listinfo/spot-announce
+  * Two new LTL translations have been implemented:
+    - eltl_to_tgba_lacim() is a symbolic translation for ELTL based
+      on Couvreur's LaCIM'00 paper.  For this translation, all operators
+      are described as finite automata. A default set of operators is
+      provided for LTL and user may add more automaton operators.
+    - ltl_to_taa() is a translation based on Tauriainen's PhD thesis.
+      LTL is translated to "self-loop" alternating automata
+      and then to Transition-based Generalized Automata.
+    The "Couvreur/FM" translation remains the best LTL translation
+    available in Spot.
+  * The data structures used to represent LTL formulae have been
+    overhauled, and it resulted in a big performence improvement
+    (in time and memory consumption) for the LTL translation.
+  * Two complementation algorithms for state-based Büchi automata
+    have been implemented:
+    - tgba_complement is an on-the-fly implementation of the
+      Kupferman-Vardi construction (TCS'05) for generalized acceptance
+      conditions.
+    - tgba_safra_complement is an implementation of Safra's
+      complementation.  This algorithm takes a degeneralized Büchi
+      automaton as input, but our implementation for the Streett->Büchi
+      step will produce a generalized automaton in the end.
+  * ltl2tgba has gained several options and the help text has been
+    reorganized.  Please run src/tgbatest/ltl2tgba without arguments
+    for details.
+  * Automata using BDD-encoded transitions relation can now be pruned
+    for useless states symbolically using the delete_unaccepting_scc()
+    function.  This is ltl2tgba's -R3b option.
+  * The SCC-based simplification (ltl2tgba's -R3 option) has been
+    rewritten and improved.
+  * More benchmarks:
+    - gspn-ssp/    some benchmarks published at ACSD'07,
+    - ltlcounter/  translation of a class of LTL formulae used by
+                     Rozier & Vardi at SPIN'07
+    - scc-stats/   SCC statistics after translation of LTL formulae
+    - split-product/ parallelizing gain after splitting LTL automata
+  * An experimental Kripke interface has been developed to simplify
+    the integration of third party tools that do not use acceptance
+    conditions, and that have label on states instead of transitions.
+    This interface has not been used yet.
+  * Experimental Interface with the Nips virtual machine.
+    It is not very useful as Spot isn't able to retrieve any property
+    information from the model.  This will just check assertions.
+  * Distribution:
+    - The Boost C++ library is now required.
+    - Update to Autoconf 2.65, Automake 1.11.1, Libtool 2.2.6b,
+      Bison 2.4.1, and Swig 1.3.40.
+    - Thanks to the newest Automake, "make check" will now
+      run in parallel if you use "make -j2 check" or more.
+  * Bug fixes:
+    - Disable warnings from the garbage collection of BuDDy, it
+      could break the standard output of ltl2tgba.
+    - Fix several C++ constructs to ensure Spot will build with
+      GCC 4.3, 4.4, and older 3.x releases, as well as with Intel's
+      ICC compiler.
+    - A very old bug in the hash function for LTL formulae caused Spot
+      to sometimes (but very rarely) consider two different LTL formulae
+      as equal.
 
 New in spot 0.4 (2007-07-17):
 

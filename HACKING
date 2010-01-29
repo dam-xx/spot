@@ -10,7 +10,7 @@ Here are the tools you need to bootstrap the CVS tree, or more
 generally if you plan to regenerate some of the generated files.
 
   GNU Autoconf >= 2.61
-  GNU Automake >= 1.10
+  GNU Automake >= 1.11
   GNU Libtool >= 2.2
   GNU Flex (the version seems to matters, we used 2.5.31)
   GNU Bison >= 2.4
