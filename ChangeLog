@@ -1,3 +1,17 @@
+2010-01-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add []-> and <>->.
+
+	* src/ltlast/binop.hh, src/ltlast/binop.cc (EConcat, UConcat):
+	Add these new operators.
+	* src/ltlparse/ltlparse.yy, src/ltlparse/ltlscan.ll: Parse
+	these new operators.
+	* src/ltlvisit/simpfg.cc, src/ltlvisit/syntimpl.cc,
+	src/ltlvisit/tostring.cc, src/tgba/formula2bdd.cc,
+	src/tgbaalgos/eltl2tgba_lacim.cc, src/tgbaalgos/ltl2taa.cc,
+	src/tgbaalgos/ltl2tgba_fm.cc, src/tgbaalgos/ltl2tgba_lacim.cc:
+	Add these new operators into the switches.
+
 2010-01-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Add a constant_term() visitor to decide wether #e is accepted.
