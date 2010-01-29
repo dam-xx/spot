@@ -1,3 +1,7 @@
+2010-01-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbaalgos/gtec/gtec.hh: Fix copyright.
+
 2010-01-29  Felix Abecassis <felix.abecassis@lrde.epita.fr>
 
 	* src/tgba/taatgba.cc, src/tgba/taatbga.hh: Fix a memory issue on
