@@ -1,4 +1,4 @@
-// Copyright (C) 2008 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2008, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -27,7 +27,7 @@
 namespace spot
 {
   /// \brief Build a spot::tgba_bdd_concrete from an ELTL formula.
-  /// \ingroup tgba_eltl
+  /// \ingroup tgba_ltl
   ///
   /// This is based on the following paper.
   /// \verbatim

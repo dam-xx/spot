@@ -34,7 +34,7 @@ namespace spot
   struct safra_tree_automaton;
 
   /// \brief Build a complemented automaton.
-  /// \ingroup tgba
+  /// \ingroup tgba_on_the_fly_algorithms
   ///
   /// It creates an automaton that recognizes the
   /// negated language of \a aut.

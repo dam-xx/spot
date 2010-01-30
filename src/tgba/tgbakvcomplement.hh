@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -62,11 +62,11 @@ namespace spot
   typedef std::vector<bdd_ordered> acc_list_t;
 
   /// \brief Build a complemented automaton.
-  /// \ingroup tgba
+  /// \ingroup tgba_on_the_fly_algorithms
   ///
   /// The construction comes from:
   /// @Article{         kupferman.05.tcs,
-  ///   title           = {{From complementation to certification}},
+  ///   title           = {From complementation to certification},
   ///   author          = {Kupferman, O. and Vardi, M.Y.},
   ///   journal         = {Theoretical Computer Science},
   ///   volume  	= {345},

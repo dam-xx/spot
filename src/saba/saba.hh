@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -27,7 +27,7 @@
 
 namespace spot
 {
-  /// \defgroup saba SABA (State-based Alternating BÃ¼chi Automata)
+  /// \defgroup saba SABA (State-based Alternating Büchi Automata)
   ///
   /// Spot was centered around non-deterministic \ref tgba.
   /// Alternating automata are an extension to non-deterministic
@@ -38,7 +38,7 @@ namespace spot
   /// \addtogroup saba_essentials Essential SABA types
   /// \ingroup saba
 
-  /// \brief A State-based Alternating (Generalized) BÃ¼chi Automaton.
+  /// \brief A State-based Alternating (Generalized) Büchi Automaton.
   /// \ingroup saba_essentials
   ///
   /// Browsing such automaton can be achieved using two functions:
