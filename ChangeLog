@@ -1,5 +1,16 @@
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Do not recognize "*" as "and".  This leaves room for an
+	implementation of rational operators in a future version.
+
+	* src/ltlparse/ltlscan.ll: Do not recognize "*".
+	* wrap/python/cgi-bin/ltl2tgba.in: Undocument it.
+	* NEWS: Mention this.
+	* src/tgbatest/kv.test, src/tgbatest/ltl2tgba.test,
+	src/tgbatest/reductgba.test: Replace "*" by "&".
+
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Make Couvreur/FM the default translation.
 
 	* src/tgbatest/ltl2tgba.cc (syntax, main): Do it.

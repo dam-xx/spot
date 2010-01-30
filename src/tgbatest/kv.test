@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2009  Laboratoire de Recherche et Development de l'EPITA.
+# Copyright (C) 2009, 2010  Laboratoire de Recherche et Development de l'EPITA.
 #
 # This file is part of Spot, a model checking library.
 #
@@ -35,7 +35,7 @@ check ()
 
 check 'a R (b R c)'
 check '(a U b) U (c U d)'
-check '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
+check '((Xp2)U(X(1)))&(p1 R(p2 R p0))'
 
 # Make sure escaped variables print OK.
 check '"G1"U"GG" && "FF"'

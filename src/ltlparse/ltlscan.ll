@@ -1,4 +1,6 @@
-/* Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2010, Laboratoire de Recherche et Développement de
+** l'Epita (LRDE).
+** Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -77,7 +79,7 @@ flex_set_buffer(const char* buf)
      /\, \/, and xor are from LBTT.
   */
 "||"|"|"|"+"|"\\/"		BEGIN(0); return token::OP_OR;
-"&&"|"&"|"."|"*"|"/\\"		BEGIN(0); return token::OP_AND;
+"&&"|"&"|"."|"/\\"		BEGIN(0); return token::OP_AND;
 "^"|"xor"			BEGIN(0); return token::OP_XOR;
 "=>"|"->"			BEGIN(0); return token::OP_IMPLIES;
 "<=>"|"<->"			BEGIN(0); return token::OP_EQUIV;

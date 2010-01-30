@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2009 Laboratoire de Recherche et Développement
+# Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 # de l'Epita (LRDE).
 # Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -48,7 +48,7 @@ check 0 'Fa & Xa & GFc & Gc'
 check 0 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
 check 0 'a R (b R c)'
 check 0 '(a U b) U (c U d)'
-check 0 '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
+check 0 '((Xp2)U(X(1)))&(p1 R(p2 R p0))'
 check 0 '((p3 | Xp3 | Xp2) & (X!p3 | (!p3 & X!p2))) R F(0)'
 
 check 1 a
@@ -62,7 +62,7 @@ check 1 'Fa & Xa & GFc & Gc'
 check 1 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
 check 1 'a R (b R c)'
 check 1 '(a U b) U (c U d)'
-check 1 '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
+check 1 '((Xp2)U(X(1)))&(p1 R(p2 R p0))'
 
 check 2 a
 check 2 'a U b'
@@ -75,7 +75,7 @@ check 2 'Fa & Xa & GFc & Gc'
 check 2 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
 check 2 'a R (b R c)'
 check 2 '(a U b) U (c U d)'
-check 2 '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
+check 2 '((Xp2)U(X(1)))&(p1 R(p2 R p0))'
 
 check 3 a
 check 3 'a U b'
@@ -89,4 +89,4 @@ check 3 'Fa & Xa & GFc & Gc'
 check 3 'Fc & X(a | Xb) & GF(a | Xb) & Gc'
 check 3 'a R (b R c)'
 check 3 '(a U b) U (c U d)'
-check 3 '((Xp2)U(X(1)))*(p1 R(p2 R p0))'
+check 3 '((Xp2)U(X(1)))&(p1 R(p2 R p0))'
