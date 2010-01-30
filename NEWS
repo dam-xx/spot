@@ -34,6 +34,8 @@ New in spot 0.5 (2010-01-31):
   * ltl2tgba has gained several options and the help text has been
     reorganized.  Please run src/tgbatest/ltl2tgba without arguments
     for details.  Couvreur/FM is now the default translation.
+  * The ltl2tgba.py CGI script can now run standalone.  It also offers
+    the Tauriainen/TAA translation.
   * Automata using BDD-encoded transitions relation can now be pruned
     for useless states symbolically using the delete_unaccepting_scc()
     function.  This is ltl2tgba's -R3b option.

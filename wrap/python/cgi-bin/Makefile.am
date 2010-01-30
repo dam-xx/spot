@@ -1,4 +1,4 @@
-## Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+## Copyright (C) 2003, 2010  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
 ##
@@ -26,7 +26,12 @@ CLEANFILES = $(nodist_noinst_SCRIPTS)
 ltl2tgba.py: $(srcdir)/ltl2tgba.in Makefile
 	sed -e 's|[@]PYTHON[@]|@PYTHON@|g' \
 	    -e 's|[@]pythondir[@]|@pythondir@|g' \
+	    -e 's|[@]srcdir[@]|@srcdir@|g' \
+	    -e 's|[@]top_builddir[@]|@top_builddir@|g' \
 	    -e 's|[@]PACKAGE_VERSION[@]|@PACKAGE_VERSION@|g' \
 	    <$(srcdir)/ltl2tgba.in >ltl2tgba.tmp
 	chmod +x ltl2tgba.tmp
 	mv -f ltl2tgba.tmp $@
+
+clean-local:
+	rm -rf spotimg

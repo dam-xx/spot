@@ -23,8 +23,31 @@
 # Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-import sys
 import os
+
+# Directory for temporary files (images and other auxiliary files).
+imgdir = 'spotimg'
+
+from CGIHTTPServer import CGIHTTPRequestHandler
+class MyHandler(CGIHTTPRequestHandler):
+    def is_cgi(self):
+        if self.path == '/ltl2tgba.py':
+            self.cgi_info = '', 'ltl2tgba.py'
+            return True
+        return False
+
+if not os.environ.has_key('SCRIPT_NAME'):
+    # If this is not run as a cgi script, let's start an HTTP server.
+    from BaseHTTPServer import HTTPServer
+    server_address=('',8000)
+    if not os.access(imgdir, os.F_OK):
+        os.mkdir(imgdir, 0755)
+        print "Directory spotimg/ created."
+    httpd = HTTPServer(server_address, MyHandler)
+    print "Point your browser to http://localhost:8000/ltl2tgba.py"
+    httpd.serve_forever()
+
+import sys
 import cgi
 import cgitb; cgitb.enable()
 import signal
@@ -37,9 +60,23 @@ print
 os.close(sys.stderr.fileno())
 os.dup2(sys.stdout.fileno(), sys.stderr.fileno())
 
+# Assume Spot is installed
 sys.path.insert(0, '@pythondir@')
-# Directory for temporary files (images and other auxiliary files).
-imgdir = 'spotimg'
+
+if (os.environ.has_key('SERVER_SOFTWARE') and
+    os.environ['SERVER_SOFTWARE'].startswith(MyHandler.server_version)):
+    # We might be running from the build tree (but it's not sure).
+    # Add the build and source directories first in the search path.
+    # If we are not in the right place, python will find the installed
+    # libraries later.
+    sys.path.insert(0, '@srcdir@/..')
+    sys.path.insert(0, '..')
+    # Darwin needs some help in figuring out where non-installed libtool
+    # libraries are (on this platform libtool encodes the expected final
+    # path of dependent libraries in each library).
+    m = '../.libs:@top_builddir@/src/.libs:@top_builddir@/buddy/src/.libs'
+    os.environ['DYLD_LIBRARY_PATH'] = m
+    import ltihooks
 
 # Extra HTML headers.
 extra_header = ''

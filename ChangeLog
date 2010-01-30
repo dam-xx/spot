@@ -1,5 +1,18 @@
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Make it possible to use the cgi script without installing a web
+	server.
+
+	* wrap/python/cgi-bin/ltl2tgba.in: Starts a web server if the
+	script is not called as a CGI.  Arrange to load libraries from
+	the build directory.  Create the spotimg/ if needed when run as
+	a web server.
+	* wrap/python/cgi-bin/Makefile.am: Adjust build rule and clean
+	the spotimg directory.
+	* wrap/python/cgi-bin/README, NEWS: Update.
+
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	More * -> & replacements.
 
 	* src/ltltest/parse.test, src/ltltest/syntimpl.test: Replace * by &.

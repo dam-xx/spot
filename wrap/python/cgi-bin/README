@@ -1,21 +1,41 @@
 ltl2tgba.py is a CGI script that translate user-supplied LTL formulae
 to Transition-based Generalized Büchi Automata.
 
-You have to install the script yourself if you want to test it.
+There are two ways to use the script: using a web server such as
+Apache, or standalone.
+
+In both cases you should ensure that the command `dot', from the
+GraphViz package, is in the PATH.
+
+
+
+Standalone usage
+================
+
+Simply run the script from this directory.  This will create a
+directory called spotimg/ in the current directory (this will hold the
+generated pictures) and start an HTTP server on port 8000.  Point your
+browser to http://localhost:8000/ltl2tgba.py and you should be OK.
+
+After you have killed the server process (e.g. with Control-C),
+you may want to erase the spotimg/ directory.
+
+Installing on a real web server
+===============================
 
 1) Install Spot first (run `make install' from the top-level).
 
    The CGI scripts uses the Python bindings and assume they
    have been installed.  Near the top of the script, you
    should see a call to sys.path.insert(), with the expected
-   location og the Python bindings for spot.  This path was
+   location of the Python bindings for spot.  This path was
    configured from ./configure's arguments and you should not
    have to fiddle with it.  I'm mentionning it just in case.
 
 2) Copy ltl2tgba.py to some place were CGI execution is allowed.
    Depending on your HTTP server's configuration, you may have
    to rename the script as ltl2tgba.cgi or something else, so
-   that the server accept to run it.
+   that the server accepts to run it.
 
    Apache users in trouble should look at the following options
    before digging the Apache manual deeper.  These can go
@@ -37,9 +57,5 @@ You have to install the script yourself if you want to test it.
    will run the script when the HTTP server processes the
    request.
 
-   ltl2tgba purges old files (>10min) from this directory
+   ltl2tgba purges old files (>15min) from this directory
    each time it runs.
-
-4) `dot', from the GraphViz package, should be in the PATH.
-
-5) Apache should have its unique_id module loaded.
