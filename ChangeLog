@@ -1,5 +1,21 @@
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Check for missing Copyright blurbs, and add them.
+
+	* src/sanity/style.test: Check for missing Copyrights blurbs.
+	* src/sanity/Makefile.am: Run style.test before includes.test.
+	* iface/gspn/dcswave.test, iface/gspn/dcswaveeltl.test,
+	iface/gspn/dcswavefm.test, iface/gspn/dcswaveltl.test,
+	iface/gspn/simple.test, iface/gspn/udcsefm.test,
+	iface/gspn/udcseltl.test, iface/gspn/udcsfm.test,
+	iface/gspn/udcsltl.test, iface/nips/nipstest/dotty.test,
+	iface/nips/nipstest/emptiness.test, src/eltltest/acc.test,
+	src/eltltest/nfa.test, src/saba/sabacomplementtgba.cc,
+	src/sabatest/sabacomplementtgba.cc, src/tgbatest/eltl2tgba.test,
+	src/tgbatest/taatgba.test: Add missing Copyright blurb.
+
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* NEWS: More text.
 
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

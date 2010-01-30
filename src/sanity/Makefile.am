@@ -27,17 +27,17 @@ AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 # Run `make TESTHEADER=foo.hh check' if you want to check only one
 # header.
 check-local:
-	CXX='$(CXX)' \
-	CPPFLAGS='$(AM_CPPFLAGS) $(CPPFLAGS)' \
-	CXXFLAGS='$(AM_CXXFLAGS) $(CXXFLAGS)' \
-	INCDIR='$(top_srcdir)/src' \
-	$(SHELL) $(srcdir)/includes.test $(TESTHEADER)
 	INCDIR='$(top_srcdir)/src' \
 	$(SHELL) $(srcdir)/80columns.test $(TESTHEADER)
 	INCDIR='$(top_srcdir)/src' \
 	$(SHELL) $(srcdir)/style.test $(TESTHEADER)
 	top_srcdir='$(top_srcdir)' \
 	$(PERL) $(srcdir)/readme.test
+	CXX='$(CXX)' \
+	CPPFLAGS='$(AM_CPPFLAGS) $(CPPFLAGS)' \
+	CXXFLAGS='$(AM_CXXFLAGS) $(CXXFLAGS)' \
+	INCDIR='$(top_srcdir)/src' \
+	$(SHELL) $(srcdir)/includes.test $(TESTHEADER)
 
 # Ensure we have not forgotten to include an header.
 installcheck-local:
