@@ -1,5 +1,11 @@
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	More * -> & replacements.
+
+	* src/ltltest/parse.test, src/ltltest/syntimpl.test: Replace * by &.
+
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Remove the theoretically bogus "containment" option of ltl2tgba_fm.
 
 	* src/tgbaalgos/ltl2tgba_fm.cc, src/tgbaalgos/ltl2tgba_fm.hh:

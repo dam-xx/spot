@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+# Copyright (C) 2009, 2010 Laboratoire de Recherche et DÃ©veloppement
 # de l'Epita (LRDE).
 # Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -38,7 +38,7 @@ for f in \
   'p11011' \
   '(p11011)' \
   'a & b' \
-  'a * _b12' \
+  'a & _b12' \
   'a . b' \
   'a + b' \
   'a3214 | b' \
@@ -67,10 +67,10 @@ for f in \
   '()b' \
   'long_atomic_proposition_1 U long_atomic_proposition_2' \
   '  ab & ac | ad ^ af' \
-  '((b * a) + a) & d' \
+  '((b & a) + a) & d' \
   '(ab & ac | ad ) <=> af ' \
   'a U b U c U d U e U f U g U h U i U j U k U l U m' \
-  '(ab * !Xad + ad U ab) & FG p12 /\ GF p13' \
+  '(ab & !Xad + ad U ab) & FG p12 /\ GF p13' \
   '((([]<>()p12))   )' \
   'a R ome V anille' \
   'p=0Uq=1' \
