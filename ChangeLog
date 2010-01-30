@@ -1,5 +1,9 @@
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/evtgbatest/ltl2evtgba.test: Replace * by &.
+
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Make it possible to use the cgi script without installing a web
 	server.
 
