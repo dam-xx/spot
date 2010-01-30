@@ -1,5 +1,5 @@
-// Copyright (C) 2007, 2008, 2009 Laboratoire de Recherche et Développement
-// de l'Epita (LRDE).
+// Copyright (C) 2007, 2008, 2009, 2010 Laboratoire de Recherche et
+// Développement de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2005, 2006, 2007 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis
 // Coopératifs (SRC), Université Pierre et Marie Curie.
@@ -149,6 +149,8 @@ syntax(char* prog)
 	    << "  -r    display the relation BDD, not the reachability graph"
 	    << std::endl
 	    << "  -R    same as -r, but as a set" << std::endl
+	    << "  -R3b  symbolically prune unaccepting SCC from BDD relation"
+	    << std::endl
 	    << std::endl
 
 	    << "Options for Tauriainen's TAA-based algorithm (-taa):"
@@ -191,7 +193,6 @@ syntax(char* prog)
 	    << "  -R2t  remove transitions using delayed simulation"
 	    << std::endl
 	    << "  -R3   use SCC to reduce the automata" << std::endl
-	    << "  -R3b  delete unaccepting SCC directly on the BDD" << std::endl
 	    << "  -Rd   display the simulation relation" << std::endl
 	    << "  -RD   display the parity game (dot format)" << std::endl
 	    << std::endl
@@ -277,7 +278,7 @@ main(int argc, char** argv)
   int reduc_aut = spot::Reduce_None;
   int redopt = spot::ltl::Reduce_None;
   bool eltl = false;
-  bool delete_unaccepting_scc = false;
+  bool symbolic_scc_pruning = false;
   bool display_reduce_form = false;
   bool display_rel_sim = false;
   bool display_parity_game = false;
@@ -558,7 +559,7 @@ main(int argc, char** argv)
 	}
       else if (!strcmp(argv[formula_index], "-R3b"))
 	{
-	  delete_unaccepting_scc = true;
+	  symbolic_scc_pruning = true;
 	}
       else if (!strcmp(argv[formula_index], "-rd"))
 	{
@@ -761,6 +762,28 @@ main(int argc, char** argv)
 	  to_free = a;
 	}
 
+      if (symbolic_scc_pruning)
+        {
+	  spot::tgba_bdd_concrete* bc =
+	    dynamic_cast<spot::tgba_bdd_concrete*>(a);
+	  if (!bc)
+	    {
+	      std::cerr << ("Error: Automaton is not symbolic: cannot "
+			    "prune SCCs symbolically.\n"
+			    "       Try -R3 instead of -R3b, or use "
+			    "another translation.")
+			<< std::endl;
+	      exit(2);
+	    }
+	  else
+	    {
+	      tm.start("reducing A_f w/ symbolic SCC pruning");
+	      if (bc)
+		bc->delete_unaccepting_scc();
+	      tm.stop("reducing A_f w/ symbolic SCC pruning");
+	    }
+	}
+
       spot::tgba_tba_proxy* degeneralized = 0;
       spot::tgba_sgba_proxy* state_labeled = 0;
 
@@ -778,15 +801,6 @@ main(int argc, char** argv)
       {
         a = state_labeled = new spot::tgba_sgba_proxy(a);
       }
-
-      if (delete_unaccepting_scc)
-        {
-	  tm.start("reducing A_f w/ SCC on BDD");
-	  if (spot::tgba_bdd_concrete* bc =
-	      dynamic_cast<spot::tgba_bdd_concrete*>(a))
-	      bc->delete_unaccepting_scc();
-	  tm.stop("reducing A_f w/ SCC on BDD");
-	}
 
       spot::tgba_reduc* aut_red = 0;
       spot::tgba* aut_scc = 0;

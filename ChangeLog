@@ -1,3 +1,14 @@
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Touch up -R3b handling.
+
+	* src/tgbatest/ltl2tgba.cc (syntax): Move -R3b with the other
+	LaCIM options.
+	(main): Speak of "symbolic SCC pruning" instead of "deleting
+	unaccepting SCC", and do that right after the translation, before
+	degeneralization.  Also error out when -R3b is used on non
+	symbolic automata.
+
 2010-01-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Update some text files for upcoming 0.5.
