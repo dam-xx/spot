@@ -1,4 +1,4 @@
-// Copyright (C) 2009  Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010  Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2005, 2006  Laboratoire d'Informatique
 // de Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -88,6 +88,7 @@
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/magic.hh"
 #include "tgbaalgos/neverclaim.hh"
+#include "tgbaalgos/reductgba_sim.hh"
 #include "tgbaalgos/rundotdec.hh"
 #include "tgbaalgos/save.hh"
 #include "tgbaalgos/stats.hh"
@@ -147,7 +148,7 @@ using namespace spot;
 %feature("new") spot::emptiness_check_result::accepting_run;
 %feature("new") spot::explicit_magic_search;
 %feature("new") spot::explicit_se05_search;
-
+%feature("new") spot::reduc_tgba_sim;
 %feature("new") spot::emptiness_check_instantiator::construct;
 %feature("new") spot::emptiness_check_instantiator::instanciate;
 
@@ -178,6 +179,7 @@ using namespace spot;
 %include "tgbaalgos/gtec/gtec.hh"
 %include "tgbaalgos/magic.hh"
 %include "tgbaalgos/neverclaim.hh"
+%include "tgbaalgos/reductgba_sim.hh"
 %include "tgbaalgos/rundotdec.hh"
 %include "tgbaalgos/save.hh"
 %include "tgbaalgos/stats.hh"

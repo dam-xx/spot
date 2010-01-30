@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2004, 2005 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -40,8 +40,12 @@ namespace spot
   /// Options for reduce.
   enum reduce_tgba_options
     {
+      // Reduce_None and Reduce_All clash with the definitions in ltl::reduce
+      // for Swig because Swig does not handle namespaces.
+#ifndef SWIG
       /// No reduction.
       Reduce_None = 0,
+#endif
       /// Reduction of state using direct simulation relation.
       Reduce_quotient_Dir_Sim = 1,
       /// Reduction of transitions using direct simulation relation.
@@ -52,8 +56,10 @@ namespace spot
       Reduce_transition_Del_Sim = 8,
       /// Reduction using SCC.
       Reduce_Scc = 16,
+#ifndef SWIG
       /// All reductions.
       Reduce_All = -1U
+#endif
     };
 
   /// \brief Remove some node of the automata using a simulation
@@ -64,6 +70,8 @@ namespace spot
   ///             which optimizations to apply.
   /// \return the reduced automata.
   const tgba* reduc_tgba_sim(const tgba* a, int opt = Reduce_All);
+
+#ifndef SWIG
 
   /// \brief Compute a direct simulation relation on state of tgba \a f.
   direct_simulation_relation* get_direct_relation_simulation(const tgba* a,
@@ -328,8 +336,9 @@ namespace spot
 
     /// \brief The Jurdzinski's lifting algorithm.
     virtual void lift();
-
   };
+
+#endif // SWIG
 
   /// @}
 }

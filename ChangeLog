@@ -1,5 +1,16 @@
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Add SCC pruning options to the CGI script.
+
+	* wrap/python/cgi-bin/ltl2tgba.in: Add options to symbolically
+	prune unaccepting SCCs in LaCIM, and explicitely pruns unaccepting
+	SCCs in all algorithms.
+	* src/tgbaalgos/reductgba_sim.hh: Conceal most of the file to
+	SWIG.
+	* wrap/python/spot.i: Include reductgba_sim.hh.
+
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/evtgbatest/ltl2evtgba.test: Replace * by &.
 
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

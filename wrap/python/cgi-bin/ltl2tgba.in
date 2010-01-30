@@ -234,12 +234,12 @@ formula = form.getfirst('formula', '')
 
 color_fm = "#DFC6F8"
 color_lacim = "#F8C6DF"
-color_taa = "#D8C6FF"
+color_taa = "#F8DFC6"
 
 options_common = [
     ('show_formula_png',    'draw the formula',                            0),
-    ('show_automaton_png',  'draw Büchi automaton',                        1),
-    ('show_degen_png',      'draw degeneralized Büchi automaton',          0),
+    ('show_automaton_png',  'draw B&uuml;chi automaton',                   1),
+    ('show_degen_png',      'draw degeneralized B&uuml;chi automaton',     0),
     ('show_never_claim',    'output Spin never claim',                     0),
     ('show_lbtt',           'convert automaton for LBTT',                  0),
     ]
@@ -247,6 +247,9 @@ options_reduce = [
     ('reduce_basics',       'basic rewritings',                            1),
     ('reduce_syntimpl',     'syntactic implication',                       1),
     ('reduce_eventuniv',    'eventuality and universality',                1),
+    ]
+options_aut_reduce = [
+    ('reduce_scc',          'prune unaccepting SCCs',                      0),
     ]
 options_debug = [
     ('show_parse',          'show traces during parsing',                  0),
@@ -260,6 +263,8 @@ options_trans_fm = [
     ('opt_fair_loop_approx','fair-loop approximations',                    0),
     ]
 options_trans_lacim = [
+    ('symbolically_prune_scc',
+     'symbolically prune unaccepting SCCs',                                1),
     ('show_relation_set',
      'print the transition relation as a BDD set',                         0),
     ('show_relation_png',
@@ -429,8 +434,9 @@ for opt, desc, color in translators:
     add_options('', 0, color, globals()['options_' + opt])
 
 add_options("Search accepting run?", 0, '', options_accepting_run)
-add_options("Common Options", 1, '', options_common)
+add_options("Common Output Options", 1, '', options_common)
 add_options("Formula Simplications", 1, '', options_reduce)
+add_options("Automata Simplifications", 1, '', options_aut_reduce)
 add_options("Debugging Options", 1, '', options_debug)
 
 print '<TABLE>'
@@ -533,12 +539,17 @@ else:
 
 if trans_lacim:
     automaton = spot.ltl_to_tgba_lacim(f, dict)
+    if symbolically_prune_scc:
+        automaton.delete_unaccepting_scc()
 elif trans_fm:
     automaton = spot.ltl_to_tgba_fm(f, dict,
                                     exprop, symb_merge, branching_postponement,
                                     fair_loop_approx)
 elif trans_taa:
     automaton = spot.ltl_to_taa(f, dict, refined_rules)
+
+if reduce_scc:
+    automaton = spot.reduc_tgba_sim(automaton, spot.Reduce_Scc)
 
 print 'done.</p>'
 sys.stdout.flush()
@@ -636,7 +647,7 @@ if draw_acc_run or print_acc_run:
                 print ('<font color="red">Cannot run ' + emptiness_check
                        + ' on automata with more than ' + n_max + ' acceptance '
                        + 'conditions.  Please select "draw degeneralized '
-                       + 'Büchi automaton" if you want to try this'
+                       + 'B&uuml;chi automaton" if you want to try this'
                        + ' algorithm on the degeneralized version of the'
                        + ' automaton.</font>')
 
