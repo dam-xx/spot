@@ -110,9 +110,9 @@ syntax(char* prog)
 
 	    << "Translation algorithm:" << std::endl
             << "  -f    use Couvreur's FM algorithm for LTL"
+	    << "(default)"
 	    << std::endl
             << "  -l    use Couvreur's LaCIM algorithm for LTL "
-	    << "(default)"
 	    << std::endl
 	    << "  -le   use Couvreur's LaCIM algorithm for ELTL"
 	    << std::endl
@@ -268,7 +268,7 @@ main(int argc, char** argv)
   enum { NoDegen, DegenTBA, DegenSBA } degeneralize_opt = NoDegen;
   enum { TransitionLabeled, StateLabeled } labeling_opt = TransitionLabeled;
   enum { TransFM, TransLaCIM, TransLaCIM_ELTL, TransLaCIM_ELTL_ops, TransTAA }
-    translation = TransLaCIM;
+    translation = TransFM;
   int fm_red = spot::ltl::Reduce_None;
   bool fm_exprop_opt = false;
   bool fm_symb_merge_opt = true;

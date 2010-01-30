@@ -1,5 +1,13 @@
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Make Couvreur/FM the default translation.
+
+	* src/tgbatest/ltl2tgba.cc (syntax, main): Do it.
+	* NEWS: Mention it.
+	* src/tgbatest/emptchk.test: Add missing -l.
+
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Overhaul LaCIM's ELTL options.
 
 	* src/tgbatest/ltl2tgba.cc (syntax, main): Introduce -le to select
