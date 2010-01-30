@@ -24,7 +24,7 @@ New in spot 0.5 (2010-01-31):
     (in time and memory consumption) for the LTL translation.
   * Two complementation algorithms for state-based Büchi automata
     have been implemented:
-    - tgba_complement is an on-the-fly implementation of the
+    - tgba_kv_complement is an on-the-fly implementation of the
       Kupferman-Vardi construction (TCS'05) for generalized acceptance
       conditions.
     - tgba_safra_complement is an implementation of Safra's

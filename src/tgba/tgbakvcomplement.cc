@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -24,7 +24,7 @@
 #include "bdd.h"
 #include "bddprint.hh"
 #include "state.hh"
-#include "tgbacomplement.hh"
+#include "tgbakvcomplement.hh"
 #include "misc/hash.hh"
 #include "tgbaalgos/bfssteps.hh"
 #include "misc/hashfunc.hh"
@@ -97,22 +97,22 @@ namespace spot
                           state_shared_ptr_equal> state_set;
 
     ////////////////////////////////////////
-    // state_complement
+    // state_kv_complement
 
-    /// States used by spot::tgba_complement.
+    /// States used by spot::tgba_kv_complement.
     /// A state has a map of states associated to ranks, and a set
     /// of filtered states.
     /// \ingroup tgba_representation
-    class state_complement : public state
+    class state_kv_complement : public state
     {
     public:
-      state_complement();
-      state_complement(state_rank_map state_map, state_set state_filter);
-      virtual ~state_complement() {}
+      state_kv_complement();
+      state_kv_complement(state_rank_map state_map, state_set state_filter);
+      virtual ~state_kv_complement() {}
 
       virtual int compare(const state* other) const;
       virtual size_t hash() const;
-      virtual state_complement* clone() const;
+      virtual state_kv_complement* clone() const;
 
       void add(shared_state state, const rank_t& rank);
       const state_rank_map& get_state_map() const;
@@ -123,20 +123,21 @@ namespace spot
       state_set state_filter_;
     };
 
-    state_complement::state_complement()
+    state_kv_complement::state_kv_complement()
     {
     }
 
-    state_complement::state_complement(state_rank_map state_map,
+    state_kv_complement::state_kv_complement(state_rank_map state_map,
                                        state_set state_filter)
       : state_map_(state_map), state_filter_(state_filter)
     {
     }
 
     int
-    state_complement::compare(const state* o) const
+    state_kv_complement::compare(const state* o) const
     {
-      const state_complement* other = dynamic_cast<const state_complement*>(o);
+      const state_kv_complement* other =
+	dynamic_cast<const state_kv_complement*>(o);
 
       if (other == 0)
         return 1;
@@ -185,7 +186,7 @@ namespace spot
     }
 
     size_t
-    state_complement::hash() const
+    state_kv_complement::hash() const
     {
       size_t hash = 0;
 
@@ -211,59 +212,59 @@ namespace spot
       return hash;
     }
 
-    state_complement*
-    state_complement::clone() const
+    state_kv_complement*
+    state_kv_complement::clone() const
     {
-      return new state_complement(*this);
+      return new state_kv_complement(*this);
     }
 
     void
-    state_complement::add(shared_state state,
+    state_kv_complement::add(shared_state state,
                           const rank_t& rank)
     {
       state_map_[state] = rank;
     }
 
     const state_rank_map&
-    state_complement::get_state_map() const
+    state_kv_complement::get_state_map() const
     {
       return state_map_;
     }
 
     const state_set&
-    state_complement::get_filter_set() const
+    state_kv_complement::get_filter_set() const
     {
       return state_filter_;
     }
 
     bool
-    state_complement::accepting() const
+    state_kv_complement::accepting() const
     {
       return state_filter_.empty();
     }
 
-    /// Successor iterators used by spot::tgba_complement.
+    /// Successor iterators used by spot::tgba_kv_complement.
     /// \ingroup tgba_representation
     ///
     /// Since the algorithm works on-the-fly, the key components of the
     /// algorithm are implemented in this class.
     ///
     ///
-    class tgba_complement_succ_iterator: public tgba_succ_iterator
+    class tgba_kv_complement_succ_iterator: public tgba_succ_iterator
     {
     public:
       typedef std::list<bdd> bdd_list_t;
 
-      tgba_complement_succ_iterator(const tgba_sgba_proxy* automaton,
-                                    bdd the_acceptance_cond,
-                                    const acc_list_t& acc_list,
-                                    const state_complement* origin);
-      virtual ~tgba_complement_succ_iterator() {};
+      tgba_kv_complement_succ_iterator(const tgba_sgba_proxy* automaton,
+				       bdd the_acceptance_cond,
+				       const acc_list_t& acc_list,
+				       const state_kv_complement* origin);
+      virtual ~tgba_kv_complement_succ_iterator() {};
 
       virtual void first();
       virtual void next();
       virtual bool done() const;
-      virtual state_complement* current_state() const;
+      virtual state_kv_complement* current_state() const;
       virtual bdd current_condition() const;
       virtual bdd current_acceptance_conditions() const;
     private:
@@ -278,8 +279,8 @@ namespace spot
       const tgba_sgba_proxy* automaton_;
       bdd the_acceptance_cond_;
       const acc_list_t& acc_list_;
-      const state_complement* origin_;
-      const state_complement* current_state_;
+      const state_kv_complement* origin_;
+      const state_kv_complement* current_state_;
       bdd_list_t condition_list_;
       bdd_list_t::const_iterator current_condition_;
       state_rank_map highest_current_ranks_;
@@ -287,11 +288,11 @@ namespace spot
       state_set highest_state_set_;
     };
 
-    tgba_complement_succ_iterator::
-    tgba_complement_succ_iterator(const tgba_sgba_proxy* automaton,
-                                  bdd the_acceptance_cond,
-                                  const acc_list_t& acc_list,
-                                  const state_complement* origin)
+    tgba_kv_complement_succ_iterator::
+    tgba_kv_complement_succ_iterator(const tgba_sgba_proxy* automaton,
+				     bdd the_acceptance_cond,
+				     const acc_list_t& acc_list,
+				     const state_kv_complement* origin)
       : automaton_(automaton), the_acceptance_cond_(the_acceptance_cond),
         acc_list_(acc_list), origin_(origin)
     {
@@ -300,7 +301,7 @@ namespace spot
 
     /// Insert in \a list atomic properties of the formula \a c.
     void
-    tgba_complement_succ_iterator::get_atomics(std::set<int>& list, bdd c)
+    tgba_kv_complement_succ_iterator::get_atomics(std::set<int>& list, bdd c)
     {
       bdd current = bdd_satone(c);
       while (current != bddtrue && current != bddfalse)
@@ -317,7 +318,7 @@ namespace spot
     /// Create the conjunction of all the atomic properties from
     /// the successors of the current state.
     void
-    tgba_complement_succ_iterator::get_conj_list()
+    tgba_kv_complement_succ_iterator::get_conj_list()
     {
       std::set<int> atomics;
       condition_list_.clear();
@@ -364,18 +365,18 @@ namespace spot
     /// For each odd rank, its condition associated must not
     /// be present in its tracked state.
     bool
-    tgba_complement_succ_iterator::is_valid_rank() const
+    tgba_kv_complement_succ_iterator::is_valid_rank() const
     {
       for (state_rank_map::const_iterator i = current_ranks_.begin();
            i != current_ranks_.end();
            ++i)
       {
         if (i->second.rank & 1)
-        {
+	  {
           if ((automaton_->state_acceptance_conditions(i->first.get()) &
                i->second.condition.get_bdd()) != bddfalse)
             return false;
-        }
+	  }
       }
 
       return true;
@@ -388,37 +389,36 @@ namespace spot
     /// When the rank is odd, its has an acceptance condition associated that
     /// must not be in its associated state.
     /// \return false if there is not valid rank as successor.
-    bool tgba_complement_succ_iterator::next_valid_rank()
+    bool tgba_kv_complement_succ_iterator::next_valid_rank()
     {
       state_rank_map::const_iterator i;
-      do {
-        for (i = current_ranks_.begin();
-             i != current_ranks_.end();
-             ++i)
-        {
-          if (i->second.rank != 0)
-          {
-            if (i->second.rank & 1)
-            {
-              if (i->second.condition.order() == 0)
-                --i->second.rank;
-              else
-                i->second.condition =
-                  acc_list_[i->second.condition.order() - 1];
-            }
-            else
-            {
-              --i->second.rank;
-              i->second.condition = acc_list_[acc_list_.size() - 1];
-            }
-            break;
-          }
-          else
-          {
-            current_ranks_[i->first] = highest_current_ranks_[i->first];
-          }
-        }
-      }
+      do
+	{
+	  for (i = current_ranks_.begin(); i != current_ranks_.end(); ++i)
+	    {
+	      if (i->second.rank != 0)
+		{
+		  if (i->second.rank & 1)
+		    {
+		      if (i->second.condition.order() == 0)
+			--i->second.rank;
+		      else
+			i->second.condition =
+			  acc_list_[i->second.condition.order() - 1];
+		    }
+		  else
+		    {
+		      --i->second.rank;
+		      i->second.condition = acc_list_[acc_list_.size() - 1];
+		    }
+		  break;
+		}
+	      else
+		{
+		  current_ranks_[i->first] = highest_current_ranks_[i->first];
+		}
+	    }
+	}
       while ((i != current_ranks_.end()) && !is_valid_rank());
 
       return i != current_ranks_.end();
@@ -427,7 +427,7 @@ namespace spot
     /// \brief Create the highest rank of \a origin_ as origin and
     /// \a condition as successor condition.
     void
-    tgba_complement_succ_iterator::successor_highest_rank(bdd condition)
+    tgba_kv_complement_succ_iterator::successor_highest_rank(bdd condition)
     {
       // Highest rank for bdd.
       state_rank_map sr_map = origin_->get_state_map();
@@ -481,7 +481,7 @@ namespace spot
     }
 
     void
-    tgba_complement_succ_iterator::first()
+    tgba_kv_complement_succ_iterator::first()
     {
       current_condition_ = condition_list_.begin();
       if (done())
@@ -494,7 +494,7 @@ namespace spot
     }
 
     void
-    tgba_complement_succ_iterator::next()
+    tgba_kv_complement_succ_iterator::next()
     {
       if (done())
         return;
@@ -512,13 +512,13 @@ namespace spot
     }
 
     bool
-    tgba_complement_succ_iterator::done() const
+    tgba_kv_complement_succ_iterator::done() const
     {
       return (current_condition_ == condition_list_.end());
     }
 
-    state_complement*
-    tgba_complement_succ_iterator::current_state() const
+    state_kv_complement*
+    tgba_kv_complement_succ_iterator::current_state() const
     {
       if (done())
         return 0;
@@ -550,11 +550,11 @@ namespace spot
         }
       }
 
-      return new state_complement(current_ranks_, filter);
+      return new state_kv_complement(current_ranks_, filter);
     }
 
     bdd
-    tgba_complement_succ_iterator::current_condition() const
+    tgba_kv_complement_succ_iterator::current_condition() const
     {
       if (done())
         return bddfalse;
@@ -562,7 +562,7 @@ namespace spot
     }
 
     bdd
-    tgba_complement_succ_iterator::current_acceptance_conditions() const
+    tgba_kv_complement_succ_iterator::current_acceptance_conditions() const
     {
       if (done())
         return bddfalse;
@@ -579,7 +579,7 @@ namespace spot
   /// Retrieve all the atomic acceptance conditions of the automaton.
   /// They are inserted into \a acc_list_.
   void
-  tgba_complement::get_acc_list()
+  tgba_kv_complement::get_acc_list()
   {
     bdd c = automaton_->all_acceptance_conditions();
     bdd current = bdd_satone(c);
@@ -596,7 +596,7 @@ namespace spot
     }
   }
 
-  tgba_complement::tgba_complement(const tgba* a)
+  tgba_kv_complement::tgba_kv_complement(const tgba* a)
     : automaton_(new tgba_sgba_proxy(a))
   {
     get_dict()->register_all_variables_of(automaton_, this);
@@ -610,45 +610,46 @@ namespace spot
     get_acc_list();
   }
 
-  tgba_complement::~tgba_complement()
+  tgba_kv_complement::~tgba_kv_complement()
   {
     get_dict()->unregister_all_my_variables(this);
     delete automaton_;
   }
 
   state*
-  tgba_complement::get_init_state() const
+  tgba_kv_complement::get_init_state() const
   {
-    state_complement* init = new state_complement();
+    state_kv_complement* init = new state_kv_complement();
     rank_t r = {2 * nb_states_, bdd_ordered()};
     init->add(shared_state(automaton_->get_init_state()), r);
     return init;
   }
 
   tgba_succ_iterator*
-  tgba_complement::succ_iter(const state* local_state,
+  tgba_kv_complement::succ_iter(const state* local_state,
                              const state*,
                              const tgba*) const
   {
-    const state_complement* state =
-      dynamic_cast<const state_complement*>(local_state);
+    const state_kv_complement* state =
+      dynamic_cast<const state_kv_complement*>(local_state);
     assert(state);
 
-    return new tgba_complement_succ_iterator(automaton_,
+    return new tgba_kv_complement_succ_iterator(automaton_,
                                              the_acceptance_cond_,
                                              acc_list_, state);
   }
 
   bdd_dict*
-  tgba_complement::get_dict() const
+  tgba_kv_complement::get_dict() const
   {
     return automaton_->get_dict();
   }
 
   std::string
-  tgba_complement::format_state(const state* state) const
+  tgba_kv_complement::format_state(const state* state) const
   {
-    const state_complement* s = dynamic_cast<const state_complement*>(state);
+    const state_kv_complement* s =
+      dynamic_cast<const state_kv_complement*>(state);
     assert(s);
     std::ostringstream ss;
     ss << "{ set: {" << std::endl;
@@ -674,19 +675,19 @@ namespace spot
   }
 
   bdd
-  tgba_complement::all_acceptance_conditions() const
+  tgba_kv_complement::all_acceptance_conditions() const
   {
     return the_acceptance_cond_;
   }
 
   bdd
-  tgba_complement::neg_acceptance_conditions() const
+  tgba_kv_complement::neg_acceptance_conditions() const
   {
     return !the_acceptance_cond_;
   }
 
   bdd
-  tgba_complement::compute_support_conditions(const state* state) const
+  tgba_kv_complement::compute_support_conditions(const state* state) const
   {
     tgba_succ_iterator* i = succ_iter(state);
     bdd result = bddtrue;
@@ -697,7 +698,7 @@ namespace spot
   }
 
   bdd
-  tgba_complement::compute_support_variables(const state* state) const
+  tgba_kv_complement::compute_support_variables(const state* state) const
   {
     tgba_succ_iterator* i = succ_iter(state);
     bdd result = bddtrue;

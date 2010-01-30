@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -34,14 +34,14 @@
 #include "tgba/tgbatba.hh"
 
 #include "tgba/tgbasafracomplement.hh"
-#include "tgba/tgbacomplement.hh"
+#include "tgba/tgbakvcomplement.hh"
 
 void usage(const char* prog)
 {
   std::cout << "usage: " << prog << " [options]" << std::endl;
   std::cout << "with options" << std::endl
-            << "-S                      Use safra complementation"
-            << std::endl
+            << "-S                      Use Safra's complementation "
+	    << "instead of Kupferman&Vardi's" << std::endl
             << "-s     buchi_automaton  display the safra automaton"
             << std::endl
             << "-a     buchi_automaton  display the complemented automaton"
@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
     if (safra)
       complement = new spot::tgba_safra_complement(a);
     else
-      complement = new spot::tgba_complement(a);
+      complement = new spot::tgba_kv_complement(a);
 
     if (print_automaton)
       spot::dotty_reachable(std::cout, complement);
@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
     if (safra)
       complement = new spot::tgba_safra_complement(a);
     else
-      complement = new spot::tgba_complement(a);
+      complement = new spot::tgba_kv_complement(a);
 
     spot::dotty_reachable(std::cout, complement);
     f1->destroy();
@@ -219,8 +219,8 @@ int main(int argc, char* argv[])
               << safra_complement->number_of_acceptance_conditions()
               << std::endl;
 
-    spot::tgba_complement* complement =
-      new spot::tgba_complement(a);
+    spot::tgba_kv_complement* complement =
+      new spot::tgba_kv_complement(a);
 
     b_size =  spot::stats_reachable(complement);
     std::cout << "GBA Complement: "
@@ -271,8 +271,8 @@ int main(int argc, char* argv[])
     }
     else
     {
-      nAf = new spot::tgba_complement(Af);
-      nAnf = new spot::tgba_complement(Anf);
+      nAf = new spot::tgba_kv_complement(Af);
+      nAnf = new spot::tgba_kv_complement(Anf);
     }
     spot::tgba* prod = new spot::tgba_product(nAf, nAnf);
     spot::emptiness_check* ec = spot::couvreur99(prod);

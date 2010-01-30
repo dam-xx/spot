@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -18,8 +18,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_TGBA_TGBACOMPLEMENT_HH
-#define SPOT_TGBA_TGBACOMPLEMENT_HH
+#ifndef SPOT_TGBA_TGBAKVCOMPLEMENT_HH
+#define SPOT_TGBA_TGBAKVCOMPLEMENT_HH
 
 #include <vector>
 #include "bdd.h"
@@ -77,16 +77,16 @@ namespace spot
   /// }
   ///
   /// The original automaton is used as a States-based Generalized
-  /// Büchi Automaton.
+  /// B�chi Automaton.
   ///
   /// The construction is done on-the-fly, by the
-  /// \c tgba_complement_succ_iterator class.
-  /// \see tgba_complement_succ_iteratora
-  class tgba_complement : public tgba
+  /// \c tgba_kv_complement_succ_iterator class.
+  /// \see tgba_kv_complement_succ_iterator
+  class tgba_kv_complement : public tgba
   {
   public:
-    tgba_complement(const tgba* a);
-    virtual ~tgba_complement();
+    tgba_kv_complement(const tgba* a);
+    virtual ~tgba_kv_complement();
 
     // tgba interface
     virtual state* get_init_state() const;
@@ -111,9 +111,9 @@ namespace spot
     bdd the_acceptance_cond_;
     unsigned nb_states_;
     acc_list_t acc_list_;
-  }; // end class tgba_complement.
+  }; // end class tgba_kv_complement.
 
 } // end namespace spot.
 
 
-#endif  // !SPOT_TGBA_TGBACOMPLEMENT_HH
+#endif  // !SPOT_TGBA_TGBAKVCOMPLEMENT_HH
