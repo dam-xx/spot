@@ -6,7 +6,7 @@ config.status
 aclocal.m4
 autom4te.cache
 libtool
-*.tar.gz
+*.gz
 *.patch
 *.o
 *~
@@ -26,6 +26,7 @@ INSTALL
 *.log
 callgrind.*
 ms_print.*
+massif.*
 pan.*
 *.dvi
 *.aux
@@ -33,3 +34,7 @@ pan.*
 *.pdf
 *.toc
 *.S
+*.tgba
+*.zip
+*.s
+*.ii
