@@ -1,5 +1,16 @@
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Remove the theoretically bogus "containment" option of ltl2tgba_fm.
+
+	* src/tgbaalgos/ltl2tgba_fm.cc, src/tgbaalgos/ltl2tgba_fm.hh:
+	Remove the containment option.
+	* src/tgbafromfile.cc, src/tgbafromfile.hh: Remove the
+	containment_ member.
+	* src/tgbatest/ltl2tgba.cc (syntax): Remove -c option for
+	FM algorithm, use it exclusively for TAA.
+
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgba/tgbasafracomplement.hh: Add missing copyright and
 	fix some comments.
 

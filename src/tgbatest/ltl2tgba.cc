@@ -121,8 +121,6 @@ syntax(char* prog)
 	    << std::endl
 
 	    << "Options for Couvreur's FM algorithm (-f):" << std::endl
-	    << "  -c    enable language containment checks (implies -f)"
-	    << std::endl
 	    << "  -fr1  use -r1 (see below) at each step of FM" << std::endl
 	    << "  -fr2  use -r2 (see below) at each step of FM" << std::endl
 	    << "  -fr3  use -r3 (see below) at each step of FM" << std::endl
@@ -159,7 +157,7 @@ syntax(char* prog)
 
 	    << "Options for Tauriainen's TAA-based algorithm (-taa):"
 	    << std::endl
-	    << "  -c    enable language containment checks" << std::endl
+	    << "  -c    enable language containment checks (implies -taa)"
 	    << std::endl
 
 	    << "Formula simplification (before translation):"
@@ -329,8 +327,7 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-c"))
 	{
 	  containment = true;
-	  if (translation != TransTAA)
-	    translation = TransFM;
+	  translation = TransTAA;
 	}
       else if (!strcmp(argv[formula_index], "-d"))
 	{
@@ -764,7 +761,7 @@ main(int argc, char** argv)
 				       post_branching,
 				       fair_loop_approx,
 				       unobservables,
-				       fm_red, containment);
+				       fm_red);
 	      break;
 	    case TransTAA:
 	      a = spot::ltl_to_taa(f, dict, containment);

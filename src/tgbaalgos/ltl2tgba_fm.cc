@@ -557,12 +557,10 @@ namespace spot
     {
     public:
       formula_canonizer(translate_dict& d,
-			bool fair_loop_approx, bdd all_promises,
-			language_containment_checker* lcc)
+			bool fair_loop_approx, bdd all_promises)
 	: v_(d),
 	  fair_loop_approx_(fair_loop_approx),
-	  all_promises_(all_promises),
-	  lcc_(lcc)
+	  all_promises_(all_promises)
       {
 	// For cosmetics, register 1 initially, so the algorithm will
 	// not register an equivalent formula first.
@@ -631,22 +629,6 @@ namespace spot
 	    f->destroy();
 	    f = i->second->clone();
 	  }
-	else if (new_variable && lcc_)
-	  {
-	    // It's a new bdd for a new formula.  Let's see if we can
-	    // find an equivalent formula with language containment
-	    // checks.
-	    for (formula_to_bdd_map::const_iterator j = f2b_.begin();
-		 j != f2b_.end(); ++j)
-	      if (f != j->first && lcc_->equal(f, j->first))
-		{
-		  f2b_[f] = j->second;
-		  i->second = j->first;
-		  f->destroy();
-		  f = i->second->clone();
-		  break;
-		}
-	  }
 	return f;
       }
 
@@ -667,7 +649,6 @@ namespace spot
       possible_fair_loop_checker pflc_;
       bool fair_loop_approx_;
       bdd all_promises_;
-      language_containment_checker* lcc_;
     };
 
   }
@@ -698,10 +679,8 @@ namespace spot
   ltl_to_tgba_fm(const formula* f, bdd_dict* dict,
 		 bool exprop, bool symb_merge, bool branching_postponement,
 		 bool fair_loop_approx, const atomic_prop_set* unobs,
-		 int reduce_ltl, bool containment_checks)
+		 int reduce_ltl)
   {
-    symb_merge |= containment_checks;
-
     // Normalize the formula.  We want all the negations on
     // the atomic propositions.  We also suppress logic
     // abbreviations such as <=>, =>, or XOR, since they
@@ -733,12 +712,7 @@ namespace spot
 	all_promises = pv.result();
       }
 
-    language_containment_checker lcc(dict, exprop, symb_merge,
-				     branching_postponement,
-				     fair_loop_approx);
-
-    formula_canonizer fc(d, fair_loop_approx, all_promises,
-			 containment_checks ? &lcc : 0);
+    formula_canonizer fc(d, fair_loop_approx, all_promises);
 
     // These are used when atomic propositions are interpreted as
     // events.  There are two kinds of events: observable events are

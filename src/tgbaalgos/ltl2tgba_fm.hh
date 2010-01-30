@@ -1,3 +1,5 @@
+// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
@@ -125,8 +127,7 @@ namespace spot
 				bool branching_postponement = false,
 				bool fair_loop_approx = false,
 				const ltl::atomic_prop_set* unobs = 0,
-				int reduce_ltl = ltl::Reduce_None,
-				bool containment_checks = false);
+				int reduce_ltl = ltl::Reduce_None);
 }
 
 #endif // SPOT_TGBAALGOS_LTL2TGBA_FM_HH

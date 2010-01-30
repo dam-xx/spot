@@ -1,6 +1,5 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Laboratoire
-// d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
-// Coopératifs (SRC), Université Pierre et Marie Curie.
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+// de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
 //
@@ -36,7 +35,6 @@ namespace spot
     fm_symb_merge_opt_ = true;
     post_branching_ = false;
     fair_loop_approx_ = false;
-    containment_ = false;
     unobservables_ = 0;
     fm_red_ = ltl::Reduce_None;
   }
@@ -79,7 +77,7 @@ namespace spot
     a = spot::ltl_to_tgba_fm(f_, dict_, fm_exprop_opt_,
 			     fm_symb_merge_opt_, post_branching_,
 			     fair_loop_approx_, unobservables_,
-			     fm_red_, containment_);
+			     fm_red_);
     return a;
   }
 
