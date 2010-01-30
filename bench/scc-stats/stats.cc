@@ -1,6 +1,5 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Laboratoire
-// d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
-// Coopératifs (SRC), Université Pierre et Marie Curie.
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+// de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
 //
@@ -23,7 +22,8 @@
 #include <math.h>
 #include "tgbaalgos/scc.hh"
 #include "tgbaalgos/cutscc.hh"
-#include "tgba/tgbafromfile.hh"
+#include "ltlparse/ltlfile.hh"
+#include "tgbaalgos/ltl2tgba_fm.hh"
 
 namespace spot
 {
@@ -121,14 +121,15 @@ int main (int argc, char* argv[])
   std::vector<double> dead_paths;
   std::vector<double> spanning_paths;
   std::vector<double> self_loops;
-  // Get each LTL formula.
-  spot::ltl_file* formulae = new spot::ltl_file (argv[1], dict);
-  formulae->begin();
   unsigned k = 0;
-  do
+  // Get each LTL formula.
+  spot::ltl::ltl_file formulae(argv[1]);
+  spot::ltl::formula* f;
+  while((f = formulae.next()))
   {
     ++k;
-    spot::tgba* a = formulae->current_automaton();
+    spot::tgba* a = ltl_to_tgba_fm(f, dict, /* exprop */ true);
+    f->destroy();
     // Get number of spanning paths.
     spot::scc_map m (a);
     m.build_map();
@@ -156,9 +157,13 @@ int main (int argc, char* argv[])
       for (j = 0; j < (*paths)[i].size(); ++j)
 	delete (*paths)[i][j];
     delete paths;
-    formulae->next();
-  } while (!formulae->done());
-  delete formulae;
+  }
+
+  if (count == 0)
+    {
+      std::cerr << "Nothing read." << std::endl;
+      exit(1);
+    }
 
   // We could have inserted at the right place instead of
   // sorting at the end.

@@ -1,4 +1,4 @@
-## Copyright (C) 2008, 2009 Laboratoire de Recherche et DÃ©veloppement
+## Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et DÃ©veloppement
 ## de l'Epita (LRDE).
 ## Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris
 ## 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -56,10 +56,12 @@ EXTRA_DIST = $(LTLPARSE_YY)
 libltlparse_la_SOURCES = \
   fmterror.cc \
   $(FROM_LTLPARSE_YY) \
+  ltlfile.cc \
   ltlscan.ll \
   parsedecl.hh
 
 ltlparse_HEADERS = \
-  public.hh \
+  ltlfile.hh \
   location.hh \
+  public.hh \
   position.hh

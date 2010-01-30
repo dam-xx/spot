@@ -1,6 +1,5 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Laboratoire
-// d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
-// Coopératifs (SRC), Université Pierre et Marie Curie.
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+// de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
 //
@@ -23,7 +22,8 @@
 #include <limits>
 #include <sys/time.h>
 #include "tgbaalgos/scc.hh"
-#include "tgba/tgbafromfile.hh"
+#include "ltlparse/ltlfile.hh"
+#include "ltlvisit/tostring.hh"
 #include "tgbaalgos/dotty.hh"
 #include "tgbaalgos/randomgraph.hh"
 #include "tgbaalgos/emptiness.hh"
@@ -33,6 +33,7 @@
 #include "ltlvisit/apcollect.hh"
 #include "tgbaparse/public.hh"
 #include "tgbaalgos/cutscc.hh"
+#include "tgbaalgos/ltl2tgba_fm.hh"
 
 namespace spot
 {
@@ -162,18 +163,19 @@ int main(int argc, char* argv[])
   unsigned iter_count = 1;
   std::cout << "Each operation is repeated " << iter_count
 	    << " times to improve precision." << std::endl << std::endl;
-  spot::ltl_file* formulae = new spot::ltl_file (argv[1], dict);
-  formulae->begin();
-  do
+
+  spot::ltl::ltl_file formulae(argv[1]);
+  spot::ltl::formula* f;
+  while((f = formulae.next()))
   {
+    spot::tgba* a = ltl_to_tgba_fm(f, dict, /* exprop */ true);
     ++i;
-    spot::tgba* a = formulae->current_automaton();
     std::cout << "Formula " << i << std::endl;
-    std::cout << formulae->current_formula_string() << std::endl << std::endl;
+    std::cout << spot::ltl::to_string(f) << std::endl << std::endl;
     if (argc != 4)
     {
       spot::ltl::atomic_prop_set* s;
-      s = spot::ltl::atomic_prop_collect(formulae->current_formula(), 0);
+      s = spot::ltl::atomic_prop_collect(f, 0);
       spot::ltl::atomic_prop_set::iterator sit;
       delete r;
       r = spot::random_graph(10000, 0.0001, s, dict, 0, 0.15, 0.5);
@@ -332,14 +334,13 @@ int main(int argc, char* argv[])
     split_sum += (accepting_vector[i]) ? min:max;
 
     delete a;
+    f->destroy();
     std::string next = "----------------------------------------";
     std::cout << next << next << std::endl;
     std::cout << std::endl;
-    formulae->next();
-  }  while (!formulae->done());
+  }
   delete r;
   delete dict;
-  delete formulae;
   std::cout << "Full    " << full_sum << "s" << std::endl
 	    << "Cutting " << cut_sum << "s" << std::endl
 	    << "Split   " << split_sum << "s" << std::endl;

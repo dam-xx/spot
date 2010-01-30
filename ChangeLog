@@ -1,5 +1,18 @@
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Replace spot::ltl_file by a rewritten spot::ltl::ltl_file.
+
+	* src/tgba/tgbafromfile.cc, src/tgba/tgbafromfile.hh: Delete these
+	files.
+	* src/tgba/Makefile.am: Remove them.
+	* src/ltl/ltlparse/ltlfile.hh, src/ltl/ltlparse/ltlfile.cc: New
+	files.
+	* src/ltl/ltlparse/Makefile.am: Add them.
+	* bench/scc-stats/stats.cc, bench/split-product/cutscc.cc: Rewrite
+	using the new class.
+
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Check for missing Copyright blurbs, and add them.
 
 	* src/sanity/style.test: Check for missing Copyrights blurbs.
