@@ -1,5 +1,18 @@
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Overhaul LaCIM's ELTL options.
+
+	* src/tgbatest/ltl2tgba.cc (syntax, main): Introduce -le to select
+	this algorithm and -lo to add the default LTL operators.  This
+	replace the undocumented hack to add LTL operators when the
+	formula with read for command-line, or the automaton was output
+	for LBTT.
+	* src/tgbatest/eltl2tgba.test, src/tgbatest/spotlbtt.test: Update
+	call syntax.
+	* NEWS: Mention -le, -lo, and -taa.
+
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Touch up -R3b handling.
 
 	* src/tgbatest/ltl2tgba.cc (syntax): Move -R3b with the other

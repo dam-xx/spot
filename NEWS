@@ -8,13 +8,15 @@ New in spot 0.5 (2010-01-31):
       to Spot.  You may subscribe at
       https://www.lrde.epita.fr/mailman/listinfo/spot-announce
   * Two new LTL translations have been implemented:
-    - eltl_to_tgba_lacim() is a symbolic translation for ELTL based
-      on Couvreur's LaCIM'00 paper.  For this translation, all operators
-      are described as finite automata. A default set of operators is
-      provided for LTL and user may add more automaton operators.
+    - eltl_to_tgba_lacim() is a symbolic translation for ELTL based on
+      Couvreur's LaCIM'00 paper.  For this translation (available with
+      ltl2tgba's option -le), all operators are described as finite
+      automata.  A default set of operators is provided for LTL
+      (option -lo) and user may add more automaton operators.
     - ltl_to_taa() is a translation based on Tauriainen's PhD thesis.
       LTL is translated to "self-loop" alternating automata
-      and then to Transition-based Generalized Automata.
+      and then to Transition-based Generalized Automata.  (ltl2tgba's
+      option -taa).
     The "Couvreur/FM" translation remains the best LTL translation
     available in Spot.
   * The data structures used to represent LTL formulae have been

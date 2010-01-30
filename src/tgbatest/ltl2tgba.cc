@@ -83,15 +83,15 @@ syntax(char* prog)
   if (slash && (strncmp(slash + 1, "lt-", 3) == 0))
     prog = slash + 4;
 
-  std::cerr << "Usage: "<< prog << " [-f|-l|-taa] [OPTIONS...] formula"
+  std::cerr << "Usage: "<< prog << " [-f|-l|-le|-taa] [OPTIONS...] formula"
 	    << std::endl
-            << "       "<< prog << " [-f|-l|-taa] -F [OPTIONS...] file"
+            << "       "<< prog << " [-f|-l|-le|-taa] -F [OPTIONS...] file"
 	    << std::endl
             << "       "<< prog << " -X [OPTIONS...] file" << std::endl
 	    << std::endl
 
-            << "Translate an LTL into an automaton, or read the automaton "
-	    << "from a file." << std::endl
+            << "Translate an LTL formula into an automaton, or read the "
+	    << "automaton from a file." << std::endl
 	    << "Optionally multiply this automaton by another"
 	    << " automaton read from a file." << std::endl
             << "Output the result in various formats, or perform an emptiness "
@@ -109,12 +109,14 @@ syntax(char* prog)
 	    << std::endl
 
 	    << "Translation algorithm:" << std::endl
-            << "  -f    use Couvreur's FM algorithm for translation"
+            << "  -f    use Couvreur's FM algorithm for LTL"
 	    << std::endl
-            << "  -l    use Couvreur's LaCIM algorithm for translation "
+            << "  -l    use Couvreur's LaCIM algorithm for LTL "
 	    << "(default)"
 	    << std::endl
-            << "  -taa  use Tauriainen's TAA-based algorithm for translation"
+	    << "  -le   use Couvreur's LaCIM algorithm for ELTL"
+	    << std::endl
+            << "  -taa  use Tauriainen's TAA-based algorithm for LTL"
 	    << std::endl
 	    << std::endl
 
@@ -140,12 +142,14 @@ syntax(char* prog)
 	    << "(implies -f)" << std::endl
 	    << std::endl
 
-	    << "Options for Couvreur's LaCIM algorithm (-l):" << std::endl
+	    << "Options for Couvreur's LaCIM algorithm (-l or -le):"
+	    << std::endl
 	    << "  -a    display the acceptance_conditions BDD, not the "
 	    << "reachability graph"
 	    << std::endl
 	    << "  -A    same as -a, but as a set" << std::endl
-	    << "  -xltl translate an extended LTL, not an LTL" << std::endl
+	    << "  -lo   pre-define standard LTL operators as automata "
+	    << "(implies -le)" << std::endl
 	    << "  -r    display the relation BDD, not the reachability graph"
 	    << std::endl
 	    << "  -R    same as -r, but as a set" << std::endl
@@ -263,7 +267,8 @@ main(int argc, char** argv)
   bool paper_opt = false;
   enum { NoDegen, DegenTBA, DegenSBA } degeneralize_opt = NoDegen;
   enum { TransitionLabeled, StateLabeled } labeling_opt = TransitionLabeled;
-  enum { TransFM, TransLaCIM, TransTAA } translation = TransLaCIM;
+  enum { TransFM, TransLaCIM, TransLaCIM_ELTL, TransLaCIM_ELTL_ops, TransTAA }
+    translation = TransLaCIM;
   int fm_red = spot::ltl::Reduce_None;
   bool fm_exprop_opt = false;
   bool fm_symb_merge_opt = true;
@@ -277,7 +282,6 @@ main(int argc, char** argv)
   bool from_file = false;
   int reduc_aut = spot::Reduce_None;
   int redopt = spot::ltl::Reduce_None;
-  bool eltl = false;
   bool symbolic_scc_pruning = false;
   bool display_reduce_form = false;
   bool display_rel_sim = false;
@@ -376,14 +380,6 @@ main(int argc, char** argv)
           expect_counter_example = false;
           output = -1;
         }
-      else if (!strcmp(argv[formula_index], "-xltl"))
-	{
-	  eltl = true;
-	}
-      else if (!strcmp(argv[formula_index], "-taa"))
-	{
-	  translation = TransTAA;
-	}
       else if (!strcmp(argv[formula_index], "-f"))
 	{
 	  translation = TransFM;
@@ -456,6 +452,16 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-l"))
 	{
 	  translation = TransLaCIM;
+	}
+      else if (!strcmp(argv[formula_index], "-le"))
+	{
+	  /* -lo is documented to imply -le, so do not overwrite it. */
+	  if (translation != TransLaCIM_ELTL_ops)
+	    translation = TransLaCIM_ELTL;
+	}
+      else if (!strcmp(argv[formula_index], "-lo"))
+	{
+	  translation = TransLaCIM_ELTL_ops;
 	}
       else if (!strcmp(argv[formula_index], "-L"))
 	{
@@ -589,6 +595,10 @@ main(int argc, char** argv)
 	{
 	  use_timer = true;
 	}
+      else if (!strcmp(argv[formula_index], "-taa"))
+	{
+	  translation = TransTAA;
+	}
       else if (!strncmp(argv[formula_index], "-U", 2))
 	{
 	  unobservables = new spot::ltl::atomic_prop_set;
@@ -665,41 +675,49 @@ main(int argc, char** argv)
     }
 
   spot::ltl::formula* f = 0;
-  if (!from_file)
+  if (!from_file) // Reading a formula, not reading an automaton from a file.
     {
-      if (!eltl)
-        {
-          spot::ltl::parse_error_list pel;
-	  tm.start("parsing formula");
-	  f = spot::ltl::parse(input, pel, env, debug_opt);
-	  tm.stop("parsing formula");
-	  exit_code = spot::ltl::format_parse_errors(std::cerr, input, pel);
-	}
-      else if (!file_opt || output == 6)
-        {
-	  // Call the LTL parser first to handle abbreviations such as
-	  // [] when the formula is not given in a file or when the
-	  // output in done in LBTT's format. The ELTL parser is then
-	  // called with usual LTL operators.
-	  spot::ltl::parse_error_list pel;
-	  tm.start("parsing formula");
-	  f = spot::ltl::parse(input, pel, env, debug_opt);
-	  input = ltl_defs();
-	  input += "%";
-	  input += spot::ltl::to_string(f, true);
-	  f->destroy();
-	  spot::eltl::parse_error_list p;
-	  f = spot::eltl::parse_string(input, p, env, debug_opt);
-	  tm.stop("parsing formula");
-	  exit_code = spot::eltl::format_parse_errors(std::cerr, p);
-        }
-      else
-        {
-	  spot::eltl::parse_error_list p;
-	  tm.start("parsing formula");
-	  f = spot::eltl::parse_string(input, p, env, false);
-	  tm.stop("parsing formula");
-	  exit_code = spot::eltl::format_parse_errors(std::cerr, p);
+      switch (translation)
+	{
+	case TransFM:
+	case TransLaCIM:
+	case TransTAA:
+	  {
+	    spot::ltl::parse_error_list pel;
+	    tm.start("parsing formula");
+	    f = spot::ltl::parse(input, pel, env, debug_opt);
+	    tm.stop("parsing formula");
+	    exit_code = spot::ltl::format_parse_errors(std::cerr, input, pel);
+	  }
+	  break;
+	case TransLaCIM_ELTL:
+	  {
+	    spot::eltl::parse_error_list p;
+	    tm.start("parsing formula");
+	    f = spot::eltl::parse_string(input, p, env, false);
+	    tm.stop("parsing formula");
+	    exit_code = spot::eltl::format_parse_errors(std::cerr, p);
+	  }
+	  break;
+	case TransLaCIM_ELTL_ops:
+	  {
+	    // Call the LTL parser first to handle operators such as
+	    // [] or <> and rewrite the output as a string with G or F.
+	    // Then prepend definitions of usual LTL operators, and parse
+	    // the result again as an ELTL formula.
+	    spot::ltl::parse_error_list pel;
+	    tm.start("parsing formula");
+	    f = spot::ltl::parse(input, pel, env, debug_opt);
+	    input = ltl_defs();
+	    input += "%";
+	    input += spot::ltl::to_string(f, true);
+	    f->destroy();
+	    spot::eltl::parse_error_list p;
+	    f = spot::eltl::parse_string(input, p, env, debug_opt);
+	    tm.stop("parsing formula");
+	    exit_code = spot::eltl::format_parse_errors(std::cerr, p);
+	  }
+	  break;
 	}
     }
   if (f || from_file)
@@ -752,10 +770,11 @@ main(int argc, char** argv)
 	      a = spot::ltl_to_taa(f, dict, containment);
 	      break;
 	    case TransLaCIM:
-	      if (!eltl)
-		a = concrete = spot::ltl_to_tgba_lacim(f, dict);
-	      else
-		a = concrete = spot::eltl_to_tgba_lacim(f, dict);
+	      a = concrete = spot::ltl_to_tgba_lacim(f, dict);
+	      break;
+	    case TransLaCIM_ELTL:
+	    case TransLaCIM_ELTL_ops:
+	      a = concrete = spot::eltl_to_tgba_lacim(f, dict);
 	      break;
 	    }
 	  tm.stop("translating formula");
