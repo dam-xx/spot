@@ -1,4 +1,4 @@
-New in spot 0.5 (2010-01-31):
+New in spot 0.4a (2010-01-31):
 
   * We have setup two mailing lists:
     - <spot-announce@lrde.epita.fr> is read-only and will be used to
@@ -35,7 +35,8 @@ New in spot 0.5 (2010-01-31):
     reorganized.  Please run src/tgbatest/ltl2tgba without arguments
     for details.  Couvreur/FM is now the default translation.
   * The ltl2tgba.py CGI script can now run standalone.  It also offers
-    the Tauriainen/TAA translation.
+    the Tauriainen/TAA translation, and some options for SCC-based
+    reductions.
   * Automata using BDD-encoded transitions relation can now be pruned
     for useless states symbolically using the delete_unaccepting_scc()
     function.  This is ltl2tgba's -R3b option.
@@ -44,7 +45,7 @@ New in spot 0.5 (2010-01-31):
   * The "*" symbol, previously parsed as a synonym for "&" is no
     longer recognized.  This makes room for an upcoming support of
     rational operators.
-  * More benchmarks:
+  * More benchmarks in the bench/ directory:
     - gspn-ssp/    some benchmarks published at ACSD'07,
     - ltlcounter/  translation of a class of LTL formulae used by
                      Rozier & Vardi at SPIN'07
@@ -52,9 +53,9 @@ New in spot 0.5 (2010-01-31):
     - split-product/ parallelizing gain after splitting LTL automata
   * An experimental Kripke interface has been developed to simplify
     the integration of third party tools that do not use acceptance
-    conditions, and that have label on states instead of transitions.
+    conditions and that have label on states instead of transitions.
     This interface has not been used yet.
-  * Experimental Interface with the Nips virtual machine.
+  * Experimental interface with the Nips virtual machine.
     It is not very useful as Spot isn't able to retrieve any property
     information from the model.  This will just check assertions.
   * Distribution:
