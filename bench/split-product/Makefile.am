@@ -1,4 +1,4 @@
-## Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+## Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 ## de l'Epita (LRDE).
 ##
 ## This file is part of Spot, a model checking library.
@@ -37,12 +37,8 @@ cutscc_SOURCES = cutscc.cc
 nodist_noinst_DATA = \
   models/cl3serv1.tgba \
   models/cl3serv1R.tgba \
-  models/cl3serv1fair.tgba \
-  models/cl3serv1Rfair.tgba \
   models/cl3serv3.tgba \
   models/cl3serv3R.tgba \
-  models/cl3serv3fair.tgba \
-  models/cl3serv3Rfair.tgba \
   models/eeaean1.tgba \
   models/eeaean1R.tgba \
   models/eeaean2.tgba \

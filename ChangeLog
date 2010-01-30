@@ -1,5 +1,10 @@
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* bench/split-product/Makefile.am (nodist_noinst_DATA): Do not
+	depend on files that cannot be built.
+
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Replace spot::ltl_file by a rewritten spot::ltl::ltl_file.
 
 	* src/tgba/tgbafromfile.cc, src/tgba/tgbafromfile.hh: Delete these
