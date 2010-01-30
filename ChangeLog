@@ -1,5 +1,10 @@
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgba/tgbasafracomplement.hh: Add missing copyright and
+	fix some comments.
+
+2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Rename tgba_complement as tgba_kv_complement.
 
 	* src/tgba/tgbacomplement.hh, src/tgba/tgbacomplement.cc: Rename
