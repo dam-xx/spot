@@ -1,5 +1,11 @@
 2010-01-31  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* doc/Makefile.am ($(srcdir)/stamp): Do not depend on dot
+	explicitly, otherwise the documentation is always built and
+	distcheck fails.
+
+2010-01-31  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	More Doxygen fixes.
 
 	* src/sabaalgos/sabareachiter.hh (process_link): Document argument SI.
