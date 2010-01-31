@@ -1,5 +1,14 @@
 2010-01-31  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	More Doxygen fixes.
+
+	* src/sabaalgos/sabareachiter.hh (process_link): Document argument SI.
+	* src/eltlparse/public.hh (format_parse_errors): Remove the
+	non-existing eltl_string argument from the description.
+	(parse_file): Fix name of parameters in documentation.
+
+2010-01-31  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Build doxygen pictures with libgd to reduce their size.
 
 	Doxygen only knows how to call dot with -Tpng, while using

@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -93,6 +93,8 @@ namespace spot
     /// \param sc The spot::saba_state_conjunction positionned on the current
     ///           conjunction.
     /// \param sc_id An unique number for the this transition assigned to \a sc.
+    /// \param si The spot::saba_succ_iterator positionned on the current
+    ///             transition.
     ///
     /// The in_s and out_s states are owned by the
     /// spot::saba_reachable_iterator instance and destroyed when the

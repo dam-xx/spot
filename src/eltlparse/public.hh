@@ -55,7 +55,7 @@ namespace spot
     typedef std::list<parse_error> parse_error_list;
 
     /// \brief Build a formula from a text file.
-    /// \param name The name of the file to parse.
+    /// \param filename The name of the file to parse.
     /// \param error_list A list that will be filled with
     ///        parse errors that occured during parsing.
     /// \param env The environment into which parsing should take place.
@@ -86,7 +86,6 @@ namespace spot
 
     /// \brief Format diagnostics produced by spot::eltl::parse.
     /// \param os Where diagnostics should be output.
-    /// \param eltl_string The string that were parsed.
     /// \param error_list The error list filled by spot::eltl::parse while
     ///        parsing \a eltl_string.
     /// \return \c true iff any diagnostic was output.
