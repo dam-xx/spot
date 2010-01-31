@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -31,7 +31,7 @@ namespace spot
   /// \ingroup saba
   ///
   /// The original TGBA is transformed into a States-based
-  /// BÃ¼chi Automaton.
+  /// Büchi Automaton.
   ///
   /// Several techniques are supposed to by applied on the resulting
   /// automaton before its transformation into a TGBA.  Those techniques
@@ -40,13 +40,13 @@ namespace spot
   /// This algorithm comes from:
   /// \verbatim
   /// @Article{         gurumurthy.03.lncs,
-  ///   title         = {{On complementing nondeterministic Buchi automata}},
+  ///   title         = {On complementing nondeterministic {Büchi} automata},
   ///   author        = {Gurumurthy, S. and Kupferman, O. and Somenzi, F. and
   ///                   Vardi, M.Y.},
-  ///   journal       = {Lecture notes in computer science},
+  ///   journal       = {Lecture Notes in Computer Science},
   ///   pages         = {96--110},
   ///   year          = {2003},
-  ///   publisher     = {Springer}
+  ///   publisher     = {Springer-Verlag}
   /// }
   /// \endverbatim
   ///

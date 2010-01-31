@@ -65,6 +65,7 @@ namespace spot
   /// \ingroup tgba_on_the_fly_algorithms
   ///
   /// The construction comes from:
+  /// \verbatim
   /// @Article{         kupferman.05.tcs,
   ///   title           = {From complementation to certification},
   ///   author          = {Kupferman, O. and Vardi, M.Y.},
@@ -75,6 +76,7 @@ namespace spot
   ///   year		= {2005},
   ///   publisher	= {Elsevier}
   /// }
+  /// \endverbatim
   ///
   /// The original automaton is used as a States-based Generalized
   /// Büchi Automaton.

@@ -1,3 +1,11 @@
+2010-01-31  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	More Doxygen fixes.
+
+	* src/tgba/tgbakvcomplement.hh: Use \verbatim around the bibtex
+	entry.
+	* src/saba/sabacomplementtgba.hh: Use latin1.
+
 2010-01-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* bench/split-product/Makefile.am (nodist_noinst_DATA): Do not
