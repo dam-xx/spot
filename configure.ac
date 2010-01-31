@@ -60,7 +60,9 @@ ad_GCC_OPTIM
 adl_NDEBUG
 
 AM_CONDITIONAL([NEVER], [false])
-AC_CHECK_PROG([DOT], [dot], [dot])
+# We need the absolute path for dot in the "doc/dot" script. Other place
+# only require a relative path.
+AC_PATH_PROG([DOT], [dot])
 AC_CHECK_PROG([LBT], [lbt], [lbt])
 AC_CHECK_PROG([LTL2BA], [ltl2ba], [ltl2ba])
 AC_CHECK_PROG([MODELLA], [modella], [modella])
@@ -127,5 +129,6 @@ AC_CONFIG_FILES([
 ])
 AC_CONFIG_FILES([bench/ltl2tgba/ltl2baw.pl:bench/ltl2tgba/ltl2baw.in],
 	        [chmod +x bench/ltl2tgba/ltl2baw.pl])
+AC_CONFIG_FILES([doc/dot], [chmod +x doc/dot])
 AC_CONFIG_FILES([wrap/python/tests/run], [chmod +x wrap/python/tests/run])
 AC_OUTPUT

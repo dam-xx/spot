@@ -1,5 +1,22 @@
 2010-01-31  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Build doxygen pictures with libgd to reduce their size.
+
+	Doxygen only knows how to call dot with -Tpng, while using
+	-Tpng:gd produces pictures that are 10 times smaller.  Use a
+	simple wrapper around dot to simplify this.
+
+	* doc/dot.in: New file, that wrap the system's dot and replace
+	-Tpng by -Tpng:gd.
+	* doc/Makefile.am ($(srcdir)/stamp): Depend on dot.
+	* doc/Doxyfile.in: Update to 1.6.2.
+	(DOT_PATH): Set to @srcdir@ to use doc/dot instead of the
+	system's dot.
+	* configure.ac: Find the absolute path of dot, and generate
+	the doc/dot script.
+
+2010-01-31  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	More Doxygen fixes.
 
 	* src/tgba/tgbakvcomplement.hh: Use \verbatim around the bibtex

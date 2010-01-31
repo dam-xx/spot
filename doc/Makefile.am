@@ -34,7 +34,7 @@ fast-doc:
 	$(DOXYGEN)
 	touch $(srcdir)/stamp
 
-$(srcdir)/stamp: $(srcdir)/Doxyfile.in $(top_srcdir)/configure.ac
+$(srcdir)/stamp: $(srcdir)/Doxyfile.in $(top_srcdir)/configure.ac dot
 	$(MAKE) Doxyfile
 	-rm -rf spot.html spot.latex
 	$(DOXYGEN)
