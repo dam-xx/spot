@@ -1,5 +1,9 @@
 2010-02-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* NEWS, configure.ac: Bump version to 0.5a.
+
+2010-02-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Release Spot 0.5.
 
 	* NEWS, configure.in: Bump version to 0.5.
