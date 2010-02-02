@@ -253,7 +253,7 @@ options_common = [
     ('show_degen_png',      'draw degeneralized B&uuml;chi automaton',     0),
     ('show_never_claim',    'output Spin never claim',                     0),
     ('show_lbtt',           'convert automaton for LBTT',                  0),
-    ('svg_output',          'draw automata in SVG instead of PNG' + new,   0),
+    ('svg_output',          'render automata in SVG instead of PNG' + new, 0),
     ]
 options_reduce = [
     ('reduce_basics',       'basic rewritings',                            1),

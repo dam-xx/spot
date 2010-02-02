@@ -1,5 +1,9 @@
 2010-02-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* wrap/python/cgi-bin/ltl2tgba.in: Reword description of svg_output.
+
+2010-02-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add SVG output and language containment options to the cgi script.
 
 	* wrap/python/cgi-bin/ltl2tgba.in (new): Mark new options as new.
