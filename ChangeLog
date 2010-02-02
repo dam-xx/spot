@@ -1,5 +1,13 @@
 2010-02-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Add SVG output and language containment options to the cgi script.
+
+	* wrap/python/cgi-bin/ltl2tgba.in (new): Mark new options as new.
+	(svg_output, reduce_langcout): Add these new options.
+	(render_dot): Support svg_output.
+
+2010-02-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* NEWS: Typo.
 
 2010-02-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

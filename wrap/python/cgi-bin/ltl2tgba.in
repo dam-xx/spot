@@ -192,11 +192,20 @@ def print_stats(automaton):
     return False
 
 def render_dot(basename):
-    os.spawnlp(os.P_WAIT, dot, dot, dot_bgcolor, '-Tpng',
-               '-Gsize=14,14', '-o', basename + '.png', basename + '.txt')
+    if svg_output:
+        ext = 'svg'
+    else:
+        ext = 'png'
+    os.spawnlp(os.P_WAIT, dot, dot, dot_bgcolor, '-T' + ext,
+               '-Gsize=14,14', '-o', basename + '.' + ext, basename + '.txt')
     reset_alarm()
     b = cgi.escape(basename)
-    print '<img src="' + b + '.png"><br>(<a href="' + b + '.txt">dot source</a>)'
+    if svg_output:
+        print ('<object type="image/svg+xml" data="' + b + '.svg">'
+               + 'Your browser does not support SVG.</object>')
+    else:
+        print ('<img src="' + b + '.png"><br>(<a href="' + b
+               + '.txt">dot source</a>)')
     sys.stdout.flush()
 
 def render_automaton(basename, automata, dont_run_dot, deco = False):
@@ -236,20 +245,24 @@ color_fm = "#DFC6F8"
 color_lacim = "#F8C6DF"
 color_taa = "#F8DFC6"
 
+new = ' <font color="red"><small>(NEW)</small></font>'
+
 options_common = [
     ('show_formula_png',    'draw the formula',                            0),
     ('show_automaton_png',  'draw B&uuml;chi automaton',                   1),
     ('show_degen_png',      'draw degeneralized B&uuml;chi automaton',     0),
     ('show_never_claim',    'output Spin never claim',                     0),
     ('show_lbtt',           'convert automaton for LBTT',                  0),
+    ('svg_output',          'draw automata in SVG instead of PNG' + new,   0),
     ]
 options_reduce = [
     ('reduce_basics',       'basic rewritings',                            1),
     ('reduce_syntimpl',     'syntactic implication',                       1),
     ('reduce_eventuniv',    'eventuality and universality',                1),
+    ('reduce_langcont',     'language containment' + new,                  0),
     ]
 options_aut_reduce = [
-    ('reduce_scc',          'prune unaccepting SCCs',                      0),
+    ('reduce_scc',          'prune unaccepting SCCs' + new,                0),
     ]
 options_debug = [
     ('show_parse',          'show traces during parsing',                  0),
@@ -264,7 +277,7 @@ options_trans_fm = [
     ]
 options_trans_lacim = [
     ('symbolically_prune_scc',
-     'symbolically prune unaccepting SCCs',                                1),
+     'symbolically prune unaccepting SCCs' + new,                          1),
     ('show_relation_set',
      'print the transition relation as a BDD set',                         0),
     ('show_relation_png',
@@ -283,7 +296,7 @@ default_translator = 'trans_fm';
 translators = [
     ('trans_fm',    'Couvreur/FM',    color_fm),
     ('trans_lacim', 'Couvreur/LaCIM', color_lacim),
-    ('trans_taa',   'Tauriainen/TAA', color_taa),
+    ('trans_taa',   'Tauriainen/TAA' + new, color_taa),
     ]
 
 options_accepting_run = [
@@ -298,7 +311,7 @@ options_accepting_run = [
       'Tau03',
       'Tau03_opt'], 'no'),
     ('emptiness_check_options',
-     '...with these <a href="http://spot.lip6.fr/wiki/EmptinessCheckOptions">'
+     '... with these <a href="http://spot.lip6.fr/wiki/EmptinessCheckOptions">'
      + 'options</a>:', ''),
     ]
 
@@ -501,6 +514,8 @@ if reduce_syntimpl:
     opt = opt + spot.Reduce_Syntactic_Implications
 if reduce_eventuniv:
     opt = opt + spot.Reduce_Eventuality_And_Universality
+if reduce_langcont:
+    opt = opt + spot.Reduce_Containment_Checks_Stronger
 if opt != spot.Reduce_None:
     f2 = spot.reduce(f, opt)
     f.destroy()
