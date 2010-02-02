@@ -8,7 +8,7 @@ New in spot 0.5 (2010-02-01):
     - <spot-announce@lrde.epita.fr> is read-only and will be used to
       announce new releases.  You may subscribe at
       https://www.lrde.epita.fr/mailman/listinfo/spot-announce
-    - <spot@lrde.epita.fr> can be used to discusse anything related
+    - <spot@lrde.epita.fr> can be used to discuss anything related
       to Spot.  You may subscribe at
       https://www.lrde.epita.fr/mailman/listinfo/spot-announce
   * Two new LTL translations have been implemented:
