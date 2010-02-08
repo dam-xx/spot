@@ -1,5 +1,15 @@
 2010-02-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	more tests for rational operator simplifications.
+
+	* src/ltltest/nenoform.test, src/ltltest/equals.test,
+	src/ltltest/consterm.test: Update tests for rational ops.
+	* src/consterm.test: Use parse_ratexp().
+	* src/ltlast/binop.cc: Fix simplification rules for []-> and
+	<>->.
+
+2010-02-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Make it possible to parse stand-alone rational expression with the
 	LTL parser.
 
