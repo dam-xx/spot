@@ -1,5 +1,11 @@
 2010-02-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Simplify {#e}[]->Exp and {#e}<>->Exp.
+
+	* src/ltlast/binop.cc: Add simplification rules.
+
+2010-02-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	more tests for rational operator simplifications.
 
 	* src/ltltest/nenoform.test, src/ltltest/equals.test,
