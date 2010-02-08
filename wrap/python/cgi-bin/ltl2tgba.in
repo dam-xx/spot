@@ -86,9 +86,8 @@ extra_header = ''
 extra_form_notice = ''
 
 # Location of the dot command
-dot = 'dot' # in PATH.
+dot = '@DOT@'
 dot_bgcolor = '-Gbgcolor=#FFFFFF'
-# dot = '/usr/local/bin/dot'
 
 ltl2tgba_version = '@PACKAGE_VERSION@'
 
@@ -138,9 +137,6 @@ os.setpgrp()
 signal.signal(signal.SIGALRM, alarm_handler)
 reset_alarm()
 
-
-# Cleanup stale files from our image directory.
-os.system('find ' + imgdir + ' -type f -amin +15 -print | xargs rm -f')
 
 myself = os.environ['SCRIPT_NAME'];
 form = cgi.FieldStorage()
@@ -405,6 +401,7 @@ def add_options(opt_group, opt_column, opt_color, opt_list):
         if isinstance(desc, list):
             s += '%s <select name="%s">' % (desc[0], opt);
             n = 1
+            val = int(form.getfirst(opt, n))
             if val >= len(desc) or val < 1:
                 val = n
             for i in desc[1:]:
@@ -474,6 +471,9 @@ if not filled:
     sys.exit(0)
 
 reset_alarm()
+
+# Cleanup stale files from our image directory.
+os.system('find ' + imgdir + ' -type f -amin +15 -print | xargs rm -f')
 
 print "<hr><H1>Output</H1>"
 
@@ -636,6 +636,7 @@ if show_lbtt:
 	print '</pre>'
 
 
+ec = 0
 if draw_acc_run or print_acc_run:
     print '<H3>Accepting run</H3>'
     sys.stdout.flush()
@@ -660,11 +661,11 @@ if draw_acc_run or print_acc_run:
                 ec_msg += ' <b>on degeneralized automaton</b>'
             else:
                 print ('<font color="red">Cannot run ' + emptiness_check
-                       + ' on automata with more than ' + n_max + ' acceptance '
-                       + 'conditions.  Please select "draw degeneralized '
-                       + 'B&uuml;chi automaton" if you want to try this'
-                       + ' algorithm on the degeneralized version of the'
-                       + ' automaton.</font>')
+                       + ' on automata with more than ' + str(n_max)
+                       + ' acceptance conditions.  Please select '
+                       + '"draw degeneralized B&uuml;chi automaton" if you '
+                       + 'want to try this algorithm on the degeneralized '
+                       + 'version of the automaton.</font>')
 
         if ec_a:
             ec = eci.instantiate(ec_a)

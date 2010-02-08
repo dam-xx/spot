@@ -29,6 +29,7 @@ ltl2tgba.py: $(srcdir)/ltl2tgba.in Makefile
 	    -e 's|[@]srcdir[@]|@srcdir@|g' \
 	    -e 's|[@]top_builddir[@]|@top_builddir@|g' \
 	    -e 's|[@]PACKAGE_VERSION[@]|@PACKAGE_VERSION@|g' \
+	    -e 's|[@]DOT[@]|@DOT@|g' \
 	    <$(srcdir)/ltl2tgba.in >ltl2tgba.tmp
 	chmod +x ltl2tgba.tmp
 	mv -f ltl2tgba.tmp $@
