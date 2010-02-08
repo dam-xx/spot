@@ -1,5 +1,11 @@
 2010-02-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Simplify #e in conjunctions.
+
+	* src/ltlast/multop.cc: Handle it.
+
+2010-02-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Simplify {#e}[]->Exp and {#e}<>->Exp.
 
 	* src/ltlast/binop.cc: Add simplification rules.
