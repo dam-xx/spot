@@ -18,6 +18,7 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+#include <cstring>
 #include "ltlfile.hh"
 #include "public.hh"
 
@@ -27,9 +28,17 @@ namespace spot
   {
 
     ltl_file::ltl_file(const std::string& filename)
-      : in(filename.c_str())
     {
-      if (!in)
+      if (filename == "-")
+        {
+          in = &std::cin;
+        }
+      else
+        {
+          file.open(filename.c_str());
+          in = &file;
+        }
+      if (!(*in))
 	{
 	  std::cerr << "Cannot open " << filename << std::endl;
 	  exit(2);
@@ -37,9 +46,17 @@ namespace spot
     }
 
     ltl_file::ltl_file(const char* filename)
-      : in(filename)
     {
-      if (!in)
+      if (!strcmp(filename, "-"))
+        {
+          in = &std::cin;
+        }
+      else
+        {
+          file.open(filename);
+          in = &file;
+        }
+      if (!(*in))
 	{
 	  std::cerr << "Cannot open " << filename << std::endl;
 	  exit(2);
@@ -48,13 +65,13 @@ namespace spot
 
     formula* ltl_file::next()
     {
-      if (!in.good())
+      if (!in->good())
 	return 0;
 
       std::string input;
       do
 	{
-	  if (!std::getline(in, input))
+	  if (!std::getline(*in, input))
 	    return 0;
 	}
       while (input == "");

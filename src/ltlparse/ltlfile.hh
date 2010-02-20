@@ -21,8 +21,8 @@
 #ifndef SPOT_LTLPARSE_LTLFILE_HH
 # define SPOT_LTLPARSE_LTLFILE_HH
 #include <fstream>
+#include <iostream>
 #include "ltlast/formula.hh"
-
 
 namespace spot
 {
@@ -39,7 +39,8 @@ namespace spot
       /// Return the next parsed LTL formula, and 0 at end of file.
       formula* next();
     private:
-      std::ifstream in;
+      std::istream* in;
+      std::ifstream file;
     };
 
   }
