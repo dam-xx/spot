@@ -46,6 +46,7 @@ tgbaalgos_HEADERS = \
   minimize.hh \
   neverclaim.hh \
   powerset.hh \
+  setdotdec.hh \
   projrun.hh \
   randomgraph.hh \
   reachiter.hh \
@@ -82,6 +83,7 @@ libtgbaalgos_la_SOURCES = \
   ndfs_result.hxx \
   neverclaim.cc \
   powerset.cc \
+  setdotdec.cc \
   projrun.cc \
   randomgraph.cc \
   reachiter.cc \

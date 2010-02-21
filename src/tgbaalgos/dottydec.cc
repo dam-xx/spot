@@ -33,6 +33,20 @@ namespace spot
   }
 
   std::string
+  dotty_decorator::start()
+  {
+    return "digraph G {\n"
+    "  0 [label=\"\", style=invis, height=0]\n"
+    "  0 -> 1";
+  }
+
+  std::string
+  dotty_decorator::end()
+  {
+    return "}";
+  }
+
+  std::string
   dotty_decorator::state_decl(const tgba*, const state*, int,
 			      tgba_succ_iterator*, const std::string& label)
   {

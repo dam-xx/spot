@@ -40,6 +40,13 @@ namespace spot
   public:
     virtual ~dotty_decorator();
 
+    /// \brief Print the dotty header and an invisible initial state.
+    virtual std::string start();
+
+    /// \brief Print potential additionnal nodes after all states were
+    /// processed.
+    virtual std::string end();
+
     /// \brief Compute the style of a state.
     ///
     /// This function should output a string of the form

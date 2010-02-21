@@ -1,3 +1,15 @@
+2010-02-21  Felix Abecassis  <abecassis@lrde.epita.fr>
+
+	* src/tgbaalgos/setdotdec.cc, src/tgbaalgos/setdoc.hh: New files.
+	Dotty decorator that colors each node depending on the set they
+	belong to.  Todo: colors nodes differently if they belong to two
+	sets.
+
+2010-02-20  Felix Abecassis  <abecassis@lrde.epita.fr>
+
+	* src/ltlparse/ltlfile.cc, src/ltlparse/ltlfile.hh: Use std::cin as
+	input stream if filename is "-".
+
 2011-02-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Correct tgba_explicit::compute_support_conditions.

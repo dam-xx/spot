@@ -41,15 +41,13 @@ namespace spot
       void
       start()
       {
-	os_ << "digraph G {" << std::endl;
-	os_ << "  0 [label=\"\", style=invis, height=0]" << std::endl;
-	os_ << "  0 -> 1" << std::endl;
+        os_ << dd_->start() << std::endl;
       }
 
       void
       end()
       {
-	os_ << "}" << std::endl;
+        os_ << dd_->end() << std::endl;
       }
 
       void

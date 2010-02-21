@@ -38,6 +38,7 @@ check_PROGRAMS = \
   expldot \
   explprod \
   ltlprod \
+  ltl2tgba-check \
   mixprod \
   powerset \
   reductgba \
@@ -55,6 +56,7 @@ expldot_SOURCES  = powerset.cc
 expldot_CXXFLAGS = -DDOTTY
 explprod_SOURCES = explprod.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
+ltl2tgba_check_SOURCES = ltl2tgba-check.cc
 ltlprod_SOURCES  = ltlprod.cc
 mixprod_SOURCES  = mixprod.cc
 powerset_SOURCES = powerset.cc
