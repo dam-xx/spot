@@ -1,5 +1,14 @@
 2010-02-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Work around a spurious style.test error.
+
+	* src/saba/sabacomplementtgba.hh (spot): Rewrite Büchi as B\"uchi
+	is the BibTex entry used as comment, because some version of sed
+	will choke on non-ascii character and cause sanity/style.test to
+	fail.
+
+2010-02-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix random_graph() not to generate dead states.
 
 	This is actually the third time I fix random_graph().  On

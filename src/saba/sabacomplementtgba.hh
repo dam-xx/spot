@@ -40,7 +40,7 @@ namespace spot
   /// This algorithm comes from:
   /// \verbatim
   /// @Article{         gurumurthy.03.lncs,
-  ///   title         = {On complementing nondeterministic {Büchi} automata},
+  ///   title         = {On complementing nondeterministic {B\"uchi} automata},
   ///   author        = {Gurumurthy, S. and Kupferman, O. and Somenzi, F. and
   ///                   Vardi, M.Y.},
   ///   journal       = {Lecture Notes in Computer Science},
