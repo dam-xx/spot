@@ -1,4 +1,4 @@
-## Copyright (C) 2009 Laboratoire de Recherche et Développement
+## Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 ## de l'Epita (LRDE).
 ## Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
 ## Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -91,6 +91,7 @@ TESTS = \
   reduccmp.test \
   reductgba.test \
   scc.test \
+  randtgba.test \
   emptchk.test \
   emptchke.test \
   dfs.test \

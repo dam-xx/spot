@@ -108,6 +108,8 @@ namespace spot
       props[pi++] = dict->register_proposition(*i, res);
 
     std::vector<tgba_explicit::state*> states(n);
+    // Indirect access to state[] to help random selection of successors.
+    std::vector<int> state_randomizer(n);
 
     std::list<bdd> accs;
     bdd allneg = bddtrue;
@@ -134,11 +136,13 @@ namespace spot
     node_set unreachable_nodes;
 
     states[0] = res->add_state(st(0));
+    state_randomizer[0] = 0;
     nodes_to_process.insert(0);
 
     for (int i = 1; i < n; ++i)
       {
 	states[i] = res->add_state(st(i));
+	state_randomizer[i] = i;
 	unreachable_nodes.insert(i);
       }
 
@@ -163,6 +167,8 @@ namespace spot
 	int possibilities = n;
 	while (nsucc--)
 	  {
+	    // No connection to unreachable successors so far.  This
+	    // is our last chance, so force it now.
 	    if (nsucc == 0
 		&& !saw_unreachable
 		&& !unreachable_nodes.empty())
@@ -180,21 +186,23 @@ namespace spot
 	      }
 	    else
 	      {
-		// Pick a random node.
+		// Pick the index of a random node.
 		int index = mrand(possibilities--);
-		tgba_explicit::state* dest = states[index];
 
-		// Permute the state with states[possibilities], so we
-		// cannot pick it again.
-		states[index] = states[possibilities];
-		states[possibilities] = dest;
+		// Permute it with state_randomizer[possibilities], so
+		// we cannot pick it again.
+		int x = state_randomizer[index];
+		state_randomizer[index] = state_randomizer[possibilities];
+		state_randomizer[possibilities] = x;
+
+		tgba_explicit::state* dest = states[x];
 
 		random_labels(res, src, dest, props, props_n, t, accs, a);
 
-		node_set::iterator j = unreachable_nodes.find(possibilities);
+		node_set::iterator j = unreachable_nodes.find(x);
 		if (j != unreachable_nodes.end())
 		  {
-		    nodes_to_process.insert(possibilities);
+		    nodes_to_process.insert(x);
 		    unreachable_nodes.erase(j);
 		    saw_unreachable = true;
 		  }
