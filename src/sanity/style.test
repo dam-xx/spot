@@ -21,6 +21,13 @@ if (grep --color=auto -n --version)>/dev/null 2>&1; then
   export GREP_COLOR
 fi
 
+# Reset the locale, so for instance we don't get bugs because sed is
+# expecting utf-8 and we feed him latin-1.  The C locale should be OK,
+# because we do not treat extended characters specifically in the
+# following style rules.
+LC_ALL=C
+export LC_ALL
+
 tmp=incltest.tmp
 
 for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
