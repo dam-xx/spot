@@ -1,3 +1,18 @@
+2010-02-24  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Introduce EConcatMarked "<>+>" as operator.
+
+	* src/ltlast/binop.cc, src/ltlast/binop.hh: Introduce
+	EConcatMarked ("<>+>").
+	* src/ltlvisit/basicreduce.cc, src/ltlvisit/consterm.cc,
+	src/ltlvisit/lunabbrev.cc, src/ltlvisit/nenoform.cc,
+	src/ltlvisit/reduce.cc, src/ltlvisit/simpfg.cc,
+	src/ltlvisit/syntimpl.cc, src/ltlvisit/tostring.cc,
+	src/tgbaalgos/ltl2taa.cc, src/tgbaalgos/eltl2tgba_lacim.cc,
+	src/tgbaalgos/ltl2tgba_lacim.cc, src/tgba/formula2bdd.cc,
+	src/tgba/formula2bdd.cc: Deal with it if possible or ignore
+	it.
+
 2010-02-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Simplify #e in conjunctions.
