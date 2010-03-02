@@ -259,6 +259,9 @@ namespace spot
 	    case multop::Concat:
 	      ch = ";";
 	      break;
+	    case multop::Fusion:
+	      ch = ":";
+	      break;
 	    }
 
 	  for (unsigned n = 1; n < max; ++n)
@@ -458,6 +461,9 @@ namespace spot
 	      break;
 	    case multop::Concat:
 	      ch = ";";
+	      break;
+	    case multop::Fusion:
+	      ch = ":";
 	      break;
 	    }
 

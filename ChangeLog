@@ -1,5 +1,24 @@
 2010-03-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Parse the fusion operator (":") and translate it in ltl2tgba_fm().
+
+	* src/ltlast/multop.hh (multop::type::Fusion): New operator.
+	* src/ltlast/multop.cc: Handle it.
+	* src/ltlparse/ltlparse.yy: Declare OP_FUSION and add grammar
+	rules.
+	* src/ltlparse/ltlscan.ll: Recognize ":" as OP_FUSION.
+	* src/tgbaalgos/ltl2tgba_fm.cc (ratexp_trad_visitor::visit):
+	Add translation rule for multop::Fusion.
+	* src/tgbatest/ltl2tgba.test: Add more tests.
+	* src/ltlvisit/basicreduce.cc, src/ltlvisit/consterm.cc,
+	src/ltlvisit/mark.cc, src/ltlvisit/nenoform.cc,
+	src/ltlvisit/syntimpl.cc, src/ltlvisit/tostring.cc,
+	src/tgba/formula2bdd.cc, src/tgbaalgos/eltl2tgba_lacim.cc,
+	src/tgbaalgos/ltl2taa.cc, src/tgbaalgos/ltl2tgba_lacim.cc: Handle
+	multop::Fusion in switches.
+
+2010-03-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Do not assume that concatenation cannot accept the empty word.
 
 	For instance "(a+#e);(b+#e);(c*)" does.

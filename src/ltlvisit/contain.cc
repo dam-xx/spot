@@ -354,6 +354,7 @@ namespace spot
 		}
 	      break;
 	    case multop::Concat:
+	    case multop::Fusion:
 	      break;
 	    }
 	  if (changed)
