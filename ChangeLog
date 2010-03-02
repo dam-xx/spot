@@ -1,3 +1,12 @@
+2010-03-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Do not assume that concatenation cannot accept the empty word.
+
+	For instance "(a+#e);(b+#e);(c*)" does.
+
+	* src/ltlvisit/consterm.cc: Fix handling of Concat operator.
+	* src/ltltest/consterm.test: Add more tests.
+
 2010-02-24  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Update the FM translation to handle <>->, []->, *, ;, #e.
