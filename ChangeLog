@@ -1,5 +1,13 @@
 2010-03-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Build deterministic automata for <>-> operators.
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_trad_visitor): Take
+	an exprop argument, and use it while translation <>-> operators.
+	* src/tgbaalgos/ltl2tgba.test (check_psl): Use -x too.
+
+2010-03-02  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Parse the fusion operator (":") and translate it in ltl2tgba_fm().
 
 	* src/ltlast/multop.hh (multop::type::Fusion): New operator.
