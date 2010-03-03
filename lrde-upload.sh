@@ -6,10 +6,18 @@
 set -e
 set -x
 
-rm -rf /lrde/dload/spot/spot-snapshot.tmp
-cp -pR doc/spot.html /lrde/dload/spot/spot-snapshot.tmp
-chmod -R a+rX /lrde/dload/spot/spot-snapshot.tmp
-mv -f spot-*.tar.gz /lrde/dload/spot/spot-snapshot.tar.gz
-chmod a+rX /lrde/dload/spot/spot-snapshot.tar.gz
-rm -rf /lrde/dload/spot/spot-snapshot.html
-mv -f /lrde/dload/spot/spot-snapshot.tmp /lrde/dload/spot/spot-snapshot.html
+# Buildbot will tell us the name of the branch being compiled using $1.
+rev=$1
+
+case $rev in
+  master) rev=;;
+  *) rev="-$rev";;
+esac
+
+rm -rf /lrde/dload/spot/spot-snapshot$rev.tmp
+cp -pR doc/spot.html /lrde/dload/spot/spot-snapshot$rev.tmp
+chmod -R a+rX /lrde/dload/spot/spot-snapshot$rev.tmp
+mv -f spot-*.tar.gz /lrde/dload/spot/spot-snapshot$rev.tar.gz
+chmod a+rX /lrde/dload/spot/spot-snapshot$rev.tar.gz
+rm -rf /lrde/dload/spot/spot-snapshot$rev.html
+mv -f /lrde/dload/spot/spot-snapshot$rev.tmp /lrde/dload/spot/spot-snapshot$rev.html
