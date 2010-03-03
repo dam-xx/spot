@@ -800,6 +800,16 @@ main(int argc, char** argv)
 	    }
 	}
 
+      // Remove dead SCCs and useless acceptance conditions before
+      // degeneralization.
+      spot::tgba* aut_scc = 0;
+      if (reduc_aut & spot::Reduce_Scc)
+	{
+	  tm.start("reducing A_f w/ SCC");
+	  a = aut_scc = spot::scc_filter(a);
+	  tm.stop("reducing A_f w/ SCC");
+	}
+
       spot::tgba_tba_proxy* degeneralized = 0;
       spot::tgba_sgba_proxy* state_labeled = 0;
 
@@ -819,17 +829,8 @@ main(int argc, char** argv)
       }
 
       spot::tgba_reduc* aut_red = 0;
-      spot::tgba* aut_scc = 0;
       if (reduc_aut != spot::Reduce_None)
 	{
-
-	  if (reduc_aut & spot::Reduce_Scc)
-	    {
-	      tm.start("reducing A_f w/ SCC");
-	      a = aut_scc = spot::scc_filter(a);
-	      tm.stop("reducing A_f w/ SCC");
-	    }
-
 	  if (reduc_aut & ~spot::Reduce_Scc)
 	    {
 	      tm.start("reducing A_f w/ sim.");
@@ -1132,8 +1133,8 @@ main(int argc, char** argv)
       delete system;
       delete expl;
       delete aut_red;
-      delete aut_scc;
       delete degeneralized;
+      delete aut_scc;
       delete state_labeled;
       delete to_free;
       delete echeck_inst;
