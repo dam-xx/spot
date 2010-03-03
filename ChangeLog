@@ -1,5 +1,26 @@
 2010-03-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Optimize tgba_tba_proxy and tgba_sba_proxy for states that share
+	an acceptance condition on all outgoing transitions.
+
+	This was motivated by experiments from Rüdiger Ehlers, showing
+	that "ltl2ba -f 'a U (b U c)'" outperformed "ltl2tgba -f -N -R3 'a
+	U (b U c)'".  With this change and the previous one, it is no
+	longer the case.
+
+	* src/tgba/tgbatba.cc (tgba_tba_proxy_succ_iterator::aut_): Store
+	a pointer to the source automaton and...
+	(tgba_tba_proxy_succ_iterator::sync_): ... use it in an extra
+	optimization step to gather the acceptance conditions common
+	to all outgoing transitions of the destination state, and pretend
+	they are on the current (ingoing) transition.
+	(tgba_tba_proxy::succ_iter): Pass the
+	source automaton to the constructed iterator.
+	* src/tgbatest/spotlbtt.test: Test -f -N -R3 -r7.
+	* src/tgbatest/ltl2tgba.test: Add a test case for 'a U (b U c)'.
+
+2010-03-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	ltl2tgba: apply -R3 before -D or -DS.
 
 	* src/tgbatest/ltl2tgba.cc (main): Call scc_filter() before the

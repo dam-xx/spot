@@ -1,6 +1,8 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// l'Epita.
+// Copyright (C) 2003, 2004, 2005 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -114,9 +116,10 @@ namespace spot
       tgba_tba_proxy_succ_iterator(tgba_succ_iterator* it,
 				   iterator expected,
 				   const list& cycle,
-				   bdd the_acceptance_cond)
+				   bdd the_acceptance_cond,
+				   const tgba* aut)
 	: it_(it), expected_(expected), cycle_(cycle),
-	  the_acceptance_cond_(the_acceptance_cond)
+	  the_acceptance_cond_(the_acceptance_cond), aut_(aut)
       {
       }
 
@@ -203,6 +206,20 @@ namespace spot
 	    //   month	= {December}
 	    // }
 
+
+	    // As an extra optimization step, gather the acceptance
+	    // conditions common to all outgoing transitions of the
+	    // destination state, and pretend they are already present
+	    // on this transition.
+	    bdd common = aut_->all_acceptance_conditions();
+	    state* dest = it_->current_state();
+	    tgba_succ_iterator* dest_it = aut_->succ_iter(dest);
+	    for (dest_it->first(); !dest_it->done(); dest_it->next())
+	      common &= dest_it->current_acceptance_conditions();
+	    acc |= common;
+	    delete dest_it;
+	    delete dest;
+
 	    next_ = expected_;
 	    while (next_ != cycle_.end() && (acc & *next_) == *next_)
 	      ++next_;
@@ -226,6 +243,7 @@ namespace spot
       bool accepting_;
       const list& cycle_;
       const bdd the_acceptance_cond_;
+      const tgba* aut_;
       friend class ::spot::tgba_tba_proxy;
     };
 
@@ -281,7 +299,8 @@ namespace spot
 					   global_state, global_automaton);
 
     return new tgba_tba_proxy_succ_iterator(it, s->acceptance_iterator(),
-					    acc_cycle_, the_acceptance_cond_);
+					    acc_cycle_, the_acceptance_cond_,
+					    a_);
   }
 
   bdd_dict*

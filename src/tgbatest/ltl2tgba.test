@@ -50,3 +50,12 @@ check 'a R (b R c)'
 check '(a U b) U (c U d)'
 
 check '((Xp2)U(X(1)))&(p1 R(p2 R p0))'
+
+
+# Make sure 'a U (b U c)' has 3 states and 6 transitions,
+# before and after degeneralization.
+for opt in '' -D -DS; do
+  ../ltl2tgba -k -f -R3 $opt 'a U (b U c)' > stdout
+  grep 'transitions: 6$' stdout
+  grep 'states: 3$' stdout
+done
