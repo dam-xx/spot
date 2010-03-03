@@ -1,5 +1,5 @@
 # -*- mode: python; coding: iso-8859-1 -*-
-# Copyright (C) 2009, 2010 Laboratoire de Recherche et DÃ©veloppement
+# Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 # de l'Epita (LRDE).
 # Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -74,10 +74,11 @@ c = e.require('c')
 T = spot.constant.true_instance()
 F = spot.constant.false_instance()
 
-f1 = spot.binop.instance(spot.binop.Equiv, T, a.clone())
-f2 = spot.binop.instance(spot.binop.Implies, F, b.clone())
-f3 = spot.binop.instance(spot.binop.Xor, F, c.clone())
+f1 = spot.binop.instance(spot.binop.Equiv, c.clone(), a.clone())
+f2 = spot.binop.instance(spot.binop.Implies, a.clone(), b.clone())
+f3 = spot.binop.instance(spot.binop.Xor, b.clone(), c.clone())
 f4 = spot.unop.instance(spot.unop.Not, f3); del f3
+f5 = spot.binop.instance(spot.binop.Xor, F, c.clone())
 
 assert spot.atomic_prop.instance_count() == 3
 assert spot.binop.instance_count() == 3
@@ -99,7 +100,15 @@ assert spot.multop.instance_count() == 0
 f1.destroy()
 del f1
 
-assert spot.atomic_prop.instance_count() == 2
+assert spot.atomic_prop.instance_count() == 3
+assert spot.binop.instance_count() == 2
+assert spot.unop.instance_count() == 1
+assert spot.multop.instance_count() == 0
+
+f5.destroy()
+del f5
+
+assert spot.atomic_prop.instance_count() == 3
 assert spot.binop.instance_count() == 2
 assert spot.unop.instance_count() == 1
 assert spot.multop.instance_count() == 0
@@ -107,7 +116,7 @@ assert spot.multop.instance_count() == 0
 f4.destroy()
 del f4
 
-assert spot.atomic_prop.instance_count() == 1
+assert spot.atomic_prop.instance_count() == 2
 assert spot.binop.instance_count() == 1
 assert spot.unop.instance_count() == 0
 assert spot.multop.instance_count() == 0
