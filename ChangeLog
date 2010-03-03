@@ -1,5 +1,12 @@
 2010-03-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Build deterministic automata for []-> operators.
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (ltl_trad_visitor::visit): Honor
+	exprop_ while handling the binop::UConcat case.
+
+2010-03-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* wrap/python/tests/ltlsimple.py: Adjust test case to the new
 	simplification rules.
 
