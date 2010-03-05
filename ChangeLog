@@ -1,5 +1,21 @@
 2010-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Better selection of the acceptance of the initial state in SBA.
+
+	* src/tgba/tgbatba.cc (tgba_sba_proxy::tgba_sba_proxy): Set
+	cycle_start_ to start in the accepting layer of the degeneralized
+	automaton if the initial state has an accepting self-loop.
+	Otherwise, starts at the level of the first acceptance condition
+	as previously.
+	(tgba_sba_proxy::get_init_state): Use cycle_start_.
+	* src/tgba/tgbatba.hh (tgba_tba_proxy::a_): Make it protected so
+	that we can use it in tgba_sba_proxy::tgba_sba_proxy.
+	(tgba_sba_proxy::cycle_start_, tgba_sba_proxy::get_init_state):
+	Declare.
+	* src/tgbatest/ltl2tgba.test: More tests.
+
+2010-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Generalize the previous patch to accepting states in SBA.
 
 	* src/tgba/tgbatba.cc (tgba_tba_proxy_succ_iterator::sync_): Move

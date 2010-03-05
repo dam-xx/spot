@@ -375,7 +375,49 @@ namespace spot
     : tgba_tba_proxy(a)
   {
     if (a->number_of_acceptance_conditions() > 0)
-      acc_cycle_.push_back(bddtrue);
+      {
+	cycle_start_ = acc_cycle_.insert(acc_cycle_.end(), bddtrue);
+
+	bdd all = a->all_acceptance_conditions();
+
+	state* init = a->get_init_state();
+	tgba_succ_iterator* it = a->succ_iter(init);
+	for (it->first(); !it->done(); it->next())
+	  {
+	    // Look only for transitions that are accepting.
+	    if (all != it->current_acceptance_conditions())
+	      continue;
+	    // Look only for self-loops.
+	    state* dest = it->current_state();
+	    if (dest->compare(init) == 0)
+	      {
+		// The initial state has an accepting self-loop.
+		// In that case it is better to start the accepting
+		// cycle on a "acceptance" state.  This will avoid
+		// duplication of the initial state.
+		// The cycle_start_ points to the right starting
+		// point already, so just return.
+		delete dest;
+		delete it;
+		return;
+	      }
+	    delete dest;
+	  }
+	delete it;
+      }
+
+    // If we arrive here either because the number of acceptance
+    // condition is 0, or because the initial state has no accepting
+    // self-loop, start the acceptance cycle on the first condition
+    // (that is a non-accepting state if the number of conditions is
+    // not 0).
+    cycle_start_ = acc_cycle_.begin();
+  }
+
+  state*
+  tgba_sba_proxy::get_init_state() const
+  {
+    return new state_tba_proxy(a_->get_init_state(), cycle_start_);
   }
 
   bool

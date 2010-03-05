@@ -59,3 +59,19 @@ for opt in '' -D -DS; do
   grep 'transitions: 6$' stdout
   grep 'states: 3$' stdout
 done
+
+# Make sure '!(Ga U b)' has 3 states and 6 transitions,
+# before and after degeneralization.
+for opt in '' -D -DS; do
+  ../ltl2tgba -k -f -R3 $opt '!(Ga U b)' > stdout
+  grep 'transitions: 6$' stdout
+  grep 'states: 3$' stdout
+done
+
+# Make sure 'Ga U b' has 4 states and 6 transitions,
+# before and after degeneralization.
+for opt in '' -D -DS; do
+  ../ltl2tgba -k -f -R3 $opt 'Ga U b' > stdout
+  grep 'transitions: 6$' stdout
+  grep 'states: 4$' stdout
+done

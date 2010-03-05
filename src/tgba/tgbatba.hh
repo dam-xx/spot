@@ -1,3 +1,5 @@
+// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// l'Epita.
 // Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
@@ -79,8 +81,8 @@ namespace spot
     virtual bdd compute_support_variables(const state* state) const;
 
     cycle_list acc_cycle_;
-  private:
     const tgba* a_;
+  private:
     bdd the_acceptance_cond_;
     // Disallow copy.
     tgba_tba_proxy(const tgba_tba_proxy&);
@@ -115,6 +117,10 @@ namespace spot
     /// considered accepting.  This is useful in algorithms working on
     /// degeneralized automata with state acceptance conditions.
     bool state_is_accepting(const state* state) const;
+
+    virtual state* get_init_state() const;
+  protected:
+    cycle_list::iterator cycle_start_;
   };
 
 }
