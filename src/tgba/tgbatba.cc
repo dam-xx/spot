@@ -181,6 +181,19 @@ namespace spot
 
 	bdd acc = it_->current_acceptance_conditions();
 
+	// As an extra optimization step, gather the acceptance
+	// conditions common to all outgoing transitions of the
+	// destination state, and pretend they are already present
+	// on this transition.
+	bdd common = aut_->all_acceptance_conditions();
+	state* dest = it_->current_state();
+	tgba_succ_iterator* dest_it = aut_->succ_iter(dest);
+	for (dest_it->first(); !dest_it->done(); dest_it->next())
+	  common &= dest_it->current_acceptance_conditions();
+	acc |= common;
+	delete dest_it;
+	delete dest;
+
 	// bddtrue is a special condition used for tgba_sba_proxy
 	// to denote the (N+1)th copy of the state, after all acceptance
 	// conditions have been traversed.  Such state is always accepting,
@@ -205,21 +218,6 @@ namespace spot
 	    //   address= {Paris, France},
 	    //   month	= {December}
 	    // }
-
-
-	    // As an extra optimization step, gather the acceptance
-	    // conditions common to all outgoing transitions of the
-	    // destination state, and pretend they are already present
-	    // on this transition.
-	    bdd common = aut_->all_acceptance_conditions();
-	    state* dest = it_->current_state();
-	    tgba_succ_iterator* dest_it = aut_->succ_iter(dest);
-	    for (dest_it->first(); !dest_it->done(); dest_it->next())
-	      common &= dest_it->current_acceptance_conditions();
-	    acc |= common;
-	    delete dest_it;
-	    delete dest;
-
 	    next_ = expected_;
 	    while (next_ != cycle_.end() && (acc & *next_) == *next_)
 	      ++next_;

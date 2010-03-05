@@ -1,3 +1,12 @@
+2010-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Generalize the previous patch to accepting states in SBA.
+
+	* src/tgba/tgbatba.cc (tgba_tba_proxy_succ_iterator::sync_): Move
+	the optimization step added by the previous patch outside the
+	before the bddtrue check, so that it also applies to accepting
+	states in SBA.
+
 2010-03-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Optimize tgba_tba_proxy and tgba_sba_proxy for states that share
