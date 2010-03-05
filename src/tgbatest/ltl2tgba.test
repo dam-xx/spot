@@ -75,3 +75,17 @@ for opt in '' -D -DS; do
   grep 'transitions: 6$' stdout
   grep 'states: 4$' stdout
 done
+
+# Make sure '(G (p -> F q)) && ((X (p) U q) || ! X (p U (p && q)))'
+# has 6 states and 15 transitions, before and after degeneralization.
+f='(G (p -> F q)) && ((X (p) U q) || ! X (p U (p && q)))'
+for opt in '' -D -DS; do
+  ../ltl2tgba -k -f -R3 $opt "$f" > stdout
+  grep 'transitions: 15$' stdout
+  grep 'states: 6$' stdout
+done
+
+# Note: this is worse with -R3f.
+../ltl2tgba -k -f -R3f -DS "$f" > stdout
+grep 'transitions: 17$' stdout
+grep 'states: 7$' stdout

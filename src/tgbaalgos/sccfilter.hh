@@ -1,5 +1,5 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Developpement de
-// l'Epita (LRDE).
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Developpement
+// de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
 //
@@ -26,8 +26,28 @@
 namespace spot
 {
 
-  // Prune unaccepting SCCs and remove superfluous acceptance conditions.
-  tgba* scc_filter(const tgba* aut);
+  /// \brief Prune unaccepting SCCs and remove superfluous acceptance
+  /// conditions.
+  ///
+  /// This functions will explore the SCCs of the automaton and remove
+  /// dead SCCs (unaccepting, and with no exit path leading to an
+  /// accepting SCC).
+  ///
+  /// Additionally, this will try to remove useless acceptance
+  /// conditions.  This operation may diminish the number of
+  /// acceptance condition of the automaton, for instance when two
+  /// acceptance conditions are always used together we only keep one
+  /// (but it will never remove all acceptance conditions, even if it
+  /// would be OK to have zero).
+  ///
+  /// Acceptance conditions on transitions going to non-accepting SCC
+  /// are all removed.  Acceptance conditions going to an accepting
+  /// SCC and coming from another SCC are only removed if \a
+  /// remove_all_useless is set.  The default value of \a
+  /// remove_all_useless is \c false because some algorithms (like the
+  /// degeneralization) will work better if transition going to an
+  /// accepting SCC are accepting.
+  tgba* scc_filter(const tgba* aut, bool remove_all_useless = false);
 
 }
 

@@ -1,5 +1,5 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Developpement de
-// l'Epita (LRDE).
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Developpement
+// de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
 //
@@ -64,13 +64,14 @@ namespace spot
       filter_iter(const tgba* a,
 		  const scc_map& sm,
 		  const std::vector<bool>& useless,
-		  bdd useful, bdd strip)
+		  bdd useful, bdd strip, bool remove_all_useless)
 	: tgba_reachable_iterator_depth_first(a),
 	  out_(new T(a->get_dict())),
 	  sm_(sm),
 	  useless_(useless),
 	  useful_(useful),
-	  strip_(strip)
+	  strip_(strip),
+	  all_(remove_all_useless)
       {
 	out_->set_acceptance_conditions(useful);
       }
@@ -96,10 +97,16 @@ namespace spot
 	  create_transition(this->automata_, out_, in_s, in, out_s, out);
 	out_->add_conditions(t, si->current_condition());
 
-	// Do not output any acceptance condition if either the source or
-	// the destination state do not belong to an accepting state.
-	if (sm_.accepting(sm_.scc_of_state(in_s))
-	    && sm_.accepting(sm_.scc_of_state(out_s)))
+	// Regardless of all_, do not output any acceptance condition
+	// if the destination is not in an accepting SCC.
+	//
+	// If all_ is set, do not output any acceptance condition if the
+	// source is not in the same SCC as dest.
+	//
+	// (See the documentation of scc_filter() for a rational.)
+	unsigned u = sm_.scc_of_state(out_s);
+	if (sm_.accepting(u)
+	    && (!all_ || u == sm_.scc_of_state(in_s)))
 	  out_->add_acceptance_conditions
 	    (t, (bdd_exist(si->current_acceptance_conditions(), strip_)
 		 & useful_));
@@ -111,12 +118,13 @@ namespace spot
       const std::vector<bool>& useless_;
       bdd useful_;
       bdd strip_;
+      bool all_;
     };
 
   } // anonymous
 
 
-  tgba* scc_filter(const tgba* aut)
+  tgba* scc_filter(const tgba* aut, bool remove_all_useless)
   {
     scc_map sm(aut);
     sm.build_map();
@@ -160,7 +168,8 @@ namespace spot
     if (af)
       {
 	filter_iter<tgba_explicit_formula> fi(af, sm, ss.useless_scc_map,
-					     useful, strip);
+					      useful, strip,
+					      remove_all_useless);
 	fi.run();
 	tgba_explicit_formula* res = fi.result();
 	res->merge_transitions();
@@ -169,14 +178,13 @@ namespace spot
     else
       {
 	filter_iter<tgba_explicit_string> fi(aut, sm, ss.useless_scc_map,
-					      useful, strip);
+					     useful, strip,
+					     remove_all_useless);
 	fi.run();
 	tgba_explicit_string* res = fi.result();
 	res->merge_transitions();
 	return res;
       }
   }
-
-
 
 }

@@ -1,3 +1,26 @@
+2010-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Keep acceptance conditions on transitions going to accepting SCCs
+	by default in scc_filter().
+
+	Doing so helps the degeneralization algorithm, because it will
+	have more opportunity to be in an accepting level when it reaches
+	the accepting SCCs.
+
+	* src/tgbaalgos/sccfilter.cc (filter_iter::filter_iter): Take a
+	remove_all_useless argument.
+	(filter_iter::process_link): Use the flag to decide whether to
+	filter acceptance conditions going to accepting SCCs.
+	(scc_filter): Take a remove_all_useless argument and pass it to
+	filter_iter.
+	* src/tgbaalgos/sccfilter.hh (filter_iter): Add the new argument
+	and document the function.
+	* src/tgbatest/tgbatests/ltl2tgba.cc (main): Add option use -R3
+	for remove_all_useless=false and add -R3f for
+	remove_all_useless=true.
+	* src/tgbatest/ltl2tgba.test: Show one case where -R3f makes
+	the degeneralization worse than -R3.
+
 2010-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Simplify F(a)|F(b) as F(a|b).  Add similar rule for G(a)&G(b).

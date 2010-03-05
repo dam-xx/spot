@@ -195,6 +195,10 @@ syntax(char* prog)
 	    << "  -R2t  remove transitions using delayed simulation"
 	    << std::endl
 	    << "  -R3   use SCC to reduce the automata" << std::endl
+	    << "  -R3f  clean more acceptance conditions that -R3" << std::endl
+	    << "          "
+	    << "(prefer -R3 over -R3f if you degeneralize with -D, -DS, or -N)"
+	    << std::endl
 	    << "  -Rd   display the simulation relation" << std::endl
 	    << "  -RD   display the parity game (dot format)" << std::endl
 	    << std::endl
@@ -280,6 +284,7 @@ main(int argc, char** argv)
   bool from_file = false;
   int reduc_aut = spot::Reduce_None;
   int redopt = spot::ltl::Reduce_None;
+  bool scc_filter_all = false;
   bool symbolic_scc_pruning = false;
   bool display_reduce_form = false;
   bool display_rel_sim = false;
@@ -560,6 +565,11 @@ main(int argc, char** argv)
 	{
 	  reduc_aut |= spot::Reduce_Scc;
 	}
+      else if (!strcmp(argv[formula_index], "-R3f"))
+	{
+	  reduc_aut |= spot::Reduce_Scc;
+	  scc_filter_all = true;
+	}
       else if (!strcmp(argv[formula_index], "-R3b"))
 	{
 	  symbolic_scc_pruning = true;
@@ -806,7 +816,7 @@ main(int argc, char** argv)
       if (reduc_aut & spot::Reduce_Scc)
 	{
 	  tm.start("reducing A_f w/ SCC");
-	  a = aut_scc = spot::scc_filter(a);
+	  a = aut_scc = spot::scc_filter(a, scc_filter_all);
 	  tm.stop("reducing A_f w/ SCC");
 	}
 
