@@ -1,5 +1,5 @@
-// Copyright (C) 2008, 2009 Laboratoire de Recherche et DÃ©veloppement
-// de l'Epita (LRDE).
+// Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
+// Développement de l'Epita (LRDE).
 // Copyright (C) 2004, 2007 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
@@ -305,7 +305,9 @@ namespace spot
 	  multop::vec* tmpU = new multop::vec;
 	  multop::vec* tmpR = new multop::vec;
 	  multop::vec* tmpFG = new multop::vec;
+	  multop::vec* tmpF = new multop::vec;
 	  multop::vec* tmpGF = new multop::vec;
+	  multop::vec* tmpG = new multop::vec;
 
 	  multop::vec* tmpOther = new multop::vec;
 
@@ -326,7 +328,7 @@ namespace spot
 		  binop* bo = dynamic_cast<binop*>(*i);
 		  if (uo)
 		    {
-		      if (uo && uo->op() == unop::X)
+		      if (uo->op() == unop::X)
 			{
 			  // Xa & Xb = X(a & b)
 			  tmpX->push_back(uo->child()->clone());
@@ -336,6 +338,11 @@ namespace spot
 			  // FG(a) & FG(b) = FG(a & b)
 			  unop* uo2 = dynamic_cast<unop*>(uo->child());
 			  tmpFG->push_back(uo2->child()->clone());
+			}
+		      else if (uo->op() == unop::G)
+			{
+			  // G(a) | G(b) = G(a | b)
+			  tmpG->push_back(uo->child()->clone());
 			}
 		      else
 			{
@@ -416,10 +423,6 @@ namespace spot
 		    }
 		  (*i)->destroy();
 		}
-
-	      delete tmpGF;
-	      tmpGF = 0;
-
 	      break;
 
 	    case multop::Or:
@@ -432,7 +435,7 @@ namespace spot
 		  binop* bo = dynamic_cast<binop*>(*i);
 		  if (uo)
 		    {
-		      if (uo && uo->op() == unop::X)
+		      if (uo->op() == unop::X)
 			{
 			  // Xa | Xb = X(a | b)
 			  tmpX->push_back(uo->child()->clone());
@@ -443,10 +446,10 @@ namespace spot
 			  unop* uo2 = dynamic_cast<unop*>(uo->child());
 			  tmpGF->push_back(uo2->child()->clone());
 			}
-		      else if (is_FG(*i))
+		      else if (uo->op() == unop::F)
 			{
-			  // FG(a) | FG(b) = F(Ga | Gb)
-			  tmpFG->push_back(uo->child()->clone());
+			  // F(a) | F(b) = F(a | b)
+			  tmpF->push_back(uo->child()->clone());
 			}
 		      else
 			{
@@ -540,19 +543,32 @@ namespace spot
 	  else
 	    delete tmpX;
 
+	  if (!tmpF->empty())
+	    tmpOther->push_back(unop::instance(unop::F,
+					       multop::instance(mo->op(),
+								tmpF)));
+	  else
+	    delete tmpF;
 
-	  if (tmpU && !tmpU->empty())
+	  if (!tmpG->empty())
+	    tmpOther->push_back(unop::instance(unop::G,
+					       multop::instance(mo->op(),
+								tmpG)));
+	  else
+	    delete tmpG;
+
+	  if (!tmpU->empty())
 	    tmpOther->push_back(multop::instance(mo->op(), tmpU));
 	  else
 	    delete tmpU;
 
 
-	  if (tmpR && !tmpR->empty())
+	  if (!tmpR->empty())
 	    tmpOther->push_back(multop::instance(mo->op(), tmpR));
 	  else
 	    delete tmpR;
 
-	  if (tmpGF && !tmpGF->empty())
+	  if (!tmpGF->empty())
 	    {
 	      formula* ftmp
 		= unop::instance(unop::G,
@@ -565,7 +581,7 @@ namespace spot
 	    delete tmpGF;
 
 
-	  if (tmpFG && !tmpFG->empty())
+	  if (!tmpFG->empty())
 	    {
 	      formula* ftmp = 0;
 	      if (mo->op() == multop::And)
