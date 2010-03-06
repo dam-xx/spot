@@ -6,7 +6,7 @@ U U t p0 V f p1
 U V f p0 p1
 & & U t U t p0 V f ! p0 & U t p0 V f V f ! p0
 & V f U t p0 U t V f ! p1
-& & V f U t p0 U t V f ! p1 & V f U t p1 U t V f ! p0
+| & V f U t p0 U t V f ! p1 & V f U t p1 U t V f ! p0
 V p0 | p0 p1
 | U X p0 X p1 X V ! p0 ! p1
 | U X p0 p1 X V ! p0 | ! p0 ! p1
@@ -20,8 +20,8 @@ V f & U t p0 U t p1
 V & X p1 p2 X U V U p3 p0 p2 V p3 p2
 | | & V f | p1 V f U t p0 V f | p2 V f U t ! p0 V f p1 V f p2
 | | & V f | p1 U t V f p0 V f | p2 U t V f ! p0 V f p1 V f p2
-& & | U t & ! p1 U t V f ! p0 U t & ! p2 U t V f p0 U t p1 U t p2
-& & | U t & ! p1 V f U t ! p0 U t & ! p2 V f U t p0 U t p1 U t p2
+& & | U t & ! p1 U t V f ! p0 U t & ! p2 U t V f p0 U t ! p1 U t ! p2
+& & | U t & ! p1 V f U t ! p0 U t & ! p2 V f U t p0 U t ! p1 U t ! p2
 & V f | p1 X V f p0 V f | p2 X V f ! p0
 V f | p1 & X p0 X ! p0
 | U p0 p0 U p1 p0
