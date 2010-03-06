@@ -169,13 +169,28 @@ namespace spot
 		  return;
 		}
 
+#if 0
 	      // F(f1 & GF(f2)) = F(f1) & GF(F2)
+	      //
+	      // As is, these two formulae are translated into
+	      // equivalent Büchi automata so the rewriting is
+	      // useless.
+	      //
+	      // However when taken in a larger formulae such as F(f1
+	      // & GF(f2)) | F(a & GF(b)), this rewriting used to
+	      // produce (F(f1) & GF(f2)) | (F(a) & GF(b)), missing
+	      // the opportunity to apply the F(E1)|F(E2) = F(E1|E2)
+	      // rule which really helps the translation. F((f1 &
+	      // GF(f2)) | (a & GF(b))) is indeed easier to translate.
+	      //
+	      // So let's not consider this rewriting rule.
 	      mo = dynamic_cast<multop*>(result_);
 	      if (mo && mo->op() == multop::And)
 		{
 		  result_ = param_case(mo, unop::F, multop::And);
 		  return;
 		}
+#endif
 
 	      result_ = unop::instance(unop::F, result_);
 	      return;
