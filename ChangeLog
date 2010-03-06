@@ -1,5 +1,16 @@
 2010-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Reverse the order of expected acceptance conditions in
+	degeneralization.
+
+	* src/tgba/tgbatba.cc (tgba_sba_proxy::tgba_tba_proxy): Build the
+	list of acceptance condition in the reverse order.  The order is
+	still arbitrary, but the bdd_satone() call seems to output the
+	acceptance conditions that are more used first, and this helps the
+	degeneralization process.
+
+2010-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Tweak precedence of "->" and <->.
 
 	* src/ltlparse/ltlparse.yy: Change the precedence of "->" and

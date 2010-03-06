@@ -263,12 +263,19 @@ namespace spot
     else
       {
 	// Build a cycle of expected acceptance conditions.
+	//
+	// The order is arbitrary, but it turns out that using
+	// push_back instead of push_front often gives better results
+	// because acceptance conditions and the beginning if the
+	// cycle are more often used in the automaton.  (This
+	// surprising fact is probably related to order in which we
+	// declare the BDD variables during the translation.)
 	bdd all = a_->all_acceptance_conditions();
 	while (all != bddfalse)
 	  {
 	    bdd next = bdd_satone(all);
 	    all -= next;
-	    acc_cycle_.push_front(next);
+	    acc_cycle_.push_back(next);
 	  }
       }
   }
