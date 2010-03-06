@@ -399,11 +399,13 @@ namespace spot
 		// point already, so just return.
 		delete dest;
 		delete it;
+		delete init;
 		return;
 	      }
 	    delete dest;
 	  }
 	delete it;
+	delete init;
       }
 
     // If we arrive here either because the number of acceptance

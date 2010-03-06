@@ -1,5 +1,12 @@
 2010-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix memory leak introduced in yesterday's change.
+
+	* src/tgba/tgbatba.cc (tgba_sba_proxy::tgba_sba_proxy): Do not
+	forget to free the initial state after usage.
+
+2010-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Keep acceptance conditions on transitions going to accepting SCCs
 	by default in scc_filter().
 
