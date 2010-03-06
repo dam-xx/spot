@@ -1,5 +1,9 @@
 2010-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgba/tgbatba.cc: Fix English in comments.
+
+2010-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Reverse the order of expected acceptance conditions in
 	degeneralization.
 

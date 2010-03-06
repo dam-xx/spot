@@ -198,14 +198,14 @@ namespace spot
 	// to denote the (N+1)th copy of the state, after all acceptance
 	// conditions have been traversed.  Such state is always accepting,
 	// so do not check acc for this.
-	// bddtrue is also used by tgba_tba_proxy if the automata do not
-	// use acceptance conditions.  In that cases, all state are accepting.
+	// bddtrue is also used by tgba_tba_proxy if the automaton does not
+	// use acceptance conditions.  In that case, all states are accepting.
 	if (*expected_ != bddtrue)
 	  {
 	    // A transition in the *EXPECTED acceptance set should be
 	    // directed to the next acceptance set.  If the current
 	    // transition is also in the next acceptance set, then go
-	    // the one after, etc.
+	    // to the one after, etc.
 	    //
 	    // See Denis Oddoux's PhD thesis for a nice explanation (in French).
 	    // @PhDThesis{	  oddoux.03.phd,
