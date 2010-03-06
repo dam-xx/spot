@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+/* Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 ** de l'Epita (LRDE).
 /* Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
 ** Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -93,10 +93,10 @@ using namespace spot::ltl;
 /* Priorities.  */
 
 /* Logical operators.  */
+%left OP_IMPLIES OP_EQUIV
 %left OP_OR
 %left OP_XOR
 %left OP_AND
-%left OP_IMPLIES OP_EQUIV
 
 /* LTL operators.  */
 %left OP_U OP_R

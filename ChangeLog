@@ -1,5 +1,14 @@
 2010-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Tweak precedence of "->" and <->.
+
+	* src/ltlparse/ltlparse.yy: Change the precedence of "->" and
+	"<->" so that "a & b -> c" is interpreted as "(a & b) -> c"
+	instead of "a & (b -> c)".  The new interpretation is more
+	intuitive, and matches that of LBTT.
+
+2010-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* bench/ltl2tgba/formulae.ltl: Fix three formulae to match the
 	original paper by Somenzi and Bloem.  Reported by Ruediger Ehlers.
 
