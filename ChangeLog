@@ -1,3 +1,23 @@
+2010-03-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add support for {SERE} and !{SERE} closure operators.
+
+	* src/ltlast/unop.hh, src/ltlast/unop.cc: Introduce Closure and
+	NegClosure operators.
+	* src/ltlvisit/mark.cc: Consider NegClosure as a marked operator.
+	* src/tgbaalgos/ltl2taa.cc (ratexp_trad_visitor): Add option to
+	select whether the empty_word should act like true (for {SERE}
+	and {!SERE}) or false (for {SERE}<>->Exp or {SERE}[]->Exp).
+	(ltl_trad_visitor): Translate Closure and NegClosure.
+	* src/tgbatest/ltl2tgba.test: Add more tests.
+	* src/ltlvisit/basicreduce.cc, src/ltlvisit/consterm.cc,
+	src/ltlvisit/nenoform.cc, src/ltlvisit/reduce.cc,
+	src/ltlvisit/syntimpl.cc, src/ltlvisit/tostring.cc,
+	src/ltlvisit/tunabbrev.cc, src/tgba/formula2bdd.cc,
+	src/tgbaalgos/eltl2tgba_lacim.cc, src/tgbaalgos/ltl2tgba_lacim.cc:
+	Straightforward update to support or assert on these new
+	operators.
+
 2010-03-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Build deterministic automata for []-> operators.
