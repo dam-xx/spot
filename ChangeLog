@@ -1,5 +1,15 @@
 2010-03-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Accept "{E}|->ltl" and "{E}(ltl)" as synonym for "{E}[]->ltl".
+
+	* src/ltlparse/ltlparse.yy (parenthesedsubformula): Extract these
+	rules from...
+	(subformula): ... here, and use it to recognize "{SERE}(formula)".
+	* src/ltlparse/ltlscan.ll: Recognize "|->" as "[]->".
+	* src/ltltest/equals.test: Test these two new syntaxes.
+
+2010-03-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Use [*0] instead of #e, and support [*] in addition to *.
 
 	* src/ltlparse/ltlscan.ll: Recognize [*] as *, and use
