@@ -1,5 +1,13 @@
 2010-03-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Support braces in addition to parentheses in rational expressions.
+
+	* src/ltlparse/ltlparse.yy (rationalexp): Allow bracedrationalexp.
+	* src/ltltest/consterm.test, src/tgbatest/ltl2tgba.test: Add more
+	tests.
+
+2010-03-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add support for {SERE} and !{SERE} closure operators.
 
 	* src/ltlast/unop.hh, src/ltlast/unop.cc: Introduce Closure and
