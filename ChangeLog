@@ -1,5 +1,17 @@
 2010-03-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Use [*0] instead of #e, and support [*] in addition to *.
+
+	* src/ltlparse/ltlscan.ll: Recognize [*] as *, and use
+	[*0] instead of #e for the empty word.
+	* src/ltlast/binop.cc, src/ltlast/constant.cc,
+	src/ltlast/multop.cc, src/ltlast/multop.hh, src/ltlast/unop.hh,
+	src/ltltest/consterm.test, src/ltltest/equals.test:
+	Adjust all occurrences of #e to [*0].
+	src/tgbatest/ltl2tgba.test: Also use [*].
+
+2010-03-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Support braces in addition to parentheses in rational expressions.
 
 	* src/ltlparse/ltlparse.yy (rationalexp): Allow bracedrationalexp.
