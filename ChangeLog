@@ -1,5 +1,14 @@
 2010-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Support non-overlapping concatenations operators []=> and <>=>.
+
+	* src/ltlparse/ltlscan.ll: Recognize "[]=>" (a.k.a "|=>") and "<>=>".
+	* src/ltlparse/ltlparse.yy: Support them by rewriting them using
+	"[]->" and "<>->".
+	* src/tgbatest/ltl2tgba.test: More tests.
+
+2010-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Allow boolean atoms to be negated in rational expressions.
 
 	* src/ltlparse/ltlparse.yy (rationalexp): Recognize "OP_NOT
