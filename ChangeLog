@@ -1,5 +1,12 @@
 2010-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Recognize and use "*" (or "[*]") as an abbreviation for 1*.
+
+	* src/ltlparse/ltlparse.yy: Recognize "*" as "1*".
+	* src/ltlvisit/tostring.cc: Abbreviate "1*" as "*".
+
+2010-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Support non-overlapping concatenations operators []=> and <>=>.
 
 	* src/ltlparse/ltlscan.ll: Recognize "[]=>" (a.k.a "|=>") and "<>=>".
