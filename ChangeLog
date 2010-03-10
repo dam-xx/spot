@@ -1,3 +1,31 @@
+2010-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add support for PSL's non-length-matching And.
+
+	* src/ltlast/multop.cc, src/ltlast/multop.hh: Declare AndNML
+	operator.
+	* src/ltlparse/ltlscan.ll: Distinguish "&" and "&&".
+	* src/ltlparse/ltlparse.yy: Handle them both as "And" for LTL
+	formula, use AndNML or And for rational expressions.
+	* src/ltlvisit/tostring.cc: Adjust to distinguish "&" and "&&" in
+	rational expressions. Also use {braces} to group rational
+	expressions.
+	* src/tgbaalgos/ltl2tgba_fm.cc
+	(ratexp_trad_visitor::ratexp_trad_visitor): Remove the possibility
+	to select the empty_word should act like true, and fix the rules
+	for Closure and NegClosure to rely on constant_term instead.
+	(ratexp_trad_visitor::visit) Adjust the And translation to also
+	support AndNML.
+	(ratexp_trad_visitor::recurse_and_concat): Introduce this new
+	method to simplify some calls to recurse(f, to_concat_).
+	* tgbatest/ltl2tgba.test: Add more test cases.
+	* src/ltlvisit/basicreduce.cc, src/ltlvisit/consterm.cc,
+	src/ltlvisit/contain.cc, src/ltlvisit/mark.cc,
+	src/ltlvisit/nenoform.cc, src/ltlvisit/syntimpl.cc,
+	src/tgba/formula2bdd.cc, src/tgbaalgos/eltl2tgba_lacim.cc,
+	src/tgbaalgos/ltl2taa.cc, src/tgbaalgos/ltl2tgba_lacim.cc, : Add
+	missing cases in switches.
+
 2010-03-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Accept "{E}|->ltl" and "{E}(ltl)" as synonym for "{E}[]->ltl".
