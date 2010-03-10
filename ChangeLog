@@ -1,5 +1,13 @@
 2010-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix deterministic translation of []->.
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (ratexp_trad_visitor::visit): Fix
+	the "deterministic case" of []->, and merge it with the
+	non-deterministic case.
+
+2010-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Recognize and use "*" (or "[*]") as an abbreviation for 1*.
 
 	* src/ltlparse/ltlparse.yy: Recognize "*" as "1*".
