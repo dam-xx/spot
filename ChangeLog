@@ -1,3 +1,12 @@
+2010-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix column in LTL error messages, it was off by one.
+
+	* src/ltlparse/fmterror.cc (format_parse_errors): Count columns
+	starting at 1.  Older Bison used to start at 0 but changed to
+	match the GNU Coding Standards.
+	* src/ltltest/parseerr.test: Add a test case.
+
 2010-03-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Do not rewrite F(a & GF(b)) = F(a) & GF(b), this can be harmful.
