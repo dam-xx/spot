@@ -1,5 +1,14 @@
 2010-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Allow boolean atoms to be negated in rational expressions.
+
+	* src/ltlparse/ltlparse.yy (rationalexp): Recognize "OP_NOT
+	booleanatom".
+	* src/ltlvisit/consterm.cc, src/tgbaalgos/ltl2tgba_fm.cc: Adjust.
+	* tgbatest/ltl2tgba.test: Add one test.
+
+2010-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add support for PSL's non-length-matching And.
 
 	* src/ltlast/multop.cc, src/ltlast/multop.hh: Declare AndNML
