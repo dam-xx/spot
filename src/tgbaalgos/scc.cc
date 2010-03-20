@@ -505,9 +505,9 @@ namespace spot
 					       m.useful_acc_of(state))) << "]";
 	  }
 
-	std::cout << "  " << state << " [shape=box,"
-		  << (m.accepting(state) ? "style=bold," : "")
-		  << "label=\"" << ostr.str() << "\"]" << std::endl;
+	out << "  " << state << " [shape=box,"
+            << (m.accepting(state) ? "style=bold," : "")
+            << "label=\"" << ostr.str() << "\"]" << std::endl;
 
 	const scc_map::succ_type& succ = m.succ(state);
 

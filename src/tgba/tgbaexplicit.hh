@@ -345,6 +345,18 @@ namespace spot
     virtual state* add_default_init();
     virtual std::string format_state(const spot::state* s) const;
   };
+
+  class tgba_explicit_number:
+    public tgba_explicit_labelled<int, std::tr1::hash<int> >
+  {
+  public:
+    tgba_explicit_number(bdd_dict* dict):
+      tgba_explicit_labelled<int, std::tr1::hash<int> >(dict)
+    {};
+    virtual ~tgba_explicit_number();
+    virtual state* add_default_init();
+    virtual std::string format_state(const spot::state* s) const;
+  };
 }
 
 #endif // SPOT_TGBA_TGBAEXPLICIT_HH

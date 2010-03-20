@@ -22,6 +22,7 @@
 #ifndef SPOT_TGBAALGOS_POWERSET_HH
 # define SPOT_TGBAALGOS_POWERSET_HH
 
+# include <list>
 # include "tgba/tgbaexplicit.hh"
 
 namespace spot
@@ -32,7 +33,11 @@ namespace spot
   /// This create a deterministic automaton that recognize the
   /// same language as \a aut would if its acceptance conditions
   /// were ignored.  This is the classical powerset algorithm.
-  tgba_explicit* tgba_powerset(const tgba* aut);
+  /// If acc_list is not 0. Whenever a power state is created from one
+  /// accepting state (a state belonging to an accepting SCC), then this power
+  /// state is added to acc_list.
+  tgba_explicit* tgba_powerset(const tgba* aut,
+                               std::list<const state*>* acc_list = 0);
 }
 
 #endif // SPOT_TGBAALGOS_POWERSET_HH

@@ -24,25 +24,28 @@
 #include <set>
 #include <map>
 #include <deque>
-#include <sstream>
+#include "powerset.hh"
 #include "misc/hash.hh"
 #include "tgbaalgos/powerset.hh"
+#include "tgbaalgos/scc.hh"
 #include "bdd.h"
 
 namespace spot
 {
   tgba_explicit*
-  tgba_powerset(const tgba* aut)
+  tgba_powerset(const tgba* aut,
+                std::list<const state*>* acc_list)
   {
     typedef Sgi::hash_set<const state*, state_ptr_hash,
                           state_ptr_equal> state_set;
     typedef std::set<const state*, state_ptr_less_than> power_state;
-    typedef std::map<power_state, std::string> power_set;
+    typedef std::map<power_state, int> power_set;
     typedef std::deque<power_state> todo_list;
 
     power_set seen;
     todo_list todo;
-    tgba_explicit_string* res = new tgba_explicit_string(aut->get_dict());
+    scc_map m(aut);
+    tgba_explicit_number* res = new tgba_explicit_number(aut->get_dict());
 
     state_set states;
 
@@ -52,7 +55,8 @@ namespace spot
       states.insert(s);
       ps.insert(s);
       todo.push_back(ps);
-      seen[ps] = "1";
+      seen[ps] = 1;
+      m.build_map();
     }
 
     unsigned state_num = 1;
@@ -77,6 +81,7 @@ namespace spot
 
 	    // Construct the set of all states reachable via COND.
 	    power_state dest;
+            bool accepting = false;
 	    for (i = src.begin(); i != src.end(); ++i)
 	      {
 		tgba_succ_iterator *si = aut->succ_iter(*i);
@@ -94,30 +99,36 @@ namespace spot
 			{
 			  states.insert(s);
 			}
+                      unsigned scc_num = m.scc_of_state(s);
+                      if (m.accepting(scc_num))
+                        accepting = true;
 		      dest.insert(s);
 		    }
 		delete si;
 	      }
 	    if (dest.empty())
 	      continue;
-
 	    // Add that transition.
 	    power_set::const_iterator i = seen.find(dest);
-	    std::string dest_name;
+	    int dest_num;
+	    tgba_explicit::transition* t;
 	    if (i != seen.end())
 	      {
-		dest_name = i->second;
+		dest_num = i->second;
+                t = res->create_transition(seen[src], dest_num);
 	      }
 	    else
 	      {
-		std::ostringstream str;
-		str << ++state_num;
-		dest_name = str.str();
-		seen[dest] = dest_name;
+		dest_num = ++state_num;
+		seen[dest] = dest_num;
 		todo.push_back(dest);
+                t = res->create_transition(seen[src], dest_num);
+                if (acc_list && accepting)
+                {
+                  const state* dst = new state_explicit(t->dest);
+                  acc_list->push_front(dst);
+                }
 	      }
-	    tgba_explicit::transition* t =
-	      res->create_transition(seen[src], dest_name);
 	    res->add_conditions(t, cond);
 	  }
       }

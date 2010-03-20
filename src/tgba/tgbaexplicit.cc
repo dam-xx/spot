@@ -21,6 +21,7 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+#include <sstream>
 #include "ltlast/atomic_prop.hh"
 #include "ltlast/constant.hh"
 #include "tgbaexplicit.hh"
@@ -349,4 +350,34 @@ namespace spot
     return ltl::to_string(i->second);
   }
 
+  tgba_explicit_number::~tgba_explicit_number()
+  {
+    ns_map::iterator i = name_state_map_.begin();
+    while (i != name_state_map_.end())
+    {
+      tgba_explicit::state::iterator i2;
+      for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	delete *i2;
+      // Advance the iterator before deleting the formula.
+      delete i->second;
+      ++i;
+    }
+  }
+
+  tgba_explicit::state* tgba_explicit_number::add_default_init()
+  {
+    return add_state(0);
+  }
+
+  std::string
+  tgba_explicit_number::format_state(const spot::state* s) const
+  {
+    const state_explicit* se = dynamic_cast<const state_explicit*>(s);
+    assert(se);
+    sn_map::const_iterator i = state_name_map_.find(se->get_state());
+    assert(i != state_name_map_.end());
+    std::stringstream ss;
+    ss << i->second;
+    return ss.str();
+  }
 }
