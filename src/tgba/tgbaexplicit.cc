@@ -358,7 +358,7 @@ namespace spot
       tgba_explicit::state::iterator i2;
       for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
 	delete *i2;
-      // Advance the iterator before deleting the formula.
+      // Advance the iterator before deleting the state.
       delete i->second;
       ++i;
     }

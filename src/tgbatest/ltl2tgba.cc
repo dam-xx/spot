@@ -47,6 +47,7 @@
 #include "tgbaparse/public.hh"
 #include "neverparse/public.hh"
 #include "tgbaalgos/dupexp.hh"
+#include "tgbaalgos/minimize.hh"
 #include "tgbaalgos/neverclaim.hh"
 #include "tgbaalgos/reductgba_sim.hh"
 #include "tgbaalgos/replayrun.hh"
@@ -207,6 +208,7 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -Rd   display the simulation relation" << std::endl
 	    << "  -RD   display the parity game (dot format)" << std::endl
+            << "  -Rm   attempt to minimize the automata" << std::endl
 	    << std::endl
 
 	    << "Options for performing emptiness checks:" << std::endl
@@ -309,6 +311,7 @@ main(int argc, char** argv)
   bool graph_run_opt = false;
   bool graph_run_tgba_opt = false;
   bool opt_reduce = false;
+  bool opt_minimize = false;
   bool containment = false;
   bool show_fc = false;
   bool spin_comments = false;
@@ -617,6 +620,10 @@ main(int argc, char** argv)
 	{
 	  display_parity_game = true;
 	}
+      else if (!strcmp(argv[formula_index], "-Rm"))
+        {
+          opt_minimize = true;
+        }
       else if (!strcmp(argv[formula_index], "-s"))
 	{
 	  dupexp = DFS;
@@ -890,6 +897,10 @@ main(int argc, char** argv)
       {
         a = state_labeled = new spot::tgba_sgba_proxy(a);
       }
+
+      spot::tgba_explicit* minimized = 0;
+      if (opt_minimize)
+        a = minimized = minimize(a);
 
       spot::tgba_reduc* aut_red = 0;
       if (reduc_aut != spot::Reduce_None)

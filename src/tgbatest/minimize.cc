@@ -19,20 +19,14 @@
 // 02111-1307, USA.
 
 #include <queue>
-#include <fstream>
-#include <limits>
+#include <cstring>
 #include "ltlast/unop.hh"
 #include "tgbaalgos/dotty.hh"
-#include "tgbaalgos/prettydotdec.hh"
-#include "tgbaalgos/rundotdec.hh"
 #include "tgbaalgos/minimize.hh"
 #include "tgbaalgos/powerset.hh"
-#include "tgbaalgos/scc.hh"
 #include "ltlparse/public.hh"
-#include "ltlvisit/tostring.hh"
 #include "tgba/tgbaexplicit.hh"
 #include "ltlparse/ltlfile.hh"
-#include "tgbaparse/public.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"
 
 namespace spot
@@ -115,12 +109,14 @@ int main(int argc, char* argv[])
     spot::ltl::parse_error_list pel;
     spot::ltl::formula* f = spot::ltl::parse(argv[2], pel);
     spot::tgba_explicit* a = ltl_to_tgba_fm(f, dict, true);
-    spot::tgba_explicit* det = spot::tgba_powerset(a);
+//    spot::tgba_explicit* det = spot::tgba_powerset(a);
     spot::tgba_explicit* res = minimize(a);
     compare_automata(a, res);
-    spot::dotty_reachable(out_dot, det);
+    spot::dotty_reachable(out_dot, res);
+//    delete det;
     delete a;
     delete res;
+    f->destroy();
   }
   else
   {
@@ -129,13 +125,17 @@ int main(int argc, char* argv[])
     spot::ltl::formula* f;
     while ((f = formulae.next()))
     {
-      spot::ltl::formula* f_neg = spot::ltl::unop::instance(spot::ltl::unop::Not,
-                                                            f->clone());
+      spot::ltl::formula* f_neg =
+        spot::ltl::unop::instance(spot::ltl::unop::Not,
+                                  f->clone());
       spot::tgba_explicit* a = ltl_to_tgba_fm(f_neg, dict, true);
       spot::tgba_explicit* res = minimize(a);
       compare_automata(a, res);
       delete a;
       delete res;
+      f->destroy();
+      f_neg->destroy();
     }
   }
+  delete dict;
 }

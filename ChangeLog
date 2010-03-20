@@ -1,5 +1,15 @@
 2010-03-20  Felix Abecassis  <abecassis@lrde.epita.fr>
 
+	Small fixes.
+
+	* src/tgbatest/minimize.cc: Delete useless includes.
+	* src/tgbaalgos/minimize.cc: Delete useless includes,
+	fixed acceptance conditions.
+	* src/tgbatest/ltl2tgba.cc: Add -Rm option for minimization.
+	* src/tgba/tgbaexplicit.cc: Fixed typo.
+
+2010-03-20  Felix Abecassis  <abecassis@lrde.epita.fr>
+
 	Test program for the minimization algorithm.
 
 	* src/tgbatest/minimize.cc: New file.  Minimize an automaton

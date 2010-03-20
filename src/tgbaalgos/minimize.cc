@@ -18,10 +18,6 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#include <set>
-#include <algorithm>
-#include <vector>
-#include <map>
 #include <queue>
 #include "minimize.hh"
 #include "ltlast/allnodes.hh"
@@ -44,14 +40,14 @@ namespace spot
                  hash_map& state_set_map)
   {
     hash_set seen;
-    std::queue<state*> tovisit;
+    std::queue<const state*> tovisit;
     // Perform breadth-first traversal.
-    state* init = a->get_init_state();
+    const state* init = a->get_init_state();
     tovisit.push(init);
     seen.insert(init);
     while (!tovisit.empty())
     {
-      state* src = tovisit.front();
+      const state* src = tovisit.front();
       tovisit.pop();
       // Is the state final ?
       if (final.find(src) == final.end())
@@ -65,7 +61,7 @@ namespace spot
       tgba_succ_iterator* sit = a->succ_iter(src);
       for (sit->first(); !sit->done(); sit->next())
       {
-        state* dst = sit->current_state();
+        const state* dst = sit->current_state();
         // Is it a new state ?
         if (seen.find(dst) == seen.end())
         {
@@ -76,6 +72,7 @@ namespace spot
         else
           delete dst;
       }
+      delete sit;
     }
   }
 
@@ -113,21 +110,24 @@ namespace spot
         const state* src = *hit;
         unsigned src_num = state_num[src];
         tgba_succ_iterator* succit = a->succ_iter(src);
-        bool accepting = final->find(src) == final->end();
+        bool accepting = (final->find(src) != final->end());
         for (succit->first(); !succit->done(); succit->next())
         {
-          state* dst = succit->current_state();
+          const state* dst = succit->current_state();
           unsigned dst_num = state_num[dst];
+          delete dst;
           trs* t = res->create_transition(src_num, dst_num);
           res->add_conditions(t, succit->current_condition());
           if (accepting)
             res->add_acceptance_condition(t, ltl::constant::true_instance());
         }
+        delete succit;
       }
     }
     res->merge_transitions();
     const state* init_state = a->get_init_state();
     unsigned init_num = state_num[init_state];
+    delete init_state;
     res->set_init_state(init_num);
     return res;
   }
@@ -137,23 +137,25 @@ namespace spot
     // The list of accepting states of a.
     std::list<const state*> acc_list;
     std::queue<hash_set*> todo;
+    // The list of equivalent states.
     std::list<hash_set*> done;
     tgba_explicit* det_a = tgba_powerset(a, &acc_list);
-    hash_set final;
-    hash_set non_final;
+    hash_set* final = new hash_set;
+    hash_set* non_final = new hash_set;
     hash_map state_set_map;
     std::list<const state*>::iterator li;
     for (li = acc_list.begin(); li != acc_list.end(); ++li)
-      final.insert(*li);
-    init_sets(det_a, final, non_final, state_set_map);
-    if (final.size() > 1)
-      todo.push(&final);
-    else if (final.size() != 0)
-      done.push_back(&final);
-    if (non_final.size() > 1)
-      todo.push(&non_final);
-    else if (non_final.size() != 0)
-      done.push_back(&non_final);
+      final->insert(*li);
+    init_sets(det_a, *final, *non_final, state_set_map);
+    hash_set* final_copy = new hash_set(*final);
+    if (final->size() > 1)
+      todo.push(final);
+    else if (!final->empty())
+      done.push_back(final);
+    if (non_final->size() > 1)
+      todo.push(non_final);
+    else if (!non_final->empty())
+      done.push_back(non_final);
     unsigned set_num = 1;
     // A bdd_states_map is a list of formulae (in a BDD form) associated with a
     // destination set of states.
@@ -175,8 +177,10 @@ namespace spot
         {
           const state* dst = si->current_state();
           unsigned dst_set = state_set_map[dst];
+          delete dst;
           f |= (bdd_ithvar(dst_set) & si->current_condition());
         }
+        delete si;
         bdd_states_map::iterator bsi;
         // Have we already seen this formula ?
         for (bsi = bdd_map.begin(); bsi != bdd_map.end() && bsi->first != f;
@@ -217,8 +221,22 @@ namespace spot
             todo.push(set);
         }
       }
+      delete cur;
     }
-    tgba_explicit_number* res = build_result(det_a, done, &final);
+
+    // Build the result.
+    tgba_explicit_number* res = build_result(det_a, done, final_copy);
+
+    // Free all the allocated memory.
+    delete final_copy;
+    hash_map::iterator hit;
+    for (hit = state_set_map.begin(); hit != state_set_map.end(); ++hit)
+      delete hit->first;
+    std::list<hash_set*>::iterator it;
+    for (it = done.begin(); it != done.end(); ++it)
+      delete *it;
+    delete det_a;
+
     return res;
   }
 }
