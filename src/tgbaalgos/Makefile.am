@@ -42,6 +42,7 @@ tgbaalgos_HEADERS = \
   ltl2tgba_fm.hh \
   ltl2tgba_lacim.hh \
   magic.hh \
+  minimize.hh \
   neverclaim.hh \
   powerset.hh \
   projrun.hh \
@@ -75,6 +76,7 @@ libtgbaalgos_la_SOURCES = \
   ltl2tgba_fm.cc \
   ltl2tgba_lacim.cc \
   magic.cc \
+  minimize.cc \
   ndfs_result.hxx \
   neverclaim.cc \
   powerset.cc \

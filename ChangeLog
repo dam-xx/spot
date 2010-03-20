@@ -1,17 +1,27 @@
 2010-03-20  Felix Abecassis  <abecassis@lrde.epita.fr>
 
+	Algorithm to minimize an automaton.
+
+	* src/tgbaalgos/minimize.cc, src/tgbaalgos/minimize.hh:
+	New files.  Minimize an automaton using first the powerset
+	construction to determinize the input automaton, the automaton is then
+	minimized using the standard algorithm, using BDDs to check if states
+	are equivalent.
+
+2010-03-20  Felix Abecassis  <abecassis@lrde.epita.fr>
+
 	Modify the powerset algorithm to keep track of accepting states
 	from the initial automaton.
 
 	* src/tgba/tgbaexplicit.cc, src/tgba/tgbaexplicit.hh:
-	Added tgba_explicit_number, a tgba_explicit where states are labelled
-	by integers.
+	Added class tgba_explicit_number, a tgba_explicit where states are
+	labelled by integers.
 	* src/tgbaalgos/powerset.hh, src/tgbaalgos/powerset.cc:
 	When building the deterministic automaton, keep track of which states
 	were created from an accepting state in the initial automaton.
 	The states are added to the new optional parameter (if not 0),
 	acc_list.
-	Now use tgba_explicit_number instead of tgba_explicit_string to build
+	Use tgba_explicit_number instead of tgba_explicit_string to build
 	the result.
 	* src/tgbaalgos/scc.cc (spot): Small fix.
 	Print everything on std::cout.
