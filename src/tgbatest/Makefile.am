@@ -38,6 +38,7 @@ check_PROGRAMS = \
   expldot \
   explprod \
   ltlprod \
+  minimize \
   mixprod \
   powerset \
   reductgba \
@@ -56,6 +57,7 @@ expldot_CXXFLAGS = -DDOTTY
 explprod_SOURCES = explprod.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
 ltlprod_SOURCES  = ltlprod.cc
+minimize_SOURCES = minimize.cc
 mixprod_SOURCES  = mixprod.cc
 powerset_SOURCES = powerset.cc
 randtgba_SOURCES = randtgba.cc

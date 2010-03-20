@@ -1,9 +1,15 @@
 2010-03-20  Felix Abecassis  <abecassis@lrde.epita.fr>
 
-	Algorithm to minimize an automaton.
+	Test program for the minimization algorithm.
+
+	* src/tgbatest/minimize.cc: New file.  Minimize an automaton
+	from a LTL formula and compare the size of the initial automaton
+	to the size of the minimized automaton.
+
+2010-03-20  Felix Abecassis  <abecassis@lrde.epita.fr>
 
 	* src/tgbaalgos/minimize.cc, src/tgbaalgos/minimize.hh:
-	New files.  Minimize an automaton using first the powerset
+	New files.  Algorithm to minimize an automaton using first the powerset
 	construction to determinize the input automaton, the automaton is then
 	minimized using the standard algorithm, using BDDs to check if states
 	are equivalent.
