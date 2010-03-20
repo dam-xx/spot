@@ -92,6 +92,7 @@ TESTS = \
   reduccmp.test \
   reductgba.test \
   scc.test \
+  safety.test \
   randtgba.test \
   emptchk.test \
   emptchke.test \

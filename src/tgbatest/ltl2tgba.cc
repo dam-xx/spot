@@ -53,6 +53,7 @@
 #include "tgbaalgos/replayrun.hh"
 #include "tgbaalgos/rundotdec.hh"
 #include "tgbaalgos/sccfilter.hh"
+#include "tgbaalgos/safety.hh"
 #include "tgbaalgos/eltl2tgba_lacim.hh"
 #include "eltlparse/public.hh"
 #include "misc/timer.hh"
@@ -256,6 +257,8 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -NN   output the never clain for Spin, with commented states"
 	    << " (implies -D)" << std::endl
+	    << "  -O    tell whether the automaton is a safety automaton"
+	    << std::endl
 	    << "  -t    output automaton in LBTT's format" << std::endl
 	    << std::endl
 
@@ -521,6 +524,10 @@ main(int argc, char** argv)
 	  degeneralize_opt = DegenSBA;
 	  output = 8;
 	  spin_comments = true;
+	}
+      else if (!strcmp(argv[formula_index], "-O"))
+	{
+	  output = 13;
 	}
       else if (!strcmp(argv[formula_index], "-p"))
 	{
@@ -1086,6 +1093,12 @@ main(int argc, char** argv)
 	      break;
 	    case 12:
 	      stats_reachable(a).dump(std::cout);
+	      break;
+	    case 13:
+	      std::cout << (is_safety_automaton(a) ?
+			    "is a safety automaton" :
+			    "may not be a safety automaton")
+			<< std::endl;
 	      break;
 	    default:
 	      assert(!"unknown output option");

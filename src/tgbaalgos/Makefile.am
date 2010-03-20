@@ -1,7 +1,8 @@
-## Copyright (C) 2003, 2004, 2005, 2008, 2009 Laboratoire
-## d'Informatique de Paris 6 (LIP6),
-## département Systèmes Répartis Coopératifs (SRC), Université Pierre
-## et Marie Curie.
+## Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
+## Développement de l'Epita (LRDE).
+## Copyright (C) 2003, 2004, 2005 Laboratoire d'Informatique de Paris
+## 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+## Université Pierre et Marie Curie.
 ##
 ## This file is part of Spot, a model checking library.
 ##
@@ -51,6 +52,7 @@ tgbaalgos_HEADERS = \
   reducerun.hh \
   replayrun.hh \
   rundotdec.hh \
+  safety.hh \
   save.hh \
   scc.hh \
   sccfilter.hh \
@@ -86,6 +88,7 @@ libtgbaalgos_la_SOURCES = \
   reducerun.cc \
   replayrun.cc \
   rundotdec.cc \
+  safety.cc \
   save.cc \
   scc.cc \
   sccfilter.cc \

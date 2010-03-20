@@ -1,5 +1,5 @@
-// Copyright (C) 2008, 2009  Laboratoire de Recherche et Developpement de
-// l'Epita.
+// Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
+// Developpement de l'Epita.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -89,6 +89,8 @@ namespace spot
     const tgba* get_aut() const;
 
     /// \brief Get the number of SCC in the automaton.
+    ///
+    /// SCCs are labelled from 0 to scc_count()-1.
     ///
     /// \pre This should only be called once build_map() has run.
     unsigned scc_count() const;

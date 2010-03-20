@@ -1,3 +1,15 @@
+2010-03-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Implement is_safety_automaton().
+
+	* src/tgbaalgos/safety.hh, src/tgbaalgos/safety.cc: New
+	files.
+	* src/tgbaalgos/Makefile.am: Add them.
+	* src/tgbatests/ltl2tgba.cc: Add option "-O".
+	* src/tgbaalgos/scc.hh: Update documentation.
+	* src/tgbatest/Makefile.am (TESTS): Add safety.test.
+	* src/tgbatest/safety.test: New file.
+
 2010-03-26  Felix Abecassis  <abecassis@lrde.epita.fr>
 
 	* src/tgbaalgos/minimize.cc: Now use register_anonymous_variables.
