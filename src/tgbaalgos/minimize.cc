@@ -143,10 +143,14 @@ namespace spot
     hash_set* final = new hash_set;
     hash_set* non_final = new hash_set;
     hash_map state_set_map;
+    bdd_dict* dict = det_a->get_dict();
     std::list<const state*>::iterator li;
     for (li = acc_list.begin(); li != acc_list.end(); ++li)
       final->insert(*li);
     init_sets(det_a, *final, *non_final, state_set_map);
+    // Size of det_a
+    unsigned size = final->size() + non_final->size();
+    unsigned bdd_offset = dict->register_anonymous_variables(size, det_a);
     hash_set* final_copy = new hash_set(*final);
     if (final->size() > 1)
       todo.push(final);
@@ -178,7 +182,7 @@ namespace spot
           const state* dst = si->current_state();
           unsigned dst_set = state_set_map[dst];
           delete dst;
-          f |= (bdd_ithvar(dst_set) & si->current_condition());
+          f |= (bdd_ithvar(bdd_offset + dst_set) & si->current_condition());
         }
         delete si;
         bdd_states_map::iterator bsi;
@@ -227,6 +231,7 @@ namespace spot
     // Build the result.
     tgba_explicit_number* res = build_result(det_a, done, final_copy);
 
+    dict->unregister_variable(bdd_offset, det_a);
     // Free all the allocated memory.
     delete final_copy;
     hash_map::iterator hit;

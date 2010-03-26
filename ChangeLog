@@ -1,3 +1,7 @@
+2010-03-26  Felix Abecassis  <abecassis@lrde.epita.fr>
+
+	* src/tgbaalgos/minimize.cc: Now use register_anonymous_variables.
+
 2010-03-20  Felix Abecassis  <abecassis@lrde.epita.fr>
 
 	Small fixes.
