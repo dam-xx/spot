@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2003, 2004
+ *  Copyright (C) 2003, 2004, 2010
  *  Heikki Tauriainen <Heikki.Tauriainen@tkk.fi>
  *
  *  Derived from SpinWrapper.cc by Alexandre Duret-Lutz <adl@src.lip6.fr>.
@@ -88,8 +88,8 @@ void SpotWrapper::translateFormula
 		BinaryOperatorInfixWriter<SPOT_XOR>,
 		BinaryOperatorInfixWriter<LtlUntil::infix_symbol>,
 		BinaryOperatorInfixWriter<LtlV::infix_symbol>,
-		WriterErrorReporter,
-		WriterErrorReporter,
+		BinaryOperatorInfixWriter<LtlWeakUntil::infix_symbol>,
+		BinaryOperatorInfixWriter<LtlStrongRelease::infix_symbol>,
 		WriterErrorReporter>
     fw(estream);
 
