@@ -1,6 +1,6 @@
-/* Copyright (C) 2009 Laboratoire de Recherche et Développement
+/* Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 ** de l'Epita (LRDE).
-/* Copyright (C) 2004, 2005, 2006 Laboratoire d'Informatique de
+** Copyright (C) 2004, 2005, 2006 Laboratoire d'Informatique de
 ** Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 ** Université Pierre et Marie Curie.
 **
@@ -50,11 +50,6 @@
    We mut ensure that YYSTYPE is declared (by the above %union)
    before parsedecl.hh uses it. */
 #include "parsedecl.hh"
-
-/* Ugly hack so that Bison use tgbayylex, not yylex.
-   (%name-prefix doesn't work for the lalr1.cc skeleton
-   at the time of writing.)  */
-#define yylex evtgbayylex
 }
 
 %token <str> STRING UNTERMINATED_STRING
@@ -64,11 +59,9 @@
 %token ACC_DEF
 %token INIT_DEF
 
-%destructor { delete $$; } STRING UNTERMINATED_STRING IDENT
-                           strident string acc_list
+%destructor { delete $$; } <str>
 
-%printer { debug_stream() << *$$; } STRING UNTERMINATED_STRING IDENT
-                                    strident string
+%printer { debug_stream() << *$$; } <str>
 
 %%
 evtgba: lines

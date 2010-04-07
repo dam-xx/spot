@@ -1,6 +1,6 @@
-/* Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+/* Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 ** de l'Epita (LRDE).
-/* Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+** Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
 ** Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 ** Université Pierre et Marie Curie.
 **
@@ -68,11 +68,6 @@ typedef std::map<std::string, bdd> formula_cache;
 #include "parsedecl.hh"
 using namespace spot::ltl;
 
-/* Ugly hack so that Bison use tgbayylex, not yylex.
-   (%name-prefix doesn't work for the lalr1.cc skeleton
-   at the time of writing.)  */
-#define yylex tgbayylex
-
 typedef std::pair<bool, spot::ltl::formula*> pair;
 }
 
@@ -83,17 +78,15 @@ typedef std::pair<bool, spot::ltl::formula*> pair;
 %type <list> acc_list
 %token ACC_DEF
 
-%destructor { delete $$; } STRING UNTERMINATED_STRING IDENT
-                           strident string condition
+%destructor { delete $$; } <str>
 %destructor {
   for (std::list<spot::ltl::formula*>::iterator i = $$->begin();
        i != $$->end(); ++i)
     (*i)->destroy();
   delete $$;
-  } acc_list
+  } <list>
 
-%printer { debug_stream() << *$$; } STRING UNTERMINATED_STRING IDENT
-                                    strident string condition
+%printer { debug_stream() << *$$; } <str>
 
 %%
 tgba: acceptance_decl lines

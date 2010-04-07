@@ -1,5 +1,5 @@
-/* Copyright (C) 2008, 2009 Laboratoire de Recherche et DÃ©veloppement
-** de l'Epita (LRDE).
+/* Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
+** Développement de l'Epita (LRDE).
 **
 ** This file is part of Spot, a model checking library.
 **
@@ -230,10 +230,10 @@ using namespace spot::ltl;
 %type <pval> nfa_arg
 %type <bval> nfa_arg_list
 
-%destructor { delete $$; } "atomic proposition"
-%destructor { $$->destroy(); } subformula
+%destructor { delete $$; } <sval>
+%destructor { $$->destroy(); } <fval>
 
-%printer { debug_stream() << *$$; } "atomic proposition"
+%printer { debug_stream() << *$$; } <sval>
 
 %%
 

@@ -1,3 +1,13 @@
+2010-04-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Modernize Bison parsers.
+
+	* src/ltlparse/ltlparse.yy, src/tgbaparse/tgbaparse.yy,
+	src/evtgbaparse/evtgbaparse.yy, src/eltlparse/eltlparse.yy: Use
+	token types for %destructor and %printer.  Remove the yylex hack,
+	since %name-prefix is now honored by Bison.  Also remove the
+	useless <token> type.  Suggested by Akim Demaille.
+
 2010-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix column in LTL error messages, it was off by one.

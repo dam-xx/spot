@@ -1,6 +1,8 @@
 /* Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 ** de l'Epita (LRDE).
-/* Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
+/* Copyright (C) 2010 Laboratoire de Recherche et Développement de
+** l'Epita (LRDE).
+** Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
 ** Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 ** Université Pierre et Marie Curie.
 **
@@ -40,7 +42,6 @@
 %parse-param {spot::ltl::formula* &result}
 %union
 {
-  int token;
   std::string* str;
   spot::ltl::formula* ltl;
 }
@@ -51,11 +52,6 @@
    before parsedecl.hh uses it. */
 #include "parsedecl.hh"
 using namespace spot::ltl;
-
-/* Ugly hack so that Bison uses ltlyylex, not yylex.
-   (%name-prefix doesn't work for the lalr1.cc skeleton
-   at the time of writing.)  */
-#define yylex ltlyylex
 
 #define missing_right_op(res, op, str)			\
   do							\
@@ -79,13 +75,13 @@ using namespace spot::ltl;
 
 /* All tokens.  */
 
-%token <token> PAR_OPEN "opening parenthesis" PAR_CLOSE "closing parenthesis"
-%token <token> OP_OR "or operator" OP_XOR "xor operator" OP_AND "and operator"
-%token <token> OP_IMPLIES "implication operator" OP_EQUIV "equivalent operator"
-%token <token> OP_U "until operator" OP_R "release operator"
-%token <token> OP_F "sometimes operator" OP_G "always operator"
-%token <token> OP_X "next operator"
-%token <str> ATOMIC_PROP "atomic proposition" OP_NOT "not operator"
+%token PAR_OPEN "opening parenthesis" PAR_CLOSE "closing parenthesis"
+%token OP_OR "or operator" OP_XOR "xor operator" OP_AND "and operator"
+%token OP_IMPLIES "implication operator" OP_EQUIV "equivalent operator"
+%token OP_U "until operator" OP_R "release operator"
+%token OP_F "sometimes operator" OP_G "always operator"
+%token OP_X "next operator" OP_NOT "not operator"
+%token <str> ATOMIC_PROP "atomic proposition"
 %token CONST_TRUE "constant true" CONST_FALSE "constant false"
 %token END_OF_INPUT "end of formula"
 %token OP_POST_NEG "negative suffix" OP_POST_POS "positive suffix"
@@ -110,14 +106,10 @@ using namespace spot::ltl;
 
 %type <ltl> subformula
 
-/* At the time of writing (2004-01-05) there is a bug in CVS Bison: if
-   you give a token (such a ATOMIC_PROP) a name (such as "atomic
-   proposition"), then the %destructor should refer to that name.
-   References to ATOMIC_PROP are silently ignored.  */
-%destructor { delete $$; } "atomic proposition"
-%destructor { $$->destroy(); } subformula
+%destructor { delete $$; } <str>
+%destructor { $$->destroy(); } <ltl>
 
-%printer { debug_stream() << *$$; } "atomic proposition"
+%printer { debug_stream() << *$$; } <str>
 
 %%
 result:       subformula END_OF_INPUT
