@@ -393,11 +393,26 @@ namespace spot
 	      res_ = f2 | (bdd_ithvar(a) & f1 & bdd_ithvar(x));
 	      return;
 	    }
+	  case binop::W:
+	    {
+	      // r(f1 W f2) = r(f2) + r(f1)r(X(f1 U f2))
+	      int x = dict_.register_next_variable(node);
+	      res_ = f2 | (f1 & bdd_ithvar(x));
+	      return;
+	    }
 	  case binop::R:
 	    {
 	      // r(f1 R f2) = r(f1)r(f2) + r(f2)r(X(f1 U f2))
 	      int x = dict_.register_next_variable(node);
 	      res_ = (f1 & f2) | (f2 & bdd_ithvar(x));
+	      return;
+	    }
+	  case binop::M:
+	    {
+	      // r(f1 M f2) = r(f1)r(f2) + a(f1)r(f2)r(X(f1 M f2))
+	      int a = dict_.register_a_variable(node->first());
+	      int x = dict_.register_next_variable(node);
+	      res_ = (f1 & f2) | (bdd_ithvar(a) & f2 & bdd_ithvar(x));
 	      return;
 	    }
 	  }
@@ -449,8 +464,8 @@ namespace spot
     };
 
 
-    // Check whether a formula has a R or G operator at its top-level
-    // (preceding logical operators do not count).
+    // Check whether a formula has a R, W, or G operator at its
+    // top-level (preceding logical operators do not count).
     class ltl_possible_fair_loop_visitor: public const_visitor
     {
     public:
@@ -501,8 +516,10 @@ namespace spot
 	      node->second()->accept(*this);
 	    return;
 	  case binop::U:
+	  case binop::M:
 	    return;
 	  case binop::R:
+	  case binop::W:
 	    res_ = true;
 	    return;
 	  }

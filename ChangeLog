@@ -1,3 +1,28 @@
+2010-04-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add support for W (weak until) and M (strong release) operators.
+
+	* src/ltlast/binop.cc, src/ltlast/binop.cc: Add support for
+	these new operators.
+	* src/ltlparse/ltlparse.yy, src/ltlparse/ltlscan.ll: Parse them.
+	* src/ltltest/reduccmp.test: Add new tests for W and M.
+	* src/ltlvisit/basicreduce.cc, src/ltlvisit/contain.cc,
+	src/ltlvisit/lunabbrev.cc, src/ltlvisit/nenoform.cc,
+	src/ltlvisit/randomltl.cc, src/ltlvisit/randomltl.hh,
+	src/ltlvisit/reduce.cc, src/ltlvisite/simpfg.cc,
+	src/ltlvisit/simpfg.hh, src/ltlvisit/syntimpl.cc,
+	src/ltlvisit/tostring.cc, src/tgba/formula2bdd.cc,
+	src/tgbaalgos/eltl2tgba_lacim.cc, src/tgbaalgos/ltl2taa.cc,
+	src/tgbaalgos/ltl2tgba_fm.cc, src/tgbaalgos/ltl2tgba_lacim.cc:
+	Add support for W and M.
+	* src/tgbatest/ltl2neverclaim.test: Test never claim output
+	using LBTT, this is more thorough.  Also we cannot use -N
+	any more in the spotlbtt.test.
+	* src/tgbatests/ltl2tgba.cc: Define M and W for ELTL.
+	* src/tgbatest/ltl2neverclaim.test: Test W and M, and use
+	-DS instead of -N, because lbtt-translate does not want
+	to translate these operators for tools that masquerade as Spin.
+
 2010-04-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Adjust ltl2tgba.py to call scc_filter() with the "full" option as

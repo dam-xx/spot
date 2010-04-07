@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -47,7 +47,14 @@ namespace spot
       ///
       /// And and Or are not here.  Because they
       /// are often nested we represent them as multops.
-      enum type { Xor, Implies, Equiv, U, R };
+      enum type { Xor,
+		  Implies,
+		  Equiv,
+		  U, //< until
+		  R, //< release (dual of until)
+		  W, //< weak until
+		  M  //< strong release (dual of weak until)
+      };
 
       /// Build an unary operator with operation \a op and
       /// children \a first and \a second.

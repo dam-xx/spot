@@ -40,15 +40,25 @@ for x in ../reduccmp ../reductaustr; do
   # Syntactic reduction
   run 0 $x 'a & (!b R !a)' 'false'
   run 0 $x '(!b R !a) & a' 'false'
-
   run 0 $x 'a & (!b R !a) & c' 'false'
   run 0 $x 'c & (!b R !a) & a' 'false'
+
+  run 0 $x 'a & (!b M !a)' 'false'
+  run 0 $x '(!b M !a) & a' 'false'
+  run 0 $x 'a & (!b M !a) & c' 'false'
+  run 0 $x 'c & (!b M !a) & a' 'false'
 
   run 0 $x 'a & (b U a)' 'a'
   run 0 $x '(b U a) & a' 'a'
   run 0 $x 'a | (b U a)' '(b U a)'
   run 0 $x '(b U a) | a' '(b U a)'
   run 0 $x 'a U (b U a)' '(b U a)'
+
+  run 0 $x 'a & (b W a)' 'a'
+  run 0 $x '(b W a) & a' 'a'
+  run 0 $x 'a | (b W a)' '(b W a)'
+  run 0 $x '(b W a) | a' '(b W a)'
+  run 0 $x 'a W (b W a)' '(b W a)'
 
   run 0 $x 'a & (b U a) & a' 'a'
   run 0 $x 'a & (b U a) & a' 'a'
@@ -101,6 +111,9 @@ for x in ../reduccmp ../reductaustr; do
      # reason as above.
      run 0 $x 'F(a & GFb & c)' 'F(a & GFb & c)'
      run 0 $x 'G(a | GFb | c)' 'G(a | c) | GFb'
+
+     run 0 $x 'Gb W a' 'Gb|a'
+     run 0 $x 'Fb M Fa' 'Fa & Fb'
      ;;
   esac
 
@@ -113,5 +126,4 @@ for x in ../reduccmp ../reductaustr; do
   run 0 $x 'GFGa' 'FGa'
   run 0 $x 'b R Ga' 'Ga'
   run 0 $x 'b R FGa' 'FGa'
-
 done

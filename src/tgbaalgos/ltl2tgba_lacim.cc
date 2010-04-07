@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -160,7 +160,8 @@ namespace spot
 	bdd f1 = recurse(node->first());
 	bdd f2 = recurse(node->second());
 
-	switch (node->op())
+	binop::type op = node->op();
+	switch (op)
 	  {
 	  case binop::Xor:
 	    res_ = bdd_apply(f1, f2, bddop_xor);
@@ -172,39 +173,47 @@ namespace spot
 	    res_ = bdd_apply(f1, f2, bddop_biimp);
 	    return;
 	  case binop::U:
+	  case binop::W:
 	    {
-	      /*
-		 f1 U f2 <=> f2 | (f1 & X(f1 U f2))
-		 In other words:
-		     now <=> f2 | (f1 & next)
-	      */
+	      // f1 U f2 <=> f2 | (f1 & X(f1 U f2))
+	      //   In other words:
+	      // now <=> f2 | (f1 & next)
 	      int v = fact_.create_state(node);
 	      bdd now = bdd_ithvar(v);
 	      bdd next = bdd_ithvar(v + 1);
 	      fact_.constrain_relation(bdd_apply(now, f2 | (f1 & next),
 						 bddop_biimp));
-	      /*
-		The rightmost conjunction, f1 & next, doesn't actually
-		encode the fact that f2 should be fulfilled eventually.
-		We declare an acceptance condition for this purpose (see
-		the comment in the unop::F case).
-	      */
-	      fact_.declare_acceptance_condition(f2 | !now, node->second());
+	      if (op == binop::U)
+		{
+		  // The rightmost conjunction, f1 & next, doesn't
+		  // actually encode the fact that f2 should be
+		  // fulfilled eventually.  We declare an acceptance
+		  // condition for this purpose (see the comment in
+		  // the unop::F case).
+		  fact_.declare_acceptance_condition(f2 | !now, node->second());
+		}
 	      res_ = now;
 	      return;
 	    }
 	  case binop::R:
+	  case binop::M:
 	    {
-	      /*
-		 f1 R f2 <=> f2 & (f1 | X(f1 R f2))
-		 In other words:
-		     now <=> f2 & (f1 | next)
-	      */
+	      // f1 R f2 <=> f2 & (f1 | X(f1 R f2))
+	      //   In other words:
+	      // now <=> f2 & (f1 | next)
 	      int v = fact_.create_state(node);
 	      bdd now = bdd_ithvar(v);
 	      bdd next = bdd_ithvar(v + 1);
 	      fact_.constrain_relation(bdd_apply(now, f2 & (f1 | next),
 						 bddop_biimp));
+	      if (op == binop::M)
+		{
+		  // f2 & next, doesn't actually encode the fact that
+		  // f1 should be fulfilled eventually.  We declare an
+		  // acceptance condition for this purpose (see the
+		  // comment in the unop::F case).
+		  fact_.declare_acceptance_condition(f1 | !now, node->second());
+		}
 	      res_ = now;
 	      return;
 	    }

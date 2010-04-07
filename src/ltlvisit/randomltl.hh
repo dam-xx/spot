@@ -1,3 +1,5 @@
+// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// l'Epita (LRDE).
 // Copyright (C) 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -82,6 +84,8 @@ namespace spot
       /// xor     1
       /// R       1
       /// U       1
+      /// W       1
+      /// M       1
       /// and     1
       /// or      1
       /// \endverbatim

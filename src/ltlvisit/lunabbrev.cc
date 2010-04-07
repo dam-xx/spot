@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -44,7 +44,8 @@ namespace spot
       formula* f1 = recurse(bo->first());
       formula* f2 = recurse(bo->second());
 
-      switch (bo->op())
+      binop::type op = bo->op();
+      switch (op)
 	{
 	  /* f1 ^ f2  ==  (f1 & !f2) | (f2 & !f1) */
 	case binop::Xor:
@@ -74,9 +75,13 @@ namespace spot
 	  return;
           /* f1 U f2 == f1 U f2 */
 	  /* f1 R f2 == f1 R f2 */
+          /* f1 W f2 == f1 W f2 */
+	  /* f1 M f2 == f1 M f2 */
    	case binop::U:
 	case binop::R:
-	  result_ = binop::instance(bo->op(), f1, f2);
+	case binop::W:
+	case binop::M:
+	  result_ = binop::instance(op, f1, f2);
 	  return;
 	}
       /* Unreachable code. */

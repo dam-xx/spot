@@ -90,6 +90,8 @@ flex_set_buffer(const char* buf)
 "U"				BEGIN(0); return token::OP_U;
 "R"|"V"				BEGIN(0); return token::OP_R;
 "X"|"()"			BEGIN(0); return token::OP_X;
+"W"				BEGIN(0); return token::OP_W;
+"M"				BEGIN(0); return token::OP_M;
 
 "=0"				return token::OP_POST_NEG;
 "=1"				return token::OP_POST_POS;

@@ -1,3 +1,5 @@
+// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// l'Epita (LRDE).
 // Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -30,6 +32,14 @@ namespace spot
   {
     /// \brief Replace <code>true U f</code> and <code>false R g</code> by
     /// <code>F f</code> and <code>G g</code>.
+    ///
+    /// Perform the following rewriting (from left to right):
+    ///
+    /// - true U a = F a
+    /// - a M true = F a
+    /// - false R a = G a
+    /// - a W false = G a
+    ///
     /// \ingroup ltl_visitor
     class simplify_f_g_visitor : public clone_visitor
     {
@@ -46,6 +56,14 @@ namespace spot
 
     /// \brief Replace <code>true U f</code> and <code>false R g</code> by
     /// <code>F f</code> and <code>G g</code>.
+    ///
+    /// Perform the following rewriting (from left to right):
+    ///
+    /// - true U a = F a
+    /// - a M true = F a
+    /// - false R a = G a
+    /// - a W false = G a
+    ///
     /// \ingroup ltl_rewriting
     formula* simplify_f_g(const formula* f);
   }

@@ -1,5 +1,5 @@
-// Copyright (C) 2008, 2009 Laboratoire de Recherche et DÃ©veloppement
-// de l'Epita (LRDE).
+// Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
+// Développement de l'Epita (LRDE).
 // Copyright (C) 2004, 2006, 2007 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
@@ -110,23 +110,46 @@ namespace spot
 	void
 	visit(binop* bo)
 	{
+	  binop::type op = bo->op();
+
 	  formula* f2 = recurse(bo->second());
+	  bool f2_eventual = false;
 
-	  /* If b is a pure eventuality formula then a U b = b.
-	     If b is a pure universality formula a R b = b. */
-	  if ((opt_ & Reduce_Eventuality_And_Universality)
-	      && ((is_eventual(f2) && ((bo->op()) == binop::U))
-		  || (is_universal(f2) && ((bo->op()) == binop::R))))
+	  if (opt_ & Reduce_Eventuality_And_Universality)
 	    {
-	      result_ = f2;
-	      return;
+	      f2_eventual = is_eventual(f2);
+	      /* If b is a pure eventuality formula then a U b = b.
+		 If b is a pure universality formula a R b = b. */
+	      if ((f2_eventual && (op == binop::U))
+		  || (is_universal(f2) && (op == binop::R)))
+		{
+		  result_ = f2;
+		  return;
+		}
 	    }
-	  /* case of implies */
-	  formula* f1 = recurse(bo->first());
 
+	  formula* f1 = recurse(bo->first());
+	  if (opt_ & Reduce_Eventuality_And_Universality)
+	    {
+	      /* If a&b is a pure eventuality formula then a M b = a & b.
+		 If a is a pure universality formula a W b = a|b. */
+	      if (is_eventual(f1) && f2_eventual && (op == binop::M))
+		{
+		  result_ = multop::instance(multop::And, f1, f2);
+		  return;
+		}
+	      if (is_universal(f1) && (op == binop::W))
+		{
+		  result_ = multop::instance(multop::Or, f1, f2);
+		  return;
+		}
+	    }
+
+
+	  /* case of implies */
 	  if (opt_ & Reduce_Syntactic_Implications)
 	    {
-	      switch (bo->op())
+	      switch (op)
 		{
 		case binop::Xor:
 		case binop::Equiv:
@@ -149,9 +172,10 @@ namespace spot
 		      return;
 		    }
 		  /* a < b => a U (b U c) = (b U c) */
+		  /* a < b => a U (b W c) = (b W c) */
 		  {
 		    binop* bo = dynamic_cast<binop*>(f2);
-		    if (bo && bo->op() == binop::U
+		    if (bo && (bo->op() == binop::U || bo->op() == binop::W)
 			&& syntactic_implication(f1, bo->first()))
 		      {
 			result_ = f2;
@@ -188,9 +212,68 @@ namespace spot
 		      }
 		  }
 		  break;
+
+		case binop::W:
+		  /* a < b => a W b = b */
+		  if (syntactic_implication(f1, f2))
+		    {
+		      result_ = f2;
+		      f1->destroy();
+		      return;
+		    }
+		  /* !b < a => a W b = 1 */
+		  if (syntactic_implication_neg(f2, f1, false))
+		    {
+		      result_ = constant::true_instance();
+		      f1->destroy();
+		      f2->destroy();
+		      return;
+		    }
+		  /* a < b => a W (b U c) = (b U c) */
+		  /* a < b => a W (b W c) = (b W c) */
+		  {
+		    binop* bo = dynamic_cast<binop*>(f2);
+		    if (bo && (bo->op() == binop::U || bo->op() == binop::W)
+			&& syntactic_implication(f1, bo->first()))
+		      {
+			result_ = f2;
+			f1->destroy();
+			return;
+		      }
+		  }
+		  break;
+
+		case binop::M:
+		  /* b < a => a M b = b */
+		  if (syntactic_implication(f2, f1))
+		    {
+		      result_ = f2;
+		      f1->destroy();
+		      return;
+		    }
+		  /* b < !a => a M b = 0 */
+		  if (syntactic_implication_neg(f2, f1, true))
+		    {
+		      result_ = constant::false_instance();
+		      f1->destroy();
+		      f2->destroy();
+		      return;
+		    }
+		  /* b < a => a R (b R c) = b R c */
+		  {
+		    binop* bo = dynamic_cast<binop*>(f2);
+		    if (bo && bo->op() == binop::R
+			&& syntactic_implication(bo->first(), f1))
+		      {
+			result_ = f2;
+			f1->destroy();
+			return;
+		      }
+		  }
+		  break;
 		}
 	    }
-	  result_ = binop::instance(bo->op(), f1, f2);
+	  result_ = binop::instance(op, f1, f2);
 	}
 
 	void

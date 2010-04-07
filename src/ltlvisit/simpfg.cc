@@ -1,3 +1,7 @@
+// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// l'Epita (LRDE).
+// département Systèmes Répartis Coopératifs (SRC), Université Pierre
+// et Marie Curie.
 // Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -42,13 +46,14 @@ namespace spot
     {
       formula* f1 = recurse(bo->first());
       formula* f2 = recurse(bo->second());
+      binop::type op = bo->op();
 
-      switch (bo->op())
+      switch (op)
 	{
 	case binop::Xor:
 	case binop::Implies:
 	case binop::Equiv:
-	  result_ = binop::instance(bo->op(), f1, f2);
+	  result_ = binop::instance(op, f1, f2);
 	  return;
 	  /* true U f2 == F(f2) */
 	case binop::U:
@@ -63,6 +68,20 @@ namespace spot
 	    result_ = unop::instance(unop::G, f2);
 	  else
 	    result_ = binop::instance(binop::R, f1, f2);
+	  return;
+	  /* f1 W false == G(f1) */
+	case binop::W:
+	  if (f2 == constant::false_instance())
+	    result_ = unop::instance(unop::G, f1);
+	  else
+	    result_ = binop::instance(binop::W, f1, f2);
+	  return;
+	  /* f1 M true == F(f1) */
+	case binop::M:
+	  if (f1 == constant::true_instance())
+	    result_ = unop::instance(unop::F, f2);
+	  else
+	    result_ = binop::instance(binop::M, f1, f2);
 	  return;
 	}
       /* Unreachable code. */

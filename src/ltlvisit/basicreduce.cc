@@ -253,7 +253,8 @@ namespace spot
 	  formula* f2 = bo->second();
 	  unop* fu1;
 	  unop* fu2;
-	  switch (bo->op())
+	  binop::type op = bo->op();
+	  switch (op)
 	    {
 	    case binop::Xor:
 	    case binop::Equiv:
@@ -262,31 +263,49 @@ namespace spot
 					basic_reduce(f1),
 					basic_reduce(f2));
 	      return;
+	    case binop::W:
+	    case binop::M:
 	    case binop::U:
 	    case binop::R:
+	      f1 = basic_reduce(f1);
 	      f2 = basic_reduce(f2);
 
+	      // a W false = Ga
+	      if (op == binop::W && f2 == constant::false_instance())
+		{
+		  result_ = unop::instance(unop::G, f1);
+		  return;
+		}
+	      // a M true = Fa
+	      if (op == binop::M && f2 == constant::true_instance())
+		{
+		  result_ = unop::instance(unop::F, f1);
+		  return;
+		}
 	      // a U false = false
 	      // a U true = true
 	      // a R false = false
 	      // a R true = true
+	      // a W true = true
+	      // a M false = false
 	      if (dynamic_cast<constant*>(f2))
 		{
 		  result_ = f2;
+		  f1->destroy();
 		  return;
 		}
 
-	      f1 = basic_reduce(f1);
-
 	      // X(a) U X(b) = X(a U b)
 	      // X(a) R X(b) = X(a R b)
+	      // X(a) W X(b) = X(a W b)
+	      // X(a) M X(b) = X(a M b)
 	      fu1 = dynamic_cast<unop*>(f1);
 	      fu2 = dynamic_cast<unop*>(f2);
 	      if (fu1 && fu2
 		  && fu1->op() == unop::X
 		  && fu2->op() == unop::X)
 		{
-		  formula* ftmp = binop::instance(bo->op(),
+		  formula* ftmp = binop::instance(op,
 						  basic_reduce(fu1->child()),
 						  basic_reduce(fu2->child()));
 		  result_ = unop::instance(unop::X, basic_reduce(ftmp));
@@ -296,7 +315,7 @@ namespace spot
 		  return;
 	      }
 
-	      result_ = binop::instance(bo->op(), f1, f2);
+	      result_ = binop::instance(op, f1, f2);
 	      return;
 	    }
 	  /* Unreachable code.  */

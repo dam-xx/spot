@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -155,12 +155,17 @@ namespace spot
 	std::vector<succ_state>::iterator i2;
 	taa_tgba::transition* t = 0;
 	bool contained = false;
+	bool strong = false;
+
 	switch (node->op())
 	{
-	  case binop::U: // Strong
-	    if (refined_)
-	      contained = lcc_->contained(node->second(), node->first());
-	    for (i1 = v1.succ_.begin(); i1 != v1.succ_.end(); ++i1)
+	case binop::U:
+	  strong = true;
+	  // fall thru
+	case binop::W:
+	  if (refined_)
+	    contained = lcc_->contained(node->second(), node->first());
+	  for (i1 = v1.succ_.begin(); i1 != v1.succ_.end(); ++i1)
 	    {
 	      // Refined rule
 	      if (refined_ && contained)
@@ -168,60 +173,75 @@ namespace spot
 		  (remove(i1->Q.begin(), i1->Q.end(), v1.init_), i1->Q.end());
 
 	      i1->Q.push_back(init_); // Add the initial state
-	      i1->acc.push_back(node->second());
+	      if (strong)
+		i1->acc.push_back(node->second());
 	      t = res_->create_transition(init_, i1->Q);
 	      res_->add_condition(t, i1->condition->clone());
-	      res_->add_acceptance_condition(t, node->second()->clone());
+	      if (strong)
+		res_->add_acceptance_condition(t, node->second()->clone());
+	      else
+		for (unsigned i = 0; i < i1->acc.size(); ++i)
+		  res_->add_acceptance_condition(t, i1->acc[i]->clone());
 	      succ_.push_back(*i1);
 	    }
-	    for (i2 = v2.succ_.begin(); i2 != v2.succ_.end(); ++i2)
+	  for (i2 = v2.succ_.begin(); i2 != v2.succ_.end(); ++i2)
 	    {
 	      t = res_->create_transition(init_, i2->Q);
 	      res_->add_condition(t, i2->condition->clone());
 	      succ_.push_back(*i2);
 	    }
-	    return;
-	  case binop::R: // Weak
-	    if (refined_)
-	      contained = lcc_->contained(node->first(), node->second());
-	    for (i2 = v2.succ_.begin(); i2 != v2.succ_.end(); ++i2)
+	  return;
+	case binop::M: // Strong Release
+	  strong = true;
+	case binop::R: // Weak Release
+	  if (refined_)
+	    contained = lcc_->contained(node->first(), node->second());
+
+	  for (i2 = v2.succ_.begin(); i2 != v2.succ_.end(); ++i2)
 	    {
 	      for (i1 = v1.succ_.begin(); i1 != v1.succ_.end(); ++i1)
-	      {
-		std::vector<const formula*> u; // Union
-		std::vector<const formula*> a; // Acceptance conditions
-		std::copy(i1->Q.begin(), i1->Q.end(), ii(u, u.end()));
-		formula* f = i1->condition->clone(); // Refined rule
-		if (!refined_ || !contained)
 		{
-		  std::copy(i2->Q.begin(), i2->Q.end(), ii(u, u.end()));
-		  f = multop::instance(multop::And, f, i2->condition->clone());
+		  std::vector<const formula*> u; // Union
+		  std::vector<const formula*> a; // Acceptance conditions
+		  std::copy(i1->Q.begin(), i1->Q.end(), ii(u, u.end()));
+		  formula* f = i1->condition->clone(); // Refined rule
+		  if (!refined_ || !contained)
+		    {
+		      std::copy(i2->Q.begin(), i2->Q.end(), ii(u, u.end()));
+		      f = multop::instance(multop::And, f,
+					   i2->condition->clone());
+		    }
+		  to_free_.push_back(f);
+		  t = res_->create_transition(init_, u);
+		  res_->add_condition(t, f->clone());
+		  succ_state ss = { u, f, a };
+		  succ_.push_back(ss);
 		}
-		to_free_.push_back(f);
-
-		t = res_->create_transition(init_, u);
-		res_->add_condition(t, f->clone());
-		succ_state ss = { u, f, a };
-		succ_.push_back(ss);
-	      }
 
 	      if (refined_) // Refined rule
 		i2->Q.erase
 		  (remove(i2->Q.begin(), i2->Q.end(), v2.init_), i2->Q.end());
 
+
 	      i2->Q.push_back(init_); // Add the initial state
 	      t = res_->create_transition(init_, i2->Q);
 	      res_->add_condition(t, i2->condition->clone());
-	      if (refined_)
+
+	      if (strong)
+		{
+		  i2->acc.push_back(node->first());
+		  res_->add_acceptance_condition(t, node->first()->clone());
+		}
+	      else if (refined_)
 		for (unsigned i = 0; i < i2->acc.size(); ++i)
 		  res_->add_acceptance_condition(t, i2->acc[i]->clone());
 	      succ_.push_back(*i2);
 	    }
-	    return;
-	  case binop::Xor:
-	  case binop::Implies:
-	  case binop::Equiv:
-	    assert(0); // TBD
+	  return;
+	case binop::Xor:
+	case binop::Implies:
+	case binop::Equiv:
+	  assert(0); // TBD
 	}
 	/* Unreachable code.  */
 	assert(0);

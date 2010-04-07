@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2005 Laboratoire d'Informatique de Paris 6
 // (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
@@ -102,7 +102,7 @@ namespace spot
 
     namespace
     {
-      const int proba_size = 14;
+      const int proba_size = 16;
     }
 
     random_ltl::random_ltl(const atomic_prop_set* ap)
@@ -122,8 +122,10 @@ namespace spot
       proba_[9].setup("xor",     3, binop_builder<binop::Xor>);
       proba_[10].setup("R",      3, binop_builder<binop::R>);
       proba_[11].setup("U",      3, binop_builder<binop::U>);
-      proba_[12].setup("and",    3, multop_builder<multop::And>);
-      proba_[13].setup("or",     3, multop_builder<multop::Or>);
+      proba_[12].setup("W",      3, binop_builder<binop::W>);
+      proba_[13].setup("M",      3, binop_builder<binop::M>);
+      proba_[14].setup("and",    3, multop_builder<multop::And>);
+      proba_[15].setup("or",     3, multop_builder<multop::Or>);
 
       proba_[0].proba = ap_->size();
 

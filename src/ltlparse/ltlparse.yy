@@ -79,6 +79,7 @@ using namespace spot::ltl;
 %token OP_OR "or operator" OP_XOR "xor operator" OP_AND "and operator"
 %token OP_IMPLIES "implication operator" OP_EQUIV "equivalent operator"
 %token OP_U "until operator" OP_R "release operator"
+%token OP_W "weak until operator" OP_M "strong release operator"
 %token OP_F "sometimes operator" OP_G "always operator"
 %token OP_X "next operator" OP_NOT "not operator"
 %token <str> ATOMIC_PROP "atomic proposition"
@@ -95,7 +96,7 @@ using namespace spot::ltl;
 %left OP_AND
 
 /* LTL operators.  */
-%left OP_U OP_R
+%left OP_U OP_R OP_M OP_W
 %nonassoc OP_F OP_G
 %nonassoc OP_X
 
@@ -239,6 +240,14 @@ subformula: ATOMIC_PROP
 	      { $$ = binop::instance(binop::R, $1, $3); }
 	    | subformula OP_R error
 	      { missing_right_binop($$, $1, @2, "release operator"); }
+	    | subformula OP_W subformula
+	      { $$ = binop::instance(binop::W, $1, $3); }
+	    | subformula OP_W error
+	      { missing_right_binop($$, $1, @2, "weak until operator"); }
+	    | subformula OP_M subformula
+	      { $$ = binop::instance(binop::M, $1, $3); }
+	    | subformula OP_M error
+	      { missing_right_binop($$, $1, @2, "strong release operator"); }
 	    | OP_F subformula
 	      { $$ = unop::instance(unop::F, $2); }
 	    | OP_F error

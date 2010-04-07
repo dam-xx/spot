@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2004, 2005 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -108,13 +108,25 @@ namespace spot
 		  // Both operand must be purely eventual, unlike in
 		  // the proceedings of Concur'00.  (The revision of
 		  // the paper available at
-		  // http://www1.bell-labs.com/project/TMP/ is fixed.)
+		  // http://www.bell-labs.com/project/TMP/ is fixed.)
+		  || (recurse_ev(f1) && recurse_ev(f2)))
+		eventual = true;
+	      return;
+	    case binop::W:
+	      universal = recurse_un(f1) && recurse_un(f2);
+	      if ((f2 == constant::true_instance())
 		  || (recurse_ev(f1) && recurse_ev(f2)))
 		eventual = true;
 	      return;
 	    case binop::R:
 	      eventual = recurse_ev(f1) && recurse_ev(f2);
 	      if ((f1 == constant::false_instance())
+		  || (recurse_un(f1) && recurse_un(f2)))
+		universal = true;
+	      return;
+	    case binop::M:
+	      eventual = recurse_ev(f1) && recurse_ev(f2);
+	      if ((f2 == constant::false_instance())
 		  || (recurse_un(f1) && recurse_un(f2)))
 		universal = true;
 	      return;
@@ -263,6 +275,7 @@ namespace spot
 	    case binop::Implies:
 	      return;
 	    case binop::U:
+	    case binop::W:
 	      if (syntactic_implication(f, f2))
 		result_ = true;
 	      return;
@@ -277,6 +290,25 @@ namespace spot
 	      if (fu && fu->op() == unop::G)
 		if (f1 == constant::false_instance() &&
 		    syntactic_implication(fu->child(), f2))
+		  {
+		    result_ = true;
+		    return;
+		  }
+	      if (syntactic_implication(f, f1)
+		  && syntactic_implication(f, f2))
+		result_ = true;
+	      return;
+	    case binop::M:
+	      if (fb && fb->op() == binop::M)
+		if (syntactic_implication(fb->first(), f1) &&
+		    syntactic_implication(fb->second(), f2))
+		  {
+		    result_ = true;
+		    return;
+		  }
+	      if (fu && fu->op() == unop::F)
+		if (f2 == constant::true_instance() &&
+		    syntactic_implication(fu->child(), f1))
 		  {
 		    result_ = true;
 		    return;
@@ -480,10 +512,41 @@ namespace spot
 		  && syntactic_implication(f2, f))
 		result_ = true;
 	      return;
+	    case binop::W:
+	      /* (a < c) && (c < d) => a W b < c W d */
+	      if (fb && fb->op() == binop::W)
+		if (syntactic_implication(f1, fb->first()) &&
+		    syntactic_implication(f2, fb->second()))
+		  {
+		    result_ = true;
+		    return;
+		  }
+	      if (fu && fu->op() == unop::G)
+		if (f2 == constant::false_instance() &&
+		    syntactic_implication(f1, fu->child()))
+		  {
+		    result_ = true;
+		    return;
+		  }
+	      if (syntactic_implication(f1, f)
+		  && syntactic_implication(f2, f))
+		result_ = true;
+	      return;
 	    case binop::R:
 	      if (fu && fu->op() == unop::G)
 		if (f1 == constant::false_instance() &&
 		    syntactic_implication(f2, fu->child()))
+		  {
+		    result_ = true;
+		    return;
+		  }
+	      if (syntactic_implication(f2, f))
+		result_ = true;
+	      return;
+	    case binop::M:
+	      if (fu && fu->op() == unop::F)
+		if (f2 == constant::true_instance() &&
+		    syntactic_implication(f1, fu->child()))
 		  {
 		    result_ = true;
 		    return;

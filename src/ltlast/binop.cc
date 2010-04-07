@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2005 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -115,6 +115,10 @@ namespace spot
 	  return "U";
 	case R:
 	  return "R";
+	case W:
+	  return "W";
+	case M:
+	  return "M";
 	}
       // Unreachable code.
       assert(0);
@@ -126,7 +130,7 @@ namespace spot
     binop*
     binop::instance(type op, formula* first, formula* second)
     {
-      // Sort the operands of associative operators, so that for
+      // Sort the operands of commutative operators, so that for
       // example the formula instance for 'a xor b' is the same as
       // that for 'b xor a'.
       switch (op)
@@ -139,7 +143,9 @@ namespace spot
 	case Implies:
 	case U:
 	case R:
-	  // Non associative operators.
+	case W:
+	case M:
+	  // Non commutative operators.
 	  break;
 	}
 

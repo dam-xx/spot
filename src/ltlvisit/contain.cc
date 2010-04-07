@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2006, 2007 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -202,6 +202,31 @@ namespace spot
 		  result_ = binop::instance(binop::U, a, b);
 		}
 	      break;
+	    case binop::W:
+	      // if (a W b) => b, then keep b !
+	      if (stronger && lcc->contained(bo, b))
+		{
+		  a->destroy();
+		  result_ = b;
+		}
+	      // if a => b,  then a W b = b.
+	      else if ((!stronger) && lcc->contained(a, b))
+		{
+		  a->destroy();
+		  result_ = b;
+		}
+	      // if !a => b, then  a W b = 1
+	      else if (lcc->neg_contained(a, b))
+		{
+		  a->destroy();
+		  b->destroy();
+		  result_ = constant::true_instance();
+		}
+	      else
+		{
+		  result_ = binop::instance(binop::W, a, b);
+		}
+	      break;
 	    case binop::R:
 	      // if (a R b) => b, then keep b !
 	      if (stronger && lcc->contained(b, bo))
@@ -224,6 +249,31 @@ namespace spot
 	      else
 		{
 		  result_ = binop::instance(binop::R, a, b);
+		}
+	      break;
+	    case binop::M:
+	      // if (a M b) => b, then keep b !
+	      if (stronger && lcc->contained(b, bo))
+		{
+		  a->destroy();
+		  result_ = b;
+		}
+	      // if b => a,  then a M b = b.
+	      else if ((!stronger) && lcc->contained(b, a))
+		{
+		  a->destroy();
+		  result_ = b;
+		}
+	      // if a => !b, then  a M b = 0
+	      else if (lcc->contained_neg(a, b))
+		{
+		  a->destroy();
+		  b->destroy();
+		  result_ = constant::false_instance();
+		}
+	      else
+		{
+		  result_ = binop::instance(binop::M, a, b);
 		}
 	      break;
 	    default:

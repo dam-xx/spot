@@ -1,4 +1,4 @@
-// Copyright (C) 2008 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2008, 2010 Laboratoire de Recherche et DÃ©veloppement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -117,6 +117,12 @@ namespace spot
 	      break;
 	    case binop::R:
 	      os_ << " R ";
+	      break;
+	    case binop::W:
+	      os_ << " W ";
+	      break;
+	    case binop::M:
+	      os_ << " M ";
 	      break;
 	    }
 
@@ -274,6 +280,17 @@ namespace spot
 	    case binop::R:
 	      bo->first()->accept(*this);
 	     os_ << " V ";
+	      bo->second()->accept(*this);
+	      break;
+	      /* W and M are not supported by Spin */
+	    case binop::W:
+	      bo->first()->accept(*this);
+	      os_ << " W ";
+	      bo->second()->accept(*this);
+	      break;
+	    case binop::M:
+	      bo->first()->accept(*this);
+	     os_ << " M ";
 	      bo->second()->accept(*this);
 	      break;
 	    }
