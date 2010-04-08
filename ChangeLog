@@ -1,3 +1,7 @@
+2010-04-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* NEWS: Summarize recent noteworthy changes.
+
 2010-04-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Modernize Bison parsers.
@@ -89,7 +93,7 @@
 	Simplify F(a)|F(b) as F(a|b).  Add similar rule for G(a)&G(b).
 
 	* src/ltlvisit/basicreduce.cc (basic_reduce_visitor): Replace
-	the FG(a)|FG(b) == FG(a|b) rule by the above more generic one.
+	the FG(a)|FG(b) == F(Ga|Gb) rule by the above more generic one.
 	Add the dual rule for G(a)&G(b), as we had none (this one won't
 	improve anything in the translation, but it is more symmetric
 	this way).  Also simplify some pointer checks.
