@@ -1,5 +1,9 @@
 2010-04-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/ltlvisit/basicreduce.cc: Typo in comment.
+
+2010-04-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* NEWS: Summarize recent noteworthy changes.
 
 2010-04-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

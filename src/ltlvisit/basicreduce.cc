@@ -356,7 +356,7 @@ namespace spot
 			}
 		      else if (uo->op() == unop::G)
 			{
-			  // G(a) | G(b) = G(a | b)
+			  // G(a) & G(b) = G(a & b)
 			  tmpG->push_back(uo->child()->clone());
 			}
 		      else
