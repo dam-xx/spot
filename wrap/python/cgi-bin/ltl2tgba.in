@@ -346,7 +346,7 @@ an identifier: <code>aUb</code> is an atomic proposition, unlike
       <td align="right">not:</td><td><code>!</code></td>
       <td align="right">and:</td><td><code>&</code> <code>&&</code>
                                      <code>.</code> <code>/\</code></td>
-      <td align="right">xor:</td><td><code>^</code> <code>xor</code></td>
+      <td align="right">(strong) until:</td><td><code>U</code></td>
       <td align="right">true:</td><td><code>1</code>
                                       <code>true</code></td>
     </tr>
@@ -356,7 +356,7 @@ an identifier: <code>aUb</code> is an atomic proposition, unlike
       <td align="right">or:</td><td><code>|</code> <code>||</code>
                                     <code>+</code> <code>\/</code></td>
 
-      <td align="right">until:</td><td><code>U</code></td>
+      <td align="right">weak until:</td><td><code>W</code></td>
       <td align="right">false:</td><td><code>0</code>
                                        <code>false</code></td>
     </tr>
@@ -365,7 +365,7 @@ an identifier: <code>aUb</code> is an atomic proposition, unlike
                                         <code>[]</code></td>
       <td align="right">implies:</td><td><code>-&gt;</code>
                                          <code>=&gt;</code></td>
-      <td align="right">release:</td><td><code>R</code>
+      <td align="right">(weak) release:</td><td><code>R</code>
                                          <code>V</code></td>
       <td></td><td></td>
     </tr>
@@ -373,10 +373,15 @@ an identifier: <code>aUb</code> is an atomic proposition, unlike
       <td align="right">next:</td><td><code>X</code> <code>()</code></td>
       <td align="right">equivalent:</td><td><code>&lt;-&gt;</code>
                                             <code>&lt;=&gt;</code></td>
+      <td align="right">strong release:</td><td><code>M</code></td>
+      <td></td><td></td>
+    </tr>
+    <tr>
+      <td></td><td></td>
+      <td align="right">xor:</td><td><code>^</code> <code>xor</code></td>
       <td></td><td></td>
       <td></td><td></td>
     </tr>
-
   </tbody>
 </table></td></tr></table>"""
 
