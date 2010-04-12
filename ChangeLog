@@ -1,3 +1,13 @@
+2010-04-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Adjust ltl2tgba.py to call scc_filter() with the "full" option as
+	appropriate.
+
+	* wrap/python/spot.i (spot::scc_filter): Make it available.
+	* wrap/python/cgi-bin/ltl2tgba.in (reduce_scc): Call scc_filter.
+	Use the "full" option unless the show_degen_png or
+	show_never_claim are set.  Also reduce_scc the default.
+
 2010-04-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/ltlvisit/basicreduce.cc: Typo in comment.

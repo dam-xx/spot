@@ -91,6 +91,7 @@
 #include "tgbaalgos/reductgba_sim.hh"
 #include "tgbaalgos/rundotdec.hh"
 #include "tgbaalgos/save.hh"
+#include "tgbaalgos/sccfilter.hh"
 #include "tgbaalgos/stats.hh"
 
 using namespace spot::ltl;
@@ -151,6 +152,7 @@ using namespace spot;
 %feature("new") spot::reduc_tgba_sim;
 %feature("new") spot::emptiness_check_instantiator::construct;
 %feature("new") spot::emptiness_check_instantiator::instanciate;
+%feature("new") spot::scc_filter;
 
 // Help SWIG with namespace lookups.
 #define ltl spot::ltl
@@ -182,6 +184,7 @@ using namespace spot;
 %include "tgbaalgos/reductgba_sim.hh"
 %include "tgbaalgos/rundotdec.hh"
 %include "tgbaalgos/save.hh"
+%include "tgbaalgos/sccfilter.hh"
 %include "tgbaalgos/stats.hh"
 #undef ltl
 
