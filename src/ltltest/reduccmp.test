@@ -120,6 +120,11 @@ for x in ../reduccmp ../reductaustr; do
      run 0 $x 'a U (G(a))' 'Ga'
      run 0 $x '(a U b) | (a W c)' 'a W (b | c)'
      run 0 $x '(a U b) | Ga' 'a W b'
+
+     run 0 $x 'a R (b & F(a) & c)' 'a M (b & c)'
+     run 0 $x 'a R (F(a))' 'Fa'
+     run 0 $x '(a R b) & (a M c)' 'a M (b & c)'
+     run 0 $x '(a R b) & Fa' 'a M b'
      ;;
   esac
 

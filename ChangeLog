@@ -1,5 +1,19 @@
 2010-04-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Add LTL reductions for strong release.
+
+	* src/ltlvisit/basicreduce.cc: Perform the following reductions.
+	a R (b & F(a)) = a M b
+	a M (b & F(a)) = a M b
+	a R Fa = Fa
+	a M Fa = Fa
+	a R b & Fa = a M b
+	a R b & a M c = a M (b & c)
+	a M b & a M c = a M (b & c)
+	* src/ltltest/reduccmp.test: More tests.
+
+2010-04-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add LTL reductions for weak until.
 
 	* src/ltlvisit/basicreduce.cc: Perform the following reductions.
@@ -1714,7 +1728,7 @@
 
 	Remove generated files that git follows.
 
-        * INSTALL, lbtt/INSTALL, lbtt/doc/texinfo.tex: Do not track
+	* INSTALL, lbtt/INSTALL, lbtt/doc/texinfo.tex: Do not track
 	anymore these generated files.
 
 2009-06-05  Guillaume Sadegh  <sadegh@lrde.epita.fr>
@@ -1933,7 +1947,7 @@
 	Add support for ELTL (AST & parser), and an adaptation of LaCIM
 	for ELTL.
 
-        * configure.ac: Adjust for src/eltlparse/ and src/eltltest/
+	* configure.ac: Adjust for src/eltlparse/ and src/eltltest/
 	directories, and call AX_BOOST_BASE.
 	* m4/boost.m4: New file defining AX_BOOST_BASE([MINIMUM-VERSION]).
 	* src/Makefile.am: Add eltlparse and eltltest.
@@ -2024,16 +2038,16 @@
 	i->s->clone().
 	* src/misc/optionmap.hh, src/misc/optionmap.cc: Remove the extra
 	`;' after the namespace.
-        * src/tgbaalgos/tau03opt.cc
+	* src/tgbaalgos/tau03opt.cc
 	(tau03_opt_search::add_new_state): Remove unreferenced method.
-        * src/tgbaalgos/ltl2tgba_fm.cc
+	* src/tgbaalgos/ltl2tgba_fm.cc
 	(translate_dict::dump): Remove unreferenced method.
-        * src/tgbaalgos/lbtt.cc
+	* src/tgbaalgos/lbtt.cc
 	(acceptance_cond_splitter::count): Remove unreferenced method.
-        * src/tgba/tgbabddconcreteproduct.cc
+	* src/tgba/tgbabddconcreteproduct.cc
 	(tgba_bdd_product_factory::get_dict): Remove unreferenced method.
-        * src/ltlvisit/syntimpl.cc
-        (eventual_universal_visitor::recurse): Remove unreferenced method.
+	* src/ltlvisit/syntimpl.cc
+	(eventual_universal_visitor::recurse): Remove unreferenced method.
 	* src/tgbaalgos/reductgba_sim.cc: Reindent.
 
 2008-12-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
@@ -4122,7 +4136,7 @@
 	Likewise.  The classes have been renamed are as following
 	  emptiness_check -> couvreur99_check
 	  emptiness_check_shy -> couvreur99_check_shy
-          emptiness_check_status -> couvreur99_check_status
+	  emptiness_check_status -> couvreur99_check_status
 	  counter_example -> couvreur99_check_result
 	* src/tgbatest/ltl2tgba.cc, iface/gspn/ltlgspn.cc, iface/gspn/ssp.hh,
 	iface/gspn/ssp.cc: Adjust to renaming and new interface.
@@ -4998,7 +5012,7 @@
 	* src/sanity/Makefile.am (check-local): Run it.
 	* src/ltltest/equals.test, src/ltltest/lunabbrev.test,
 	src/ltltest/nenoform.test, src/ltltest/parseerr.test
-        src/ltltest/tunabbrev.test, src/ltltest/reduc.cc,
+	src/ltltest/tunabbrev.test, src/ltltest/reduc.cc,
 	src/ltltest/tunabbrev.test, src/ltlvisit/forminf.cc,
 	src/tgbatest/explpro2.test, src/tgbatest/explpro3.test,
 	src/tgbatest/explprod.test, src/tgbatest/spotlbtt.test,
