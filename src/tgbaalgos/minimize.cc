@@ -1,4 +1,4 @@
-// Copyright (C) 2010 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -33,11 +33,9 @@ namespace spot
 
   // Given an automaton a, find all states that are not in "final" and add
   // them to the set "non_final".
-  // "state_set_map" gives corresponding set for each state.
   void init_sets(const tgba_explicit* a,
                  hash_set& final,
-                 hash_set& non_final,
-                 hash_map& state_set_map)
+                 hash_set& non_final)
   {
     hash_set seen;
     std::queue<const state*> tovisit;
@@ -51,13 +49,8 @@ namespace spot
       tovisit.pop();
       // Is the state final ?
       if (final.find(src) == final.end())
-      {
         // No, add it to the set non_final
         non_final.insert(src);
-        state_set_map[src] = 0;
-      }
-      else
-        state_set_map[src] = 1;
       tgba_succ_iterator* sit = a->succ_iter(src);
       for (sit->first(); !sit->done(); sit->next())
       {
@@ -147,20 +140,48 @@ namespace spot
     std::list<const state*>::iterator li;
     for (li = acc_list.begin(); li != acc_list.end(); ++li)
       final->insert(*li);
-    init_sets(det_a, *final, *non_final, state_set_map);
+
+    init_sets(det_a, *final, *non_final);
     // Size of det_a
     unsigned size = final->size() + non_final->size();
-    unsigned bdd_offset = dict->register_anonymous_variables(size, det_a);
+    // Use bdd variables to number sets.  set_num is the first variable
+    // available.
+    unsigned set_num = dict->register_anonymous_variables(size, det_a);
+
+    std::set<int> free_var;
+    for (unsigned i = set_num; i < set_num + size; ++i)
+      free_var.insert(i);
+    std::map<int, int> used_var;
+
+    if (!final->empty())
+      {
+	unsigned s = final->size();
+	used_var[set_num] = s;
+	free_var.erase(set_num);
+	if (s > 1)
+	  todo.push(final);
+	else
+	  done.push_back(final);
+	for (hash_set::const_iterator i = final->begin();
+	     i != final->end(); ++i)
+	  state_set_map[*i] = set_num;
+      }
+    if (!non_final->empty())
+      {
+	unsigned s = non_final->size();
+	unsigned num = set_num + 1;
+	used_var[num] = s;
+	free_var.erase(num);
+	if (s > 1)
+	  todo.push(non_final);
+	else
+	  done.push_back(non_final);
+	for (hash_set::const_iterator i = non_final->begin();
+	     i != non_final->end(); ++i)
+	  state_set_map[*i] = num;
+      }
+
     hash_set* final_copy = new hash_set(*final);
-    if (final->size() > 1)
-      todo.push(final);
-    else if (!final->empty())
-      done.push_back(final);
-    if (non_final->size() > 1)
-      todo.push(non_final);
-    else if (!non_final->empty())
-      done.push_back(non_final);
-    unsigned set_num = 1;
     // A bdd_states_map is a list of formulae (in a BDD form) associated with a
     // destination set of states.
     typedef std::list<std::pair<bdd, hash_set*> > bdd_states_map;
@@ -182,7 +203,7 @@ namespace spot
           const state* dst = si->current_state();
           unsigned dst_set = state_set_map[dst];
           delete dst;
-          f |= (bdd_ithvar(bdd_offset + dst_set) & si->current_condition());
+          f |= (bdd_ithvar(dst_set) & si->current_condition());
         }
         delete si;
         bdd_states_map::iterator bsi;
@@ -213,11 +234,25 @@ namespace spot
         for (; bsi != bdd_map.end(); ++bsi)
         {
           hash_set* set = bsi->second;
-          // Give a new number for new states.
-          ++set_num;
-          hash_set::iterator hit;
-          for (hit = set->begin(); hit != set->end(); ++hit)
-            state_set_map[*hit] = set_num;
+          // Free the number associated to these states.
+	  unsigned num = state_set_map[*set->begin()];
+	  assert(used_var.find(num) != used_var.end());
+	  unsigned left = (used_var[num] -= set->size());
+	  // Make sure LEFT does not become negative (hence bigger
+	  // than SIZE when read as unsigned)
+	  assert(left < size);
+	  if (left == 0)
+	    {
+	      used_var.erase(num);
+	      free_var.insert(num);
+	    }
+	  // Pick a free number
+	  assert(!free_var.empty());
+	  num = *free_var.begin();
+	  free_var.erase(free_var.begin());
+	  used_var[num] = set->size();
+          for (hash_set::iterator hit = set->begin(); hit != set->end(); ++hit)
+	    state_set_map[*hit] = num;
           // Trivial sets can't be splitted any further.
           if (set->size() == 1)
             done.push_back(set);
@@ -231,7 +266,6 @@ namespace spot
     // Build the result.
     tgba_explicit_number* res = build_result(det_a, done, final_copy);
 
-    dict->unregister_variable(bdd_offset, det_a);
     // Free all the allocated memory.
     delete final_copy;
     hash_map::iterator hit;

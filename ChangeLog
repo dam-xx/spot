@@ -1,3 +1,15 @@
+2010-04-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Better resource handling in minimization.
+
+	* src/tgbatest/ltl2tgba.cc (main): Delete the minimized automaton.
+	* src/tgbaalgos/minimize.cc (minimize): Remove the call to
+	unregister_variable() at the end.  It was both
+	wrong (unregistering only the first variable) and useless ("delete
+	del_a" will unregister all these variables).  Use a map and a set
+	to keep track of free BDD variable and reuse them, otherwise the
+	algorithm would sometimes use more variables than allocated.
+
 2010-03-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Implement is_safety_automaton().

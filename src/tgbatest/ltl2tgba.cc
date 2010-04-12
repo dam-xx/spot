@@ -1247,6 +1247,7 @@ main(int argc, char** argv)
       delete system;
       delete expl;
       delete aut_red;
+      delete minimized;
       delete degeneralized;
       delete aut_scc;
       delete state_labeled;
