@@ -495,22 +495,27 @@ namespace spot
 		    }
 		  else if (bo)
 		    {
-		      if (bo->op() == binop::U)
+		      if (bo->op() == binop::U || bo->op() == binop::W)
 			{
 			  // (a U b) & (c U b) = (a & c) U b
+			  // (a U b) & (c W b) = (a & c) U b
+			  // (a W b) & (c W b) = (a & c) W b
+			  bool weak = true;
 			  formula* ftmp = dynamic_cast<binop*>(*i)->second();
-			  multop::vec* tmpUright = new multop::vec;
+			  multop::vec* right = new multop::vec;
 			  for (multop::vec::iterator j = i; j != res->end();
 			       j++)
 			    {
 			      if (!*j)
 				continue;
 			      binop* bo2 = dynamic_cast<binop*>(*j);
-			      if (bo2 && bo2->op() == binop::U
+			      if (bo2 && (bo2->op() == binop::U
+					  || bo2->op() == binop::W)
 				  && ftmp == bo2->second())
 				{
-				  tmpUright
-				    ->push_back(bo2->first()->clone());
+				  if (bo2->op() == binop::U)
+				    weak = false;
+				  right->push_back(bo2->first()->clone());
 				  if (j != i)
 				    {
 				      (*j)->destroy();
@@ -519,11 +524,11 @@ namespace spot
 				}
 			    }
 			  tmpU
-			    ->push_back(binop::instance(binop::U,
+			    ->push_back(binop::instance(weak ?
+							binop::W : binop::U,
 							multop::
 							instance(multop::
-								 And,
-								 tmpUright),
+								 And, right),
 							ftmp->clone()));
 			}
 		      else if (bo->op() == binop::R || bo->op() == binop::M)
@@ -690,22 +695,27 @@ namespace spot
 							  instance(multop::Or,
 								   right)));
 			}
-		      else if (bo->op() == binop::R)
+		      else if (bo->op() == binop::R || bo->op() == binop::M)
 			{
 			  // (a R b) | (c R b) = (a | c) R b
+			  // (a R b) | (c M b) = (a | c) R b
+			  // (a M b) | (c M b) = (a | c) M b
+			  bool weak = false;
 			  formula* ftmp = dynamic_cast<binop*>(*i)->second();
-			  multop::vec* tmpRright = new multop::vec;
+			  multop::vec* right = new multop::vec;
 			  for (multop::vec::iterator j = i; j != res->end();
 			       j++)
 			    {
 			      if (!*j)
 				continue;
 			      binop* bo2 = dynamic_cast<binop*>(*j);
-			      if (bo2 && bo2->op() == binop::R
+			      if (bo2 && (bo2->op() == binop::R
+					  || bo2->op() == binop::M)
 				  && ftmp == bo2->second())
 				{
-				  tmpRright
-				    ->push_back(bo2->first()->clone());
+				  if (bo2->op() == binop::R)
+				    weak = true;
+				  right->push_back(bo2->first()->clone());
 				  if (j != i)
 				    {
 				      (*j)->destroy();
@@ -714,10 +724,11 @@ namespace spot
 				}
 			    }
 			  tmpR
-			    ->push_back(binop::instance(binop::R,
+			    ->push_back(binop::instance(weak ?
+							binop::R : binop::M,
 							multop::
 							instance(multop::Or,
-								 tmpRright),
+								 right),
 							ftmp->clone()));
 			}
 		      else

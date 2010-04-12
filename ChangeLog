@@ -1,5 +1,16 @@
 2010-04-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	More LTL reductions for W and M.
+
+	* src/ltlvisit/basicreduce.cc: Perform the following reductions:
+	(a U b) & (c W b) = (a & c) U b
+	(a W b) & (c W b) = (a & c) W b
+	(a R b) | (c M b) = (a | c) R b
+	(a M b) | (c M b) = (a | c) M b
+	* src/ltltest/reduccmp.test: Test them.
+
+2010-04-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add LTL reductions for strong release.
 
 	* src/ltlvisit/basicreduce.cc: Perform the following reductions.
