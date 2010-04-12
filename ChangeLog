@@ -1,3 +1,17 @@
+2010-04-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add LTL reductions for weak until.
+
+	* src/ltlvisit/basicreduce.cc: Perform the following reductions.
+	a U (b | Ga) = a W b
+	a W (b | Ga) = a W b
+	a U b | Ga = a W b
+	a U b | a W c = a W (b | c)
+	a W b | a W c = a W (b | c)
+	a U Ga = Ga
+	a W Ga = Ga
+	* src/ltltest/reduccmp.test: More tests.
+
 2010-04-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Add support for W (weak until) and M (strong release) operators.

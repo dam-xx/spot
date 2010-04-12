@@ -76,6 +76,7 @@ for x in ../reduccmp ../reductaustr; do
   run 0 $x 'G(false)' 'false'
 
   run 0 $x 'XGF(f)' 'GF(f)'
+
   case $x in
    *tau*);;
    *)
@@ -114,6 +115,11 @@ for x in ../reduccmp ../reductaustr; do
 
      run 0 $x 'Gb W a' 'Gb|a'
      run 0 $x 'Fb M Fa' 'Fa & Fb'
+
+     run 0 $x 'a U (b | G(a) | c)' 'a W (b | c)'
+     run 0 $x 'a U (G(a))' 'Ga'
+     run 0 $x '(a U b) | (a W c)' 'a W (b | c)'
+     run 0 $x '(a U b) | Ga' 'a W b'
      ;;
   esac
 
