@@ -93,7 +93,8 @@ namespace spot
     tgba_explicit_number* res = new tgba_explicit_number(a->get_dict());
     // For each transition in the initial automaton, add the corresponding
     // transition in res.
-    res->declare_acceptance_condition(ltl::constant::true_instance());
+    if (!final->empty())
+      res->declare_acceptance_condition(ltl::constant::true_instance());
     for (sit = sets.begin(); sit != sets.end(); ++sit)
     {
       hash_set::iterator hit;

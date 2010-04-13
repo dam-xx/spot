@@ -1,5 +1,15 @@
 2010-04-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix bugs in minimize(), caught by spotlbtt.test.
+
+	* src/tgbaalgos/minimize.cc (minimize): Don't add acceptance
+	conditions if the final set is empty.
+	* src/tgbaalgos/powerset.cc (tgba_powerset): Add the initial state
+	to acc_list if it is accepting.  Also do not compute an SCC build
+	map if we don't have to build acc_list.
+
+2010-04-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	"ltl2tgba -Rm" will apply WDBA-minimization only if correct.
 
 	* src/tgbatest/ltl2tgba.cc (main): Use WDBA-minimization only when

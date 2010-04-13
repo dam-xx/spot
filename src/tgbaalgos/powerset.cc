@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -56,7 +56,12 @@ namespace spot
       ps.insert(s);
       todo.push_back(ps);
       seen[ps] = 1;
-      m.build_map();
+      if (acc_list)
+	{
+	  m.build_map();
+	  if (m.accepting(m.scc_of_state(s)))
+	    acc_list->push_front(new state_explicit(res->add_state(1)));
+	}
     }
 
     unsigned state_num = 1;
@@ -99,9 +104,12 @@ namespace spot
 			{
 			  states.insert(s);
 			}
-                      unsigned scc_num = m.scc_of_state(s);
-                      if (m.accepting(scc_num))
-                        accepting = true;
+		      if (acc_list)
+			{
+			  unsigned scc_num = m.scc_of_state(s);
+			  if (m.accepting(scc_num))
+			    accepting = true;
+			}
 		      dest.insert(s);
 		    }
 		delete si;
@@ -123,7 +131,7 @@ namespace spot
 		seen[dest] = dest_num;
 		todo.push_back(dest);
                 t = res->create_transition(seen[src], dest_num);
-                if (acc_list && accepting)
+                if (accepting)
                 {
                   const state* dst = new state_explicit(t->dest);
                   acc_list->push_front(dst);
