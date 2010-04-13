@@ -55,6 +55,7 @@
 #include "tgbaalgos/sccfilter.hh"
 #include "tgbaalgos/safety.hh"
 #include "tgbaalgos/eltl2tgba_lacim.hh"
+#include "tgbaalgos/gtec/gtec.hh"
 #include "eltlparse/public.hh"
 #include "misc/timer.hh"
 
@@ -907,7 +908,66 @@ main(int argc, char** argv)
 
       spot::tgba_explicit* minimized = 0;
       if (opt_minimize)
-        a = minimized = minimize(a);
+	{
+	  tm.start("WDBA-minimization");
+	  minimized = minimize(a);
+	  tm.stop("WDBA-minimization");
+	  tm.start("WDBA-check");
+	  // If A is a safety automaton, the WDBA minimization
+	  // must be correct.
+	  if (is_safety_automaton(a))
+	    {
+	      a = minimized;
+	    }
+	  else // We don't know if A is a safety automaton.
+	    {
+	      // Let's make sure that a recognize the same language
+	      // as minimized.
+	      spot::ltl::formula* neg =
+		spot::ltl::unop::instance(spot::ltl::unop::Not, f->clone());
+	      spot::tgba* n = spot::ltl_to_tgba_fm(neg, dict, fm_exprop_opt,
+						   fm_symb_merge_opt,
+						   post_branching,
+						   fair_loop_approx,
+						   unobservables, fm_red);
+	      neg->destroy();
+	      spot::tgba* nscc = spot::scc_filter(n, true);
+	      // If the negation is a safety automaton,
+	      // then the minimization is correct.
+	      if (is_safety_automaton(n))
+		{
+		  a = minimized;
+		}
+	      else
+		{
+		  spot::tgba* p = new spot::tgba_product(minimized, nscc);
+		  spot::emptiness_check* ec = couvreur99(p);
+		  spot::emptiness_check_result* res = ec->check();
+		  if (!res)
+		    {
+		      delete ec;
+		      delete p;
+		      spot::tgba* nm = minimize(nscc);
+		      p = new spot::tgba_product(a, nm);
+		      ec = couvreur99(p);
+		      res = ec->check();
+		      if (!res)
+			{
+			  // Finally, we are now sure that it was safe
+			  // to minimize the automaton.
+			  a = minimized;
+			}
+		      delete nm;
+		    }
+		  delete res;
+		  delete ec;
+		  delete p;
+		}
+	      delete nscc;
+	      delete n;
+	    }
+	  tm.stop("WDBA-check");
+	}
 
       spot::tgba_reduc* aut_red = 0;
       if (reduc_aut != spot::Reduce_None)

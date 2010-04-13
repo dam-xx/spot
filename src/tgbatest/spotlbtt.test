@@ -184,6 +184,14 @@ Algorithm
 
 Algorithm
 {
+   Name = "Spot (Couvreur -- FM), +pre +WDBA"
+   Path = "${LBTT_TRANSLATE}"
+   Parameters = "--spot '../ltl2tgba -r4 -R3 -Rm -F -f -t'"
+   Enabled = yes
+}
+
+Algorithm
+{
    Name = "Spot (Couvreur -- FM), pre + allpost reduction"
    Path = "${LBTT_TRANSLATE}"
    Parameters = "--spot '../ltl2tgba -r4 -R1q -R1t -R2q -R2t -R3 -F -f -t'"

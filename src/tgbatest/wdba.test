@@ -21,9 +21,10 @@
 
 . ./defs
 
+set +x
 set -e
 
-cat >safety.txt <<EOF
+cat >obligations.txt <<EOF
 G(!p)
 Fr->(!p U r)
 G(q->G(!p))
@@ -59,16 +60,14 @@ Fr->(p->(!r U (s&!r&X(!r U t)))) U r
 G((q&Fr)->(p->(!r U (s&!r&X(!r U t)))) U r)
 Fr->(p->(!r U (s&!r&!z&X((!r&!z) U t)))) U r
 G((q&Fr)->(p->(!r U (s&!r&!z&X((!r&!z) U t)))) U r)
-EOF
-
-# The negation of the first 5 formulae are not safety properties, but they
-# are obligation properties.
-cat >non-safety.txt <<EOF
 Fp
 G(!q)|F(q&Fp)
 (!p U s)|Gp
 G(q->(!(s&(!r)&X(!r U (t&!r)))U(r|p)|G(!(s&XFt))))
 Fr->(s&X(!r U t)->X(!r U (t&Fp))) U r
+EOF
+
+cat >non-obligations.txt <<EOF
 G(q&!r->(!r U (p&!r)))
 G!q|F(q&((!p U s)|G!p))
 G(p->Fs)
@@ -88,21 +87,31 @@ EOF
 
 success=:
 while read f; do
-  x=`../ltl2tgba -f -R3f -O "!($f)"`
+  # If the labels of the state have only digits, assume the minimization
+  # worked.
+  x=`../ltl2tgba -f -Rm "!($f)" |
+     grep -v -- '->' |
+     sed -n 's/.*label="\(..*\)".*/\1/p' |
+     tr -d '0-9\n'`
   case $x in
-  *may*) echo "MNO !($f)"; success=false;;
-  *) echo "OBL !($f)";;
+  "") echo "OK !($f)";;
+  *) echo "KO !($f)"; success=false;;
   esac
-done < safety.txt
+done < obligations.txt
 
 echo ====
 
 while read f; do
-  x=`../ltl2tgba -f -R3f -O "!($f)"`
+  # If the labels of the state have only digits, assume the minimization
+  # worked.
+  x=`../ltl2tgba -f -Rm "!($f)" |
+     grep -v -- '->' |
+     sed -n 's/.*label="\(..*\)".*/\1/p' |
+     tr -d '0-9\n'`
   case $x in
-  *may*) echo "MNO !($f)";;
-  *) echo "OBL !($f)"; success=false;;
+  "") echo "wrongly minimized !($f)"; success=false;;
+  *) echo "OK !($f)";;
   esac
-done < non-safety.txt
+done < non-obligations.txt
 
 $success

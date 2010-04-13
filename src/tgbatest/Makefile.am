@@ -93,6 +93,7 @@ TESTS = \
   reductgba.test \
   scc.test \
   safety.test \
+  wdba.test \
   randtgba.test \
   emptchk.test \
   emptchke.test \

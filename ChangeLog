@@ -1,5 +1,19 @@
 2010-04-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	"ltl2tgba -Rm" will apply WDBA-minimization only if correct.
+
+	* src/tgbatest/ltl2tgba.cc (main): Use WDBA-minimization only when
+	it is correct. Either we can quickly determine that a formula or
+	its negation is a safety formula, or we can slowly check the
+	equivalence of the WDBA-minimized automaton and the original
+	automaton.
+	* src/tgbatest/wdba.test: New test.
+	* src/tgbatest/safety.test: Adjust comment.
+	* src/tgbatest/spotlbtt.test: Use -Rm.
+	* src/tgbatest/Makefile.am (TESTS): Add wdba.test.
+
+2010-04-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Better resource handling in minimization.
 
 	* src/tgbatest/ltl2tgba.cc (main): Delete the minimized automaton.
