@@ -463,6 +463,8 @@ namespace spot
 			{
 			  // F(a) & (a R b) = a M b
 			  // F(a) & (a M b) = a M b
+			  // F(a) & (b W a) = b U a
+			  // F(a) & (b U a) = b U a
 			  formula* a = uo->child();
 			  bool rewritten = false;
 			  for (multop::vec::iterator j = i;
@@ -479,6 +481,19 @@ namespace spot
 				    binop::instance(binop::M,
 						    a->clone(),
 						    b->second()->clone());
+				  tmpOther->push_back(r);
+				  (*j)->destroy();
+				  *j = 0;
+				  rewritten = true;
+				}
+			      else if (b && (b->op() == binop::W
+					     || b->op() == binop::U)
+				       && b->second() == a)
+				{
+				  binop* r =
+				    binop::instance(binop::U,
+						    b->first()->clone(),
+						    a->clone());
 				  tmpOther->push_back(r);
 				  (*j)->destroy();
 				  *j = 0;
@@ -508,6 +523,16 @@ namespace spot
 			    {
 			      if (!*j)
 				continue;
+			      // (a U b) & Fb = a U b.
+			      // (a W b) & Fb = a U b.
+			      unop* uo2 = dynamic_cast<unop*>(*j);
+			      if (uo2 && uo2->op() == unop::F
+				  && uo2->child() == ftmp)
+				{
+				  (*j)->destroy();
+				  *j = 0;
+				  weak = false;
+				}
 			      binop* bo2 = dynamic_cast<binop*>(*j);
 			      if (bo2 && (bo2->op() == binop::U
 					  || bo2->op() == binop::W)
@@ -708,6 +733,16 @@ namespace spot
 			    {
 			      if (!*j)
 				continue;
+			      // (a R b) | Gb = a R b.
+			      // (a M b) | Gb = a R b.
+			      unop* uo2 = dynamic_cast<unop*>(*j);
+			      if (uo2 && uo2->op() == unop::G
+				  && uo2->child() == ftmp)
+				{
+				  (*j)->destroy();
+				  *j = 0;
+				  weak = true;
+				}
 			      binop* bo2 = dynamic_cast<binop*>(*j);
 			      if (bo2 && (bo2->op() == binop::R
 					  || bo2->op() == binop::M)
