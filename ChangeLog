@@ -1,5 +1,9 @@
 2010-04-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* NEWS: Mention W and M.
+
+2010-04-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	More LTL reductions for W and M.
 
 	* src/ltlvisit/basicreduce.cc: Perform the following reductions:

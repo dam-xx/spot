@@ -16,6 +16,18 @@ New in spot 0.5a
     - The syntactic simplification rule for F(a&GF(b)) = F(a)&GF(b) has
       be disabled because the latter formula is in fact harder to translate
       efficiently.
+  * New LTL operators: W (weak until) and its dual M (strong release)
+    - Weak until allows many LTL specification to be specified more
+      compactly.
+    - All LTL translation algorithms have been updated to
+      support these operators.
+    - Although they do not add any expressive power, translating
+      "a W b" is more efficient (read smaller output automaton) than
+      translating the equivalent form using the U operator.
+    - Basic syntactic rewriting rules will automatically rewrite "a U
+      (b | G(a))" and "(a U b)|G(a)" as "a W b", so you will benefit
+      from the new operators even if you do not use them.  Similar
+      rewriting rules exist for R and M, although they are less used.
   * New options have been added to the CGI script for
     - SVG output
     - SCC simplifications
