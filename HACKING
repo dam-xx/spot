@@ -12,8 +12,8 @@ generally if you plan to regenerate some of the generated files.
   GNU Autoconf >= 2.61
   GNU Automake >= 1.11
   GNU Libtool >= 2.2
-  GNU Flex (the version seems to matters, we used 2.5.31)
-  GNU Bison >= 2.4
+  GNU Flex (the version seems to matters, we used 2.5.35)
+  GNU Bison >= 2.4.2
   SWIG >= 1.3.31
   Doxygen >= 1.4.0
 
