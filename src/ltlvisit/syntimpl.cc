@@ -616,12 +616,12 @@ namespace spot
     {
       if (f1 == f2)
 	return true;
-      inf_left_recurse_visitor v1(f2);
-      inf_right_recurse_visitor v2(f1);
-
       if (f2 == constant::true_instance()
 	  || f1 == constant::false_instance())
 	return true;
+
+      inf_left_recurse_visitor v1(f2);
+      inf_right_recurse_visitor v2(f1);
 
       const_cast<formula*>(f1)->accept(v1);
       if (v1.result())

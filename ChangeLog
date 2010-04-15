@@ -1,5 +1,12 @@
 2010-04-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Speed up syntactic_implication() for constants.
+
+	* src/ltlvisit/syntimpl.cc (syntactic_implication): Do not
+	create visitors if arguments are constant.
+
+2010-04-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix simplification of "a M true" as Fa.
 
 	* src/ltlvisit/simpfg.cc: Typo.
