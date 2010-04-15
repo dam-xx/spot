@@ -66,6 +66,10 @@ for x in ../reduccmp ../reductaustr; do
   run 0 $x 'a | (b U a) | a' '(b U a)'
   run 0 $x 'a U (b U a)' '(b U a)'
 
+  run 0 $x 'a M 1' 'Fa'
+  run 0 $x 'a W 0' 'Ga'
+  run 0 $x '1 U a' 'Fa'
+  run 0 $x '0 R a' 'Ga'
 
   # Basics reduction
   run 0 $x 'X(true)' 'true'

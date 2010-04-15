@@ -78,8 +78,8 @@ namespace spot
 	  return;
 	  /* f1 M true == F(f1) */
 	case binop::M:
-	  if (f1 == constant::true_instance())
-	    result_ = unop::instance(unop::F, f2);
+	  if (f2 == constant::true_instance())
+	    result_ = unop::instance(unop::F, f1);
 	  else
 	    result_ = binop::instance(binop::M, f1, f2);
 	  return;

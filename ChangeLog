@@ -1,5 +1,12 @@
 2010-04-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix simplification of "a M true" as Fa.
+
+	* src/ltlvisit/simpfg.cc: Typo.
+	* src/ltltest/reduccmp.test: Add more tests.
+
+2010-04-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* HACKING: Bison 2.4.2 has a bugfix we rely on.
 
 2010-04-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
