@@ -1,5 +1,21 @@
 2010-04-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	More simplifications rules for M.
+
+	* src/ltlvisit/reduce.cc (reduce_visitor): Add the following
+	implication rewriting rules:
+	a M (b M c) = a M c if a implies b.
+	a M (b R c) = a M c if a implies b.
+	a R (b R c) = a R c if a implies b.
+	a R (b M c) = b M c if b implies a.
+	a M (b M c) = b M c if b implies a.
+	The latter rule was fixed from an incorrectly copied&pasted
+	rule for a M (b R c) = b R c if b implies a (this is wrong).
+	Also remove the wrong rule for a W (b U c) = b U c if a implies b.
+	* src/ltltest/reduccmp.test: Add more tests.
+
+2010-04-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Speed up syntactic_implication() for constants.
 
 	* src/ltlvisit/syntimpl.cc (syntactic_implication): Do not

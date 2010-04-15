@@ -201,13 +201,26 @@ namespace spot
 		      return;
 		    }
 		  /* b < a => a R (b R c) = b R c */
+		  /* b < a => a R (b M c) = b M c */
 		  {
 		    binop* bo = dynamic_cast<binop*>(f2);
-		    if (bo && bo->op() == binop::R
+		    if (bo && (bo->op() == binop::R || bo->op() == binop::M)
 			&& syntactic_implication(bo->first(), f1))
 		      {
 			result_ = f2;
 			f1->destroy();
+			return;
+		      }
+		  }
+		  /* a < b => a R (b R c) = a R c */
+		  {
+		    binop* bo = dynamic_cast<binop*>(f2);
+		    if (bo && bo->op() == binop::R
+			&& syntactic_implication(f1, bo->first()))
+		      {
+			result_ = binop::instance(binop::R, f1,
+						  bo->second()->clone());
+			f2->destroy();
 			return;
 		      }
 		  }
@@ -229,11 +242,10 @@ namespace spot
 		      f2->destroy();
 		      return;
 		    }
-		  /* a < b => a W (b U c) = (b U c) */
 		  /* a < b => a W (b W c) = (b W c) */
 		  {
 		    binop* bo = dynamic_cast<binop*>(f2);
-		    if (bo && (bo->op() == binop::U || bo->op() == binop::W)
+		    if (bo && bo->op() == binop::W
 			&& syntactic_implication(f1, bo->first()))
 		      {
 			result_ = f2;
@@ -259,14 +271,27 @@ namespace spot
 		      f2->destroy();
 		      return;
 		    }
-		  /* b < a => a R (b R c) = b R c */
+		  /* b < a => a M (b M c) = b M c */
 		  {
 		    binop* bo = dynamic_cast<binop*>(f2);
-		    if (bo && bo->op() == binop::R
+		    if (bo && bo->op() == binop::M
 			&& syntactic_implication(bo->first(), f1))
 		      {
 			result_ = f2;
 			f1->destroy();
+			return;
+		      }
+		  }
+		  /* a < b => a M (b M c) = a M c */
+		  /* a < b => a M (b R c) = a M c */
+		  {
+		    binop* bo = dynamic_cast<binop*>(f2);
+		    if (bo && (bo->op() == binop::M || bo->op() == binop::R)
+			&& syntactic_implication(f1, bo->first()))
+		      {
+			result_ = binop::instance(binop::M, f1,
+						  bo->second()->clone());
+			f2->destroy();
 			return;
 		      }
 		  }

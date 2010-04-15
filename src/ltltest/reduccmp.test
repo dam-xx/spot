@@ -143,6 +143,16 @@ for x in ../reduccmp ../reductaustr; do
      ;;
   esac
 
+  # Syntactic implication
+  run 0 $x '(a & b) R (a R c)' '(a & b)R c'
+  run 0 $x 'a R ((a & b) R c)' '(a & b)R c'
+  run 0 $x 'a R ((a & b) M c)' '(a & b)M c'
+  run 0 $x 'a M ((a & b) M c)' '(a & b)M c'
+  run 0 $x '(a & b) M (a R c)' '(a & b)M c'
+  run 0 $x '(a & b) M (a M c)' '(a & b)M c'
+  run 0 $x 'a M ((a&b) R c)' 'a M ((a&b) R c)' #not reduced.
+  run 0 $x '(a&b) W (a U c)' '(a&b) W (a U c)' #not reduced.
+
   # Eventuality and universality class reduction
   run 0 $x 'FFa' 'Fa'
   run 0 $x 'FGFa' 'GFa'
