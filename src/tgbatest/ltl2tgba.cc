@@ -161,6 +161,7 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -c    enable language containment checks (implies -taa)"
 	    << std::endl
+	    << std::endl
 
 	    << "Formula simplification (before translation):"
 	    << std::endl
