@@ -228,14 +228,8 @@ namespace spot
 		}
 	      break;
 	    case binop::R:
-	      // if (a R b) => b, then keep b !
-	      if (stronger && lcc->contained(b, bo))
-		{
-		  a->destroy();
-		  result_ = b;
-		}
 	      // if b => a,  then a R b = b.
-	      else if ((!stronger) && lcc->contained(b, a))
+	      if (lcc->contained(b, a))
 		{
 		  a->destroy();
 		  result_ = b;
@@ -252,14 +246,8 @@ namespace spot
 		}
 	      break;
 	    case binop::M:
-	      // if (a M b) => b, then keep b !
-	      if (stronger && lcc->contained(b, bo))
-		{
-		  a->destroy();
-		  result_ = b;
-		}
 	      // if b => a,  then a M b = b.
-	      else if ((!stronger) && lcc->contained(b, a))
+	      if (lcc->contained(b, a))
 		{
 		  a->destroy();
 		  result_ = b;

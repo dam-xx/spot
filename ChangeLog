@@ -1,5 +1,14 @@
 2010-04-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix a long-standing bug in the stronger rule for R and its recent
+	clone for M.
+
+	* src/ltlvisit/contain.cc (reduce_tau03_visitor): Remove
+	the stronger rules for R and M.  They were wrong.
+	* src/ltltest/reduccmp.test: Test a simpple counterexample.
+
+2010-04-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	More simplifications rules for M.
 
 	* src/ltlvisit/reduce.cc (reduce_visitor): Add the following

@@ -143,6 +143,8 @@ for x in ../reduccmp ../reductaustr; do
      ;;
   esac
 
+  run 0 $x 'a R (b W G(c))' 'a R (b W G(c))' #not reduced
+
   # Syntactic implication
   run 0 $x '(a & b) R (a R c)' '(a & b)R c'
   run 0 $x 'a R ((a & b) R c)' '(a & b)R c'
