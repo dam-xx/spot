@@ -66,24 +66,25 @@ for x in ../reduccmp ../reductaustr; do
   run 0 $x 'a | (b U a) | a' '(b U a)'
   run 0 $x 'a U (b U a)' '(b U a)'
 
-  run 0 $x 'a M 1' 'Fa'
-  run 0 $x 'a W 0' 'Ga'
-  run 0 $x '1 U a' 'Fa'
-  run 0 $x '0 R a' 'Ga'
-
   # Basics reduction
   run 0 $x 'X(true)' 'true'
   run 0 $x 'X(false)' 'false'
   run 0 $x 'F(true)' 'true'
   run 0 $x 'F(false)' 'false'
-  run 0 $x 'G(true)' 'true'
-  run 0 $x 'G(false)' 'false'
 
   run 0 $x 'XGF(f)' 'GF(f)'
 
   case $x in
    *tau*);;
    *)
+     run 0 $x 'G(true)' 'true'
+     run 0 $x 'G(false)' 'false'
+
+     run 0 $x 'a M 1' 'Fa'
+     run 0 $x 'a W 0' 'Ga'
+     run 0 $x '1 U a' 'Fa'
+     run 0 $x '0 R a' 'Ga'
+
      run 0 $x 'G(a R b)' 'G(b)'
 
      run 0 $x 'FX(a)' 'XF(a)'
@@ -140,18 +141,23 @@ for x in ../reduccmp ../reductaustr; do
      run 0 $x '(a U b) & Fb' 'a U b'
      run 0 $x '(a W b) & Fb' 'a U b'
      run 0 $x '(a M b) | Gb | (c M b)' '(a | c) R b'
+
+     run 0 $x 'GFGa' 'FGa'
+     run 0 $x 'b R Ga' 'Ga'
+     run 0 $x 'b R FGa' 'FGa'
+
+     # Syntactic implication
+     run 0 $x '(a & b) R (a R c)' '(a & b)R c'
+     run 0 $x 'a R ((a & b) R c)' '(a & b)R c'
+     run 0 $x 'a R ((a & b) M c)' '(a & b)M c'
+     run 0 $x 'a M ((a & b) M c)' '(a & b)M c'
+     run 0 $x '(a & b) M (a R c)' '(a & b)M c'
+     run 0 $x '(a & b) M (a M c)' '(a & b)M c'
      ;;
   esac
 
   run 0 $x 'a R (b W G(c))' 'a R (b W G(c))' #not reduced
 
-  # Syntactic implication
-  run 0 $x '(a & b) R (a R c)' '(a & b)R c'
-  run 0 $x 'a R ((a & b) R c)' '(a & b)R c'
-  run 0 $x 'a R ((a & b) M c)' '(a & b)M c'
-  run 0 $x 'a M ((a & b) M c)' '(a & b)M c'
-  run 0 $x '(a & b) M (a R c)' '(a & b)M c'
-  run 0 $x '(a & b) M (a M c)' '(a & b)M c'
   run 0 $x 'a M ((a&b) R c)' 'a M ((a&b) R c)' #not reduced.
   run 0 $x '(a&b) W (a U c)' '(a&b) W (a U c)' #not reduced.
 
@@ -161,7 +167,4 @@ for x in ../reduccmp ../reductaustr; do
   run 0 $x 'b U Fa' 'Fa'
   run 0 $x 'b U GFa' 'GFa'
   run 0 $x 'Ga' 'Ga'
-  run 0 $x 'GFGa' 'FGa'
-  run 0 $x 'b R Ga' 'Ga'
-  run 0 $x 'b R FGa' 'FGa'
 done

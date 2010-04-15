@@ -1,5 +1,13 @@
 2010-04-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Reorder recent additions to reduccmp.test.
+
+	* src/ltltest/reduccmp.test: Reorder the test added by the
+	previous patches.  Some are not supposed to be reduced by
+	reductaustr.
+
+2010-04-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix a long-standing bug in the stronger rule for R and its recent
 	clone for M.
 
