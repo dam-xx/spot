@@ -1,5 +1,9 @@
 2010-04-16  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* NEWS: Typo.
+
+2010-04-16  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* NEWS, configure.ac: Bump version to 0.6a.
 
 2010-04-16  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

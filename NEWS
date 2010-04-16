@@ -39,7 +39,7 @@ New in spot 0.6 (16-04-2010):
     - The precedence of the "->" and "<->" Boolean operators has been
       adjusted to better match other tools.
       Spot <= 0.5 used to parse "a & b -> c & d" as "a & (b -> c) & d";
-      Spot >= 0.5.1 will parse it as "(a & b) -> (c & d)".
+      Spot >= 0.6 will parse it as "(a & b) -> (c & d)".
     - The random graph generator was fixed (again!) not to produce
       dead states as documented.
     - Locations in the error messages of the LTL parser were off by one.
