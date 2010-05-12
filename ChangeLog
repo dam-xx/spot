@@ -1,3 +1,35 @@
+2010-05-19  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add support the bounded star operator [*i..j].
+
+	* src/ltlast/bunop.hh, src/ltlast/bunop.cc: New files for
+	bounded unary operators.
+	* src/ltlast/Makefile.am, src/ltlast/allnodes.hh: Add them.
+	* src/ltlast/predecl.hh (bunop): Declare.
+	* src/ltlast/unop.hh, src/ltlast/unop.cc (Star): Remove
+	declaration of Star and associated code.
+	* src/ltlast/visitor.hh: Add visit(bunop* node) methods.
+	* src/ltlparse/ltlparse.yy, src/ltlparse/ltlscan.ll: Add parse
+	rules for LTL.  This required passing the parse_error list
+	to the lexer, so it can report scanning errors when it reads
+	a number that does not fit in an unsigned int.
+	* src/ltlparse/parsedecl.hh (YY_DECL): Take error_list
+	as third argument.
+	* src/ltltest/consterm.test, src/ltltest/tostring.test,
+	src/ltltest/equals.test, src/tgbatest/ltl2tgba.test: More tests.
+	* src/ltlvisit/basicreduce.cc, src/ltlvisit/clone.cc,
+	src/ltlvisit/clone.hh, src/ltlvisit/consterm.cc,
+	src/ltlvisit/dotty.cc, src/ltlvisit/mark.cc,
+	src/ltlvisit/nenoform.cc, src/ltlvisit/postfix.cc,
+	src/ltlvisit/postfix.hh, src/ltlvisit/reduce.cc,
+	src/ltlvisit/syntimpl.cc, src/ltlvisit/tostring.cc,
+	src/ltlvisit/tunabbrev.cc, src/tgba/formula2bdd.cc,
+	src/tgbaalgos/eltl2tgba_lacim.cc, src/tgbaalgos/ltl2taa.cc,
+	src/tgbaalgos/ltl2tgba_lacim.cc: Adjust syntax to use
+	"bunop::Star" instead of "unop::Star".
+	* src/tgbaalgos/ltl2tgba_fm.cc: Likewise, but also adjust
+	the code to handle the bounds of the operator.
+
 2010-03-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Print '{!a}*' rather than '!a*'.
