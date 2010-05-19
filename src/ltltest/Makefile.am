@@ -30,6 +30,7 @@ check_SCRIPTS = defs
 check_PROGRAMS = \
   consterm \
   equals \
+  kind \
   ltl2dot \
   ltl2text \
   lunabbrev \
@@ -50,6 +51,7 @@ noinst_PROGRAMS = \
 consterm_SOURCES = consterm.cc
 equals_SOURCES = equals.cc
 genltl_SOURCES = genltl.cc
+kind_SOURCES = kind.cc
 ltl2dot_SOURCES = readltl.cc
 ltl2dot_CPPFLAGS = $(AM_CPPFLAGS) -DDOTTY
 ltl2text_SOURCES = readltl.cc
@@ -86,6 +88,7 @@ TESTS = \
   nenoform.test \
   tunenoform.test \
   consterm.test \
+  kind.test \
   syntimpl.test \
   reduc.test \
   reduccmp.test
