@@ -1,5 +1,15 @@
 2010-05-19  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Add support for [+].
+
+	* src/ltlast/bunop.cc (bunop::format): Output [*1..] as [+].
+	* src/ltlvisit/tostring.cc: Output "a*" as "a[*]" for consistency.
+	* src/ltlparse/ltlparse.yy, src/ltlparse/ltlscan.ll: Recognize [+].
+	* src/ltltest/tostring.test, src/ltltest/equals.test,
+	src/tgbatest/ltl2tgba.test: More tests.
+
+2010-05-19  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add support the bounded star operator [*i..j].
 
 	* src/ltlast/bunop.hh, src/ltlast/bunop.cc: New files for
