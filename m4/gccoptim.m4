@@ -11,6 +11,7 @@ AC_DEFUN([ad_GCC_OPTIM],
 int main(int argc, char *argv[]) { return argv[argc-1] == 0; }
 EOF
   changequote([,])dnl
+  AC_LANG_PUSH([C])
   cf_save_CFLAGS="$CFLAGS"
   ac_cv_prog_gcc_opt_flags="-O3"
   for cf_opt in \
@@ -24,6 +25,7 @@ EOF
     fi
   done
   rm -f conftest*
+  AC_LANG_POP([C])
   CFLAGS="$cf_save_CFLAGS $ac_cv_prog_gcc_opt_flags"])
   AC_CACHE_CHECK([for g++ optimization options], ac_cv_prog_gxx_opt_flags,
   [changequote(,)dnl

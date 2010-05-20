@@ -1,3 +1,10 @@
+2010-05-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix the --enable-optimizations check.
+
+	* m4/gccoptim.m4: Add missing AC_LANG_PUSH/AC_LANG_POP around the
+	C test.  It was using the C++ compiler instead...
+
 2010-04-16  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* NEWS: Typo.
