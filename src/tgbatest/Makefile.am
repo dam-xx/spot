@@ -39,6 +39,7 @@ check_PROGRAMS = \
   explprod \
   ltlprod \
   mixprod \
+  neverclaimread \
   powerset \
   reductgba \
   reduccmp \
@@ -57,6 +58,7 @@ explprod_SOURCES = explprod.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
 ltlprod_SOURCES  = ltlprod.cc
 mixprod_SOURCES  = mixprod.cc
+neverclaimread_SOURCES = neverclaimread.cc
 powerset_SOURCES = powerset.cc
 randtgba_SOURCES = randtgba.cc
 reductgba_SOURCES = reductgba.cc
@@ -73,6 +75,7 @@ TESTS = \
   explicit.test \
   taatgba.test \
   tgbaread.test \
+  neverclaimread.test \
   readsave.test \
   ltl2tgba.test \
   ltl2neverclaim.test \

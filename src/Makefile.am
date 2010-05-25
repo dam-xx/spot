@@ -28,7 +28,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 # libspot.la needed by the tests).
 SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse eltlparse tgba		\
           tgbaalgos tgbaparse evtgba evtgbaalgos evtgbaparse kripke	\
-          saba sabaalgos . ltltest eltltest tgbatest evtgbatest		\
+          neverclaimparse . ltltest eltltest tgbatest evtgbatest	\
           sabatest sanity
 
 lib_LTLIBRARIES = libspot.la
@@ -44,6 +44,7 @@ libspot_la_LIBADD =  \
   tgba/libtgba.la \
   tgbaalgos/libtgbaalgos.la \
   tgbaparse/libtgbaparse.la \
+  neverclaimparse/libneverclaimparse.la \
   evtgba/libevtgba.la \
   evtgbaalgos/libevtgbaalgos.la \
   evtgbaparse/libevtgbaparse.la \
