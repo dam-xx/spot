@@ -1,3 +1,27 @@
+2010-05-25  Felix Abecassis  <abecassis@lrde.epita.fr>
+
+	Add never claim parser.
+
+	* src/neverclaimparse/: New directory.
+	* src/neverclaimparse/fmterror.cc: New file.  Print a formatted parse
+	error on a output stream.
+	* src/neverclaimparse/neverclaimparse.yy: New file.  Parser declaration
+	for Bison.
+	* src/neverclaimparse/neverclaimscan.ll: New file.  Scanner declaration
+	for Flex.
+	* src/neverclaimparse/public.hh: New file.  Public header for external
+	use.
+	* src/neverclaimparse/parsedecl.hh: New file.  Header file for
+	Flex-Bison interaction.
+	* src/neverclaimparse/Makefile.am: New Makefile.
+	* src/tgbatest/neverclaimread.cc: New file.  Test program for the
+	never claim parser.
+	* src/tgbatest/neverclaimread.test: New file.  Test script for the
+	never claim parser.
+	* src/tgbatest/Makefile.am: Adjust.
+	* configure.ac : Adjust.
+	* README: Adjust.
+
 2010-05-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix the --enable-optimizations check.
