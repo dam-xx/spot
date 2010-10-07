@@ -31,8 +31,6 @@
 
 namespace spot
 {
-  struct safra_tree_automaton;
-
   /// \brief Build a complemented automaton.
   /// \ingroup tgba_on_the_fly_algorithms
   ///
@@ -56,11 +54,6 @@ namespace spot
     tgba_safra_complement(const tgba* a);
     virtual ~tgba_safra_complement();
 
-    safra_tree_automaton* get_safra() const
-    {
-      return safra_;
-    }
-
     // tgba interface.
     virtual state* get_init_state() const;
     virtual tgba_succ_iterator*
@@ -73,12 +66,17 @@ namespace spot
     virtual bdd all_acceptance_conditions() const;
     virtual bdd neg_acceptance_conditions() const;
 
+    void* get_safra() const
+    {
+      return safra_;
+    }
+
   protected:
     virtual bdd compute_support_conditions(const state* state) const;
     virtual bdd compute_support_variables(const state* state) const;
   private:
     const tgba* automaton_;
-    safra_tree_automaton* safra_;
+    void* safra_;
 #if TRANSFORM_TO_TBA
     bdd the_acceptance_cond_;
 #endif
@@ -88,7 +86,6 @@ namespace spot
     // Map to i the i-th acceptance condition of the final automaton.
     std::vector<int> acceptance_cond_vec_;
 #endif
-
   };
 
   /// \brief Produce a dot output of the Safra automaton associated

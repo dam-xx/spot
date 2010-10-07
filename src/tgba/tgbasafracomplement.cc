@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -50,32 +50,29 @@ namespace spot
       operator()(const safra_tree* left,
                  const safra_tree* right) const;
     };
-  } // anonymous.
 
-  /// \brief Automaton with Safra's tree as states.
-  struct safra_tree_automaton
-  {
-    safra_tree_automaton(const tgba* sba);
-    ~safra_tree_automaton();
-    typedef std::map<bdd, const safra_tree*, bdd_less_than> transition_list;
-    typedef
-    std::map<safra_tree*, transition_list, safra_tree_ptr_less_than>
-    automaton_t;
-    automaton_t automaton;
+    /// \brief Automaton with Safra's tree as states.
+    struct safra_tree_automaton
+    {
+      safra_tree_automaton(const tgba* sba);
+      ~safra_tree_automaton();
+      typedef std::map<bdd, const safra_tree*, bdd_less_than> transition_list;
+      typedef
+      std::map<safra_tree*, transition_list, safra_tree_ptr_less_than>
+      automaton_t;
+      automaton_t automaton;
 
-    /// \brief The number of acceptance pairs of this Rabin (Streett)
-    /// automaton.
-    int get_nb_acceptance_pairs() const;
-    safra_tree* get_initial_state() const;
-    void set_initial_state(safra_tree* s);
-  private:
-    mutable int max_nb_pairs_;
-    safra_tree* initial_state;
-    const tgba* a_;
-  };
+      /// \brief The number of acceptance pairs of this Rabin (Streett)
+      /// automaton.
+      int get_nb_acceptance_pairs() const;
+      safra_tree* get_initial_state() const;
+      void set_initial_state(safra_tree* s);
+    private:
+      mutable int max_nb_pairs_;
+      safra_tree* initial_state;
+      const tgba* a_;
+    };
 
-  namespace
-  {
     /// \brief A Safra tree, used as state during the determinization
     /// of a Büchi automaton
     ///
@@ -1120,7 +1117,8 @@ namespace spot
 #endif
 
 #if TRANSFORM_TO_TGBA
-    unsigned nb_acc = safra_->get_nb_acceptance_pairs();
+    unsigned nb_acc =
+      static_cast<safra_tree_automaton*>(safra_)->get_nb_acceptance_pairs();
     all_acceptance_cond_ = bddfalse;
     neg_acceptance_cond_ = bddtrue;
     acceptance_cond_vec_.reserve(nb_acc);
@@ -1138,15 +1136,15 @@ namespace spot
   tgba_safra_complement::~tgba_safra_complement()
   {
     get_dict()->unregister_all_my_variables(safra_);
-    delete safra_;
+    delete static_cast<safra_tree_automaton*>(safra_);
   }
 
   state*
   tgba_safra_complement::get_init_state() const
   {
-    bitset_t empty(safra_->get_nb_acceptance_pairs());
-    return new state_complement(empty, empty, safra_->get_initial_state(),
-                                false);
+    safra_tree_automaton* a = static_cast<safra_tree_automaton*>(safra_);
+    bitset_t empty(a->get_nb_acceptance_pairs());
+    return new state_complement(empty, empty, a->get_initial_state(), false);
   }
 
 
@@ -1189,19 +1187,20 @@ namespace spot
                              const state* /* = 0 */,
                              const tgba* /* = 0 */) const
   {
+    const safra_tree_automaton* a = static_cast<safra_tree_automaton*>(safra_);
     const state_complement* s =
       dynamic_cast<const state_complement*>(local_state);
     assert(s);
     safra_tree_automaton::automaton_t::const_iterator tr =
-      safra_->automaton.find(const_cast<safra_tree*>(s->get_safra()));
+      a->automaton.find(const_cast<safra_tree*>(s->get_safra()));
 
     typedef safra_tree_automaton::transition_list::const_iterator trans_iter;
 
-    if (tr != safra_->automaton.end())
+    if (tr != a->automaton.end())
     {
       bdd condition = bddfalse;
       tgba_safra_complement_succ_iterator::succ_list_t succ_list;
-      int nb_acceptance_pairs = safra_->get_nb_acceptance_pairs();
+      int nb_acceptance_pairs = a->get_nb_acceptance_pairs();
       bitset_t e(nb_acceptance_pairs);
 
       if (!s->get_use_bitset()) // if \delta'(q, a)
@@ -1311,14 +1310,14 @@ namespace spot
   bdd
   tgba_safra_complement::compute_support_conditions(const state* state) const
   {
+    const safra_tree_automaton* a = static_cast<safra_tree_automaton*>(safra_);
     const state_complement* s = dynamic_cast<const state_complement*>(state);
     assert(s);
     typedef safra_tree_automaton::automaton_t::const_iterator auto_it;
     typedef safra_tree_automaton::transition_list::const_iterator trans_it;
-    auto_it node(safra_->
-                 automaton.find(const_cast<safra_tree*>(s->get_safra())));
+    auto_it node(a->automaton.find(const_cast<safra_tree*>(s->get_safra())));
 
-    if (node == safra_->automaton.end())
+    if (node == a->automaton.end())
       return bddtrue;
 
     bdd res = bddtrue;
@@ -1331,14 +1330,14 @@ namespace spot
   bdd
   tgba_safra_complement::compute_support_variables(const state* state) const
   {
+    const safra_tree_automaton* a = static_cast<safra_tree_automaton*>(safra_);
     const state_complement* s = dynamic_cast<const state_complement*>(state);
     assert(s);
     typedef safra_tree_automaton::automaton_t::const_iterator auto_it;
     typedef safra_tree_automaton::transition_list::const_iterator trans_it;
-    auto_it node(safra_->
-                 automaton.find(const_cast<safra_tree*>(s->get_safra())));
+    auto_it node(a->automaton.find(const_cast<safra_tree*>(s->get_safra())));
 
-    if (node == safra_->automaton.end())
+    if (node == a->automaton.end())
       return bddtrue;
 
     bdd res = bddtrue;
@@ -1352,6 +1351,7 @@ namespace spot
   //////////////////////////////
   void display_safra(const tgba_safra_complement* a)
   {
-    test::print_safra_automaton(a->get_safra());
+    test::print_safra_automaton(static_cast<safra_tree_automaton*>
+				(a->get_safra()));
   }
 }

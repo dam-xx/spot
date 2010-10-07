@@ -1,3 +1,20 @@
+2010-10-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Hide the safra_tree_automaton type from the public interface.
+
+	We do that because the declaration of this type, which is local to
+	src/tgba/tgbasafracomplement.cc has a member in an anonymous
+	namespace, and some versions of g++-4.2 issue a very annoying
+	warning about this legitimate code.  See Bug 29365 on GCC's
+	Bugzilla.  Report by Silien Hong <silien.hong@lip6.fr>.
+
+	* src/tgba/tgbasafracomplement.hh (safra_tree_automaton): Do not
+	forward declare.
+	(tgba_safra_complement): Use void* instead of
+	safra_tree_automaton*.
+	* src/tgba/tgbasafracomplement.cc: static_cast void* to
+	safra_tree_automaton* anywhere needed.
+
 2010-05-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix the --enable-optimizations check.
