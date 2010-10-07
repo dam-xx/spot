@@ -1,5 +1,9 @@
 2010-10-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* configure.ac: Do not run CF_GXX_WARNINGS unless they are enabled.
+
+2010-10-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Hide the safra_tree_automaton type from the public interface.
 
 	We do that because the declaration of this type, which is local to

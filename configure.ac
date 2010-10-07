@@ -54,7 +54,9 @@ AC_CHECK_FUNCS([srand48 drand48])
 LT_INIT([win32-dll])
 
 spot_INTEL
-CF_GXX_WARNINGS
+if test x$enable_warnings = xyes; then
+  CF_GXX_WARNINGS
+fi
 adl_ENABLE_DEBUG
 ad_GCC_OPTIM
 adl_NDEBUG
