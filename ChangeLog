@@ -1,3 +1,10 @@
+2010-10-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Simplify ![*0] as [+].
+
+	* src/ltlast/unop.cc: Simplify ![*0] as 1[+].
+	* src/ltlast/unop.hh: Document it.
+
 2010-05-19  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Add functions to compute the kind of a formula (LTL, PSL, Boolean...)
