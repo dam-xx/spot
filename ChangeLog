@@ -1,5 +1,13 @@
 2010-10-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Rewrite Exp[=0..] as [*].
+
+	* src/ltlast/bunop.cc: Implement this rewriting.
+	* src/ltlast/bunop.hh: Document it.
+	* src/ltltest/equals.test: Test it.
+
+2010-10-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Introduce [=min..max] operator.
 
 	* src/ltlast/bunop.hh: Declare bunop::Equal
