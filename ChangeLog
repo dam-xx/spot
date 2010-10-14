@@ -1,5 +1,19 @@
 2010-10-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Introduce [=min..max] operator.
+
+	* src/ltlast/bunop.hh: Declare bunop::Equal
+	* src/ltlast/bunop.cc: Handle it.
+	* src/ltlparse/ltlparse.yy,
+	src/ltlparse/ltlscan.ll: Add rules for [=min..max].
+	* src/tgbaalgos/ltl2tgba_fm.cc: Handle bunop::Equal in
+	the translation.
+	* src/ltltest/equals.test: Test trivial identities
+	for [=min..max].
+	* src/tgbatest/ltl2tgba.test: Add new formulae to test.
+
+2010-10-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Simplify ![*0] as [+].
 
 	* src/ltlast/unop.cc: Simplify ![*0] as 1[+].
