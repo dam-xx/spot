@@ -1,5 +1,13 @@
 2010-10-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Read p=0Wq=1 and p=0Mq=1 correctly.
+
+	* src/ltlparse/ltlscan.ll: Handle p=0Wq=1 and p=0Mq=1 in
+	the same way as we did for
+	* src/ltltest/parse.test: More tests.
+
+2010-10-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Accept more syntaxes for the range specifications of the operators
 	[*], [=], and [->].
 
