@@ -1,5 +1,17 @@
 2010-10-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Accept more syntaxes for the range specifications of the operators
+	[*], [=], and [->].
+
+	* src/ltlparse/ltlscan.ll (OP_SQBKT_SEP): Accept ":" and "to"
+	in addition to ".." and ",".
+	(OP_UNBOUNDED): Recognize "$" for the rule below.
+	* src/ltlparse/ltlparse.yy: Accept [OP1:$] as a synonym
+	for [OP1:], for people used to SVA's syntax.
+	* src/ltltest/equals.test: Test these syntaxes.
+
+2010-10-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix rewriting of Negated constants and atomic propositions
 
 	* src/tgbaalgos/ltl2tgba_fm.cc (ratexp_trad_visitor): Take a
