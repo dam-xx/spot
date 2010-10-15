@@ -1,3 +1,16 @@
+2010-10-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Introduce [->min..max] operator.
+
+	* src/ltlast/bunop.hh: Declare bunop::Goto
+	* src/ltlast/bunop.cc: Handle it.
+	* src/ltlparse/ltlparse.yy,
+	src/ltlparse/ltlscan.ll: Add rules for [->min..max].
+	* src/tgbaalgos/ltl2tgba_fm.cc: Handle bunop::Goto in
+	the translation.
+	* src/ltltest/equals.test: Test trivial identities.
+	* src/tgbatest/ltl2tgba.test: Test two more formulae using [->].
+
 2010-10-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Rewrite Exp[=0..] as [*].
