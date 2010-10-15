@@ -1,5 +1,11 @@
 2010-10-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Speed up computation of constant term on [->] and [=] operators.
+
+	* src/ltlvisit/consterm.cc: Stop the recursion on [->] and [=].
+
+2010-10-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/ltlast/multop.hh: Fix documentation of some trivial
 	identity.
 
