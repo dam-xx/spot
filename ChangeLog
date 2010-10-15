@@ -1,5 +1,12 @@
 2010-10-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix rewriting of Negated constants and atomic propositions
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (ratexp_trad_visitor): Take a
+	"negated" parameter and use it.
+
+2010-10-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Speed up computation of constant term on [->] and [=] operators.
 
 	* src/ltlvisit/consterm.cc: Stop the recursion on [->] and [=].
