@@ -1,3 +1,13 @@
+2010-10-16  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix trivial identity (0 => Exp) == 1, and add rewritings for
+	(Exp => Exp) = 1, (Exp <=> Exp) == 1, (Exp ^ Exp) == 0.
+
+	* src/ltlast/binop.hh: Fix documentation.
+	* src/ltlast/binop.cc: Fix implementation.
+	* src/ltltest/equals.test: More tests.
+	* src/tgbatest/emptchk.test: Remove a useless test.
+
 2010-10-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Read p=0Wq=1 and p=0Mq=1 correctly.
