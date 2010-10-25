@@ -1,3 +1,11 @@
+2010-10-19  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Do not simplify F([*0]) and G([*0]).  Instead make sure it does
+	not happen.
+
+	* src/ltlast/unop.hh, src/ltlast/unop.cc: Replace the
+	simplification by an assert.
+
 2010-10-16  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix trivial identity (0 => Exp) == 1, and add rewritings for
