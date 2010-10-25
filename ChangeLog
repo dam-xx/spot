@@ -1,3 +1,13 @@
+2010-10-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Simplify fUf, fRf, fWf,	and fRF as f.
+
+	* src/ltlast/binop.cc (binop::instance): Simplify fUf, fRf, fWf,
+	and fRF.
+	* src/ltlast/binop.hh: Document it.
+	* src/ltltest/equals.test: Add new tests for 'Exp U Exp'
+	and 'Exp R Exp', and all missing tests for W and M.
+
 2010-10-19  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Do not simplify F([*0]) and G([*0]).  Instead make sure it does
