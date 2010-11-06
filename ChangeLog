@@ -1,3 +1,23 @@
+2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Cleanup neverclaim support.
+
+	* src/neverclaimparse/: Shorthen as ...
+	* src/neverparse/:... this.
+	* src/Makefile.am: Adjust, and add back the directories mistakenly
+	removed by previous patch.
+	* README: Adjust, and keep the file's width under 80 columns.
+	* configure.ac: Adjust.
+	* src/neverparse/Makefile.am, src/neverparse/fmterror.cc, 
+	src/neverparse/neverclaimparse.yy, 
+	src/neverparse/neverclaimscan.ll, src/neverparse/public.hh: 
+	Fix copyright.
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Remove neverclaimread.
+	* src/tgbatest/ltl2tgba.cc: Add option -XN to read a neverclaim.
+	* src/tgbatest/readneverclaim.cc: Delete.
+	* src/tgbatest/neverclaimread.test: Use ltl2tgba instead of
+	neverclaimread.
+
 2010-05-25  Felix Abecassis  <abecassis@lrde.epita.fr>
 
 	Add never claim parser.

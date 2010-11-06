@@ -45,6 +45,7 @@
 #include "tgba/futurecondcol.hh"
 #include "tgbaalgos/reducerun.hh"
 #include "tgbaparse/public.hh"
+#include "neverparse/public.hh"
 #include "tgbaalgos/dupexp.hh"
 #include "tgbaalgos/neverclaim.hh"
 #include "tgbaalgos/reductgba_sim.hh"
@@ -105,6 +106,8 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -X    do not compute an automaton, read it from a file"
 	    << std::endl
+	    << "  -XN   do not compute an automaton, read it from a"
+	    << " neverclaim file" << std::endl
 	    << "  -Pfile  multiply the formula automaton with the automaton"
 	    << " from `file'"
 	    << std::endl
@@ -285,6 +288,7 @@ main(int argc, char** argv)
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
   bool expect_counter_example = false;
   bool from_file = false;
+  bool read_neverclaim = false;
   int reduc_aut = spot::Reduce_None;
   int redopt = spot::ltl::Reduce_None;
   bool scc_filter_all = false;
@@ -635,6 +639,11 @@ main(int argc, char** argv)
 	{
 	  from_file = true;
 	}
+      else if (!strcmp(argv[formula_index], "-XN"))
+	{
+	  from_file = true;
+	  read_neverclaim = true;
+	}
       else if (!strcmp(argv[formula_index], "-y"))
 	{
 	  translation = TransFM;
@@ -738,17 +747,34 @@ main(int argc, char** argv)
 
       if (from_file)
 	{
-	  spot::tgba_parse_error_list pel;
 	  spot::tgba_explicit_string* e;
-	  tm.start("parsing automaton");
-	  to_free = a = e = spot::tgba_parse(input, pel, dict,
-					     env, env, debug_opt);
-	  tm.stop("parsing automaton");
-	  if (spot::format_tgba_parse_errors(std::cerr, input, pel))
+	  if (!read_neverclaim)
 	    {
-	      delete to_free;
-	      delete dict;
-	      return 2;
+	      spot::tgba_parse_error_list pel;
+	      tm.start("parsing automaton");
+	      to_free = a = e = spot::tgba_parse(input, pel, dict,
+						 env, env, debug_opt);
+	      tm.stop("parsing automaton");
+	      if (spot::format_tgba_parse_errors(std::cerr, input, pel))
+		{
+		  delete to_free;
+		  delete dict;
+		  return 2;
+		}
+	    }
+	  else
+	    {
+	      spot::neverclaim_parse_error_list pel;
+	      tm.start("parsing never claim");
+	      to_free = a = e = spot::neverclaim_parse(input, pel, dict, 
+						       env, debug_opt);	      
+	      tm.stop("parsing never claim");
+	      if (spot::format_neverclaim_parse_errors(std::cerr, input, pel))
+		{
+		  delete to_free;
+		  delete dict;
+		  return 2;
+		}	      
 	    }
 	  e->merge_transitions();
 	}
