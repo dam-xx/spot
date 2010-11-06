@@ -117,7 +117,9 @@ my $model = shift @ARGV;
 my $model_size = `wc -l <"$model"`;
 my $neverstartline_spin517 = 3 + $model_size;
 my $neverstartline_spin520 = 4 + $model_size;
-my $neverstartline = "($neverstartline_spin517|$neverstartline_spin520)";
+my $neverstartline_spin525 = 0 + $model_size;
+my $neverstartline = 
+  "($neverstartline_spin517|$neverstartline_spin520|$neverstartline_spin525)";
 
 # Create the automaton
 open NEVER, ">never.$$";
