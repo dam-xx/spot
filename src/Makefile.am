@@ -44,7 +44,7 @@ libspot_la_LIBADD =  \
   tgba/libtgba.la \
   tgbaalgos/libtgbaalgos.la \
   tgbaparse/libtgbaparse.la \
-  neverparse/libneverclaimparse.la \
+  neverparse/libneverparse.la \
   evtgba/libevtgba.la \
   evtgbaalgos/libevtgbaalgos.la \
   evtgbaparse/libevtgbaparse.la \

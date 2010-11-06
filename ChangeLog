@@ -1,5 +1,12 @@
 2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/Makefile.am (libspot_la_LIBADD): Rename libneverclaimparse.la
+	as libneverparse.la.
+	* src/neverparse/Makefile.am: Install files in 
+	$(pkgincludedir)/neverparse, not $(pkgincludedir)/neverclaimparse.
+
+2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Cosmetics to please sanity checks.
 
 	* src/neverparse/public.hh, src/neverparse/parsedecl.hh: Fix

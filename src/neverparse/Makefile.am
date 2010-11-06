@@ -1,4 +1,4 @@
-## Copyright (C) 2010 Laboratoire de Recherche et DÃ©veloppement
+## Copyright (C) 2010 Laboratoire de Recherche et Développement
 ## de l'Epita (LRDE).
 ##
 ## This file is part of Spot, a model checking library.
@@ -22,14 +22,14 @@ AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
 # Disable -Werror because too many versions of flex yield warnings.
 AM_CXXFLAGS = $(WARNING_CXXFLAGS:-Werror=)
 
-neverclaimparsedir = $(pkgincludedir)/neverclaimparse
+neverparsedir = $(pkgincludedir)/neverparse
 
-neverclaimparse_HEADERS = \
+neverparse_HEADERS = \
   public.hh \
   location.hh \
   position.hh
 
-noinst_LTLIBRARIES = libneverclaimparse.la
+noinst_LTLIBRARIES = libneverparse.la
 
 NEVERCLAIMPARSE_YY = neverclaimparse.yy
 FROM_NEVERCLAIMPARSE_YY_MAIN = neverclaimparse.cc
@@ -56,7 +56,7 @@ $(FROM_NEVERCLAIMPARSE_YY_OTHERS): $(NEVERCLAIMPARSE_YY)
 
 EXTRA_DIST = $(NEVERCLAIMPARSE_YY)
 
-libneverclaimparse_la_SOURCES = \
+libneverparse_la_SOURCES = \
   fmterror.cc \
   $(FROM_NEVERCLAIMPARSE_YY) \
   neverclaimscan.ll \
