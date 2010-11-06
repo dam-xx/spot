@@ -95,9 +95,6 @@ EOF
 grep input: stderr >> stderrfilt
 diff stderrfilt expected
 
-# Skip the rest of this test if neither Spin nor ltl2ba are installed.
-test -n "$SPIN$LTL2BA" || exit
-
 cat >formulae<<EOF
 a
 <>[] a
@@ -116,4 +113,6 @@ do
 	$LTL2BA -f "$f" > f.ltl2ba
 	run 0 ../ltl2tgba -E -Pf.tgba -XN f.ltl2ba
     fi
+    run 0 ../ltl2tgba -DS -NN -f "$f" > f.spot
+    run 0 ../ltl2tgba -E -Pf.tgba -XN f.spot
 done  <formulae
