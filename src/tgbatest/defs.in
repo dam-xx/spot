@@ -1,5 +1,5 @@
 # -*- shell-script -*-
-# Copyright (C) 2009 Laboratoire de Recherche et Développement
+# Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 # de l'Epita (LRDE).
 # Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -65,6 +65,8 @@ top_builddir='../@top_builddir@'
 LBTT="@LBTT@"
 LBTT_TRANSLATE="@LBTT_TRANSLATE@"
 VALGRIND='@VALGRIND@'
+SPIN='@SPIN@'
+LTL2BA='@LTL2BA@'
 
 run()
 {

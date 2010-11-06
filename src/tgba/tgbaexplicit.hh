@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -212,7 +212,7 @@ namespace spot
 	}
       return i->second;
     }
-
+    
     state*
     set_init_state(const label& state)
     {
@@ -323,6 +323,15 @@ namespace spot
     virtual ~tgba_explicit_string();
     virtual state* add_default_init();
     virtual std::string format_state(const spot::state* s) const;
+
+    /// Create an alias for a state.  Any reference to \a alias_name
+    /// will act as a reference to \a real_name.
+    virtual
+    void add_state_alias(const std::string& alias_name, 
+			 const std::string& real_name)
+    {
+      name_state_map_[alias_name] = add_state(real_name);
+    }
   };
 
   class tgba_explicit_formula:

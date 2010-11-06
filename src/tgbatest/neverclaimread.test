@@ -54,7 +54,7 @@ digraph G {
   2 -> 2 [label="p1\n"]
   2 -> 3 [label="p1 & !p0\n"]
   3 [label="accept_all"]
-  3 -> 3 [label="1\n"]
+  3 -> 3 [label="1\n{Acc[1]}"]
 }
 EOF
 
@@ -65,3 +65,55 @@ sed -e 's/!p0 & p1/p1 \& !p0/g' -e 's/p1 & p0/p0 \& p1/g' stdout \
 diff stdout expected
 
 rm input stdout expected
+
+
+# Test broken guards in input
+cat >input <<EOF
+never {
+T2_init:
+if
+:: (1) -> goto T2_init
+:: (p1 && ) -> goto T1
+fi;
+T1:
+if
+:: (p1 && ! p0)) -> goto accept_all
+:: (p1) -> goto T1
+fi;
+accept_all:
+skip
+}
+EOF
+
+run 2 ../ltl2tgba -XN input > stdout 2>stderr
+cat >expected <<EOF
+input:5.11: syntax error, unexpected closing parenthesis
+input:5.8-9: missing right operand for "and operator"
+input:9.16: syntax error, unexpected closing parenthesis
+input:9.16: ignoring trailing garbage
+EOF
+grep input: stderr >> stderrfilt
+diff stderrfilt expected
+
+# Skip the rest of this test if neither Spin nor ltl2ba are installed.
+test -n "$SPIN$LTL2BA" || exit
+
+cat >formulae<<EOF
+a
+<>[] a
+X false
+([] a) U X b
+(a U b) U (c U d)
+EOF
+while read f
+do
+    run 0 ../ltl2tgba -b -f "!($f)" > f.tgba
+    if test -n "$SPIN"; then
+	$SPIN -f "$f" > f.spin
+	run 0 ../ltl2tgba -E -Pf.tgba -XN f.spin
+    fi
+    if test -n "$LTL2BA"; then
+	$LTL2BA -f "$f" > f.ltl2ba
+	run 0 ../ltl2tgba -E -Pf.tgba -XN f.ltl2ba
+    fi
+done  <formulae

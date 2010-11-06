@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -291,10 +291,14 @@ namespace spot
     ns_map::iterator i;
     for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
     {
-      tgba_explicit::state::iterator i2;
-      for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	delete *i2;
-      delete i->second;
+      // Do not erase the same state twice.  (Because of possible aliases.)
+      if (state_name_map_.erase(i->second))
+	{
+	  tgba_explicit::state::iterator i2;
+	  for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	    delete *i2;
+	  delete i->second;
+	}
     }
   }
 

@@ -49,17 +49,17 @@ eol      \n|\r|\n\r|\r\n
 "/*".*"*/"		yylloc->step();
 
 "never"			return token::NEVER;
-"skip"|"skip;"	        return token::SKIP;
+"skip"			return token::SKIP;
 "if"			return token::IF;
-"fi"|"fi;"		return token::FI;
+"fi"			return token::FI;
 "->"			return token::ARROW;
 "goto"			return token::GOTO;
+"false"|"0"		return token::FALSE;
 
-"(".*")"|"true"|"1"|"false"|"0" {
-                                  yylval->str =
-				    new std::string(yytext, yyleng);
-				  return token::FORMULA;
-                                }
+"(".*")"|"true"|"1"     {
+                          yylval->str = new std::string(yytext, yyleng);
+			  return token::FORMULA;
+                        }
 
 [a-zA-Z][a-zA-Z0-9_]*   {
 			  yylval->str = new std::string(yytext, yyleng);

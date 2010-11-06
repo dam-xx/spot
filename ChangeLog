@@ -1,5 +1,26 @@
 2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Make sure the neverclaim parser works on the output of spin and
+	ltl2ba.
+
+	* src/neverparse/neverclaimparse.yy: Accept multiple labels
+	for the same state.  Honor accepting states.  Forward parse
+	error from the parser used for guards.  Accept "false" as a
+	single instruction for a state.
+	* src/neverparse/neverclaimscan.ll: Recognize "false" specifically,
+	and remove the ";" hack.
+	* src/tgba/tgbaexplicit.cc 
+	(tgba_explicit_string::~tgba_explicit_string): Adjust not to
+	destroy a state twice.
+	* src/tgba/tgbaexplicit.hh
+	(tgba_explicit_string::add_state_alias): New function.
+	* src/tgbatest/defs.in (SPIN, LTL2BA): New variables.
+	* src/tgbatest/neverclaimread.test: Check error messages for
+	syntax errors in guards.  Make sure we can read the output 
+	of `spin -f' and `ltl2ba -f' on a few test formulae.
+
+2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Cleanup neverclaim support.
 
 	* src/neverclaimparse/: Shorthen as ...

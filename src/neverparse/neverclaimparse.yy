@@ -30,8 +30,11 @@
 %code requires
 {
 #include <string>
+#include <cstring>
+#include "ltlast/constant.hh"
 #include "public.hh"
-typedef std::pair<std::string*, std::string*> pair;
+
+  typedef std::pair<spot::ltl::formula*, std::string*> pair;
 }
 
 %parse-param {spot::neverclaim_parse_error_list& error_list}
@@ -65,18 +68,22 @@ using namespace spot::ltl;
 %token FI "fi"
 %token ARROW "->"
 %token GOTO "goto"
-%token <str> FORMULA
-%token <str> IDENT
+%token FALSE "false"
+%token <str> FORMULA "boolean formula"
+%token <str> IDENT "identifier"
+%type <str> formula
 %type <p> transition
 %type <list> transitions
+%type <str> ident_list
+
 
 %destructor { delete $$; } <str>
-%destructor { delete $$->first; delete $$->second; delete $$; } <p>
+%destructor { $$->first->destroy(); delete $$->second; delete $$; } <p>
 %destructor {
   for (std::list<pair>::iterator i = $$->begin();
        i != $$->end(); ++i)
   {
-    delete i->first;
+    i->first->destroy();
     delete i->second;
   }
   delete $$;
@@ -86,42 +93,60 @@ using namespace spot::ltl;
 %%
 neverclaim:
   "never" '{' states '}'
-;
+
 
 states:
   /* empty */
-  | state states
-;
+  | state
+  | states ';' state
+  | states ';'
+
+ident_list: 
+    IDENT ':'
+    {
+      $$ = $1;
+    }
+  | ident_list IDENT ':'
+    {
+      result->add_state_alias(*$2, *$1);
+      delete $1;
+      $$ = $2;
+    }
 
 state:
-  IDENT ':' "skip"
+  ident_list "skip"
     {
-      result->create_transition(*$1, *$1);
+      spot::tgba_explicit::transition* t = result->create_transition(*$1, *$1);
+      bool acc = !strncmp("accept", $1->c_str(), 6);
+      if (acc)
+	result->add_acceptance_condition(t, 
+					 spot::ltl::constant::true_instance());
       delete $1;
     }
-  | IDENT ':' { delete $1; }
-  | IDENT ':' "if" transitions "fi"
+  | ident_list { delete $1; }
+  | ident_list "false" { delete $1; }
+  | ident_list "if" transitions "fi"
     {
       std::list<pair>::iterator it;
-      for (it = $4->begin(); it != $4->end(); ++it)
+      bool acc = !strncmp("accept", $1->c_str(), 6);
+      for (it = $3->begin(); it != $3->end(); ++it)
       {
 	spot::tgba_explicit::transition* t =
 	  result->create_transition(*$1,*it->second);
-	spot::ltl::parse_error_list pel;
-	spot::ltl::formula* f = spot::ltl::parse(*(it->first), pel);
-	result->add_condition(t, f);
+	      
+	result->add_condition(t, it->first);
+	if (acc)
+	  result
+	    ->add_acceptance_condition(t, spot::ltl::constant::true_instance());
       }
       // Free the list
       delete $1;
-      for (std::list<pair>::iterator it = $4->begin();
-	   it != $4->end(); ++it)
-      {
-	delete it->first;
+      for (std::list<pair>::iterator it = $3->begin();
+	   it != $3->end(); ++it)
 	delete it->second;
-      }
-      delete $4;
+      delete $3;
     }
-;
+
 
 transitions:
   /* empty */ { $$ = new std::list<pair>; }
@@ -131,12 +156,29 @@ transitions:
       delete $1;
       $$ = $2;
     }
-;
 
+
+formula: FORMULA | "false" { $$ = new std::string("0"); }
+   
 transition:
-  ':' ':' FORMULA  "->" "goto" IDENT
+  ':' ':' formula  "->" "goto" IDENT
     {
-      $$ = new pair($3, $6);
+      spot::ltl::parse_error_list pel;
+      spot::ltl::formula* f = spot::ltl::parse(*$3, pel);
+      delete $3;
+      for(spot::ltl::parse_error_list::const_iterator i = pel.begin();
+	  i != pel.end(); ++i)
+	{
+	  // Adjust the diagnostic to the current position.
+	  location here = @3;
+	  here.end.line = here.begin.line + i->first.end.line - 1;
+	  here.end.column = here.begin.column + i->first.end.column -1;
+	  here.begin.line += i->first.begin.line - 1;
+	  here.begin.column += i->first.begin.column - 1;
+	  error(here, i->second);
+	}
+
+      $$ = new pair(f, $6);
     }
 %%
 
@@ -164,11 +206,11 @@ namespace spot
 	return 0;
       }
     tgba_explicit_string* result = new tgba_explicit_string(dict);
+    result->declare_acceptance_condition(spot::ltl::constant::true_instance());
     neverclaimyy::parser parser(error_list, env, result);
     parser.set_debug_level(debug);
     parser.parse();
     neverclaimyyclose();
-    result->merge_transitions();
     return result;
   }
 }
