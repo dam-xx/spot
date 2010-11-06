@@ -1,5 +1,15 @@
 2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Remove `readsave' and fix line numbers in tgbaparse error messages.
+
+	* src/tgbaparse/tgbaparse.yy (line): Fix computation of line number
+	for error messages when parsing conditions.
+	* src/tgbatest/readsave.test: Check the syntax position of syntax errors
+	in the diagnostics.  Use ltl2tgba instead of readsave.
+	* src/tgbatest/Makefile.am (check_PROGRAMS): Remove readsave.
+
+2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* bench/emptchk/pml2tgba.pl: Adjust to work with Spin 5.2.5.
 
 2010-10-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

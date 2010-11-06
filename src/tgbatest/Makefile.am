@@ -40,7 +40,6 @@ check_PROGRAMS = \
   ltlprod \
   mixprod \
   powerset \
-  readsave \
   reductgba \
   reduccmp \
   taatgba \
@@ -60,7 +59,6 @@ ltlprod_SOURCES  = ltlprod.cc
 mixprod_SOURCES  = mixprod.cc
 powerset_SOURCES = powerset.cc
 randtgba_SOURCES = randtgba.cc
-readsave_SOURCES = readsave.cc
 reductgba_SOURCES = reductgba.cc
 reduccmp_SOURCES = reductgba.cc
 reduccmp_CXXFLAGS = -DREDUCCMP
