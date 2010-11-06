@@ -520,6 +520,8 @@ main(int argc, char** argv)
 	}
       else if (!strncmp(argv[formula_index], "-P", 2))
 	{
+	  tm.start("reading -P's argument");
+
 	  spot::tgba_parse_error_list pel;
 	  system = spot::tgba_parse(argv[formula_index] + 2,
 				    pel, dict, env, env, debug_opt);
@@ -528,8 +530,7 @@ main(int argc, char** argv)
 	    return 2;
 	  system->merge_transitions();
 
-	  if (!paper_opt)
-	    std::clog << argv[formula_index] + 2 << " read" << std::endl;
+	  tm.stop("reading -P's argument");
 	}
       else if (!strcmp(argv[formula_index], "-r"))
 	{
@@ -782,10 +783,10 @@ main(int argc, char** argv)
 	  else
 	    {
 	      spot::neverclaim_parse_error_list pel;
-	      tm.start("parsing never claim");
+	      tm.start("parsing neverclaim");
 	      to_free = a = e = spot::neverclaim_parse(input, pel, dict, 
 						       env, debug_opt);	      
-	      tm.stop("parsing never claim");
+	      tm.stop("parsing neverclaim");
 	      if (spot::format_neverclaim_parse_errors(std::cerr, input, pel))
 		{
 		  delete to_free;

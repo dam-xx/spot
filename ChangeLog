@@ -1,4 +1,8 @@
-2010-11-06  Alexandre Duret-Lutz  <adl@gnu.org>
+2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgbatest/ltl2tgba.cc: Clock the time spent reading -P file.
+
+2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgbatest/neverclaimread.test: Check that Spot can read the
 	neverclaims it outputs.
