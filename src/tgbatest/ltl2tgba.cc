@@ -784,15 +784,15 @@ main(int argc, char** argv)
 	    {
 	      spot::neverclaim_parse_error_list pel;
 	      tm.start("parsing neverclaim");
-	      to_free = a = e = spot::neverclaim_parse(input, pel, dict, 
-						       env, debug_opt);	      
+	      to_free = a = e = spot::neverclaim_parse(input, pel, dict,
+						       env, debug_opt);
 	      tm.stop("parsing neverclaim");
 	      if (spot::format_neverclaim_parse_errors(std::cerr, input, pel))
 		{
 		  delete to_free;
 		  delete dict;
 		  return 2;
-		}	      
+		}
 	    }
 	  e->merge_transitions();
 	}
@@ -1166,7 +1166,6 @@ main(int argc, char** argv)
                           else
                             {
                               spot::print_tgba_run(std::cout, a, run);
-                     
 			      if (accepting_run_replay
 				  && !spot::replay_tgba_run(std::cout, a, run,
 							    true))

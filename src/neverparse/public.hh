@@ -18,8 +18,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_NEVERCLAIMPARSE_PUBLIC_HH
-# define SPOT_NEVERCLAIMPARSE_PUBLIC_HH
+#ifndef SPOT_NEVERPARSE_PUBLIC_HH
+# define SPOT_NEVERPARSE_PUBLIC_HH
 
 # include "tgba/tgbaexplicit.hh"
 // Unfortunately Bison 2.3 uses the same guards in all parsers :(

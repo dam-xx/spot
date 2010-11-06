@@ -212,7 +212,7 @@ namespace spot
 	}
       return i->second;
     }
-    
+
     state*
     set_init_state(const label& state)
     {
@@ -327,7 +327,7 @@ namespace spot
     /// Create an alias for a state.  Any reference to \a alias_name
     /// will act as a reference to \a real_name.
     virtual
-    void add_state_alias(const std::string& alias_name, 
+    void add_state_alias(const std::string& alias_name,
 			 const std::string& real_name)
     {
       name_state_map_[alias_name] = add_state(real_name);

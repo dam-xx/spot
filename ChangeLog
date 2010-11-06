@@ -1,5 +1,14 @@
 2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Cosmetics to please sanity checks.
+
+	* src/neverparse/public.hh, src/neverparse/parsedecl.hh: Fix
+	inclusion guards.
+	* src/tgba/tgbaexplicit.hh, src/tgbatest/emptchk.test,
+	src/tgbatest/ltl2tgba.cc: Fix trailing whitespaces.
+
+2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbatest/ltl2tgba.cc: Clock the time spent reading -P file.
 
 2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
@@ -29,14 +38,14 @@
 	single instruction for a state.
 	* src/neverparse/neverclaimscan.ll: Recognize "false" specifically,
 	and remove the ";" hack.
-	* src/tgba/tgbaexplicit.cc 
+	* src/tgba/tgbaexplicit.cc
 	(tgba_explicit_string::~tgba_explicit_string): Adjust not to
 	destroy a state twice.
 	* src/tgba/tgbaexplicit.hh
 	(tgba_explicit_string::add_state_alias): New function.
 	* src/tgbatest/defs.in (SPIN, LTL2BA): New variables.
 	* src/tgbatest/neverclaimread.test: Check error messages for
-	syntax errors in guards.  Make sure we can read the output 
+	syntax errors in guards.  Make sure we can read the output
 	of `spin -f' and `ltl2ba -f' on a few test formulae.
 
 2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
@@ -49,9 +58,9 @@
 	removed by previous patch.
 	* README: Adjust, and keep the file's width under 80 columns.
 	* configure.ac: Adjust.
-	* src/neverparse/Makefile.am, src/neverparse/fmterror.cc, 
-	src/neverparse/neverclaimparse.yy, 
-	src/neverparse/neverclaimscan.ll, src/neverparse/public.hh: 
+	* src/neverparse/Makefile.am, src/neverparse/fmterror.cc,
+	src/neverparse/neverclaimparse.yy,
+	src/neverparse/neverclaimscan.ll, src/neverparse/public.hh:
 	Fix copyright.
 	* src/tgbatest/Makefile.am (check_PROGRAMS): Remove neverclaimread.
 	* src/tgbatest/ltl2tgba.cc: Add option -XN to read a neverclaim.

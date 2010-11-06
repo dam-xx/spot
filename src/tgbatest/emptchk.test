@@ -54,9 +54,9 @@ expect_ce()
   run 0 ../ltl2tgba -CR -eTau03_opt -f "$1"
   run 0 ../ltl2tgba -CR -eGV04 -f "$1"
   # Expect multiple accepting runs
-  test `../ltl2tgba -CR -e'CVWY90(repeated)' -l "$1" | 
+  test `../ltl2tgba -CR -e'CVWY90(repeated)' -l "$1" |
                                         grep Prefix: | wc -l` -ge $2
-  test `../ltl2tgba -CR -e'SE05(repeated)' -l "$1" | 
+  test `../ltl2tgba -CR -e'SE05(repeated)' -l "$1" |
                                         grep Prefix: | wc -l` -ge $2
 }
 

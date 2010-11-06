@@ -1,6 +1,5 @@
-// Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// l'EPITA.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -19,8 +18,8 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_NEVERCLAIMPARSE_PARSEDECL_HH
-# define SPOT_NEVERCLAIMPARSE_PARSEDECL_HH
+#ifndef SPOT_NEVERPARSE_PARSEDECL_HH
+# define SPOT_NEVERPARSE_PARSEDECL_HH
 
 #include <string>
 #include "neverclaimparse.hh"
