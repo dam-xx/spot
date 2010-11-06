@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2009 Laboratoire de Recherche et Développement
+# Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 # de l'Epita (LRDE).
 # Copyright (C) 2003, 2004, 2005 Laboratoire d'Informatique de
 # Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -79,8 +79,8 @@ s9, s8,,;
 s9, s9,,;
 EOF
 
-run 0 ../ltl2tgba -eSE05 -X blue_counter
-run 0 ../ltl2tgba -eTau03_opt -X blue_counter
+run 0 ../ltl2tgba -CR -eSE05 -X blue_counter
+run 0 ../ltl2tgba -CR -eTau03_opt -X blue_counter
 
 # s1->s2->s3->(large composant from s4 to s9)
 # ^       ||
@@ -131,8 +131,8 @@ s9, s8,,;
 s9, s9,,;
 EOF
 
-run 0 ../ltl2tgba -eSE05 -X blue_last
-run 0 ../ltl2tgba -eTau03_opt -X blue_last
+run 0 ../ltl2tgba -CR -eSE05 -X blue_last
+run 0 ../ltl2tgba -CR -eTau03_opt -X blue_last
 
 #  _______
 # |       |
@@ -187,7 +187,7 @@ s9, s8,,;
 s9, s9,,;
 EOF
 
-run 0 ../ltl2tgba -eSE05 -X red
-run 0 ../ltl2tgba -eTau03_opt -X red
+run 0 ../ltl2tgba -CR -eSE05 -X red
+run 0 ../ltl2tgba -CR -eTau03_opt -X red
 
 rm -f red blue_counter blue_last

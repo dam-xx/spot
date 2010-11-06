@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2009 Laboratoire de Recherche et Développement
+# Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
 # de l'Epita (LRDE).
 #
 # This file is part of Spot, a model checking library.
@@ -33,11 +33,11 @@ check_construct()
 # translated using FM.
 check_true()
 {
-  run 0 ../ltl2tgba -e -Poutput -f "$1"
+  run 0 ../ltl2tgba -CR -e -Poutput -f "$1"
 }
 check_false()
 {
-  run 1 ../ltl2tgba -e -Poutput -f "$1"
+  run 1 ../ltl2tgba -CR -e -Poutput -f "$1"
 }
 
 # Create the prelude file.

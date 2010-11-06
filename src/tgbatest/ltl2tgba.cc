@@ -214,6 +214,10 @@ syntax(char* prog)
 	    << "accepting run" << std::endl
 	    << "  -E[ALGO]  run emptiness check, expect no accepting run"
 	    << std::endl
+	    << "  -C    compute an accepting run (Counterexample) if it exists"
+	    << std::endl
+	    << "  -CR   compute and replay an accepting run (implies -C)"
+	    << std::endl
 	    << "  -g    graph the accepting run on the automaton (requires -e)"
 	    << std::endl
 	    << "  -G    graph the accepting run seen as an automaton "
@@ -287,6 +291,8 @@ main(int argc, char** argv)
   spot::emptiness_check_instantiator* echeck_inst = 0;
   enum { NoneDup, BFS, DFS } dupexp = NoneDup;
   bool expect_counter_example = false;
+  bool accepting_run = false;
+  bool accepting_run_replay = false;
   bool from_file = false;
   bool read_neverclaim = false;
   int reduc_aut = spot::Reduce_None;
@@ -340,6 +346,15 @@ main(int argc, char** argv)
 	{
 	  containment = true;
 	  translation = TransTAA;
+	}
+      else if (!strcmp(argv[formula_index], "-C"))
+	{
+	  accepting_run = true;
+	}
+      else if (!strcmp(argv[formula_index], "-CR"))
+	{
+	  accepting_run = true;
+	  accepting_run_replay = true;
 	}
       else if (!strcmp(argv[formula_index], "-d"))
 	{
@@ -440,10 +455,12 @@ main(int argc, char** argv)
 	}
       else if (!strcmp(argv[formula_index], "-g"))
 	{
+	  accepting_run = true;
 	  graph_run_opt = true;
 	}
       else if (!strcmp(argv[formula_index], "-G"))
 	{
+	  accepting_run = true;
 	  graph_run_tgba_opt = true;
 	}
       else if (!strcmp(argv[formula_index], "-k"))
@@ -1111,7 +1128,7 @@ main(int argc, char** argv)
                       std::cout << std::endl;
                       break;
                     }
-                  else
+                  else if (accepting_run)
                     {
 
 		      tm.start("computing accepting run");
@@ -1148,14 +1165,21 @@ main(int argc, char** argv)
                           else
                             {
                               spot::print_tgba_run(std::cout, a, run);
-                              if (!spot::replay_tgba_run(std::cout, a, run,
-                                                                        true))
-                                exit_code = 1;
+                     
+			      if (accepting_run_replay
+				  && !spot::replay_tgba_run(std::cout, a, run,
+							    true))
+				exit_code = 1;
                             }
                           delete run;
 			  tm.stop("printing accepting run");
                         }
                     }
+		  else
+		    {
+		      std::cout << "an accepting run exists "
+				<< "(use -C to print it)" << std::endl;
+		    }
                 }
 	      delete res;
 	    }

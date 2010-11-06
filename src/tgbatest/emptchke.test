@@ -29,14 +29,14 @@ set -e
 
 expect_ce()
 {
-  run 0 ../ltl2tgba -e -X "$1"
-  run 0 ../ltl2tgba -e -D -X "$1"
-  run 0 ../ltl2tgba -e'Cou99(shy)' -X "$1"
-  run 0 ../ltl2tgba -e'Cou99(shy)' -D -X "$1"
-  run 0 ../ltl2tgba -eCVWY90 -X "$1"
-  run 0 ../ltl2tgba -eGV04 -X "$1"
-  run 0 ../ltl2tgba -eSE05 -X "$1"
-  run 0 ../ltl2tgba -eTau03 -X "$1"
+  run 0 ../ltl2tgba -CR -e -X "$1"
+  run 0 ../ltl2tgba -CR -e -D -X "$1"
+  run 0 ../ltl2tgba -CR -e'Cou99(shy)' -X "$1"
+  run 0 ../ltl2tgba -CR -e'Cou99(shy)' -D -X "$1"
+  run 0 ../ltl2tgba -CR -eCVWY90 -X "$1"
+  run 0 ../ltl2tgba -CR -eGV04 -X "$1"
+  run 0 ../ltl2tgba -CR -eSE05 -X "$1"
+  run 0 ../ltl2tgba -CR -eTau03 -X "$1"
 }
 
 cat >input <<'EOF'

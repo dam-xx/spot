@@ -35,52 +35,54 @@ expect_ce_do()
 
 expect_ce()
 {
-  expect_ce_do -e -l "$1"
-  expect_ce_do -e -l -D "$1"
-  expect_ce_do -e -f "$1"
-  expect_ce_do -e -f -D "$1"
-  expect_ce_do -e'Cou99(shy)' -l "$1"
-  expect_ce_do -e'Cou99(shy)' -l -D "$1"
-  expect_ce_do -e'Cou99(shy)' -f "$1"
-  expect_ce_do -e'Cou99(shy)' -f -D "$1"
-  expect_ce_do -eCVWY90 -l "$1"
-  expect_ce_do -eCVWY90 -f "$1"
-  run 0 ../ltl2tgba -e'CVWY90(bsh=10M)' -l "$1"
-  run 0 ../ltl2tgba -e'CVWY90(bsh=10M)' -f "$1"
-  run 0 ../ltl2tgba -eSE05 -l "$1"
-  run 0 ../ltl2tgba -eSE05 -f "$1"
-  run 0 ../ltl2tgba -e'SE05(bsh=10M)' -l "$1"
-  run 0 ../ltl2tgba -e'SE05(bsh=10M)' -f "$1"
-  run 0 ../ltl2tgba -eTau03_opt -f "$1"
-  run 0 ../ltl2tgba -eGV04 -f "$1"
+  expect_ce_do -CR -e -l "$1"
+  expect_ce_do -CR -e -l -D "$1"
+  expect_ce_do -CR -e -f "$1"
+  expect_ce_do -CR -e -f -D "$1"
+  expect_ce_do -CR -e'Cou99(shy)' -l "$1"
+  expect_ce_do -CR -e'Cou99(shy)' -l -D "$1"
+  expect_ce_do -CR -e'Cou99(shy)' -f "$1"
+  expect_ce_do -CR -e'Cou99(shy)' -f -D "$1"
+  expect_ce_do -CR -eCVWY90 -l "$1"
+  expect_ce_do -CR -eCVWY90 -f "$1"
+  run 0 ../ltl2tgba -CR -e'CVWY90(bsh=10M)' -l "$1"
+  run 0 ../ltl2tgba -CR -e'CVWY90(bsh=10M)' -f "$1"
+  run 0 ../ltl2tgba -CR -eSE05 -l "$1"
+  run 0 ../ltl2tgba -CR -eSE05 -f "$1"
+  run 0 ../ltl2tgba -CR -e'SE05(bsh=10M)' -l "$1"
+  run 0 ../ltl2tgba -CR -e'SE05(bsh=10M)' -f "$1"
+  run 0 ../ltl2tgba -CR -eTau03_opt -f "$1"
+  run 0 ../ltl2tgba -CR -eGV04 -f "$1"
   # Expect multiple accepting runs
-  test `../ltl2tgba -e'CVWY90(repeated)' -l "$1" | grep Prefix: | wc -l` -ge $2
-  test `../ltl2tgba -e'SE05(repeated)' -l "$1" | grep Prefix: | wc -l` -ge $2
+  test `../ltl2tgba -CR -e'CVWY90(repeated)' -l "$1" | 
+                                        grep Prefix: | wc -l` -ge $2
+  test `../ltl2tgba -CR -e'SE05(repeated)' -l "$1" | 
+                                        grep Prefix: | wc -l` -ge $2
 }
 
 expect_no()
 {
-  run 0 ../ltl2tgba -E -l "$1"
-  run 0 ../ltl2tgba -E -l -D "$1"
-  run 0 ../ltl2tgba -E -f "$1"
-  run 0 ../ltl2tgba -E -f -D "$1"
-  run 0 ../ltl2tgba -E'Cou99(shy)' -l "$1"
-  run 0 ../ltl2tgba -E'Cou99(shy)' -l -D "$1"
-  run 0 ../ltl2tgba -E'Cou99(shy)' -f "$1"
-  run 0 ../ltl2tgba -E'Cou99(shy)' -f -D "$1"
-  run 0 ../ltl2tgba -ECVWY90 -l "$1"
-  run 0 ../ltl2tgba -ECVWY90 -f "$1"
-  run 0 ../ltl2tgba -E'CVWY90(bsh=10M)' -l "$1"
-  run 0 ../ltl2tgba -E'CVWY90(bsh=10M)' -f "$1"
-  run 0 ../ltl2tgba -ESE05 -l "$1"
-  run 0 ../ltl2tgba -ESE05 -f "$1"
-  run 0 ../ltl2tgba -E'SE05(bsh=10M)' -l "$1"
-  run 0 ../ltl2tgba -E'SE05(bsh=10M)' -f "$1"
-  run 0 ../ltl2tgba -ETau03_opt -f "$1"
-  run 0 ../ltl2tgba -EGV04 -f "$1"
-  test `../ltl2tgba -e'CVWY90(repeated)' -l "!($1)" |
+  run 0 ../ltl2tgba -CR -E -l "$1"
+  run 0 ../ltl2tgba -CR -E -l -D "$1"
+  run 0 ../ltl2tgba -CR -E -f "$1"
+  run 0 ../ltl2tgba -CR -E -f -D "$1"
+  run 0 ../ltl2tgba -CR -E'Cou99(shy)' -l "$1"
+  run 0 ../ltl2tgba -CR -E'Cou99(shy)' -l -D "$1"
+  run 0 ../ltl2tgba -CR -E'Cou99(shy)' -f "$1"
+  run 0 ../ltl2tgba -CR -E'Cou99(shy)' -f -D "$1"
+  run 0 ../ltl2tgba -CR -ECVWY90 -l "$1"
+  run 0 ../ltl2tgba -CR -ECVWY90 -f "$1"
+  run 0 ../ltl2tgba -CR -E'CVWY90(bsh=10M)' -l "$1"
+  run 0 ../ltl2tgba -CR -E'CVWY90(bsh=10M)' -f "$1"
+  run 0 ../ltl2tgba -CR -ESE05 -l "$1"
+  run 0 ../ltl2tgba -CR -ESE05 -f "$1"
+  run 0 ../ltl2tgba -CR -E'SE05(bsh=10M)' -l "$1"
+  run 0 ../ltl2tgba -CR -E'SE05(bsh=10M)' -f "$1"
+  run 0 ../ltl2tgba -CR -ETau03_opt -f "$1"
+  run 0 ../ltl2tgba -CR -EGV04 -f "$1"
+  test `../ltl2tgba -CR -e'CVWY90(repeated)' -l "!($1)" |
         grep Prefix: | wc -l` -ge $2
-  test `../ltl2tgba -e'SE05(repeated)' -l "!($1)" |
+  test `../ltl2tgba -CR -e'SE05(repeated)' -l "!($1)" |
         grep Prefix: | wc -l` -ge $2
 }
 

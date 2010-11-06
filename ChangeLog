@@ -1,5 +1,16 @@
 2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Do not output a counterexample by default in ltl2tgba, introduce
+	options -C and -CR for that.
+
+	* src/tgbatest/ltl2tgba.cc: Add option -C and -CR to control
+	whether we want the accepting run to be printed or replayed.
+	* src/tgbatest/dfs.test, src/tgbatest/eltl2tgba.test,
+	src/tgbatest/emptchk.test, src/tgbatest/emptchke.test,
+	src/tgbatest/ltl2tgba.cc, src/tgbatest/ltlcounter.test: Use -CR.
+
+2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Make sure the neverclaim parser works on the output of spin and
 	ltl2ba.
 
