@@ -1,8 +1,16 @@
+2010-11-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add interface for and test the bdd_setxor() function added to Buddy.
+
+	* wrap/python/buddy.i (bdd_setxor): New function.
+	* wrap/python/tests/setxor.py: New file.
+	* wrap/python/tests/Makefile.am (TESTS): Add setxor.py.
+
 2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/Makefile.am (libspot_la_LIBADD): Rename libneverclaimparse.la
 	as libneverparse.la.
-	* src/neverparse/Makefile.am: Install files in 
+	* src/neverparse/Makefile.am: Install files in
 	$(pkgincludedir)/neverparse, not $(pkgincludedir)/neverclaimparse.
 
 2010-11-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

@@ -1,3 +1,4 @@
+// Copyright (C) 2010  Laboratoire de Recherche et Développement de l'EPITA.
 // Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -155,6 +156,7 @@ bdd bdd_or(const bdd &l, const bdd &r);
 bdd bdd_xor(const bdd &l, const bdd &r);
 bdd bdd_imp(const bdd &l, const bdd &r);
 bdd bdd_biimp(const bdd &l, const bdd &r);
+bdd bdd_setxor(const bdd &l, const bdd &r);
 bdd bdd_ite(const bdd &f, const bdd &g, const bdd &h);
 bdd bdd_exist(const bdd &r, const bdd &var);
 bdd bdd_existcomp(const bdd &r, const bdd &var);
