@@ -49,6 +49,7 @@
 #define CACHEID_SATCOU      0x2
 #define CACHEID_SATCOULN    0x3
 #define CACHEID_PATHCOU     0x4
+#define CACHEID_SETXOR      0x5
 
    /* Hash value modifiers for replace/compose */
 #define CACHEID_REPLACE      0x0
@@ -156,6 +157,7 @@ static int    varset2svartable(BDD);
 #define NOTHASH(r)           (r)
 #define APPLYHASH(l,r,op)    (TRIPLE(l,r,op))
 #define ITEHASH(f,g,h)       (TRIPLE(f,g,h))
+#define SETXORHASH(l,r)      (TRIPLE(l,r,CACHEID_SETXOR))
 #define RESTRHASH(r,var)     (PAIR(r,var))
 #define CONSTRAINHASH(f,c)   (PAIR(f,c))
 #define QUANTHASH(r)         (r)
@@ -721,6 +723,111 @@ BDD bdd_biimp(BDD l, BDD r)
 {
    return bdd_apply(l,r,bddop_biimp);
 }
+
+/*=== bdd_setxor =========================================================*/
+
+/*
+NAME    {* bdd\_setxor *}
+SECTION {* operator *}
+SHORT   {* xor operator for variable sets *}
+PROTO   {* BDD bdd_setxor(BDD l, BDD r) *}
+DESCR   {* Given to set $l$ and $r$ represented as conjuctions of variables.
+           (positive variables are present in the set, negative or absent
+	   variables are not in the set), this computes
+	   $(l\setminus r)\cup(r\setminus l)$.  The resulting set will be
+	   represented as a conjunction in which all variables occur
+	   (positive variables are present in the set, negative variables
+	   are not in the set) *}
+RETURN  {* The BDD for $(l\setminus r)\cup(r\setminus l)$ *}
+*/
+BDD bdd_setxor(BDD l, BDD r)
+{
+  BddCacheData *entry;
+  BDD res;
+
+  if (ISONE(l))
+    return r;
+  if (ISONE(r))
+    return l;
+
+   entry = BddCache_lookup(&misccache, SETXORHASH(l,r));
+   if (entry->a == l &&  entry->b == r  && entry->c == CACHEID_SETXOR)
+   {
+#ifdef CACHESTATS
+      bddcachestats.opHit++;
+#endif
+      return entry->r.res;
+   }
+#ifdef CACHESTATS
+   bddcachestats.opMiss++;
+#endif
+
+  if (LEVEL(l) == LEVEL(r))
+    {
+      if (ISZERO(LOW(l)))
+	{
+	  if (ISZERO(LOW(r)))
+	    {
+	      PUSHREF(bdd_setxor(HIGH(l), HIGH(r)));
+	      res = bdd_makenode(LEVEL(l), READREF(1), 0);
+	    }
+	  else
+	    {
+	      PUSHREF(bdd_setxor(HIGH(l), LOW(r)));
+	      res = bdd_makenode(LEVEL(l), 0, READREF(1));
+	    }
+	}
+      else
+	{
+	  if (ISZERO(LOW(r)))
+	    {
+	      PUSHREF(bdd_setxor(LOW(l), HIGH(r)));
+	      res = bdd_makenode(LEVEL(l), 0, READREF(1));
+	    }
+	  else
+	    {
+	      PUSHREF(bdd_setxor(LOW(l), LOW(r)));
+	      res = bdd_makenode(LEVEL(l), READREF(1), 0);
+	    }
+	}
+    }
+  else if (LEVEL(l) < LEVEL(r))
+    {
+      if (ISZERO(LOW(l)))
+	{
+	  PUSHREF(bdd_setxor(HIGH(l), r));
+	  res = bdd_makenode(LEVEL(l), 0, READREF(1));
+	}
+      else
+	{
+	  PUSHREF(bdd_setxor(LOW(l), r));
+	  res = bdd_makenode(LEVEL(l), READREF(1), 0);
+	}
+    }
+  else /* (LEVEL(l) > LEVEL(r)) */
+    {
+      if (ISZERO(LOW(r)))
+	{
+	  PUSHREF(bdd_setxor(l, HIGH(r)));
+	  res = bdd_makenode(LEVEL(r), 0, READREF(1));
+	}
+      else
+	{
+	  PUSHREF(bdd_setxor(l, LOW(r)));
+	  res = bdd_makenode(LEVEL(r), READREF(1), 0);
+	}
+    }
+
+  POPREF(1);
+
+  entry->a = l;
+  entry->b = r;
+  entry->c = CACHEID_SETXOR;
+  entry->r.res = res;
+
+  return res;
+}
+
 
 
 /*=== ITE ==============================================================*/

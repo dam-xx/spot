@@ -1,3 +1,8 @@
+2010-11-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/bddop.c (bdd_setxor): New function.
+	* src/bdd.h (bdd_setxor): New function.
+
 2010-01-22  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Get rid of some "deprecated conversion from string constant to

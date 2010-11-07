@@ -285,6 +285,7 @@ extern BDD      bdd_or(BDD, BDD);
 extern BDD      bdd_xor(BDD, BDD);
 extern BDD      bdd_imp(BDD, BDD);
 extern BDD      bdd_biimp(BDD, BDD);
+extern BDD      bdd_setxor(BDD, BDD);
 extern BDD      bdd_ite(BDD, BDD, BDD);
 extern BDD      bdd_restrict(BDD, BDD);
 extern BDD      bdd_constrain(BDD, BDD);
@@ -492,6 +493,7 @@ private:
    friend bdd      bdd_xor(const bdd &, const bdd &);
    friend bdd      bdd_imp(const bdd &, const bdd &);
    friend bdd      bdd_biimp(const bdd &, const bdd &);
+   friend bdd      bdd_setxor(const bdd &, const bdd &);
    friend bdd      bdd_ite(const bdd &, const bdd &, const bdd &);
    friend bdd      bdd_restrict(const bdd &, const bdd &);
    friend bdd      bdd_constrain(const bdd &, const bdd &);
@@ -648,6 +650,9 @@ inline bdd bdd_imp(const bdd &l, const bdd &r)
 
 inline bdd bdd_biimp(const bdd &l, const bdd &r)
 { return bdd_apply(l.root, r.root, bddop_biimp); }
+
+inline bdd bdd_setxor(const bdd &l, const bdd &r)
+{ return bdd_setxor(l.root, r.root); }
 
 inline bdd bdd_ite(const bdd &f, const bdd &g, const bdd &h)
 { return bdd_ite(f.root, g.root, h.root); }
