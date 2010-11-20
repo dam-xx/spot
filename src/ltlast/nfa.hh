@@ -1,4 +1,4 @@
-// Copyright (C) 2008 Laboratoire de Recherche et Développement
+// Copyright (C) 2008, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -39,7 +39,7 @@ namespace spot
     /// which are defined in formula_tree.hh, included in nfa.cc.
     namespace formula_tree
     {
-      class node;
+      struct node;
     }
 
     /// \brief Nondeterministic Finite Automata used by automata operators.

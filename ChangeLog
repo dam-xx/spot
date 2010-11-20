@@ -1,3 +1,12 @@
+2010-11-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix some struct/class missmatches reported by clang.
+
+	* src/ltlast/predecl.hh: Predeclare the LTL AST nodes as class,
+	not struct.
+	* src/ltlast/nfa.hh (formula_tree::node): Predeclare as struct,
+	not class.
+
 2010-11-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Add interface for and test the bdd_setxor() function added to Buddy.

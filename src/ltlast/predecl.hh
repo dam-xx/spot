@@ -1,6 +1,8 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2010  Laboratoire de Recherche et Developpement
+// de l'Epita.
+// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6
+// (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
+// Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -36,13 +38,13 @@ namespace spot
     struct visitor;
     struct const_visitor;
 
-    struct atomic_prop;
-    struct unop;
-    struct constant;
-    struct binop;
-    struct formula;
-    struct multop;
-    struct automatop;
+    class atomic_prop;
+    class unop;
+    class constant;
+    class binop;
+    class formula;
+    class multop;
+    class automatop;
   }
 }
 
