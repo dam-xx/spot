@@ -171,6 +171,9 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
       grep 'Sgi::[^h]' $tmp &&
 	diag 'Sgi:: is for hash and hash_map only'
 
+      egrep 'bdd_(false|true)[	]*\(' $tmp &&
+	diag 'Use bddfalse and bddtrue instead of bdd_false() and bdd_true()'
+
       res=`perl -ne '$/ = undef;
 	print "$&\n"
 	while /if \((.*)(\s*==\s*0)?\)\s*delete(\[\])?\s+\1;(?!\s+else)/g' $tmp`
