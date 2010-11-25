@@ -87,6 +87,11 @@ EOF
 
 success=:
 while read f; do
+  # Run ltl2tgba through valgrind with some combination of options to
+  # detect any crash
+  run 0 ../ltl2tgba -f -R3 -DS -Rm "!($f)" >/dev/null
+  run 0 ../ltl2tgba -l -R3b -DS -Rm "!($f)" >/dev/null
+
   # If the labels of the state have only digits, assume the minimization
   # worked.
   x=`../ltl2tgba -f -Rm "!($f)" |
@@ -102,6 +107,11 @@ done < obligations.txt
 echo ====
 
 while read f; do
+  # Run ltl2tgba through valgrind with some combination of options to
+  # detect any crash
+  run 0 ../ltl2tgba -f -R3 -DS -Rm "!($f)" >/dev/null
+  run 0 ../ltl2tgba -l -R3b -DS -Rm "!($f)" >/dev/null
+
   # If the labels of the state have only digits, assume the minimization
   # worked.
   x=`../ltl2tgba -f -Rm "!($f)" |

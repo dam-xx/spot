@@ -1,3 +1,12 @@
+2010-11-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix bugs in minimize().
+
+	* src/tgbaalgos/minimize.cc (init_sets, minimize): Fix memory
+	leaks and a usage of the wrong automaton.
+	* src/tgbatest/wdba.test: Try using -Rm with -R3 or -R3b, and with
+	valgrind.  This caught all the bugs fixed above.
+
 2010-04-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix bugs in minimize(), caught by spotlbtt.test.

@@ -49,8 +49,8 @@ namespace spot
       tovisit.pop();
       // Is the state final ?
       if (final.find(src) == final.end())
-        // No, add it to the set non_final
-        non_final.insert(src);
+	// No, add it to the set non_final
+	non_final.insert(src->clone());
       tgba_succ_iterator* sit = a->succ_iter(src);
       for (sit->first(); !sit->done(); sit->next())
       {
@@ -67,6 +67,15 @@ namespace spot
       }
       delete sit;
     }
+
+    while (!seen.empty())
+      {
+	hash_set::iterator i = seen.begin();
+	const state* s = *i;
+	seen.erase(i);
+	delete s;
+      }
+
   }
 
   // From the base automaton and the list of sets, build the minimal
@@ -154,6 +163,8 @@ namespace spot
       free_var.insert(i);
     std::map<int, int> used_var;
 
+    hash_set* final_copy;
+
     if (!final->empty())
       {
 	unsigned s = final->size();
@@ -166,7 +177,14 @@ namespace spot
 	for (hash_set::const_iterator i = final->begin();
 	     i != final->end(); ++i)
 	  state_set_map[*i] = set_num;
+
+	final_copy = new hash_set(*final);
       }
+    else
+      {
+	final_copy = final;
+      }
+
     if (!non_final->empty())
       {
 	unsigned s = non_final->size();
@@ -181,8 +199,11 @@ namespace spot
 	     i != non_final->end(); ++i)
 	  state_set_map[*i] = num;
       }
+    else
+      {
+	delete non_final;
+      }
 
-    hash_set* final_copy = new hash_set(*final);
     // A bdd_states_map is a list of formulae (in a BDD form) associated with a
     // destination set of states.
     typedef std::list<std::pair<bdd, hash_set*> > bdd_states_map;
@@ -198,7 +219,7 @@ namespace spot
       {
         const state* src = *hi;
         bdd f = bddfalse;
-        tgba_succ_iterator* si = a->succ_iter(src);
+        tgba_succ_iterator* si = det_a->succ_iter(src);
         for (si->first(); !si->done(); si->next())
         {
           const state* dst = si->current_state();
