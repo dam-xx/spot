@@ -1,5 +1,16 @@
 2010-11-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Never claim output used to print the degeneralized automaton
+	before some optional operations (like more optimizations, or a
+	product).
+
+	* src/tgbatest/ltl2tgba.cc (-N, -NN): Make sure we print the last
+	automaton computed, not just the automaton when we degeneralized
+	it.  We may have applied other algorithms since the original
+	degeneralization.
+
+2010-11-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbatest/ltl2tgba.test: Test both -l and -f.  This should
 	have been done on 2010-01-30 when the default translation was
 	changed from -l to -f.
