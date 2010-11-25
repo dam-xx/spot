@@ -1,5 +1,12 @@
 2010-11-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	"ltl2tgba -Rm -X foo.tgba" would fail.
+
+	* src/tgbatest/ltl2tgba.cc (main): Warn if -Rm is used without
+	knowing the formula whose automaton is minimized.
+
+2010-11-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix bugs in minimize().
 
 	* src/tgbaalgos/minimize.cc (init_sets, minimize): Fix memory

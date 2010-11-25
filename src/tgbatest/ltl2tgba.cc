@@ -921,8 +921,15 @@ main(int argc, char** argv)
 	    }
 	  else // We don't know if A is a safety automaton.
 	    {
-	      // Let's make sure that a recognize the same language
-	      // as minimized.
+	      if (!f)
+		{
+		  std::cerr << "Error: Without a formula I cannot make "
+			    << "sure that the automaton built with -Rm\n"
+			    << "       is correct." << std::endl;
+		  exit(2);
+		}
+	      // Let's make sure that A recognizes the same language
+	      // as MINIMIZED.
 	      spot::ltl::formula* neg =
 		spot::ltl::unop::instance(spot::ltl::unop::Not, f->clone());
 	      spot::tgba* n = spot::ltl_to_tgba_fm(neg, dict, fm_exprop_opt,
