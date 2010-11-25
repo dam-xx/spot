@@ -29,7 +29,7 @@ set -e
 
 check ()
 {
-  run 0 ../ltl2tgba "$1"
+  run 0 ../ltl2tgba -l "$1"
   run 0 ../ltl2tgba -f "$1"
   run 0 ../ltl2tgba -f -FC "$1"
 }

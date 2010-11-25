@@ -1,5 +1,11 @@
 2010-11-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgbatest/ltl2tgba.test: Test both -l and -f.  This should
+	have been done on 2010-01-30 when the default translation was
+	changed from -l to -f.
+
+2010-11-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbaalgos/scc.hh: Typos in the documentation.
 
 2010-11-24  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
@@ -980,7 +986,7 @@
 
 	Speedup reduc.test by not spawning one process per formula.
 
-	* src/ltltest/reduc.cc: Add an option -f to read a lost of
+	* src/ltltest/reduc.cc: Add an option -f to read a lot of
 	formulae from a file.  Running a process for each formula was
 	too slow.  Also add an option -h to hide reduced formulae.
 	* src/ltltest/reduc.test: Simplify accordingly.
