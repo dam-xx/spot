@@ -1,5 +1,15 @@
 2010-11-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Preliminary support for monitors.
+
+	* src/tgbatest/ltl2tgba.cc (-M): New option for building
+	deterministic monitors.
+	* src/tgbaalgos/minimize.cc (minimize): Take a monitor
+	argument and adjust the code.
+	* src/tgbaalgos/minimize.hh (minimize): Document it.
+
+2010-11-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	"ltl2tgba -Rm -X foo.tgba" would fail.
 
 	* src/tgbatest/ltl2tgba.cc (main): Warn if -Rm is used without

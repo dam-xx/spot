@@ -135,14 +135,14 @@ namespace spot
     return res;
   }
 
-  tgba_explicit* minimize(const tgba* a)
+  tgba_explicit* minimize(const tgba* a, bool monitor)
   {
     // The list of accepting states of a.
     std::list<const state*> acc_list;
     std::queue<hash_set*> todo;
     // The list of equivalent states.
     std::list<hash_set*> done;
-    tgba_explicit* det_a = tgba_powerset(a, &acc_list);
+    tgba_explicit* det_a = tgba_powerset(a, monitor ? 0 : &acc_list);
     hash_set* final = new hash_set;
     hash_set* non_final = new hash_set;
     hash_map state_set_map;

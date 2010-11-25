@@ -213,6 +213,11 @@ syntax(char* prog)
             << "  -Rm   attempt to minimize the automata" << std::endl
 	    << std::endl
 
+            << "Automaton conversion:"
+            << "  -M    convert into a deterministic minimal monitor "
+	    << "(implies -R3 or R3b)" << std::endl
+	    << std::endl
+
 	    << "Options for performing emptiness checks:" << std::endl
 	    << "  -e[ALGO]  run emptiness check, expect and compute an "
 	    << "accepting run" << std::endl
@@ -316,6 +321,7 @@ main(int argc, char** argv)
   bool graph_run_tgba_opt = false;
   bool opt_reduce = false;
   bool opt_minimize = false;
+  bool opt_monitor = false;
   bool containment = false;
   bool show_fc = false;
   bool spin_comments = false;
@@ -632,6 +638,10 @@ main(int argc, char** argv)
         {
           opt_minimize = true;
         }
+      else if (!strcmp(argv[formula_index], "-M"))
+        {
+          opt_monitor = true;
+        }
       else if (!strcmp(argv[formula_index], "-s"))
 	{
 	  dupexp = DFS;
@@ -856,6 +866,14 @@ main(int argc, char** argv)
 	  to_free = a;
 	}
 
+      if (opt_monitor && ((reduc_aut & spot::Reduce_Scc) == 0))
+	{
+	  if (dynamic_cast<spot::tgba_bdd_concrete*>(a))
+	    symbolic_scc_pruning = true;
+	  else
+	    reduc_aut |= spot::Reduce_Scc;
+	}
+
       if (symbolic_scc_pruning)
         {
 	  spot::tgba_bdd_concrete* bc =
@@ -974,6 +992,13 @@ main(int argc, char** argv)
 	      delete n;
 	    }
 	  tm.stop("WDBA-check");
+	}
+
+      if (opt_monitor)
+	{
+	  tm.start("Monitor minimization");
+	  a = minimized = minimize(a, true);
+	  tm.stop("Monitor minimization");
 	}
 
       spot::tgba_reduc* aut_red = 0;
