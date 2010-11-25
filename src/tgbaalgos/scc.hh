@@ -134,7 +134,7 @@ namespace spot
     /// \pre This should only be called once build_map() has run.
     bdd acc_set_of(unsigned n) const;
 
-    /// \brief Return the set of useful acceptance conditions if SCC \a n.
+    /// \brief Return the set of useful acceptance conditions of SCC \a n.
     ///
     /// Useless acceptances conditions are always implied by other acceptances
     /// conditions.  This returns all the other acceptance conditions.
