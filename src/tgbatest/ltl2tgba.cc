@@ -191,7 +191,6 @@ syntax(char* prog)
 	    << "  -DS   degeneralize the automaton as an SBA" << std::endl
 	    << std::endl
 
-
 	    << "Automaton simplifications (after translation):"
 	    << std::endl
 	    << "  -R1q  merge states using direct simulation "
@@ -213,9 +212,13 @@ syntax(char* prog)
             << "  -Rm   attempt to minimize the automata" << std::endl
 	    << std::endl
 
-            << "Automaton conversion:"
+            << "Automaton conversion:" << std::endl
             << "  -M    convert into a deterministic minimal monitor "
 	    << "(implies -R3 or R3b)" << std::endl
+	    << "  -s    convert to explicit automata, and number states "
+	    << "in DFS order" << std::endl
+	    << "  -S    convert to explicit automata, and number states "
+	    << "in BFS order" << std::endl
 	    << std::endl
 
 	    << "Options for performing emptiness checks:" << std::endl
@@ -272,10 +275,6 @@ syntax(char* prog)
 	    << "  -0    produce minimal output dedicated to the paper"
 	    << std::endl
 	    << "  -d    turn on traces during parsing" << std::endl
-	    << "  -s    convert to explicit automata, and number states "
-	    << "in DFS order" << std::endl
-	    << "  -S    convert to explicit automata, and number states "
-	    << "in BFS order" << std::endl
             << "  -T    time the different phases of the translation"
 	    << std::endl
 	    << "  -v    display the BDD variables used by the automaton"
