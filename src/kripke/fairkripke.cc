@@ -1,4 +1,5 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Developpement de l'Epita
+// Copyright (C) 2009, 2010 Laboratoire de Recherche et Developpement
+// de l'Epita
 //
 // This file is part of Spot, a model checking library.
 //
@@ -22,10 +23,9 @@
 namespace spot
 {
 
-  fair_kripke_succ_iterator::fair_kripke_succ_iterator(const fair_kripke* aut,
-						       const state* st)
-    : cond(aut->conditions_of_state(st)),
-      acc_cond(aut->acceptance_conditions_of_state(st))
+  fair_kripke_succ_iterator::fair_kripke_succ_iterator(const bdd& cond,
+						       const bdd& acc_cond)
+    : cond_(cond), acc_cond_(acc_cond)
   {
   }
 
@@ -34,26 +34,31 @@ namespace spot
   }
 
   bdd
-  fair_kripke_succ_iterator::current_conditions() const
+  fair_kripke_succ_iterator::current_condition() const
   {
-    return cond;
+    // Do not assert(!done()) here.  It is OK to call
+    // this function on a state without successor.
+    return cond_;
   }
 
   bdd
   fair_kripke_succ_iterator::current_acceptance_conditions() const
   {
-    return acc_cond;
+    // Do not assert(!done()) here.  It is OK to call
+    // this function on a state without successor.
+    return acc_cond_;
   }
 
   bdd
   fair_kripke::compute_support_conditions(const state* s) const
   {
-    return conditions_of_state(s);
+    return state_condition(s);
   }
 
   bdd
   fair_kripke::compute_support_variables(const state* s) const
   {
-    return bdd_support(conditions_of_state(s));
+    return bdd_support(state_condition(s));
   }
+
 }

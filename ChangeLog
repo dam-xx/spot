@@ -1,3 +1,12 @@
+2010-11-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Finalize Kripke interface.
+
+	* src/kripke/fairkripke.hh, src/kripke/fairkripke.cc,
+	* src/kripke/kripke.hh, src/kripke/kripke.cc: Finalize and
+	document the Kripke interface.  I have tested it by updating
+	checkpn to use it.
+
 2010-11-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Never claim output used to print the degeneralized automaton
