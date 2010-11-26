@@ -1,5 +1,13 @@
 2010-11-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Speed up wdba.test, it was too slow for our buildfarm.
+
+	* src/tgbatest/wdba.test: Speed up execution by running only a
+	couple of formula with valgrind.  Half of those with`-l -R3b' and
+	the other half with `-f -R3'.
+
+2010-11-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbatest/ltl2tgba.cc (syntax): Regroup -M, -s, and -S option
 	under the same heading "automaton conversion".
 

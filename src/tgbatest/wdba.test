@@ -86,11 +86,15 @@ G(q->(p->(!r U (s&!r&!z&X((!r&!z) U t))))U(r|G(p->(s&!z&X(!z U t)))))
 EOF
 
 success=:
+i=0
 while read f; do
   # Run ltl2tgba through valgrind with some combination of options to
-  # detect any crash
-  run 0 ../ltl2tgba -f -R3 -DS -Rm "!($f)" >/dev/null
-  run 0 ../ltl2tgba -l -R3b -DS -Rm "!($f)" >/dev/null
+  # detect any crash.  Do that only for the first few formula, because
+  # it takes a long time.
+  if test $i -lt 5; then
+    run 0 ../ltl2tgba -f -R3 -DS -Rm "!($f)" >/dev/null
+    i=`expr $i + 1`
+  fi
 
   # If the labels of the state have only digits, assume the minimization
   # worked.
@@ -106,11 +110,15 @@ done < obligations.txt
 
 echo ====
 
+i=0
 while read f; do
-  # Run ltl2tgba through valgrind with some combination of options to
-  # detect any crash
-  run 0 ../ltl2tgba -f -R3 -DS -Rm "!($f)" >/dev/null
-  run 0 ../ltl2tgba -l -R3b -DS -Rm "!($f)" >/dev/null
+  # Run ltl2tgba through valgrind with ANOTHER combination of options
+  # to detect any crash.  Do that only for the first few formula, because
+  # it takes a long time.
+  if test $i -lt 5; then
+    run 0 ../ltl2tgba -l -R3b -DS -Rm "!($f)" >/dev/null
+    i=`expr $i + 1`
+  fi
 
   # If the labels of the state have only digits, assume the minimization
   # worked.
