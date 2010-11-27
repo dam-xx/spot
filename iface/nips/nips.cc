@@ -1,4 +1,4 @@
-// Copyright (C) 2008 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2008, 2010 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -339,11 +339,14 @@ namespace spot
     {
       const state_nips* s = dynamic_cast<const state_nips*>(state);
       unsigned size = global_state_to_str(s->get_state(), 0, 0, 0);
-      char buf[size];
+      char* buf = new char[size];
 
       global_state_to_str(s->get_state(), 0, buf, size);
 
-      return std::string(buf);
+      std::string res(buf);
+      delete buf;
+
+      return res;
     }
 
     bdd

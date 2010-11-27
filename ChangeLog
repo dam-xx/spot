@@ -1,5 +1,12 @@
 2010-11-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Another Clang report.
+
+	* iface/nips/nips.cc (format_state): Do not use a variable-sized
+	array, this is not allowed in C++.
+
+2010-11-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix more errors reported by Clang.
 
 	* src/tgbaalgos/reducerun.hh (tgba_run): Predeclare as a struct
