@@ -1,5 +1,9 @@
 2010-11-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgbatest/ltl2tgba.cc (syntax): Typo.
+
+2010-11-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Another Clang report.
 
 	* iface/nips/nips.cc (format_state): Do not use a variable-sized

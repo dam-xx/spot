@@ -201,7 +201,7 @@ syntax(char* prog)
 	    << "  -R2t  remove transitions using delayed simulation"
 	    << std::endl
 	    << "  -R3   use SCC to reduce the automata" << std::endl
-	    << "  -R3f  clean more acceptance conditions that -R3" << std::endl
+	    << "  -R3f  clean more acceptance conditions than -R3" << std::endl
 	    << "          "
 	    << "(prefer -R3 over -R3f if you degeneralize with -D, -DS, or -N)"
 	    << std::endl
