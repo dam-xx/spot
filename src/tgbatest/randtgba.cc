@@ -1,5 +1,5 @@
-// Copyright (C) 2008, 2009 Laboratoire de Recherche et Développement
-// de l'Epita (LRDE).
+// Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
+// Développement de l'Epita (LRDE).
 // Copyright (C) 2004, 2005 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
@@ -1225,9 +1225,9 @@ main(int argc, char** argv)
       ec_ratio_stat_type::stats_alg_map& stats = glob_ec_ratio_stats.stats;
       typedef ec_ratio_stat_type::alg_1stat_map::const_iterator ec_iter;
 
-      for (unsigned i = 0; i < ec_algos.size(); ++i)
+      for (unsigned ai = 0; ai < ec_algos.size(); ++ai)
 	{
-	  const std::string algo = ec_algos[i].name;
+	  const std::string algo = ec_algos[ai].name;
 
 	  int n = -1;
 
@@ -1270,9 +1270,9 @@ main(int argc, char** argv)
       std::cout << std::right << std::fixed << std::setprecision(1);
       ec_ratio_stat_type::stats_alg_map& stats2 = arc_ratio_stats.stats;
 
-      for (unsigned i = 0; i < ec_algos.size(); ++i)
+      for (unsigned ai = 0; ai < ec_algos.size(); ++ai)
 	{
-	  const std::string algo = ec_algos[i].name;
+	  const std::string algo = ec_algos[ai].name;
 
 	  std::cout << std::setw(25)  << algo << " " << std::setw(8);
 
