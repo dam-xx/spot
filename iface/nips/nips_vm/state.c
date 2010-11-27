@@ -17,12 +17,6 @@
 
 #define STATE_OUT_DOTTY_LINE_END "\\l\\"
 
-
-// import functions as "extern" for unoptimized compilation
-#define STATE_INLINE extern
-#include "state_inline.h"
-#undef STATE_INLINE
-
 // *** helper functions ***
 
 // allocate memory of size sz in supplied buffer

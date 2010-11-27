@@ -1,3 +1,14 @@
+2010-11-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix compilation with Clang.
+
+	* state.c: Do not include state_inline.h twice with different
+	value of STATE_INLINE.  It was included once via state.h with
+	STATE_INLINE = "extern inline", and another time directly with
+	STATE_INLINE = "extern". Now...
+	* state.h: ... only include it once here with STATE_INLINE =
+	"static inline".
+
 2010-01-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Kill a warning on Ubuntu.
