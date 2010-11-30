@@ -1161,28 +1161,36 @@ main(int argc, char** argv)
                               delete run;
                               run = redrun;
                             }
-			  tm.start("printing accepting run");
-                          if (graph_run_opt)
-                            {
-                              spot::tgba_run_dotty_decorator deco(run);
-                              spot::dotty_reachable(std::cout, a, &deco);
-                            }
-                          else if (graph_run_tgba_opt)
-                            {
-                              spot::tgba* ar = spot::tgba_run_to_tgba(a, run);
-                              spot::dotty_reachable(std::cout, ar);
-                              delete ar;
-                            }
-                          else
-                            {
-                              spot::print_tgba_run(std::cout, a, run);
-			      if (accepting_run_replay
-				  && !spot::replay_tgba_run(std::cout, a, run,
-							    true))
+			  if (accepting_run_replay)
+			    {
+			      tm.start("replaying acc. run");
+			      if (!spot::replay_tgba_run(std::cout, a,
+							 run, true))
 				exit_code = 1;
-                            }
-                          delete run;
-			  tm.stop("printing accepting run");
+			      tm.stop("replaying acc. run");
+			    }
+			  else
+			    {
+			      tm.start("printing accepting run");
+			      if (graph_run_opt)
+				{
+				  spot::tgba_run_dotty_decorator deco(run);
+				  spot::dotty_reachable(std::cout, a, &deco);
+				}
+			      else if (graph_run_tgba_opt)
+				{
+				  spot::tgba* ar =
+				    spot::tgba_run_to_tgba(a, run);
+				  spot::dotty_reachable(std::cout, ar);
+				  delete ar;
+				}
+			      else
+				{
+				  spot::print_tgba_run(std::cout, a, run);
+				}
+			      delete run;
+			      tm.stop("printing accepting run");
+			    }
                         }
                     }
 		  else

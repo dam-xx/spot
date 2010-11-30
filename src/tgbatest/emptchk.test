@@ -54,10 +54,10 @@ expect_ce()
   run 0 ../ltl2tgba -CR -eTau03_opt -f "$1"
   run 0 ../ltl2tgba -CR -eGV04 -f "$1"
   # Expect multiple accepting runs
-  test `../ltl2tgba -CR -e'CVWY90(repeated)' -l "$1" |
-                                        grep Prefix: | wc -l` -ge $2
-  test `../ltl2tgba -CR -e'SE05(repeated)' -l "$1" |
-                                        grep Prefix: | wc -l` -ge $2
+  test `../ltl2tgba -C -e'CVWY90(repeated)' -l "$1" |
+        grep Prefix: | wc -l` -ge $2
+  test `../ltl2tgba -C -e'SE05(repeated)' -l "$1" |
+        grep Prefix: | wc -l` -ge $2
 }
 
 expect_no()
@@ -80,9 +80,9 @@ expect_no()
   run 0 ../ltl2tgba -CR -E'SE05(bsh=10M)' -f "$1"
   run 0 ../ltl2tgba -CR -ETau03_opt -f "$1"
   run 0 ../ltl2tgba -CR -EGV04 -f "$1"
-  test `../ltl2tgba -CR -e'CVWY90(repeated)' -l "!($1)" |
+  test `../ltl2tgba -C -e'CVWY90(repeated)' -l "!($1)" |
         grep Prefix: | wc -l` -ge $2
-  test `../ltl2tgba -CR -e'SE05(repeated)' -l "!($1)" |
+  test `../ltl2tgba -C -e'SE05(repeated)' -l "!($1)" |
         grep Prefix: | wc -l` -ge $2
 }
 

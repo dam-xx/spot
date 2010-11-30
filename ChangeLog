@@ -1,5 +1,14 @@
 2010-11-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Rationalize options for counter-example output.
+
+	* src/tgbatest/ltl2tgba.cc (main): Either replay the accepting
+	run or print it, but do not do both.
+	* src/tgbatest/emptchk.test: Adjust. I.e. use -C instead of -CR
+	when we expect the run to be displayed.
+
+2010-11-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix a GCC 4.6 warning.
 
 	* src/tgbatest/randtgba.cc (main): Remove the set but unused opt_A
