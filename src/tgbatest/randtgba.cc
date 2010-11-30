@@ -542,7 +542,6 @@ generate_formula(const spot::ltl::random_ltl& rl, int opt_f, int opt_s,
 int
 main(int argc, char** argv)
 {
-  bool opt_A;
   bool opt_paper = false;
   bool opt_dp = false;
   int opt_f = 15;
@@ -612,7 +611,8 @@ main(int argc, char** argv)
         {
           if (argc < argn + 2)
             syntax(argv[0]);
-	  opt_A = true;
+	  if (!opt_ec)
+	    opt_ec = 1;
 	  std::istream* in;
           if (strcmp(argv[++argn], "-"))
             {
