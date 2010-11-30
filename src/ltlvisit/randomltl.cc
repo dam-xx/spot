@@ -152,7 +152,7 @@ namespace spot
 	  else if (proba_[i].min_n > 2)
 	    total_2_and_more_ += proba_[i].proba;
 	  else
-	    assert(!"un expected max_n");
+	    assert(!"unexpected max_n");
 	}
       total_2_and_more_ += total_2_;
       assert(total_1_ != 0.0);

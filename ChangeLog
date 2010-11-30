@@ -1,5 +1,9 @@
 2010-11-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/ltlvisit/randomltl.cc (random_ltl::update_sums): Typo in string.
+
+2010-11-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Remove a quadratic behavior in eventual_universal_visitor.
 
 	* src/ltlvisit/syntimpl.cc (eventual_universal_visitor): Use
