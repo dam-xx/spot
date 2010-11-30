@@ -38,10 +38,19 @@ namespace spot
 
       class eventual_universal_visitor: public const_visitor
       {
+	union
+	{
+	  unsigned v;
+	  struct is_struct
+	  {
+	    bool eventual:1;
+	    bool universal:1;
+	  } is;
+	} ret_;
+
       public:
 
 	eventual_universal_visitor()
-	  : eventual(false), universal(false)
 	{
 	}
 
@@ -53,23 +62,25 @@ namespace spot
 	bool
 	is_eventual() const
 	{
-	  return eventual;
+	  return ret_.is.eventual;
 	}
 
 	bool
 	is_universal() const
 	{
-	  return universal;
+	  return ret_.is.universal;
 	}
 
 	void
 	visit(const atomic_prop*)
 	{
+	  ret_.v = 0;
 	}
 
 	void
 	visit(const constant*)
 	{
+	  ret_.v = 0;
 	}
 
 	void
@@ -78,15 +89,18 @@ namespace spot
 	  const formula* f1 = uo->child();
 	  if (uo->op() == unop::F)
 	    {
-	      eventual = true;
-	      universal = recurse_un(f1);
+	      ret_.v = recurse_(f1);
+	      ret_.is.eventual = true;
 	      return;
 	    }
 	  if (uo->op() == unop::G)
 	    {
-	      universal = true;
-	      eventual = recurse_ev(f1);
+	      ret_.v = recurse_(f1);
+	      ret_.is.universal = true;
+	      return;
 	    }
+	  ret_.v = 0;
+	  return;
 	}
 
 	void
@@ -94,41 +108,43 @@ namespace spot
 	{
 	  const formula* f1 = bo->first();
 	  const formula* f2 = bo->second();
+
+	  // Beware: (f U g) is purely eventual if both operands
+	  // are purely eventual, unlike in the proceedings of
+	  // Concur'00.  (The revision of the paper available at
+	  // http://www.bell-labs.com/project/TMP/ is fixed.)  See
+	  // also http://arxiv.org/abs/1011.4214 for a discussion
+	  // about this problem.  (Which we fixed in 2005 thanks
+	  // to LBTT.)
+
+	  // This means that we can use the following case to handle
+	  // all cases of (f U g), (f R g), (f W g), (f M g) for
+	  // universality and eventuality.
+	  ret_.v = recurse_(f1) & recurse_(f2);
+
+	  // we are left with the case where U, R, W, or M are actually
+	  // used to represent F or G.
 	  switch (bo->op())
 	    {
 	    case binop::Xor:
 	    case binop::Equiv:
 	    case binop::Implies:
-	      universal = recurse_un(f1) && recurse_un(f2);
-	      eventual = recurse_ev(f1) && recurse_ev(f2);
 	      return;
 	    case binop::U:
-	      universal = recurse_un(f1) && recurse_un(f2);
-	      if ((f1 == constant::true_instance())
-		  // Both operand must be purely eventual, unlike in
-		  // the proceedings of Concur'00.  (The revision of
-		  // the paper available at
-		  // http://www.bell-labs.com/project/TMP/ is fixed.)
-		  || (recurse_ev(f1) && recurse_ev(f2)))
-		eventual = true;
+	      if (f1 == constant::true_instance())
+		ret_.is.eventual = true;
 	      return;
 	    case binop::W:
-	      universal = recurse_un(f1) && recurse_un(f2);
-	      if ((f2 == constant::true_instance())
-		  || (recurse_ev(f1) && recurse_ev(f2)))
-		eventual = true;
+	      if (f2 == constant::true_instance())
+		ret_.is.eventual = true;
 	      return;
 	    case binop::R:
-	      eventual = recurse_ev(f1) && recurse_ev(f2);
-	      if ((f1 == constant::false_instance())
-		  || (recurse_un(f1) && recurse_un(f2)))
-		universal = true;
+	      if (f1 == constant::false_instance())
+		ret_.is.universal = true;
 	      return;
 	    case binop::M:
-	      eventual = recurse_ev(f1) && recurse_ev(f2);
-	      if ((f2 == constant::false_instance())
-		  || (recurse_un(f1) && recurse_un(f2)))
-		universal = true;
+	      if (f2 == constant::false_instance())
+		ret_.is.universal = true;
 	      return;
 	    }
 	  /* Unreachable code.  */
@@ -145,42 +161,20 @@ namespace spot
 	visit(const multop* mo)
 	{
 	  unsigned mos = mo->size();
-
-	  eventual = true;
-	  universal = true;
-	  for (unsigned i = 0; i < mos; ++i)
-	    if (!recurse_ev(mo->nth(i)))
-	      {
-		eventual = false;
-		break;
-	      }
-	  for (unsigned i = 0; i < mos; ++i)
-	    if (!recurse_un(mo->nth(i)))
-	      {
-		universal = false;
-		break;
-	      }
+	  assert(mos != 0);
+	  ret_.v = recurse_(mo->nth(0));
+	  for (unsigned i = 1; i < mos && ret_.v != 0; ++i)
+	    ret_.v &= recurse_(mo->nth(i));
 	}
 
-	bool
-	recurse_ev(const formula* f)
+      private:
+	unsigned
+	recurse_(const formula* f)
 	{
 	  eventual_universal_visitor v;
 	  const_cast<formula*>(f)->accept(v);
-	  return v.is_eventual();
+	  return v.ret_.v;
 	}
-
-	bool
-	recurse_un(const formula* f)
-	{
-	  eventual_universal_visitor v;
-	  const_cast<formula*>(f)->accept(v);
-	  return v.is_universal();
-	}
-
-      protected:
-	bool eventual;
-	bool universal;
       };
 
 

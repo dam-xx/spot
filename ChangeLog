@@ -1,3 +1,16 @@
+2010-11-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Remove a quadratic behavior in eventual_universal_visitor.
+
+	* src/ltlvisit/syntimpl.cc (eventual_universal_visitor): Use
+	a union to store the eventual and universal properties as two
+	bit in a bit-field, and "AND" both of them at once.
+	(eventual_universal_visitor::recurse_un,
+	eventual_universal_visitor::recurse_ev): Replace these
+	two functions by ...
+	(eventual_universal_visitor::recurse_): ... this one, that
+	returns both bits as an unsigned.
+
 2010-12-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgbatest/ltl2tgba.cc (main): Delete the accepting run
