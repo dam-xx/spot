@@ -1,3 +1,16 @@
+2010-12-01  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	Halve the number of application of eventual_universal_visitor in
+	reduce_visitor::visit(binop).
+
+	* src/ltlvisit/reduce.cc (eventual_universal_visitor::recurse_): 
+	Move this method...
+	(recurse_eu): ... outside as a separate function.  Likewise for
+	the universal/eventual result struct.
+	(reduce_visitor::visit(binop)): Call recurse_eu() once to replace
+	two calls to is_eventual and is_universal, thus replacing two
+	recursions by one.
+
 2010-12-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Move the eventual-universal functions where the belong.

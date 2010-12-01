@@ -38,18 +38,20 @@ namespace spot
   {
     namespace
     {
+      typedef union
+      {
+	unsigned v;
+	struct is_struct
+	{
+	  bool eventual:1;
+	  bool universal:1;
+	} is;
+      } eu_info;
+
+      static unsigned recurse_eu(const formula* f);
+
       class eventual_universal_visitor: public const_visitor
       {
-	union
-	{
-	  unsigned v;
-	  struct is_struct
-	  {
-	    bool eventual:1;
-	    bool universal:1;
-	  } is;
-	} ret_;
-
       public:
 
 	eventual_universal_visitor()
@@ -73,6 +75,12 @@ namespace spot
 	  return ret_.is.universal;
 	}
 
+	unsigned
+	eu() const
+	{
+	  return ret_.v;
+	}
+
 	void
 	visit(const atomic_prop*)
 	{
@@ -91,13 +99,13 @@ namespace spot
 	  const formula* f1 = uo->child();
 	  if (uo->op() == unop::F)
 	    {
-	      ret_.v = recurse_(f1);
+	      ret_.v = recurse_eu(f1);
 	      ret_.is.eventual = true;
 	      return;
 	    }
 	  if (uo->op() == unop::G)
 	    {
-	      ret_.v = recurse_(f1);
+	      ret_.v = recurse_eu(f1);
 	      ret_.is.universal = true;
 	      return;
 	    }
@@ -122,7 +130,7 @@ namespace spot
 	  // This means that we can use the following case to handle
 	  // all cases of (f U g), (f R g), (f W g), (f M g) for
 	  // universality and eventuality.
-	  ret_.v = recurse_(f1) & recurse_(f2);
+	  ret_.v = recurse_eu(f1) & recurse_eu(f2);
 
 	  // we are left with the case where U, R, W, or M are actually
 	  // used to represent F or G.
@@ -164,20 +172,22 @@ namespace spot
 	{
 	  unsigned mos = mo->size();
 	  assert(mos != 0);
-	  ret_.v = recurse_(mo->nth(0));
+	  ret_.v = recurse_eu(mo->nth(0));
 	  for (unsigned i = 1; i < mos && ret_.v != 0; ++i)
-	    ret_.v &= recurse_(mo->nth(i));
+	    ret_.v &= recurse_eu(mo->nth(i));
 	}
 
       private:
-	unsigned
-	recurse_(const formula* f)
-	{
-	  eventual_universal_visitor v;
-	  const_cast<formula*>(f)->accept(v);
-	  return v.ret_.v;
-	}
+	eu_info ret_;
       };
+
+      static unsigned
+      recurse_eu(const formula* f)
+      {
+	eventual_universal_visitor v;
+	const_cast<formula*>(f)->accept(v);
+	return v.eu();
+      }
 
 
       /////////////////////////////////////////////////////////////////////////
@@ -257,15 +267,14 @@ namespace spot
 	  binop::type op = bo->op();
 
 	  formula* f2 = recurse(bo->second());
-	  bool f2_eventual = false;
+	  eu_info f2i = { recurse_eu(f2) };
 
 	  if (opt_ & Reduce_Eventuality_And_Universality)
 	    {
-	      f2_eventual = is_eventual(f2);
 	      /* If b is a pure eventuality formula then a U b = b.
 		 If b is a pure universality formula a R b = b. */
-	      if ((f2_eventual && (op == binop::U))
-		  || (is_universal(f2) && (op == binop::R)))
+	      if ((f2i.is.eventual && (op == binop::U))
+		  || (f2i.is.universal && (op == binop::R)))
 		{
 		  result_ = f2;
 		  return;
@@ -273,16 +282,17 @@ namespace spot
 	    }
 
 	  formula* f1 = recurse(bo->first());
+	  eu_info f1i = { recurse_eu(f1) };
 	  if (opt_ & Reduce_Eventuality_And_Universality)
 	    {
 	      /* If a&b is a pure eventuality formula then a M b = a & b.
 		 If a is a pure universality formula a W b = a|b. */
-	      if (is_eventual(f1) && f2_eventual && (op == binop::M))
+	      if (f1i.is.eventual && f2i.is.eventual && (op == binop::M))
 		{
 		  result_ = multop::instance(multop::And, f1, f2);
 		  return;
 		}
-	      if (is_universal(f1) && (op == binop::W))
+	      if (f1i.is.universal && (op == binop::W))
 		{
 		  result_ = multop::instance(multop::Or, f1, f2);
 		  return;
