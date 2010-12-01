@@ -1188,9 +1188,9 @@ main(int argc, char** argv)
 				{
 				  spot::print_tgba_run(std::cout, a, run);
 				}
-			      delete run;
 			      tm.stop("printing accepting run");
 			    }
+			  delete run;
                         }
                     }
 		  else
