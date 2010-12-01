@@ -1,3 +1,12 @@
+2010-12-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Move the eventual-universal functions where the belong.
+
+	* src/ltlvisit/syntimpl.cc (eventual_universal_visitor,
+	is_eventual, is_universal): Move ...
+	* src/ltlvisit/reduce.cc (eventual_universal_visitor,
+	is_eventual, is_universal): ... here.
+
 2010-11-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/ltlvisit/randomltl.cc (random_ltl::update_sums): Typo in string.

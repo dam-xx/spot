@@ -38,6 +38,150 @@ namespace spot
   {
     namespace
     {
+      class eventual_universal_visitor: public const_visitor
+      {
+	union
+	{
+	  unsigned v;
+	  struct is_struct
+	  {
+	    bool eventual:1;
+	    bool universal:1;
+	  } is;
+	} ret_;
+
+      public:
+
+	eventual_universal_visitor()
+	{
+	}
+
+	virtual
+	~eventual_universal_visitor()
+	{
+	}
+
+	bool
+	is_eventual() const
+	{
+	  return ret_.is.eventual;
+	}
+
+	bool
+	is_universal() const
+	{
+	  return ret_.is.universal;
+	}
+
+	void
+	visit(const atomic_prop*)
+	{
+	  ret_.v = 0;
+	}
+
+	void
+	visit(const constant*)
+	{
+	  ret_.v = 0;
+	}
+
+	void
+	visit(const unop* uo)
+	{
+	  const formula* f1 = uo->child();
+	  if (uo->op() == unop::F)
+	    {
+	      ret_.v = recurse_(f1);
+	      ret_.is.eventual = true;
+	      return;
+	    }
+	  if (uo->op() == unop::G)
+	    {
+	      ret_.v = recurse_(f1);
+	      ret_.is.universal = true;
+	      return;
+	    }
+	  ret_.v = 0;
+	  return;
+	}
+
+	void
+	visit(const binop* bo)
+	{
+	  const formula* f1 = bo->first();
+	  const formula* f2 = bo->second();
+
+	  // Beware: (f U g) is purely eventual if both operands
+	  // are purely eventual, unlike in the proceedings of
+	  // Concur'00.  (The revision of the paper available at
+	  // http://www.bell-labs.com/project/TMP/ is fixed.)  See
+	  // also http://arxiv.org/abs/1011.4214 for a discussion
+	  // about this problem.  (Which we fixed in 2005 thanks
+	  // to LBTT.)
+
+	  // This means that we can use the following case to handle
+	  // all cases of (f U g), (f R g), (f W g), (f M g) for
+	  // universality and eventuality.
+	  ret_.v = recurse_(f1) & recurse_(f2);
+
+	  // we are left with the case where U, R, W, or M are actually
+	  // used to represent F or G.
+	  switch (bo->op())
+	    {
+	    case binop::Xor:
+	    case binop::Equiv:
+	    case binop::Implies:
+	      return;
+	    case binop::U:
+	      if (f1 == constant::true_instance())
+		ret_.is.eventual = true;
+	      return;
+	    case binop::W:
+	      if (f2 == constant::true_instance())
+		ret_.is.eventual = true;
+	      return;
+	    case binop::R:
+	      if (f1 == constant::false_instance())
+		ret_.is.universal = true;
+	      return;
+	    case binop::M:
+	      if (f2 == constant::false_instance())
+		ret_.is.universal = true;
+	      return;
+	    }
+	  /* Unreachable code.  */
+	  assert(0);
+	}
+
+	void
+	visit(const automatop*)
+	{
+	  assert(0);
+	}
+
+	void
+	visit(const multop* mo)
+	{
+	  unsigned mos = mo->size();
+	  assert(mos != 0);
+	  ret_.v = recurse_(mo->nth(0));
+	  for (unsigned i = 1; i < mos && ret_.v != 0; ++i)
+	    ret_.v &= recurse_(mo->nth(i));
+	}
+
+      private:
+	unsigned
+	recurse_(const formula* f)
+	{
+	  eventual_universal_visitor v;
+	  const_cast<formula*>(f)->accept(v);
+	  return v.ret_.v;
+	}
+      };
+
+
+      /////////////////////////////////////////////////////////////////////////
+
       class reduce_visitor: public visitor
       {
       public:
@@ -463,6 +607,22 @@ namespace spot
 	}
       prev->destroy();
       return const_cast<formula*>(f);
+    }
+
+    bool
+    is_eventual(const formula* f)
+    {
+      eventual_universal_visitor v;
+      const_cast<formula*>(f)->accept(v);
+      return v.is_eventual();
+    }
+
+    bool
+    is_universal(const formula* f)
+    {
+      eventual_universal_visitor v;
+      const_cast<formula*>(f)->accept(v);
+      return v.is_universal();
     }
   }
 }
