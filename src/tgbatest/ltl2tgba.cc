@@ -63,6 +63,9 @@
 #include "tgbaalgos/scc.hh"
 #include "tgbaalgos/emptiness_stats.hh"
 
+#include "taalgos/sba2ta.hh"
+#include "taalgos/dotty.hh"
+
 std::string
 ltl_defs()
 {
@@ -282,7 +285,13 @@ syntax(char* prog)
             << "  -T    time the different phases of the translation"
 	    << std::endl
 	    << "  -v    display the BDD variables used by the automaton"
-	    << std::endl;
+	    << std::endl
+
+  	  	<< "Options for Testing Automata:"
+ 	    << std::endl
+ 	    << "  -TA    Translate an LTL formula into a Testing automata"
+ 	    << std::endl;
+
   exit(2);
 }
 
@@ -336,6 +345,7 @@ main(int argc, char** argv)
   spot::bdd_dict* dict = new spot::bdd_dict();
   spot::timer_map tm;
   bool use_timer = false;
+  bool ta_opt = false;
 
   for (;;)
     {
@@ -666,6 +676,10 @@ main(int argc, char** argv)
 	{
 	  use_timer = true;
 	}
+      else if (!strcmp(argv[formula_index], "-TA"))
+        {
+          ta_opt = true;
+        }
       else if (!strcmp(argv[formula_index], "-taa"))
 	{
 	  translation = TransTAA;
@@ -1039,7 +1053,38 @@ main(int argc, char** argv)
 	  break;
 	}
 
+
       const spot::tgba* product_degeneralized = 0;
+
+      if (ta_opt)
+        {
+          spot::tgba_sba_proxy* degeneralized_new = 0;
+          spot::tgba_sba_proxy* degeneralized =
+              dynamic_cast<spot::tgba_sba_proxy*> (a);
+          if (degeneralized == 0)
+            degeneralized_new = degeneralized =  new spot::tgba_sba_proxy(a);
+
+          spot::ltl::atomic_prop_set* aps = atomic_prop_collect(f, 0);
+
+          bdd atomic_props_set_bdd = bdd_true();
+          for (spot::ltl::atomic_prop_set::const_iterator i = aps->begin(); i
+              != aps->end(); ++i)
+            {
+              bdd atomic_prop = bdd_ithvar(
+                  (degeneralized->get_dict())->var_map[*i]);
+
+              atomic_props_set_bdd &= atomic_prop;
+
+            }
+          delete aps;
+
+          spot::ta* testing_automata = sba_to_ta(degeneralized, atomic_props_set_bdd);
+          spot::dotty_reachable(std::cout, testing_automata);
+          delete testing_automata;
+          delete degeneralized_new;
+          output = -1;
+        }
+
 
       if (system)
         {

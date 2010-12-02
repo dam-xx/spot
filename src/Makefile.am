@@ -27,7 +27,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 # end, after building '.' (since the current directory contains
 # libspot.la needed by the tests).
 SUBDIRS = misc ltlenv ltlast ltlvisit ltlparse eltlparse tgba		\
-          tgbaalgos tgbaparse evtgba evtgbaalgos evtgbaparse kripke	\
+          tgbaalgos ta taalgos tgbaparse evtgba evtgbaalgos evtgbaparse kripke	\
           saba sabaalgos neverparse . ltltest eltltest tgbatest		\
           evtgbatest sabatest sanity
 
@@ -43,6 +43,8 @@ libspot_la_LIBADD =  \
   eltlparse/libeltlparse.la \
   tgba/libtgba.la \
   tgbaalgos/libtgbaalgos.la \
+  ta/libta.la \
+  taalgos/libtaalgos.la \
   tgbaparse/libtgbaparse.la \
   neverparse/libneverparse.la \
   evtgba/libevtgba.la \

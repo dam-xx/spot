@@ -1,3 +1,12 @@
+2010-12-02  Ala Eddine  <ala@lrde.epita.fr>
+
+	add Testing Automata Product and corresponding Emptiness Check algorithm.
+	
+	* src/ta/taproduct.cc, src/ta/taproduct.hh, 
+	src/taalgos/emptinessta.cc, taalgos/emptinessta.hh
+	src/ta/taexplicit.hh, src/taalgos/Makefile.am,
+	src/taalgos/stats.cc, src/taalgos/stats.hh: New files.
+	
 2011-02-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Enable VERBOSE logs for nips, greatspn, and python tests.
@@ -822,7 +831,20 @@
 	handling of full_parent.
 	(to_spin_string_visitor): Handle full_parent.
 
-2010-12-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+2010-12-02  Ala Eddine  <ala@lrde.epita.fr>
+
+	Preliminary implementation of Testing Automata.
+	
+	* configure.ac: Generate src/ta/Makefile and src/taalgos/Makefile.
+	* src/Makefile.am (SUBDIRS): Add them.	
+	* src/tgbatest/ltl2tgba.cc (main): Add option -TA. 
+	* src/ta/Makefile.am, src/ta/ta.hh, src/ta/taexplicit.cc,
+	src/ta/taexplicit.hh, src/taalgos/Makefile.am,
+	src/taalgos/dotty.cc, src/taalgos/dotty.hh,
+	src/taalgos/reachiter.cc, src/taalgos/reachiter.hh,
+	src/taalgos/sba2ta.cc, src/taalgos/sba2ta.hh: New files.
+
+2010-12-01  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	Halve the number of application of eventual_universal_visitor in
 	reduce_visitor::visit(binop).
@@ -955,7 +977,8 @@
 
 2010-11-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
-	Add interface for and test the bdd_setxor() function added to Buddy.
+	Add interface for and test the bdd_setxor() function added to
+	Buddy.
 
 	* wrap/python/buddy.i (bdd_setxor): New function.
 	* wrap/python/tests/setxor.py: New file.
