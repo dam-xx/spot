@@ -1,3 +1,12 @@
+2010-12-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Preliminary implementation of a tool to generate some interesting
+	families of LTL formulae.
+
+	* src/ltltest/genltl.cc: New file.  Based on five classes of
+	formulae defined in a paper by CichÃ³n, Czubak, and JasiÅ„ski.
+	* src/ltltest/Makefile.am (noinst_PROGRAMS): Build genltl.
+
 2010-12-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Add full_parent support to to_spin_string().
@@ -587,7 +596,7 @@
 	Optimize tgba_tba_proxy and tgba_sba_proxy for states that share
 	an acceptance condition on all outgoing transitions.
 
-	This was motivated by experiments from Rüdiger Ehlers, showing
+	This was motivated by experiments from RÃ¼diger Ehlers, showing
 	that "ltl2ba -f 'a U (b U c)'" outperformed "ltl2tgba -f -N -R3 'a
 	U (b U c)'".  With this change and the previous one, it is no
 	longer the case.
@@ -610,7 +619,7 @@
 	* src/tgbatest/ltl2tgba.cc (main): Call scc_filter() before the
 	degeneralization, because it might remove useless acceptance
 	conditions.  I realized this while looking at experiments from
-	Rüdiger Ehlers.
+	RÃ¼diger Ehlers.
 
 2010-02-24  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
@@ -620,7 +629,7 @@
 
 	Work around a spurious style.test error.
 
-	* src/saba/sabacomplementtgba.hh (spot): Rewrite Büchi as B\"uchi
+	* src/saba/sabacomplementtgba.hh (spot): Rewrite BÃ¼chi as B\"uchi
 	is the BibTex entry used as comment, because some version of sed
 	will choke on non-ascii character and cause sanity/style.test to
 	fail.
@@ -1242,12 +1251,12 @@
 
 2009-11-30  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
-	Add a new type of automata: State-labeled Alternating Büchi
+	Add a new type of automata: State-labeled Alternating BÃ¼chi
 	Automata (SABA).
 
 	* src/saba/saba.hh, src/saba/saba.cc, src/saba/sabastate.hh,
 	src/saba/sabasucciter.hh: New.  Interface for
-	SABA (State-labeled Alternating Büchi Automata).
+	SABA (State-labeled Alternating BÃ¼chi Automata).
 	* src/saba/explicitstateconjunction.cc,
 	src/saba/explicitstateconjunction.hh: New.  Default
 	implementation for a conjunction of states.
@@ -1843,7 +1852,7 @@
 
 2009-10-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
-	* AUTHORS: Add Damien Lefortier, Guillaume Sadegh, and Félix
+	* AUTHORS: Add Damien Lefortier, Guillaume Sadegh, and FÃ©lix
 	Abecassis.
 
 2009-10-01  Guillaume Sadegh  <sadegh@lrde.epita.fr>
@@ -2043,7 +2052,7 @@
 
 	* src/tgba/tgbacomplement.cc: Stay on 80 columns.
 
-2009-07-08  Félix Abecassis <abecassis@lrde.epita.fr>
+2009-07-08  FÃ©lix Abecassis <abecassis@lrde.epita.fr>
 
 	Add 2 benchmarks directories.
 	Add an algorithm to split an automaton in several automata.
@@ -2095,7 +2104,7 @@
 	automaton into a TGBA instead of a TBA.
 
 	* src/tgba/tgbacomplement.hh, src/tgba/tgbacomplement.cc:
-	Adjust the transformation from Streett to Büchi to support
+	Adjust the transformation from Streett to BÃ¼chi to support
 	generalized acceptance conditions.
 	* src/tgbatest/complementation.cc: Improve output messages.
 	* src/tgbatest/complementation.test: New tests.
@@ -2125,7 +2134,7 @@
 
 2009-06-05  Guillaume Sadegh  <sadegh@lrde.epita.fr>
 
-	Add an algorithm to complement Büchi automata.
+	Add an algorithm to complement BÃ¼chi automata.
 
 	* src/tgba/tgbacomplement.hh, src/tgba/tgbacomplement.cc: New
 	files. The complementation algorithm.
@@ -4944,10 +4953,10 @@
 	* src/tgbaalgos/gtec/ce.cc (counter_example::counter_example): Do
 	not parenthesize the type after the new operator (g++ 3.4 complains).
 	* src/tgbaalgos/dupexp.cc (dupexp_iter::process_state,
-	dupexp_iter::declare_state): Use this->automata_ instead of
+	dupexp_iter::declare_state): Use this->automata_Â instead of
 	automata_.  Local protected member automata_ inherited from
 	template base class must be prefixed or g++ 3.4 will not look it
-	up (conforming to §14.6.2.3).
+	up (conforming to Â§14.6.2.3).
 
 2004-07-07  Alexandre Duret-Lutz  <adl@src.lip6.fr>
 
@@ -8208,7 +8217,7 @@
 	not a bdd.
 	* src/tgba/tgbabddconcrete.cc: Likewise.
 
-	Initial code for TGBA (Transition Generalized Büchi Automata).
+	Initial code for TGBA (Transition Generalized BÃ¼chi Automata).
 	Contains tgba_bdd, a BDD-encoded TGBA, and ltl_to_tgba,
 	a LTL-to-TGBA translator using Couvreur's algorithm.
 
