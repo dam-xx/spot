@@ -1,9 +1,19 @@
-2010-12-01  Alexandre Duret-Lutz  <adl@gnu.org>
+2010-12-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add full_parent support to to_spin_string().
+
+	* src/ltlvisit/tostrinc.hh (to_spin_string): Add a full_parent
+	optional parameter, like for the to_string() function.
+	* src/ltlvisit/tostrinc.cc (to_string_visitor): Fix the
+	handling of full_parent.
+	(to_spin_string_visitor): Handle full_parent.
+
+2010-12-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Halve the number of application of eventual_universal_visitor in
 	reduce_visitor::visit(binop).
 
-	* src/ltlvisit/reduce.cc (eventual_universal_visitor::recurse_): 
+	* src/ltlvisit/reduce.cc (eventual_universal_visitor::recurse_):
 	Move this method...
 	(recurse_eu): ... outside as a separate function.  Likewise for
 	the universal/eventual result struct.

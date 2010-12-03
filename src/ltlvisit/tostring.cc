@@ -75,6 +75,8 @@ namespace spot
 	visit(const atomic_prop* ap)
 	{
 	  std::string str = ap->name();
+	  if (full_parent_)
+	    os_ << "(";
 	  if (!is_bare_word(str.c_str()))
 	    {
 	      os_ << '"' << str << '"';
@@ -83,12 +85,18 @@ namespace spot
 	    {
 	      os_ << str;
 	    }
+	  if (full_parent_)
+	    os_ << ")";
 	}
 
 	void
 	visit(const constant* c)
 	{
+	  if (full_parent_)
+	    os_ << "(";
 	  os_ << c->val_name();
+	  if (full_parent_)
+	    os_ << ")";
 	}
 
 	void
@@ -137,6 +145,16 @@ namespace spot
 	  // The parser treats F0, F1, G0, G1, X0, and X1 as atomic
 	  // propositions.  So make sure we output F(0), G(1), etc.
 	  bool need_parent = !!dynamic_cast<const constant*>(uo->child());
+	  bool top_level = top_level_;
+
+	  if (full_parent_)
+	    {
+	      need_parent = false; // These will be printed by each subformula
+
+	      if (!top_level)
+		os_ << "(";
+	    }
+
 	  switch (uo->op())
 	    {
 	    case unop::Not:
@@ -159,10 +177,13 @@ namespace spot
 	    }
 
 	  top_level_ = false;
-	  if (need_parent || full_parent_)
+	  if (need_parent)
 	    os_ << "(";
 	  uo->child()->accept(*this);
-	  if (need_parent || full_parent_)
+	  if (need_parent)
+	    os_ << ")";
+
+	  if (full_parent_ && !top_level)
 	    os_ << ")";
 	}
 
@@ -225,8 +246,8 @@ namespace spot
       class to_spin_string_visitor : public to_string_visitor
       {
       public:
-      to_spin_string_visitor(std::ostream& os)
-	: to_string_visitor(os)
+	to_spin_string_visitor(std::ostream& os, bool full_parent = false)
+	  : to_string_visitor(os, full_parent)
 	{
 	}
 
@@ -302,8 +323,9 @@ namespace spot
 	void
 	visit(const unop* uo)
 	{
-	  // The parser treats X0, and X1 as atomic propositions.	 So
-	  // make sure we output X(0) and X(1).
+	  bool top_level = top_level_;
+	  if (full_parent_ && !top_level)
+	    os_ << "(";
 	  bool need_parent = false;
 	  switch (uo->op())
 	    {
@@ -311,7 +333,11 @@ namespace spot
 	      os_ << "!";
 	      break;
 	    case unop::X:
+	      // The parser treats X0, and X1 as atomic propositions.	 So
+	      // make sure we output X(0) and X(1).
 	      need_parent = !!dynamic_cast<const constant*>(uo->child());
+	      if (full_parent_)
+		need_parent = false;
 	      os_ << "X";
 	      break;
 	    case unop::F:
@@ -331,6 +357,8 @@ namespace spot
 	    os_ << "(";
 	  uo->child()->accept(*this);
 	  if (need_parent)
+	    os_ << ")";
+	  if (full_parent_ && !top_level)
 	    os_ << ")";
 	}
 
@@ -405,18 +433,18 @@ namespace spot
     }
 
     std::ostream&
-    to_spin_string(const formula* f, std::ostream& os)
+    to_spin_string(const formula* f, std::ostream& os, bool full_parent)
     {
-      to_spin_string_visitor v(os);
+      to_spin_string_visitor v(os, full_parent);
       f->accept(v);
       return os;
     }
 
     std::string
-    to_spin_string(const formula* f)
+    to_spin_string(const formula* f, bool full_parent)
     {
       std::ostringstream os;
-      to_spin_string(f, os);
+      to_spin_string(f, os, full_parent);
       return os.str();
     }
   }
