@@ -59,7 +59,7 @@ namespace spot
 	void
 	visit(const atomic_prop* ap)
 	{
-	  if (dynamic_cast<const atomic_prop*>(f) == ap)
+	  if (f == ap)
 	    result_ = true;
 	}
 
@@ -220,13 +220,12 @@ namespace spot
 	}
 
 	bool
-	special_case(const formula* f2)
+	special_case(const binop* f2)
 	{
 	  const binop* fb = dynamic_cast<const binop*>(f);
-	  const binop* f2b = dynamic_cast<const binop*>(f2);
-	  if (fb && f2b && fb->op() == f2b->op()
-	      && syntactic_implication(f2b->first(), fb->first())
-	      && syntactic_implication(f2b->second(), fb->second()))
+	  if (fb && fb->op() == f2->op()
+	      && syntactic_implication(f2->first(), fb->first())
+	      && syntactic_implication(f2->second(), fb->second()))
 	    return true;
 	  return false;
 	}
@@ -284,9 +283,9 @@ namespace spot
 	    case unop::F:
 	      {
 		/* F(a) = true U a */
-		const formula* tmp = binop::instance(binop::U,
-						     constant::true_instance(),
-						     f1->clone());
+		const binop* tmp = binop::instance(binop::U,
+						   constant::true_instance(),
+						   f1->clone());
 		if (special_case(tmp))
 		  {
 		    result_ = true;
@@ -301,9 +300,9 @@ namespace spot
 	    case unop::G:
 	      {
 		/* G(a) = false R a */
-		const formula* tmp = binop::instance(binop::R,
-						     constant::false_instance(),
-						     f1->clone());
+		const binop* tmp = binop::instance(binop::R,
+						   constant::false_instance(),
+						   f1->clone());
 		if (special_case(tmp))
 		  {
 		    result_ = true;
