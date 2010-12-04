@@ -1,5 +1,13 @@
 2010-12-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Preliminary benchmark using genltl, introduced earlier.
+
+	* bench/ltlclasses/: New benchmark.
+	* bench/Makefile.am: Add it.
+	* configure.ac: Adjust.
+
+2010-12-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/ltlvisit/syntimpl.cc: Reduce the number of dynamic_cast<>s.
 
 2010-12-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
