@@ -47,6 +47,7 @@ noinst_PROGRAMS = \
   randltl
 
 equals_SOURCES = equals.cc
+genltl_SOURCES = genltl.cc
 ltl2dot_SOURCES = readltl.cc
 ltl2dot_CPPFLAGS = $(AM_CPPFLAGS) -DDOTTY
 ltl2text_SOURCES = readltl.cc
