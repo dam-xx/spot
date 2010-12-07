@@ -1,3 +1,7 @@
+2010-12-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* README: Mention bench/ltlclases/.
+
 2010-12-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Preliminary benchmark using genltl, introduced earlier.

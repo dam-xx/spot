@@ -135,6 +135,7 @@ bench/            Benchmarks for ...
    gspn-ssp/      ... various symmetry-based methods with GreatSPN,
    ltl2tgba/      ... LTL-to-Büchi translation algorithms,
    ltlcounter/    ... translation of a class of LTL formulae,
+   ltlclasses/    ... translation of more classes of LTL formulae,
    scc-stats/     ... SCC statistics after translation of LTL formulae,
    split-product/ ... parallelizing gain after splitting LTL automata.
 wrap/             Wrappers for other languages.
