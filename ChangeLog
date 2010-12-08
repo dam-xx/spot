@@ -1,3 +1,40 @@
+2010-12-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Maintain basic properties of LTL formulae using a bitfield inside
+	the formula objects.
+
+	This bitfield is easily updated as the formulae are constructed.
+	Doing so avoids many AST recursions to compute these properties
+	individually.  This patch removes the eventual_universal_visitor,
+	as well as the kind_of() function.
+
+	* src/ltlast/formula.cc (is_boolean, is_sugar_free_boolean,
+	is_in_nenoform, is_X_free, is_sugar_free_ltl,
+	is_ltl_formula, is_eltl_formula, is_psl_formula, is_eventual,
+	is_universal, is_marked): New methods to query formula
+	properties in constant time.
+	(get_props, ltl_prop): A method and structure for
+	implementation as a field bit in an unsigned, for fast
+	computation.
+	(print_formula_props): New function.
+	* src/ltlast/atomic_prop.cc, src/ltlast/binop.cc,
+	src/ltlast/bunop.cc, src/ltlast/constant.cc, src/ltlast/multop.cc,
+	src/ltlast/unop.cc, src/ltlast/automatop.cc: Compute the
+	properties as instances are constructed.
+	* src/ltlparse/ltlparse.yy: Update to use is_boolean() instead
+	of kind_of().
+	* src/ltltest/kind.cc: Update to use print_formula_props().
+	* src/ltltest/kind.test: Adjust to test eventual and universal
+	properties.
+	* src/ltlvisit/kind.cc, src/ltlvisit/kind.hh: Delete these files.
+	* src/ltlvisit/Makefile.am: Remove kind.hh and kind.cc.
+	* src/ltlvisit/reduce.cc (recurse_eu, eventual_universal_visitor):
+	Remove, no longer needed.
+	(reduce_visitor, is_eventual, is_universal): Adjust to
+	use formula::is_eventual(), and formula::is_universal().
+	* src/ltlvisit/reduce.hh (is_eventual, is_universal): Declare as
+	deprecated.
+
 2010-10-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Simplify fUf, fRf, fWf,	and fRF as f.

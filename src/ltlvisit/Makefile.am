@@ -33,7 +33,6 @@ ltlvisit_HEADERS = \
   destroy.hh \
   dotty.hh \
   dump.hh \
-  kind.hh \
   length.hh \
   lunabbrev.hh \
   mark.hh \
@@ -56,7 +55,6 @@ libltlvisit_la_SOURCES = \
   destroy.cc \
   dotty.cc \
   dump.cc \
-  kind.cc \
   length.cc \
   lunabbrev.cc \
   mark.cc \
