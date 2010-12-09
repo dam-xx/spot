@@ -1,5 +1,21 @@
 2010-12-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Speedup syntactic_implication() by using a cache.
+
+	* src/ltlvisit/syntimpl.hh (syntactic_implication,
+	syntactic_implication_neg): Move as member of ...
+	(syntactic_implication_cache): ... this new class, that holds
+	a cache of results to speedup these functions.
+	* src/ltlvisit/syntimpl.cc: Adjust to use (lookup, populate,
+	and cleanup) the cache.
+	* src/ltlvisit/reduce.hh (reduce): Take an optional
+	syntactic_implication_cache parameter.
+	* src/ltlvisit/reduce.cc: Adjust to use a
+	syntactic_implication_cache.
+	* src/ltl/equals.cc: Call dump_instances() to help debugging.
+
+2010-12-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Speedup some rewriting functions by detecting cases where they do
 	nothing.
 
