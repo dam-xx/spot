@@ -1,5 +1,22 @@
 2010-12-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Get rid of all dynamic_cast<>s while working on LTL formulae. They
+	are too slow.
+
+	* src/ltlast/formula.hh (opkind, kind, kind_): Use an enum
+	to indicate the actual kind of the formula.  This way we can
+	check the kind of a formula without relying on dynamic_cast.
+	* src/ltlast/atomic_prop.cc, src/ltlast/automatop.cc,
+	src/ltlast/binop.cc, src/ltlast/bunop.cc, src/ltlast/constant.cc,
+	src/ltlast/multop.cc, src/ltlast/refformula.cc,
+	src/ltlast/refformula.hh, src/ltlast/unop.cc: Adjust constructors.
+	* src/ltlvisit/basicreduce.cc, src/ltlvisit/mark.cc,
+	src/ltlvisit/reduce.cc, src/ltlvisit/syntimpl.cc,
+	src/ltlvisit/tostring.cc: Replace all dynamic_cast by a
+	call to kind() followed by a static_cast.
+
+2010-12-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Replace the constant_term visitor by a flag in the formulae.
 
 	* src/ltlast/formula.hh (formula::accepts_eword): New method.
