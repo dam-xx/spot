@@ -1,3 +1,20 @@
+2010-12-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Replace the constant_term visitor by a flag in the formulae.
+
+	* src/ltlast/formula.hh (formula::accepts_eword): New method.
+	(formula::is.accepting_eword): New flag.
+	* src/ltlast/formula.cc (print_formula_props): Display the new
+	property.
+	* src/ltlast/atomic_prop.cc, src/ltlast/automatop.cc,
+	src/ltlast/binop.cc, src/ltlast/bunop.cc, src/ltlast/constant.cc,
+	src/ltlast/multop.cc, src/ltlast/unop.cc: Update
+	is.accepting_eword as appropriate.
+	* src/ltltest/consterm.cc, src/tgbaalgos/ltl2tgba_fm.cc: Adjust to
+	use accepts_eword().
+	* src/ltlvisit/consterm.cc, src/ltlvisit/consterm.hh: Delete.
+	* src/ltlvisit/Makefile.am: Remove these files.
+
 2010-12-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Maintain basic properties of LTL formulae using a bitfield inside
