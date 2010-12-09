@@ -1,5 +1,15 @@
 2010-12-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Remove the has_mark() function in favor of the is_marked() method.
+
+	* src/ltlast/unop.cc (NegClosure): Reset is.not_marked.
+	* src/ltlvisit/mark.hh,
+	src/ltlvisit/mark.cc (has_mark_visitor, has_mark): Remove.
+	* src/tgbaalgos/ltl2tgba_fm.cc: Use f->is_marked() instead
+	of has_mark(f).
+
+2010-12-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Get rid of all dynamic_cast<>s while working on LTL formulae. They
 	are too slow.
 
