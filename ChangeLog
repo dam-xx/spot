@@ -1,5 +1,15 @@
 2010-12-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Speedup some rewriting functions by detecting cases where they do
+	nothing.
+
+	* src/ltlvisit/nenoform.cc, src/ltlvisit/lunabbrev.cc,
+	src/ltlvisit/simpfg.cc, src/ltlvisit/tunabbrev.cc: Do not recurse
+	if the formula properties indicate that it is already in the right
+	form.
+
+2010-12-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Remove the has_mark() function in favor of the is_marked() method.
 
 	* src/ltlast/unop.cc (NegClosure): Reset is.not_marked.
