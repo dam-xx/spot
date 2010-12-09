@@ -27,6 +27,7 @@
 #include <list>
 #include "tgba.hh"
 #include "misc/bddlt.hh"
+#include "misc/hash.hh"
 
 namespace spot
 {
@@ -76,6 +77,19 @@ namespace spot
     virtual bdd neg_acceptance_conditions() const;
 
     typedef std::list<bdd> cycle_list;
+
+
+    /// \brief Return the acceptance conditions common to all outgoing
+    /// transitions of state \a ostate in the original automaton.
+    ///
+    /// This internal function is only meant to be used to implement
+    /// the iterator returned by succ_iter.
+    ///
+    /// The result of this function is computed the first time, and
+    /// then cached.
+    bdd common_acceptance_conditions_of_original_state(const state*
+						       ostate) const;
+
   protected:
     virtual bdd compute_support_conditions(const state* state) const;
     virtual bdd compute_support_variables(const state* state) const;
@@ -84,6 +98,10 @@ namespace spot
     const tgba* a_;
   private:
     bdd the_acceptance_cond_;
+    typedef Sgi::hash_map<const state*, bdd,
+			  state_ptr_hash, state_ptr_equal> accmap_t;
+    mutable accmap_t accmap_;
+
     // Disallow copy.
     tgba_tba_proxy(const tgba_tba_proxy&);
     tgba_tba_proxy& operator=(const tgba_tba_proxy&);

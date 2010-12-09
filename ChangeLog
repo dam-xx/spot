@@ -1,3 +1,18 @@
+2010-12-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Use a cache to speed up tgba_tba_proxy.
+
+	tgba_tba_proxy used to spend a lot of time (re)computing the
+	acceptance condition common to all outgoing transition of a state.
+
+	* src/tgba/tgbatba.hh (accmap_): New cache.
+	(common_acceptance_conditions_of_original_state): New method.
+	* src/tgba/tgbatba.cc (tgba_tba_proxy_succ_iterator::~sync)
+	Call common_acceptance_conditions_of_original_state() instead of
+	computing the result.
+	(~tgba_tba_proxy): Cleanup the cache.
+	(common_acceptance_conditions_of_original_state): Implement it.
+
 2010-12-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/ltltest/Makefile.am (genltl_SOURCES): Add missing variable.

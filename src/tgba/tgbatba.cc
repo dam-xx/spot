@@ -117,7 +117,7 @@ namespace spot
 				   iterator expected,
 				   const list& cycle,
 				   bdd the_acceptance_cond,
-				   const tgba* aut)
+				   const tgba_tba_proxy* aut)
 	: it_(it), expected_(expected), cycle_(cycle),
 	  the_acceptance_cond_(the_acceptance_cond), aut_(aut)
       {
@@ -185,13 +185,8 @@ namespace spot
 	// conditions common to all outgoing transitions of the
 	// destination state, and pretend they are already present
 	// on this transition.
-	bdd common = aut_->all_acceptance_conditions();
 	state* dest = it_->current_state();
-	tgba_succ_iterator* dest_it = aut_->succ_iter(dest);
-	for (dest_it->first(); !dest_it->done(); dest_it->next())
-	  common &= dest_it->current_acceptance_conditions();
-	acc |= common;
-	delete dest_it;
+	acc |= aut_->common_acceptance_conditions_of_original_state(dest);
 	delete dest;
 
 	// bddtrue is a special condition used for tgba_sba_proxy
@@ -241,7 +236,7 @@ namespace spot
       bool accepting_;
       const list& cycle_;
       const bdd the_acceptance_cond_;
-      const tgba* aut_;
+      const tgba_tba_proxy* aut_;
       friend class ::spot::tgba_tba_proxy;
     };
 
@@ -283,6 +278,15 @@ namespace spot
   tgba_tba_proxy::~tgba_tba_proxy()
   {
     get_dict()->unregister_all_my_variables(this);
+
+    accmap_t::const_iterator i = accmap_.begin();
+    while (i != accmap_.end())
+      {
+	// Advance the iterator before deleting the key.
+	const state* s = i->first;
+	++i;
+	delete s;
+      }
   }
 
   state*
@@ -305,7 +309,27 @@ namespace spot
 
     return new tgba_tba_proxy_succ_iterator(it, s->acceptance_iterator(),
 					    acc_cycle_, the_acceptance_cond_,
-					    a_);
+					    this);
+  }
+
+  bdd
+  tgba_tba_proxy::common_acceptance_conditions_of_original_state(const state* s)
+    const
+  {
+    // Lookup cache
+    accmap_t::const_iterator i = accmap_.find(s);
+    if (i != accmap_.end())
+      return i->second;
+
+    bdd common = a_->all_acceptance_conditions();
+    tgba_succ_iterator* it = a_->succ_iter(s);
+    for (it->first(); !it->done() && common != bddfalse; it->next())
+      common &= it->current_acceptance_conditions();
+    delete it;
+
+    // Populate cache
+    accmap_[s->clone()] = common;
+    return common;
   }
 
   bdd_dict*
