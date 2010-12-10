@@ -1,3 +1,12 @@
+2010-12-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Introduce -ks to print only the size of the automaton (without
+	SCC information).
+
+	* src/tgbatest/ltl2tgba.cc (syntax, main): Add a -ks option.
+	* src/tgbatest/ltl2tgba.test, bench/ltlclasses/run,
+	bench/ltlcounter/run: Use -ks instead of -k to speed things up.
+
 2010-12-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Use a cache to speed up tgba_tba_proxy.

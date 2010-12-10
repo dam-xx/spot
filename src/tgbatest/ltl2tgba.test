@@ -55,7 +55,7 @@ check '((Xp2)U(X(1)))&(p1 R(p2 R p0))'
 # Make sure 'a U (b U c)' has 3 states and 6 transitions,
 # before and after degeneralization.
 for opt in '' -D -DS; do
-  ../ltl2tgba -k -f -R3 $opt 'a U (b U c)' > stdout
+  ../ltl2tgba -ks -f -R3 $opt 'a U (b U c)' > stdout
   grep 'transitions: 6$' stdout
   grep 'states: 3$' stdout
 done
@@ -63,7 +63,7 @@ done
 # Make sure '!(Ga U b)' has 3 states and 6 transitions,
 # before and after degeneralization.
 for opt in '' -D -DS; do
-  ../ltl2tgba -k -f -R3 $opt '!(Ga U b)' > stdout
+  ../ltl2tgba -ks -f -R3 $opt '!(Ga U b)' > stdout
   grep 'transitions: 6$' stdout
   grep 'states: 3$' stdout
 done
@@ -71,7 +71,7 @@ done
 # Make sure 'Ga U b' has 4 states and 6 transitions,
 # before and after degeneralization.
 for opt in '' -D -DS; do
-  ../ltl2tgba -k -f -R3 $opt 'Ga U b' > stdout
+  ../ltl2tgba -ks -f -R3 $opt 'Ga U b' > stdout
   grep 'transitions: 6$' stdout
   grep 'states: 4$' stdout
 done
@@ -80,12 +80,12 @@ done
 # has 6 states and 15 transitions, before and after degeneralization.
 f='(G (p -> F q)) && ((X (p) U q) || ! X (p U (p && q)))'
 for opt in '' -D -DS; do
-  ../ltl2tgba -k -f -R3 $opt "$f" > stdout
+  ../ltl2tgba -ks -f -R3 $opt "$f" > stdout
   grep 'transitions: 15$' stdout
   grep 'states: 6$' stdout
 done
 
 # Note: this is worse with -R3f.
-../ltl2tgba -k -f -R3f -DS "$f" > stdout
+../ltl2tgba -ks -f -R3f -DS "$f" > stdout
 grep 'transitions: 17$' stdout
 grep 'states: 7$' stdout

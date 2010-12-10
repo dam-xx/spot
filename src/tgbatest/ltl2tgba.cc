@@ -243,7 +243,9 @@ syntax(char* prog)
             << std::endl
             << "  -FC   dump the automaton showing future conditions on states"
 	    << std::endl
-	    << "  -k    display statistics on the automaton of dumping it"
+	    << "  -k    display statistics on the automaton (size and SCCs)"
+	    << std::endl
+	    << "  -ks   display statistics on the automaton (size only)"
 	    << std::endl
 	    << "  -K    dump the graph of SCCs in dot format" << std::endl
 	    << "  -KV   verbosely dump the graph of SCCs in dot format"
@@ -466,6 +468,10 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-k"))
 	{
 	  output = 9;
+	}
+      else if (!strcmp(argv[formula_index], "-ks"))
+	{
+	  output = 12;
 	}
       else if (!strcmp(argv[formula_index], "-K"))
 	{
@@ -1066,6 +1072,9 @@ main(int argc, char** argv)
 	      break;
 	    case 11:
 	      dump_scc_dot(a, std::cout, true);
+	      break;
+	    case 12:
+	      stats_reachable(a).dump(std::cout);
 	      break;
 	    default:
 	      assert(!"unknown output option");
