@@ -1,5 +1,12 @@
 2010-12-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Augment the size of the ltlclasses benchmark.
+
+	* bench/ltlclasses/run: Augment the max size to 20.
+	* bench/ltlcounter/run: Typo in comment.
+
+2010-12-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Introduce -ks to print only the size of the automaton (without
 	SCC information).
 
