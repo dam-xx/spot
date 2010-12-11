@@ -1,3 +1,22 @@
+2010-12-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Merge transitions in tgba_tba_proxy.
+
+	With this change the output of
+	ltl2tgba -f -x -k -DS "GF(p_1) & ... & GF(p_n)
+	uses less than (n+1)^2 transitions when it used
+	exactly (n+1)*(2^n) transitions before.
+
+	* src/tgba/tgbatba.cc (tgba_tba_proxy_succ_iterator): Merge
+	transitions going to the same states if they are both accepting or
+	if neither are.
+	(state_ptr_bool_t, state_ptr_bool_less_than): Helper type to
+	store a transition in tgba_tba_proxy_succ_iterator.
+	* src/tgba/tgbatba.cc, src/tgba/tgbatba.hh
+	(tgba_tba_proxy::transition_annotation): Remove.  We cannot
+	implement this method if transitions are merged.
+	* src/tgbatest/ltl2tgba.test: Add a test.
+
 2010-12-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Augment the size of the ltlclasses benchmark.

@@ -106,6 +106,25 @@ namespace spot
     };
 
 
+    typedef std::pair<const state_tba_proxy*, bool> state_ptr_bool_t;
+
+    struct state_ptr_bool_less_than:
+      public std::binary_function<const state_ptr_bool_t&,
+				  const state_ptr_bool_t&, bool>
+    {
+      bool
+      operator()(const state_ptr_bool_t& left,
+		 const state_ptr_bool_t& right) const
+      {
+	// Order accepting transitions first, so that
+	// they are processed early during emptiness-check.
+	if (left.second != right.second)
+	  return left.second > right.second;
+	assert(left.first);
+	return left.first->compare(right.first) < 0;
+      }
+    };
+
     /// \brief Iterate over the successors of tgba_tba_proxy computed
     /// on the fly.
     class tgba_tba_proxy_succ_iterator: public tgba_succ_iterator
@@ -118,15 +137,90 @@ namespace spot
 				   const list& cycle,
 				   bdd the_acceptance_cond,
 				   const tgba_tba_proxy* aut)
-	: it_(it), expected_(expected), cycle_(cycle),
-	  the_acceptance_cond_(the_acceptance_cond), aut_(aut)
+	: the_acceptance_cond_(the_acceptance_cond)
       {
+	for (it->first(); !it->done(); it->next())
+	  {
+	    bool accepting;
+	    bdd acc = it->current_acceptance_conditions();
+	    // As an extra optimization step, gather the acceptance
+	    // conditions common to all outgoing transitions of the
+	    // destination state, and pretend they are already present
+	    // on this transition.
+	    state* odest = it->current_state();
+	    acc |= aut->common_acceptance_conditions_of_original_state(odest);
+
+	    iterator next;
+	    // bddtrue is a special condition used for tgba_sba_proxy
+	    // to denote the (N+1)th copy of the state, after all
+	    // acceptance conditions have been traversed.  Such state
+	    // is always accepting, so do not check acc for this.
+	    // bddtrue is also used by tgba_tba_proxy if the automaton
+	    // does not use acceptance conditions.  In that case, all
+	    // states are accepting.
+	    if (*expected != bddtrue)
+	      {
+		// A transition in the *EXPECTED acceptance set should
+		// be directed to the next acceptance set.  If the
+		// current transition is also in the next acceptance
+		// set, then go to the one after, etc.
+		//
+		// See Denis Oddoux's PhD thesis for a nice
+		// explanation (in French).
+		// @PhDThesis{	  oddoux.03.phd,
+		//   author	= {Denis Oddoux},
+		//   title	= {Utilisation des automates alternants pour un
+		// 		  model-checking efficace des logiques
+		//		  temporelles lin{\'e}aires.},
+		//   school	= {Universit{\'e}e Paris 7},
+		//   year	= {2003},
+		//   address= {Paris, France},
+		//   month	= {December}
+		// }
+		next = expected;
+		while (next != cycle.end() && (acc & *next) == *next)
+		  ++next;
+		if (next != cycle.end())
+		  {
+		    accepting = false;
+		    goto next_is_set;
+		  }
+	      }
+	    // The transition is accepting.
+	    accepting = true;
+	    // Skip as much acceptance conditions as we can on our cycle.
+	    next = cycle.begin();
+	    while (next != expected && (acc & *next) == *next)
+	      ++next;
+	  next_is_set:
+	    state_tba_proxy* dest = new state_tba_proxy(odest, next);
+	    // Is DEST already reachable with the same value of ACCEPTING?
+	    state_ptr_bool_t key(dest, accepting);
+	    transmap_t::iterator id = transmap_.find(key);
+	    if (id == transmap_.end()) // No
+	      {
+		transmap_[key] = it->current_condition();
+	      }
+	    else // Yes, combine labels.
+	      {
+		id->second |= it->current_condition();
+		delete dest;
+	      }
+	  }
+	delete it;
       }
 
       virtual
       ~tgba_tba_proxy_succ_iterator()
       {
-	delete it_;
+	for (transmap_t::const_iterator i = transmap_.begin();
+	     i != transmap_.end();)
+	  {
+	    const state* d = i->first.first;
+	    // Advance i before deleting d.
+	    ++i;
+	    delete d;
+	  }
       }
 
       // iteration
@@ -134,21 +228,19 @@ namespace spot
       void
       first()
       {
-	it_->first();
-	sync_();
+	it_ = transmap_.begin();
       }
 
       void
       next()
       {
-	it_->next();
-	sync_();
+	++it_;
       }
 
       bool
       done() const
       {
-	return it_->done();
+	return it_ == transmap_.end();
       }
 
       // inspection
@@ -156,88 +248,29 @@ namespace spot
       state_tba_proxy*
       current_state() const
       {
-	return new state_tba_proxy(it_->current_state(), next_);
+	return it_->first.first->clone();
       }
 
       bdd
       current_condition() const
       {
-	return it_->current_condition();
+	return it_->second;
       }
 
       bdd
       current_acceptance_conditions() const
       {
-	return accepting_ ? the_acceptance_cond_ : bddfalse;
+	return it_->first.second ? the_acceptance_cond_ : bddfalse;
       }
 
     protected:
-
-      void
-      sync_()
-      {
-	if (done())
-	  return;
-
-	bdd acc = it_->current_acceptance_conditions();
-
-	// As an extra optimization step, gather the acceptance
-	// conditions common to all outgoing transitions of the
-	// destination state, and pretend they are already present
-	// on this transition.
-	state* dest = it_->current_state();
-	acc |= aut_->common_acceptance_conditions_of_original_state(dest);
-	delete dest;
-
-	// bddtrue is a special condition used for tgba_sba_proxy
-	// to denote the (N+1)th copy of the state, after all acceptance
-	// conditions have been traversed.  Such state is always accepting,
-	// so do not check acc for this.
-	// bddtrue is also used by tgba_tba_proxy if the automaton does not
-	// use acceptance conditions.  In that case, all states are accepting.
-	if (*expected_ != bddtrue)
-	  {
-	    // A transition in the *EXPECTED acceptance set should be
-	    // directed to the next acceptance set.  If the current
-	    // transition is also in the next acceptance set, then go
-	    // to the one after, etc.
-	    //
-	    // See Denis Oddoux's PhD thesis for a nice explanation (in French).
-	    // @PhDThesis{	  oddoux.03.phd,
-	    //   author	= {Denis Oddoux},
-	    //   title	= {Utilisation des automates alternants pour un
-	    // 		  model-checking efficace des logiques temporelles
-	    // 		  lin{\'e}aires.},
-	    //   school	= {Universit{\'e}e Paris 7},
-	    //   year	= {2003},
-	    //   address= {Paris, France},
-	    //   month	= {December}
-	    // }
-	    next_ = expected_;
-	    while (next_ != cycle_.end() && (acc & *next_) == *next_)
-	      ++next_;
-	    if (next_ != cycle_.end())
-	      {
-		accepting_ = false;
-		return;
-	      }
-	  }
-	// The transition is accepting.
-	accepting_ = true;
-	// Skip as much acceptance conditions as we can on our cycle.
-	next_ = cycle_.begin();
-	while (next_ != expected_ && (acc & *next_) == *next_)
-	  ++next_;
-      }
-
-      tgba_succ_iterator* it_;
-      const iterator expected_;
-      iterator next_;
-      bool accepting_;
-      const list& cycle_;
       const bdd the_acceptance_cond_;
-      const tgba_tba_proxy* aut_;
-      friend class ::spot::tgba_tba_proxy;
+
+      typedef std::map<state_ptr_bool_t,
+		       bdd,
+		       spot::state_ptr_bool_less_than> transmap_t;
+      transmap_t transmap_;
+      transmap_t::const_iterator it_;
     };
 
   } // anonymous
@@ -388,15 +421,6 @@ namespace spot
       dynamic_cast<const state_tba_proxy*>(state);
     assert(s);
     return a_->support_variables(s->real_state());
-  }
-
-  std::string
-  tgba_tba_proxy::transition_annotation(const tgba_succ_iterator* t) const
-  {
-    const tgba_tba_proxy_succ_iterator* i =
-      dynamic_cast<const tgba_tba_proxy_succ_iterator*>(t);
-    assert(i);
-    return a_->transition_annotation(i->it_);
   }
 
   ////////////////////////////////////////////////////////////////////////
