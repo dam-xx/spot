@@ -1,3 +1,7 @@
+2010-12-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* NEWS: Summarize recent changes.
+
 2010-12-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Merge transitions in tgba_tba_proxy.
