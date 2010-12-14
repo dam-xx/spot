@@ -21,6 +21,9 @@ New in spot 0.6a:
     formulae has been integrated.  Use ltl2tgba -Rm to enable this
     optimization; it will have no effect if the property is not an
     obligation.
+  * bench/wdba/ conducts a benchmark similar to the one on Dax's
+    webpage, comparing the size of the automata expressing obligation
+    formula before and after minimization.
   * New ltl2tgba options:
     -XN: read an input automaton as a neverclaim.
     -C, -CR: Compute (and display) a counterexample after running the

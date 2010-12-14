@@ -22,4 +22,4 @@
 ## 02111-1307, USA.
 
 SUBDIRS = emptchk gspn-ssp ltl2tgba scc-stats split-product ltlcounter	\
-          ltlclasses
+          ltlclasses wdba
