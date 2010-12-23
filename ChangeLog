@@ -1,3 +1,23 @@
+2010-12-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Get rid of ltihooks.py.
+
+	ltihooks.py apparently breaks the import mechanisms of Python 2.6,
+	causes SWIG's runtime to fail to share a global type table, and
+	yields various failures in our tests.
+
+	* wrap/python/ltihooks.py: Delete.
+	* wrap/python/Makefile.am (EXTRA_DIST): remove ltihooks.py.
+	* wrap/python/tests/bddnqueen.py, wrap/python/tests/interdep.py,
+	wrap/python/tests/ltl2tgba.py, wrap/python/tests/ltlparse.py,
+	wrap/python/tests/ltlsimple.py, wrap/python/tests/minato.py,
+	wrap/python/tests/modgray.py, wrap/python/tests/optionmap.py,
+	wrap/python/tests/setxor.py: Do not use ltihooks.
+	* wrap/python/tests/run.in (pypath): Include the .libs/ directories
+	in the search path so that Python can find the *.so libraries.
+	* wrap/python/cgi-bin/ltl2tgba.in: Insert the .libs/ directories
+	into sys.path instead of importing ltihooks.
+
 2010-12-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* NEWS: Summarize recent changes.

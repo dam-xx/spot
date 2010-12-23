@@ -1,5 +1,5 @@
 # -*- mode: python; coding: iso-8859-1 -*-
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2010  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -22,9 +22,8 @@
 
 # Make sure that interdependencies between the spot and buddy wrappers
 # are not problematic.
-import ltihooks
-import spot
 import buddy
+import spot
 e = spot.default_environment.instance()
 p = spot.empty_parse_error_list()
 f = spot.parse('GFa', p, e)

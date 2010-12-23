@@ -1,5 +1,5 @@
 # -*- mode: python; coding: iso-8859-1 -*-
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+# Copyright (C) 2003, 2004, 2010  Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
 # et Marie Curie.
 #
@@ -23,7 +23,6 @@
 # Python translation of the C++ example from the BuDDy distribution.
 # (compare with buddy/examples/queen/queen.cxx)
 
-import ltihooks
 import sys
 from buddy import *
 

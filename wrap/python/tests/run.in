@@ -1,7 +1,10 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
-# département Systèmes Répartis Coopératifs (SRC), Université Pierre
-# et Marie Curie.
+
+# Copyright (C) 2010 Laboratoire de Recherche et Developpement de
+# l'EPITA (LRDE).
+# Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6
+# (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
+# Pierre et Marie Curie.
 #
 # This file is part of Spot, a model checking library.
 #
@@ -30,7 +33,11 @@ test -n "$srcdir" && test -z "$VERBOSE" && exec >/dev/null 2>&1
 # path of dependent libraries in each library).
 modpath='../.libs:@top_builddir@/src/.libs:@top_builddir@/buddy/src/.libs'
 
-pypath='..:@srcdir@/..:$PYTHONPATH'
+# .. is for the *.py files, and ../.libs for the *.so.  We used to
+# rely on a module called ltihooks.py to teach the import function how
+# to load a Libtool library, but it started to cause issues with
+# Python 2.6.
+pypath='..:../.libs:@srcdir@/..:@srcdir@/../.libs:$PYTHONPATH'
 
 test -z "$1" &&
   PYTHONPATH=$pypath DYLD_LIBRARY_PATH=$modpath exec @PYTHON@

@@ -1,5 +1,5 @@
 # -*- mode: python; coding: iso-8859-1 -*-
-# Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+# Copyright (C) 2009, 2010 Laboratoire de Recherche et DÃ©veloppement
 # de l'Epita (LRDE).
 # Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -27,7 +27,6 @@
 
 import sys
 import getopt
-import ltihooks
 import spot
 
 def usage(prog):
