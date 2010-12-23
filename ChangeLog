@@ -1,5 +1,11 @@
 2010-12-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Define SWIG_TYPE_TABLE as suggested by the SWIG documentation.
+
+	* wrap/python/Makefile.am: Add -DSWIG_TYPE_TABLE=spot.
+
+2010-12-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Use swig2.0 if available.
 
 	* configure.ac: Search for swig2.0 and swig.
