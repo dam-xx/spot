@@ -73,6 +73,9 @@ AC_CHECK_PROG([PERL], [perl], [perl])
 AC_CHECK_PROG([SPIN], [spin], [spin])
 AX_CHECK_VALGRIND
 AC_CHECK_PROG([WRING2LBTT], [wring2lbtt], [wring2lbtt])
+# Debian has a binary for SWIG 2.0 named swig2.0 and they kept swig as
+# an alias for swig-1.3.  Let's use the former when available.
+AC_CHECK_PROGS([SWIG], [swig2.0 swig], [swig])
 
 AC_CONFIG_FILES([
   Makefile

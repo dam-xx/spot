@@ -1,5 +1,12 @@
 2010-12-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Use swig2.0 if available.
+
+	* configure.ac: Search for swig2.0 and swig.
+	* wrap/python/Makefile.am: Use $(SWIG).
+
+2010-12-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Get rid of ltihooks.py.
 
 	ltihooks.py apparently breaks the import mechanisms of Python 2.6,
