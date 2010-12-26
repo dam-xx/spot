@@ -77,16 +77,17 @@
 #include "tgba/tgbaproduct.hh"
 #include "tgba/tgbatba.hh"
 
-#include "tgbaalgos/ltl2tgba_lacim.hh"
-#include "tgbaalgos/ltl2tgba_fm.hh"
-#include "tgbaalgos/ltl2taa.hh"
 #include "tgbaalgos/dottydec.hh"
 #include "tgbaalgos/dotty.hh"
 #include "tgbaalgos/dupexp.hh"
-#include "tgbaalgos/lbtt.hh"
 #include "tgbaalgos/emptiness.hh"
 #include "tgbaalgos/gtec/gtec.hh"
+#include "tgbaalgos/lbtt.hh"
+#include "tgbaalgos/ltl2taa.hh"
+#include "tgbaalgos/ltl2tgba_fm.hh"
+#include "tgbaalgos/ltl2tgba_lacim.hh"
 #include "tgbaalgos/magic.hh"
+#include "tgbaalgos/minimize.hh"
 #include "tgbaalgos/neverclaim.hh"
 #include "tgbaalgos/reductgba_sim.hh"
 #include "tgbaalgos/rundotdec.hh"
@@ -137,22 +138,23 @@ using namespace spot;
 %include "ltlvisit/tostring.hh"
 %include "ltlvisit/tunabbrev.hh"
 
-%feature("new") spot::ltl_to_tgba_lacim;
-%feature("new") spot::ltl_to_tgba_fm;
-%feature("new") spot::ltl_to_taa;
-%feature("new") spot::tgba::get_init_state;
-%feature("new") spot::tgba::succ_iter;
-%feature("new") spot::tgba_succ_iterator::current_state;
-%feature("new") spot::tgba_dupexp_bfs;
-%feature("new") spot::tgba_dupexp_dfs;
 %feature("new") spot::emptiness_check::check;
+%feature("new") spot::emptiness_check_instantiator::construct;
+%feature("new") spot::emptiness_check_instantiator::instanciate;
 %feature("new") spot::emptiness_check_result::accepting_run;
 %feature("new") spot::explicit_magic_search;
 %feature("new") spot::explicit_se05_search;
+%feature("new") spot::ltl_to_taa;
+%feature("new") spot::ltl_to_tgba_fm;
+%feature("new") spot::ltl_to_tgba_lacim;
+%feature("new") spot::minimize;
 %feature("new") spot::reduc_tgba_sim;
-%feature("new") spot::emptiness_check_instantiator::construct;
-%feature("new") spot::emptiness_check_instantiator::instanciate;
 %feature("new") spot::scc_filter;
+%feature("new") spot::tgba_dupexp_bfs;
+%feature("new") spot::tgba_dupexp_dfs;
+%feature("new") spot::tgba::get_init_state;
+%feature("new") spot::tgba::succ_iter;
+%feature("new") spot::tgba_succ_iterator::current_state;
 
 // Help SWIG with namespace lookups.
 #define ltl spot::ltl
@@ -170,16 +172,17 @@ using namespace spot;
 %include "tgba/tgbaproduct.hh"
 %include "tgba/tgbatba.hh"
 
-%include "tgbaalgos/ltl2tgba_lacim.hh"
-%include "tgbaalgos/ltl2tgba_fm.hh"
-%include "tgbaalgos/ltl2taa.hh"
 %include "tgbaalgos/dottydec.hh"
 %include "tgbaalgos/dotty.hh"
 %include "tgbaalgos/dupexp.hh"
-%include "tgbaalgos/lbtt.hh"
 %include "tgbaalgos/emptiness.hh"
 %include "tgbaalgos/gtec/gtec.hh"
+%include "tgbaalgos/lbtt.hh"
+%include "tgbaalgos/ltl2taa.hh"
+%include "tgbaalgos/ltl2tgba_fm.hh"
+%include "tgbaalgos/ltl2tgba_lacim.hh"
 %include "tgbaalgos/magic.hh"
+%include "tgbaalgos/minimize.hh"
 %include "tgbaalgos/neverclaim.hh"
 %include "tgbaalgos/reductgba_sim.hh"
 %include "tgbaalgos/rundotdec.hh"
