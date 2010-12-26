@@ -250,16 +250,16 @@ options_common = [
     ('show_degen_png',      'draw degeneralized B&uuml;chi automaton',     0),
     ('show_never_claim',    'output Spin never claim',                     0),
     ('show_lbtt',           'convert automaton for LBTT',                  0),
-    ('svg_output',          'render automata in SVG instead of PNG' + new, 0),
+    ('svg_output',          'render automata in SVG instead of PNG',       0),
     ]
 options_reduce = [
     ('reduce_basics',       'basic rewritings',                            1),
     ('reduce_syntimpl',     'syntactic implication',                       1),
     ('reduce_eventuniv',    'eventuality and universality',                1),
-    ('reduce_langcont',     'language containment' + new,                  0),
+    ('reduce_langcont',     'language containment',                        0),
     ]
 options_aut_reduce = [
-    ('reduce_scc',          'prune unaccepting SCCs' + new,                1),
+    ('reduce_scc',          'prune unaccepting SCCs',                      1),
     ]
 options_debug = [
     ('show_parse',          'show traces during parsing',                  0),
@@ -274,7 +274,7 @@ options_trans_fm = [
     ]
 options_trans_lacim = [
     ('symbolically_prune_scc',
-     'symbolically prune unaccepting SCCs' + new,                          1),
+     'symbolically prune unaccepting SCCs',                                1),
     ('show_relation_set',
      'print the transition relation as a BDD set',                         0),
     ('show_relation_png',
@@ -293,7 +293,7 @@ default_translator = 'trans_fm';
 translators = [
     ('trans_fm',    'Couvreur/FM',    color_fm),
     ('trans_lacim', 'Couvreur/LaCIM', color_lacim),
-    ('trans_taa',   'Tauriainen/TAA' + new, color_taa),
+    ('trans_taa',   'Tauriainen/TAA', color_taa),
     ]
 
 options_accepting_run = [

@@ -1,3 +1,7 @@
+2010-12-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* wrap/python/cgi-bin/ltl2tgba.in: Remove all "new" markers.
+
 2010-12-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Define SWIG_TYPE_TABLE as suggested by the SWIG documentation.
