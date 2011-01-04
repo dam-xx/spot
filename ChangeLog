@@ -1,5 +1,12 @@
 2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Add trivial() and one_state_of() functions to scc_map.
+
+	* src/tgbaalgos/scc.hh, src/tgbaalgos/scc.cc (scc_map::trivial,
+	scc_map::one_state_of): Two new helper functions.
+
+2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgba/tgbaunion.hh: Remove one useless include.
 
 2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

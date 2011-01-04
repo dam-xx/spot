@@ -1,5 +1,5 @@
-// Copyright (C) 2008, 2009  Laboratoire de Recherche et Developpement de
-// l'Epita.
+// Copyright (C) 2008, 2009, 2011 Laboratoire de Recherche et
+// Developpement de l'Epita.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -72,6 +72,13 @@ namespace spot
   {
     assert(scc_map_.size() > n);
     return scc_map_[n].succ;
+  }
+
+  bool
+  scc_map::trivial(unsigned n) const
+  {
+    assert(scc_map_.size() > n);
+    return scc_map_[n].trivial;
   }
 
   bool
@@ -345,6 +352,12 @@ namespace spot
   {
     assert(scc_map_.size() > n);
     return scc_map_[n].states;
+  }
+
+  const state* scc_map::one_state_of(unsigned n) const
+  {
+    assert(scc_map_.size() > n);
+    return scc_map_[n].states.front();
   }
 
   unsigned scc_map::scc_count() const

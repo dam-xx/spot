@@ -105,6 +105,13 @@ namespace spot
     /// \pre This should only be called once build_map() has run.
     const succ_type& succ(unsigned n) const;
 
+    /// \brief Return whether an SCC is trivial.
+    ///
+    /// Trivial SCCs have one state and no self-loop.
+    ///
+    /// \pre This should only be called once build_map() has run.
+    bool trivial(unsigned n) const;
+
     /// \brief Return whether an SCC is accepting.
     ///
     /// \pre This should only be called once build_map() has run.
@@ -149,6 +156,14 @@ namespace spot
     ///
     /// \pre This should only be called once build_map() has run.
     const std::list<const state*>& states_of(unsigned n) const;
+
+    /// \brief Return one state of an SCC.
+    ///
+    /// The state in the returned list is still owned by the scc_map
+    /// instance.  It should NOT be deleted by the client code.
+    ///
+    /// \pre This should only be called once build_map() has run.
+    const state* one_state_of(unsigned n) const;
 
     /// \brief Return the number of the SCC a state belongs too.
     ///
