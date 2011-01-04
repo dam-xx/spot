@@ -1,5 +1,9 @@
 2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgbaalgos/scc.hh: Typo in documentation.
+
+2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Move the logic for detecting when the minimize() algorithm is
 	correct from ltl2tgba to the library.
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
+// Copyright (C) 2008, 2009, 2010, 2011 Laboratoire de Recherche et
 // Developpement de l'Epita.
 //
 // This file is part of Spot, a model checking library.
@@ -46,8 +46,8 @@ namespace spot
 
     /// Number of maximal accepting paths.
     ///
-    /// An path is maximal and accepting if it ends in an accepting
-    /// SCC that is only dead (i.e. non accepting) successors, or no
+    /// A path is maximal and accepting if it ends in an accepting
+    /// SCC that has only dead (i.e. non accepting) successors, or no
     /// successors at all.
     unsigned acc_paths;
     /// Number of paths to a terminal dead SCC.
