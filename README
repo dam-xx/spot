@@ -137,7 +137,8 @@ bench/            Benchmarks for ...
    ltlcounter/    ... translation of a class of LTL formulae,
    ltlclasses/    ... translation of more classes of LTL formulae,
    scc-stats/     ... SCC statistics after translation of LTL formulae,
-   split-product/ ... parallelizing gain after splitting LTL automata.
+   split-product/ ... parallelizing gain after splitting LTL automata,
+   wdba/          ... WDBA minimization (for obligation properties).
 wrap/             Wrappers for other languages.
    python/        Python bindings for Spot and BuDDy
       tests/      Tests for these bindings
