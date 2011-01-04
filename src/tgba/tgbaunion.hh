@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -22,7 +22,6 @@
 # define SPOT_TGBA_TGBAUNION_HH
 
 #include "tgba.hh"
-#include "statebdd.hh"
 
 namespace spot
 {
