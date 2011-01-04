@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Développement
+// de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
@@ -159,6 +161,18 @@ namespace spot
     // Disallow copy.
     tgba_product(const tgba_product&);
     tgba_product& operator=(const tgba_product&);
+  };
+
+  /// \brief A lazy product with different initial states.
+  class tgba_product_init: public tgba_product
+  {
+  public:
+    tgba_product_init(const tgba* left, const tgba* right,
+		      const state* left_init, const state* right_init);
+    virtual state* get_init_state() const;
+  private:
+    const state* left_init_;
+    const state* right_init_;
   };
 
 }

@@ -1,5 +1,13 @@
 2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Define tgba_product_init, a new kind of product with different
+	initial states.
+
+	* src/tgba/tgbaproduct.hh, src/tgba/tgbaproduct.cc
+	(tgba_product_init): New class.
+
+2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbatest/spotlbtt.test: Add test for -l -R3b, showing many
 	failure because the minimization() algorithm is currently
 	incorrect when applied to non-weak automata.

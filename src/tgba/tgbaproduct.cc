@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -331,6 +331,23 @@ namespace spot
     if (right == "")
       return left;
     return "<" + left + ", " + right + ">";
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // tgba_product_init
+
+  tgba_product_init::tgba_product_init(const tgba* left, const tgba* right,
+				       const state* left_init,
+				       const state* right_init)
+    : tgba_product(left, right),
+      left_init_(left_init), right_init_(right_init)
+  {
+  }
+
+  state*
+  tgba_product_init::get_init_state() const
+  {
+    return new state_product(left_init_->clone(), right_init_->clone());
   }
 
 }
