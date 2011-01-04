@@ -1,5 +1,11 @@
 2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgbatest/spotlbtt.test: Add test for -l -R3b, showing many
+	failure because the minimization() algorithm is currently
+	incorrect when applied to non-weak automata.
+
+2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbaalgos/scc.hh: Typo in documentation.
 
 2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
