@@ -1,4 +1,6 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2011 Laboratoire de Recherche et Développement de
+// l'Epita.
+// Copyright (C) 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -23,21 +25,72 @@
 # define SPOT_TGBAALGOS_POWERSET_HH
 
 # include <list>
+# include <map>
 # include "tgba/tgbaexplicit.hh"
 
 namespace spot
 {
+
+  struct power_map
+  {
+    typedef std::set<const state*, state_ptr_less_than> power_state;
+    typedef std::map<int, power_state> power_map_data;
+    typedef Sgi::hash_set<const state*, state_ptr_hash,
+			  state_ptr_equal> state_set;
+
+    ~power_map()
+    {
+      // Release all states.
+      state_set::const_iterator i = states.begin();
+      while (i != states.end())
+	{
+	  // Advance the iterator before deleting the key.
+	  const state* s = *i;
+	  ++i;
+	  delete s;
+	}
+    }
+
+    const power_state&
+    states_of(int s) const
+    {
+      return map_.find(s)->second;
+    }
+
+    const state*
+    canonicalize(const state* s)
+    {
+      state_set::const_iterator i = states.find(s);
+      if (i != states.end())
+	{
+	  delete s;
+	  s = *i;
+	}
+      else
+	{
+	  states.insert(s);
+	}
+      return s;
+    }
+
+    power_map_data map_;
+    state_set states;
+  };
+
+
   /// \brief Build a deterministic automaton, ignoring acceptance conditions.
   /// \ingroup tgba_misc
   ///
-  /// This create a deterministic automaton that recognize the
+  /// This create a deterministic automaton that recognizes the
   /// same language as \a aut would if its acceptance conditions
   /// were ignored.  This is the classical powerset algorithm.
-  /// If acc_list is not 0. Whenever a power state is created from one
-  /// accepting state (a state belonging to an accepting SCC), then this power
-  /// state is added to acc_list.
-  tgba_explicit* tgba_powerset(const tgba* aut,
-                               std::list<const state*>* acc_list = 0);
+  ///
+  /// If \a pm is supplied it will be filled with the set of original states
+  /// associated to each state of the deterministic automaton.
+  //@{
+  tgba_explicit_number* tgba_powerset(const tgba* aut, power_map& pm);
+  tgba_explicit_number* tgba_powerset(const tgba* aut);
+  //@}
 }
 
 #endif // SPOT_TGBAALGOS_POWERSET_HH

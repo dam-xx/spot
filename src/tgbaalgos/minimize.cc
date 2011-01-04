@@ -19,6 +19,9 @@
 // 02111-1307, USA.
 
 #include <queue>
+#include <deque>
+#include <set>
+#include <list>
 #include "minimize.hh"
 #include "ltlast/allnodes.hh"
 #include "misc/hash.hh"
@@ -28,7 +31,9 @@
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/safety.hh"
 #include "tgbaalgos/sccfilter.hh"
+#include "tgbaalgos/scc.hh"
 #include "tgbaalgos/ltl2tgba_fm.hh"
+#include "tgbaalgos/bfssteps.hh"
 
 namespace spot
 {
@@ -141,28 +146,174 @@ namespace spot
     return res;
   }
 
+
+  namespace
+  {
+
+    struct wdba_search_acc_loop : public bfs_steps
+    {
+      wdba_search_acc_loop(const tgba* det_a,
+			   unsigned scc_n, scc_map& sm,
+			   power_map& pm, const state* dest)
+	: bfs_steps(det_a), scc_n(scc_n), sm(sm), pm(pm), dest(dest)
+      {
+	seen.insert(dest);
+      }
+
+      virtual
+      ~wdba_search_acc_loop()
+      {
+	hash_set::const_iterator i = seen.begin();
+	while (i != seen.end())
+	  {
+	    hash_set::const_iterator old = i;
+	    ++i;
+	    delete *old;
+	  }
+      }
+
+      virtual const state*
+      filter(const state* s)
+      {
+	// Use the state from seen.
+	hash_set::const_iterator i = seen.find(s);
+	if (i == seen.end())
+	  {
+	    seen.insert(s);
+	  }
+	else
+	  {
+	    delete s;
+	    s = *i;
+	  }
+	// Ignore states outside SCC #n.
+	if (sm.scc_of_state(s) != scc_n)
+	  return 0;
+	return s;
+      }
+
+      virtual bool
+      match(tgba_run::step&, const state* to)
+      {
+	return to == dest;
+      }
+
+      unsigned scc_n;
+      scc_map& sm;
+      power_map& pm;
+      const state* dest;
+      hash_set seen;
+    };
+
+
+    bool
+    wdba_scc_is_accepting(const tgba_explicit_number* det_a, unsigned scc_n,
+			  const tgba* orig_a, scc_map& sm, power_map& pm)
+    {
+      // Get some state from the SCC #n.
+      const state* start = sm.one_state_of(scc_n)->clone();
+
+      // Find a loop around START in SCC #n.
+      wdba_search_acc_loop wsal(det_a, scc_n, sm, pm, start);
+      tgba_run::steps loop;
+      const state* reached = wsal.search(start, loop);
+      assert(reached == start);
+      (void)reached;
+
+      // Build an automaton representing this loop.
+      tgba_explicit_number loop_a(det_a->get_dict());
+      tgba_run::steps::const_iterator i;
+      int loop_size = loop.size();
+      int n;
+      for (n = 1, i = loop.begin(); n < loop_size; ++n, ++i)
+	{
+	  loop_a.create_transition(n - 1, n)->condition = i->label;
+	  delete i->s;
+	}
+      assert(i != loop.end());
+      loop_a.create_transition(n - 1, 0)->condition = i->label;
+      delete i->s;
+      assert(++i == loop.end());
+
+      const state* loop_a_init = loop_a.get_init_state();
+      assert(loop_a.get_label(loop_a_init) == 0);
+
+      // Check if the loop is accepting in the original automaton.
+      bool accepting = false;
+
+      // Iterate on each original state corresponding to start.
+      const power_map::power_state& ps = pm.states_of(det_a->get_label(start));
+      for (power_map::power_state::const_iterator it = ps.begin();
+	   it != ps.end() && !accepting; ++it)
+	{
+	  // Contrustruct a product between
+	  // LOOP_A, and ORIG_A starting in *IT.
+
+	  tgba* p = new tgba_product_init(&loop_a, orig_a,
+					  loop_a_init, *it);
+
+	  emptiness_check* ec = couvreur99(p);
+	  emptiness_check_result* res = ec->check();
+
+	  if (res)
+	    accepting = true;
+	  delete res;
+	  delete ec;
+	  delete p;
+	}
+
+      delete loop_a_init;
+      return accepting;
+    }
+
+  }
+
+
+
   tgba_explicit* minimize(const tgba* a, bool monitor)
   {
-    // The list of accepting states of a.
-    std::list<const state*> acc_list;
     std::queue<hash_set*> todo;
     // The list of equivalent states.
     std::list<hash_set*> done;
-    tgba_explicit* det_a = tgba_powerset(a, monitor ? 0 : &acc_list);
     hash_set* final = new hash_set;
     hash_set* non_final = new hash_set;
     hash_map state_set_map;
-    bdd_dict* dict = det_a->get_dict();
-    std::list<const state*>::iterator li;
-    for (li = acc_list.begin(); li != acc_list.end(); ++li)
-      final->insert(*li);
+
+    tgba_explicit_number* det_a;
+
+    {
+      power_map pm;
+      det_a = tgba_powerset(a, pm);
+      if (!monitor)
+	{
+	  // For each SCC of the deterministic automaton, determine if
+	  // it is accepting or not.
+	  scc_map sm(det_a);
+	  sm.build_map();
+	  unsigned scc_count = sm.scc_count();
+	  for (unsigned n = 0; n < scc_count; ++n)
+	    {
+	      // Trivial SCCs are not accepting.
+	      if (sm.trivial(n))
+		continue;
+	      if (wdba_scc_is_accepting(det_a, n, a, sm, pm))
+		{
+		  std::list<const state*> l = sm.states_of(n);
+		  std::list<const state*>::const_iterator il;
+		  for (il = l.begin(); il != l.end(); ++il)
+		    final->insert((*il)->clone());
+		}
+	    }
+	}
+    }
 
     init_sets(det_a, *final, *non_final);
     // Size of det_a
     unsigned size = final->size() + non_final->size();
     // Use bdd variables to number sets.  set_num is the first variable
     // available.
-    unsigned set_num = dict->register_anonymous_variables(size, det_a);
+    unsigned set_num =
+      det_a->get_dict()->register_anonymous_variables(size, det_a);
 
     std::set<int> free_var;
     for (unsigned i = set_num; i < set_num + size; ++i)

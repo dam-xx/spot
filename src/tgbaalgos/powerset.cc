@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -22,46 +22,33 @@
 // 02111-1307, USA.
 
 #include <set>
-#include <map>
 #include <deque>
 #include "powerset.hh"
 #include "misc/hash.hh"
 #include "tgbaalgos/powerset.hh"
-#include "tgbaalgos/scc.hh"
 #include "bdd.h"
 
 namespace spot
 {
-  tgba_explicit*
-  tgba_powerset(const tgba* aut,
-                std::list<const state*>* acc_list)
+  tgba_explicit_number*
+  tgba_powerset(const tgba* aut, power_map& pm)
   {
-    typedef Sgi::hash_set<const state*, state_ptr_hash,
-                          state_ptr_equal> state_set;
-    typedef std::set<const state*, state_ptr_less_than> power_state;
-    typedef std::map<power_state, int> power_set;
-    typedef std::deque<power_state> todo_list;
+    typedef power_map::power_state power_state;
+    typedef std::map<power_map::power_state, int> power_set;
+    typedef std::deque<power_map::power_state> todo_list;
 
     power_set seen;
     todo_list todo;
-    scc_map m(aut);
     tgba_explicit_number* res = new tgba_explicit_number(aut->get_dict());
-
-    state_set states;
 
     {
       power_state ps;
       state* s = aut->get_init_state();
-      states.insert(s);
+      pm.states.insert(s);
       ps.insert(s);
       todo.push_back(ps);
       seen[ps] = 1;
-      if (acc_list)
-	{
-	  m.build_map();
-	  if (m.accepting(m.scc_of_state(s)))
-	    acc_list->push_front(new state_explicit(res->add_state(1)));
-	}
+      pm.map_[1] = ps;
     }
 
     unsigned state_num = 1;
@@ -86,30 +73,13 @@ namespace spot
 
 	    // Construct the set of all states reachable via COND.
 	    power_state dest;
-            bool accepting = false;
 	    for (i = src.begin(); i != src.end(); ++i)
 	      {
 		tgba_succ_iterator *si = aut->succ_iter(*i);
 		for (si->first(); !si->done(); si->next())
 		  if ((cond >> si->current_condition()) == bddtrue)
 		    {
-		      const state* s = si->current_state();
-		      state_set::const_iterator i = states.find(s);
-		      if (i != states.end())
-			{
-			  delete s;
-			  s = *i;
-			}
-		      else
-			{
-			  states.insert(s);
-			}
-		      if (acc_list)
-			{
-			  unsigned scc_num = m.scc_of_state(s);
-			  if (m.accepting(scc_num))
-			    accepting = true;
-			}
+		      const state* s = pm.canonicalize(si->current_state());
 		      dest.insert(s);
 		    }
 		delete si;
@@ -129,29 +99,21 @@ namespace spot
 	      {
 		dest_num = ++state_num;
 		seen[dest] = dest_num;
+		pm.map_[dest_num] = dest;
 		todo.push_back(dest);
                 t = res->create_transition(seen[src], dest_num);
-                if (accepting)
-                {
-                  const state* dst = new state_explicit(t->dest);
-                  acc_list->push_front(dst);
-                }
 	      }
 	    res->add_conditions(t, cond);
 	  }
       }
     res->merge_transitions();
-
-    // Release all states.
-    state_set::const_iterator i = states.begin();
-    while (i != states.end())
-      {
-	// Advance the iterator before deleting the key.
-	const state* s = *i;
-	++i;
-	delete s;
-      }
-
     return res;
+  }
+
+  tgba_explicit_number*
+  tgba_powerset(const tgba* aut)
+  {
+    power_map pm;
+    return tgba_powerset(aut, pm);
   }
 }

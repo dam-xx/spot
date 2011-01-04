@@ -1,6 +1,19 @@
 2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
-	Add trivial() and one_state_of() functions to scc_map.
+	Rewrite the check of WDBA state acceptance in minimize().
+
+	* src/tgbaalgos/powerset.hh (power_map): New structure, allowing
+	the caller to retrieve the set of original states corresponding to
+	the set in the deterministic automaton.
+	(power_set): Adjust prototype to take a power_map instead of the
+	acc_list.
+	* src/tgbaalgos/powerset.cc (power_set): Strip all code using
+	acc_list, and update power_set.
+	* src/tgbaalgos/minimize.cc (minimize): Rewrite, using an
+	algorithm similar to the one in the Dax paper to check whether
+	state of the minimized automaton should be accepting.
+
+2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgbaalgos/scc.hh, src/tgbaalgos/scc.cc (scc_map::trivial,
 	scc_map::one_state_of): Two new helper functions.
