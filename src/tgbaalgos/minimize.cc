@@ -1,4 +1,4 @@
-// Copyright (C) 2010 Laboratoire de Recherche et Développement
+// Copyright (C) 2010, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -22,7 +22,13 @@
 #include "minimize.hh"
 #include "ltlast/allnodes.hh"
 #include "misc/hash.hh"
+#include "tgba/tgbaproduct.hh"
+#include "tgba/tgbatba.hh"
 #include "tgbaalgos/powerset.hh"
+#include "tgbaalgos/gtec/gtec.hh"
+#include "tgbaalgos/safety.hh"
+#include "tgbaalgos/sccfilter.hh"
+#include "tgbaalgos/ltl2tgba_fm.hh"
 
 namespace spot
 {
@@ -299,5 +305,88 @@ namespace spot
     delete det_a;
 
     return res;
+  }
+
+  const tgba*
+  minimize_obligation(const tgba* aut_f,
+		      const ltl::formula* f, const tgba* aut_neg_f)
+  {
+    // WDBA minimization
+    tgba* min_aut_f = minimize(aut_f);
+
+    // If aut_f is a safety automaton, the WDBA minimization must be
+    // correct.
+    if (is_safety_automaton(aut_f))
+      {
+	return min_aut_f;
+      }
+
+    if (!f && !aut_neg_f)
+      {
+	// We do not now if the minimization is safe.
+	return 0;
+      }
+
+    const tgba* to_free = 0;
+
+    // Build negation automaton if not supplied.
+    if (!aut_neg_f)
+      {
+	assert(f);
+
+	ltl::formula* neg_f = ltl::unop::instance(ltl::unop::Not, f->clone());
+	aut_neg_f = ltl_to_tgba_fm(neg_f, aut_f->get_dict());
+	neg_f->destroy();
+
+	// Remove useless SCCs.
+	const tgba* tmp = scc_filter(aut_neg_f, true);
+	delete aut_neg_f;
+	to_free = aut_neg_f = tmp;
+      }
+
+    // If the negation is a safety automaton, then the
+    // minimization is correct.
+    if (is_safety_automaton(aut_neg_f))
+      {
+	delete to_free;
+	return min_aut_f;
+      }
+
+    bool ok = false;
+
+    tgba* p = new tgba_product(min_aut_f, aut_neg_f);
+    emptiness_check* ec = couvreur99(p);
+    emptiness_check_result* res = ec->check();
+    if (!res)
+      {
+	delete ec;
+	delete p;
+	tgba* min_aut_neg_f = minimize(aut_neg_f);
+	tgba* p = new tgba_product(aut_f, min_aut_neg_f);
+	emptiness_check* ec = couvreur99(p);
+	res = ec->check();
+
+	if (!res)
+	  // Finally, we are now sure that it was safe
+	  // to minimize the automaton.
+	  ok = true;
+
+	delete res;
+	delete ec;
+	delete p;
+	delete min_aut_neg_f;
+      }
+    else
+      {
+	delete res;
+	delete ec;
+	delete p;
+      }
+    delete to_free;
+
+    if (ok)
+      return min_aut_f;
+    delete min_aut_f;
+    return aut_f;
   }
 }

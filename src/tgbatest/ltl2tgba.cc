@@ -1,4 +1,4 @@
-// Copyright (C) 2007, 2008, 2009, 2010 Laboratoire de Recherche et
+// Copyright (C) 2007, 2008, 2009, 2010, 2011 Laboratoire de Recherche et
 // Développement de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2005, 2006, 2007 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis
@@ -327,8 +327,8 @@ main(int argc, char** argv)
   spot::ltl::environment& env(spot::ltl::default_environment::instance());
   spot::ltl::atomic_prop_set* unobservables = 0;
   spot::tgba_explicit_string* system = 0;
-  spot::tgba* product = 0;
-  spot::tgba* product_to_free = 0;
+  const spot::tgba* product = 0;
+  const spot::tgba* product_to_free = 0;
   spot::bdd_dict* dict = new spot::bdd_dict();
   spot::timer_map tm;
   bool use_timer = false;
@@ -789,9 +789,9 @@ main(int argc, char** argv)
     }
   if (f || from_file)
     {
-      spot::tgba_bdd_concrete* concrete = 0;
-      spot::tgba* to_free = 0;
-      spot::tgba* a = 0;
+      const spot::tgba_bdd_concrete* concrete = 0;
+      const spot::tgba* to_free = 0;
+      const spot::tgba* a = 0;
 
       if (from_file)
 	{
@@ -867,7 +867,7 @@ main(int argc, char** argv)
 
       if (opt_monitor && ((reduc_aut & spot::Reduce_Scc) == 0))
 	{
-	  if (dynamic_cast<spot::tgba_bdd_concrete*>(a))
+	  if (dynamic_cast<const spot::tgba_bdd_concrete*>(a))
 	    symbolic_scc_pruning = true;
 	  else
 	    reduc_aut |= spot::Reduce_Scc;
@@ -875,8 +875,8 @@ main(int argc, char** argv)
 
       if (symbolic_scc_pruning)
         {
-	  spot::tgba_bdd_concrete* bc =
-	    dynamic_cast<spot::tgba_bdd_concrete*>(a);
+	  const spot::tgba_bdd_concrete* bc =
+	    dynamic_cast<const spot::tgba_bdd_concrete*>(a);
 	  if (!bc)
 	    {
 	      std::cerr << ("Error: Automaton is not symbolic: cannot "
@@ -890,14 +890,15 @@ main(int argc, char** argv)
 	    {
 	      tm.start("reducing A_f w/ symbolic SCC pruning");
 	      if (bc)
-		bc->delete_unaccepting_scc();
+		const_cast<spot::tgba_bdd_concrete*>(bc)
+		  ->delete_unaccepting_scc();
 	      tm.stop("reducing A_f w/ symbolic SCC pruning");
 	    }
 	}
 
       // Remove dead SCCs and useless acceptance conditions before
       // degeneralization.
-      spot::tgba* aut_scc = 0;
+      const spot::tgba* aut_scc = 0;
       if (reduc_aut & spot::Reduce_Scc)
 	{
 	  tm.start("reducing A_f w/ SCC");
@@ -905,8 +906,8 @@ main(int argc, char** argv)
 	  tm.stop("reducing A_f w/ SCC");
 	}
 
-      spot::tgba_tba_proxy* degeneralized = 0;
-      spot::tgba_sgba_proxy* state_labeled = 0;
+      const spot::tgba_tba_proxy* degeneralized = 0;
+      const spot::tgba_sgba_proxy* state_labeled = 0;
 
       unsigned int n_acc = a->number_of_acceptance_conditions();
       if (echeck_inst
@@ -923,74 +924,31 @@ main(int argc, char** argv)
         a = state_labeled = new spot::tgba_sgba_proxy(a);
       }
 
-      spot::tgba_explicit* minimized = 0;
+      const spot::tgba* minimized = 0;
       if (opt_minimize)
 	{
-	  tm.start("WDBA-minimization");
-	  minimized = minimize(a);
-	  tm.stop("WDBA-minimization");
-	  tm.start("WDBA-check");
-	  // If A is a safety automaton, the WDBA minimization
-	  // must be correct.
-	  if (is_safety_automaton(a))
+	  tm.start("obligation minimization");
+	  minimized = minimize_obligation(a, f);
+	  tm.stop("obligation minimization");
+
+	  if (minimized == 0)
 	    {
-	      a = minimized;
-	    }
-	  else // We don't know if A is a safety automaton.
-	    {
-	      if (!f)
+	      // if (!f)
 		{
 		  std::cerr << "Error: Without a formula I cannot make "
 			    << "sure that the automaton built with -Rm\n"
 			    << "       is correct." << std::endl;
 		  exit(2);
 		}
-	      // Let's make sure that A recognizes the same language
-	      // as MINIMIZED.
-	      spot::ltl::formula* neg =
-		spot::ltl::unop::instance(spot::ltl::unop::Not, f->clone());
-	      spot::tgba* n = spot::ltl_to_tgba_fm(neg, dict, fm_exprop_opt,
-						   fm_symb_merge_opt,
-						   post_branching,
-						   fair_loop_approx,
-						   unobservables, fm_red);
-	      neg->destroy();
-	      spot::tgba* nscc = spot::scc_filter(n, true);
-	      // If the negation is a safety automaton,
-	      // then the minimization is correct.
-	      if (is_safety_automaton(n))
-		{
-		  a = minimized;
-		}
-	      else
-		{
-		  spot::tgba* p = new spot::tgba_product(minimized, nscc);
-		  spot::emptiness_check* ec = couvreur99(p);
-		  spot::emptiness_check_result* res = ec->check();
-		  if (!res)
-		    {
-		      delete ec;
-		      delete p;
-		      spot::tgba* nm = minimize(nscc);
-		      p = new spot::tgba_product(a, nm);
-		      ec = couvreur99(p);
-		      res = ec->check();
-		      if (!res)
-			{
-			  // Finally, we are now sure that it was safe
-			  // to minimize the automaton.
-			  a = minimized;
-			}
-		      delete nm;
-		    }
-		  delete res;
-		  delete ec;
-		  delete p;
-		}
-	      delete nscc;
-	      delete n;
 	    }
-	  tm.stop("WDBA-check");
+	  else if (minimized == a)
+	    {
+	      minimized = 0;
+	    }
+	  else
+	    {
+	      a = minimized;
+	    }
 	}
 
       if (opt_monitor)
@@ -1059,7 +1017,7 @@ main(int argc, char** argv)
 	    }
 	}
 
-      spot::tgba_explicit* expl = 0;
+      const spot::tgba_explicit* expl = 0;
       switch (dupexp)
 	{
 	case NoneDup:
@@ -1072,7 +1030,7 @@ main(int argc, char** argv)
 	  break;
 	}
 
-      spot::tgba* product_degeneralized = 0;
+      const spot::tgba* product_degeneralized = 0;
 
       if (system)
         {

@@ -1,3 +1,13 @@
+2011-01-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Move the logic for detecting when the minimize() algorithm is
+	correct from ltl2tgba to the library.
+
+	* src/tgbaalgos/minimize.hh,
+	src/tgbaalgos/minimize.cc (minimize_obligation): New function.
+	* src/tgbatests/ltl2tgba.cc (main): Fix constness of automata,
+	and call minimize_obligation() for -R3b.
+
 2010-12-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Make minimization of obligation properties and deterministic
