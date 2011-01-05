@@ -1,4 +1,4 @@
-## Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+## Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et Développement
 ## de l'Epita (LRDE).
 ## Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
 ## Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -38,7 +38,6 @@ check_PROGRAMS = \
   expldot \
   explprod \
   ltlprod \
-  minimize \
   mixprod \
   powerset \
   reductgba \
@@ -57,7 +56,6 @@ expldot_CXXFLAGS = -DDOTTY
 explprod_SOURCES = explprod.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
 ltlprod_SOURCES  = ltlprod.cc
-minimize_SOURCES = minimize.cc
 mixprod_SOURCES  = mixprod.cc
 powerset_SOURCES = powerset.cc
 randtgba_SOURCES = randtgba.cc

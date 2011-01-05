@@ -1,5 +1,10 @@
 2011-01-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgbatest/Makefile.am: Remove the unused minimize program.
+	* src/tgbatest/minimize.cc: Delete.
+
+2011-01-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Cleanup the minimize.hh interface.
 
 	* src/tgbaalgos/minimize.hh, src/tgbaalgos/minimize.cc
