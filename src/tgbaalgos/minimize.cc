@@ -22,6 +22,7 @@
 #include <deque>
 #include <set>
 #include <list>
+#include <vector>
 #include "minimize.hh"
 #include "ltlast/allnodes.hh"
 #include "misc/hash.hh"
@@ -291,12 +292,44 @@ namespace spot
 	  scc_map sm(det_a);
 	  sm.build_map();
 	  unsigned scc_count = sm.scc_count();
+	  std::vector<bool> accepting(scc_count);
+	  // SCC are numbered in topological order
 	  for (unsigned n = 0; n < scc_count; ++n)
 	    {
-	      // Trivial SCCs are not accepting.
+	      bool acc = true;
+
 	      if (sm.trivial(n))
-		continue;
-	      if (wdba_scc_is_accepting(det_a, n, a, sm, pm))
+		{
+		  // Trivial SCCs are accepting if all their
+		  // successors are accepting.
+
+		  // This corresponds to the algorithm in Fig. 1 of
+		  // "Efficient minimization of deterministic weak
+		  // omega-automata" written by Christof Löding and
+		  // published in Information Processing Letters 79
+		  // (2001) pp 105--109.  Except we do not keep track
+		  // of the actual color associated to each SCC.
+
+		  const scc_map::succ_type& succ = sm.succ(n);
+		  for (scc_map::succ_type::const_iterator i = succ.begin();
+		       i != succ.end(); ++i)
+		    {
+		      if (!accepting[i->first])
+			{
+			  acc = false;
+			  break;
+			}
+		    }
+		}
+	      else
+		{
+		  // Regular SCCs are accepting if any of their loop
+		  // corresponds to an accepting
+		  acc = wdba_scc_is_accepting(det_a, n, a, sm, pm);
+		}
+
+	      accepting[n] = acc;
+	      if (acc)
 		{
 		  std::list<const state*> l = sm.states_of(n);
 		  std::list<const state*>::const_iterator il;
