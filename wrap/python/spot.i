@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010  Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010, 2011  Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2005, 2006  Laboratoire d'Informatique
 // de Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -147,7 +147,9 @@ using namespace spot;
 %feature("new") spot::ltl_to_taa;
 %feature("new") spot::ltl_to_tgba_fm;
 %feature("new") spot::ltl_to_tgba_lacim;
-%feature("new") spot::minimize;
+%feature("new") spot::minimize_wdba;
+%feature("new") spot::minimize_monitor;
+%feature("new") spot::minimize_obligation;
 %feature("new") spot::reduc_tgba_sim;
 %feature("new") spot::scc_filter;
 %feature("new") spot::tgba_dupexp_bfs;

@@ -1,5 +1,22 @@
 2011-01-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Cleanup the minimize.hh interface.
+
+	* src/tgbaalgos/minimize.hh, src/tgbaalgos/minimize.cc
+	(minimize): Split into ...
+	(minimize_wdba, minimize_monitor): ... these two functions.
+	* src/tgbatest/ltl2tgba.cc (main): Adjust the call to
+	minimize_monitor.
+	* wrap/python/cgi-bin/ltl2tgba.in: Adjust the calls to
+	minimize_monitor and minimize_obligation.
+	* wrap/python/spot.i: Declare minimize_monitor, minimize_wdba,
+	minimize_obligations.
+	* src/tgba/tgbaexplicit.hh (tgba_explicit_string)
+	(tgba_explicit_formula, tgba_explicit_number): Add fake
+	declarations so that SWIG can see they inherits from tgba.
+
+2011-01-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Cleanup the DFA minimization algorithm.
 
 	* src/tgbaalgos/minimize.cc (minimize):  Move the minimization

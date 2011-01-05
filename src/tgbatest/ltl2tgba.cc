@@ -954,7 +954,7 @@ main(int argc, char** argv)
       if (opt_monitor)
 	{
 	  tm.start("Monitor minimization");
-	  a = minimized = minimize(a, true);
+	  a = minimized = minimize_monitor(a);
 	  tm.stop("Monitor minimization");
 	}
 

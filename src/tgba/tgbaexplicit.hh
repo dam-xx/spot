@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -313,6 +313,7 @@ namespace spot
 
   };
 
+#ifndef SWIG
   class tgba_explicit_string:
     public tgba_explicit_labelled<std::string, string_hash>
   {
@@ -333,7 +334,13 @@ namespace spot
       name_state_map_[alias_name] = add_state(real_name);
     }
   };
+#else
+  class tgba_explicit_string: public tgba
+  {
+  };
+#endif
 
+#ifndef SWIG
   class tgba_explicit_formula:
     public tgba_explicit_labelled<const ltl::formula*, ltl::formula_ptr_hash>
   {
@@ -345,7 +352,13 @@ namespace spot
     virtual state* add_default_init();
     virtual std::string format_state(const spot::state* s) const;
   };
+#else
+  class tgba_explicit_formula: public tgba
+  {
+  };
+#endif
 
+#ifndef SWIG
   class tgba_explicit_number:
     public tgba_explicit_labelled<int, std::tr1::hash<int> >
   {
@@ -357,6 +370,11 @@ namespace spot
     virtual state* add_default_init();
     virtual std::string format_state(const spot::state* s) const;
   };
+#else
+  class tgba_explicit_number: public tgba
+  {
+  };
+#endif
 }
 
 #endif // SPOT_TGBA_TGBAEXPLICIT_HH

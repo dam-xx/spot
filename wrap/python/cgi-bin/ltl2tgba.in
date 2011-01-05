@@ -1,7 +1,7 @@
 #!@PYTHON@
 # -*- mode: python; coding: iso-8859-1 -*-
-# Copyright (C) 2007, 2009, 2010 Laboratoire de Recherche et Développement
-# de l'Epita (LRDE).
+# Copyright (C) 2007, 2009, 2010, 2011 Laboratoire de Recherche et
+# Développement de l'Epita (LRDE).
 # Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de
 # Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 # Université Pierre et Marie Curie.
@@ -572,9 +572,9 @@ elif trans_taa:
     automaton = spot.ltl_to_taa(f, dict, refined_rules)
 
 if reduce_dmonitor:
-    automaton = spot.minimize(automaton, True)
+    automaton = spot.minimize_monitor(automaton)
 elif reduce_wdba:
-    automaton = spot.minimize(automaton, False)
+    automaton = spot.minimize_obligation(automaton)
 elif reduce_scc:
     # Do not suppress all useless acceptance conditions if
     # degeneralization is requested: keeping those that lead to

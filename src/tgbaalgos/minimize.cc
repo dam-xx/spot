@@ -506,7 +506,20 @@ namespace spot
   }
 
 
-  tgba_explicit_number* minimize(const tgba* a, bool monitor)
+  tgba_explicit_number* minimize_monitor(const tgba* a)
+  {
+    hash_set* final = new hash_set;
+    tgba_explicit_number* det_a;
+
+    {
+      power_map pm;
+      det_a = tgba_powerset(a, pm);
+    }
+    // final is empty: there is no acceptance condition
+    return minimize_dfa(det_a, final);
+  }
+
+  tgba_explicit_number* minimize_wdba(const tgba* a)
   {
     hash_set* final = new hash_set;
     tgba_explicit_number* det_a;
@@ -515,57 +528,54 @@ namespace spot
       power_map pm;
       det_a = tgba_powerset(a, pm);
 
-      if (!monitor)
+      // For each SCC of the deterministic automaton, determine if
+      // it is accepting or not.
+      scc_map sm(det_a);
+      sm.build_map();
+      unsigned scc_count = sm.scc_count();
+      std::vector<bool> accepting(scc_count);
+      // SCC are numbered in topological order
+      for (unsigned n = 0; n < scc_count; ++n)
 	{
-	  // For each SCC of the deterministic automaton, determine if
-	  // it is accepting or not.
-	  scc_map sm(det_a);
-	  sm.build_map();
-	  unsigned scc_count = sm.scc_count();
-	  std::vector<bool> accepting(scc_count);
-	  // SCC are numbered in topological order
-	  for (unsigned n = 0; n < scc_count; ++n)
+	  bool acc = true;
+
+	  if (sm.trivial(n))
 	    {
-	      bool acc = true;
+	      // Trivial SCCs are accepting if all their
+	      // successors are accepting.
 
-	      if (sm.trivial(n))
+	      // This corresponds to the algorithm in Fig. 1 of
+	      // "Efficient minimization of deterministic weak
+	      // omega-automata" written by Christof Löding and
+	      // published in Information Processing Letters 79
+	      // (2001) pp 105--109.  Except we do not keep track
+	      // of the actual color associated to each SCC.
+
+	      const scc_map::succ_type& succ = sm.succ(n);
+	      for (scc_map::succ_type::const_iterator i = succ.begin();
+		   i != succ.end(); ++i)
 		{
-		  // Trivial SCCs are accepting if all their
-		  // successors are accepting.
-
-		  // This corresponds to the algorithm in Fig. 1 of
-		  // "Efficient minimization of deterministic weak
-		  // omega-automata" written by Christof Löding and
-		  // published in Information Processing Letters 79
-		  // (2001) pp 105--109.  Except we do not keep track
-		  // of the actual color associated to each SCC.
-
-		  const scc_map::succ_type& succ = sm.succ(n);
-		  for (scc_map::succ_type::const_iterator i = succ.begin();
-		       i != succ.end(); ++i)
+		  if (!accepting[i->first])
 		    {
-		      if (!accepting[i->first])
-			{
-			  acc = false;
-			  break;
-			}
+		      acc = false;
+		      break;
 		    }
 		}
-	      else
-		{
-		  // Regular SCCs are accepting if any of their loop
-		  // corresponds to an accepting
-		  acc = wdba_scc_is_accepting(det_a, n, a, sm, pm);
-		}
+	    }
+	  else
+	    {
+	      // Regular SCCs are accepting if any of their loop
+	      // corresponds to an accepting
+	      acc = wdba_scc_is_accepting(det_a, n, a, sm, pm);
+	    }
 
-	      accepting[n] = acc;
-	      if (acc)
-		{
-		  std::list<const state*> l = sm.states_of(n);
-		  std::list<const state*>::const_iterator il;
-		  for (il = l.begin(); il != l.end(); ++il)
-		    final->insert((*il)->clone());
-		}
+	  accepting[n] = acc;
+	  if (acc)
+	    {
+	      std::list<const state*> l = sm.states_of(n);
+	      std::list<const state*>::const_iterator il;
+	      for (il = l.begin(); il != l.end(); ++il)
+		final->insert((*il)->clone());
 	    }
 	}
     }
@@ -577,8 +587,7 @@ namespace spot
   minimize_obligation(const tgba* aut_f,
 		      const ltl::formula* f, const tgba* aut_neg_f)
   {
-    // WDBA minimization
-    tgba_explicit_number* min_aut_f = minimize(aut_f);
+    tgba_explicit_number* min_aut_f = minimize_wdba(aut_f);
 
     // If aut_f is a safety automaton, the WDBA minimization must be
     // correct.
