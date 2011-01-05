@@ -1,5 +1,15 @@
 2011-01-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Cleanup the DFA minimization algorithm.
+
+	* src/tgbaalgos/minimize.cc (minimize):  Move the minimization
+	code into...
+	(minimize_dfa): ... this new function, and fix the condition
+	under which a partition is considered to be minimal.  Also
+	use a map instead of a list to lookup known formulae.
+
+2011-01-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Speed up the obligation test.
 
 	* src/tgbaalgos/minimize.cc (minimize_obligation): Do not
