@@ -93,7 +93,7 @@ namespace spot
   /// \endverbatim
   /// (Note: although the above paper uses Spot, this function did not
   /// exist at that time.)
-  tgba_explicit* minimize(const tgba* a, bool monitor = false);
+  tgba_explicit_number* minimize(const tgba* a, bool monitor = false);
 
 
   /// \brief Minimize an automaton if it represents an obligation property.
@@ -138,7 +138,7 @@ namespace spot
   /// formula, then the result of \code minimize(aut) is returned.
   /// Otherwise, if \a aut_neg_f was not supplied but \a f was, \a
   /// aut_neg_f is built from the negation of \a f.  Then we check
-  /// that \code product(aut,minimize(aut_neg_f)) and \code
+  /// that \code product(aut,!minimize(aut_f)) and \code
   /// product(aut_neg_f,minize(aut)) are both empty.  If they are, the
   /// the minimization was sound.  (See the paper for full details.)
   const tgba* minimize_obligation(const tgba* aut_f,

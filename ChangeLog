@@ -1,5 +1,13 @@
 2011-01-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Speed up the obligation test.
+
+	* src/tgbaalgos/minimize.cc (minimize_obligation): Do not
+	minimize aut_neg_f, complement min_aut_f instead.
+	* src/tgbaalgos/minimize.hh: Adjust description.
+
+2011-01-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/tgbaalgos/minimize.cc (minimize): Use the Loeding algorithm
 	to label transient states.
 

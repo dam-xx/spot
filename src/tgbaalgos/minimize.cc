@@ -271,7 +271,7 @@ namespace spot
 
 
 
-  tgba_explicit* minimize(const tgba* a, bool monitor)
+  tgba_explicit_number* minimize(const tgba* a, bool monitor)
   {
     std::queue<hash_set*> todo;
     // The list of equivalent states.
@@ -496,7 +496,7 @@ namespace spot
 		      const ltl::formula* f, const tgba* aut_neg_f)
   {
     // WDBA minimization
-    tgba* min_aut_f = minimize(aut_f);
+    tgba_explicit_number* min_aut_f = minimize(aut_f);
 
     // If aut_f is a safety automaton, the WDBA minimization must be
     // correct.
@@ -545,20 +545,24 @@ namespace spot
       {
 	delete ec;
 	delete p;
-	tgba* min_aut_neg_f = minimize(aut_neg_f);
-	tgba* p = new tgba_product(aut_f, min_aut_neg_f);
+	// Complement the minimized WDBA.
+	min_aut_f->complement_all_acceptance_conditions();
+	tgba* p = new tgba_product(aut_f, min_aut_f);
 	emptiness_check* ec = couvreur99(p);
 	res = ec->check();
 
 	if (!res)
-	  // Finally, we are now sure that it was safe
-	  // to minimize the automaton.
-	  ok = true;
+	  {
+	    // Finally, we are now sure that it was safe
+	    // to minimize the automaton.
+	    ok = true;
+	    // Get the original automaton back.
+	    min_aut_f->complement_all_acceptance_conditions();
+	  }
 
 	delete res;
 	delete ec;
 	delete p;
-	delete min_aut_neg_f;
       }
     else
       {
