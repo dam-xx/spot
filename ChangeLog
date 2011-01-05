@@ -1,3 +1,16 @@
+2011-01-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix computation of support_conditions for bdd-based TGBA.
+	This fixes a bug in the powerset of such TGBA on the minimize branch.
+
+	* src/tgba/tgbabddconcrete.cc (compute_support_conditions): Also
+	account for the conditions from the acceptance relations.
+	* rc/tgba/tgbabddconcretefactory.hh, rc/tgba/tgbabddconcretefactory.cc
+	(acceptance_conditions_support): New variable to hold the value
+	of bdd_support(acceptance_conditions_support).
+	* src/tgba/tgbabddconcretefactory.cc (finish): Update
+	data_.acceptance_conditions_support.
+
 2010-12-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* wrap/python/cgi-bin/ltl2tgba.in: Remove all "new" markers.

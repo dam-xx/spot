@@ -1,4 +1,6 @@
-// Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2011 Laboratoire de Recherche et Développement de
+// l'Epita (LRDE).
+// Copyright (C) 2003 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -127,9 +129,16 @@ namespace spot
     // bdd_support must be called BEFORE bdd_exist
     // because bdd_exist(bdd_support((a&Next[f])|(!a&Next[g])),Next[*])
     // is obviously not the same as bdd_support(a|!a).
-    // In other words: we can reuse compute_support_conditions() for
+    // In other words: we cannot reuse compute_support_conditions() for
     // this computation.
-    return bdd_exist(bdd_support(succ_set), data_.notvar_set);
+    //
+    // Also we need to inject the support of acceptance conditions, because a
+    // "Next[f]" that looks like one transition might in fact be two
+    // transitions if the acceptance condition distinguish between
+    // letters, e.g. "Next[f] & ((a & Acc[1]) | (!a))"
+    return bdd_exist(bdd_support(succ_set)
+		     & data_.acceptance_conditions_support,
+		     data_.notvar_set);
   }
 
   std::string

@@ -1,3 +1,5 @@
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Développement de
+// l'Epita (LRDE).
 // Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -27,6 +29,7 @@ namespace spot
   tgba_bdd_core_data::tgba_bdd_core_data(bdd_dict* dict)
     : relation(bddtrue),
       acceptance_conditions(bddfalse),
+      acceptance_conditions_support(bddtrue),
       all_acceptance_conditions(bddfalse),
       now_set(bddtrue),
       next_set(bddtrue),
@@ -46,6 +49,7 @@ namespace spot
   tgba_bdd_core_data::tgba_bdd_core_data(const tgba_bdd_core_data& copy)
     : relation(copy.relation),
       acceptance_conditions(copy.acceptance_conditions),
+      acceptance_conditions_support(copy.acceptance_conditions_support),
       all_acceptance_conditions(copy.all_acceptance_conditions),
       now_set(copy.now_set),
       next_set(copy.next_set),
@@ -68,6 +72,8 @@ namespace spot
     : relation(left.relation & right.relation),
       acceptance_conditions(left.acceptance_conditions
 			   | right.acceptance_conditions),
+      acceptance_conditions_support(left.acceptance_conditions_support
+				    & right.acceptance_conditions_support),
       all_acceptance_conditions(left.all_acceptance_conditions
 			       | right.all_acceptance_conditions),
       now_set(left.now_set & right.now_set),

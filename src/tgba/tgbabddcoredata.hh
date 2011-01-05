@@ -1,3 +1,5 @@
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Développement de
+// l'Epita (LRDE).
 // Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -73,6 +75,9 @@ namespace spot
     ///     to the next state,
     /// \li "Acc" variables.
     bdd acceptance_conditions;
+
+    /// The value of \c bdd_support(acceptance_conditions)
+    bdd acceptance_conditions_support;
 
     /// \brief The set of all acceptance conditions used by the Automaton.
     ///

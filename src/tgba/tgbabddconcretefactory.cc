@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -117,6 +117,9 @@ namespace spot
 	// conditions.
 	data_.all_acceptance_conditions |= acc;
       }
+
+    data_.acceptance_conditions_support =
+      bdd_support(data_.acceptance_conditions);
 
     // Any constraint between Now variables also exist between Next
     // variables.  Doing this limits the quantity of useless
