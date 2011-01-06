@@ -11,7 +11,7 @@ New in spot 0.6a:
   * src/ltltest/genltl is a new tool that generates some interesting
     families of LTL formulae, for testing purpose.
   * bench/ltlclasses/ uses the above tool to conduct the same benchmark
-    as in the DepCoS'09 paper by Cichón et al.  The resulting benchmark
+    as in the DepCoS'09 paper by CichoÅ„ et al.  The resulting benchmark
     completes in 12min, while it tooks days (or crashed) when the paper
     was written (using Spot 0.4).
   * Degeneralization has again been improved in two ways:
@@ -23,7 +23,8 @@ New in spot 0.6a:
     obligation.
   * bench/wdba/ conducts a benchmark similar to the one on Dax's
     webpage, comparing the size of the automata expressing obligation
-    formula before and after minimization.
+    formula before and after minimization.  See bench/wdba/README for
+    results.
   * New ltl2tgba options:
     -XN: read an input automaton as a neverclaim.
     -C, -CR: Compute (and display) a counterexample after running the
@@ -42,7 +43,7 @@ New in spot 0.6a:
     - Various warning fixes for different versions of GCC and Clang.
     - The neverclaim output with ltl2tgba -N or -NN used to ignore any
       automaton simplification performed after degeneralization.
-    - The formula simplification based on universality and eventuallity
+    - The formula simplification based on universality and eventuality
       had a quadratic run-time.
 
 New in spot 0.6 (16-04-2010):
@@ -111,14 +112,14 @@ New in spot 0.5 (2010-02-01):
   * The data structures used to represent LTL formulae have been
     overhauled, and it resulted in a big performence improvement
     (in time and memory consumption) for the LTL translation.
-  * Two complementation algorithms for state-based Büchi automata
+  * Two complementation algorithms for state-based BÃ¼chi automata
     have been implemented:
     - tgba_kv_complement is an on-the-fly implementation of the
       Kupferman-Vardi construction (TCS'05) for generalized acceptance
       conditions.
     - tgba_safra_complement is an implementation of Safra's
-      complementation.  This algorithm takes a degeneralized Büchi
-      automaton as input, but our implementation for the Streett->Büchi
+      complementation.  This algorithm takes a degeneralized BÃ¼chi
+      automaton as input, but our implementation for the Streett->BÃ¼chi
       step will produce a generalized automaton in the end.
   * ltl2tgba has gained several options and the help text has been
     reorganized.  Please run src/tgbatest/ltl2tgba without arguments
@@ -323,7 +324,7 @@ New in spot 0.0h (2003-08-18):
   * More python bindings:
     - "import buddy" works (see wrap/python/tests/bddnqueen.py for an example),
     - almost all the Spot API is now available via "import spot".
-  * wrap/python/cgi/ltl2tgba.py is an LTL-to-Büchi translator that
+  * wrap/python/cgi/ltl2tgba.py is an LTL-to-BÃ¼chi translator that
     work as as a cgi script.
   * Couvreur's FM'99 ltl-to-tgba translation.
 

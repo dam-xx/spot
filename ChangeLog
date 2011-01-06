@@ -1,5 +1,9 @@
 2011-01-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* NEWS: Convert to utf-8 and fix a few typos.
+
+2011-01-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	'([]a && XXXX!a)' was not properly minimized because its
 	translation contain useless SCCs that where not ignored for
 	minimization.
