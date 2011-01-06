@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 Laboratoire de Recherche et Développement
+/* Copyright (C) 2010, 2011 Laboratoire de Recherche et Développement
 ** de l'Epita (LRDE).
 **
 ** This file is part of Spot, a model checking library.
@@ -71,7 +71,7 @@ using namespace spot::ltl;
 %token FALSE "false"
 %token <str> FORMULA "boolean formula"
 %token <str> IDENT "identifier"
-%type <str> formula
+%type <str> formula opt_dest
 %type <p> transition
 %type <list> transitions
 %type <str> ident_list
@@ -88,7 +88,11 @@ using namespace spot::ltl;
   }
   delete $$;
   } <list>
-%printer { debug_stream() << *$$; } <str>
+  %printer {
+    if ($$)
+      debug_stream() << *$$;
+    else
+      debug_stream() << "\"\""; } <str>
 
 %%
 neverclaim:
@@ -101,7 +105,7 @@ states:
   | states ';' state
   | states ';'
 
-ident_list: 
+ident_list:
     IDENT ':'
     {
       $$ = $1;
@@ -119,7 +123,7 @@ state:
       spot::tgba_explicit::transition* t = result->create_transition(*$1, *$1);
       bool acc = !strncmp("accept", $1->c_str(), 6);
       if (acc)
-	result->add_acceptance_condition(t, 
+	result->add_acceptance_condition(t,
 					 spot::ltl::constant::true_instance());
       delete $1;
     }
@@ -133,7 +137,7 @@ state:
       {
 	spot::tgba_explicit::transition* t =
 	  result->create_transition(*$1,*it->second);
-	      
+
 	result->add_condition(t, it->first);
 	if (acc)
 	  result
@@ -150,35 +154,60 @@ state:
 
 transitions:
   /* empty */ { $$ = new std::list<pair>; }
-  | transition transitions
+  | transitions transition
     {
-      $2->push_back(*$1);
-      delete $1;
-      $$ = $2;
+      if ($2)
+	{
+	  $1->push_back(*$2);
+	  delete $2;
+	}
+      $$ = $1;
     }
 
 
 formula: FORMULA | "false" { $$ = new std::string("0"); }
-   
-transition:
-  ':' ':' formula  "->" "goto" IDENT
-    {
-      spot::ltl::parse_error_list pel;
-      spot::ltl::formula* f = spot::ltl::parse(*$3, pel);
-      delete $3;
-      for(spot::ltl::parse_error_list::const_iterator i = pel.begin();
-	  i != pel.end(); ++i)
-	{
-	  // Adjust the diagnostic to the current position.
-	  location here = @3;
-	  here.end.line = here.begin.line + i->first.end.line - 1;
-	  here.end.column = here.begin.column + i->first.end.column -1;
-	  here.begin.line += i->first.begin.line - 1;
-	  here.begin.column += i->first.begin.column - 1;
-	  error(here, i->second);
-	}
 
-      $$ = new pair(f, $6);
+opt_dest:
+  /* empty */
+    {
+      $$ = 0;
+    }
+  | "->" "goto" IDENT
+    {
+      $$ = $3;
+    }
+
+transition:
+  ':' ':' formula opt_dest
+    {
+      // If there is no destination, do ignore the transition.
+      // This happens for instance with
+      //   if
+      //   :: false
+      //   fi
+      if (!$4)
+	{
+	  delete $3;
+	  $$ = 0;
+	}
+      else
+	{
+	  spot::ltl::parse_error_list pel;
+	  spot::ltl::formula* f = spot::ltl::parse(*$3, pel);
+	  delete $3;
+	  for(spot::ltl::parse_error_list::const_iterator i = pel.begin();
+	  i != pel.end(); ++i)
+	    {
+	      // Adjust the diagnostic to the current position.
+	      location here = @3;
+	      here.end.line = here.begin.line + i->first.end.line - 1;
+	      here.end.column = here.begin.column + i->first.end.column -1;
+	      here.begin.line += i->first.begin.line - 1;
+	      here.begin.column += i->first.begin.column - 1;
+	      error(here, i->second);
+	    }
+	  $$ = new pair(f, $4);
+	}
     }
 %%
 

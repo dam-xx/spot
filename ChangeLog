@@ -1,5 +1,17 @@
 2011-01-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	The neverclaim output by spin -f '([]a && XXXX!a)' was not
+	understood by Spot.
+
+	* src/neverparse/neverclaimparse.yy: Support "if :: false fi;"
+	instructions.  Spin sometimes output these on dead states.
+	Also rewrite the "transitions" rule as a left recursion.
+	* src/tgbatest/neverclaimread.test: Adjust output because
+	of the right->left recursion change, and add two more formula
+	to submit to Spin to test its output.
+
+2011-01-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Speed up computation of non_final states for minimize_wdba.
 
 	* src/tgbaalgos/minimize.cc (minimize_dfa): Take final and
