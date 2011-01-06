@@ -1,5 +1,15 @@
 2011-01-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	'([]a && XXXX!a)' was not properly minimized because its
+	translation contain useless SCCs that where not ignored for
+	minimization.
+
+	* src/tgbaalgos/minimize.cc (minimize_wdba): Strip useless
+	SCCs before minimization.
+	* src/tgbatest/ltl2tgba.test: Add a check.
+
+2011-01-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	The neverclaim output by spin -f '([]a && XXXX!a)' was not
 	understood by Spot.
 

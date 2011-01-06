@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+# Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et Développement
 # de l'Epita (LRDE).
 # Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -92,6 +92,15 @@ grep 'states: 7$' stdout
 # Make sure 'GFa & GFb & GFc & GFd & GFe & GFf'
 # has 7 states and 34 transitions after degeneralization.
 f='GFa & GFb & GFc & GFd & GFe & GFg'
-../ltl2tgba -ks -DS -x -f $opt "$f" > stdout
+../ltl2tgba -ks -DS -x -f "$f" > stdout
 grep 'transitions: 34$' stdout
 grep 'states: 7$' stdout
+
+# Make sure 'Ga & XXXX!a' is minimized to one state.
+f='Ga & XXXX!a'
+../ltl2tgba -ks -f "$f" > stdout
+grep 'transitions: 4$' stdout
+grep 'states: 5$' stdout
+../ltl2tgba -ks -Rm -f "$f" > stdout
+grep 'transitions: 0$' stdout
+grep 'states: 1$' stdout

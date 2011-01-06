@@ -522,14 +522,27 @@ namespace spot
       scc_map sm(det_a);
       sm.build_map();
       unsigned scc_count = sm.scc_count();
+      // SCC that have been marked as accepting.
       std::vector<bool> accepting(scc_count);
+      // SCC that have been marked as useless.
+      std::vector<bool> useless(scc_count);
       // SCC are numbered in topological order
       for (unsigned n = 0; n < scc_count; ++n)
 	{
 	  bool acc = true;
+	  bool is_useless = true;
 
 	  if (sm.trivial(n))
 	    {
+	      const scc_map::succ_type& succ = sm.succ(n);
+	      if (succ.empty())
+		{
+		  // A trivial SCC without successor is useless.
+		  useless[n] = true;
+		  accepting[n] = false;
+		  // Do not add even add it to final or non_final.
+		  continue;
+		}
 	      // Trivial SCCs are accepting if all their
 	      // successors are accepting.
 
@@ -540,31 +553,48 @@ namespace spot
 	      // (2001) pp 105--109.  Except we do not keep track
 	      // of the actual color associated to each SCC.
 
-	      const scc_map::succ_type& succ = sm.succ(n);
+	      // Also they are useless if all their successor are
+	      // useless.
 	      for (scc_map::succ_type::const_iterator i = succ.begin();
 		   i != succ.end(); ++i)
 		{
-		  if (!accepting[i->first])
-		    {
-		      acc = false;
-		      break;
-		    }
+		  is_useless &= useless[i->first];
+		  acc &= accepting[i->first];
 		}
 	    }
 	  else
 	    {
 	      // Regular SCCs are accepting if any of their loop
-	      // corresponds to an accepting
+	      // corresponds to an accepted word in the original
+	      // automaton.
 	      acc = wdba_scc_is_accepting(det_a, n, a, sm, pm);
+
+	      if (acc)
+		{
+		  is_useless = false;
+		}
+	      else
+		{
+		  // Unaccepting SCCs are useless if their successors
+		  // are all useless.
+		  const scc_map::succ_type& succ = sm.succ(n);
+		  for (scc_map::succ_type::const_iterator i = succ.begin();
+		       i != succ.end(); ++i)
+		    is_useless &= useless[i->first];
+		}
 	    }
 
+	  useless[n] = is_useless;
 	  accepting[n] = acc;
 
-	  hash_set* dest_set = acc ? final : non_final;
-	  const std::list<const state*>& l = sm.states_of(n);
-	  std::list<const state*>::const_iterator il;
-	  for (il = l.begin(); il != l.end(); ++il)
-	    dest_set->insert((*il)->clone());
+	  if (!is_useless)
+	    {
+	      hash_set* dest_set = acc ? final : non_final;
+	      const std::list<const state*>& l = sm.states_of(n);
+	      std::list<const state*>::const_iterator il;
+	      for (il = l.begin(); il != l.end(); ++il)
+		dest_set->insert((*il)->clone());
+	    }
 	}
     }
 
