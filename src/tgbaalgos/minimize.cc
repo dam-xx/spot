@@ -80,51 +80,35 @@ namespace spot
     }
   }
 
-  // Given an automaton a, find all states that are not in "final" and add
-  // them to the set "non_final".
-  void init_sets(const tgba_explicit* a,
-                 hash_set& final,
-                 hash_set& non_final)
+  // Find all states of an automaton.
+  void state_set(const tgba* a, hash_set* seen)
   {
-    hash_set seen;
     std::queue<const state*> tovisit;
     // Perform breadth-first traversal.
     const state* init = a->get_init_state();
     tovisit.push(init);
-    seen.insert(init);
+    seen->insert(init);
     while (!tovisit.empty())
     {
       const state* src = tovisit.front();
       tovisit.pop();
-      // Is the state final ?
-      if (final.find(src) == final.end())
-	// No, add it to the set non_final
-	non_final.insert(src->clone());
+
       tgba_succ_iterator* sit = a->succ_iter(src);
       for (sit->first(); !sit->done(); sit->next())
       {
         const state* dst = sit->current_state();
         // Is it a new state ?
-        if (seen.find(dst) == seen.end())
-        {
-          // Register the successor for later processing.
-          tovisit.push(dst);
-          seen.insert(dst);
-        }
+        if (seen->find(dst) == seen->end())
+	  {
+	    // Register the successor for later processing.
+	    tovisit.push(dst);
+	    seen->insert(dst);
+	  }
         else
           delete dst;
       }
       delete sit;
     }
-
-    while (!seen.empty())
-      {
-	hash_set::iterator i = seen.begin();
-	const state* s = *i;
-	seen.erase(i);
-	delete s;
-      }
-
   }
 
   // From the base automaton and the list of sets, build the minimal
@@ -307,7 +291,7 @@ namespace spot
   }
 
   tgba_explicit_number* minimize_dfa(const tgba_explicit_number* det_a,
-				     hash_set* final)
+				     hash_set* final, hash_set* non_final)
   {
     typedef std::list<hash_set*> partition_t;
     partition_t cur_run;
@@ -318,9 +302,6 @@ namespace spot
 
     hash_map state_set_map;
 
-    hash_set* non_final = new hash_set;
-
-    init_sets(det_a, *final, *non_final);
     // Size of det_a
     unsigned size = final->size() + non_final->size();
     // Use bdd variables to number sets.  set_num is the first variable
@@ -510,19 +491,26 @@ namespace spot
   tgba_explicit_number* minimize_monitor(const tgba* a)
   {
     hash_set* final = new hash_set;
+    hash_set* non_final = new hash_set;
     tgba_explicit_number* det_a;
 
     {
       power_map pm;
       det_a = tgba_powerset(a, pm);
     }
+
+    // non_final contain all states.
     // final is empty: there is no acceptance condition
-    return minimize_dfa(det_a, final);
+    state_set(a, non_final);
+
+    return minimize_dfa(det_a, final, non_final);
   }
 
   tgba_explicit_number* minimize_wdba(const tgba* a)
   {
     hash_set* final = new hash_set;
+    hash_set* non_final = new hash_set;
+
     tgba_explicit_number* det_a;
 
     {
@@ -571,17 +559,16 @@ namespace spot
 	    }
 
 	  accepting[n] = acc;
-	  if (acc)
-	    {
-	      std::list<const state*> l = sm.states_of(n);
-	      std::list<const state*>::const_iterator il;
-	      for (il = l.begin(); il != l.end(); ++il)
-		final->insert((*il)->clone());
-	    }
+
+	  hash_set* dest_set = acc ? final : non_final;
+	  const std::list<const state*>& l = sm.states_of(n);
+	  std::list<const state*>::const_iterator il;
+	  for (il = l.begin(); il != l.end(); ++il)
+	    dest_set->insert((*il)->clone());
 	}
     }
 
-    return minimize_dfa(det_a, final);
+    return minimize_dfa(det_a, final, non_final);
   }
 
   const tgba*
