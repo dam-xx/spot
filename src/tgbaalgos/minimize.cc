@@ -39,6 +39,7 @@
 #include "misc/bddlt.hh"
 #include "tgba/tgbaproduct.hh"
 #include "tgba/tgbatba.hh"
+#include "tgba/wdbacomp.hh"
 #include "tgbaalgos/powerset.hh"
 #include "tgbaalgos/gtec/gtec.hh"
 #include "tgbaalgos/safety.hh"
@@ -636,9 +637,11 @@ namespace spot
       {
 	delete ec;
 	delete p;
+
 	// Complement the minimized WDBA.
-	min_aut_f->complement_all_acceptance_conditions();
-	tgba* p = new tgba_product(aut_f, min_aut_f);
+	tgba* neg_min_aut_f = wdba_complement(min_aut_f);
+
+	tgba* p = new tgba_product(aut_f, neg_min_aut_f);
 	emptiness_check* ec = couvreur99(p);
 	res = ec->check();
 
@@ -647,13 +650,12 @@ namespace spot
 	    // Finally, we are now sure that it was safe
 	    // to minimize the automaton.
 	    ok = true;
-	    // Get the original automaton back.
-	    min_aut_f->complement_all_acceptance_conditions();
 	  }
 
 	delete res;
 	delete ec;
 	delete p;
+	delete neg_min_aut_f;
       }
     else
       {

@@ -1,3 +1,12 @@
+2011-01-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Introduce a class to complement a WDBA on-the-fly.
+
+	* src/tgba/wdbacomp.hh, src/tgba/wdbacomp.cc: New file.
+	* src/tgba/Makefile.am: Add them.
+	* src/tgbaalgos/minimize.cc (minimize_obligation): Use
+	wdba_complement().
+
 2011-01-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgbatest/Makefile.am: Remove the unused minimize program.

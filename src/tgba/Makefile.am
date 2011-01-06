@@ -1,4 +1,4 @@
-## Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+## Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et Développement
 ## de l'Epita (LRDE).
 ## Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -51,7 +51,8 @@ tgba_HEADERS = \
   tgbasgba.hh \
   tgbasafracomplement.hh \
   tgbatba.hh \
-  tgbaunion.hh
+  tgbaunion.hh \
+  wdbacomp.hh
 
 noinst_LTLIBRARIES = libtgba.la
 libtgba_la_SOURCES = \
@@ -75,4 +76,5 @@ libtgba_la_SOURCES = \
   tgbascc.cc \
   tgbasgba.cc \
   tgbatba.cc \
-  tgbaunion.cc
+  tgbaunion.cc \
+  wdbacomp.cc
