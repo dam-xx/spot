@@ -1,3 +1,13 @@
+2011-01-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix usage of minimize_obligation in the CGI script.
+
+	* wrap/python/cgi-bin/ltl2tgba.py (reduce_wdba): Use
+	minimize_obligation_new a pass the formula.
+	* wrap/python/spot.i (minimize_obligation_new): New function, to
+	cope with the strange specification of spot::minimize_obligation()
+	not always creating a new automaton.
+
 2011-01-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* NEWS: Convert to utf-8 and fix a few typos.

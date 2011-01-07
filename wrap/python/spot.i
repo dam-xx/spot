@@ -149,7 +149,6 @@ using namespace spot;
 %feature("new") spot::ltl_to_tgba_lacim;
 %feature("new") spot::minimize_wdba;
 %feature("new") spot::minimize_monitor;
-%feature("new") spot::minimize_obligation;
 %feature("new") spot::reduc_tgba_sim;
 %feature("new") spot::scc_filter;
 %feature("new") spot::tgba_dupexp_bfs;
@@ -229,7 +228,22 @@ namespace std {
   };
 }
 
+%feature("new") minimize_obligation_new;
+
 %inline %{
+
+// A variant of minimize_obligation() that always return a new object.
+const spot::tgba*
+minimize_obligation_new(const spot::tgba* a, const spot::ltl::formula* f)
+{
+  const tgba* res = spot::minimize_obligation(a, f);
+  // Return 0 if the output is the same as the input, otherwise
+  // it is hard for swig to know if the output is "new" or not.
+  if (res == a)
+    return 0;
+  else
+    return res;
+}
 
 spot::ltl::parse_error_list
 empty_parse_error_list()

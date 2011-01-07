@@ -574,7 +574,10 @@ elif trans_taa:
 if reduce_dmonitor:
     automaton = spot.minimize_monitor(automaton)
 elif reduce_wdba:
-    automaton = spot.minimize_obligation(automaton)
+    minimized = spot.minimize_obligation_new(automaton, f)
+    if minimized:
+        automaton = minimized
+        minimized = 0
 elif reduce_scc:
     # Do not suppress all useless acceptance conditions if
     # degeneralization is requested: keeping those that lead to
