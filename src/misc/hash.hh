@@ -1,4 +1,4 @@
-// Copyright (C) 2008 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2008, 2011 Laboratoire de Recherche et DÃ©veloppement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2005 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -86,7 +86,7 @@ namespace spot
 #  if (__GNUC__ == 4 && __GNUC_MINOR__ >= 3) || __GNUC__ > 4
   typedef std::tr1::hash<std::string> string_hash;
 #  else  // GCC < 4.3
-  struct string_hash :
+  struct string_hash:
     public Sgi::hash<const char*>,
     public std::unary_function<const std::string&, size_t>
   {
@@ -99,6 +99,18 @@ namespace spot
   };
   /// @}
 #  endif
+
+  /// \brief A hash function that returns identity
+  /// \ingroup hash_funcs
+  template<typename T>
+  struct identity_hash:
+    public std::unary_function<const T&, size_t>
+  {
+    size_t operator()(const T& s) const
+    {
+      return s;
+    }
+  };
 }
 
 #endif // SPOT_MISC_HASH_HH

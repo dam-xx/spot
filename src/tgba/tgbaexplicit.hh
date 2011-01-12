@@ -360,11 +360,11 @@ namespace spot
 
 #ifndef SWIG
   class tgba_explicit_number:
-    public tgba_explicit_labelled<int, std::tr1::hash<int> >
+    public tgba_explicit_labelled<int, identity_hash<int> >
   {
   public:
     tgba_explicit_number(bdd_dict* dict):
-      tgba_explicit_labelled<int, std::tr1::hash<int> >(dict)
+      tgba_explicit_labelled<int, identity_hash<int> >(dict)
     {};
     virtual ~tgba_explicit_number();
     virtual state* add_default_init();
