@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2010 Laboratoire de Recherche et Développement
+// Copyright (C) 2008, 2010, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -49,18 +49,18 @@ namespace spot
     }
 
     // Callback for error which fails on assertions
-    nipsvm_status_t
-    search_error_callback_assert(nipsvm_errorcode_t err, nipsvm_pid_t pid,
-				 nipsvm_pc_t pc, void *)
-    {
-      char str[256];
-
-      nipsvm_errorstring (str, sizeof str, err, pid, pc);
-      std::cerr << "RUNTIME ERROR (" << err << "): " << str << std::endl;
-
-      throw nips_exception(std::string(str), static_cast<int>(err));
-      return IC_STOP;
-    }
+    // nipsvm_status_t
+    // search_error_callback_assert(nipsvm_errorcode_t err, nipsvm_pid_t pid,
+    // 				 nipsvm_pc_t pc, void *)
+    // {
+    //   char str[256];
+    //
+    //   nipsvm_errorstring (str, sizeof str, err, pid, pc);
+    //   std::cerr << "RUNTIME ERROR (" << err << "): " << str << std::endl;
+    //
+    //   throw nips_exception(std::string(str), static_cast<int>(err));
+    //   return IC_STOP;
+    // }
 
     // state_nips
     //////////////////////////////////////////////////////////////////////

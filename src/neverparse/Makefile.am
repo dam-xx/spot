@@ -1,4 +1,4 @@
-## Copyright (C) 2010 Laboratoire de Recherche et Développement
+## Copyright (C) 2010, 2011 Laboratoire de Recherche et Développement
 ## de l'Epita (LRDE).
 ##
 ## This file is part of Spot, a model checking library.
@@ -18,7 +18,7 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS)
+AM_CPPFLAGS = -I$(srcdir)/.. $(BUDDY_CPPFLAGS) -DYY_NO_INPUT
 # Disable -Werror because too many versions of flex yield warnings.
 AM_CXXFLAGS = $(WARNING_CXXFLAGS:-Werror=)
 

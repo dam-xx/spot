@@ -1,5 +1,23 @@
 2011-01-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix "unused function" warnings reported by clang++.
+
+	* src/evtgbaparse/Makefile.am, src/ltlparse/Makefile.am,
+	src/neverparse/Makefile.am, src/tgbaparse/Makefile.am
+	(AM_CPPFLAGS): Define -DYY_NO_INPUT so that the unused yyinput()
+	function does not get compiled.
+	* src/eltlparse/Makefile.am (AM_CPPFLAGS): Likewise.
+	(AM_CXXFLAGS): Also enable warnings.
+	* src/eltlparse/eltlparse.yy: Move helper functions from
+	the "%code requires" block to the "%code" block, so that they
+	do not appear in the eltlparse.hh file (which is included in
+	two places...).
+	* iface/nips/nips.cc (search_error_callback_assert): Comment
+	this unused function.
+
+2011-01-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+
 	Fix segfault with g++-3.3.
 
 	* src/tgbaalgos/minimize.cc (minimize_dfa): Fix deletion of the

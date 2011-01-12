@@ -1,4 +1,4 @@
-/* Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
+/* Copyright (C) 2008, 2009, 2010, 2011 Laboratoire de Recherche et
 ** Développement de l'Epita (LRDE).
 **
 ** This file is part of Spot, a model checking library.
@@ -56,7 +56,43 @@ namespace spot
       parse_error_list list_;
       std::string file_;
     };
+  }
+}
+}
 
+%parse-param {spot::eltl::nfamap& nmap}
+%parse-param {spot::eltl::aliasmap& amap}
+%parse-param {spot::eltl::parse_error_list_t &pe}
+%parse-param {spot::ltl::environment &parse_environment}
+%parse-param {spot::ltl::formula* &result}
+%lex-param {spot::eltl::parse_error_list_t &pe}
+%expect 0
+%pure-parser
+%union
+{
+  int ival;
+  std::string* sval;
+  spot::ltl::nfa* nval;
+  spot::ltl::automatop::vec* aval;
+  spot::ltl::formula* fval;
+
+  /// To handle aliases.
+  spot::ltl::formula_tree::node* pval;
+  spot::ltl::formula_tree::node_nfa* bval;
+}
+
+%code {
+/* ltlparse.hh and parsedecl.hh include each other recursively.
+   We mut ensure that YYSTYPE is declared (by the above %union)
+   before parsedecl.hh uses it. */
+#include "parsedecl.hh"
+using namespace spot::eltl;
+using namespace spot::ltl;
+
+namespace spot
+{
+  namespace eltl
+  {
     using namespace spot::ltl::formula_tree;
 
     /// Alias an existing alias, as in Strong=G(F($0))->G(F($1)),
@@ -157,36 +193,6 @@ namespace spot
     Name = res;						\
   }
 
-}
-
-%parse-param {spot::eltl::nfamap& nmap}
-%parse-param {spot::eltl::aliasmap& amap}
-%parse-param {spot::eltl::parse_error_list_t &pe}
-%parse-param {spot::ltl::environment &parse_environment}
-%parse-param {spot::ltl::formula* &result}
-%lex-param {spot::eltl::parse_error_list_t &pe}
-%expect 0
-%pure-parser
-%union
-{
-  int ival;
-  std::string* sval;
-  spot::ltl::nfa* nval;
-  spot::ltl::automatop::vec* aval;
-  spot::ltl::formula* fval;
-
-  /// To handle aliases.
-  spot::ltl::formula_tree::node* pval;
-  spot::ltl::formula_tree::node_nfa* bval;
-}
-
-%code {
-/* ltlparse.hh and parsedecl.hh include each other recursively.
-   We mut ensure that YYSTYPE is declared (by the above %union)
-   before parsedecl.hh uses it. */
-#include "parsedecl.hh"
-using namespace spot::eltl;
-using namespace spot::ltl;
 }
 
 /* All tokens.  */
@@ -455,7 +461,7 @@ subformula: ATOMIC_PROP
 	    nfa::ptr np = nmap[*$1];
 
 	    /// Easily handle deletion of $3 when CHECK_ARITY fails.
-	    int i = $3->size();
+	    unsigned i = $3->size();
 	    if ($3->size() != np->arity())
 	    {
 	      automatop::vec::iterator it = $3->begin();
