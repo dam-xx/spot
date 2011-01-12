@@ -477,8 +477,11 @@ namespace spot
     // Free all the allocated memory.
     delete final_copy;
     hash_map::iterator hit;
-    for (hit = state_set_map.begin(); hit != state_set_map.end(); ++hit)
-      delete hit->first;
+    for (hit = state_set_map.begin(); hit != state_set_map.end();)
+      {
+	hash_map::iterator old = hit++;
+	delete old->first;
+      }
     std::list<hash_set*>::iterator it;
     for (it = done.begin(); it != done.end(); ++it)
       delete *it;

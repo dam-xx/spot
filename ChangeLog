@@ -1,5 +1,12 @@
 2011-01-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix segfault with g++-3.3.
+
+	* src/tgbaalgos/minimize.cc (minimize_dfa): Fix deletion of the
+	state_set_map.  It led to a crash when compiled with g++-3.3.
+
+2011-01-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix a compilation failure with g++-3.3.
 
 	* src/misc/hash.hh (identity_hash): New function.
