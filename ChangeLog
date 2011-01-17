@@ -1,3 +1,12 @@
+2011-01-17  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Do not output empty parse error blocks in the CGI script.
+
+	* wrap/python/spot.i: Provide a __nonzero__() method for
+	parse_error_list.
+	* wrap/python/cgi-bin/ltl2tgba.in: Do not call format_parse_errors()
+	unconditionally.
+
 2011-01-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix "unused function" warnings reported by clang++.

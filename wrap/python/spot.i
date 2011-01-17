@@ -280,3 +280,13 @@ unblock_signal(int signum)
 }
 
 %}
+
+%extend spot::ltl::parse_error_list {
+
+bool
+__nonzero__()
+{
+  return !self->empty();
+}
+
+}

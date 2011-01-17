@@ -497,9 +497,10 @@ pel = spot.empty_parse_error_list()
 f = spot.parse(formula, pel, env, show_parse)
 if show_parse: print '</pre>'
 
-print '<font color="red"><pre>'
-err = spot.format_parse_errors(spot.get_cout(), formula, pel)
-print '</pre></font>'
+if pel:
+    print '<font color="red"><pre>'
+    err = spot.format_parse_errors(spot.get_cout(), formula, pel)
+    print '</pre></font>'
 
 if not f:
     print '<p><b>Aborting...</b></p>'
