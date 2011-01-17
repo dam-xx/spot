@@ -1,3 +1,15 @@
+2011-01-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Preliminary implementation of an ajax-based ltl2tgba translator.
+
+	* configure.ac: Output wrap/python/ajax/Makefile.
+	* wrap/python/Makefile.am (SUBDIRS): Add ajax.
+	* wrap/python/ajax/Makefile.am, wrap/python/ajax/README,
+	wrap/python/ajax/ltl2tgba.html, wrap/python/ajax/spot.in: New files.
+	* wrap/python/ajax/css/, wrap/python/ajax/js,
+	wrap/python/ajax/logos: New directories.
+	* README: Document wrap/python/ajax/.
+
 2011-01-17  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Do not output empty parse error blocks in the CGI script.
