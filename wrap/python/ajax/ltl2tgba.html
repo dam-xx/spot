@@ -96,7 +96,8 @@
 
                 $("#send").click(updateResults);
                 $("input,select").change(autoUpdate);
-                $('input[name="f"]').keydown(function(e){
+                $('input[name="f"]').attr('spellcheck', false)
+			            .keydown(function(e){
                    if (e.keyCode == 13 && !$("#autoupdate").attr("checked"))
 		      updateResults();	           
                 });
