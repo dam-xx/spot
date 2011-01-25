@@ -105,7 +105,7 @@ namespace spot
 	    seen->insert(dst);
 	  }
         else
-          delete dst;
+          dst->destroy();
       }
       delete sit;
     }
@@ -151,7 +151,7 @@ namespace spot
         {
           const state* dst = succit->current_state();
           unsigned dst_num = state_num[dst];
-          delete dst;
+          dst->destroy();
           trs* t = res->create_transition(src_num, dst_num);
           res->add_conditions(t, succit->current_condition());
           if (accepting)
@@ -163,7 +163,7 @@ namespace spot
     res->merge_transitions();
     const state* init_state = a->get_init_state();
     unsigned init_num = state_num[init_state];
-    delete init_state;
+    init_state->destroy();
     res->set_init_state(init_num);
     return res;
   }
@@ -190,7 +190,7 @@ namespace spot
 	  {
 	    hash_set::const_iterator old = i;
 	    ++i;
-	    delete *old;
+	    (*old)->destroy();
 	  }
       }
 
@@ -205,7 +205,7 @@ namespace spot
 	  }
 	else
 	  {
-	    delete s;
+	    s->destroy();
 	    s = *i;
 	  }
 	// Ignore states outside SCC #n.
@@ -250,11 +250,11 @@ namespace spot
       for (n = 1, i = loop.begin(); n < loop_size; ++n, ++i)
 	{
 	  loop_a.create_transition(n - 1, n)->condition = i->label;
-	  delete i->s;
+	  i->s->destroy();
 	}
       assert(i != loop.end());
       loop_a.create_transition(n - 1, 0)->condition = i->label;
-      delete i->s;
+      i->s->destroy();
       assert(++i == loop.end());
 
       const state* loop_a_init = loop_a.get_init_state();
@@ -284,7 +284,7 @@ namespace spot
 	  delete p;
 	}
 
-      delete loop_a_init;
+      loop_a_init->destroy();
       return accepting;
     }
 
@@ -383,7 +383,7 @@ namespace spot
 		  {
 		    const state* dst = si->current_state();
 		    unsigned dst_set = state_set_map[dst];
-		    delete dst;
+		    dst->destroy();
 		    f |= (bdd_ithvar(dst_set) & si->current_condition());
 		  }
 		delete si;
@@ -480,7 +480,7 @@ namespace spot
     for (hit = state_set_map.begin(); hit != state_set_map.end();)
       {
 	hash_map::iterator old = hit++;
-	delete old->first;
+	old->first->destroy();
       }
     std::list<hash_set*>::iterator it;
     for (it = done.begin(); it != done.end(); ++it)

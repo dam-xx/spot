@@ -1,4 +1,4 @@
-// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// Copyright (C) 2010, 2011 Laboratoire de Recherche et Développement de
 // l'Epita.
 // Copyright (C) 2003, 2004, 2005 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -56,7 +56,7 @@ namespace spot
       virtual
       ~state_tba_proxy()
       {
-	delete s_;
+	s_->destroy();
       }
 
       state*
@@ -204,7 +204,7 @@ namespace spot
 	    else // Yes, combine labels.
 	      {
 		id->second |= it->current_condition();
-		delete dest;
+		dest->destroy();
 	      }
 	  }
 	delete it;
@@ -219,7 +219,7 @@ namespace spot
 	    const state* d = i->first.first;
 	    // Advance i before deleting d.
 	    ++i;
-	    delete d;
+	    d->destroy();
 	  }
       }
 
@@ -318,7 +318,7 @@ namespace spot
 	// Advance the iterator before deleting the key.
 	const state* s = i->first;
 	++i;
-	delete s;
+	s->destroy();
       }
   }
 
@@ -452,15 +452,15 @@ namespace spot
 		// duplication of the initial state.
 		// The cycle_start_ points to the right starting
 		// point already, so just return.
-		delete dest;
+		dest->destroy();
 		delete it;
-		delete init;
+		init->destroy();
 		return;
 	      }
-	    delete dest;
+	    dest->destroy();
 	  }
 	delete it;
-	delete init;
+	init->destroy();
       }
 
     // If we arrive here either because the number of acceptance

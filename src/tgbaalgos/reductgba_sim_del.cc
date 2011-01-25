@@ -1,4 +1,4 @@
-// Copyright (C) 2008 Laboratoire de Recherche et Développement
+// Copyright (C) 2008, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2004, 2005 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -410,7 +410,7 @@ namespace spot
 	    s  = si->current_state();
 	    if (s->compare(*i1) == 0)
 	      {
-		delete s;
+		s->destroy();
 		duplicator_node_delayed* dn
 		  = add_duplicator_node_delayed(*i1,
 						sn->get_duplicator_node(),
@@ -426,7 +426,7 @@ namespace spot
 		build_recurse_successor_duplicator(dn, sn, os2);
 	      }
 	    else
-	      delete s;
+	      s->destroy();
 	  }
       }
 
@@ -463,7 +463,7 @@ namespace spot
 
 	    if (s->compare(*i1) == 0)
 	      {
-		delete s;
+		s->destroy();
 		spoiler_node_delayed* sn_n
 		  = add_spoiler_node_delayed(dn->get_spoiler_node(),
 					     *i1,
@@ -478,7 +478,7 @@ namespace spot
 		build_recurse_successor_spoiler(sn_n, os2);
 	      }
 	    else
-	      delete s;
+	      s->destroy();
 	  }
       }
 
@@ -668,7 +668,7 @@ namespace spot
       {
 	const state* ptr = j->first;
 	++j;
-	delete ptr;
+	ptr->destroy();
       }
   }
 

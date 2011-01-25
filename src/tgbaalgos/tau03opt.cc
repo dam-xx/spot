@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE).
 // Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -340,7 +342,7 @@ namespace spot
                 if (c_prime.is_white())
                   {
                     trace << "  It is white, pop it" << std::endl;
-                    delete s_prime;
+                    s_prime->destroy();
                     continue;
                   }
 		else if (c_prime.get_color() == CYAN &&
@@ -492,14 +494,14 @@ namespace spot
             {
               const state* ptr = sc->first;
               ++sc;
-              delete ptr;
+              ptr->destroy();
             }
           hash_type::const_iterator s = h.begin();
           while (s != h.end())
             {
               const state* ptr = s->first;
               ++s;
-              delete ptr;
+              ptr->destroy();
             }
         }
 
@@ -514,7 +516,7 @@ namespace spot
                 return color_ref(0, 0);
               if (s!=it->first)
                 {
-                  delete s;
+                  s->destroy();
                   s = it->first;
                 }
               // blue or red state
@@ -522,7 +524,7 @@ namespace spot
             }
           if (s!=ic->first)
             {
-              delete s;
+              s->destroy();
               s = ic->first;
             }
           // cyan state

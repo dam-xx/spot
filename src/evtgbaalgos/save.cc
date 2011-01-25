@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE).
 // Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -48,7 +50,7 @@ namespace spot
 	  {
 	    const state* s = i->current_state();
 	    os_ << " " << quote_unless_bare_word(automata_->format_state(s));
-	    delete s;
+	    s->destroy();
 	  }
 	os_ << ";" << std::endl;
 	delete i;
@@ -69,7 +71,7 @@ namespace spot
 		<< ",";
 	    output_acc_set(si->current_acceptance_conditions());
 	    os_ << ";" << std::endl;
-	    delete dest;
+	    dest->destroy();
 	  }
       }
 

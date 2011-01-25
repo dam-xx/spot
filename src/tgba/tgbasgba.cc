@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -48,7 +48,7 @@ namespace spot
       virtual
       ~state_sgba_proxy()
       {
-	delete s_;
+	s_->destroy();
       }
 
       state*

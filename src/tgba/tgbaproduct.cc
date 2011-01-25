@@ -41,8 +41,8 @@ namespace spot
 
   state_product::~state_product()
   {
-    delete left_;
-    delete right_;
+    left_->destroy();
+    right_->destroy();
   }
 
   int

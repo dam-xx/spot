@@ -1,4 +1,4 @@
-// Copyright (C) 2008 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2008, 2011 Laboratoire de Recherche et DÃ©veloppement
 // de l'Epita (LRDE).
 // Copyright (C) 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -43,7 +43,7 @@ namespace spot
       ~evtgba_product_state()
       {
 	for (int j = 0; j < n_; ++j)
-	  delete s_[j];
+	  s_[j]->destroy();
 	delete[] s_;
       }
 

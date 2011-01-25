@@ -1,6 +1,40 @@
+2011-01-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Introduce a destroy() method on states, and use it instead of delete.
+
+	Right now, destroy() just executes "delete this".  But in a later
+	version, we will rewrite tgba_explicit so that it does not
+	allocate new states (and the destroy() method for explicit state
+	will do nothing).
+
+	* src/tgba/state.hh (state::destroy): New method, to replace
+	state::~state() in the future.
+	(shared_state_deleter): New function.
+	* src/evtgba/product.cc, src/evtgbaalgos/reachiter.cc,
+	src/evtgbaalgos/save.cc, src/evtgbaalgos/tgba2evtgba.cc,
+	src/tgba/tgba.cc, src/tgba/tgbaproduct.cc, src/tgba/tgbareduc.cc,
+	src/tgba/tgbasafracomplement.cc, src/tgba/tgbasgba.cc,
+	src/tgba/tgbatba.cc, src/tgba/tgbaunion.cc, src/tgba/wdbacomp.cc,
+	src/tgbaalgos/cutscc.cc, src/tgbaalgos/emptiness.cc,
+	src/tgbaalgos/gtec/ce.cc, src/tgbaalgos/gtec/explscc.cc,
+	src/tgbaalgos/gtec/gtec.cc, src/tgbaalgos/gtec/nsheap.cc,
+	src/tgbaalgos/gv04.cc, src/tgbaalgos/magic.cc,
+	src/tgbaalgos/minimize.cc, src/tgbaalgos/ndfs_result.hxx,
+	src/tgbaalgos/neverclaim.cc, src/tgbaalgos/powerset.hh,
+	src/tgbaalgos/reachiter.cc, src/tgbaalgos/reducerun.cc,
+	src/tgbaalgos/reductgba_sim.cc,
+	src/tgbaalgos/reductgba_sim_del.cc, src/tgbaalgos/replayrun.cc,
+	src/tgbaalgos/safety.cc, src/tgbaalgos/save.cc,
+	src/tgbaalgos/scc.cc, src/tgbaalgos/se05.cc,
+	src/tgbaalgos/tau03.cc, src/tgbaalgos/tau03opt.cc: Adjust to call
+	"s->destroy()" instead of "delete s".
+	* src/saba/sabacomplementtgba.cc, src/tgba/tgbakvcomplement.cc:
+	Pass shared_state_deleter to the shared_ptr constructor, so that
+	it calls destroy() instead of delete.
+
 2011-01-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
-	* wrap/python/ajax/ltl2tgba.html: Display the Spot version in 
+	* wrap/python/ajax/ltl2tgba.html: Display the Spot version in
 	the tooltip over the Spot logo.
 
 2011-01-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
@@ -17,7 +51,7 @@
 
 	* wrap/python/ajax/ltl2tgba.html: Remove the auto-update button, and
 	enable auto-update automatically after the first submission.  Add
-	tools tips for the "Desired Output" tabs, and the Spot logo.  
+	tools tips for the "Desired Output" tabs, and the Spot logo.
 	Add a email icon to encourage feedback.
 	* wrap/python/ajax/ltl2tgba.css: fix sizes of formula field and
 	send button.  Set position of mail icon.

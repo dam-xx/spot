@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -170,7 +170,7 @@ namespace spot
         delete *i;
 
       for (subset_t::iterator i = nodes.begin(); i != nodes.end(); ++i)
-        delete *i;
+        (*i)->destroy();
     }
 
     const safra_tree&
@@ -403,7 +403,7 @@ namespace spot
             const state* s = *node_it;
             (*child_it)->remove_node_from_children(*node_it);
             (*child_it)->nodes.erase(node_it++);
-            delete s;
+            s->destroy();
           }
           else
           {
@@ -431,7 +431,7 @@ namespace spot
         {
           const spot::state* s = *it;
           (*child_it)->nodes.erase(it);
-          delete s;
+          s->destroy();
         }
         (*child_it)->remove_node_from_children(state);
       }
@@ -679,7 +679,7 @@ namespace spot
           for (safra_tree::tr_cache_t::iterator j = i->second.begin();
                j != i->second.end();
                ++j)
-            delete j->second;
+            j->second->destroy();
         // delete node;
       }
 

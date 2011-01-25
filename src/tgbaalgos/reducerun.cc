@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Développement
+// de l'Epita (LRDE).
 // Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -46,7 +48,7 @@ namespace spot
           {
             const state* ptr = *i;
             ++i;
-            delete ptr;
+            ptr->destroy();
           }
       }
 
@@ -70,7 +72,7 @@ namespace spot
           seen.insert(s);
         else
           {
-            delete s;
+            s->destroy();
             s = *i;
           }
         return s;
@@ -162,7 +164,7 @@ namespace spot
     if (ps != ss.end())
       {
 	// The initial state is on the cycle.
-	delete prefix_start;
+	prefix_start->destroy();
 	cycle_entry_point = *ps;
       }
     else

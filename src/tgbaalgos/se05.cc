@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE).
 // Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -292,7 +294,7 @@ namespace spot
                     // collision, this property does not hold.
                     trace << "  It is white (due to collision), pop it"
                           << std::endl;
-                    delete s_prime;
+                    s_prime->destroy();
                   }
                 else if (c.get_color() == RED)
                   {
@@ -499,14 +501,14 @@ namespace spot
             {
               const state* ptr = *sc;
               ++sc;
-              delete ptr;
+              ptr->destroy();
             }
           hash_type::const_iterator s = h.begin();
           while (s != h.end())
             {
               const state* ptr = s->first;
               ++s;
-              delete ptr;
+              ptr->destroy();
             }
         }
 
@@ -520,14 +522,14 @@ namespace spot
                 return color_ref(0); // white state
               if (s!=it->first)
                 {
-                  delete s;
+                  s->destroy();
                   s = it->first;
                 }
               return color_ref(&(it->second)); // blue or red state
             }
           if (s!=*ic)
             {
-              delete s;
+              s->destroy();
               s = *ic;
             }
           return color_ref(&h, &hc, *ic); // cyan state
@@ -651,7 +653,7 @@ namespace spot
 
       void pop_notify(const state* s) const
         {
-          delete s;
+          s->destroy();
         }
 
       bool has_been_visited(const state* s) const

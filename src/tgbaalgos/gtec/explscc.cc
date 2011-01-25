@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE).
 // Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -30,7 +32,7 @@ namespace spot
     if (it != states.end())
       {
 	if (s != *it)
-	  delete s;
+	  s->destroy();
 	return *it;
       }
     else

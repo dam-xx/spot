@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -220,7 +220,8 @@ namespace spot
         {
           bdd c = iterator->current_condition();
           if ((c & condition) != bddfalse)
-            state_list.push_back(shared_state(iterator->current_state()));
+            state_list.push_back(shared_state(iterator->current_state(),
+					      shared_state_deleter));
         }
         delete iterator;
 
@@ -399,12 +400,14 @@ namespace spot
     saba_state_complement_tgba* new_init;
     if (automaton_->state_is_accepting(original_init_state))
       new_init =
-        new saba_state_complement_tgba(shared_state(original_init_state),
+        new saba_state_complement_tgba(shared_state(original_init_state,
+						    shared_state_deleter),
                                        2 * nb_states_,
                                        the_acceptance_cond_);
     else
       new_init =
-        new saba_state_complement_tgba(shared_state(original_init_state),
+        new saba_state_complement_tgba(shared_state(original_init_state,
+						    shared_state_deleter),
                                        2 * nb_states_,
                                        bddfalse);
 

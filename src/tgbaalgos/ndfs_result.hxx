@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de recherche et développement de
+// l'Epita (LRDE).
 // Copyright (C) 2004, 2005, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -190,7 +192,7 @@ namespace spot
           (void) b;
         }
 
-      delete start;
+      start->destroy();
 
       assert(!acc_trans.empty());
 
@@ -205,8 +207,8 @@ namespace spot
       for (typename accepting_transitions_list::const_iterator i =
 	     acc_trans.begin(); i != acc_trans.end(); ++i)
         {
-          delete i->source;
-          delete i->dest;
+          i->source->destroy();
+          i->dest->destroy();
         }
 
       return run;
@@ -240,13 +242,13 @@ namespace spot
 	{
 	  const state* s = *i;
 	  ++i;
-	  delete s;
+	  s->destroy();
 	}
       for (state_set::iterator i = dead.begin(); i != dead.end();)
 	{
 	  const state* s = *i;
 	  ++i;
-	  delete s;
+	  s->destroy();
 	}
     }
 
@@ -282,7 +284,7 @@ namespace spot
                   if (dead.find(s_prime) != dead.end())
                     {
                       ndfsr_trace << "  it is dead, pop it" << std::endl;
-                      delete s_prime;
+                      s_prime->destroy();
                     }
                   else if (seen.find(s_prime) == seen.end())
                     {
@@ -309,23 +311,23 @@ namespace spot
                           if (covered_acc == a_->all_acceptance_conditions())
                             {
                               clean(st1, seen, dead);
-                              delete s_prime;
+                              s_prime->destroy();
                               return true;
                             }
                         }
-                      delete s_prime;
+                      s_prime->destroy();
                     }
                   else
                     {
                       ndfsr_trace << "  already seen, pop it" << std::endl;
-                      delete s_prime;
+                      s_prime->destroy();
                     }
                 }
               else
                 {
                   ndfsr_trace << "  not seen during the search, pop it"
                               << std::endl;
-                  delete s_prime;
+                  s_prime->destroy();
                 }
             }
           else
@@ -384,7 +386,7 @@ namespace spot
           {
             const state* ptr = *i;
             ++i;
-            delete ptr;
+            ptr->destroy();
           }
       }
 
@@ -403,7 +405,7 @@ namespace spot
 	    || seen.find(s) != seen.end()
 	    || dead.find(s) != dead.end())
           {
-            delete s;
+            s->destroy();
             return 0;
           }
 	ars->inc_ars_cycle_states();
@@ -477,7 +479,7 @@ namespace spot
           {
             const state* ptr = *i;
             ++i;
-            delete ptr;
+            ptr->destroy();
           }
       }
 
@@ -499,7 +501,7 @@ namespace spot
               ndfsr_trace << " not visited" << std::endl;
             else
               ndfsr_trace << " already seen" << std::endl;
-            delete s;
+            s->destroy();
             return 0;
           }
         ndfsr_trace << " OK" << std::endl;
@@ -634,7 +636,7 @@ namespace spot
       if (ps != target.end())
         {
           // The initial state is on the cycle.
-          delete prefix_start;
+          prefix_start->destroy();
           cycle_entry_point = ps->first->clone();
         }
       else
@@ -653,7 +655,7 @@ namespace spot
 	     && cycle_entry_point->compare(cycle_ep_it->s); ++cycle_ep_it)
         continue;
       assert(cycle_ep_it != run->cycle.end());
-      delete cycle_entry_point;
+      cycle_entry_point->destroy();
 
       // Now shift the cycle so it starts on cycle_entry_point.
       run->cycle.splice(run->cycle.end(), run->cycle,

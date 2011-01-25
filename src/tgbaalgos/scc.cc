@@ -54,7 +54,7 @@ namespace spot
 	// Advance the iterator before deleting the key.
 	const state* s = i->first;
 	++i;
-	delete s;
+	s->destroy();
       }
   }
 
@@ -63,7 +63,7 @@ namespace spot
   {
     state* in = aut_->get_init_state();
     int val = scc_of_state(in);
-    delete in;
+    in->destroy();
     return val;
   }
 
@@ -231,7 +231,7 @@ namespace spot
 	  }
 
 	// If we know the state, reuse the previous object.
-	delete dest;
+	dest->destroy();
 	dest = spi->first;
 
 	// Have we reached a maximal SCC?

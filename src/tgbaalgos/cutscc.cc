@@ -1,5 +1,5 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Developpement de
-// l'Epita (LRDE).
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Developpement
+// de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
 //
@@ -72,7 +72,7 @@ namespace spot
 	  }
 	  else
 	  {
-	    delete dst;
+	    dst->destroy();
 	  }
 	  tgba_explicit::transition* t =
 	    sub_a->create_transition(cur_format, dst_format);
@@ -83,7 +83,7 @@ namespace spot
 	}
 	else
 	{
-	  delete dst;
+	  dst->destroy();
 	}
       }
       delete sit;
@@ -93,7 +93,7 @@ namespace spot
     // Free visited states.
     for (it2 = seen.begin(); it2 != seen.end(); it2++)
     {
-      delete *it2;
+      (*it2)->destroy();
     }
     return sub_a;
   }
@@ -255,7 +255,7 @@ namespace spot
       scc_sizes[i] = m.states_of(i).size();
     state* initial_state = a->get_init_state();
     unsigned init = m.scc_of_state(initial_state);
-    delete initial_state;
+    initial_state->destroy();
     // Find all interesting pathes in our automaton.
     find_paths_sub(init, m, d, scc_sizes);
 
@@ -272,7 +272,7 @@ namespace spot
     std::vector<std::vector<sccs_set* > >* rec_paths = find_paths(a, m);
     state* initial_state = a->get_init_state();
     unsigned init = m.scc_of_state(initial_state);
-    delete initial_state;
+    initial_state->destroy();
     std::vector<sccs_set*>* final_sets =&(*rec_paths)[init];
     if (rec_paths->empty())
     {

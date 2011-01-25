@@ -44,7 +44,8 @@ namespace spot
       virtual
       ~state_wdba_comp_proxy()
       {
-	delete s_;
+	if (s_)
+	  s_->destroy();
       }
 
       state*

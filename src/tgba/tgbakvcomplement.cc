@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -443,7 +443,7 @@ namespace spot
           bdd c = iterator->current_condition();
           if ((c & condition) != bddfalse)
           {
-            shared_state s(iterator->current_state());
+            shared_state s(iterator->current_state(), shared_state_deleter);
             if (highest_current_ranks_.find(s) != highest_current_ranks_.end())
             {
               if (i->second < highest_current_ranks_[s])
@@ -470,7 +470,7 @@ namespace spot
           bdd c = iterator->current_condition();
           if ((c & condition) != bddfalse)
           {
-            shared_state s(iterator->current_state());
+            shared_state s(iterator->current_state(), shared_state_deleter);
             highest_state_set_.insert(s);
           }
         }
@@ -621,7 +621,8 @@ namespace spot
   {
     state_kv_complement* init = new state_kv_complement();
     rank_t r = {2 * nb_states_, bdd_ordered()};
-    init->add(shared_state(automaton_->get_init_state()), r);
+    init->add(shared_state(automaton_->get_init_state(), shared_state_deleter),
+	      r);
     return init;
   }
 

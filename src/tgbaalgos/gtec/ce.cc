@@ -1,8 +1,8 @@
+// Copyright (C) 2010, 2011  Laboratoire de Recherche et Développement de
+// l'Epita (LRDE).
 // Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
-// Copyright (C) 2010  Laboratoire de Recherche et Développement de
-// l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
 //
@@ -55,7 +55,7 @@ namespace spot
 	// Ignore unknown states ...
 	if (!sip.first)
 	  {
-	    delete s;
+	    s->destroy();
 	    return 0;
 	  }
 	// ... as well as dead states.
@@ -129,7 +129,7 @@ namespace spot
     if (ps != ss.end())
       {
 	// The initial state is on the cycle.
-	delete prefix_start;
+	prefix_start->destroy();
 	cycle_entry_point = *ps;
       }
     else
@@ -198,7 +198,7 @@ namespace spot
 	    // Ignore unknown states.
 	    if (!sip.first)
 	      {
-		delete s;
+		s->destroy();
 		return 0;
 	      }
 	    // Stay in the final SCC.

@@ -1,8 +1,8 @@
+// Copyright (C) 2008, 2010, 2011 Laboratoire de recherche et
+// développement de l'Epita (LRDE).
 // Copyright (C) 2004, 2005 Laboratoire d'Informatique de Paris 6
 // (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
 // Pierre et Marie Curie.
-// Copyright (C) 2008, 2010 Laboratoire de recherche et développement
-// de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
 //
@@ -88,7 +88,7 @@ namespace spot
 	    // Advance the iterator before deleting the "key" pointer.
 	    const state* ptr = s->first;
 	    ++s;
-	    delete ptr;
+	    ptr->destroy();
 	  }
       }
 
@@ -156,7 +156,7 @@ namespace spot
 			      << std::endl;
 		      }
 
-		    delete s_prime;
+		    s_prime->destroy();
 		  }
 	      }
 	    set_states(h.size());
@@ -355,11 +355,11 @@ namespace spot
 		  // Or it is still on the stack but not in the SCC
 		  || data.stack[j->second].lowlink < scc_root)
 		{
-		  delete s;
+		  s->destroy();
 		  return 0;
 		}
 	      r->inc_ars_cycle_states();
-	      delete s;
+	      s->destroy();
 	      return j->first;
 	    }
 

@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'EPITA (LRDE).
 // Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -32,8 +34,10 @@ namespace spot
 
   tgba::~tgba()
   {
-    delete last_support_conditions_input_;
-    delete last_support_variables_input_;
+    if (last_support_conditions_input_)
+      last_support_conditions_input_->destroy();
+    if (last_support_variables_input_)
+      last_support_variables_input_->destroy();
   }
 
   bdd
@@ -43,7 +47,8 @@ namespace spot
 	|| last_support_conditions_input_->compare(state) != 0)
       {
 	last_support_conditions_output_ = compute_support_conditions(state);
-	delete last_support_conditions_input_;
+	if (last_support_conditions_input_)
+	  last_support_conditions_input_->destroy();
 	last_support_conditions_input_ = state->clone();
       }
     return last_support_conditions_output_;
@@ -56,7 +61,8 @@ namespace spot
 	|| last_support_variables_input_->compare(state) != 0)
       {
 	last_support_variables_output_ = compute_support_variables(state);
-	delete last_support_variables_input_;
+	if (last_support_variables_input_)
+	  last_support_variables_input_->destroy();
 	last_support_variables_input_ = state->clone();
       }
     return last_support_variables_output_;

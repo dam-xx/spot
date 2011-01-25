@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de recherche et développement de
+// l'Epita (LRDE).
 // Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -292,7 +294,7 @@ namespace spot
                     // to visit white states either if a cycle can be missed
                     // with bit-state hashing search.
                     trace << "  It is white, pop it" << std::endl;
-                    delete s_prime;
+                    s_prime->destroy();
                   }
                 else if (c.get_color() == BLUE)
                   {
@@ -463,7 +465,7 @@ namespace spot
               // Advance the iterator before deleting the "key" pointer.
               const state* ptr = s->first;
               ++s;
-              delete ptr;
+              ptr->destroy();
             }
         }
 
@@ -474,7 +476,7 @@ namespace spot
             return color_ref(0);
           if (s!=it->first)
             {
-              delete s;
+              s->destroy();
               s = it->first;
             }
           return color_ref(&(it->second));
@@ -564,7 +566,7 @@ namespace spot
 
       void pop_notify(const state* s) const
         {
-          delete s;
+          s->destroy();
         }
 
       bool has_been_visited(const state* s) const

@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Développement
+// de l'Epita (LRDE).
 // Copyright (C) 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -84,7 +86,7 @@ namespace spot
 	// Advance the iterator before deleting the key.
 	const state* s = i->first;
 	++i;
-	delete s;
+	s->destroy();
       }
   }
 
@@ -105,7 +107,7 @@ namespace spot
 	res.second = i->second;
 
 	if (s != i->first)
-	  delete s;
+	  s->destroy();
       }
     return res;
   }
@@ -127,7 +129,7 @@ namespace spot
 	res.second = &i->second;
 
 	if (s != i->first)
-	  delete s;
+	  s->destroy();
       }
     return res;
   }

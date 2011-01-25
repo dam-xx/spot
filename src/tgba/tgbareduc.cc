@@ -1,5 +1,5 @@
-// Copyright (C) 2008, 2009 Laboratoire de Recherche et DÃ©veloppement
-// de l'Epita (LRDE).
+// Copyright (C) 2008, 2009, 2011 Laboratoire de Recherche et
+// Developpement de l'Epita (LRDE).
 // Copyright (C) 2004, 2005 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
@@ -156,7 +156,7 @@ namespace spot
     spot::state* init = automata_->get_init_state();
     if (init->compare(s) == 0)
       this->set_init_state(automata_->format_state(s));
-    delete init;
+    init->destroy();
 
     transition* t;
     for (si->first(); !si->done(); si->next())
@@ -165,7 +165,7 @@ namespace spot
 	t = this->create_transition(s, init);
 	this->add_conditions(t, si->current_condition());
 	this->add_acceptance_conditions(t, si->current_acceptance_conditions());
-	delete init;
+	init->destroy();
       }
   }
 
@@ -361,7 +361,7 @@ namespace spot
 	sim1 = sim2;
 	sim2 = simtmp;
       }
-    delete init;
+    init->destroy();
 
     sp_map::iterator i = state_predecessor_map_.find(s1);
     if (i == state_predecessor_map_.end()) // 0 predecessor

@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -38,8 +38,8 @@ namespace spot
 
   state_union::~state_union()
   {
-    delete left_;
-    delete right_;
+    left_->destroy();
+    right_->destroy();
   }
 
   int
@@ -293,8 +293,8 @@ namespace spot
 					 right_acc_missing_,
 					 left_var_missing_,
 					 right_var_missing_);
-      delete left_init;
-      delete right_init;
+      left_init->destroy();
+      right_init->destroy();
     }
     else
     {

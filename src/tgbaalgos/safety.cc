@@ -1,4 +1,4 @@
-// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// Copyright (C) 2010, 2011 Laboratoire de Recherche et Développement de
 // l'Epita (LRDE)
 //
 // This file is part of Spot, a model checking library.
@@ -58,7 +58,7 @@ namespace spot
 	bdd cond = it->current_condition();
 	it->next();
 	result = (!dest->compare(s)) && it->done() && (cond == bddtrue);
-	delete dest;
+	dest->destroy();
 	delete it;
       }
 

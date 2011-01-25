@@ -1,4 +1,4 @@
-// Copyright (C) 2008 Laboratoire de Recherche et Développement
+// Copyright (C) 2008, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2005, 2006 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -376,7 +376,7 @@ namespace spot
 	    numbered_state_heap::state_index_p spi = ecs_->h->index(q->s);
 	    // ... or if it is an unknown state.
 	    if (spi.first == 0)
-	      delete q->s;
+	      q->s->destroy();
 	  }
 	dec_depth(todo.back().q.size() + 1);
 	todo.pop_back();

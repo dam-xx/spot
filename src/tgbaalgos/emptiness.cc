@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2004, 2005 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -42,9 +42,9 @@ namespace spot
   tgba_run::~tgba_run()
   {
     for (steps::const_iterator i = prefix.begin(); i != prefix.end(); ++i)
-      delete i->s;
+      i->s->destroy();
     for (steps::const_iterator i = cycle.begin(); i != cycle.end(); ++i)
-      delete i->s;
+      i->s->destroy();
   }
 
   tgba_run::tgba_run(const tgba_run& run)
@@ -345,7 +345,7 @@ namespace spot
 
         // browse the actual outgoing transitions
         tgba_succ_iterator* j = a->succ_iter(s);
-        delete s;
+        s->destroy(); // FIXME: is it always legitimate to destroy s before j?
         for (j->first(); !j->done(); j->next())
           {
             if (j->current_condition() != label
@@ -355,7 +355,7 @@ namespace spot
             const state* s2 = j->current_state();
             if (s2->compare(next) != 0)
               {
-                delete s2;
+                s2->destroy();
                 continue;
               }
             else
@@ -386,7 +386,7 @@ namespace spot
         if (l == &run->cycle && i != l->begin())
             seen_acc |= acc;
       }
-    delete s;
+    s->destroy();
 
     assert(seen_acc == a->all_acceptance_conditions());
 

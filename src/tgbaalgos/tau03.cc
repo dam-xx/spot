@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE).
 // Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -251,7 +253,7 @@ namespace spot
                 if (c_prime.is_white())
                   {
                     trace << "  It is white, pop it" << std::endl;
-                    delete s_prime;
+                    s_prime->destroy();
                   }
                  else if ((c_prime.get_acc() & acu) != acu)
                   {
@@ -328,7 +330,7 @@ namespace spot
               // Advance the iterator before deleting the "key" pointer.
               const state* ptr = s->first;
               ++s;
-              delete ptr;
+              ptr->destroy();
             }
         }
 
@@ -339,7 +341,7 @@ namespace spot
             return color_ref(0, 0);
           if (s!=it->first)
             {
-              delete s;
+              s->destroy();
               s = it->first;
             }
           return color_ref(&(it->second.first), &(it->second.second));

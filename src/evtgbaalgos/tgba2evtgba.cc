@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Developpement
 // de l'Epita (LRDE).
 // Copyright (C) 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -72,7 +72,7 @@ namespace spot
 	  {
 	    const state* s = si->current_state();
 	    process_state(s, out, 0);
-	    delete s;
+	    s->destroy();
 	  }
 
 	rsymbol_set ss = acc_to_symbol_set(si->current_acceptance_conditions());

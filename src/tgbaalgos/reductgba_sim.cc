@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2004, 2005, 2007 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -469,7 +469,7 @@ namespace spot
 		    else
 		      delete p;
 		  }
-		delete s;
+		s->destroy();
 	      }
 	    delete si;
 	  }
@@ -513,7 +513,7 @@ namespace spot
 			(*j)->add_succ(*i);
 			++nb_ds;
 		      }
-		    delete s;
+		    s->destroy();
 		  }
 		delete si;
 	      }
@@ -534,7 +534,7 @@ namespace spot
 			(*i)->add_succ(*j);
 			++nb_sd;
 		      }
-		    delete s;
+		    s->destroy();
 		  }
 		delete si;
 	      }
@@ -656,7 +656,7 @@ namespace spot
       {
 	const state* ptr = j->first;
 	++j;
-	delete ptr;
+	ptr->destroy();
       }
   }
 

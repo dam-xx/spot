@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Développement
+// de l'Epita (LRDE).
 // Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -80,7 +82,7 @@ namespace spot
 	     << a->format_state(i->s) << std::endl
 	     << "does not match initial state of automata: "
 	     << a->format_state(s) << std::endl;
-	delete s;
+	s->destroy();
 	return false;
       }
 
@@ -98,7 +100,7 @@ namespace spot
 		for (d = o->second.begin(); d != o->second.end(); ++d)
 		  msg << " == " << *d;
 		o->second.insert(serial);
-		delete s;
+		s->destroy();
 		s = o->first;
 	      }
 	    else
@@ -142,7 +144,7 @@ namespace spot
 	// When not debugging, S is not used as key in SEEN, so we can
 	// delete it right now.
 	if (!debug)
-	  delete s;
+	  s->destroy();
 	for (j->first(); !j->done(); j->next())
 	  {
 	    if (j->current_condition() != label
@@ -152,7 +154,7 @@ namespace spot
 	    const state* s2 = j->current_state();
 	    if (s2->compare(next))
 	      {
-		delete s2;
+		s2->destroy();
 		continue;
 	      }
 	    else
@@ -185,11 +187,11 @@ namespace spot
 		       << bdd_format_accset(a->get_dict(),
 					    j->current_acceptance_conditions())
 		       << " going to " << a->format_state(s2) << std::endl;
-		    delete s2;
+		    s2->destroy();
 		  }
 	      }
 	    delete j;
-	    delete s;
+	    s->destroy();
 	    return false;
 	  }
 	if (debug)
@@ -232,7 +234,7 @@ namespace spot
 	      }
 	  }
       }
-    delete s;
+    s->destroy();
     if (all_acc != expected_all_acc)
       {
 	if (debug)
@@ -251,7 +253,7 @@ namespace spot
 	// Advance the iterator before deleting the "key" pointer.
 	const state* ptr = o->first;
 	++o;
-	delete ptr;
+	ptr->destroy();
       }
 
     return true;

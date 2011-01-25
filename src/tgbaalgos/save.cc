@@ -1,6 +1,8 @@
-// Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
-// département Systèmes Répartis Coopératifs (SRC), Université Pierre
-// et Marie Curie.
+// Copyright (C) 2011 Laboratoire de Recherche et Développement de
+// l'Epita (LRDE)
+// Copyright (C) 2003, 2004, 2005 Laboratoire d'Informatique de Paris
+// 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
+// Université Pierre et Marie Curie.
 //
 // This file is part of Spot, a model checking library.
 //
@@ -59,7 +61,7 @@ namespace spot
 	    escape_str(os_, bdd_format_formula(d, si->current_condition()));
 	    os_ << "\",";
 	    print_acc(si->current_acceptance_conditions()) << ";" << std::endl;
-	    delete dest;
+	    dest->destroy();
 	  }
       }
 

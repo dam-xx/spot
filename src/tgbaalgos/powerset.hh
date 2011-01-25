@@ -47,7 +47,7 @@ namespace spot
 	  // Advance the iterator before deleting the key.
 	  const state* s = *i;
 	  ++i;
-	  delete s;
+	  s->destroy();
 	}
     }
 
@@ -63,7 +63,7 @@ namespace spot
       state_set::const_iterator i = states.find(s);
       if (i != states.end())
 	{
-	  delete s;
+	  s->destroy();
 	  s = *i;
 	}
       else

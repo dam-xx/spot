@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -71,7 +71,7 @@ namespace spot
 	    os_ << "  skip" << std::endl;
 	  }
 	os_ << "}" << std::endl;
-	delete init_;
+	init_->destroy();
       }
 
       bool
@@ -110,7 +110,7 @@ namespace spot
 		      label = "accept_S" + ns;
 		    else
 		      label = "accept_all";
-		    delete current;
+		    current->destroy();
 		  }
 		delete it;
 	      }
@@ -156,7 +156,7 @@ namespace spot
 		os_ << "  if" << std::endl;
 		fi_needed_ = true;
 	      }
-	    delete current;
+	    current->destroy();
 	  }
 	  delete it;
        }
@@ -174,7 +174,7 @@ namespace spot
 	    f->destroy();
 	    state* current = si->current_state();
 	    os_ << ") -> goto " << get_state_label(current, out) << std::endl;
-	    delete current;
+	    current->destroy();
 	  }
       }
 

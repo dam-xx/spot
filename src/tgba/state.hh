@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et DÃ©veloppement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6
 // (LIP6), département Systèmes Répartis Coopératifs (SRC), Université
@@ -74,6 +74,27 @@ namespace spot
     /// Duplicate a state.
     virtual state* clone() const = 0;
 
+    /// \brief Release a state.
+    ///
+    /// Methods from the tgba or tgba_succ_iterator always return a
+    /// new state that you should deallocate with this function.
+    /// Before Spot 0.7, you had to "delete" your state directly.
+    /// Starting with Spot 0.7, you update your code to this function
+    /// instead (which simply calls "delete").  In a future version,
+    /// some subclasses will redefine destroy() to allow better memory
+    /// management (e.g. no memory allocation for explicit automata).
+    virtual void destroy() const
+    {
+      delete this;
+    }
+
+    // FIXME: Make the destructor protected after Spot 0.7.
+    //protected:
+
+    /// \brief Destructor.
+    ///
+    /// \deprecated Client code should now call
+    /// <code>s->destroy();</code> instead of <code>delete s;</code>.
     virtual ~state()
     {
     }
@@ -155,6 +176,8 @@ namespace spot
   //////////////////////////////////////////////////
 
   typedef boost::shared_ptr<const state> shared_state;
+
+  inline void shared_state_deleter(state* s) { s->destroy(); }
 
   /// \brief Strict Weak Ordering for \c shared_state
   /// (shared_ptr<const state*>).
