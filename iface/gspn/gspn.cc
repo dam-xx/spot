@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et DÃ©veloppement
+// de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2006, 2007 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
@@ -21,6 +23,7 @@
 
 #include <map>
 #include <cassert>
+#include <cstring>
 #include "gspn.hh"
 #include <gspnlib.h>
 
@@ -382,11 +385,11 @@ namespace spot
     }
 
     tgba_succ_iterator*
-    tgba_gspn::succ_iter(const state* state,
+    tgba_gspn::succ_iter(const state* local_state,
 			 const state* global_state,
 			 const tgba* global_automaton) const
     {
-      const state_gspn* s = dynamic_cast<const state_gspn*>(state);
+      const state_gspn* s = dynamic_cast<const state_gspn*>(local_state);
       assert(s);
       (void) global_state;
       (void) global_automaton;

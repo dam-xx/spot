@@ -1,3 +1,11 @@
+2011-01-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Update gspn interface for recent tools.
+
+	* iface/gspn/ssp.cc: Use the new destroy() interface, and
+	fix a couple of recent g++ reports.
+	* iface/gspn/gspn.cc: Adjust to newer g++.
+
 2011-01-25  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Introduce a destroy() method on states, and use it instead of delete.

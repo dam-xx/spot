@@ -1,4 +1,6 @@
-// Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Laboratoire
+// Copyright (C) 2008, 2011 Laboratoire de Recherche et Developpement
+// de l'Epita (LRDE).
+// Copyright (C) 2003, 2004, 2005, 2006, 2007  Laboratoire
 // d'Informatique de Paris 6 (LIP6), département Systèmes Répartis
 // Coopératifs (SRC), Université Pierre et Marie Curie.
 //
@@ -66,7 +68,7 @@ namespace spot
     virtual
     ~state_gspn_ssp()
     {
-      delete right_;
+      right_->destroy();
     }
 
     virtual int
@@ -84,8 +86,8 @@ namespace spot
     virtual size_t
     hash() const
     {
-      return (reinterpret_cast<char*>(left())
-	      - static_cast<char*>(0)) << 10 + right_->hash();
+      return ((reinterpret_cast<char*>(left())
+	       - static_cast<char*>(0)) << 10) + right_->hash();
     }
 
     virtual state_gspn_ssp* clone() const
@@ -200,7 +202,7 @@ namespace spot
     {
 
       for (size_t i = 0; i < size_states_; i++)
-      	delete state_array_[i];
+	state_array_[i]->destroy();
 
       delete[] bdd_array_;
       free(state_array_);
@@ -582,9 +584,9 @@ namespace spot
     virtual const state*
     has_state(const state* s) const
     {
-      set_type::iterator i;
+      set_type::const_iterator i;
 
-      for (i = states.begin(); i !=states.end(); i++)
+      for (i = states.begin(); i != states.end(); ++i)
 	{
 	  const state_gspn_ssp* old_state = (const state_gspn_ssp*)(*i);
 	  const state_gspn_ssp* new_state = (const state_gspn_ssp*)(s);
@@ -595,7 +597,7 @@ namespace spot
 	    if (spot_inclusion(new_state->left(), old_state->left()))
 	      {
 		if (*i != s)
-		  delete s;
+		  s->destroy();
 		return *i;
 	      }
 	}
@@ -672,7 +674,7 @@ namespace spot
 	  // Advance the iterator before deleting the key.
 	  const state* s = i->first;
 	  ++i;
-	  delete s;
+	  s->destroy();
 	}
     }
 
@@ -714,7 +716,7 @@ namespace spot
 		{
 		  if (s != *j)
 		    {
-		      delete s;
+		      s->destroy();
 		      s = *j;
 		    }
 		}
@@ -789,7 +791,7 @@ namespace spot
 		{
 		  if (s != *j)
 		    {
-		      delete s;
+		      s->destroy();
 		      s = *j;
 		    }
 		}
@@ -842,7 +844,7 @@ namespace spot
 	  res.second = i->second;
 
 	  if (s != i->first)
-	    delete s;
+	    s->destroy();
 	}
       return res;
     }
@@ -863,7 +865,7 @@ namespace spot
 	  res.second = &i->second;
 
 	  if (s != i->first)
-	    delete s;
+	    s->destroy();
 	}
       return res;
     }
@@ -1165,13 +1167,13 @@ namespace spot
 				  // s is not equal to another known
 				  // state.  (We risk some intricate
 				  // memory corruption if we don't
-				  // delete "clone states" at this
+				  // destroy "clone states" at this
 				  // point.)
 
 				  // Since we have that first loop and
 				  // we therefore know that state s is
 				  // genuinely new, position j so that
-				  // we won't delete it.
+				  // we won't destroy it.
 				  j = l.end();
 				}
 			      else
@@ -1213,7 +1215,7 @@ namespace spot
 		{
 		  if (s != *j)
 		    {
-		      delete s;
+		      s->destroy();
 		      s = *j;
 		    }
 		}
