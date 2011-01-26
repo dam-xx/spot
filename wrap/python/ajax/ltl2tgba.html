@@ -42,6 +42,13 @@
                                         content: "<b>Click<\/b> to fold/unfold."
                                        });
 
+	              $.get("/cgi-bin/spot.py", "o=v", function(data) {
+			  $("#spottip").attr("title", "This page uses <b>" + data + "<\/b> to process LTL formulas and automata.  Please download the <b>Spot<\/b> library and install it on your computer if you want to do the same from the command line, or from another program.")
+			       .tipTip({maxWidth: "400px", delay: 1000,
+                                        edgeOffset: 10, 
+                                        defaultPosition: "right"});
+                      });
+
                 function fold(ui) {
                   var icon = ui.children(".ui-icon");
                   icon.removeClass("ui-icon-circle-arrow-n")
@@ -151,7 +158,7 @@
   </head>
   <body>
     <div id="spotlogo">
-      <a href="http://spot.lip6.fr/"><img border=0 src="logos/spot64s.png" alt="Spot Logo" class="rtip" title="This on-line tool is using the <b>Spot</b> library to process LTL formulas and automata.  Please download <b>Spot</b> and install it on your computer if you want to do the same from the command line, or from another program."></a></div>
+      <a href="http://spot.lip6.fr/"><img border=0 src="logos/spot64s.png" alt="Spot Logo" class="rtip" id="spottip" title="This page uses the <b>Spot</b> library to process LTL formulas and automata.  Please download <b>Spot</b> and install it on your computer if you want to do the same from the command line, or from another program."></a></div>
     <div id="mailicon">
       <a href="mailto:spot@lrde.epita.fr"><img border=0 src="logos/mail.png" alt="Spot Logo" class="rtip" title="A bug? A question? Please e-mail us at <b>spot@lrde.epita.fr</b>."></a></div>
     <div id="lrdelogo">
