@@ -1,5 +1,9 @@
 2011-01-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* NEWS: Mention the new on-line ltl2tgba version.
+
+2011-01-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Updates to the ltl2tgba ajax version.
 
 	* wrap/python/ajax/ltl2tgba.html: Remove the auto-update button, and

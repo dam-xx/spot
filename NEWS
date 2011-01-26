@@ -38,6 +38,9 @@ New in spot 0.6a:
     -Rn: Minimize automata for obligation formulae.
     -M: Build a deterministic monitor.
     -O: Tell whether an automaton is a safety automaton.
+  * The on-line tool to translate LTL formulae into automata
+    has been rewritten and is now at http://spot.lip6.fr/ltl2tgba.html
+    It requires a javascript-enabled browser.
   * Bug fixes:
     - Location of the errors messages in the TGBA parser where inaccurate.
     - Various warning fixes for different versions of GCC and Clang.
