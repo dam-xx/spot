@@ -5,6 +5,13 @@ html {overflow-y:scroll;}
     font-size: 1em;
 }
 
+input.formula {
+    width: 700px;
+}
+div#send {
+    width: 80px;
+}
+
 div.ltl2tgba {
     width: 800px;
     position:relative;
@@ -32,6 +39,12 @@ div.ltl2tgba {
   left:10px;
   bottom:10px;
   z-index:1;    
+}
+#mailicon {
+  position:fixed;
+  left:10px;
+  top:84px;
+  z-index:1;
 }
 
 .ltl2tgba div.ui-widget-content { 
