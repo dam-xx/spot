@@ -1,5 +1,9 @@
 2011-01-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* wrap/python/ajax/Makefile.am (EXTRA_DIST): Add icons/mail.png.
+
+2011-01-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* NEWS: Mention the new on-line ltl2tgba version.
 
 2011-01-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
