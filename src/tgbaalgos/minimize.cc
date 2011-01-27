@@ -610,9 +610,9 @@ namespace spot
   {
     tgba_explicit_number* min_aut_f = minimize_wdba(aut_f);
 
-    // If aut_f is a safety automaton, the WDBA minimization must be
+    // If aut_f is a guarantee automaton, the WDBA minimization must be
     // correct.
-    if (is_safety_automaton(aut_f))
+    if (is_guarantee_automaton(aut_f))
       {
 	return min_aut_f;
       }
@@ -640,9 +640,9 @@ namespace spot
 	to_free = aut_neg_f = tmp;
       }
 
-    // If the negation is a safety automaton, then the
+    // If the negation is a guarantee automaton, then the
     // minimization is correct.
-    if (is_safety_automaton(aut_neg_f))
+    if (is_guarantee_automaton(aut_neg_f))
       {
 	delete to_free;
 	return min_aut_f;

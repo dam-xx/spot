@@ -36,9 +36,10 @@ New in spot 0.6a:
     -ks: traverse the automaton to compute its number of states and
          transitions (this is faster than -k which will also count
          SCCs and paths).
-    -Rn: Minimize automata for obligation formulae.
     -M: Build a deterministic monitor.
-    -O: Tell whether an automaton is a safety automaton.
+    -O: Tell whether a formula represents a safety, guarantee, or
+        obligation property.
+    -Rm: Minimize automata representing obligation properties.
   * The on-line tool to translate LTL formulae into automata
     has been rewritten and is now at http://spot.lip6.fr/ltl2tgba.html
     It requires a javascript-enabled browser.

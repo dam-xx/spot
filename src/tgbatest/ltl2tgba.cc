@@ -266,7 +266,8 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -NN   output the never clain for Spin, with commented states"
 	    << " (implies -D)" << std::endl
-	    << "  -O    tell whether the automaton is a safety automaton"
+	    << "  -O    tell if a formula represents a safety, guarantee, "
+	    << "or obligation property"
 	    << std::endl
 	    << "  -t    output automaton in LBTT's format" << std::endl
 	    << std::endl
@@ -534,6 +535,7 @@ main(int argc, char** argv)
       else if (!strcmp(argv[formula_index], "-O"))
 	{
 	  output = 13;
+          opt_minimize = true;
 	}
       else if (!strcmp(argv[formula_index], "-p"))
 	{
@@ -1144,10 +1146,30 @@ main(int argc, char** argv)
 	      stats_reachable(a).dump(std::cout);
 	      break;
 	    case 13:
-	      std::cout << (is_safety_automaton(a) ?
-			    "is a safety automaton" :
-			    "may not be a safety automaton")
-			<< std::endl;
+	      if (minimized == 0)
+		{
+		  std::cout << "this is not an obligation property";
+		}
+	      else
+		{
+		  if (is_guarantee_automaton(minimized))
+		    {
+		      std::cout << "this is a guarantee property (hence, "
+				<< "an obligation property)";
+		    }
+		  else if (is_safety_mwdba(minimized))
+		    {
+		      std::cout << "this is a safety property (hence, "
+				<< "an obligation property)";
+		    }
+		  else
+		    {
+		      std::cout << "this is an obligation property that is "
+				<< "neither a safety nor a guarantee";
+		    }
+		}
+	      std::cout << std::endl;
+
 	      break;
 	    default:
 	      assert(!"unknown output option");

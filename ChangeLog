@@ -1,5 +1,29 @@
 2011-01-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Rename is_safety_automaton() as is_guarantee_automaton() and
+	implement is_safety_mwdba().
+
+	Note: I swapped the name of safety and guarantee when I
+	implemented is_safety_automaton() on 2010-03-20.  Fortunately,
+	is_safety_automaton() was only used where is_guarantee_automaton()
+	would have been correct.
+
+	* src/tgbaalgos/safety.cc (is_guarantee_automaton): Rename as ...
+	(is_guarantee_automaton): ... this.
+	(is_safety_mwdba): New function.
+	* src/tgbaalgos/safety.hh: Adjust and add documentation.
+	* src/tgbaalgos/minimize.cc: Use is_guarantee_automaton() instead
+	of is_safety_automaton().
+	* src/tgbatests/safety.test: Rename as ...
+	* src/tgbatests/obligation.test: ... this, and augment the
+	test.
+	* src/tgbatest/Makefile.am: Adjust.
+	* src/tgbatest/ltl2tgba.cc (-O): Display whether a formula
+	represent a safety, guarantee, or obligation property.
+	* NEWS: Adjust.
+
+2011-01-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* NEWS: Minor rewritings.
 
 2011-01-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

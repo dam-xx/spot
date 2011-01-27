@@ -1,4 +1,4 @@
-// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// Copyright (C) 2010, 2011 Laboratoire de Recherche et Développement de
 // l'Epita (LRDE)
 //
 // This file is part of Spot, a model checking library.
@@ -25,20 +25,40 @@
 
 namespace spot
 {
-  /// \brief Whether an automaton is a safety property.
+  /// \brief Whether an automaton represents a guarantee property.
   ///
-  /// An automaton is an safety if any accepting path ends on an
-  /// accepting state with only one transition that is a self-loop
-  /// labelled by true.  Note that this is only a sufficient
-  /// condition.  Some safety automata might not be recognized with
-  /// this check because of some non-determinism in the automaton.
+  /// A weak deterministic TGBA represents a guarantee property if any
+  /// accepting path ends on an accepting state with only one
+  /// transition that is a self-loop labelled by true.
+  ///
+  /// Note that in the general case, this is only a sufficient
+  /// condition : some guarantee automata might not be recognized with
+  /// this check e.g. because of some non-determinism in the
+  /// automaton.  In that case, you should interpret a \c false return
+  /// value as "I don't know".
+  ///
+  /// If you apply this function on a weak deterministic TGBA
+  /// (e.g. after a successful minimization with
+  /// minimize_obligation()), then the result leaves no doubt: false
+  /// really means that the automaton is not a guarantee property.
   ///
   /// \param aut the automaton to check
   ///
   /// \param sm an scc_map of the automaton if available (it will be
   /// built otherwise.  If you supply an scc_map you should call
   /// build_map() before passing it to this function.
-  bool is_safety_automaton(const tgba* aut, const scc_map* sm = 0);
+  bool is_guarantee_automaton(const tgba* aut, const scc_map* sm = 0);
+
+  /// \brief Whether a minimized WDBA represents a safety property.
+  ///
+  /// A minimized WDBA (as returned by a successful run of
+  /// minimize_obligation()) represent safety property if it contains
+  /// only accepting transitions.
+  ///
+  /// \param aut the automaton to check
+  bool is_safety_mwdba(const tgba* aut);
+
+
 }
 
 #endif // SPOT_TGBAALGOS_SAFETY_HH
