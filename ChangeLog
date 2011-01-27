@@ -1,5 +1,9 @@
 2011-01-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* NEWS: Minor rewritings.
+
+2011-01-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Replace delete by destroy in comments dealing with states.
 
 	* src/tgba/succiter.hh, src/tgba/tgba.hh,

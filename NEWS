@@ -5,26 +5,27 @@ New in spot 0.6a:
     been rewritten, and is no longer experimental.  We have a
     developement version of checkpn using it, and it should be
     released shortly after Spot 0.7.
-  * The function to_spin_string(), used to output an LTL formula using
-    Spin's syntax, now takes an optional argument to request full
-    parenthesis.
+  * The function to_spin_string(), that outputs an LTL formula using
+    Spin's syntax, now takes an optional argument to request
+    parentheses at all levels.
   * src/ltltest/genltl is a new tool that generates some interesting
     families of LTL formulae, for testing purpose.
   * bench/ltlclasses/ uses the above tool to conduct the same benchmark
     as in the DepCoS'09 paper by Cichoń et al.  The resulting benchmark
-    completes in 12min, while it tooks days (or crashed) when the paper
-    was written (using Spot 0.4).
+    completes in 12min, while it tooks days (or exhausted the memory)
+    when the paper was written (they used Spot 0.4).
   * Degeneralization has again been improved in two ways:
-    - It will merge the degeneralized transitions that can be merged.
+    - It will merge degeneralized transitions that can be merged.
     - It uses a cache to speed up the improvement introduced in 0.6.
   * An implementation of Dax et al.'s paper for minimizing obligation
     formulae has been integrated.  Use ltl2tgba -Rm to enable this
-    optimization; it will have no effect if the property is not an
-    obligation.
+    optimization from the command-line; it will have no effect if the
+    property is not an obligation.
   * bench/wdba/ conducts a benchmark similar to the one on Dax's
     webpage, comparing the size of the automata expressing obligation
     formula before and after minimization.  See bench/wdba/README for
     results.
+  * Using similar code, Spot can now construct deterministic monitors.
   * New ltl2tgba options:
     -XN: read an input automaton as a neverclaim.
     -C, -CR: Compute (and display) a counterexample after running the
@@ -33,7 +34,7 @@ New in spot 0.6a:
 	     (previous version would always compute a replay a
 	     counterexample when emptiness-check was enabled)
     -ks: traverse the automaton to compute its number of states and
-         transitions (this is faster than -k whichi will also count
+         transitions (this is faster than -k which will also count
          SCCs and paths).
     -Rn: Minimize automata for obligation formulae.
     -M: Build a deterministic monitor.
