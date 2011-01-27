@@ -1152,15 +1152,22 @@ main(int argc, char** argv)
 		}
 	      else
 		{
-		  if (is_guarantee_automaton(minimized))
+		  bool g = is_guarantee_automaton(minimized);
+		  bool s = is_safety_mwdba(minimized);
+		  if (g && !s)
 		    {
 		      std::cout << "this is a guarantee property (hence, "
 				<< "an obligation property)";
 		    }
-		  else if (is_safety_mwdba(minimized))
+		  else if (s && !g)
 		    {
 		      std::cout << "this is a safety property (hence, "
 				<< "an obligation property)";
+		    }
+		  else if (s && g)
+		    {
+		      std::cout << "this is a guarantee and a safety property"
+				<< " (and of course an obligation property)";
 		    }
 		  else
 		    {

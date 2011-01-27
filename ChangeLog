@@ -1,5 +1,13 @@
 2011-01-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Report formulas that are both safety and guarantee.
+
+	* src/tgbatest/ltl2tgba.cc (-O): Report formulas that are both
+	safety and guarantee.
+	* src/tgbatest/obligation.test: Add cases.
+
+2011-01-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Rename is_safety_automaton() as is_guarantee_automaton() and
 	implement is_safety_mwdba().
 

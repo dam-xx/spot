@@ -80,6 +80,9 @@ NO G(q->(p->(!r U (s&!r&X(!r U t))))U(r|G(p->(s&XFt))))
 NO G(p->F(s&!z&X(!z U t)))
 NO G(q->G(p->(s&!z&X(!z U t))))
 NO G(q->(p->(!r U (s&!r&!z&X((!r&!z) U t))))U(r|G(p->(s&!z&X(!z U t)))))
+GS p
+GS q&Xp
+GS G(Ga&F!a)
 EOF
 
 grok()
@@ -87,6 +90,7 @@ grok()
   case $1 in
   "this is a safety property"*)          echo SA;;
   "this is a guarantee property"*)       echo GU;;
+  "this is a guarantee and a safety"*)   echo GS;;
   "this is an obligation property"*)     echo OB;;
   "this is not an obligation property"*) echo NO;;
   *)                                     echo XX;;
@@ -107,6 +111,7 @@ while read exp f; do
   case $resx,$resy in
       SA,GU);;
       GU,SA);;
+      GS,GS);;
       OB,OB);;
       NO,NO);;
       *) echo "Incompatible results: $resx,$resy"; exit 1;;
