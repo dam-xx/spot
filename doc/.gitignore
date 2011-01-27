@@ -6,3 +6,5 @@ spot.latex
 spot.tag
 *.pdf
 stamp
+*.tmp
+dot

@@ -9,3 +9,4 @@ buddy.py*
 *.loT
 *_wrap.*
 *.pyc
+*/spotimg
