@@ -152,7 +152,7 @@ namespace spot
     /// \brief Return the set of states of an SCC.
     ///
     /// The states in the returned list are still owned by the scc_map
-    /// instance.  They should NOT be deleted by the client code.
+    /// instance.  They should NOT be destroyed by the client code.
     ///
     /// \pre This should only be called once build_map() has run.
     const std::list<const state*>& states_of(unsigned n) const;
@@ -160,7 +160,7 @@ namespace spot
     /// \brief Return one state of an SCC.
     ///
     /// The state in the returned list is still owned by the scc_map
-    /// instance.  It should NOT be deleted by the client code.
+    /// instance.  It should NOT be destroyed by the client code.
     ///
     /// \pre This should only be called once build_map() has run.
     const state* one_state_of(unsigned n) const;

@@ -216,7 +216,7 @@ namespace spot
 	      }
 
 	    delete succ;
-	    // Do not delete CURR: it is a key in H.
+	    // Do not destroy CURR: it is a key in H.
 	    continue;
 	  }
 
@@ -363,7 +363,7 @@ namespace spot
   void
   couvreur99_check_shy::clear_todo()
   {
-    // We must delete all states appearing in TODO
+    // We must destroy all states appearing in TODO
     // unless they are used as keys in H.
     while (!todo.empty())
       {
@@ -371,7 +371,7 @@ namespace spot
 	for (succ_queue::iterator q = queue.begin();
 	     q != queue.end(); ++q)
 	  {
-	    // Delete the state if it is a clone of a
+	    // Destroy the state if it is a clone of a
 	    // state in the heap...
 	    numbered_state_heap::state_index_p spi = ecs_->h->index(q->s);
 	    // ... or if it is an unknown state.

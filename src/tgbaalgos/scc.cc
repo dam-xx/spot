@@ -198,7 +198,7 @@ namespace spot
 	      }
 
 	    delete succ;
-	    // Do not delete CURR: it is a key in H.
+	    // Do not destroy CURR: it is a key in H.
 	    continue;
 	  }
 

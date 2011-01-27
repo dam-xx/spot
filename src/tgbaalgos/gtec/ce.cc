@@ -235,7 +235,7 @@ namespace spot
   {
     ecs_->print_stats(os);
     // FIXME: This is bogusly assuming run_ exists.  (Even if we
-    // created it, the user might have delete it.)
+    // created it, the user might have deleted it.)
     os << run_->prefix.size() << " states in run_->prefix" << std::endl;
     os << run_->cycle.size() << " states in run_->cycle" << std::endl;
   }

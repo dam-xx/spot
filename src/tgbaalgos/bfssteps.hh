@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE).
 // Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -62,8 +64,8 @@ namespace spot
     ///
     /// If you already have a map or a set which uses states as keys,
     /// you should probably arrange for filter() to return these keys,
-    /// and delete \a s.  Otherwise you will have to define such a
-    /// set, just to be able to delete all the state* in a subclass.
+    /// and destroy \a s.  Otherwise you will have to define such a
+    /// set, just to be able to destroy all the state* in a subclass.
     ///
     /// This function can return 0 if the given state should not be
     /// explored.

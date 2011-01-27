@@ -1,3 +1,15 @@
+2011-01-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Replace delete by destroy in comments dealing with states.
+
+	* src/tgba/succiter.hh, src/tgba/tgba.hh,
+	src/tgba/tgbabddconcrete.hh, src/tgba/tgbaproduct.hh,
+	src/tgba/tgbaunion.hh, src/tgbaalgos/bfssteps.hh,
+	src/tgbaalgos/gtec/ce.cc, src/tgbaalgos/gtec/explscc.hh,
+	src/tgbaalgos/gtec/gtec.cc, src/tgbaalgos/replayrun.cc,
+	src/tgbaalgos/scc.cc, src/tgbaalgos/scc.hh: Update comments
+	to say that we "destroy" a state instead of "deleting" it.
+
 2011-01-26  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Update gspn interface for recent tools.

@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2005 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -77,7 +77,7 @@ namespace spot
     /// \brief Get the initial state of the automaton.
     ///
     /// The state has been allocated with \c new.  It is the
-    /// responsability of the caller to \c delete it when no
+    /// responsability of the caller to \c destroy it when no
     /// longer needed.
     virtual state* get_init_state() const = 0;
 
@@ -97,7 +97,7 @@ namespace spot
     ///
     /// \param local_state The state whose successors are to be explored.
     /// This pointer is not adopted in any way by \c succ_iter, and
-    /// it is still the caller's responsability to delete it when
+    /// it is still the caller's responsability to destroy it when
     /// appropriate (this can be done during the lifetime of
     /// the iterator).
     /// \param global_state In a product, the state of the global
@@ -176,7 +176,7 @@ namespace spot
     ///
     /// \return 0 if the projection fails (\a s is unrelated to \a t),
     ///    or a new \c state* (the projected state) that must be
-    ///    deleted by the caller.
+    ///    destroyed by the caller.
     virtual state* project_state(const state* s, const tgba* t) const;
 
     /// \brief Return the set of all acceptance conditions used

@@ -42,7 +42,7 @@ namespace spot
     /// \param left The state from the left automaton.
     /// \param right The state from the right automaton.
     /// These states are acquired by spot::state_product, and will
-    /// be deleted on destruction.
+    /// be destroyed on destruction.
     state_product(state* left, state* right)
       :	left_(left),
 	right_(right)

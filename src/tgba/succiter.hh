@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -85,6 +87,9 @@ namespace spot
     /// in the iteration.  These actually correspond to the same
     /// destination.  It just means there were several transitions,
     /// with different conditions, leading to the same state.
+    ///
+    /// The returned state should be destroyed (see state::destroy)
+    /// by the caller after it is no longer used.
     virtual state* current_state() const = 0;
     /// \brief Get the condition on the transition leading to this successor.
     ///

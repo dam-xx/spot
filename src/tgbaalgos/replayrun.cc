@@ -142,7 +142,7 @@ namespace spot
 	// browse the actual outgoing transitions
 	tgba_succ_iterator* j = a->succ_iter(s);
 	// When not debugging, S is not used as key in SEEN, so we can
-	// delete it right now.
+	// destroy it right now.
 	if (!debug)
 	  s->destroy();
 	for (j->first(); !j->done(); j->next())

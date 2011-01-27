@@ -1,3 +1,5 @@
+// Copyright (C) 2011  Laboratoire de Recherche et Développement de
+// l'Epita (LRDE).
 // Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -35,7 +37,7 @@ namespace spot
     virtual ~explicit_connected_component() {}
     /// \brief Check if the SCC contains states \a s.
     ///
-    /// Return the representative of \a s in the SCC, and delete \a
+    /// Return the representative of \a s in the SCC, and destroy \a
     /// s if it is different (acting like
     /// numbered_state_heap::filter), or 0 otherwise.
     virtual const state* has_state(const state* s) const = 0;

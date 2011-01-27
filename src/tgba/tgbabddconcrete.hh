@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Développement
+// de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de Paris
 // 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
 // Université Pierre et Marie Curie.
@@ -56,7 +58,7 @@ namespace spot
     /// \code
     ///   state_bdd* s = automata.get_init_state();
     ///   some_class some_instance(s->as_bdd());
-    ///   delete s;
+    ///   s->destroy();
     /// \endcode
     bdd get_init_bdd() const;
 
