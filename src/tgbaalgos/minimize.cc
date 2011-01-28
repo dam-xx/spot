@@ -504,7 +504,7 @@ namespace spot
 
     // non_final contain all states.
     // final is empty: there is no acceptance condition
-    state_set(a, non_final);
+    state_set(det_a, non_final);
 
     return minimize_dfa(det_a, final, non_final);
   }

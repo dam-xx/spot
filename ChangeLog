@@ -1,3 +1,11 @@
+2011-01-28  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fixup minimize_monitor().
+
+	* src/tgbaalgos/minimize.cc (minimize_monitor): Fix typo yielding
+	incorrect monitor if the input tgba is not deterministic.
+	* src/tgbatest/ltl2tgba.test: Add test case.
+
 2011-01-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Report formulas that are both safety and guarantee.
