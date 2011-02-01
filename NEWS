@@ -1,4 +1,4 @@
-New in spot 0.6a:
+New in spot 0.7 (2011-02-01):
 
   * Spot is now able to read an automaton expressed as a Spin neverclaim.
   * The "experimental" Kripke structure introduced in Spot 0.5 has
@@ -51,7 +51,7 @@ New in spot 0.6a:
     - The formula simplification based on universality and eventuality
       had a quadratic run-time.
 
-New in spot 0.6 (16-04-2010):
+New in spot 0.6 (2010-04-16):
 
   * Several optimizations to improve some auxiliary steps
     of the LTL translation (not the core of the translation):

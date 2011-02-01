@@ -22,7 +22,7 @@
 # 02111-1307, USA.
 
 AC_PREREQ([2.61])
-AC_INIT([spot], [0.6a], [spot@lrde.epita.fr])
+AC_INIT([spot], [0.7], [spot@lrde.epita.fr])
 AC_CONFIG_AUX_DIR([tools])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.11 gnits nostdinc tar-ustar color-tests parallel-tests])
