@@ -1,5 +1,16 @@
 2011-02-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Read guard of the form !(x) in neverclaims.
+
+	So far all neverclaims encountered would use (!(x)), but the
+	files from the Büchi store do not.
+
+	* src/neverparse/neverclaimscan.ll: Accept ! in front of guard,
+	so that we can read Promela files from Goal's Büchi store.
+	* src/tgbatest/neverclaimread.test: Test it.
+
+2011-02-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Recognize Goal's syntax for Boolean operators.
 
 	* src/ltlparse/ltlscan.ll: Recognize ~, -->, and <--> operators

@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 Laboratoire de Recherche et Développement de
+/* Copyright (C) 2010, 2011 Laboratoire de Recherche et Développement de
 ** l'Epita (LRDE).
 **
 ** This file is part of Spot, a model checking library.
@@ -56,7 +56,7 @@ eol      \n|\r|\n\r|\r\n
 "goto"			return token::GOTO;
 "false"|"0"		return token::FALSE;
 
-"(".*")"|"true"|"1"     {
+"!"?"(".*")"|"true"|"1"   {
                           yylval->str = new std::string(yytext, yyleng);
 			  return token::FORMULA;
                         }
