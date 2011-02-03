@@ -1,3 +1,11 @@
+2011-02-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Minor fixes to ltl2tgba.html.
+
+	* wrap/python/ajax/css/ltl2tgba.css,
+	wrap/python/ajax/ltl2tgba.html: Tweak a few things for Firefox
+	3.0, and fix a </li> tag.
+
 2011-02-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* NEWS, configure.ac: Bump version to 0.7a.

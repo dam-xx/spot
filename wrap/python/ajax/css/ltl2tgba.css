@@ -8,8 +8,10 @@ html {overflow-y:scroll;}
 input.formula {
     width: 700px;
 }
-div#send {
-    width: 80px;
+
+span#send {
+    width: 60px;
+    margin-left: 4px;
 }
 
 div.ltl2tgba {
