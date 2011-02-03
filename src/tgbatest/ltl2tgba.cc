@@ -259,6 +259,9 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -ks   display statistics on the automaton (size only)"
 	    << std::endl
+	    << "  -kt   display statistics on the automaton (size + "
+	    << "subtransitions)"
+	    << std::endl
 	    << "  -K    dump the graph of SCCs in dot format" << std::endl
 	    << "  -KV   verbosely dump the graph of SCCs in dot format"
 	    << std::endl
@@ -486,6 +489,10 @@ main(int argc, char** argv)
 	{
 	  output = 12;
 	}
+      else if (!strcmp(argv[formula_index], "-kt"))
+	{
+	  output = 13;
+	}
       else if (!strcmp(argv[formula_index], "-K"))
 	{
 	  output = 10;
@@ -534,7 +541,7 @@ main(int argc, char** argv)
 	}
       else if (!strcmp(argv[formula_index], "-O"))
 	{
-	  output = 13;
+	  output = 14;
           opt_minimize = true;
 	}
       else if (!strcmp(argv[formula_index], "-p"))
@@ -1146,6 +1153,9 @@ main(int argc, char** argv)
 	      stats_reachable(a).dump(std::cout);
 	      break;
 	    case 13:
+	      sub_stats_reachable(a).dump(std::cout);
+	      break;
+	    case 14:
 	      if (minimized == 0)
 		{
 		  std::cout << "this is not an obligation property";

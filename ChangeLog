@@ -1,3 +1,14 @@
+2011-02-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add a way to count the number of sub-transitions.
+
+	* src/tgbaalgos/stats.hh (tgba_sub_statistics): New class.
+	(sub_stats_reachable): New function.
+	* src/tgbaalgos/stats.cc (sub_stats_bfs): New class.
+	(tgba_sub_statistics::dump, sub_stats_reachable): New function.
+	* src/tgbatest/ltl2tgba.cc (-kt): New option.
+	* src/tgbatest/ltl2tgba.test: Use -kt.
+
 2011-02-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Read guard of the form !(x) in neverclaims.

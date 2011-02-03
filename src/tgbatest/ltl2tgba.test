@@ -63,7 +63,8 @@ done
 # Make sure '!(Ga U b)' has 3 states and 6 transitions,
 # before and after degeneralization.
 for opt in '' -D -DS; do
-  ../ltl2tgba -ks -f -R3 $opt '!(Ga U b)' > stdout
+  ../ltl2tgba -kt -f -R3 $opt '!(Ga U b)' > stdout
+  grep 'sub trans.: 11$' stdout
   grep 'transitions: 6$' stdout
   grep 'states: 3$' stdout
 done
@@ -71,7 +72,8 @@ done
 # Make sure 'Ga U b' has 4 states and 6 transitions,
 # before and after degeneralization.
 for opt in '' -D -DS; do
-  ../ltl2tgba -ks -f -R3 $opt 'Ga U b' > stdout
+  ../ltl2tgba -kt -f -R3 $opt 'Ga U b' > stdout
+  grep 'sub trans.: 12$' stdout
   grep 'transitions: 6$' stdout
   grep 'states: 4$' stdout
 done
