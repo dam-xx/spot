@@ -1,5 +1,14 @@
 2011-02-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Recognize Goal's syntax for Boolean operators.
+
+	* src/ltlparse/ltlscan.ll: Recognize ~, -->, and <--> operators
+	from Goal, to ease the use of formulas provided by the Goal team.
+	* src/ltltest/equals.test: Use these once, just to be on the
+	safe side.
+
+2011-02-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Minor fixes to ltl2tgba.html.
 
 	* wrap/python/ajax/css/ltl2tgba.css,

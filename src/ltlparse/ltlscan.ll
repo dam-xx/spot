@@ -1,4 +1,4 @@
-/* Copyright (C) 2010, Laboratoire de Recherche et Développement de
+/* Copyright (C) 2010, 2011, Laboratoire de Recherche et Développement de
 ** l'Epita (LRDE).
 ** Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -72,17 +72,17 @@ flex_set_buffer(const char* buf)
 "0"|[fF][aA][lL][sS][eE]	BEGIN(0); return token::CONST_FALSE;
 
 
-
-"!"				BEGIN(0); return token::OP_NOT;
+  /* ~ comes from Goal, ! from everybody else */
+"!"|"~"				BEGIN(0); return token::OP_NOT;
 
   /* & and | come from Spin.  && and || from LTL2BA.
      /\, \/, and xor are from LBTT.
-  */
+     --> and <--> come from Goal.  */
 "||"|"|"|"+"|"\\/"		BEGIN(0); return token::OP_OR;
 "&&"|"&"|"."|"/\\"		BEGIN(0); return token::OP_AND;
 "^"|"xor"			BEGIN(0); return token::OP_XOR;
-"=>"|"->"			BEGIN(0); return token::OP_IMPLIES;
-"<=>"|"<->"			BEGIN(0); return token::OP_EQUIV;
+"=>"|"->"|"-->"			BEGIN(0); return token::OP_IMPLIES;
+"<=>"|"<->"|"<-->"		BEGIN(0); return token::OP_EQUIV;
 
   /* <>, [], and () are used in Spin.  */
 "F"|"<>"			BEGIN(0); return token::OP_F;
