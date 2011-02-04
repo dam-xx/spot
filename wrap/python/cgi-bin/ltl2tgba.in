@@ -505,7 +505,7 @@ if pel:
 if not f:
     print '<p><b>Aborting...</b></p>'
     sys.exit(0)
-if err:
+if pel:
     print '<p><b>Continuing anyway...</b></p>'
 
 print "<p>Formula is<code>", f, "</code></p>"
