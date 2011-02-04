@@ -1,5 +1,12 @@
 2011-02-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Prevent Spot from using an installed BuDDy version that does not
+	have the latest function we added.  Reported by Kristin Rozier.
+
+	* m4/buddy.m4 (AX_CHECK_BUDDY): Check for bdd_setxor.
+
+2011-02-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add a way to count the number of sub-transitions.
 
 	* src/tgbaalgos/stats.hh (tgba_sub_statistics): New class.
