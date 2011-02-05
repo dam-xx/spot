@@ -1,3 +1,11 @@
+2011-02-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix call to scc_filter in the CGI script.
+
+	* wrap/python/ajax/spot.in: Do full scc_filter for TGBA (-R3f),
+	and keep some extra acceptance conditions (-R3) when
+	degeneralizing.  The converse was done.
+
 2011-02-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* wrap/python/cgi-bin/ltl2tgba.in: Fix python error occurring
