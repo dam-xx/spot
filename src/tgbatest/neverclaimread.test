@@ -35,7 +35,7 @@ T1:
 if
 :: (p1 && (! p0)) -> goto accept_all
 :: (p1) -> goto T1
-:: !(p1) -> goto T2_init
+:: ! (p1) -> goto T2_init
 fi;
 accept_all:
 skip
