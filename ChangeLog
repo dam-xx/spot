@@ -1,5 +1,13 @@
 2011-02-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Speedup scc_filter on tgba_explicit_number automata.
+
+	* src/tgbaalgos/sccfilter.cc (scc_filter): If the input automaton
+	is an instance of tgba_explicit_number, create a similar automaton
+	for output, instead of a tgba_explicit_string.
+
+2011-02-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Document the new operators in the on-line tools.
 
 	* wrap/python/ajax/ltl2tgba.html: Mention Goal's ~, -->, and <-->
