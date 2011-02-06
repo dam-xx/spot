@@ -346,7 +346,7 @@ an identifier: <code>aUb</code> is an atomic proposition, unlike
   </thead>
   <tbody>
     <tr>
-      <td align="right">not:</td><td><code>!</code></td>
+      <td align="right">not:</td><td><code>!</code> <code>~</code></td>
       <td align="right">and:</td><td><code>&</code> <code>&&</code>
                                      <code>.</code> <code>/\</code></td>
       <td align="right">(strong) until:</td><td><code>U</code></td>
@@ -367,6 +367,7 @@ an identifier: <code>aUb</code> is an atomic proposition, unlike
       <td align="right">always:</td><td><code>G</code>
                                         <code>[]</code></td>
       <td align="right">implies:</td><td><code>-&gt;</code>
+                                         <code>--&gt;</code>
                                          <code>=&gt;</code></td>
       <td align="right">(weak) release:</td><td><code>R</code>
                                          <code>V</code></td>
@@ -375,6 +376,7 @@ an identifier: <code>aUb</code> is an atomic proposition, unlike
     <tr>
       <td align="right">next:</td><td><code>X</code> <code>()</code></td>
       <td align="right">equivalent:</td><td><code>&lt;-&gt;</code>
+                                            <code>&lt;--&gt;</code>
                                             <code>&lt;=&gt;</code></td>
       <td align="right">strong release:</td><td><code>M</code></td>
       <td></td><td></td>

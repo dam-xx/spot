@@ -1,5 +1,13 @@
 2011-02-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Document the new operators in the on-line tools.
+
+	* wrap/python/ajax/ltl2tgba.html: Mention Goal's ~, -->, and <-->
+	operators.
+	* wrap/python/cgi-bin/ltl2tgba.in: Likewise.
+
+2011-02-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix a segfault in WDBA minimization.
 
 	* src/tgbaalgos/minimize.cc (build_result, minimize_dfa,
