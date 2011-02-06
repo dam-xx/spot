@@ -114,3 +114,13 @@ cat >expected <<EOF
   1 -> 1 [label="1\n"]
 EOF
 cmp stdout expected
+
+# This formula caused a segfault with Spot 0.7.
+run 0 ../ltl2tgba -Rm -ks -f "Gq|Gr|(G(q|FGp)&G(r|FG!p))" >stdout
+grep 'transitions: 5$' stdout
+grep 'states: 3$' stdout
+
+# Adding -R3 used to make it work...
+run 0 ../ltl2tgba -R3 -Rm -ks -f "Gq|Gr|(G(q|FGp)&G(r|FG!p))" >stdout
+grep 'transitions: 5$' stdout
+grep 'states: 3$' stdout

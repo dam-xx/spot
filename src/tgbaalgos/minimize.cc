@@ -150,9 +150,11 @@ namespace spot
         for (succit->first(); !succit->done(); succit->next())
         {
           const state* dst = succit->current_state();
-          unsigned dst_num = state_num[dst];
+	  hash_map::const_iterator i = state_num.find(dst);
           dst->destroy();
-          trs* t = res->create_transition(src_num, dst_num);
+	  if (i == state_num.end()) // Ignore useless destinations.
+	    continue;
+          trs* t = res->create_transition(src_num, i->second);
           res->add_conditions(t, succit->current_condition());
           if (accepting)
             res->add_acceptance_condition(t, ltl::constant::true_instance());
@@ -382,9 +384,17 @@ namespace spot
 		for (si->first(); !si->done(); si->next())
 		  {
 		    const state* dst = si->current_state();
-		    unsigned dst_set = state_set_map[dst];
+		    hash_map::const_iterator i = state_set_map.find(dst);
 		    dst->destroy();
-		    f |= (bdd_ithvar(dst_set) & si->current_condition());
+		    if (i == state_set_map.end())
+		      // The destination state is not in our
+		      // partition.  This can happen if the initial
+		      // FINAL and NON_FINAL supplied to the algorithm
+		      // do not cover the whole automaton (because we
+		      // want to ignore some useless states).  Simply
+		      // ignore these states here.
+		      continue;
+		    f |= (bdd_ithvar(i->second) & si->current_condition());
 		  }
 		delete si;
 
@@ -547,7 +557,7 @@ namespace spot
 		  continue;
 		}
 	      // Trivial SCCs are accepting if all their
-	      // successors are accepting.
+	      // useful successors are accepting.
 
 	      // This corresponds to the algorithm in Fig. 1 of
 	      // "Efficient minimization of deterministic weak
@@ -561,8 +571,11 @@ namespace spot
 	      for (scc_map::succ_type::const_iterator i = succ.begin();
 		   i != succ.end(); ++i)
 		{
-		  is_useless &= useless[i->first];
-		  acc &= accepting[i->first];
+		  if (!useless[i->first])
+		    {
+		      is_useless = false;
+		      acc &= accepting[i->first];
+		    }
 		}
 	    }
 	  else
