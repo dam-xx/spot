@@ -1,5 +1,9 @@
 2011-02-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* configure.ac: s/gnit/gnu so that we can use 0.7.1a as a version.
+
+2011-02-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* NEWS: Typos.
 
 2011-02-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

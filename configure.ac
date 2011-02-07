@@ -25,7 +25,7 @@ AC_PREREQ([2.61])
 AC_INIT([spot], [0.7.1a], [spot@lrde.epita.fr])
 AC_CONFIG_AUX_DIR([tools])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([1.11 gnits nostdinc tar-ustar color-tests parallel-tests])
+AM_INIT_AUTOMAKE([1.11 gnu nostdinc tar-ustar color-tests parallel-tests])
 
 # If the user didn't supplied a CFLAGS value,
 # set an empty one to prevent autoconf to stick -O2 -g here.
