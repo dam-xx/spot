@@ -1,6 +1,21 @@
-New in spot 0.7a:
+New in spot 0.7.1 (2001-02-07):
 
-  Nothing yet.
+  * The LTL parser will accept operator ~ (for not) as well
+    as --> and <--> (for implication and equivalence), allowing
+    formulae from the Büchi Store to be read directly.
+  * The neverclaim parser will accept guards of the form
+        :: !(...) -> goto ...
+    instead of the more commonly used
+        :: (!(...)) -> goto
+    This makes it possible to read neverclaims provided by the Büchi Store.
+  * A new ltl2tgba option, -kt, will count the number of "sub-transitions".
+    I.e., a transition labelled by "true" count for 4 "sub-transitions"
+    if the automaton uses 2 atomic propositions.
+  * Bugs fixed:
+    - Fix segfault during WDBA minimization on automata with useless states.
+    - Use the included BuDDy library if the one alrady installed
+      is older than the one distributed with Spot 0.7.
+    - Fix two typos in the code of the CGI scripts.
 
 New in spot 0.7 (2011-02-01):
 
