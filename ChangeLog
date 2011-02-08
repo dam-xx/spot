@@ -1,3 +1,10 @@
+2011-02-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix a spurious g++ warning observed on Darwin builds.
+
+	* src/tgba/taatgba.cc (taa_succ_iterator::taa_succ_iterator):
+	Initialize iterator i to silence a spurious g++ warning on Darwin.
+
 2011-02-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* configure.ac: s/gnit/gnu so that we can use 0.7.1a as a version.

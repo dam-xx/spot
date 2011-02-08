@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE)
 //
 // This file is part of Spot, a model checking library.
@@ -245,7 +245,7 @@ namespace spot
 
       // If no contradiction, then look for another transition to
       // merge with the new one.
-      seen_map::iterator i;
+      seen_map::iterator i = seen_.end(); // Initialize to silent a g++ warning.
       std::vector<taa_tgba::transition*>::iterator j;
       if (t->condition != bddfalse)
       {
