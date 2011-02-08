@@ -22,8 +22,8 @@ later).  Especially, Python's headers files should be installed.
 
 Spot also uses modified versions of BuDDy (a binary decision diagram),
 and LBTT (an LTL to Büchi test bench).  You do not need to install
-these yourself, they are included in this package (directories buddy/
-and lbtt/), and will built and installed alongside of Spot.
+these yourself: they are included in this package (directories buddy/
+and lbtt/) and will be built and installed alongside of Spot.
 
 
 Building and installing
@@ -33,7 +33,7 @@ Spot follows the traditional `./configure && make && make check &&
 make install' process.  People unfamiliar with the GNU Build System
 should read the file INSTALL for generic instructions.
 
-In additions to its usual options, ./configure will accept some
+In addition to its usual options, ./configure will accept some
 flags specific to Spot:
 
   --with-gspn=DIR
