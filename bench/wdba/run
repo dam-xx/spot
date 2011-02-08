@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2010 Laboratoire de Recherche et Développement
+# Copyright (C) 2010, 2011 Laboratoire de Recherche et Développement
 # de l'Epita (LRDE).
 #
 # This file is part of Spot, a model checking library.
@@ -68,15 +68,15 @@ EOF
 line=0
 echo "# form. nbr., states, trans., states minimized, trans. minimized, formula"
 while read f; do
-  "$LTL2TGBA" -f -r7 -R3 -DS -k "!($f)" >out
+  "$LTL2TGBA" -f -r7 -x -R3 -DS -kt "!($f)" >out
   states=`sed -n 's/^states: \([0-9]*\)$/\1/p' out`
-  transitions=`sed -n 's/^transitions: \([0-9]*\)$/\1/p' out`
+  transitions=`sed -n 's/^sub trans.: \([0-9]*\)$/\1/p' out`
 
-  "$LTL2TGBA" -f -r1 -R3 -Rm -k "!($f)" >out
+  "$LTL2TGBA" -f -r1 -R3 -Rm -kt "!($f)" >out
   states2=`sed -n 's/^states: \([0-9]*\)$/\1/p' out`
-  transitions2=`sed -n 's/^transitions: \([0-9]*\)$/\1/p' out`
+  transitions2=`sed -n 's/^sub trans.: \([0-9]*\)$/\1/p' out`
 
-  line=`expr $line + 1`  
+  line=`expr $line + 1`
   echo "$line, $states, $transitions, $states2, $transitions2, !($f)"
 done < obligations.txt
 ) | tee results.txt
