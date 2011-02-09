@@ -27,7 +27,7 @@ set -e
 check ()
 {
   run 0 ../ltl2tgba -f -KV "$1" > out.dot
-  "${DOT-:}" out.dot > /dev/null
+  "${DOT-true}" out.dot > /dev/null
   rm -f out.dot
 }
 
