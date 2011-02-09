@@ -1,5 +1,6 @@
 #!/bin/sh
-# Copyright (C) 2009, 2010  Laboratoire de Recherche et Development de l'EPITA.
+# Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et
+# Development de l'EPITA.
 #
 # This file is part of Spot, a model checking library.
 #
@@ -26,7 +27,7 @@ set -e
 check ()
 {
   run 0 ../ltl2tgba -f -KV "$1" > out.dot
-  $DOT out.dot > /dev/null
+  "${DOT-:}" out.dot > /dev/null
   rm -f out.dot
 }
 
