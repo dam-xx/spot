@@ -6,9 +6,8 @@ test -f ./defs || {
    exit 1
 }
 
-# If srcdir is not set, then we are not running from `make check', be verbose.
+# If srcdir is not set, then we are not running from `make check'.
 if test -z "$srcdir"; then
-   test -z "$VERBOSE" && VERBOSE=x
    # compute $srcdir.
    srcdir=`echo "$0" | sed -e 's,/[^\\/]*$,,'`
    test $srcdir = $0 && srcdir=.

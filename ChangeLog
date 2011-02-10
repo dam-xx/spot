@@ -1,5 +1,14 @@
 2011-02-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Enable VERBOSE logs for nips, greatspn, and python tests.
+
+	* wrap/python/tests/run.in, iface/nips/nipstest/defs.in,
+	iface/gspn/defs.in: Do not disable VERBOSE when running from "make
+	check".  Since we have started using parallel-check on 2009-08-31,
+	we should always send verbose output to the log.
+
+2011-02-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	This should finally fix kv.test and dotty.test on the LIP6 buildfarm.
 
 	* src/tgbatest/kv.test, iface/nips/nipstest/dotty.test: Don't rely
