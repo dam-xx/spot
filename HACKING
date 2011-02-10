@@ -90,6 +90,30 @@ shorthand "libtool --mode=execute" as "libtool execute" or even
 "libtool e".
 
 
+Running coverage tests
+----------------------
+
+First, compile (and link) Spot with coverage enabled.
+
+  % ./configure CXX='gcc --coverage'
+  % make
+
+Then run the test suite (or any program you want to study).
+
+  % make check
+
+Executing programs using Spot will generate a lot of *.gc* files
+everywhere.  Collect these using lcov:
+
+  % lcov --capture --directory src --output spot.info
+
+Finally generate a coverage report in HTML:
+
+  % genhtml --legend --demangle-cpp --output-directory html spot.info
+
+This should create the directory html/.
+
+
 Coding conventions:
 ===================
 
