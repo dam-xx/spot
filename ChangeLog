@@ -1,5 +1,13 @@
 2011-02-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	This should finally fix kv.test and dotty.test on the LIP6 buildfarm.
+
+	* src/tgbatest/kv.test, iface/nips/nipstest/dotty.test: Don't rely
+	on the ${DOT-...} syntax, because DOT is always set and might be
+	set to the empty value.
+
+2011-02-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* HACKING (Running coverage tests): New section.
 
 2011-02-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
