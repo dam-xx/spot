@@ -99,7 +99,7 @@ namespace spot
       }
 
       void
-      process_link(int in, int out, const tgba_succ_iterator* si)
+      process_link(int in, int out, const ta_succ_iterator* si)
       {
 
         os_ << "  " << in << " -> " << out << " [label=\"";

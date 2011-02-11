@@ -28,14 +28,15 @@
 
 #include "tgba/bddprint.hh"
 
-
 namespace spot
 {
 
   ////////////////////////////////////////
   // ta_explicit_succ_iterator
 
-  ta_explicit_succ_iterator::ta_explicit_succ_iterator(const state_ta_explicit* s)
+  ta_explicit_succ_iterator::ta_explicit_succ_iterator(
+      const state_ta_explicit* s) :
+    source_(s)
   {
     transitions_ = s->get_transitions();
   }
@@ -43,7 +44,8 @@ namespace spot
   void
   ta_explicit_succ_iterator::first()
   {
-    i_ = transitions_->begin();
+    if (transitions_ != 0)
+      i_ = transitions_->begin();
   }
 
   void
@@ -55,7 +57,7 @@ namespace spot
   bool
   ta_explicit_succ_iterator::done() const
   {
-    return i_ == transitions_->end();
+    return transitions_ == 0 || i_ == transitions_->end();
   }
 
   state*
@@ -73,8 +75,11 @@ namespace spot
     return (*i_)->condition;
   }
 
-
-
+  bool
+  ta_explicit_succ_iterator::is_stuttering_transition() const
+  {
+    return source_->get_tgba_condition() == ((*i_)->dest)->get_tgba_condition();
+  }
 
   ////////////////////////////////////////
   // state_ta_explicit
@@ -85,16 +90,15 @@ namespace spot
     return transitions_;
   }
 
-
   void
-  state_ta_explicit::add_transition(state_ta_explicit::transition* t){
-    if(transitions_ == 0)
-      transitions_= new transitions;
+  state_ta_explicit::add_transition(state_ta_explicit::transition* t)
+  {
+    if (transitions_ == 0)
+      transitions_ = new transitions;
 
     transitions_->push_back(t);
 
   }
-
 
   const state*
   state_ta_explicit::get_tgba_state() const
@@ -133,7 +137,8 @@ namespace spot
   }
 
   void
-  state_ta_explicit::set_livelock_accepting_state(bool is_livelock_accepting_state)
+  state_ta_explicit::set_livelock_accepting_state(
+      bool is_livelock_accepting_state)
   {
     is_livelock_accepting_state_ = is_livelock_accepting_state;
   }
@@ -170,54 +175,41 @@ namespace spot
     return new state_ta_explicit(*this);
   }
 
-  sscc_stack::connected_component::connected_component(int i)
-  {
-    index = i;
-    is_accepting = false;
-    is_initial = false;
-  }
-
-  sscc_stack::connected_component&
-  sscc_stack::top()
-  {
-    return s.front();
-  }
-
-  const sscc_stack::connected_component&
-  sscc_stack::top() const
-  {
-    return s.front();
-  }
-
   void
-  sscc_stack::pop()
+  state_ta_explicit::delete_stuttering_and_hole_successors()
   {
-    // assert(rem().empty());
-    s.pop_front();
-  }
+    state_ta_explicit::transitions* trans = get_transitions();
+    state_ta_explicit::transitions::iterator it_trans;
 
-  void
-  sscc_stack::push(int index)
-  {
-    s.push_front(connected_component(index));
-  }
+    if (trans != 0)
+      for (it_trans = trans->begin(); it_trans != trans->end();)
+        {
+          state_ta_explicit* dest = (*it_trans)->dest;
+          bool is_stuttering_transition = (get_tgba_condition() == (dest)->get_tgba_condition());
+          bool dest_is_livelock_accepting = dest->is_livelock_accepting_state();
 
-  std::list<state*>&
-  sscc_stack::rem()
-  {
-    return top().rem;
-  }
+          //Before deleting stuttering transitions, propaged back livelock and initial state's properties
+          if(is_stuttering_transition){
+              if(dest_is_livelock_accepting) set_livelock_accepting_state(true);
+              if(dest->is_initial_state()) set_initial_state(true);
+          }
 
-  size_t
-  sscc_stack::size() const
-  {
-    return s.size();
-  }
 
-  bool
-  sscc_stack::empty() const
-  {
-    return s.empty();
+
+          //remove hole successors states
+          state_ta_explicit::transitions* dest_trans =
+              (dest)->get_transitions();
+          bool dest_trans_empty = dest_trans == 0 || dest_trans->empty();
+          if (is_stuttering_transition || (dest_trans_empty && (!dest_is_livelock_accepting)) )
+            {
+              it_trans = trans->erase(it_trans);
+            }
+          else
+            {
+              it_trans++;
+            }
+        }
+
   }
 
   ////////////////////////////////////////
@@ -234,15 +226,17 @@ namespace spot
     ta::states_set_t::iterator it;
     for (it = states_set_.begin(); it != states_set_.end(); it++)
       {
-        const state_ta_explicit* s = dynamic_cast<const state_ta_explicit*> (*it);
+        const state_ta_explicit* s =
+            dynamic_cast<const state_ta_explicit*> (*it);
         state_ta_explicit::transitions* trans = s->get_transitions();
         state_ta_explicit::transitions::iterator it_trans;
         // We don't destroy the transitions in the state's destructor because
         // they are not cloned.
-        for (it_trans = trans->begin(); it_trans != trans->end(); it_trans++)
-          {
-            delete *it_trans;
-          }
+        if (trans != 0)
+          for (it_trans = trans->begin(); it_trans != trans->end(); it_trans++)
+            {
+              delete *it_trans;
+            }
         delete trans;
         delete s->get_tgba_state();
         delete s;
@@ -256,24 +250,32 @@ namespace spot
     std::pair<ta::states_set_t::iterator, bool> add_state_to_ta =
         states_set_.insert(s);
 
-    if (is_initial_state(*add_state_to_ta.first))
-      initial_states_set_.insert(*add_state_to_ta.first);
-
     return dynamic_cast<state_ta_explicit*> (*add_state_to_ta.first);
 
   }
 
-  state_ta_explicit*
-  ta_explicit::add_initial_state(state_ta_explicit* s)
+  void
+  ta_explicit::add_to_initial_states_set(state* state)
   {
+    state_ta_explicit * s = dynamic_cast<state_ta_explicit*> (state);
+
     s->set_initial_state(true);
 
-    return add_state(s);
+    initial_states_set_.insert(s);
 
   }
 
   void
-  ta_explicit::create_transition(state_ta_explicit* source, bdd condition, state_ta_explicit* dest)
+  ta_explicit::delete_stuttering_and_hole_successors(spot::state* s)
+  {
+    state_ta_explicit * state = dynamic_cast<state_ta_explicit*> (s);
+    state->delete_stuttering_and_hole_successors();
+
+  }
+
+  void
+  ta_explicit::create_transition(state_ta_explicit* source, bdd condition,
+      state_ta_explicit* dest)
   {
     state_ta_explicit::transition* t = new state_ta_explicit::transition;
     t->dest = dest;
@@ -292,7 +294,8 @@ namespace spot
   bdd
   ta_explicit::get_state_condition(const spot::state* initial_state) const
   {
-    const state_ta_explicit* sta = dynamic_cast<const state_ta_explicit*> (initial_state);
+    const state_ta_explicit* sta =
+        dynamic_cast<const state_ta_explicit*> (initial_state);
     return sta->get_tgba_condition();
   }
 
@@ -354,26 +357,33 @@ namespace spot
     for (it = states_set_.begin(); it != states_set_.end(); it++)
       {
 
-        const state_ta_explicit* source = dynamic_cast<const state_ta_explicit*> (*it);
+        const state_ta_explicit* source =
+            dynamic_cast<const state_ta_explicit*> (*it);
 
         state_ta_explicit::transitions* trans = source->get_transitions();
         state_ta_explicit::transitions::iterator it_trans;
 
-        for (it_trans = trans->begin(); it_trans != trans->end();)
-          {
-            if (source->get_tgba_condition()
-                == ((*it_trans)->dest)->get_tgba_condition())
-              {
-                delete *it_trans;
-                it_trans = trans->erase(it_trans);
-              }
-            else
-              {
-                it_trans++;
-              }
-          }
+        if (trans != 0)
+          for (it_trans = trans->begin(); it_trans != trans->end();)
+            {
+              if (source->get_tgba_condition()
+                  == ((*it_trans)->dest)->get_tgba_condition())
+                {
+                  delete *it_trans;
+                  it_trans = trans->erase(it_trans);
+                }
+              else
+                {
+                  it_trans++;
+                }
+            }
       }
 
+  }
+
+  void
+  ta_explicit::free_state(const spot::state*) const
+  {
   }
 
 }
