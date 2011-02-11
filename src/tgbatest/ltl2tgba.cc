@@ -1054,8 +1054,6 @@ main(int argc, char** argv)
 	}
 
 
-      const spot::tgba* product_degeneralized = 0;
-
       if (ta_opt)
         {
           spot::tgba_sba_proxy* degeneralized_new = 0;
@@ -1085,16 +1083,17 @@ main(int argc, char** argv)
           output = -1;
         }
 
+      spot::tgba* product_degeneralized = 0;
 
       if (system)
         {
           a = product = product_to_free = new spot::tgba_product(system, a);
 
-	  unsigned int n_acc = a->number_of_acceptance_conditions();
-	  if (echeck_inst
-	      && degeneralize_opt == NoDegen
-	      && n_acc > 1
-	      && echeck_inst->max_acceptance_conditions() < n_acc)
+          unsigned int n_acc = a->number_of_acceptance_conditions();
+          if (echeck_inst
+              && degeneralize_opt == NoDegen
+              && n_acc > 1
+              && echeck_inst->max_acceptance_conditions() < n_acc)
             degeneralize_opt = DegenTBA;
           if (degeneralize_opt == DegenTBA)
             a = product = product_degeneralized =
@@ -1103,6 +1102,7 @@ main(int argc, char** argv)
             a = product = product_degeneralized =
                                             new spot::tgba_sba_proxy(product);
         }
+
 
       if (echeck_inst
 	  && (a->number_of_acceptance_conditions()
