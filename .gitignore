@@ -38,4 +38,7 @@ pan.*
 *.zip
 *.s
 *.ii
-cahegrind.*
+cachegrind.*
+*.gcda
+*.gcno
+*.info
