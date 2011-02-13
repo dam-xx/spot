@@ -1,5 +1,11 @@
 2011-02-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Equal and Goto should only apply to Boolean expressions.
+
+	* src/ltlast/bunop.cc (bunop::bunop): Ensure it using an assert.
+
+2011-02-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Prepare the introduction of random_sere() and random_psl().
 
 	* src/ltlvisit/randomltl.hh (random_ltl): Split this class into...
