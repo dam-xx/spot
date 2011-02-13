@@ -1,5 +1,15 @@
 2011-02-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Add random generators of Boolean, SERE, and PSL formula.
+
+	* src/ltlvisit/randomltl.cc, src/ltlvisit/randomltl.hh:
+	(random_boolean, random_sere, random_psl): Add new classes.
+	* src/ltltest/randltl.cc: Add options to support the above.
+	Nore: the -p option was renamed to -pL for consistency, but
+	it is still understood.
+
+2011-02-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/ltlvisit/tostring.hh, src/ltlvisit/tostring.cc (to_string):
 	Add third option to enable formating suitable for SERE.
 
