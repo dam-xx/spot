@@ -1,5 +1,15 @@
 2011-02-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Relax usage of ->, <->, and xor in SERE.
+
+	* src/ltlparse/ltlparse.yy (rationalexp): Allow ->, <->, and xor,
+	in rational expressions as long as they apply only to Boolean
+	formulae.
+	* src/tgbaalgos/ltl2tgba_fm.cc (ratexp_trad_visitor): Adjust
+	assert in handling of unop::Not.
+
+2011-02-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Equal and Goto should only apply to Boolean expressions.
 
 	* src/ltlast/bunop.cc (bunop::bunop): Ensure it using an assert.
