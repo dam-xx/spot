@@ -99,7 +99,8 @@ TESTS = \
   emptchkr.test \
   ltlcounter.test \
   spotlbtt.test \
-  complementation.test
+  complementation.test \
+  randpsl.test
 
 EXTRA_DIST = $(TESTS) ltlcounter/LTLcounter.pl				\
   ltlcounter/LTLcounterCarry.pl ltlcounter/LTLcounterCarryLinear.pl	\
