@@ -1,3 +1,11 @@
+2011-02-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix infinite recursion when translating E* and E accepts [*0].
+
+	* src/tgbaalgos/ltl2tgba_fm.cc (ratexp_trad_visitor::visit):
+	Use a different translating rule for E* if E accepts [*0].
+	* src/tgbatest/ltl2tgba.test: Add test case.
+
 2011-02-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Add random generators of Boolean, SERE, and PSL formula.
