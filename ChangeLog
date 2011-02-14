@@ -1,3 +1,11 @@
+2011-02-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Correct tgba_explicit::compute_support_conditions.
+
+	* src/tgba/tgbaexplicit.cc (tgba_explicit::compute_support_conditions):
+	Fix logic.  This function has always been returning bddtrue instead
+	of the actual computed value...
+
 2011-02-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Enable VERBOSE logs for nips, greatspn, and python tests.

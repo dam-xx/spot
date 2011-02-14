@@ -1,4 +1,4 @@
-// Copyright (C) 2009, 2010 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -242,7 +242,7 @@ namespace spot
     assert(s);
     const state* st = s->get_state();
 
-    bdd res = bddtrue;
+    bdd res = bddfalse;
     tgba_explicit::state::const_iterator i;
     for (i = st->begin(); i != st->end(); ++i)
       res |= (*i)->condition;
