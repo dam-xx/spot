@@ -1,5 +1,20 @@
 2011-02-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix handling of PSL operators in reductions rules.
+
+	We still don't have any PSL-specific reductions, but at least
+	the LTL reduction now appear to work on PSL formulas.
+
+	* src/ltlvisit/basicreduce.cc (basic_reduce_visitor): Fix the
+	call to std::copy to handle Concat, Fusion, and AndNLM.
+	* src/ltlvisit/reduce.cc (reduce_visitor): Fix handling
+	of UConcat, EConcat, and EConcatMarked.
+	* src/tgbatest/randpsl.test: Activate reductions.
+	* src/ltltest/reducpsl.test: New file.
+	* src/ltltest/Makefile.am (TESTS): Add it.
+
+2011-02-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Plug a memory leak in randltl.
 
 	* src/ltlvisit/randomltl.cc (random_formula::~random_formula):

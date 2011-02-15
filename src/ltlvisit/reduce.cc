@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
+// Copyright (C) 2008, 2009, 2010, 2011 Laboratoire de Recherche et
 // Développement de l'Epita (LRDE).
 // Copyright (C) 2004, 2006, 2007 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -157,10 +157,12 @@ namespace spot
 		case binop::Xor:
 		case binop::Equiv:
 		case binop::Implies:
+		  assert(!"operator not supported for syntactic implication");
+		  return;
 		case binop::UConcat:
 		case binop::EConcat:
 		case binop::EConcatMarked:
-		  return;
+		  break;
 
 		case binop::U:
 		  /* a < b => a U b = b */
