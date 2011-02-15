@@ -1,3 +1,10 @@
+2011-02-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Plug a memory leak in randltl.
+
+	* src/ltlvisit/randomltl.cc (random_formula::~random_formula):
+	Declare as virtual.
+
 2011-02-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Translate 50 random PSL formulae until we get a better test.
