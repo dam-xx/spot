@@ -1,4 +1,4 @@
-// Copyright (C) 2010 Laboratoire de Recherche et Développement
+// Copyright (C) 2010, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -19,6 +19,7 @@
 // 02111-1307, USA.
 
 #include <cstring>
+#include <iostream>
 #include "ltlfile.hh"
 #include "public.hh"
 

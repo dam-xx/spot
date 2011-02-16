@@ -1,4 +1,4 @@
-// Copyright (C) 2010 Laboratoire de Recherche et Développement
+// Copyright (C) 2010, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -21,7 +21,7 @@
 #ifndef SPOT_LTLPARSE_LTLFILE_HH
 # define SPOT_LTLPARSE_LTLFILE_HH
 #include <fstream>
-#include <iostream>
+#include <iosfwd>
 #include "ltlast/formula.hh"
 
 namespace spot

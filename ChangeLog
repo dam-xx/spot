@@ -1,3 +1,10 @@
+2011-02-16  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Predeclare iostream to fix a sanity check.
+
+	* src/ltlparse/ltlfile.hh: Use <iofswd> instead of <iostream>.
+	* src/ltlparse/ltlfile.cc: Use <iostream>.
+
 2010-02-21  Felix Abecassis  <abecassis@lrde.epita.fr>
 
 	* src/tgbaalgos/setdotdec.cc, src/tgbaalgos/setdoc.hh: New files.
