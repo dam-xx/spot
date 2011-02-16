@@ -1,3 +1,9 @@
+2011-02-16  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Cosmetic changes in doc for bunop and multop.
+
+	* src/ltlast/bunop.hh, src/ltlast/multop.hh: Reorder some comments.
+
 2011-02-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix handling of PSL operators in reductions rules.
