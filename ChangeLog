@@ -1,3 +1,14 @@
+2011-02-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add support for the {SERE}! PSL operator.
+
+	* src/ltlparse/ltlscan.ll: Recognize }!.  Also remove
+	five duplicate rules.
+	* src/ltlparse/ltlparse.yy: Build {r}<>->1 when parsing {r}!.
+	* src/ltlvisit/tostring.cc: Print {r}! instead of {r}<>->1.
+	* src/ltltest/tostring.test, src/ltltest/equals.test:
+	Add more tests.
+
 2011-02-16  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Cosmetic changes in doc for bunop and multop.
