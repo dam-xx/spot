@@ -50,6 +50,10 @@
 #include "tgbaalgos/cutscc.hh"
 #include "misc/random.hh"
 
+
+
+
+
 // Introduction: This is a program to test the ltl to tgba algorithms
 // in Spot, 3 tests are computed as described in [TauHel02].
 
@@ -103,12 +107,13 @@ tgba_map* build_tgba_map(const spot::ltl::formula* f,
     }
     else if (*it == "taa")
     {
+
       // FIXME: when using TAA, there are no acceptance conditions on the
       // resulting TGBA.
       std::cerr << "Do not use TAA for now." << std::endl;
       exit(1);
-      /*
-      spot::tgba* taa_prop = ltl_to_taa(f, dict, false);
+
+/*      spot::tgba* taa_prop = ltl_to_taa(f, dict, false);
       spot::tgba* taa_prop_neg = ltl_to_taa(f_neg, dict, false);
       tgba_pair taa_pair(taa_prop, taa_prop_neg);
       (*res)["taa"] = taa_pair;
@@ -244,45 +249,157 @@ void delete_state_set(spot::state_set* s)
   delete s;
 }
 
+// bool check_cross_comp_N(tgba_map* m,
+//                         spot::tgba* model,
+//                         spot::emptiness_check_instantiator* inst)
+// {
+//   bool res = true;
+//   bool ref = true;
+//   bool current = true;
+//   tgba_map::iterator it = m->begin();
+//   // Compute the first state of accepting states as a reference.
+//   tgba_pair& p = it->second;
+//   spot::tgba_product* prod = new spot::tgba_product(p.second, model);
+//   spot::emptiness_check* ec = inst->instantiate(prod);
+//   spot::emptiness_check_result* refe = ec->check ();
+//   // For now, We just check the nullity or not of the emptiness_check.
+//   ref = (0 == refe);
+//   delete ec;
+//   delete prod;
+//   delete refe;
+
+//   for (; it != m->end(); it++)
+//   {
+//     p = it->second;
+//     prod = new spot::tgba_product(p.second, model);
+//     ec = inst->instantiate(prod);
+//     refe = ec->check();
+//     current = (0 == refe);
+//     delete prod;
+//     delete ec;
+//     delete refe;
+
+//     if (current != ref)
+//     {
+//       res = false;
+//       break;
+//     }
+//   }
+
+//   return res;
+// }
+
+
+
+
+bool check_cross_comparison(tgba_map* m,
+                            spot::tgba* model,
+                            spot::emptiness_check_instantiator* inst)
+{
+  bool res = true;
+  bool ref_N = true;
+  bool ref_P = true;
+  bool current_N = true;
+  bool current_P = true;
+  tgba_map::iterator it = m->begin();
+
+  // Compute the first state of accepting states as a reference.
+  tgba_pair& p = it->second;
+  spot::tgba_product* prod_P = new spot::tgba_product(p.first, model);
+  spot::emptiness_check* ec_P = inst->instantiate(prod_P);
+  spot::emptiness_check_result* refe_P = ec_P->check ();
+  spot::tgba_product* prod_N = new spot::tgba_product(p.second, model);
+  spot::emptiness_check* ec_N = inst->instantiate(prod_N);
+  spot::emptiness_check_result* refe_N = ec_N->check ();
+
+  // For now, We just check the nullity or not of the emptiness_check.
+  ref_N = (0 == refe_N);
+  delete ec_N;
+  delete prod_N;
+  delete refe_N;
+  ref_P = (0 == refe_P);
+  delete ec_P;
+  delete prod_P;
+  delete refe_P;
+
+  it++;
+
+  for (; it != m->end(); it++)
+  {
+    p = it->second;
+    prod_P = new spot::tgba_product(p.first, model);
+    ec_P = inst->instantiate(prod_P);
+    refe_P = ec_P->check();
+    prod_N = new spot::tgba_product(p.second, model);
+    ec_N = inst->instantiate(prod_N);
+    refe_N = ec_N->check();
+
+    current_N = (0 == refe_N);
+    delete ec_N;
+    delete prod_N;
+    delete refe_N;
+    current_P = (0 == refe_P);
+    delete ec_P;
+    delete prod_P;
+    delete refe_P;
+
+    std::cout << "Pass there" << std::endl;
+    if (current_N != ref_N)
+    {
+      res = false;
+      break;
+    }
+    if (current_P != ref_P)
+    {
+      res = false;
+      break;
+    }
+
+  }
+
+  return res;
+}
+
 // 'Model checking result cross-comparison test' as described in [TauHel02].
 // Given a formula p, the result of model checking must be the same with
 // all translation algorithms.
 // For each product, compute the set of accepting states in the
 // model, this set must be the same for all translation algorithms.
-bool check_cross_comparison(tgba_map* m,
-                            spot::tgba* model)
-{
-  tgba_map::iterator it = m->begin();
-  // Compute the first state of accepting states as a reference.
-  tgba_pair& p = it->second;
-  spot::tgba_product* prod = new spot::tgba_product(p.first, model);
-  spot::state_set* acc_states_first = project_accepting_states(prod, model);
-  delete prod;
-  bool good = true;
-  for (it = m->begin(); it != m->end() && good; ++it)
-  {
-    tgba_pair& p = it->second;
-    spot::tgba_product* prod = new spot::tgba_product(p.first, model);
-    spot::state_set* acc_states = project_accepting_states(prod, model);
-    delete prod;
-    bool cross_eq = (acc_states->size() == acc_states_first->size());
-    // If sizes of sets are different, no need to compare further, they
-    // are different, the test failed.
-    if (!cross_eq)
-      good = false;
-    else
-    {
-      spot::state_set::iterator it;
-      // Check if each element in the new set is in the reference set.
-      for (it = acc_states->begin(); it != acc_states->end(); ++it)
-        if (acc_states_first->find(*it) == acc_states_first->end())
-          good = false;
-    }
-    delete_state_set(acc_states);
-  }
-  delete_state_set(acc_states_first);
-  return true;
-}
+// bool    check_cross_comparison(tgba_map* m,
+//                                spot::tgba* model,
+//                                spot::emptiness_check_instantiator* inst)
+// {
+//   return (check_cross_comp_P(m, model, inst)
+//           && check_cross_comp_N(m, model, inst));
+// }
+
+//   spot::state_set* acc_states_first = project_accepting_states(prod, model);
+//   delete prod;
+//   bool good = true;
+//   for (it = m->begin(); it != m->end() && good; ++it)
+//   {
+//     tgba_pair& p = it->second;
+//     spot::tgba_product* prod = new spot::tgba_product(p.first, model);
+//     spot::state_set* acc_states = project_accepting_states(prod, model);
+//     delete prod;
+//     bool cross_eq = (acc_states->size() == acc_states_first->size());
+//     // If sizes of sets are different, no need to compare further, they
+//     // are different, the test failed.
+//     if (!cross_eq)
+//       good = false;
+//     else
+//     {
+//       spot::state_set::iterator it;
+//       // Check if each element in the new set is in the reference set.
+//       for (it = acc_states->begin(); it != acc_states->end(); ++it)
+//         if (acc_states_first->find(*it) == acc_states_first->end())
+//           good = false;
+//     }
+//     delete_state_set(acc_states);
+//   }
+//   delete_state_set(acc_states_first);
+//   return true;
+
 
 // 'Model checking result consistency check' as described in [TauHel02].
 // Given a formula p, Ap is the resulting Buchi automaton with a given
@@ -430,7 +547,7 @@ int
 main(int argc, char** argv)
 {
   char empt_default[] = "Cou99";
-  char algos_default[] = "fm lacim";
+  char algos_default[] = "fm lacim taa";
   char* prog = basename(argv[0]);
   char* opt_e = 0;
   int opt_n = 20;
@@ -535,7 +652,7 @@ main(int argc, char** argv)
     bool consistency_result = check_consistency(m, model);
     if (consistency_result)
       ++cons_success;
-    bool cross_comparison_result = check_cross_comparison(m, model);
+    bool cross_comparison_result = check_cross_comparison(m, model, inst);
     if (cross_comparison_result)
       ++cross_success;
     std::cout << "Check intersection: "
@@ -547,7 +664,7 @@ main(int argc, char** argv)
     std::cout << std::endl;
     delete model;
     f->destroy();
-    free_tgba_map(m);
+//    free_tgba_map(m);
   }
   double elapsed = TimerGetElapsedTime(start);
   std::cout << std::endl
@@ -558,6 +675,6 @@ main(int argc, char** argv)
             << "Cross-comparison check: " << cross_success << "/" << i
             << std::endl
             << "Computation time: " << elapsed << std::endl;
-  delete inst;
-  delete dict;
+//  delete inst;
+//  delete dict;
 }
