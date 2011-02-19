@@ -132,6 +132,7 @@ AC_CONFIG_FILES([
   src/tgbaparse/Makefile
   src/tgbatest/defs
   src/tgbatest/Makefile
+  src/tgbatest/ltl2tgba-checker/Makefile
   wrap/Makefile
   wrap/python/Makefile
   wrap/python/ajax/Makefile
