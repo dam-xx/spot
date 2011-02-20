@@ -1,5 +1,17 @@
 2011-02-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Disable LTL reductions on SERE formulae.
+
+	* src/ltlvisit/contain.c (recurse, reduce_tau03): Do not
+	run on non-PSL formulae.
+	* src/ltlvisit/reduce.cc (reduce_visitor::visit): Skip
+	multop::Fusion operators, and do not run syntactic_implication_neg
+	on SERE formulae.
+	* src/ltlvisit/syntimpl.cc (inf_right_recurse_visitor::visit):
+	Skip [*0].
+
+2011-02-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Track SERE formulas.
 
 	* src/ltlast/atomic_prop.cc, src/ltlast/automatop.cc,
