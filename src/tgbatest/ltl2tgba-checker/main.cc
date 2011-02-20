@@ -33,15 +33,15 @@ main (int argc, char** argv)
     spot::ltl::formula* f = o1->formula_get();
     std::cout << "Formula " << ++i << ": "
               << spot::ltl::to_string (f) << std::endl;
-    bool intersection_result = check_intersection(&(o1->m_get()), inst);
+    bool intersection_result = check_intersection(o1->m_get(), inst);
     if (intersection_result)
       ++inter_success;
-    bool cross_comparison_result = check_cross_comparison(&(o1->m_get()),
+    bool cross_comparison_result = check_cross_comparison(o1->m_get(),
                                                           o1->model_get(),
                                                           inst);
     if (cross_comparison_result)
       ++cross_success;
-    bool consistency_result = check_consistency(&(o1->m_get()),
+    bool consistency_result = check_consistency(o1->m_get(),
                                                 o1->model_get());
     if (consistency_result)
       ++cons_success;
