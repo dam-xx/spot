@@ -1,5 +1,16 @@
 2011-02-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Track SERE formulas.
+
+	* src/ltlast/atomic_prop.cc, src/ltlast/automatop.cc,
+	src/ltlast/binop.cc, src/ltlast/bunop.cc, src/ltlast/constant.cc,
+	src/ltlast/formula.cc, src/ltlast/formula.hh,
+	src/ltlast/multop.cc, src/ltlast/unop.cc: Add a bit is.sere_formula
+	to track SEREs, and fix tracking of PSL formulae.
+	* src/ltltest/kind.test: Adjust.
+
+2011-02-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add support for the {SERE}! PSL operator.
 
 	* src/ltlparse/ltlscan.ll: Recognize }!.  Also remove
