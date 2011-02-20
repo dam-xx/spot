@@ -133,8 +133,6 @@ bool check_cross_comparison(tgba_map* m,
 
   for (; it != m->end(); it++)
   {
-
-    std::cout << "Coucou" << std::endl;
     p = it->second;
     prod_P = new spot::tgba_product(p.first, model);
     ec_P = inst->instantiate(prod_P);

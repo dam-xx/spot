@@ -22,6 +22,10 @@ public:
   std::string file_get () const;
   int seed_get () const;
 
+  unsigned int nstate_get () const;
+  double density_get () const;
+
+
 protected:
   po::options_description desc_;
   po::variables_map vm_;

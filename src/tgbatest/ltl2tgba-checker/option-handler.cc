@@ -13,15 +13,15 @@ OptionHandler::OptionHandler (int argc, char **argv)
 {
   std::string fmd ("use the fm algorithm to compute the automaton\n\
 with arg:\n    \
-expr :\n    \
-symb :\n    \
-bran :\n    \
-fair :\n    \
+expr : enable property combination on each state\n    \
+symb : disable merging of special states\n    \
+bran : enable merging of some transitions\n    \
+fair :enable unstable state caracterization\n    \
 none : don't use this algorithm in tests\n");
 
   std::string taad ("use the taa algorithm to compute the automaton\n\
 with arg:\n    \
-refi :\n    \
+refi : enable refined rules\n    \
 none : don't use this algorithm in tests\n");
 
   std::string lacimd ("use the lacim algorithm to compute the automaton\n\
@@ -39,7 +39,9 @@ tau03 : use Tau03 algorithm\n");
     ("intersection", "compute an intersection test")
     ("cross-comparison", "compute a cross comparison test")
     ("consistency", "compute a consistency test")
-    ("seed,s", "set seed for the tests")
+    ("seed,s", po::value<int> (), "set seed for the tests")
+    ("nstate,n", po::value<unsigned int> (), "number of state for generated graph")
+    ("density,d", po::value<double> (), "density of generated graph")
     ("fm", po::value<std::vector <std::string> >(),fmd.c_str ())
     ("taa", po::value<std::vector <std::string> >(), taad.c_str ())
     ("lacim", po::value<std::vector <std::string> >(), lacimd.c_str ())
@@ -73,7 +75,7 @@ tau03 : use Tau03 algorithm\n");
 
 OptionHandler::~OptionHandler ()
 {
-  std::cout << "euarg I'm begin destroyed" << std::endl;
+  // destroy something here
 }
 
 po::variables_map
@@ -107,7 +109,25 @@ int
 OptionHandler::seed_get () const
 {
   if (vm_.count ("seed"))
-    return vm_["file"].as<int> ();
+    return vm_["seed"].as<int> ();
   else
     return spot::mrand(1231);
+}
+
+unsigned int
+OptionHandler::nstate_get () const
+{
+  if (vm_.count ("nstate"))
+    return vm_["nstate"].as<unsigned int> ();
+  else
+    return 1000;
+}
+
+double
+OptionHandler::density_get () const
+{
+  if (vm_.count ("density") && vm_["density"].as<double> () >= 0)
+    return vm_["density"].as <double> ();
+  else
+    return 0.7;
 }

@@ -60,6 +60,8 @@ protected:
   spot::ltl::ltl_file* lf_;
   std::vector<Trad*> algo_;
   spot::emptiness_check_instantiator* empty_;
+  unsigned int nstate_;
+  double density_;
 };
 
 #endif /* !BUILDER_HH_ */

@@ -14,16 +14,16 @@ main (int argc, char** argv)
   OptionHandler h (argc, argv);
 
   if (h.vm_get ().count ("help"))
+  {
     std::cout << h.desc_get () << std::endl;
-
+    std::cout << "see http://lrde.epita.fr/dload/spot/spot-snapshot.html "
+	      << "for further details"
+	      << std::endl;
+    return 0;
+  }
   Builder b (h);
 
   BuiltObj* o1;
-
-  // spot::emptiness_check_instantiator* inst;
-  // const char *err;
-  // std::string s ("Cou99");
-  // inst = spot::emptiness_check_instantiator::construct(s.c_str(), &err);
 
   unsigned inter_success = 0;
   unsigned cons_success = 0;

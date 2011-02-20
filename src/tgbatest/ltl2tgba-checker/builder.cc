@@ -15,6 +15,8 @@ Builder::Builder (OptionHandler& opth)
   lf_ = new spot::ltl::ltl_file (opth.file_get ());
   dict_ = new spot::bdd_dict ();
   algo_ = opth.trad_get ();
+  nstate_ = opth.nstate_get ();
+  density_ = opth.density_get ();
  
   const char* error;
   if (opth.vm_get ().count("emptiness") == 0)
@@ -50,7 +52,13 @@ Builder::operator() ()
     }
   
   spot::ltl::atomic_prop_set* s = spot::ltl::atomic_prop_collect (f, 0);
-  spot::tgba* model = spot::random_graph (1, 1, s, dict_, 0, 0.15, 0.5);
+  spot::tgba* model = spot::random_graph (nstate_,
+					  density_,
+					  s,
+					  dict_,
+					  0,
+					  0.15,
+					  0.5);
   delete s;
 
   return (new BuiltObj (f, model, m));
