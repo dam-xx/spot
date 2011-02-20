@@ -113,7 +113,7 @@ tgba_map* build_tgba_map(const spot::ltl::formula* f,
       std::cerr << "Do not use TAA for now." << std::endl;
       exit(1);
 
-/*      spot::tgba* taa_prop = ltl_to_taa(f, dict, false);
+/*    spot::tgba* taa_prop = ltl_to_taa(f, dict, false);
       spot::tgba* taa_prop_neg = ltl_to_taa(f_neg, dict, false);
       tgba_pair taa_pair(taa_prop, taa_prop_neg);
       (*res)["taa"] = taa_pair;
@@ -249,49 +249,12 @@ void delete_state_set(spot::state_set* s)
   delete s;
 }
 
-// bool check_cross_comp_N(tgba_map* m,
-//                         spot::tgba* model,
-//                         spot::emptiness_check_instantiator* inst)
-// {
-//   bool res = true;
-//   bool ref = true;
-//   bool current = true;
-//   tgba_map::iterator it = m->begin();
-//   // Compute the first state of accepting states as a reference.
-//   tgba_pair& p = it->second;
-//   spot::tgba_product* prod = new spot::tgba_product(p.second, model);
-//   spot::emptiness_check* ec = inst->instantiate(prod);
-//   spot::emptiness_check_result* refe = ec->check ();
-//   // For now, We just check the nullity or not of the emptiness_check.
-//   ref = (0 == refe);
-//   delete ec;
-//   delete prod;
-//   delete refe;
 
-//   for (; it != m->end(); it++)
-//   {
-//     p = it->second;
-//     prod = new spot::tgba_product(p.second, model);
-//     ec = inst->instantiate(prod);
-//     refe = ec->check();
-//     current = (0 == refe);
-//     delete prod;
-//     delete ec;
-//     delete refe;
-
-//     if (current != ref)
-//     {
-//       res = false;
-//       break;
-//     }
-//   }
-
-//   return res;
-// }
-
-
-
-
+// 'Model checking result cross-comparison test' as described in [TauHel02].
+// Given a formula p, the result of model checking must be the same with
+// all translation algorithms.
+// For each product, compute the set of accepting states in the
+// model, this set must be the same for all translation algorithms.
 bool check_cross_comparison(tgba_map* m,
                             spot::tgba* model,
                             spot::emptiness_check_instantiator* inst)
@@ -343,7 +306,6 @@ bool check_cross_comparison(tgba_map* m,
     delete prod_P;
     delete refe_P;
 
-    std::cout << "Pass there" << std::endl;
     if (current_N != ref_N)
     {
       res = false;
@@ -359,46 +321,6 @@ bool check_cross_comparison(tgba_map* m,
 
   return res;
 }
-
-// 'Model checking result cross-comparison test' as described in [TauHel02].
-// Given a formula p, the result of model checking must be the same with
-// all translation algorithms.
-// For each product, compute the set of accepting states in the
-// model, this set must be the same for all translation algorithms.
-// bool    check_cross_comparison(tgba_map* m,
-//                                spot::tgba* model,
-//                                spot::emptiness_check_instantiator* inst)
-// {
-//   return (check_cross_comp_P(m, model, inst)
-//           && check_cross_comp_N(m, model, inst));
-// }
-
-//   spot::state_set* acc_states_first = project_accepting_states(prod, model);
-//   delete prod;
-//   bool good = true;
-//   for (it = m->begin(); it != m->end() && good; ++it)
-//   {
-//     tgba_pair& p = it->second;
-//     spot::tgba_product* prod = new spot::tgba_product(p.first, model);
-//     spot::state_set* acc_states = project_accepting_states(prod, model);
-//     delete prod;
-//     bool cross_eq = (acc_states->size() == acc_states_first->size());
-//     // If sizes of sets are different, no need to compare further, they
-//     // are different, the test failed.
-//     if (!cross_eq)
-//       good = false;
-//     else
-//     {
-//       spot::state_set::iterator it;
-//       // Check if each element in the new set is in the reference set.
-//       for (it = acc_states->begin(); it != acc_states->end(); ++it)
-//         if (acc_states_first->find(*it) == acc_states_first->end())
-//           good = false;
-//     }
-//     delete_state_set(acc_states);
-//   }
-//   delete_state_set(acc_states_first);
-//   return true;
 
 
 // 'Model checking result consistency check' as described in [TauHel02].
@@ -434,7 +356,7 @@ bool check_consistency(tgba_map* m,
     set_union(acc_states->begin(), acc_states->end(),
               acc_states_neg->begin(), acc_states->end(),
               std::inserter(*states_union, states_union->begin()));
-              unsigned union_size = states_union->size();
+    unsigned union_size = states_union->size();
     delete prod;
     delete prod_neg;
     delete_state_set(acc_states);
@@ -547,7 +469,7 @@ int
 main(int argc, char** argv)
 {
   char empt_default[] = "Cou99";
-  char algos_default[] = "fm lacim taa";
+  char algos_default[] = "fm lacim";
   char* prog = basename(argv[0]);
   char* opt_e = 0;
   int opt_n = 20;

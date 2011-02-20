@@ -35,7 +35,7 @@ noinst_PROGRAMS = checker
 # 	checker
 
 # Keep this sorted alphabetically.
-checker_SOURCES  = main.cc option-handler.cc builder.cc
+checker_SOURCES  = main.cc option-handler.cc builder.cc algos.cc
 checker_CXXFLAGS = -lboost_program_options
 # Keep this sorted by STRENGTH.  Test basic things first,
 # because such failures will be easier to diagnose and fix.
