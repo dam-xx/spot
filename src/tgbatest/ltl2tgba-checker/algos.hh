@@ -41,4 +41,9 @@ spot::state_set* project_accepting_states(spot::tgba* prod,
 
 void delete_state_set(spot::state_set* s);
 
+
+void TimerReset(struct timeval& start);
+
+double TimerGetElapsedTime(struct timeval& start);
+
 #endif /* !ALGOS_HH_ */

@@ -1,3 +1,4 @@
+#include <sys/time.h>
 #include "algos.hh"
 
 tgba_map* build_tgba_map(const spot::ltl::formula* f,
@@ -132,6 +133,8 @@ bool check_cross_comparison(tgba_map* m,
 
   for (; it != m->end(); it++)
   {
+
+    std::cout << "Coucou" << std::endl;
     p = it->second;
     prod_P = new spot::tgba_product(p.first, model);
     ec_P = inst->instantiate(prod_P);
@@ -290,3 +293,26 @@ void delete_state_set(spot::state_set* s)
     delete *it;
   delete s;
 }
+
+
+
+
+void TimerReset(struct timeval& start)
+{
+  // Initialize timer with the current time.
+  gettimeofday(&start, 0);
+}
+
+double TimerGetElapsedTime(struct timeval& start)
+{
+  double t1, t2;
+  struct timeval end;
+  TimerReset(end);
+  t1 = (double)start.tv_sec + (double)start.tv_usec*0.000001;
+  t2 = (double)end.tv_sec + (double)end.tv_usec*0.000001;
+
+  return t2 - t1;
+}
+
+
+

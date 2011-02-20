@@ -1,0 +1,16 @@
+#! /bin/sh
+
+#. ./defs
+
+
+src/ltltest/randltl -F 3 -u -f 20 a b c |
+     ./checker |
+     grep 3/3 | wc -l | grep 3 > /dev/null
+if [ $? -eq 0 ]; then
+    echo "\033[1;32mPass\033[m"
+else
+    echo "\033[1;31mFail\033[m"
+fi
+
+
+set -e

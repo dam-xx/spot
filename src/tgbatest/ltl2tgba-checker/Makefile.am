@@ -47,7 +47,7 @@ checker_SOURCES  = \
 checker_CXXFLAGS = -lboost_program_options
 # Keep this sorted by STRENGTH.  Test basic things first,
 # because such failures will be easier to diagnose and fix.
-TESTS = \
+TESTS = ltl2tgba.test \
 	ltl2tgba-checker.test
 
 EXTRA_DIST = $(TESTS)

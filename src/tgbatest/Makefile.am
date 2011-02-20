@@ -29,6 +29,9 @@ LDADD = ../libspot.la
 # to run manually outside the test suite.  Always build them.
 noinst_PROGRAMS = ltl2tgba randtgba
 
+SUBDIRS = ltl2tgba-checker
+
+
 check_SCRIPTS = defs
 # Keep this sorted alphabetically.
 check_PROGRAMS = \
