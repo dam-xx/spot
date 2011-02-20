@@ -5,6 +5,7 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
+#include "trad.hh"
 
 namespace po = boost::program_options;
 
@@ -17,14 +18,14 @@ public:
 public:
   po::variables_map vm_get () const;
   po::options_description desc_get () const;
-  std::vector <std::string> trad_get () const;
+  std::vector <Trad*> trad_get () const;
   std::string file_get () const;
   int seed_get () const;
 
 protected:
   po::options_description desc_;
   po::variables_map vm_;
-  std::vector<std::string> trad_;
+  std::vector<Trad*> trad_;
 
 
 };

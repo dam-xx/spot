@@ -3,6 +3,10 @@
 #include <iostream>
 #include "misc/random.hh"
 
+#include "trad-taa.hh"
+#include "trad-lacim.hh"
+#include "trad-fm.hh"
+
 OptionHandler::OptionHandler (int argc, char **argv)
   : desc_ ("Allowed options"),
     trad_ ()
@@ -23,9 +27,9 @@ OptionHandler::OptionHandler (int argc, char **argv)
   po::notify(this->vm_);    
 
   //Add here you traduction algorithm
-  trad_.push_back (std::string ("fm"));
-  trad_.push_back (std::string ("taa"));
-  trad_.push_back (std::string ("lacim"));
+  trad_.push_back (new TradFm ("fm"));
+  trad_.push_back (new TradTaa ("taa"));
+  trad_.push_back (new TradLacim ("lacim"));
 }
 
 OptionHandler::~OptionHandler ()
@@ -45,7 +49,7 @@ OptionHandler::desc_get () const
   return this->desc_;
 }
 
-std::vector <std::string>
+std::vector <Trad*>
 OptionHandler::trad_get () const
 {
   return this->trad_;

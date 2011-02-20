@@ -15,7 +15,6 @@
 // maybe move it into the Builder
 typedef std::pair <spot::tgba*, spot::tgba*> tgba_pair;
 typedef std::map <std::string, tgba_pair> tgba_map;
-typedef std::pair <std::string, spot::tgba*> model_pair;
 
 class BuiltObj
 {
@@ -51,20 +50,13 @@ public:
   Builder (OptionHandler& opth);
   ~Builder ();
 
-  //  tgba_map& tgba_get ();
-  //std::vector <spot::ltl::formula*> formula_get ();
-
   // return a built obj or NULL if there is no more formulas in the file
   BuiltObj* operator() ();
 
 protected:
-
-  //  spot::tgba* build_model (spot::ltl::formula* f);
-
   spot::bdd_dict* dict_;
   spot::ltl::ltl_file* lf_;
-  std::vector<std::string> algo_;
-
+  std::vector<Trad*> algo_;
 };
 
 #endif /* !BUILDER_HH_ */
