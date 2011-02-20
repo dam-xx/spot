@@ -21,7 +21,7 @@ class BuiltObj
 public:
   BuiltObj (spot::ltl::formula* f,
 	    spot::tgba* model,
-	    tgba_map m)
+	    tgba_map* m)
   {
     formula_ = f;
     model_ = model;
@@ -30,14 +30,14 @@ public:
 
   spot::ltl::formula* formula_get () { return this->formula_; };
   spot::tgba* model_get () { return this->model_; };
-  tgba_map m_get () { return this->m_; };
+  tgba_map* m_get () { return this->m_; };
 
   ~BuiltObj ();
 
 protected:
   spot::ltl::formula* formula_;
   spot::tgba* model_;
-  tgba_map m_;
+  tgba_map* m_;
 };
 
 /*

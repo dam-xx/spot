@@ -28,12 +28,12 @@ Builder::operator() ()
   spot::ltl::formula* nf = spot::ltl::unop::instance(spot::ltl::unop::Not,
 						     f->clone());
 
-  tgba_map m;
+  tgba_map *m = new tgba_map ();
   std::vector<Trad*>::iterator i;
   for (i = algo_.begin (); i != algo_.end (); ++i)
     {
-      m[(*i)->name_get ()] = tgba_pair ((**i)(f, dict_),
-				     (**i)(nf, dict_));
+      (*m)[(*i)->name_get ()] = tgba_pair ((**i)(f, dict_),
+					 (**i)(nf, dict_));
     }
   
   spot::ltl::atomic_prop_set* s = spot::ltl::atomic_prop_collect (f, 0);
