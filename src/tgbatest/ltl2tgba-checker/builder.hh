@@ -11,6 +11,7 @@
 #include "ltlparse/public.hh"
 #include "option-handler.hh"
 #include "ltlparse/ltlfile.hh"
+#include "tgbaalgos/emptiness.hh"
 
 // maybe move it into the Builder
 typedef std::pair <spot::tgba*, spot::tgba*> tgba_pair;
@@ -52,11 +53,13 @@ public:
 
   // return a built obj or NULL if there is no more formulas in the file
   BuiltObj* operator() ();
+  spot::emptiness_check_instantiator* emptiness_get () const;
 
 protected:
   spot::bdd_dict* dict_;
   spot::ltl::ltl_file* lf_;
   std::vector<Trad*> algo_;
+  spot::emptiness_check_instantiator* empty_;
 };
 
 #endif /* !BUILDER_HH_ */

@@ -38,11 +38,11 @@ TradFm::optobin (std::vector<std::string> v)
 
   for (i = v.begin (); i != v.end (); ++i)
   {
-    if (*i == "exprop")
+    if (*i == "expr")
       res += (1 << 0);
     else if (*i == "symb")
       res += (1 << 1);
-    else if (*i == "branching")
+    else if (*i == "bran")
       res += (1 << 2);
     else if (*i == "fair")
       res += (1 << 3);

@@ -15,6 +15,18 @@ Builder::Builder (OptionHandler& opth)
   lf_ = new spot::ltl::ltl_file (opth.file_get ());
   dict_ = new spot::bdd_dict ();
   algo_ = opth.trad_get ();
+ 
+  const char* error;
+  if (opth.vm_get ().count("emptiness") == 0)
+    empty_ = spot::emptiness_check_instantiator::construct ("Cou99", &error);
+  else if (opth.vm_get ()["emptiness"].as<std::string> () == "cou99")
+    empty_ = spot::emptiness_check_instantiator::construct ("Cou99", &error);
+  else if (opth.vm_get ()["emptiness"].as <std::string> () == "tau03")
+    empty_ = spot::emptiness_check_instantiator::construct ("Tau03_opt", &error);
+  else
+    std::cerr << "can't recognize emptiness check algorithm : "
+	      << opth.vm_get ()["emptiness"].as<std::string> ()
+	      << std::endl;
 }
 
 BuiltObj*
@@ -42,6 +54,12 @@ Builder::operator() ()
   delete s;
 
   return (new BuiltObj (f, model, m));
+}
+
+spot::emptiness_check_instantiator*
+Builder::emptiness_get () const
+{
+  return (this->empty_);
 }
 
 Builder::~Builder ()

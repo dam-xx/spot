@@ -20,10 +20,10 @@ main (int argc, char** argv)
 
   BuiltObj* o1;
 
-  spot::emptiness_check_instantiator* inst;
-  const char *err;
-  std::string s ("Cou99");
-  inst = spot::emptiness_check_instantiator::construct(s.c_str(), &err);
+  // spot::emptiness_check_instantiator* inst;
+  // const char *err;
+  // std::string s ("Cou99");
+  // inst = spot::emptiness_check_instantiator::construct(s.c_str(), &err);
 
   unsigned inter_success = 0;
   unsigned cons_success = 0;
@@ -38,13 +38,14 @@ main (int argc, char** argv)
     spot::ltl::formula* f = o1->formula_get();
     std::cout << "Formula " << ++i << ": "
               << spot::ltl::to_string (f) << std::endl;
-    bool intersection_result = check_intersection(o1->m_get(), inst);
+    bool intersection_result = check_intersection(o1->m_get(),
+						  b.emptiness_get ());
 
     if (intersection_result)
       ++inter_success;
     bool cross_comparison_result = check_cross_comparison(o1->m_get(),
                                                           o1->model_get(),
-                                                          inst);
+                                                          b.emptiness_get ());
 
     if (cross_comparison_result)
       ++cross_success;
@@ -72,6 +73,4 @@ main (int argc, char** argv)
             << "Cross-comparison check: " << cross_success << "/" << i
             << std::endl
             << "Computation time: " << elapsed << std::endl;
-
-
 }

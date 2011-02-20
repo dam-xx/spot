@@ -24,7 +24,7 @@ TradTaa::optobin (std::vector<std::string> v)
 
   for (i = v.begin (); i != v.end (); ++i)
   {
-    if (*i == "refined")
+    if (*i == "refi")
       ret += (1 << 0);
     else if (*i == "none")
 	ret += (1 << 7);
