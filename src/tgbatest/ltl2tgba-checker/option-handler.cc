@@ -18,18 +18,34 @@ OptionHandler::OptionHandler (int argc, char **argv)
     ("cross-comparison", "compute a cross comparison test")
     ("consistency", "compute a consistency check")
     ("seed,s", "set seed for the tests")
-    ("fm", "use the fm algorithm to compute the automaton")
-    ("taa", "use the taa algorithm to compute the automaton")
-    ("lacim", "use the lacim algorithm to compute the automaton")
+    ("fm", po::value<std::vector <std::string> >(), "use the fm algorithm to compute the automaton")
+    ("taa", po::value<std::vector <std::string> >(), "use the taa algorithm to compute the automaton")
+    ("lacim", po::value<std::vector <std::string> >(), "use the lacim algorithm to compute the automaton")
     ;
 
   po::store(po::parse_command_line(argc, argv, desc_), this->vm_);
   po::notify(this->vm_);    
 
   //Add here you traduction algorithm
-  trad_.push_back (new TradFm ("fm"));
-  trad_.push_back (new TradTaa ("taa"));
-  trad_.push_back (new TradLacim ("lacim"));
+  if (vm_.count ("fm"))
+    trad_.push_back (new TradFm ("fm",
+				 TradFm::optobin (vm_["fm"].as<std::vector<std::string> > ())));
+  else
+    trad_.push_back (new TradFm("fm", 0));
+
+  if (vm_.count ("taa"))
+    trad_.push_back (new TradTaa ("taa",
+				  TradTaa::optobin (vm_["taa"].as<std::vector <std::string> >())));
+  else
+    trad_.push_back (new TradTaa("taa", 0));
+
+
+  if (vm_.count ("lacim"))
+    trad_.push_back (new TradLacim ("lacim",
+				    TradLacim::optobin (vm_["lacim"].as<std::vector <std::string> > ())));
+  else
+    trad_.push_back (new TradLacim("lacim", 0));
+
 }
 
 OptionHandler::~OptionHandler ()

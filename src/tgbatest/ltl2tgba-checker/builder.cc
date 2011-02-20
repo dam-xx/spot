@@ -32,8 +32,9 @@ Builder::operator() ()
   std::vector<Trad*>::iterator i;
   for (i = algo_.begin (); i != algo_.end (); ++i)
     {
-      (*m)[(*i)->name_get ()] = tgba_pair ((**i)(f, dict_),
-					 (**i)(nf, dict_));
+      if ((*i)->do_get ())
+	(*m)[(*i)->name_get ()] = tgba_pair ((**i)(f, dict_),
+					     (**i)(nf, dict_));
     }
   
   spot::ltl::atomic_prop_set* s = spot::ltl::atomic_prop_collect (f, 0);

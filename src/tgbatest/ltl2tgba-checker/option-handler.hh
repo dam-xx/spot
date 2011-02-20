@@ -26,8 +26,6 @@ protected:
   po::options_description desc_;
   po::variables_map vm_;
   std::vector<Trad*> trad_;
-
-
 };
 
 #endif /* !OPTION_HANDLER_HH_ */
