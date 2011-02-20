@@ -41,7 +41,8 @@ checker_SOURCES  = \
 	builder.cc \
 	trad-lacim.cc \
 	trad-fm.cc \
-	trad-taa.cc
+	trad-taa.cc \
+	algos.cc
 
 checker_CXXFLAGS = -lboost_program_options
 # Keep this sorted by STRENGTH.  Test basic things first,
