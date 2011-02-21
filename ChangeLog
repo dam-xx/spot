@@ -1,3 +1,7 @@
+2011-02-21  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/misc/escape.hh: Correct documentation.
+
 2011-02-14  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Correct tgba_explicit::compute_support_conditions.

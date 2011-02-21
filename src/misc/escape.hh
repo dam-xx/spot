@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE).
 // Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -30,9 +32,12 @@ namespace spot
   /// \addtogroup misc_tools
   /// @{
 
-  /// Escape " and \ characters in \a str.
+  /// Escape <code>"</code>, <code>\</code>, and <code>\n</code>
+  /// characters in \a str.
   std::ostream& escape_str(std::ostream& os, const std::string& str);
-  /// Escape " and \ characters in \a str.
+
+  /// Escape <code>"</code>, <code>\</code>, and <code>\n</code>
+  /// characters in \a str.
   std::string escape_str(const std::string& str);
 
   /// @}
