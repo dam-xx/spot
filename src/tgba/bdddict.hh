@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2006  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -33,8 +35,15 @@
 namespace spot
 {
 
-  /// Map BDD variables to formulae.
   /// \ingroup tgba_essentials
+  /// \brief Map BDD variables to formulae.
+  ///
+  /// The BDD library uses integers to designate Boolean variables in
+  /// its decision diagrams.  This class is used to map such integers
+  /// to objects actually used in Spot.  These objects are usually
+  /// atomic propositions, but they can also be acceptance conditions,
+  /// or "Now/Next" variables (although the latter should be
+  /// eventually removed).
   class bdd_dict: public bdd_allocator
   {
   public:
