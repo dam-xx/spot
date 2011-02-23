@@ -1,3 +1,20 @@
+2011-02-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add trivial identities for &&, <>->, []-> and Boolean arguments.
+
+	* src/ltlast/binop.cc (EConcat, UConcat): Rewrite "{b}<>-> f"
+	as "b && f", and rewrite "{b}[]->f" as "b->f".
+	* src/ltlast/binop.hh (binop::instance): Document trivial
+	identities for <>-> and []->.
+	* src/ltlast/multop.cc (multop::instance): Rewrite "b1 & b2"
+	as "b1 && b2" when b1 and b2 are Boolean.
+	(multop::multop): Always disable is.boolean for AndNLM.
+	* src/ltlast/multop.hh: Document the rewriting.
+	* src/ltltest/equals.cc: Show the two formulas if the exit_code
+	is 1, to help debugging.
+	* src/ltltest/equals.test: Add more tests.
+	* src/ltltest/kind.test: Adjust tests.
+
 2011-02-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Cosmetic change to please sanity checks.
