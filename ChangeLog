@@ -1,5 +1,14 @@
 2011-02-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Combine Boolean formulae in Fusion arguments.
+
+	* src/ltlast/multop.cc (multop::instance): Implement
+	the rewriting.   "a:b:c[*]:d:e" becomes "{{a&&b}&c[*]}:{d&&e}".
+	* src/ltlast/multop.hh: Document it.
+	* src/ltltest/equals.test, src/ltltest/kind.test: Add test cases.
+
+2011-02-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add trivial identities for &&, <>->, []-> and Boolean arguments.
 
 	* src/ltlast/binop.cc (EConcat, UConcat): Rewrite "{b}<>-> f"
