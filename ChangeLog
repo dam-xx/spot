@@ -1,3 +1,15 @@
+2011-02-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Track syntactic classes (safety, guarantee, obligation,
+	persistence, recurrence).
+
+	* src/ltlast/formula.hh, src/ltlast/formula.cc: Declare a bit for
+	each of these classes.
+	* src/ltlast/atomic_prop.cc, src/ltlast/constant.cc,
+	src/ltlast/automatop.cc, src/ltlast/binop.cc, src/ltlast/bunop.cc,
+	src/ltlast/unop.cc: Update these bits.
+	* src/ltltest/kind.test: Update tests and add more.
+
 2011-02-23  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Combine Boolean formulae in Fusion arguments.
