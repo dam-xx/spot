@@ -1,5 +1,19 @@
 2011-02-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Track finite formulae (i.e. SERE without star, or LTL formula
+	using only X and Boolean operators).
+
+	* src/ltlast/formula.hh, src/ltlast/formula.cc: Add a bit for
+	tracking finite formulas.
+	* src/ltlast/atomic_prop.cc, src/ltlast/automatop.cc,
+	src/ltlast/bunop.cc, src/ltlast/constant.cc, src/ltlast/formula.cc:
+	Adjust.
+	* src/ltlast/unop.cc, src/ltlast/binop.cc: Adjust and use that
+	bit to refine the computation of some LTL classes.
+	* src/ltltest/kind.test: New tests.
+
+2011-02-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Track syntactic classes (safety, guarantee, obligation,
 	persistence, recurrence).
 
