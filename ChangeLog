@@ -1,5 +1,10 @@
 2011-02-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/tgbatest/randpsl.test: Run without valgrind, it is too slow
+	otherwise.
+
+2011-02-27  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Track finite formulae (i.e. SERE without star, or LTL formula
 	using only X and Boolean operators).
 
