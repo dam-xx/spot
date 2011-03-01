@@ -1,4 +1,4 @@
-// Copyright (C) 2010 Laboratoire de Recherche et Développement de
+// Copyright (C) 2010, 2011 Laboratoire de Recherche et Développement de
 // l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -34,8 +34,6 @@ using namespace spot::ltl;
 
 environment& env(default_environment::instance());
 
-
-
 // The five first classes defined here come from the following paper:
 //
 // @InProceedings{cichon.09.depcos,
@@ -47,27 +45,49 @@ environment& env(default_environment::instance());
 //   year = 2009,
 //   publisher = {IEEE Computer Society},
 // }
+//
+// Classes 6-9 and 12-14 where used in
+//
+// @InProceedings{geldenhuys.06.spin,
+//   author = {Jaco Geldenhuys and Henri Hansen},
+//   title = {Larger Automata and Less Work for LTL Model Checking},
+//   booktitle = {Proceedings of the 13th International SPIN Workshop},
+//   year = {2006},
+//   pages = {53--70},
+//   series = {Lecture Notes in Computer Science},
+//   volume = {3925},
+//   publisher = {Springer}
+// }
 
 void
 syntax(char* prog)
 {
-  std::cerr << "Usage: "<< prog << " [-s] F N" << std::endl
-	    << std::endl
-	    << "-s output using Spin's syntax" << std::endl
-	    << "F  specifies the familly of LTL formula to build" << std::endl
-	    << "N  is the size parameter of the familly" << std::endl
-	    << std::endl
-	    << "Classes available (F):" << std::endl
-	    << "  1: F(p1&F(p2&F(p3&...F(pn)))) & F(q1&F(q2&F(q3&...F(qn))))"
-	    << std::endl
-	    << "  2: p&X(p&X(p&...X(p)))) & X(q&F(q&F(q&...F(q))))"
-	    << std::endl
-	    << "  3: p&(Xp)&(XXp)&...(X...X(p)) & p&(Xq)&(XXq)&...(X...X(q))"
-	    << std::endl
-	    << "  4: GF(p1)&GF(p2)&...&GF(pn)"
-	    << std::endl
-	    << "  5: FG(p1)|GF(p2)|...|GF(pn)"
-	    << std::endl;
+  std::cerr
+    << "Usage: "<< prog << " [-s] F N" << std::endl
+    << std::endl
+    << "-s output using Spin's syntax" << std::endl
+    << "F  specifies the familly of LTL formula to build" << std::endl
+    << "N  is the size parameter of the familly" << std::endl
+    << std::endl
+    << "Classes available (F):" << std::endl
+    << "  1: F(p1&F(p2&F(p3&...F(pn)))) & F(q1&F(q2&F(q3&...F(qn))))"
+    << std::endl
+    << "  2: p&X(p&X(p&...X(p)))) & X(q&F(q&F(q&...F(q))))" << std::endl
+    << "  3: p&(Xp)&(XXp)&...(X...X(p)) & p&(Xq)&(XXq)&...(X...X(q))"
+    << std::endl
+    << "  4: GF(p1)&GF(p2)&...&GF(pn)" << std::endl
+    << "  5: FG(p1)|FG(p2)|...|FG(pn)" << std::endl
+    << "  6: GF(p1)|GF(p2)|...|GF(pn)" << std::endl
+    << "  7: FG(p1)&FG(p2)&...&FG(pn)" << std::endl
+    << "  8: (((p1 U p2) U p3) ... U pn)" << std::endl
+    << "  9: (p1 U (p2 U (... U pn)))" << std::endl
+    << " 10: (((p1 R p2) R p3) ... R pn)" << std::endl
+    << " 11: (p1 R (p2 R (... R pn)))" << std::endl
+    << " 12: (GF(p1)|FG(p2))&(GF(p2)|FG(p3))&...&(GF(pn)|FG(p{n+1}))"
+    << std::endl
+    << " 13: (F(p1)|G(p2))&(F(p2)|G(p3))&...&(F(pn)|G(p{n+1}))" << std::endl
+    << " 14: G(p1)|G(p2)|...|G(pn)" << std::endl
+    << " 15: F(p1)&F(p2)&...&F(pn)" << std::endl;
   exit(2);
 }
 
@@ -161,13 +181,16 @@ formula* N_prime_n(std::string name, int n)
 }
 
 
-// GF(p_1) | GF(p_2) | ... | GF(p_n)
-formula* FG_n(std::string name, int n)
+// GF(p_1) & GF(p_2) & ... & GF(p_n)   if conj == true
+// GF(p_1) | GF(p_2) | ... | GF(p_n)   if conj == false
+formula* GF_n(std::string name, int n, bool conj = true)
 {
   if (n <= 0)
-    return constant::true_instance();
+    return conj ? constant::true_instance() : constant::false_instance();
 
   formula* result = 0;
+
+  multop::type op = conj ? multop::And : multop::Or;
 
   for (int i = 1; i <= n; ++i)
     {
@@ -185,13 +208,16 @@ formula* FG_n(std::string name, int n)
   return result;
 }
 
-// FG(p_1) | FG(p_2) | ... | FG(p_n)
-formula* GF_n(std::string name, int n)
+// FG(p_1) | FG(p_2) | ... | FG(p_n)   if conj == false
+// FG(p_1) & FG(p_2) & ... & FG(p_n)   if conj == true
+formula* FG_n(std::string name, int n, bool conj = false)
 {
   if (n <= 0)
-    return constant::false_instance();
+    return conj ? constant::true_instance() : constant::false_instance();
 
   formula* result = 0;
+
+  multop::type op = conj ? multop::And : multop::Or;
 
   for (int i = 1; i <= n; ++i)
     {
@@ -202,7 +228,138 @@ formula* GF_n(std::string name, int n)
 						 env.require(p.str())));
 
       if (result)
-	result = multop::instance(multop::Or, f, result);
+	result = multop::instance(op, f, result);
+      else
+	result = f;
+    }
+  return result;
+}
+
+//  (((p1 OP p2) OP p3)...OP pn)   if right_assoc == false
+//  (p1 OP (p2 OP (p3 OP (... pn)  if right_assoc == true
+formula* bin_n(std::string name, int n,
+	       binop::type op, bool right_assoc = false)
+{
+  if (n <= 0)
+    {
+      std::cerr << "n>0 required for this class" << std::endl;
+      exit(1);
+    }
+
+  formula* result = 0;
+
+  for (int i = 1; i <= n; ++i)
+    {
+      std::ostringstream p;
+      p << name << (right_assoc ? (n + 1 - i) : i);
+      formula* f = env.require(p.str());
+      if (!result)
+	result = f;
+      else if (right_assoc)
+	result = binop::instance(op, f, result);
+      else
+	result = binop::instance(op, result, f);
+    }
+  return result;
+}
+
+// (GF(p1)|FG(p2))&(GF(p2)|FG(p3))&...&(GF(pn)|FG(p{n+1}))"
+formula* R_n(std::string name, int n)
+{
+  if (n <= 0)
+    return constant::true_instance();
+
+  formula* pi;
+
+  {
+    std::ostringstream p;
+    p << name << 1;
+    pi = env.require(p.str());
+  }
+
+  formula* result = 0;
+
+  for (int i = 1; i <= n; ++i)
+    {
+      formula* gf = unop::instance(unop::G,
+				   unop::instance(unop::F,
+						  pi));
+      std::ostringstream p;
+      p << name << i + 1;
+      pi = env.require(p.str());
+
+      formula* fg = unop::instance(unop::F,
+				   unop::instance(unop::G,
+						  pi->clone()));
+
+      formula* f = multop::instance(multop::Or, gf, fg);
+
+      if (result)
+	result = multop::instance(multop::And, f, result);
+      else
+	result = f;
+    }
+  pi->destroy();
+  return result;
+}
+
+// (F(p1)|G(p2))&(F(p2)|G(p3))&...&(F(pn)|G(p{n+1}))"
+formula* Q_n(std::string name, int n)
+{
+  if (n <= 0)
+    return constant::true_instance();
+
+  formula* pi;
+
+  {
+    std::ostringstream p;
+    p << name << 1;
+    pi = env.require(p.str());
+  }
+
+  formula* result = 0;
+
+  for (int i = 1; i <= n; ++i)
+    {
+      formula* f = unop::instance(unop::F, pi);
+
+      std::ostringstream p;
+      p << name << i + 1;
+      pi = env.require(p.str());
+
+      formula* g = unop::instance(unop::G, pi->clone());
+
+      f = multop::instance(multop::Or, f, g);
+
+      if (result)
+	result = multop::instance(multop::And, f, result);
+      else
+	result = f;
+    }
+  pi->destroy();
+  return result;
+}
+
+//  OP(p1) | OP(p2) | ... | OP(Pn) if conj == false
+//  OP(p1) & OP(p2) & ... & OP(Pn) if conj == true
+formula* combunop_n(std::string name, int n,
+		    unop::type op, bool conj = false)
+{
+  if (n <= 0)
+    return conj ? constant::true_instance() : constant::false_instance();
+
+  formula* result = 0;
+
+  multop::type cop = conj ? multop::And : multop::Or;
+
+  for (int i = 1; i <= n; ++i)
+    {
+      std::ostringstream p;
+      p << name << i;
+      formula* f = unop::instance(op, env.require(p.str()));
+
+      if (result)
+	result = multop::instance(cop, f, result);
       else
 	result = f;
     }
@@ -240,10 +397,40 @@ main(int argc, char** argv)
       res = multop::instance(multop::And, N_prime_n("p", n), N_prime_n("q", n));
       break;
     case 4:
-      res = FG_n("p", n);
+      res = GF_n("p", n, true);
       break;
     case 5:
-      res = GF_n("p", n);
+      res = FG_n("p", n, false);
+      break;
+    case 6:
+      res = GF_n("p", n, false);
+      break;
+    case 7:
+      res = FG_n("p", n, true);
+      break;
+    case 8:
+      res = bin_n("p", n, binop::U, false);
+      break;
+    case 9:
+      res = bin_n("p", n, binop::U, true);
+      break;
+    case 10:
+      res = bin_n("p", n, binop::R, false);
+      break;
+    case 11:
+      res = bin_n("p", n, binop::R, true);
+      break;
+    case 12:
+      res = R_n("p", n);
+      break;
+    case 13:
+      res = Q_n("p", n);
+      break;
+    case 14:
+      res = combunop_n("p", n, unop::G, false);
+      break;
+    case 15:
+      res = combunop_n("p", n, unop::F, true);
       break;
     default:
       std::cerr << "Unknown familly " << f << std::endl;
