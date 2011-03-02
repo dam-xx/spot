@@ -202,6 +202,7 @@ namespace spot
           bool dest_trans_empty = dest_trans == 0 || dest_trans->empty();
           if (is_stuttering_transition || (dest_trans_empty && (!dest_is_livelock_accepting)) )
             {
+              delete (*it_trans);
               it_trans = trans->erase(it_trans);
             }
           else
@@ -284,10 +285,10 @@ namespace spot
 
   }
 
-  const ta::states_set_t*
+  const ta::states_set_t
   ta_explicit::get_initial_states_set() const
   {
-    return &initial_states_set_;
+    return initial_states_set_;
 
   }
 

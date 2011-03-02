@@ -45,26 +45,23 @@ namespace spot
 
     // build Initial states set:
     state* tgba_init_state = tgba_->get_init_state();
-    tgba_succ_iterator* tgba_succ_it = tgba_->succ_iter(tgba_init_state);
 
-    for (tgba_succ_it->first(); !tgba_succ_it->done(); tgba_succ_it->next())
+    bdd tgba_condition = tgba_->support_conditions(tgba_init_state);
+
+    bdd satone_tgba_condition;
+    while ((satone_tgba_condition = bdd_satoneset(tgba_condition,
+        atomic_propositions_set_, bddtrue)) != bddfalse)
       {
-        bdd tgba_condition = tgba_succ_it->current_condition();
-        bdd satone_tgba_condition;
-        while ((satone_tgba_condition = bdd_satoneset(tgba_condition,
-            atomic_propositions_set_, bddtrue)) != bddfalse)
-          {
-            tgba_condition -= satone_tgba_condition;
-            state_ta_explicit* init_state = new state_ta_explicit(
-                tgba_init_state->clone(), satone_tgba_condition, true,
-                tgba_->state_is_accepting(tgba_init_state));
-
-            ta->add_to_initial_states_set(ta->add_state(init_state));
+        tgba_condition -= satone_tgba_condition;
+        state_ta_explicit* init_state = new state_ta_explicit(
+            tgba_init_state->clone(), satone_tgba_condition, true,
+            tgba_->state_is_accepting(tgba_init_state));
+            state_ta_explicit* is = ta->add_state(init_state);
+            assert(is == init_state);
+            ta->add_to_initial_states_set(is);
             todo.push(init_state);
-          }
       }
     delete tgba_init_state;
-    delete tgba_succ_it;
 
     while (!todo.empty())
       {
@@ -158,8 +155,8 @@ namespace spot
     std::stack<state*> init_set;
 
     ta::states_set_t::const_iterator it;
-    for (it = (testing_automata->get_initial_states_set())->begin(); it
-        != (testing_automata->get_initial_states_set())->end(); it++)
+    ta::states_set_t init_states = testing_automata->get_initial_states_set();
+    for (it = init_states.begin(); it != init_states.end(); it++)
       {
         state* init_state = dynamic_cast<state_ta_explicit*> (*it);
         init_set.push(init_state);

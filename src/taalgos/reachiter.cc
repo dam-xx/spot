@@ -51,11 +51,11 @@ namespace spot
   {
     int n = 0;
     start();
-    const ta::states_set_t* init_states_set =
+    const ta::states_set_t init_states_set =
         t_automata_->get_initial_states_set();
     ta::states_set_t::const_iterator it;
 
-    for (it = init_states_set->begin(); it != init_states_set->end(); it++)
+    for (it = init_states_set.begin(); it != init_states_set.end(); it++)
       {
         state* init_state = (*it);
         if (want_state(init_state))

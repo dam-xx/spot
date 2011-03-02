@@ -46,7 +46,7 @@ namespace spot
 
     typedef std::set<state*, state_ptr_less_than> states_set_t;
 
-    virtual const states_set_t*
+    virtual const states_set_t
     get_initial_states_set() const = 0;
 
     virtual ta_succ_iterator*

@@ -61,7 +61,7 @@ namespace spot
     // ta interface
     virtual
     ~ta_explicit();
-    virtual const states_set_t*
+    virtual const states_set_t
     get_initial_states_set() const;
 
     virtual ta_succ_iterator*

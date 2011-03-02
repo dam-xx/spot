@@ -77,6 +77,7 @@ namespace spot
 
   ta_succ_iterator_product::~ta_succ_iterator_product()
   {
+    delete current_state_;
     delete ta_succ_it_;
     delete kripke_succ_it_;
   }
@@ -118,7 +119,8 @@ namespace spot
   void
   ta_succ_iterator_product::next()
   {
-
+    delete current_state_;
+    current_state_ = 0;
     if (is_stuttering_transition())
       {
         ta_succ_it_->first();
@@ -161,6 +163,7 @@ namespace spot
             return;
           }
 
+        delete kripke_succ_it_current_state;
         step_();
       }
   }
@@ -182,7 +185,7 @@ namespace spot
     //
     //    return new state_ta_product(ta_succ_it_->current_state(),
     //        kripke_succ_it_->current_state());
-    return current_state_;
+    return current_state_->clone();
   }
 
   bool
@@ -223,42 +226,41 @@ namespace spot
     dict_->register_all_variables_of(&ta_, this);
     dict_->register_all_variables_of(&kripke_, this);
 
-    //build initial states set
-
-    const ta::states_set_t* ta_init_states_set = ta_->get_initial_states_set();
-    ta::states_set_t::const_iterator it;
-
-    for (it = ta_init_states_set->begin(); it != ta_init_states_set->end(); it++)
-      {
-        state* kripke_init_state = kripke_->get_init_state();
-        if ((kripke_->state_condition(kripke_init_state))
-            == (ta_->get_state_condition(*it)))
-          initial_states_set_.insert(new state_ta_product((*it),
-              kripke_init_state));
-      }
-
   }
 
   ta_product::~ta_product()
   {
-    const ta::states_set_t* init_states_set = get_initial_states_set();
-    ta::states_set_t::const_iterator it;
-
-    for (it = init_states_set->begin(); it != init_states_set->end(); it++)
-      {
-
-        const state_ta_product* stp =
-            dynamic_cast<const state_ta_product*> (*it);
-        delete stp;
-      }
-
     dict_->unregister_all_my_variables(this);
   }
 
-  const ta::states_set_t*
+  const ta::states_set_t
   ta_product::get_initial_states_set() const
   {
-    return &initial_states_set_;
+    //build initial states set
+
+       const ta::states_set_t ta_init_states_set = ta_->get_initial_states_set();
+       ta::states_set_t::const_iterator it;
+
+       ta::states_set_t initial_states_set;
+
+       for (it = ta_init_states_set.begin(); it != ta_init_states_set.end(); it++)
+         {
+           state* kripke_init_state = kripke_->get_init_state();
+           if ((kripke_->state_condition(kripke_init_state))
+               == (ta_->get_state_condition(*it)))
+             {
+               state_ta_product* stp = new state_ta_product((*it),
+                   kripke_init_state);
+
+               initial_states_set.insert(stp);
+             } else {
+                 delete kripke_init_state;
+             }
+
+         }
+
+
+    return initial_states_set;
   }
 
   ta_succ_iterator_product*
@@ -326,12 +328,11 @@ namespace spot
   void
   ta_product::free_state(const spot::state* s) const
   {
-    if (!is_initial_state(s))
-      {
+
         const state_ta_product* stp = dynamic_cast<const state_ta_product*> (s);
         ta_->free_state(stp->get_ta_state());
         delete stp;
-      }
+
 
   }
 

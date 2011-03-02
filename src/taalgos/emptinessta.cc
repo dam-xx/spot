@@ -88,12 +88,12 @@ namespace spot
 
     std::stack<spot::state*> livelock_roots;
 
+    const ta::states_set_t init_states_set = a_->get_initial_states_set();
     ta::states_set_t::const_iterator it;
-    for (it = (a_->get_initial_states_set())->begin(); it
-        != (a_->get_initial_states_set())->end(); it++)
+    for (it = init_states_set.begin(); it != init_states_set.end(); it++)
       {
         state* init_state = (*it);
-        init_set.push(init_state->clone());
+        init_set.push(init_state);
         //colour[init_state] = WHITE;
 
       }
@@ -155,7 +155,7 @@ namespace spot
                 inc_depth();
 
                 // set the h value of the Backtracked state to negative value.
-               // colour[curr] = BLUE;
+                // colour[curr] = BLUE;
                 *spi.second = -std::abs(*spi.second);
 
                 // Backtrack livelock_roots.
@@ -208,7 +208,6 @@ namespace spot
             // the next iteration.
             succ->next();
             // We do not need SUCC from now on.
-
 
             // Are we going to a new state?
             numbered_state_heap::state_index_p spi = h->find(dest);
@@ -290,37 +289,34 @@ namespace spot
                 const state* dest = spi.first;
                 std::set<const state*, state_ptr_less_than> liveset_dest =
                     liveset[dest];
-                assert(!liveset.empty());
 
-                liveset_dest.insert(dest);
+                std::set<const state*, state_ptr_less_than> liveset_curr =
+                    liveset[curr];
+
+                int h_livelock_root = 0;
+                if (!livelock_roots.empty())
+                  h_livelock_root = *(h->find((livelock_roots.top()))).second;
+
+                if (heuristic_livelock_detection(dest, h, h_livelock_root,
+                    liveset_curr))
+                  {
+                    clear(h, todo, init_set);
+                    return true;
+                  }
 
                 std::set<const state*, state_ptr_less_than>::const_iterator it;
                 for (it = liveset_dest.begin(); it != liveset_dest.end(); it++)
                   {
-                    const state* u = (*it);
-                    numbered_state_heap::state_index_p hu = h->find(u);
-
-
-                    if (*hu.second > 0)
-                       // colour[u] == GREY)
+                    const state* succ = (*it);
+                    if (heuristic_livelock_detection(succ, h, h_livelock_root,
+                        liveset_curr))
                       {
-
-
-                        if (livelock_roots.empty() || *hu.second >= *(h->find(
-                            (livelock_roots.top()))).second)
-                          {
-                            clear(h, todo, init_set);
-                            trace
-                              << "PASS 1: heuristic livelock detection SUCCESS"
-                                  << std::endl;
-                            return true;
-                          }
-
-                        liveset[curr].insert(u);
+                        clear(h, todo, init_set);
+                        return true;
                       }
+
                   }
 
-                liveset_dest.erase(dest);
               }
           }
 
@@ -328,6 +324,30 @@ namespace spot
 
     clear(h, todo, init_set);
     return livelock_detection(a_);
+  }
+
+  bool
+  ta_check::heuristic_livelock_detection(const state * u,
+      numbered_state_heap* h, int h_livelock_root, std::set<const state*,
+          state_ptr_less_than> liveset_curr)
+  {
+    numbered_state_heap::state_index_p hu = h->find(u);
+
+    if (*hu.second > 0) // colour[u] == GREY
+      {
+
+        if (*hu.second >= h_livelock_root)
+          {
+            trace
+              << "PASS 1: heuristic livelock detection SUCCESS" << std::endl;
+            return true;
+          }
+
+        liveset_curr.insert(u);
+      }
+
+    return false;
+
   }
 
   bool
@@ -361,14 +381,18 @@ namespace spot
     // * init: the set of the depth-first search initial states
     std::stack<spot::state*> init_set;
 
+
+
+    const ta::states_set_t init_states_set = a_->get_initial_states_set();
     ta::states_set_t::const_iterator it;
-    for (it = (t->get_initial_states_set())->begin(); it
-        != (t->get_initial_states_set())->end(); it++)
+    for (it = init_states_set.begin(); it != init_states_set.end(); it++)
       {
         state* init_state = (*it);
-        init_set.push(init_state->clone());
+        init_set.push(init_state);
+
 
       }
+
 
     while (!init_set.empty())
       {
@@ -457,7 +481,6 @@ namespace spot
             // the next iteration.
             succ->next();
             // We do not need SUCC from now on.
-
 
             numbered_state_heap::state_index_p spi = h->find(dest);
 
@@ -564,7 +587,6 @@ namespace spot
       {
         a_->free_state(init_states.top());
         init_states.pop();
-
       }
 
     // Release all iterators in TODO.

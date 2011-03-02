@@ -242,7 +242,7 @@ namespace spot
     assert(s);
     const state* st = s->get_state();
 
-    bdd res = bddtrue;
+    bdd res = bddfalse;
     tgba_explicit::state::const_iterator i;
     for (i = st->begin(); i != st->end(); ++i)
       res |= (*i)->condition;

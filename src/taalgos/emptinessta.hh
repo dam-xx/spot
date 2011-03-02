@@ -69,8 +69,12 @@ namespace spot
 
   protected:
     void
-    clear(numbered_state_heap* h, std::stack<pair_state_iter> todo,
-        std::stack<spot::state*> init_set);
+    clear(numbered_state_heap* h, std::stack<pair_state_iter> todo, std::stack<
+        spot::state*> init_set);
+    bool
+    heuristic_livelock_detection(const state * stuttering_succ,
+        numbered_state_heap* h, int h_livelock_root, std::set<const state*,
+            state_ptr_less_than> liveset_curr);
     const ta* a_; ///< The automaton.
     option_map o_; ///< The options
 

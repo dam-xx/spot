@@ -129,7 +129,7 @@ namespace spot
     virtual
     ~ta_product();
 
-    virtual const states_set_t*
+    virtual const states_set_t
     get_initial_states_set() const;
 
     virtual ta_succ_iterator_product*
@@ -160,7 +160,6 @@ namespace spot
     bdd_dict* dict_;
     const ta* ta_;
     const kripke* kripke_;
-    ta::states_set_t initial_states_set_;
 
     // Disallow copy.
     ta_product(const ta_product&);
