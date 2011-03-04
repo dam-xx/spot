@@ -1,5 +1,10 @@
 2011-03-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* wrap/python/ajax/spot.in: Use the degeneralized automaton if
+	available while computing the emptiness check.
+
+2011-03-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Speedup build_result() called by minimize_dfa().
 
 	* src/tgbaalgos/minimize.cc (build_result): Speed it up by

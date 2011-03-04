@@ -347,22 +347,22 @@ if output_type == 'r':
         print_acc_run = True
     elif s == 'd':
         draw_acc_run = True
-    
-    
+
+
     err = ""
-    opt = (form.getfirst('ec', 'Cou99') + "(" + 
+    opt = (form.getfirst('ec', 'Cou99') + "(" +
            form.getfirst('eo', '') + ")")
     eci, err = spot.emptiness_check_instantiator.construct(opt)
 
     if not eci:
-        print ('<div class="parse-error">Cannot parse "' + opt + '" near "' 
+        print ('<div class="parse-error">Cannot parse "' + opt + '" near "'
                + err + '".</div>')
     else:
         ec_a = 0
         n_acc = degen.number_of_acceptance_conditions()
         n_max = eci.max_acceptance_conditions()
         if (n_acc <= n_max):
-            ec_a = automaton
+            ec_a = degen
         else:
             print ('<div class="ec-error">Cannot run ' + opt
                    + ' on automata with more than ' + str(n_max)
