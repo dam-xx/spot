@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2011  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -53,9 +53,12 @@ namespace spot
     /// \param si an iterator over the successors of this state (owned by the
     ///           caller, but can be freely iterated)
     /// \param label the computed name of this state
+    /// \param accepting whether the state is accepting (it makes sense only
+    ///                  for state-acceptance automata)
     virtual std::string state_decl(const tgba* a, const state* s, int n,
 				   tgba_succ_iterator* si,
-				   const std::string& label);
+				   const std::string& label,
+				   bool accepting);
 
     /// \brief Compute the style of a link.
     ///
@@ -86,6 +89,7 @@ namespace spot
   protected:
     dotty_decorator();
   };
+
 }
 
 #endif // SPOT_TGBAALGOS_DOTTYDEC_HH

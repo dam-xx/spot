@@ -1,5 +1,27 @@
 2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Using double borders for acceptance states in SBAs.
+
+	* src/tgbaalgos/dotty.hh (dotty_reachable): Take a new
+	assume_sba argument.
+	* src/tgbaalgos/dotty.cc (dotty_bfs): Take a new
+	mark_accepting_states arguments.
+	(dotty_bfs::process_state): Check if a state is accepting using
+	the state_is_accepting() method for tgba_sba_proxies, or by
+	looking at the first outgoing transition of the state.  Pass
+	the result to the dectorator.
+	(dotty_reachable): Adjust function.
+	* src/tgbaalgos/dottydec.hh, src/tgbaalgos/dottydec.cc,
+	src/tgbaalgos/rundotdec.hh, src/tgbaalgos/rundotdec.cc
+	(state_decl): Add an "accepting" argument, and use it to
+	decorate accepting states with a double border.
+	* src/tgbatest/ltl2tgba.cc: Keep track of whether the output
+	is an SBA or not, so that we can tell it to dotty().
+	* wrap/python/ajax/spot.in: Likewise.
+	* wrap/python/cgi-bin/ltl2tgba.in: Likewise.
+
+2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/ltltest/genltl.cc (GF_n): Really use "op".
 
 2011-03-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

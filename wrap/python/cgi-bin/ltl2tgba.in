@@ -205,12 +205,12 @@ def render_dot(basename):
                + '.txt">dot source</a>)')
     sys.stdout.flush()
 
-def render_automaton(basename, automata, dont_run_dot, deco = False):
+def render_automaton(basename, automata, dont_run_dot, issba, deco = False):
     outfile = spot.ofstream(basename + '.txt')
     if not deco:
-        spot.dotty_reachable(outfile, automata)
+        spot.dotty_reachable(outfile, automata, issba)
     else:
-        spot.dotty_reachable(outfile, automata, deco)
+        spot.dotty_reachable(outfile, automata, issba, deco)
     del outfile
     if dont_run_dot:
         print ('<p>' + dont_run_dot + ''' to be rendered on-line.  However
@@ -574,6 +574,8 @@ elif trans_fm:
 elif trans_taa:
     automaton = spot.ltl_to_taa(f, dict, refined_rules)
 
+issba = False
+
 if reduce_dmonitor:
     automaton = spot.minimize_monitor(automaton)
 elif reduce_wdba:
@@ -581,6 +583,7 @@ elif reduce_wdba:
     if minimized:
         automaton = minimized
         minimized = 0
+        issba = True
 elif reduce_scc:
     # Do not suppress all useless acceptance conditions if
     # degeneralization is requested: keeping those that lead to
@@ -594,14 +597,14 @@ sys.stdout.flush()
 dont_run_dot = print_stats(automaton)
 
 if show_automaton_png:
-    render_automaton(imgprefix + '-a', automaton, dont_run_dot)
+    render_automaton(imgprefix + '-a', automaton, dont_run_dot, issba)
 
 if show_degen_png or show_never_claim:
     print '<H3>Degeneralized automaton</H3>'
     degen = spot.tgba_sba_proxy(automaton)
     dont_run_dot = print_stats(degen)
     if show_degen_png:
-        render_automaton(imgprefix + '-d', degen, dont_run_dot)
+        render_automaton(imgprefix + '-d', degen, dont_run_dot, True)
 else:
     degen = 0
 
@@ -627,7 +630,7 @@ if (type(automaton) == spot.tgba_bdd_concrete
     print '<H3>Transition relation</H3>'
     if show_relation_set:
 	escaped_print_set(automaton.get_dict(),
-			  automaton.get_core_data().relation)
+                          automaton.get_core_data().relation)
     if show_relation_png:
         render_bdd(imgprefix + '-b', automaton.get_dict(),
                    automaton.get_core_data().relation)
@@ -637,7 +640,7 @@ if (type(automaton) == spot.tgba_bdd_concrete
     print '<H3>Acceptance relation</H3>'
     if show_acceptance_set:
 	escaped_print_set(automaton.get_dict(),
-			  automaton.get_core_data().acceptance_conditions)
+                          automaton.get_core_data().acceptance_conditions)
     if show_acceptance_png:
         render_bdd(imgprefix + '-c', automaton.get_dict(),
                    automaton.get_core_data().acceptance_conditions)
@@ -681,6 +684,7 @@ if draw_acc_run or print_acc_run:
             if degen:
                 ec_a = degen
                 ec_msg += ' <b>on degeneralized automaton</b>'
+                issba = True
             else:
                 print ('<font color="red">Cannot run ' + emptiness_check
                        + ' on automata with more than ' + str(n_max)
@@ -712,7 +716,8 @@ if draw_acc_run or print_acc_run:
                 if draw_acc_run:
                     deco = spot.tgba_run_dotty_decorator(ec_run)
                     dont_run_dot = print_stats(ec_a)
-                    render_automaton(imgprefix + '-e', ec_a, dont_run_dot, deco)
+                    render_automaton(imgprefix + '-e', ec_a, dont_run_dot,
+                                     issba, deco)
                     del deco
                 del ec_run
             del ec_res

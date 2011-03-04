@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE).
 // Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -34,9 +36,13 @@ namespace spot
 
   std::string
   dotty_decorator::state_decl(const tgba*, const state*, int,
-			      tgba_succ_iterator*, const std::string& label)
+			      tgba_succ_iterator*, const std::string& label,
+			      bool accepting)
   {
-    return "[label=\"" + label + "\"]";
+    if (accepting)
+      return "[label=\"" + label + "\", peripheries=2]";
+    else
+      return "[label=\"" + label + "\"]";
   }
 
   std::string

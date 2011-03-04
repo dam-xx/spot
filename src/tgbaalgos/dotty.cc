@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE).
 // Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -25,6 +27,7 @@
 #include "tgba/bddprint.hh"
 #include "reachiter.hh"
 #include "misc/escape.hh"
+#include "tgba/tgbatba.hh"
 
 namespace spot
 {
@@ -33,8 +36,11 @@ namespace spot
     class dotty_bfs : public tgba_reachable_iterator_breadth_first
     {
     public:
-      dotty_bfs(std::ostream& os, const tgba* a, dotty_decorator* dd)
-	: tgba_reachable_iterator_breadth_first(a), os_(os), dd_(dd)
+      dotty_bfs(std::ostream& os, const tgba* a, bool mark_accepting_states,
+		dotty_decorator* dd)
+	: tgba_reachable_iterator_breadth_first(a), os_(os),
+	  mark_accepting_states_(mark_accepting_states), dd_(dd),
+	  sba_(dynamic_cast<const tgba_sba_proxy*>(a))
       {
       }
 
@@ -55,9 +61,31 @@ namespace spot
       void
       process_state(const state* s, int n, tgba_succ_iterator* si)
       {
+	bool accepting;
+
+	if (mark_accepting_states_)
+	  {
+	    if (sba_)
+	      {
+		accepting = sba_->state_is_accepting(s);
+	      }
+	    else
+	      {
+		si->first();
+		accepting = ((!si->done())
+			     && (si->current_acceptance_conditions() ==
+				 automata_->all_acceptance_conditions()));
+	      }
+	  }
+	else
+	  {
+	    accepting = false;
+	  }
+
 	os_ << "  " << n << " "
 	    << dd_->state_decl(automata_, s, n, si,
-			       escape_str(automata_->format_state(s)))
+			       escape_str(automata_->format_state(s)),
+			       accepting)
 	    << std::endl;
       }
 
@@ -80,14 +108,17 @@ namespace spot
 
     private:
       std::ostream& os_;
+      bool mark_accepting_states_;
       dotty_decorator* dd_;
+      const tgba_sba_proxy* sba_;
     };
   }
 
   std::ostream&
-  dotty_reachable(std::ostream& os, const tgba* g, dotty_decorator* dd)
+  dotty_reachable(std::ostream& os, const tgba* g,
+		  bool assume_sba, dotty_decorator* dd)
   {
-    dotty_bfs d(os, g, dd);
+    dotty_bfs d(os, g, assume_sba, dd);
     d.run();
     return os;
   }

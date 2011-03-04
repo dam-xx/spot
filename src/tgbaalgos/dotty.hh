@@ -1,4 +1,4 @@
-// Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2003, 2004, 2011  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -31,12 +31,17 @@ namespace spot
 
   /// \brief Print reachable states in dot format.
   /// \ingroup tgba_io
+  ///
+  /// If assume_sba is set, this assumes that the automaton
+  /// is an SBA and use double elipse to mark accepting states.
+  ///
   /// The \a dd argument allows to customize the output in various
   /// ways.  See \ref tgba_dotty "this page" for a list of available
   /// decorators.
   std::ostream&
   dotty_reachable(std::ostream& os,
 		  const tgba* g,
+		  bool assume_sba = false,
 		  dotty_decorator* dd = dotty_decorator::instance());
 }
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
+// Copyright (C) 2004, 2011  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
 //
@@ -45,11 +45,13 @@ namespace spot
   std::string
   tgba_run_dotty_decorator::state_decl(const tgba*, const state* s, int,
 				       tgba_succ_iterator*,
-				       const std::string& label)
+				       const std::string& label,
+				       bool accepting)
   {
     step_map::const_iterator i = map_.find(s);
+    std::string acc = accepting ? ", peripheries=2" : "";
     if (i == map_.end())
-      return "[label=\"" + label + "\"]";
+      return "[label=\"" + label + acc + "\"]";
 
     std::ostringstream os;
     std::string sep = "(";
@@ -74,7 +76,8 @@ namespace spot
     assert(in_cycle || in_prefix);
     os << ")\\n" << label;
     std::string color = in_prefix ? (in_cycle ? "violet" : "blue") : "red";
-    return "[label=\"" + os.str() + "\", style=bold, color=" + color + "]";
+    return "[label=\"" + os.str() + "\", style=bold, color="
+      + color + acc + "]";
   }
 
   std::string

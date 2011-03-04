@@ -336,6 +336,7 @@ main(int argc, char** argv)
   spot::bdd_dict* dict = new spot::bdd_dict();
   spot::timer_map tm;
   bool use_timer = false;
+  bool assume_sba = false;
 
   for (;;)
     {
@@ -924,14 +925,20 @@ main(int argc, char** argv)
 	  && n_acc > 1
 	  && echeck_inst->max_acceptance_conditions() < n_acc)
 	degeneralize_opt = DegenTBA;
+
       if (degeneralize_opt == DegenTBA)
-	a = degeneralized = new spot::tgba_tba_proxy(a);
+	{
+	  a = degeneralized = new spot::tgba_tba_proxy(a);
+	}
       else if (degeneralize_opt == DegenSBA)
-	a = degeneralized = new spot::tgba_sba_proxy(a);
+	{
+	  a = degeneralized = new spot::tgba_sba_proxy(a);
+	  assume_sba = true;
+	}
       else if (labeling_opt == StateLabeled)
-      {
-        a = state_labeled = new spot::tgba_sgba_proxy(a);
-      }
+	{
+	  a = state_labeled = new spot::tgba_sgba_proxy(a);
+	}
 
       const spot::tgba* minimized = 0;
       if (opt_minimize)
@@ -957,6 +964,7 @@ main(int argc, char** argv)
 	  else
 	    {
 	      a = minimized;
+	      assume_sba = true;
 	    }
 	}
 
@@ -965,6 +973,9 @@ main(int argc, char** argv)
 	  tm.start("Monitor minimization");
 	  a = minimized = minimize_monitor(a);
 	  tm.stop("Monitor minimization");
+	  assume_sba = false; 	// All states are accepting, so double
+				// circles in the dot output are
+				// pointless.
 	}
 
       spot::tgba_reduc* aut_red = 0;
@@ -1045,6 +1056,8 @@ main(int argc, char** argv)
         {
           a = product = product_to_free = new spot::tgba_product(system, a);
 
+	  assume_sba = false;
+
 	  unsigned int n_acc = a->number_of_acceptance_conditions();
 	  if (echeck_inst
 	      && degeneralize_opt == NoDegen
@@ -1052,11 +1065,16 @@ main(int argc, char** argv)
 	      && echeck_inst->max_acceptance_conditions() < n_acc)
             degeneralize_opt = DegenTBA;
           if (degeneralize_opt == DegenTBA)
-            a = product = product_degeneralized =
-                                            new spot::tgba_tba_proxy(product);
+	    {
+	      a = product = product_degeneralized =
+		new spot::tgba_tba_proxy(product);
+	    }
           else if (degeneralize_opt == DegenSBA)
-            a = product = product_degeneralized =
-                                            new spot::tgba_sba_proxy(product);
+	    {
+	      a = product = product_degeneralized =
+		new spot::tgba_sba_proxy(product);
+	      assume_sba = true;
+	    }
         }
 
       if (echeck_inst
@@ -1088,7 +1106,7 @@ main(int argc, char** argv)
 	  switch (output)
 	    {
 	    case 0:
-	      spot::dotty_reachable(std::cout, a);
+	      spot::dotty_reachable(std::cout, a, assume_sba);
 	      break;
 	    case 1:
 	      if (concrete)
@@ -1296,7 +1314,8 @@ main(int argc, char** argv)
 			      if (graph_run_opt)
 				{
 				  spot::tgba_run_dotty_decorator deco(run);
-				  spot::dotty_reachable(std::cout, a, &deco);
+				  spot::dotty_reachable(std::cout, a,
+							assume_sba, &deco);
 				}
 			      else if (graph_run_tgba_opt)
 				{
