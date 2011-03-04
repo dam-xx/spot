@@ -1,3 +1,11 @@
+2011-03-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Speedup build_result() called by minimize_dfa().
+
+	* src/tgbaalgos/minimize.cc (build_result): Speed it up by
+	removing one useless loop, creating many duplicate transitions
+	that had to be merged.
+
 2011-03-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/ltltest/genltl.cc: Add 10 more LTL formula classes.

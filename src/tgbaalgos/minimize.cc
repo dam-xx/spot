@@ -141,13 +141,15 @@ namespace spot
     {
       hash_set::iterator hit;
       hash_set* h = *sit;
-      for (hit = h->begin(); hit != h->end(); ++hit)
-      {
-        const state* src = *hit;
-        unsigned src_num = state_num[src];
-        tgba_succ_iterator* succit = a->succ_iter(src);
-        bool accepting = (final->find(src) != final->end());
-        for (succit->first(); !succit->done(); succit->next())
+
+      // Pick one state.
+      const state* src = *h->begin();
+      unsigned src_num = state_num[src];
+      bool accepting = (final->find(src) != final->end());
+
+      // Connect it to all destinations.
+      tgba_succ_iterator* succit = a->succ_iter(src);
+      for (succit->first(); !succit->done(); succit->next())
         {
           const state* dst = succit->current_state();
 	  hash_map::const_iterator i = state_num.find(dst);
@@ -159,8 +161,7 @@ namespace spot
           if (accepting)
             res->add_acceptance_condition(t, ltl::constant::true_instance());
         }
-        delete succit;
-      }
+      delete succit;
     }
     res->merge_transitions();
     const state* init_state = a->get_init_state();
