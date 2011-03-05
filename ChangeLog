@@ -1,5 +1,17 @@
 2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Setup libltdl in ltdl/, so we can use it in the dve2 interface.
+
+	Don't keep it under version control since it is installed by
+	autoreconf.
+
+	* configure.ac: Call LT_CONFIG_LTDL_DIR and LTDL_INIT.
+	* README: Mention ltdl/.
+	* Makefile.am: Recurse into ldtl.
+	* iface/dve2/Makefile.am: Link with it.
+
+2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Setup build system for a new dve2 interface.
 
 	* iface/dve2/dve2.cc, iface/dve2/dve2.hh: New dummy files.

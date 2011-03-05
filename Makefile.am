@@ -1,3 +1,5 @@
+## Copyright (C) 2011 Laboratoire de Recherche et Développement
+## de l'Epita (LRDE).
 ## Copyright (C) 2003, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 ## département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ## et Marie Curie.
@@ -33,7 +35,7 @@ if NEVER
   NEVER_BENCH = bench
 endif
 
-SUBDIRS = $(MAYBE_BUDDY) $(MAYBE_LBTT) $(NEVER_BENCH) doc src wrap iface
+SUBDIRS = $(MAYBE_BUDDY) $(MAYBE_LBTT) $(NEVER_BENCH) doc src wrap ltdl iface
 
 ACLOCAL_AMFLAGS = -I m4
 EXTRA_DIST = HACKING

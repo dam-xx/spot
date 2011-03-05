@@ -42,3 +42,4 @@ cachegrind.*
 *.gcda
 *.gcno
 *.info
+ltdl

@@ -51,7 +51,9 @@ AX_CHECK_BOOST([1.34], [103400])
 
 AC_CHECK_FUNCS([srand48 drand48])
 
+LT_CONFIG_LTDL_DIR([ltdl])
 LT_INIT([win32-dll])
+LTDL_INIT([subproject convenience])
 
 spot_INTEL
 if test x$enable_warnings = xyes; then

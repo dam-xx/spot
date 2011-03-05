@@ -18,7 +18,7 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-AM_CPPFLAGS = -I$(top_srcdir)/src $(BUDDY_CPPFLAGS)
+AM_CPPFLAGS = -I$(top_srcdir)/src $(BUDDY_CPPFLAGS) -I$(top_srcdir)/ltdl
 AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
 dve2dir = $(pkgincludedir)/iface/dve2
@@ -26,5 +26,7 @@ dve2dir = $(pkgincludedir)/iface/dve2
 dve2_HEADERS = dve2.hh
 
 lib_LTLIBRARIES = libspotdve2.la
-libspotdve2_la_LIBADD = $(top_builddir)/src/libspot.la
+libspotdve2_la_LIBADD = \
+  $(top_builddir)/src/libspot.la \
+  $(top_builddir)/ltdl/libltdlc.la
 libspotdve2_la_SOURCES = dve2.cc
