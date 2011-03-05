@@ -1,5 +1,25 @@
 2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Teach the DVE2 interface about atomic propositions such as "a <=
+	10" or "b != 3".  This only work for integer variables presently.
+
+	* iface/dve2/dve2.hh (load_dve2): Take an atomic_prop_set
+	argument to indicate the AP to observe.
+	* iface/dve2/dve2.cc (convert_aps): New function.  Parse the
+	atomic propositions in format them in a prop_set structure that
+	will allow fast generation of the state condition.
+	(load_dve2): Call convert_aps, and pass the resulting prop_set
+	structure to the kripke object.
+	(dve2_kripke::dve2_kripke): Store the prop_set structure.
+	(dve2_kripke::~dve2_kripke): Release the prop_set, and unregister
+	the bdd_variable associated to it.
+	(compute_state_condition): New method that uses the prop_set.
+	(succ_iter, state_condition): Call compute_state_condition().
+	* iface/dve2/dve2check.cc: Adjust the call to load_dve2 to
+	pass it atomic propositions read from the command line.
+
+2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Display states variables in the state label.
 
 	* iface/dve2/dve2.cc (dve2_kripke::dve2_kripke): Retrieve

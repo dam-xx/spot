@@ -20,12 +20,16 @@
 
 #include "dve2.hh"
 #include "tgbaalgos/dotty.hh"
-#include "ltlenv/declenv.hh"
+#include "ltlenv/defaultenv.hh"
+#include "ltlast/allnodes.hh"
 
 int
 main(int argc, char **argv)
 {
-  spot::ltl::declarative_environment env;
+  spot::ltl::default_environment& env =
+    spot::ltl::default_environment::instance();
+
+  spot::ltl::atomic_prop_set ap;
 
   if (argc <= 1)
     {
@@ -35,12 +39,18 @@ main(int argc, char **argv)
 
   while (argc > 2)
     {
-      env.declare(argv[argc - 1]);
+      ap.insert(static_cast<spot::ltl::atomic_prop*>
+		(env.require(argv[argc - 1])));
       --argc;
     }
 
   spot::bdd_dict* dict = new spot::bdd_dict();
-  spot::kripke* a = spot::load_dve2(argv[1], dict, true);
+  spot::kripke* a = spot::load_dve2(argv[1], dict, &ap, true);
+
+  for (spot::ltl::atomic_prop_set::const_iterator it = ap.begin();
+       it != ap.end(); ++it)
+    (*it)->destroy();
+  ap.clear();
 
   if (!a)
     {
@@ -51,5 +61,17 @@ main(int argc, char **argv)
   spot::dotty_reachable(std::cout, a);
 
   delete a;
+
+  spot::ltl::atomic_prop::dump_instances(std::cerr);
+  spot::ltl::unop::dump_instances(std::cerr);
+  spot::ltl::binop::dump_instances(std::cerr);
+  spot::ltl::multop::dump_instances(std::cerr);
+  spot::ltl::automatop::dump_instances(std::cerr);
+  assert(spot::ltl::atomic_prop::instance_count() == 0);
+  assert(spot::ltl::unop::instance_count() == 0);
+  assert(spot::ltl::binop::instance_count() == 0);
+  assert(spot::ltl::multop::instance_count() == 0);
+  assert(spot::ltl::automatop::instance_count() == 0);
+
   delete dict;
 }

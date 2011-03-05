@@ -193,14 +193,182 @@ namespace spot
     };
 
     ////////////////////////////////////////////////////////////////////////
+    // PREDICATE EVALUATION
+
+    typedef enum { OP_EQ, OP_NE, OP_LT, OP_GT, OP_LE, OP_GE } relop;
+
+    struct one_prop
+    {
+      int var_num;
+      relop op;
+      int val;
+      int bddvar;  // if "var_num op val" is true, output bddvar,
+		   // else its negation
+    };
+    typedef std::vector<one_prop> prop_set;
+
+    int
+    convert_aps(const ltl::atomic_prop_set* aps,
+		const dve2_interface* d,
+		bdd_dict* dict,
+		prop_set& out)
+    {
+      int errors = 0;
+
+      int state_size = d->get_state_variable_count();
+      std::map<std::string, int> val_n;
+      for (int i = 0; i < state_size; ++i)
+	val_n[d->get_state_variable_name(i)] = i;
+
+      for (ltl::atomic_prop_set::const_iterator ap = aps->begin();
+	   ap != aps->end(); ++ap)
+	{
+	  std::string str = (*ap)->name();
+	  const char* s = str.c_str();
+
+	  // Skip any leading blank.
+	  while (*s && (*s == ' ' || *s == '\t'))
+	    ++s;
+	  if (!*s)
+	    {
+	      std::cerr << "Proposition `" << str
+			<< "' cannot be parsed." << std::endl;
+	      ++errors;
+	      continue;
+	    }
+
+
+	  char* name = (char*) malloc(str.size() + 1);
+	  char* name_p = name;
+	  while (*s && (*s != '=') && *s != '<' && *s != '!'  && *s != '>')
+	    {
+	      if (*s == ' ' || *s == '\t')
+		++s;
+	      else
+		*name_p++ = *s++;
+	    }
+	  *name_p = 0;
+
+	  if (name == name_p)
+	    {
+	      std::cerr << "Proposition `" << str
+			<< "' cannot be parsed." << std::endl;
+	      free(name);
+	      ++errors;
+	      continue;
+	    }
+
+	  // Lookup the name
+	  std::map<std::string, int>::const_iterator ni = val_n.find(name);
+	  if (ni == val_n.end())
+	    {
+	      std::cerr << "No variable `" << name
+			<< "' found in model (for proposition `"
+			<< str << "')." << std::endl;
+	      free(name);
+	      ++errors;
+	      continue;
+	    }
+	  free(name);
+
+	  if (!*s)		// No operator?  Assume "!= 0".
+	    {
+	      int v = dict->register_proposition(*ap, d);
+	      one_prop p = { ni->second, OP_NE, 0, v };
+	      out.push_back(p);
+	      continue;
+	    }
+
+	  relop op;
+
+	  switch (*s)
+	    {
+	    case '!':
+	      if (s[1] != '=')
+		goto report_error;
+	      op = OP_NE;
+	      s += 2;
+	      break;
+	    case '=':
+	      if (s[1] != '=')
+		goto report_error;
+	      op = OP_EQ;
+	      s += 2;
+	      break;
+	    case '<':
+	      if (s[1] == '=')
+		{
+		  op = OP_LE;
+		  s += 2;
+		}
+	      else
+		{
+		  op = OP_LT;
+		  ++s;
+		}
+	      break;
+	    case '>':
+	      if (s[1] == '=')
+		{
+		  op = OP_LE;
+		  s += 2;
+		}
+	      else
+		{
+		  op = OP_LT;
+		  ++s;
+		}
+	      break;
+	    default:
+	    report_error:
+	      std::cerr << "Unexpected `" << s
+			<< "' while parsing atomic proposition `" << str
+			<< "'." << std::endl;
+	      ++errors;
+	      continue;
+	    }
+
+	  while (*s && (*s == ' ' || *s == '\t'))
+	    ++s;
+
+	  char* s_end;
+	  int val = strtol(s, &s_end, 10);
+	  if (s == s_end)
+	    {
+	      std::cerr << "Failed to parse `" << s
+			<< "' as an integer." << std::endl;
+	      ++errors;
+	      continue;
+	    }
+	  s = s_end;
+	  while (*s && (*s == ' ' || *s == '\t'))
+	    ++s;
+	  if (*s)
+	    {
+	      std::cerr << "Unexpected character `" << s
+			<< "' while parsing atomic proposition `" << str
+			<< "'." << std::endl;
+	      ++errors;
+	      continue;
+	    }
+
+	  int v = dict->register_proposition(*ap, d);
+	  one_prop p = { ni->second, op, val, v };
+	  out.push_back(p);
+	}
+
+      return errors;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
     // KRIPKE
 
     class dve2_kripke: public kripke
     {
     public:
 
-      dve2_kripke(const dve2_interface* d, bdd_dict* dict)
-	: d_(d), dict_(dict)
+      dve2_kripke(const dve2_interface* d, bdd_dict* dict, const prop_set* ps)
+	: d_(d), dict_(dict), ps_(ps)
       {
 	state_size_ = d_->get_state_variable_count();
 
@@ -212,7 +380,13 @@ namespace spot
       ~dve2_kripke()
       {
 	delete[] vname_;
+	lt_dlclose(d_->handle);
+
+	dict_->unregister_all_my_variables(d_);
+
 	delete d_;
+	delete ps_;
+	lt_dlexit();
       }
 
       virtual
@@ -221,6 +395,36 @@ namespace spot
 	dve2_state* res = new dve2_state(state_size_);
 	d_->get_initial_state(res->vars);
 	res->compute_hash();
+	return res;
+      }
+
+      bdd
+      compute_state_condition(const dve2_state* s) const
+      {
+	bdd res = bddtrue;
+	for (prop_set::const_iterator i = ps_->begin();
+	     i != ps_->end(); ++i)
+	  {
+	    int l = s->vars[(*i).var_num];
+	    int r = (*i).val;
+
+
+	    bool cond = false;
+	    switch ((*i).op)
+	      {
+	      case OP_EQ: cond = (l == r); break;
+	      case OP_NE: cond = (l != r); break;
+	      case OP_LT: cond = (l < r); break;
+	      case OP_GT: cond = (l > r); break;
+	      case OP_LE: cond = (l <= r); break;
+	      case OP_GE: cond = (l >= r); break;
+	      }
+
+	    if (cond)
+	      res &= bdd_ithvar((*i).bddvar);
+	    else
+	      res &= bdd_nithvar((*i).bddvar);
+	  }
 	return res;
       }
 
@@ -238,15 +442,16 @@ namespace spot
 	(void) t;
 	assert((unsigned)t == cc->transitions.size());
 
-	return new dve2_succ_iterator(cc, bddtrue);
+	return new dve2_succ_iterator(cc, compute_state_condition(s));
       }
 
       virtual
       bdd
-      state_condition(const state* s) const
+      state_condition(const state* st) const
       {
-	(void) s;
-	return bddfalse;
+	const dve2_state* s = dynamic_cast<const dve2_state*>(st);
+	assert(s);
+	return compute_state_condition(s);
       }
 
       virtual
@@ -283,6 +488,7 @@ namespace spot
       int state_size_;
       bdd_dict* dict_;
       const char** vname_;
+      const prop_set* ps_;
     };
 
   }
@@ -291,7 +497,8 @@ namespace spot
   ////////////////////////////////////////////////////////////////////////////
   // LOADER
 
-  kripke* load_dve2(const std::string& file_arg, bdd_dict* dict, bool verbose)
+  kripke* load_dve2(const std::string& file_arg, bdd_dict* dict,
+		    ltl::atomic_prop_set* to_observe, bool verbose)
   {
     std::string file;
     if (file_arg.find_first_of("/\\") != std::string::npos)
@@ -371,6 +578,17 @@ namespace spot
 	return 0;
       }
 
-    return new dve2_kripke(d, dict);
+    prop_set* ps = new prop_set;
+    int errors = convert_aps(to_observe, d, dict, *ps);
+    if (errors)
+      {
+	delete ps;
+	dict->unregister_all_my_variables(d);
+	delete d;
+	lt_dlexit();
+	return 0;
+      }
+
+    return new dve2_kripke(d, dict, ps);
   }
 }

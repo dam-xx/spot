@@ -22,10 +22,15 @@
 # define SPOT_IFACE_DVE2_DVE2_HH
 
 #include "kripke/kripke.hh"
+#include "ltlvisit/apcollect.hh"
+
+
 
 namespace spot
 {
-  kripke* load_dve2(const std::string& file, bdd_dict* dict,
+  kripke* load_dve2(const std::string& file,
+		    bdd_dict* dict,
+		    ltl::atomic_prop_set* to_observe,
 		    bool verbose = true);
 }
 
