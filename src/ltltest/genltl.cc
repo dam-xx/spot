@@ -201,7 +201,7 @@ formula* GF_n(std::string name, int n, bool conj = true)
 						 env.require(p.str())));
 
       if (result)
-	result = multop::instance(multop::And, f, result);
+	result = multop::instance(op, f, result);
       else
 	result = f;
     }
