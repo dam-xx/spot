@@ -1,5 +1,13 @@
 2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Teach the DVE2 interface about enumerated types.
+
+	* iface/dve2/dve2.cc (convert_aps): Add support for
+	enumerated types.  E.g. an atomic proposition such
+	as "P_0.CS" really means "P_0 == CS".
+
+2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Teach the DVE2 interface about atomic propositions such as "a <=
 	10" or "b != 3".  This only work for integer variables presently.
 

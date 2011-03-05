@@ -207,6 +207,14 @@ namespace spot
     };
     typedef std::vector<one_prop> prop_set;
 
+
+    struct var_info
+    {
+      int num;
+      int type;
+    };
+
+
     int
     convert_aps(const ltl::atomic_prop_set* aps,
 		const dve2_interface* d,
@@ -216,9 +224,28 @@ namespace spot
       int errors = 0;
 
       int state_size = d->get_state_variable_count();
-      std::map<std::string, int> val_n;
+      typedef std::map<std::string, var_info> val_map_t;
+      val_map_t val_map;
+
       for (int i = 0; i < state_size; ++i)
-	val_n[d->get_state_variable_name(i)] = i;
+	{
+	  const char* name = d->get_state_variable_name(i);
+	  int type = d->get_state_variable_type(i);
+	  var_info v = { i , type };
+	  val_map[name] = v;
+	}
+
+      int type_count = d->get_state_variable_type_count();
+      typedef std::map<std::string, int> enum_map_t;
+      std::vector<enum_map_t> enum_map(type_count);
+      for (int i = 0; i < type_count; ++i)
+	{
+	  int enum_count = d->get_state_variable_type_value_count(i);
+	  for (int j = 0; j < enum_count; ++j)
+	    enum_map[i]
+	      .insert(std::make_pair(d->get_state_variable_type_value(i, j),
+				     j));
+	}
 
       for (ltl::atomic_prop_set::const_iterator ap = aps->begin();
 	   ap != aps->end(); ++ap)
@@ -240,12 +267,18 @@ namespace spot
 
 	  char* name = (char*) malloc(str.size() + 1);
 	  char* name_p = name;
+	  char* lastdot = 0;
 	  while (*s && (*s != '=') && *s != '<' && *s != '!'  && *s != '>')
 	    {
+
 	      if (*s == ' ' || *s == '\t')
 		++s;
 	      else
-		*name_p++ = *s++;
+		{
+		  if (*s == '.')
+		    lastdot = name_p;
+		  *name_p++ = *s++;
+		}
 	    }
 	  *name_p = 0;
 
@@ -259,22 +292,74 @@ namespace spot
 	    }
 
 	  // Lookup the name
-	  std::map<std::string, int>::const_iterator ni = val_n.find(name);
-	  if (ni == val_n.end())
+	  val_map_t::const_iterator ni = val_map.find(name);
+	  if (ni == val_map.end())
 	    {
-	      std::cerr << "No variable `" << name
-			<< "' found in model (for proposition `"
-			<< str << "')." << std::endl;
+	      // We may have a name such as X.Y.Z
+	      // If it is not a known variable, it might mean
+	      // an enumerated variable X.Y with value Z.
+	      if (lastdot)
+		{
+		  *lastdot++ = 0;
+		  ni = val_map.find(name);
+		}
+
+	      if (ni == val_map.end())
+		{
+		  std::cerr << "No variable `" << name
+			    << "' found in model (for proposition `"
+			    << str << "')." << std::endl;
+		  free(name);
+		  ++errors;
+		  continue;
+		}
+
+	      // We have found the enumerated variable, and lastdot is
+	      // pointing to its expected value.
+	      int type_num = ni->second.type;
+	      enum_map_t::const_iterator ei = enum_map[type_num].find(lastdot);
+	      if (ei == enum_map[type_num].end())
+		{
+		  std::cerr << "No state `" << lastdot
+			    << "' known for variable `"
+			    << name << "'." << std::endl;
+		  std::cerr << "Possible states are:";
+		  for (ei = enum_map[type_num].begin();
+		       ei != enum_map[type_num].end(); ++ei)
+		    std::cerr << " " << ei->first;
+		  std::cerr << std::endl;
+
+		  free(name);
+		  ++errors;
+		  continue;
+		}
+
+	      // At this point, *s should be 0.
+	      if (*s)
+		{
+		  std::cerr << "Trailing garbage `" << s
+			    << "' at end of proposition `"
+			    << str << "'." << std::endl;
+		  free(name);
+		  ++errors;
+		  continue;
+		}
+
+	      // Record that X.Y must be equal to Z.
+	      int v = dict->register_proposition(*ap, d);
+	      one_prop p = { ni->second.num, OP_EQ, ei->second, v };
+	      out.push_back(p);
 	      free(name);
-	      ++errors;
 	      continue;
 	    }
 	  free(name);
 
+	  int var_num = ni->second.num;
+
 	  if (!*s)		// No operator?  Assume "!= 0".
 	    {
 	      int v = dict->register_proposition(*ap, d);
-	      one_prop p = { ni->second, OP_NE, 0, v };
+	      one_prop p = { var_num, OP_NE, 0, v };
 	      out.push_back(p);
 	      continue;
 	    }
@@ -353,7 +438,7 @@ namespace spot
 	    }
 
 	  int v = dict->register_proposition(*ap, d);
-	  one_prop p = { ni->second, op, val, v };
+	  one_prop p = { var_num, op, val, v };
 	  out.push_back(p);
 	}
 
