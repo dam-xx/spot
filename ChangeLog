@@ -1,5 +1,17 @@
 2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	We can now explore a divine2 compiled model, but the atomic
+	properties are still missing.
+
+	* iface/dve2/dve2.cc, iface/dve2/dve2.hh: Add
+	classes for presenting the DiVinE2 model as a kripke object.
+	(load_dve2): Load the *.dve2C file using libltdl.
+	* iface/dve2/Makefile.am: Add a dve2check program.
+	* iface/dve2/dve2check.cc: New file.  Currently it just
+	outputs the reachability graph using dotty.
+
+2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Setup libltdl in ltdl/, so we can use it in the dve2 interface.
 
 	Don't keep it under version control since it is installed by

@@ -1,5 +1,5 @@
-// Copyright (C) 2011 Laboratoire de Recherche et Developpement
-// de l'Epita (LRDE)
+// Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+// l'Epita (LRDE)
 //
 // This file is part of Spot, a model checking library.
 //
@@ -18,15 +18,38 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
-#ifndef SPOT_IFACE_DVE2_DVE2_HH
-# define SPOT_IFACE_DVE2_DVE2_HH
+#include "dve2.hh"
+#include "tgbaalgos/dotty.hh"
+#include "ltlenv/declenv.hh"
 
-#include "kripke/kripke.hh"
-
-namespace spot
+int
+main(int argc, char **argv)
 {
-  kripke* load_dve2(const std::string& file, bdd_dict* dict,
-		    bool verbose = true);
-}
+  spot::ltl::declarative_environment env;
 
-#endif // SPOT_IFACE_DVE2_DVE2_HH
+  if (argc <= 1)
+    {
+      std::cerr << "usage: " << argv[0] << " model" << std::endl;
+      exit(1);
+    }
+
+  while (argc > 2)
+    {
+      env.declare(argv[argc - 1]);
+      --argc;
+    }
+
+  spot::bdd_dict* dict = new spot::bdd_dict();
+  spot::kripke* a = spot::load_dve2(argv[1], dict, true);
+
+  if (!a)
+    {
+      delete dict;
+      exit(1);
+    }
+
+  spot::dotty_reachable(std::cout, a);
+
+  delete a;
+  delete dict;
+}
