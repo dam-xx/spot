@@ -22,6 +22,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <vector>
+#include <sstream>
 
 #include "misc/hashfunc.hh"
 #include "dve2.hh"
@@ -44,7 +45,7 @@ namespace spot
 
     struct dve2_interface
     {
-      lt_dlhandle handle;
+      lt_dlhandle handle;	// handle to the dynamic library
       void (*get_initial_state)(void *to);
       int (*have_property)();
       int (*get_successors)( void* m, int *in, TransitionCB, void *arg );
@@ -202,10 +203,15 @@ namespace spot
 	: d_(d), dict_(dict)
       {
 	state_size_ = d_->get_state_variable_count();
+
+	vname_ = new const char*[state_size_];
+	for (int i = 0; i < state_size_; ++i)
+	  vname_[i] = d_->get_state_variable_name(i);
       }
 
       ~dve2_kripke()
       {
+	delete[] vname_;
 	delete d_;
       }
 
@@ -244,10 +250,26 @@ namespace spot
       }
 
       virtual
-      std::string format_state(const state *s) const
+      std::string format_state(const state *st) const
       {
-	(void) s;
-	return "x";
+	const dve2_state* s = dynamic_cast<const dve2_state*>(st);
+	assert(s);
+
+	std::stringstream res;
+
+	if (state_size_ == 0)
+	  return "empty state";
+
+	int i = 0;
+	for (;;)
+	  {
+	    res << vname_[i] << "=" << s->vars[i];
+	    ++i;
+	    if (i == state_size_)
+	      break;
+	    res << ", ";
+	  }
+	return res.str();
       }
 
       virtual
@@ -260,6 +282,7 @@ namespace spot
       const dve2_interface* d_;
       int state_size_;
       bdd_dict* dict_;
+      const char** vname_;
     };
 
   }

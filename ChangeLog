@@ -1,5 +1,14 @@
 2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Display states variables in the state label.
+
+	* iface/dve2/dve2.cc (dve2_kripke::dve2_kripke): Retrieve
+	the name of all the state variables.
+	(dve2_kripke::format_state): Use them to format the name
+	of the state.
+
+2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	We can now explore a divine2 compiled model, but the atomic
 	properties are still missing.
 
