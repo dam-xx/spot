@@ -1,8 +1,5 @@
-## Copyright (C) 2008, 2011 Laboratoire de Recherche et Développement
-## de l'Epita (LRDE).
-## Copyright (C) 2003 Laboratoire d'Informatique de Paris 6 (LIP6),
-## département Systèmes Répartis Coopératifs (SRC), Université Pierre
-## et Marie Curie.
+## Copyright (C) 2011 Laboratoire de Recherche et Developpement de
+## l'Epita (LRDE).
 ##
 ## This file is part of Spot, a model checking library.
 ##
@@ -21,8 +18,13 @@
 ## Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-SUBDIRS = nips dve2
+AM_CPPFLAGS = -I$(top_srcdir)/src $(BUDDY_CPPFLAGS)
+AM_CXXFLAGS = $(WARNING_CXXFLAGS)
 
-if WITH_GSPN
-  SUBDIRS += gspn
-endif
+dve2dir = $(pkgincludedir)/iface/dve2
+
+dve2_HEADERS = dve2.hh
+
+lib_LTLIBRARIES = libspotdve2.la
+libspotdve2_la_LIBADD = $(top_builddir)/src/libspot.la
+libspotdve2_la_SOURCES = dve2.cc

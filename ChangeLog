@@ -1,5 +1,15 @@
 2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Setup build system for a new dve2 interface.
+
+	* iface/dve2/dve2.cc, iface/dve2/dve2.hh: New dummy files.
+	* iface/dve2/Makefile.am: New file.
+	* iface/Makefile.am (SUBDIRS): Add dve2.
+	* configure.ac: Build iface/dve2/Makefile.
+	* README: Mention the new directory.
+
+2011-03-05  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Using double borders for acceptance states in SBAs.
 
 	* src/tgbaalgos/dotty.hh (dotty_reachable): Take a new

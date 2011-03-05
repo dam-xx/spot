@@ -96,6 +96,7 @@ AC_CONFIG_FILES([
   bench/wdba/defs
   doc/Doxyfile
   doc/Makefile
+  iface/dve2/Makefile
   iface/gspn/defs
   iface/gspn/Makefile
   iface/Makefile
@@ -139,7 +140,7 @@ AC_CONFIG_FILES([
   wrap/python/tests/Makefile
 ])
 AC_CONFIG_FILES([bench/ltl2tgba/ltl2baw.pl:bench/ltl2tgba/ltl2baw.in],
-	        [chmod +x bench/ltl2tgba/ltl2baw.pl])
+		[chmod +x bench/ltl2tgba/ltl2baw.pl])
 AC_CONFIG_FILES([doc/dot], [chmod +x doc/dot])
 AC_CONFIG_FILES([wrap/python/tests/run], [chmod +x wrap/python/tests/run])
 AC_OUTPUT
