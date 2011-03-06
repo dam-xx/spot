@@ -100,9 +100,15 @@ main(int argc, char **argv)
 	    case 'g':
 	      switch (opt[1])
 		{
-		case 'm': output = DotModel; break;
-		case 'p': output = DotProduct; break;
-		case 'f': output = DotFormula; break;
+		case 'm':
+		  output = DotModel;
+		  break;
+		case 'p':
+		  output = DotProduct;
+		  break;
+		case 'f':
+		  output = DotFormula;
+		  break;
 		default:
 		  goto error;
 		}

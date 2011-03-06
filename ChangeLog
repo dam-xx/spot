@@ -1,5 +1,10 @@
 2011-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* iface/dve2/dve2.cc, iface/dve2/dve2check.cc: Cosmetic changes
+	to please sanity checks.
+
+2011-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Call divine to compile dve models.
 
 	* iface/dve2/dve2.cc (compile_dve2): New function.  Compile

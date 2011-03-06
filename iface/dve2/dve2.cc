@@ -31,7 +31,8 @@
 
 namespace spot
 {
-  namespace {
+  namespace
+  {
 
     ////////////////////////////////////////////////////////////////////////
     // DVE2 --ltsmin interface
@@ -50,7 +51,7 @@ namespace spot
       lt_dlhandle handle;	// handle to the dynamic library
       void (*get_initial_state)(void *to);
       int (*have_property)();
-      int (*get_successors)( void* m, int *in, TransitionCB, void *arg );
+      int (*get_successors)(void* m, int *in, TransitionCB, void *arg);
 
       int (*get_state_variable_count)();
       const char* (*get_state_variable_name)(int var);
@@ -492,25 +493,37 @@ namespace spot
 	for (prop_set::const_iterator i = ps_->begin();
 	     i != ps_->end(); ++i)
 	  {
-	    int l = s->vars[(*i).var_num];
-	    int r = (*i).val;
+	    int l = s->vars[i->var_num];
+	    int r = i->val;
 
 
 	    bool cond = false;
-	    switch ((*i).op)
+	    switch (i->op)
 	      {
-	      case OP_EQ: cond = (l == r); break;
-	      case OP_NE: cond = (l != r); break;
-	      case OP_LT: cond = (l < r); break;
-	      case OP_GT: cond = (l > r); break;
-	      case OP_LE: cond = (l <= r); break;
-	      case OP_GE: cond = (l >= r); break;
+	      case OP_EQ:
+		cond = (l == r);
+		break;
+	      case OP_NE:
+		cond = (l != r);
+		break;
+	      case OP_LT:
+		cond = (l < r);
+		break;
+	      case OP_GT:
+		cond = (l > r);
+		break;
+	      case OP_LE:
+		cond = (l <= r);
+		break;
+	      case OP_GE:
+		cond = (l >= r);
+		break;
 	      }
 
 	    if (cond)
-	      res &= bdd_ithvar((*i).bddvar);
+	      res &= bdd_ithvar(i->bddvar);
 	    else
-	      res &= bdd_nithvar((*i).bddvar);
+	      res &= bdd_nithvar(i->bddvar);
 	  }
 	return res;
       }
@@ -694,7 +707,7 @@ namespace spot
     d->get_state_variable_type_count = (int (*)())
       lt_dlsym(h, "get_state_variable_type_count");
     d->get_state_variable_type_name = (const char* (*)(int))
-      lt_dlsym(h, "get_state_variable_type_name" );
+      lt_dlsym(h, "get_state_variable_type_name");
     d->get_state_variable_type_value_count = (int (*)(int))
       lt_dlsym(h, "get_state_variable_type_value_count");
     d->get_state_variable_type_value = (const char* (*)(int, int))
