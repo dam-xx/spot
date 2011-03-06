@@ -28,6 +28,22 @@
 
 namespace spot
 {
+
+  // \brief Load a DVE model.
+  //
+  // The filename given can be either a *.dve source or a *.dve2C
+  // dynamic library compiled with "divine compile --ltsmin file".
+  // When the *.dve source is supplied, the *.dve2C will be updated
+  // only if it is not newer.
+  //
+  // This function returns 0 on error.
+  //
+  // \a file the name of the *.dve source file or of the *.dve2C
+  //         dynamic library
+  // \a to_observe the list of atomic propositions that should be observed
+  //               in the model
+  // \a dict the BDD dictionary to use
+  // \a verbose whether to output verbose messages
   kripke* load_dve2(const std::string& file,
 		    bdd_dict* dict,
 		    ltl::atomic_prop_set* to_observe,

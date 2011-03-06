@@ -1,5 +1,14 @@
 2011-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Call divine to compile dve models.
+
+	* iface/dve2/dve2.cc (compile_dve2): New function.  Compile
+	the *.dve source if there is no newer *.dve2C already.
+	(load_dve2): Call compile_dve2 when given a *.dve file.
+	* iface/dve2/dve2.hh (load_dve2): Document it.
+
+2011-03-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Allow atomic propositions and identifiers like `X.Y'.
 
 	* src/ltlparse/ltlscan.ll: Do not recognize `.' as an AND.  Allow

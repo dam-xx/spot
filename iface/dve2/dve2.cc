@@ -23,6 +23,8 @@
 #include <cstdlib>
 #include <vector>
 #include <sstream>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "misc/hashfunc.hh"
 #include "dve2.hh"
@@ -582,14 +584,81 @@ namespace spot
   ////////////////////////////////////////////////////////////////////////////
   // LOADER
 
-  kripke* load_dve2(const std::string& file_arg, bdd_dict* dict,
-		    ltl::atomic_prop_set* to_observe, bool verbose)
+
+  // Call divine to compile "foo.dve" as "foo.dve2C" if the latter
+  // does not exist already or is older.
+  bool
+  compile_dve2(std::string& filename, bool verbose)
+  {
+
+    std::string command = "divine compile --ltsmin " + filename;
+
+    struct stat s;
+    if (stat(filename.c_str(), &s) != 0)
+      {
+	if (verbose)
+	  {
+	    std::cerr << "Cannot open " << filename << std::endl;
+	    return true;
+	  }
+      }
+
+    std::string old = filename;
+    filename += "2C";
+
+    // Remove any directory, because the new file will
+    // be compiled in the current directory.
+    size_t pos = filename.find_last_of("/\\");
+    if (pos != std::string::npos)
+      filename = "./" + filename.substr(pos + 1);
+
+    struct stat d;
+    if (stat(filename.c_str(), &d) == 0)
+      if (s.st_mtime < d.st_mtime)
+	// The dve2C is up-to-date, no need to recompile it.
+	return false;
+
+    int res = system(command.c_str());
+    if (res)
+      {
+	if (verbose)
+	  std::cerr << "Execution of `" << command.c_str()
+		    << "' returned exit code " << WEXITSTATUS(res)
+		    << "." << std::endl;
+	return true;
+      }
+    return false;
+  }
+
+
+  kripke*
+  load_dve2(const std::string& file_arg, bdd_dict* dict,
+	    ltl::atomic_prop_set* to_observe, bool verbose)
   {
     std::string file;
     if (file_arg.find_first_of("/\\") != std::string::npos)
       file = file_arg;
     else
       file = "./" + file_arg;
+
+    std::string ext = file.substr(file.find_last_of("."));
+    if (ext == ".dve")
+      {
+	if (compile_dve2(file, verbose))
+	  {
+	    if (verbose)
+	      std::cerr << "Failed to compile `" << file_arg
+			<< "'." << std::endl;
+	    return 0;
+	  }
+      }
+    else if (ext != ".dve2C")
+      {
+	if (verbose)
+	  std::cerr << "Unknown extension `" << ext
+		    << "'.  Use `.dve' or `.dve2C'." << std::endl;
+	return 0;
+      }
 
     if (lt_dlinit())
       {
