@@ -79,7 +79,7 @@ flex_set_buffer(const char* buf)
      /\, \/, and xor are from LBTT.
      --> and <--> come from Goal.  */
 "||"|"|"|"+"|"\\/"		BEGIN(0); return token::OP_OR;
-"&&"|"&"|"."|"/\\"		BEGIN(0); return token::OP_AND;
+"&&"|"&"|"/\\"			BEGIN(0); return token::OP_AND;
 "^"|"xor"			BEGIN(0); return token::OP_XOR;
 "=>"|"->"|"-->"			BEGIN(0); return token::OP_IMPLIES;
 "<=>"|"<->"|"<-->"		BEGIN(0); return token::OP_EQUIV;
@@ -104,8 +104,8 @@ flex_set_buffer(const char* buf)
      it's an ATOMIC_PROP (even though F0 could be seen as Ffalse, we
      don't, because Ffalse is never used in practice).
   */
-<INITIAL>[a-zA-EH-WYZ_][a-zA-Z0-9_]* |
-<INITIAL>[FGX][0-9][a-zA-Z0-9_]* |
+<INITIAL>[a-zA-EH-WYZ_.][a-zA-Z0-9_.]* |
+<INITIAL>[FGX][0-9][a-zA-Z0-9_.]* |
   /*
      However if we have just parsed an atomic proposition, then we
      are not expecting another atomic proposition, so we can be stricter
@@ -120,8 +120,8 @@ flex_set_buffer(const char* buf)
      of a binary operator followed by several unary operators.
      E.g. UFXp.   This way, `p=0UFXp=1' will be parsed as `(p=0)U(F(X(p=1)))'.
   */
-<not_prop>[a-zA-EH-QSTWYZ_][a-zA-EH-WYZ0-9_]* |
-<not_prop>[a-zA-EH-QSTWYZ_][a-zA-EH-WYZ0-9_][a-zA-Z0-9_]* {
+<not_prop>[a-zA-EH-QSTWYZ_.][a-zA-EH-WYZ0-9_.]* |
+<not_prop>[a-zA-EH-QSTWYZ_.][a-zA-EH-WYZ0-9_.][a-zA-Z0-9_.]* {
 			  yylval->str = new std::string(yytext, yyleng);
 			  BEGIN(not_prop);
 			  return token::ATOMIC_PROP;
@@ -130,7 +130,7 @@ flex_set_buffer(const char* buf)
   /* Atomic propositions can also be enclosed in double quotes.  */
 \"[^\"]*\"		{
 			  yylval->str = new std::string(yytext + 1,
-			                                yyleng - 2);
+							yyleng - 2);
 			  BEGIN(not_prop);
 			  return token::ATOMIC_PROP;
 			}

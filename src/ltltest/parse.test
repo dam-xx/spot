@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2009, 2010 Laboratoire de Recherche et DÃ©veloppement
+# Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et Developpement
 # de l'Epita (LRDE).
 # Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -39,7 +39,7 @@ for f in \
   '(p11011)' \
   'a & b' \
   'a & _b12' \
-  'a . b' \
+  'a && .b.' \
   'a + b' \
   'a3214 | b' \
   'a & b' \

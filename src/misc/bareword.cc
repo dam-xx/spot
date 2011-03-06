@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Développement
+// de l'Epita (LRDE).
 // Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -30,11 +32,11 @@ namespace spot
   {
     // Bare words cannot be empty and should start with a letter.
     if (!*str
-	|| !(isalpha(*str) || *str == '_'))
+	|| !(isalpha(*str) || *str == '_' || *str == '.'))
       return false;
     // The remaining of the word must be alphanumeric.
     while (*++str)
-      if (!(isalnum(*str) || *str == '_'))
+      if (!(isalnum(*str) || *str == '_' || *str == '.'))
 	return false;
     return true;
   }

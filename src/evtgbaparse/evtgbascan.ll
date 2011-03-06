@@ -1,4 +1,6 @@
-/* Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
+/* Copyright (C) 2011, Laboratoire de Recherche et Développement de
+** l'Epita (LRDE).
+** Copyright (C) 2004, 2005  Laboratoire d'Informatique de Paris 6 (LIP6),
 ** département Systèmes Répartis Coopératifs (SRC), Université Pierre
 ** et Marie Curie.
 **
@@ -47,10 +49,10 @@ eol      \n|\r|\n\r|\r\n
 acc[ \t]*=		return token::ACC_DEF;
 init[ \t]*=		return token::INIT_DEF;
 
-[a-zA-Z][a-zA-Z0-9_]*   {
+[a-zA-Z_.][a-zA-Z0-9_.]*   {
 			  yylval->str = new std::string(yytext);
-	                  return token::IDENT;
-		        }
+			  return token::IDENT;
+			}
 
 			/* discard whitespace */
 {eol}			yylloc->lines(yyleng); yylloc->step();
