@@ -1,2 +1,5 @@
 *.dve2C
+*.dve.cpp
 dve2check
+defs
+*.dir

@@ -35,3 +35,11 @@ noinst_PROGRAMS = dve2check
 
 dve2check_SOURCES = dve2check.cc
 dve2check_LDADD = libspotdve2.la
+
+check_SCRIPTS = defs
+
+TESTS = dve2check.test
+EXTRA_DIST = $(TESTS) beem-peterson.4.dve
+
+distclean-local:
+	rm -rf $(TESTS:.test=.dir)

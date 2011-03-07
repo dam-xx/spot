@@ -1,5 +1,14 @@
 2011-03-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Add some tests for the DVE2 interface.
+
+	* iface/dve2/defs.in, iface/dve2/dve2check.test,
+	iface/dve2/beem-peterson.4.dve: New files.
+	* iface/dve2/Makefile.am: Add them.
+	* configure.ac: Generate iface/dve2/defs.
+
+2011-03-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Clear the timer map to help valgrind.
 
 	* src/misc/timer.hh (reset_all): New method.
