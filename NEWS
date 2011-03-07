@@ -1,6 +1,6 @@
 New in spot 0.7.1a:
 
-  Nothing yet.
+  * Spot can read DiVinE models.  See iface/dve2/README for details.
 
 New in spot 0.7.1 (2001-02-07):
 
