@@ -306,6 +306,7 @@ main(int argc, char **argv)
 
   if (use_timer)
     tm.print(std::cout);
+  tm.reset_all();		// This helps valgrind.
 
   spot::ltl::atomic_prop::dump_instances(std::cerr);
   spot::ltl::unop::dump_instances(std::cerr);

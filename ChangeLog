@@ -1,5 +1,12 @@
 2011-03-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Clear the timer map to help valgrind.
+
+	* src/misc/timer.hh (reset_all): New method.
+	* iface/dve2/dve2check.cc: Use it to help valgrind.
+
+2011-03-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Some documentation of about the dve2 interface.
 
 	* iface/dve2/README: New file.

@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Developpement
 // de l'Epita (LRDE).
 // Copyright (C) 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -191,6 +191,13 @@ namespace spot
     std::ostream&
     print(std::ostream& os) const;
 
+    /// \brief Remove information about all timers.
+    void
+    reset_all()
+    {
+      tm.clear();
+    }
+
   protected:
     typedef std::pair<spot::timer, int> item_type;
     typedef std::map<std::string, item_type> tm_type;
@@ -200,4 +207,4 @@ namespace spot
   /// @}
 }
 
-#endif // SPOT_MISC_ESCAPE_HH
+#endif // SPOT_MISC_TIMER_HH
