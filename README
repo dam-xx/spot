@@ -148,8 +148,6 @@ iface/            Interfaces to other libraries.
    dve2/          Interface with DiVinE2.
    gspn/          GreatSPN interface.
       examples/   Supporting models used by the test cases.
-   nips/          NIPS interface (to use Promela models).
-      nipstest/   Tests for NIPS.
 
 Third party software
 --------------------
@@ -157,10 +155,6 @@ Third party software
 buddy/            A patched version of BuDDy 2.3 (a BDD library).
 lbtt/             lbtt 1.2.1 (an LTL to Büchi automata test bench).
 ltdl/             Libtool's portable dlopen() wrapper library.
-iface/            Interfaces to other libraries.
-   nips/          NIPS interface (to use Promela models).
-      nips_vm/    NIPS VM 1.2.7 (New Implementation of Promela Semantics
-                  Virtual Machine).
 
 Build-system stuff
 ------------------
@@ -179,4 +173,3 @@ End:
  LocalWords:  gtec Tarjan tgbaparse tgbatest doc html PDF spotref pdf cgi ELTL
  LocalWords:  CGI ltl iface BDD Couvreur's evtgba emptchk kripke Kripke saba vm
  LocalWords:  eltlparse eltltest SABA sabaalgos sabatest ssp ltlcouter scc SCC
- LocalWords:  Promela nipstest VM

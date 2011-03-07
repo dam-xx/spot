@@ -1,6 +1,7 @@
 New in spot 0.7.1a:
 
   * Spot can read DiVinE models.  See iface/dve2/README for details.
+  * The experimental Nips interface has been removed.
 
 New in spot 0.7.1 (2001-02-07):
 

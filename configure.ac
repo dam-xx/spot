@@ -103,10 +103,6 @@ AC_CONFIG_FILES([
   iface/gspn/defs
   iface/gspn/Makefile
   iface/Makefile
-  iface/nips/Makefile
-  iface/nips/nipstest/defs
-  iface/nips/nipstest/Makefile
-  iface/nips/nips_vm/Makefile
   src/eltlparse/Makefile
   src/eltltest/defs
   src/eltltest/Makefile

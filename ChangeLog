@@ -1,5 +1,14 @@
 2011-03-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Remove the Nips interface.
+
+	* NEWS: Mention it.
+	* configure.ac, README: Remove it.
+	* iface/Makefile.am (SUBDIRS): Remove nips.
+	* iface/nips/: Delete this directory.
+
+2011-03-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Accept "P_0 == CS" as synonym for "P_0.CS" in the dve2 interface.
 	Suggested by Yann Thierry-Mieg.
 
