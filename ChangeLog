@@ -1,5 +1,14 @@
 2011-03-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Accept "P_0 == CS" as synonym for "P_0.CS" in the dve2 interface.
+	Suggested by Yann Thierry-Mieg.
+
+	* iface/dve2/dve2.cc (convert_aps): Allow string on the right
+	of operators, and look them up.
+	* iface/dve2/dve2check.test: Test this syntax.
+
+2011-03-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add some tests for the DVE2 interface.
 
 	* iface/dve2/defs.in, iface/dve2/dve2check.test,

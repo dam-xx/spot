@@ -38,7 +38,12 @@ set -e
 # time with valgrind.).
 
 ../dve2check -e $srcdir/beem-peterson.4.dve '!GF(P_0.CS|P_1.CS|P_2.CS|P_3.CS)'
-run 0 ../dve2check -E $srcdir/beem-peterson.4.dve '!G(P_0.wait -> F P_0.CS)'
+run 0 ../dve2check -E $srcdir/beem-peterson.4.dve \
+  '!G(P_0.wait -> F P_0.CS)' > stdout1
+# same formula, different syntax.
+run 0 ../dve2check -E $srcdir/beem-peterson.4.dve \
+          '!G("P_0 == wait" -> F "P_0 == CS")' > stdout2
+cmp stdout1 stdout2
 run 0 ../dve2check -E $srcdir/beem-peterson.4.dve '!G("pos[1] < 3")'
 
 

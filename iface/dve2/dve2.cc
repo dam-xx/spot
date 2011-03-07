@@ -355,7 +355,6 @@ namespace spot
 	      free(name);
 	      continue;
 	    }
-	  free(name);
 
 	  int var_num = ni->second.num;
 
@@ -364,6 +363,7 @@ namespace spot
 	      int v = dict->register_proposition(*ap, d);
 	      one_prop p = { var_num, OP_NE, 0, v };
 	      out.push_back(p);
+	      free(name);
 	      continue;
 	    }
 
@@ -413,32 +413,72 @@ namespace spot
 			<< "' while parsing atomic proposition `" << str
 			<< "'." << std::endl;
 	      ++errors;
+	      free(name);
 	      continue;
 	    }
 
 	  while (*s && (*s == ' ' || *s == '\t'))
 	    ++s;
 
-	  char* s_end;
-	  int val = strtol(s, &s_end, 10);
-	  if (s == s_end)
+	  int val;
+	  int type_num = ni->second.type;
+	  if (type_num == 0 || (*s >= '0' && *s <= '9') || *s == '-')
 	    {
-	      std::cerr << "Failed to parse `" << s
-			<< "' as an integer." << std::endl;
-	      ++errors;
-	      continue;
+	      char* s_end;
+	      val = strtol(s, &s_end, 10);
+	      if (s == s_end)
+		{
+		  std::cerr << "Failed to parse `" << s
+			    << "' as an integer." << std::endl;
+		  ++errors;
+		  free(name);
+		  continue;
+		}
+	      s = s_end;
 	    }
-	  s = s_end;
+	  else
+	    {
+	      // We are in a case such as P_0 == S, trying to convert
+	      // the string S into an integer.
+	      const char* end = s;
+	      while (*end && *end != ' ' && *end != '\t')
+		++end;
+	      std::string st(s, end);
+
+	      // Lookup the string.
+	      enum_map_t::const_iterator ei = enum_map[type_num].find(st);
+	      if (ei == enum_map[type_num].end())
+		{
+		  std::cerr << "No state `" << st
+			    << "' known for variable `"
+			    << name << "'." << std::endl;
+		  std::cerr << "Possible states are:";
+		  for (ei = enum_map[type_num].begin();
+		       ei != enum_map[type_num].end(); ++ei)
+		    std::cerr << " " << ei->first;
+		  std::cerr << std::endl;
+
+		  free(name);
+		  ++errors;
+		  continue;
+		}
+	      s = end;
+	      val = ei->second;
+	    }
+
+	  free(name);
+
 	  while (*s && (*s == ' ' || *s == '\t'))
 	    ++s;
 	  if (*s)
 	    {
-	      std::cerr << "Unexpected character `" << s
+	      std::cerr << "Unexpected `" << s
 			<< "' while parsing atomic proposition `" << str
 			<< "'." << std::endl;
-	      ++errors;
-	      continue;
+		  ++errors;
+		  continue;
 	    }
+
 
 	  int v = dict->register_proposition(*ap, d);
 	  one_prop p = { var_num, op, val, v };
