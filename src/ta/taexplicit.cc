@@ -41,6 +41,13 @@ namespace spot
     transitions_ = s->get_transitions();
   }
 
+  ta_explicit_succ_iterator::ta_explicit_succ_iterator(
+      const state_ta_explicit* s, bdd condition) :
+    source_(s)
+  {
+    transitions_ = s->get_transitions(condition);
+  }
+
   void
   ta_explicit_succ_iterator::first()
   {
@@ -90,6 +97,25 @@ namespace spot
     return transitions_;
   }
 
+  // return transitions filtred by condition
+  state_ta_explicit::transitions*
+  state_ta_explicit::get_transitions(bdd condition) const
+  {
+
+    Sgi::hash_map<int, transitions*, Sgi::hash<int> >::const_iterator i =
+        transitions_by_condition.find(condition.id());
+
+    if (i == transitions_by_condition.end())
+      {
+        return 0;
+      }
+    else
+      {
+        return i->second;
+      }
+
+  }
+
   void
   state_ta_explicit::add_transition(state_ta_explicit::transition* t)
   {
@@ -97,6 +123,16 @@ namespace spot
       transitions_ = new transitions;
 
     transitions_->push_back(t);
+
+    transitions* transitions_condition = get_transitions(t->condition);
+
+    if (transitions_condition == 0)
+      {
+        transitions_condition = new transitions;
+        transitions_by_condition[(t->condition).id()] = transitions_condition;
+      }
+
+    transitions_condition->push_back(t);
 
   }
 
@@ -185,23 +221,27 @@ namespace spot
       for (it_trans = trans->begin(); it_trans != trans->end();)
         {
           state_ta_explicit* dest = (*it_trans)->dest;
-          bool is_stuttering_transition = (get_tgba_condition() == (dest)->get_tgba_condition());
+          bool is_stuttering_transition = (get_tgba_condition()
+              == (dest)->get_tgba_condition());
           bool dest_is_livelock_accepting = dest->is_livelock_accepting_state();
 
           //Before deleting stuttering transitions, propaged back livelock and initial state's properties
-          if(is_stuttering_transition){
-              if(dest_is_livelock_accepting) set_livelock_accepting_state(true);
-              if(dest->is_initial_state()) set_initial_state(true);
-          }
-
-
+          if (is_stuttering_transition)
+            {
+              if (dest_is_livelock_accepting)
+                set_livelock_accepting_state(true);
+              if (dest->is_initial_state())
+                set_initial_state(true);
+            }
 
           //remove hole successors states
           state_ta_explicit::transitions* dest_trans =
               (dest)->get_transitions();
           bool dest_trans_empty = dest_trans == 0 || dest_trans->empty();
-          if (is_stuttering_transition || (dest_trans_empty && (!dest_is_livelock_accepting)) )
+          if (is_stuttering_transition || (dest_trans_empty
+              && (!dest_is_livelock_accepting)))
             {
+              get_transitions((*it_trans)->condition)->remove(*it_trans);
               delete (*it_trans);
               it_trans = trans->erase(it_trans);
             }
@@ -213,6 +253,31 @@ namespace spot
 
   }
 
+  void
+  state_ta_explicit::free_transitions()
+  {
+    state_ta_explicit::transitions* trans = get_transitions();
+    state_ta_explicit::transitions::iterator it_trans;
+    // We don't destroy the transitions in the state's destructor because
+    // they are not cloned.
+    if (trans != 0)
+      for (it_trans = trans->begin(); it_trans != trans->end(); it_trans++)
+        {
+          delete *it_trans;
+        }
+    delete trans;
+    delete get_tgba_state();
+
+    Sgi::hash_map<int, transitions*, Sgi::hash<int> >::iterator i =
+        transitions_by_condition.begin();
+    while (i != transitions_by_condition.end())
+      {
+        delete i->second;
+        ++i;
+      }
+
+  }
+
   ////////////////////////////////////////
   // ta_explicit
 
@@ -220,6 +285,7 @@ namespace spot
   ta_explicit::ta_explicit(const tgba* tgba_) :
     tgba_(tgba_)
   {
+    get_dict()->register_all_variables_of(&tgba_, this);
   }
 
   ta_explicit::~ta_explicit()
@@ -227,22 +293,13 @@ namespace spot
     ta::states_set_t::iterator it;
     for (it = states_set_.begin(); it != states_set_.end(); it++)
       {
-        const state_ta_explicit* s =
-            dynamic_cast<const state_ta_explicit*> (*it);
-        state_ta_explicit::transitions* trans = s->get_transitions();
-        state_ta_explicit::transitions::iterator it_trans;
-        // We don't destroy the transitions in the state's destructor because
-        // they are not cloned.
-        if (trans != 0)
-          for (it_trans = trans->begin(); it_trans != trans->end(); it_trans++)
-            {
-              delete *it_trans;
-            }
-        delete trans;
-        delete s->get_tgba_state();
+        state_ta_explicit* s = dynamic_cast<state_ta_explicit*> (*it);
+
+        s->free_transitions();
         delete s;
       }
-
+    get_dict()->unregister_all_my_variables(this);
+    delete tgba_;
   }
 
   state_ta_explicit*
@@ -329,6 +386,14 @@ namespace spot
     return new ta_explicit_succ_iterator(s);
   }
 
+  ta_succ_iterator*
+  ta_explicit::succ_iter(const spot::state* state, bdd condition) const
+  {
+    const state_ta_explicit* s = dynamic_cast<const state_ta_explicit*> (state);
+    assert(s);
+    return new ta_explicit_succ_iterator(s, condition);
+  }
+
   bdd_dict*
   ta_explicit::get_dict() const
   {
@@ -346,6 +411,10 @@ namespace spot
   {
     const state_ta_explicit* sta = dynamic_cast<const state_ta_explicit*> (s);
     assert(sta);
+
+    if (sta->get_tgba_condition() == bddtrue)
+      return tgba_->format_state(sta->get_tgba_state());
+
     return tgba_->format_state(sta->get_tgba_state()) + "\n"
         + bdd_format_formula(get_dict(), sta->get_tgba_condition());
 

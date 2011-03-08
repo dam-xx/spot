@@ -52,6 +52,9 @@ namespace spot
     virtual ta_succ_iterator*
     succ_iter(const spot::state* s) const = 0;
 
+    virtual ta_succ_iterator*
+    succ_iter(const spot::state* s, bdd condition) const = 0;
+
     virtual bdd_dict*
     get_dict() const = 0;
 

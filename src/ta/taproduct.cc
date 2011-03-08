@@ -71,14 +71,13 @@ namespace spot
       const ta* t, const kripke* k) :
     source_(s), ta_(t), kripke_(k)
   {
-    ta_succ_it_ = t->succ_iter(s->get_ta_state());
     kripke_succ_it_ = k->succ_iter(s->get_kripke_state());
     current_state_ = 0;
   }
 
   ta_succ_iterator_product::~ta_succ_iterator_product()
   {
-   // ta_->free_state(current_state_);
+    // ta_->free_state(current_state_);
     delete current_state_;
     current_state_ = 0;
     delete ta_succ_it_;
@@ -92,7 +91,8 @@ namespace spot
       ta_succ_it_->next();
     if (ta_succ_it_->done())
       {
-        ta_succ_it_->first();
+        delete ta_succ_it_;
+        ta_succ_it_ = 0;
         kripke_succ_it_->next();
       }
   }
@@ -103,7 +103,7 @@ namespace spot
     if (!kripke_succ_it_)
       return;
 
-    ta_succ_it_->first();
+    ta_succ_it_ = 0;
     kripke_succ_it_->first();
     // If one of the two successor sets is empty initially, we reset
     // kripke_succ_it_, so that done() can detect this situation easily.  (We
@@ -126,7 +126,7 @@ namespace spot
     current_state_ = 0;
     if (is_stuttering_transition())
       {
-        ta_succ_it_->first();
+        ta_succ_it_ = 0;
         kripke_succ_it_->next();
       }
     else
@@ -157,9 +157,13 @@ namespace spot
             return;
           }
 
-        current_condition_ = bdd_setxor(sc, dc);
-        if (!ta_succ_it_->done() && current_condition_
-            == ta_succ_it_->current_condition())
+        if (ta_succ_it_ == 0){
+            current_condition_ = bdd_setxor(sc, dc);
+            ta_succ_it_ = ta_->succ_iter(source_->get_ta_state(), current_condition_);
+            ta_succ_it_->first();
+        }
+
+        if (!ta_succ_it_->done())
           {
             current_state_ = new state_ta_product(ta_succ_it_->current_state(),
                 kripke_succ_it_current_state);

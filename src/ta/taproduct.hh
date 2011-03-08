@@ -135,6 +135,14 @@ namespace spot
     virtual ta_succ_iterator_product*
     succ_iter(const spot::state* s) const;
 
+    virtual ta_succ_iterator_product*
+    succ_iter(const spot::state* s, bdd condition) const {
+
+      if(condition == bddtrue) return succ_iter(s);
+      //TODO
+      return 0;
+    }
+
     virtual bdd_dict*
     get_dict() const;
 

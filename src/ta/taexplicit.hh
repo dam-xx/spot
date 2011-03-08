@@ -67,6 +67,9 @@ namespace spot
     virtual ta_succ_iterator*
     succ_iter(const spot::state* s) const;
 
+    virtual ta_succ_iterator*
+    succ_iter(const spot::state* s, bdd condition) const;
+
     virtual bdd_dict*
     get_dict() const;
 
@@ -142,6 +145,10 @@ namespace spot
     transitions*
     get_transitions() const;
 
+    // return transitions filtred by condition
+    transitions*
+    get_transitions(bdd condition) const;
+
     void
     add_transition(transition* t);
 
@@ -164,6 +171,9 @@ namespace spot
     void
     delete_stuttering_and_hole_successors();
 
+    void
+    free_transitions();
+
   private:
     const state* tgba_state_;
     const bdd tgba_condition_;
@@ -171,6 +181,7 @@ namespace spot
     bool is_accepting_state_;
     bool is_livelock_accepting_state_;
     transitions* transitions_;
+    Sgi::hash_map<int, transitions*, Sgi::hash<int> > transitions_by_condition;
 
   };
 
@@ -179,6 +190,8 @@ namespace spot
   {
   public:
     ta_explicit_succ_iterator(const state_ta_explicit* s);
+
+    ta_explicit_succ_iterator(const state_ta_explicit* s, bdd condition);
 
     virtual void
     first();
