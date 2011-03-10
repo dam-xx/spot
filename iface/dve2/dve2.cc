@@ -398,12 +398,12 @@ namespace spot
 	    case '>':
 	      if (s[1] == '=')
 		{
-		  op = OP_LE;
+		  op = OP_GE;
 		  s += 2;
 		}
 	      else
 		{
-		  op = OP_LT;
+		  op = OP_GT;
 		  ++s;
 		}
 	      break;

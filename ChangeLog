@@ -1,3 +1,8 @@
+2011-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* iface/dve2/dve2.cc (convert_aps): Fix two typos while
+	parsing >= and >, mistakenly registered as <= and <.
+
 2011-03-07  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Remove the Nips interface.
