@@ -1,5 +1,25 @@
 2011-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Add support for finite behaviors in the DVE interface.
+
+	* iface/dve2/dve2.hh (load_dve2): Take a "dead" argument.
+	* iface/dve2/dve2.cc (callback_context): Add a destructor
+	to simplify...
+	(dve2_succ_iterator::~dve2_succ_iterator) ... this one.
+	(convert_aps): Skip the dead proposition.
+	(dve2_kripke::dve2_kripke): Take a dead argument, and
+	setup alive_prop and dead_prop.
+	(compute_state_condition, get_succ): Use a cache for the
+	conditions and successor of the last state, to share
+	some work between these two function.  Add loops on dead
+	states.
+	(load_dve2): Pass dead to dve2_kripke and convert_aps.
+	* iface/dve2/dve2check.cc: Add a -dDEAD option.
+	* iface/dve2/finite.test, iface/dve2/finite.dve: New file.
+	* iface/dve2/Makefile.am: Declare them.
+
+2011-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* iface/dve2/dve2.cc (convert_aps): Fix two typos while
 	parsing >= and >, mistakenly registered as <= and <.
 

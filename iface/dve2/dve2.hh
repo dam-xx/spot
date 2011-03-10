@@ -23,7 +23,7 @@
 
 #include "kripke/kripke.hh"
 #include "ltlvisit/apcollect.hh"
-
+#include "ltlast/constant.hh"
 
 
 namespace spot
@@ -36,6 +36,17 @@ namespace spot
   // When the *.dve source is supplied, the *.dve2C will be updated
   // only if it is not newer.
   //
+  // The dead parameter is used to control the behavior of the model
+  // on dead states (i.e. the final states of finite sequences).
+  // If DEAD is "false", it means we are not
+  // interested in finite sequences of the system, and dead state
+  // will have no successor.  If DEAD is
+  // "true", we want to check finite sequences as well as infinite
+  // sequences, but do not need to distinguish them.  In that case
+  // dead state will have a loop labeled by true.  If DEAD is any
+  // other string, this is the name a property that should be true
+  // when looping on a dead state, and false otherwise.
+  //
   // This function returns 0 on error.
   //
   // \a file the name of the *.dve source file or of the *.dve2C
@@ -43,10 +54,13 @@ namespace spot
   // \a to_observe the list of atomic propositions that should be observed
   //               in the model
   // \a dict the BDD dictionary to use
+  // \a dead an atomic proposition or constant to use for looping on
+  //         dead states
   // \a verbose whether to output verbose messages
   kripke* load_dve2(const std::string& file,
 		    bdd_dict* dict,
-		    ltl::atomic_prop_set* to_observe,
+		    const ltl::atomic_prop_set* to_observe,
+		    const ltl::formula* dead = ltl::constant::true_instance(),
 		    bool verbose = true);
 }
 

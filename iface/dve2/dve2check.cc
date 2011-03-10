@@ -42,6 +42,9 @@ syntax(char* prog)
   std::cerr << "usage: " << prog << " [options] model formula" << std::endl
 	    << std::endl
 	    << "Options:" << std::endl
+	    << "  -dDEAD use DEAD as property for marking DEAD states"
+	    << std::endl
+	    << "          (by default DEAD = true)" << std::endl
 	    << "  -e[ALGO]  run emptiness check, expect an accepting run"
 	    << std::endl
 	    << "  -E[ALGO]  run emptiness check, expect no accepting run"
@@ -71,6 +74,7 @@ main(int argc, char **argv)
   output = EmptinessCheck;
   bool accepting_run = false;
   bool expect_counter_example = false;
+  char *dead = 0;
 
   const char* echeck_algo = "Cou99";
 
@@ -85,6 +89,9 @@ main(int argc, char **argv)
 	    {
 	    case 'C':
 	      accepting_run = true;
+	      break;
+	    case 'd':
+	      dead = opt + 1;
 	      break;
 	    case 'e':
 	    case 'E':
@@ -135,6 +142,7 @@ main(int argc, char **argv)
   spot::ltl::default_environment& env =
     spot::ltl::default_environment::instance();
 
+
   spot::ltl::atomic_prop_set ap;
   spot::bdd_dict* dict = new spot::bdd_dict();
   spot::kripke* model = 0;
@@ -143,6 +151,21 @@ main(int argc, char **argv)
   spot::emptiness_check_instantiator* echeck_inst = 0;
   int exit_code = 0;
   spot::ltl::formula* f = 0;
+  spot::ltl::formula* deadf = 0;
+
+  if (dead == 0 || !strcasecmp(dead, "true"))
+    {
+      deadf = spot::ltl::constant::true_instance();
+      std::cerr << "true" << std::endl;
+    }
+  else if (!strcasecmp(dead, "false"))
+    {
+      deadf = spot::ltl::constant::false_instance();
+    }
+  else
+    {
+      deadf = env.require(dead);
+    }
 
   if (output == EmptinessCheck)
     {
@@ -175,7 +198,7 @@ main(int argc, char **argv)
   if (output != DotFormula)
     {
       tm.start("loading dve2");
-      model = spot::load_dve2(argv[1], dict, &ap, true);
+      model = spot::load_dve2(argv[1], dict, &ap, deadf, true);
       tm.stop("loading dve2");
 
       if (!model)
@@ -303,6 +326,8 @@ main(int argc, char **argv)
   if (f)
     f->destroy();
   delete dict;
+
+  deadf->destroy();
 
   if (use_timer)
     tm.print(std::cout);

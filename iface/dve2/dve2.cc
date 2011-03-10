@@ -133,6 +133,13 @@ namespace spot
       typedef std::vector<dve2_state*> transitions_t;
       transitions_t transitions;
       int state_size;
+
+      ~callback_context()
+      {
+	callback_context::transitions_t::const_iterator it;
+	for (it = transitions.begin(); it != transitions.end(); ++it)
+	  (*it)->destroy();
+      }
     };
 
     void transition_callback(void* arg, transition_info_t*, int *dst)
@@ -159,10 +166,6 @@ namespace spot
 
       ~dve2_succ_iterator()
       {
-	for (it_ = cc_->transitions.begin();
-	     it_ != cc_->transitions.end();
-	     ++it_)
-	  (*it_)->destroy();
 	delete cc_;
       }
 
@@ -222,6 +225,7 @@ namespace spot
     convert_aps(const ltl::atomic_prop_set* aps,
 		const dve2_interface* d,
 		bdd_dict* dict,
+		const ltl::formula* dead,
 		prop_set& out)
     {
       int errors = 0;
@@ -253,6 +257,9 @@ namespace spot
       for (ltl::atomic_prop_set::const_iterator ap = aps->begin();
 	   ap != aps->end(); ++ap)
 	{
+	  if (*ap == dead)
+	    continue;
+
 	  std::string str = (*ap)->name();
 	  const char* s = str.c_str();
 
@@ -495,14 +502,46 @@ namespace spot
     {
     public:
 
-      dve2_kripke(const dve2_interface* d, bdd_dict* dict, const prop_set* ps)
-	: d_(d), dict_(dict), ps_(ps)
+      dve2_kripke(const dve2_interface* d, bdd_dict* dict, const prop_set* ps,
+		  const ltl::formula* dead)
+	: d_(d), dict_(dict), ps_(ps), state_condition_last_state_(0),
+	  state_condition_last_cc_(0)
       {
 	state_size_ = d_->get_state_variable_count();
 
 	vname_ = new const char*[state_size_];
 	for (int i = 0; i < state_size_; ++i)
 	  vname_[i] = d_->get_state_variable_name(i);
+
+	// Register the "dead" proposition.  There are three cases to
+	// consider:
+	//  * If DEAD is "false", it means we are not interested in finite
+	//    sequences of the system.
+	//  * If DEAD is "true", we want to check finite sequences as well
+	//    as infinite sequences, but do not need to distinguish them.
+	//  * If DEAD is any other string, this is the name a property
+	//    that should be true when looping on a dead state, and false
+	//    otherwise.
+	// We handle these three cases by setting ALIVE_PROP and DEAD_PROP
+	// appropriately.  ALIVE_PROP is the bdd that should be ANDed
+	// to all transitions leaving a live state, while DEAD_PROP should
+	// be ANDed to all transitions leaving a dead state.
+	if (dead == ltl::constant::false_instance())
+	  {
+	    alive_prop = bddtrue;
+	    dead_prop = bddfalse;
+	  }
+	else if (dead == ltl::constant::false_instance())
+	  {
+	    alive_prop = bddtrue;
+	    dead_prop = bddtrue;
+	  }
+	else
+	  {
+	    int var = dict->register_proposition(dead, d_);
+	    dead_prop = bdd_ithvar(var);
+	    alive_prop = bdd_nithvar(var);
+	  }
       }
 
       ~dve2_kripke()
@@ -515,6 +554,10 @@ namespace spot
 	delete d_;
 	delete ps_;
 	lt_dlexit();
+
+	if (state_condition_last_state_)
+	  state_condition_last_state_->destroy();
+	delete state_condition_last_cc_; // Might be 0 already.
       }
 
       virtual
@@ -529,6 +572,17 @@ namespace spot
       bdd
       compute_state_condition(const dve2_state* s) const
       {
+	// If we just computed it, don't do it twice.
+	if (s == state_condition_last_state_)
+	  return state_condition_last_cond_;
+
+	if (state_condition_last_state_)
+	  {
+	    state_condition_last_state_->destroy();
+	    delete state_condition_last_cc_; // Might be 0 already.
+	    state_condition_last_cc_ = 0;
+	  }
+
 	bdd res = bddtrue;
 	for (prop_set::const_iterator i = ps_->begin();
 	     i != ps_->end(); ++i)
@@ -565,6 +619,29 @@ namespace spot
 	    else
 	      res &= bdd_nithvar(i->bddvar);
 	  }
+
+	callback_context* cc = new callback_context;
+	cc->state_size = state_size_;
+	int t = d_->get_successors(0, s->vars, transition_callback, cc);
+	assert((unsigned)t == cc->transitions.size());
+	state_condition_last_cc_ = cc;
+
+	if (t)
+	  {
+	    res &= alive_prop;
+	  }
+	else
+	  {
+	    res &= dead_prop;
+
+	    // Add a self-loop to dead-states if we care about these.
+	    if (res != bddfalse)
+	      cc->transitions.push_back(s->clone());
+	  }
+
+	state_condition_last_cond_ = res;
+	state_condition_last_state_ = s->clone();
+
 	return res;
       }
 
@@ -576,13 +653,29 @@ namespace spot
 	const dve2_state* s = dynamic_cast<const dve2_state*>(local_state);
 	assert(s);
 
-	callback_context* cc = new callback_context;
-	cc->state_size = state_size_;
-	int t = d_->get_successors(0, s->vars, transition_callback, cc);
-	(void) t;
-	assert((unsigned)t == cc->transitions.size());
+	// This may also compute successors in state_condition_last_cc
+	bdd scond = compute_state_condition(s);
 
-	return new dve2_succ_iterator(cc, compute_state_condition(s));
+	callback_context* cc;
+
+	if (state_condition_last_cc_)
+	  {
+	    cc = state_condition_last_cc_;
+	    state_condition_last_cc_ = 0; // Now owned by the iterator.
+	  }
+	else
+	  {
+	    cc = new callback_context;
+	    cc->state_size = state_size_;
+	    int t = d_->get_successors(0, s->vars, transition_callback, cc);
+	    assert((unsigned)t == cc->transitions.size());
+
+	    // Add a self-loop to dead-states if we care about these.
+	    if (t == 0 && scond != bddfalse)
+	      cc->transitions.push_back(s->clone());
+	  }
+
+	return new dve2_succ_iterator(cc, scond);
       }
 
       virtual
@@ -629,6 +722,17 @@ namespace spot
       bdd_dict* dict_;
       const char** vname_;
       const prop_set* ps_;
+      bdd alive_prop;
+      bdd dead_prop;
+
+      // This cache is used to speedup repeated calls to state_condition()
+      // and get_succ().
+      // If state_condition_last_state_ != 0, then state_condition_last_cond_
+      // contain its (recently computed) condition.  If additionally
+      // state_condition_last_cc_ != 0, then it contains the successors.
+      mutable const dve2_state* state_condition_last_state_;
+      mutable bdd state_condition_last_cond_;
+      mutable callback_context* state_condition_last_cc_;
     };
 
   }
@@ -686,7 +790,9 @@ namespace spot
 
   kripke*
   load_dve2(const std::string& file_arg, bdd_dict* dict,
-	    ltl::atomic_prop_set* to_observe, bool verbose)
+	    const ltl::atomic_prop_set* to_observe,
+	    const ltl::formula* dead,
+	    bool verbose)
   {
     std::string file;
     if (file_arg.find_first_of("/\\") != std::string::npos)
@@ -786,7 +892,7 @@ namespace spot
       }
 
     prop_set* ps = new prop_set;
-    int errors = convert_aps(to_observe, d, dict, *ps);
+    int errors = convert_aps(to_observe, d, dict, dead, *ps);
     if (errors)
       {
 	delete ps;
@@ -796,6 +902,6 @@ namespace spot
 	return 0;
       }
 
-    return new dve2_kripke(d, dict, ps);
+    return new dve2_kripke(d, dict, ps, dead);
   }
 }
