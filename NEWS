@@ -2,6 +2,9 @@ New in spot 0.7.1a:
 
   * Spot can read DiVinE models.  See iface/dve2/README for details.
   * The experimental Nips interface has been removed.
+  * The dotty_reachable() has a new option "assume_sba" that can
+    be used for rendering automata with state-based acceptance.  In
+    that case, acceptance states are displayed with a double circle.
 
 New in spot 0.7.1 (2001-02-07):
 

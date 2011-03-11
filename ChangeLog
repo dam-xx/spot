@@ -1,3 +1,7 @@
+2011-03-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* NEWS: Mention recent changes to dotty_reachable.
+
 2011-03-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Add support for finite behaviors in the DVE interface.
