@@ -328,6 +328,7 @@ namespace spot
   {
     state_ta_explicit * state = dynamic_cast<state_ta_explicit*> (s);
     state->delete_stuttering_and_hole_successors();
+    if (state->is_initial_state()) add_to_initial_states_set(state);
 
   }
 
