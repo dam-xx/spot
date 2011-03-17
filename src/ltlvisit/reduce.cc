@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009, 2010 Laboratoire de Recherche et
+// Copyright (C) 2008, 2009, 2010, 2011 Laboratoire de Recherche et
 // Développement de l'Epita (LRDE).
 // Copyright (C) 2004, 2006, 2007 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -285,9 +285,9 @@ namespace spot
 	  eu_info f1i = { recurse_eu(f1) };
 	  if (opt_ & Reduce_Eventuality_And_Universality)
 	    {
-	      /* If a&b is a pure eventuality formula then a M b = a & b.
+	      /* If a is a pure eventuality formula then a M b = a & b.
 		 If a is a pure universality formula a W b = a|b. */
-	      if (f1i.is.eventual && f2i.is.eventual && (op == binop::M))
+	      if (f1i.is.eventual && (op == binop::M))
 		{
 		  result_ = multop::instance(multop::And, f1, f2);
 		  return;

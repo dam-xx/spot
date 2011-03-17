@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2009, 2010 Laboratoire de Recherche et DÃ©veloppement
+# Copyright (C) 2009, 2010, 2011 Laboratoire de Recherche et Developpement
 # de l'Epita (LRDE).
 # Copyright (C) 2004, 2006 Laboratoire d'Informatique de Paris 6 (LIP6),
 # département Systèmes Répartis Coopératifs (SRC), Université Pierre
@@ -153,6 +153,10 @@ for x in ../reduccmp ../reductaustr; do
      run 0 $x 'a M ((a & b) M c)' '(a & b)M c'
      run 0 $x '(a & b) M (a R c)' '(a & b)M c'
      run 0 $x '(a & b) M (a M c)' '(a & b)M c'
+
+     # Eventuality and universality class reductions
+     run 0 $x 'Fa M b' 'Fa & b'
+     run 0 $x 'GFa M b' 'GFa & b'
      ;;
   esac
 
@@ -161,7 +165,7 @@ for x in ../reduccmp ../reductaustr; do
   run 0 $x 'a M ((a&b) R c)' 'a M ((a&b) R c)' #not reduced.
   run 0 $x '(a&b) W (a U c)' '(a&b) W (a U c)' #not reduced.
 
-  # Eventuality and universality class reduction
+  # Eventuality and universality class reductions
   run 0 $x 'FFa' 'Fa'
   run 0 $x 'FGFa' 'GFa'
   run 0 $x 'b U Fa' 'Fa'

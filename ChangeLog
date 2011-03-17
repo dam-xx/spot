@@ -1,3 +1,12 @@
+2011-03-17  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Improve a reduction rule for "a M b".
+
+	* src/ltlvisit/reduce.cc (reduce_visitor): Always reduce "a M b"
+	to "a & b" if "a" is a pure eventual formula, remove the
+	constraint on "b".
+	* src/ltltest/reduccmp.test: Add two tests.
+
 2011-03-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* NEWS: Mention recent changes to dotty_reachable.
