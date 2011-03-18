@@ -72,8 +72,8 @@ syntax(char* prog)
     << "Classes available (F):" << std::endl
     << "  1: F(p1&F(p2&F(p3&...F(pn)))) & F(q1&F(q2&F(q3&...F(qn))))"
     << std::endl
-    << "  2: p&X(p&X(p&...X(p)))) & X(q&F(q&F(q&...F(q))))" << std::endl
-    << "  3: p&(Xp)&(XXp)&...(X...X(p)) & p&(Xq)&(XXq)&...(X...X(q))"
+    << "  2: F(p&X(p&X(p&...X(p)))) & F(q&X(q&X(q&...X(q))))" << std::endl
+    << "  3: F(p&(Xp)&(XXp)&...(X...X(p))) & F(q&(Xq)&(XXq)&...(X...X(q)))"
     << std::endl
     << "  4: GF(p1)&GF(p2)&...&GF(pn)" << std::endl
     << "  5: FG(p1)|FG(p2)|...|FG(pn)" << std::endl

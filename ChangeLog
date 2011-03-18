@@ -1,3 +1,7 @@
+2011-03-18  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/ltltest/genltl.cc (syntax): Typos in the help text.
+
 2011-03-17  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Improve a reduction rule for "a M b".
