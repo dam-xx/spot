@@ -1,3 +1,13 @@
+2011-03-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Include <cstddef> in python modules to workaround Swig bug.
+
+	* wrap/python/spot.i, wrap/python/buddy.i: Include <cstddef>
+	because Swig 2.0.2 uses ptrdiff_t and does not do the include
+	itself.  In g++ most libstdc++ standard headers have been changed
+	to no longer include <cstddef> as an implementation detail, so
+	the difference shows.
+
 2011-03-20  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* THANKS: Add Michael Weber for his help on the DiVinE interface.

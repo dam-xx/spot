@@ -1,4 +1,4 @@
-// Copyright (C) 2010  Laboratoire de Recherche et Développement de l'EPITA.
+// Copyright (C) 2010, 2011  Laboratoire de Recherche et Développement de l'EPITA.
 // Copyright (C) 2003, 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -52,6 +52,11 @@
     MODIFICATIONS.
 ========================================================================*/
 
+%{
+  // Workaround for SWIG 2.0.2 using ptrdiff_t but not including cstddef.
+  // It matters with g++ 4.6.
+#include <cstddef>
+%}
 
 %module buddy
 

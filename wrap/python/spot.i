@@ -21,6 +21,12 @@
 // Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 
+%{
+  // Workaround for SWIG 2.0.2 using ptrdiff_t but not including cstddef.
+  // It matters with g++ 4.6.
+#include <cstddef>
+%}
+
 %module(directors="1") spot
 
 %include "std_string.i"
