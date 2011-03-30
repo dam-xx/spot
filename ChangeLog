@@ -1,3 +1,7 @@
+2011-03-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* src/tgba/tgbaproduct.hh: Do not include statebdd.hh.
+
 2011-03-29  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Include <cstddef> in python modules to workaround Swig bug.

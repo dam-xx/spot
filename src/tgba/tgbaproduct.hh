@@ -25,7 +25,6 @@
 # define SPOT_TGBA_TGBAPRODUCT_HH
 
 #include "tgba.hh"
-#include "statebdd.hh"
 
 namespace spot
 {
