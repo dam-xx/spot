@@ -209,10 +209,11 @@ namespace spot
     virtual bdd compute_support_conditions(const state* state) const = 0;
     /// Do the actual computation of tgba::support_variables().
     virtual bdd compute_support_variables(const state* state) const = 0;
-  private:
+  protected:
     mutable const state* last_support_conditions_input_;
-    mutable bdd last_support_conditions_output_;
     mutable const state* last_support_variables_input_;
+  private:
+    mutable bdd last_support_conditions_output_;
     mutable bdd last_support_variables_output_;
     mutable int num_acc_;
   };

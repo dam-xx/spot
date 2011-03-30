@@ -1,3 +1,20 @@
+2011-03-31  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Make state_explicit instances persistent objects.
+
+	* src/tgba/tgbaexplicit.cc, src/tgba/tgbaexplicit.hh: Merge
+	state_explicit and tgba_explicit::state.  In the past,
+	state_explicit was a small object encapsulating a pointer to the
+	persistent tgba_explicit::state; and we used to clone() and
+	destroy() a lot of state_explicit instance.  Now state_explicit is
+	persistent, and clone() and destroy() have no effects.
+	* src/tgba/tgbareduce.cc: Adjust, since this inherits from
+	tgbaexplicit and uses the internals of state_explicit.
+	* src/tgbatest/reductgba.cc: Fix deletion order for automata.
+	* src/tgba/tgba.hh (last_support_conditions_input_,
+	last_support_variables_input_): Make these protected, so
+	they can be zeroed by tgba_explicit.
+
 2011-03-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Remove tgba_reduc::format_state().

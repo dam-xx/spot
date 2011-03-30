@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2008, 2009, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 // Copyright (C) 2003, 2004, 2006 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -161,8 +161,8 @@ main(int argc, char** argv)
 
   spot::dotty_reachable(std::cout, res);
 
-  delete automata;
   delete res;
+  delete automata;
 #ifndef REDUCCMP
   if (f != 0)
     f->destroy();

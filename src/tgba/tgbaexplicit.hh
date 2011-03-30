@@ -37,23 +37,65 @@ namespace spot
   class tgba_explicit_succ_iterator;
   class tgba_explicit;
 
+  /// States used by spot::tgba_explicit.
+  /// \ingroup tgba_representation
+  class state_explicit: public spot::state
+  {
+  public:
+    state_explicit()
+    {
+    }
+
+    virtual int compare(const spot::state* other) const;
+    virtual size_t hash() const;
+
+    virtual state_explicit* clone() const
+    {
+      return const_cast<state_explicit*>(this);
+    }
+
+    bool empty() const
+    {
+      return successors.empty();
+    }
+
+    virtual
+    void destroy() const
+    {
+    }
+
+    /// Explicit transitions.
+    struct transition
+    {
+      bdd condition;
+      bdd acceptance_conditions;
+      const state_explicit* dest;
+    };
+
+    typedef std::list<transition> transitions_t;
+    transitions_t successors;
+  private:
+    state_explicit(const state_explicit& other);
+    state_explicit& operator=(const state_explicit& other);
+
+    virtual ~state_explicit()
+    {
+    }
+    friend class tgba_explicit_string;
+    friend class tgba_explicit_formula;
+    friend class tgba_explicit_number;
+  };
+
+
   /// Explicit representation of a spot::tgba.
   /// \ingroup tgba_representation
   class tgba_explicit: public tgba
   {
   public:
+    typedef state_explicit state;
+    typedef state_explicit::transition transition;
+
     tgba_explicit(bdd_dict* dict);
-
-    struct transition;
-    typedef std::list<transition*> state;
-
-    /// Explicit transitions (used by spot::tgba_explicit).
-    struct transition
-    {
-      bdd condition;
-      bdd acceptance_conditions;
-      const state* dest;
-    };
 
     /// Add a default initial state.
     virtual state* add_default_init() = 0;
@@ -100,7 +142,7 @@ namespace spot
     bdd get_acceptance_condition(const ltl::formula* f);
 
     bdd_dict* dict_;
-    tgba_explicit::state* init_;
+    state_explicit* init_;
     mutable bdd all_acceptance_conditions_;
     bdd neg_acceptance_conditions_;
     mutable bool all_acceptance_conditions_computed_;
@@ -113,36 +155,13 @@ namespace spot
 
 
 
-  /// States used by spot::tgba_explicit.
-  /// \ingroup tgba_representation
-  class state_explicit : public spot::state
-  {
-  public:
-    state_explicit(const tgba_explicit::state* s)
-      : state_(s)
-    {
-    }
-
-    virtual int compare(const spot::state* other) const;
-    virtual size_t hash() const;
-    virtual state_explicit* clone() const;
-
-    virtual ~state_explicit()
-    {
-    }
-
-    const tgba_explicit::state* get_state() const;
-  private:
-    const tgba_explicit::state* state_;
-  };
-
-
   /// Successor iterators used by spot::tgba_explicit.
   /// \ingroup tgba_representation
   class tgba_explicit_succ_iterator: public tgba_succ_iterator
   {
   public:
-    tgba_explicit_succ_iterator(const tgba_explicit::state* s, bdd all_acc);
+    tgba_explicit_succ_iterator(const state_explicit::transitions_t* s,
+				bdd all_acc);
 
     virtual void first();
     virtual void next();
@@ -153,8 +172,8 @@ namespace spot
     virtual bdd current_acceptance_conditions() const;
 
   private:
-    const tgba_explicit::state* s_;
-    tgba_explicit::state::const_iterator i_;
+    const state_explicit::transitions_t* s_;
+    state_explicit::transitions_t::const_iterator i_;
     bdd all_acceptance_conditions_;
   };
 
@@ -164,10 +183,10 @@ namespace spot
   {
   protected:
     typedef label label_t;
-    typedef Sgi::hash_map<label, tgba_explicit::state*,
+    typedef Sgi::hash_map<label, state_explicit*,
 			  label_hash> ns_map;
-    typedef Sgi::hash_map<const tgba_explicit::state*, label,
-			  ptr_hash<tgba_explicit::state> > sn_map;
+    typedef Sgi::hash_map<const state_explicit*, label,
+			  ptr_hash<state_explicit> > sn_map;
     ns_map name_state_map_;
     sn_map state_name_map_;
   public:
@@ -178,7 +197,7 @@ namespace spot
       return name_state_map_.find(name) != name_state_map_.end();
     }
 
-    const label& get_label(const tgba_explicit::state* s) const
+    const label& get_label(const state_explicit* s) const
     {
       typename sn_map::const_iterator i = state_name_map_.find(s);
       assert(i != state_name_map_.end());
@@ -189,17 +208,17 @@ namespace spot
     {
       const state_explicit* se = dynamic_cast<const state_explicit*>(s);
       assert(se);
-      return get_label(se->get_state());
+      return get_label(se);
     }
 
-    /// Return the tgba_explicit::state for \a name, creating the state if
+    /// Return the state_explicit for \a name, creating the state if
     /// it does not exist.
     state* add_state(const label& name)
     {
       typename ns_map::iterator i = name_state_map_.find(name);
       if (i == name_state_map_.end())
 	{
-	  tgba_explicit::state* s = new tgba_explicit::state;
+	  state_explicit* s = new state_explicit;
 	  name_state_map_[name] = s;
 	  state_name_map_[s] = name;
 
@@ -216,7 +235,7 @@ namespace spot
     state*
     set_init_state(const label& state)
     {
-      tgba_explicit::state* s = add_state(state);
+      state_explicit* s = add_state(state);
       init_ = s;
       return s;
     }
@@ -245,10 +264,11 @@ namespace spot
       typename ns_map::iterator i;
       for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
 	{
-	  tgba_explicit::state::iterator i2;
-	  for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
+	  state_explicit::transitions_t::iterator i2;
+	  for (i2 = i->second->successors.begin();
+	       i2 != i->second->successors.end(); ++i2)
 	    {
-	      (*i2)->acceptance_conditions = all - (*i2)->acceptance_conditions;
+	      i2->acceptance_conditions = all - i2->acceptance_conditions;
 	    }
 	}
     }
@@ -265,9 +285,10 @@ namespace spot
       typename ns_map::iterator i;
       for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
 	{
-	  tgba_explicit::state::iterator i2;
-	  for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	    (*i2)->acceptance_conditions &= neg;
+	  state_explicit::transitions_t::iterator i2;
+	  for (i2 = i->second->successors.begin();
+	       i2 != i->second->successors.end(); ++i2)
+	    i2->acceptance_conditions &= neg;
 	}
 
       all_acceptance_conditions_computed_ = false;
@@ -280,25 +301,25 @@ namespace spot
       typename ns_map::iterator i;
       for (i = name_state_map_.begin(); i != name_state_map_.end(); ++i)
 	{
-	  state::iterator t1;
-	  for (t1 = i->second->begin(); t1 != i->second->end(); ++t1)
+	  state_explicit::transitions_t::iterator t1;
+	  for (t1 = i->second->successors.begin();
+	       t1 != i->second->successors.end(); ++t1)
 	    {
-	      bdd acc = (*t1)->acceptance_conditions;
-	      const state* dest = (*t1)->dest;
+	      bdd acc = t1->acceptance_conditions;
+	      const state* dest = t1->dest;
 
 	      // Find another transition with the same destination and
 	      // acceptance conditions.
-	      state::iterator t2 = t1;
+	      state_explicit::transitions_t::iterator t2 = t1;
 	      ++t2;
-	      while (t2 != i->second->end())
+	      while (t2 != i->second->successors.end())
 		{
-		  state::iterator t2copy = t2++;
-		  if ((*t2copy)->acceptance_conditions == acc
-		      && (*t2copy)->dest == dest)
+		  state_explicit::transitions_t::iterator t2copy = t2++;
+		  if (t2copy->acceptance_conditions == acc
+		      && t2copy->dest == dest)
 		    {
-		      (*t1)->condition |= (*t2copy)->condition;
-		      delete *t2copy;
-		      i->second->erase(t2copy);
+		      t1->condition |= t2copy->condition;
+		      i->second->successors.erase(t2copy);
 		    }
 		}
 	    }
@@ -309,6 +330,10 @@ namespace spot
     virtual
     ~tgba_explicit_labelled()
     {
+      // These have already been destroyed by subclasses.
+      // Prevent destroying by tgba::~tgba.
+      last_support_conditions_input_ = 0;
+      last_support_variables_input_ = 0;
     }
 
   };

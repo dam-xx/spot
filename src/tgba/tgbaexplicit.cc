@@ -37,7 +37,7 @@ namespace spot
   // tgba_explicit_succ_iterator
 
   tgba_explicit_succ_iterator::tgba_explicit_succ_iterator
-  (const tgba_explicit::state* s, bdd all_acc)
+  (const state_explicit::transitions_t* s, bdd all_acc)
     : s_(s), all_acceptance_conditions_(all_acc)
   {
   }
@@ -64,53 +64,47 @@ namespace spot
   tgba_explicit_succ_iterator::current_state() const
   {
     assert(!done());
-    return new state_explicit((*i_)->dest);
+    return const_cast<state_explicit*>(i_->dest);
   }
 
   bdd
   tgba_explicit_succ_iterator::current_condition() const
   {
     assert(!done());
-    return (*i_)->condition;
+    return i_->condition;
   }
 
   bdd
   tgba_explicit_succ_iterator::current_acceptance_conditions() const
   {
     assert(!done());
-    return (*i_)->acceptance_conditions & all_acceptance_conditions_;
+    return i_->acceptance_conditions & all_acceptance_conditions_;
   }
 
 
   ////////////////////////////////////////
   // state_explicit
 
-  const tgba_explicit::state*
-  state_explicit::get_state() const
-  {
-    return state_;
-  }
-
   int
   state_explicit::compare(const spot::state* other) const
   {
     const state_explicit* o = dynamic_cast<const state_explicit*>(other);
     assert(o);
-    return o->get_state() - get_state();
+    // Do not simply return "o - this", it might not fit in an int.
+    if (o < this)
+      return -1;
+    if (o > this)
+      return 1;
+    return 0;
   }
 
   size_t
   state_explicit::hash() const
   {
     return
-      reinterpret_cast<const char*>(get_state()) - static_cast<const char*>(0);
+      reinterpret_cast<const char*>(this) - static_cast<const char*>(0);
   }
 
-  state_explicit*
-  state_explicit::clone() const
-  {
-    return new state_explicit(*this);
-  }
 
   ////////////////////////////////////////
   // tgba_explicit
@@ -131,12 +125,13 @@ namespace spot
   tgba_explicit::transition*
   tgba_explicit::create_transition(state* source, const state* dest)
   {
-    transition* t = new transition;
-    t->dest = dest;
-    t->condition = bddtrue;
-    t->acceptance_conditions = bddfalse;
-    source->push_back(t);
-    return t;
+    transition t;
+    t.dest = dest;
+    t.condition = bddtrue;
+    t.acceptance_conditions = bddfalse;
+    state_explicit::transitions_t::iterator i =
+      source->successors.insert(source->successors.end(), t);
+    return &*i;
   }
   void
   tgba_explicit::add_condition(transition* t, const ltl::formula* f)
@@ -219,7 +214,7 @@ namespace spot
     // Fix empty automata by adding a lone initial state.
     if (!init_)
       const_cast<tgba_explicit*>(this)->add_default_init();
-    return new state_explicit(init_);
+    return init_;
   }
 
   tgba_succ_iterator*
@@ -231,7 +226,7 @@ namespace spot
     assert(s);
     (void) global_state;
     (void) global_automaton;
-    return new tgba_explicit_succ_iterator(s->get_state(),
+    return new tgba_explicit_succ_iterator(&s->successors,
 					   all_acceptance_conditions());
   }
 
@@ -240,12 +235,12 @@ namespace spot
   {
     const state_explicit* s = dynamic_cast<const state_explicit*>(in);
     assert(s);
-    const state* st = s->get_state();
+    const state_explicit::transitions_t& st = s->successors;
 
     bdd res = bddfalse;
-    tgba_explicit::state::const_iterator i;
-    for (i = st->begin(); i != st->end(); ++i)
-      res |= (*i)->condition;
+    state_explicit::transitions_t::const_iterator i;
+    for (i = st.begin(); i != st.end(); ++i)
+      res |= i->condition;
     return res;
   }
 
@@ -254,12 +249,12 @@ namespace spot
   {
     const state_explicit* s = dynamic_cast<const state_explicit*>(in);
     assert(s);
-    const state* st = s->get_state();
+    const state_explicit::transitions_t& st = s->successors;
 
     bdd res = bddtrue;
-    tgba_explicit::state::const_iterator i;
-    for (i = st->begin(); i != st->end(); ++i)
-      res &= bdd_support((*i)->condition);
+    state_explicit::transitions_t::const_iterator i;
+    for (i = st.begin(); i != st.end(); ++i)
+      res &= bdd_support(i->condition);
     return res;
   }
 
@@ -295,9 +290,6 @@ namespace spot
       // Do not erase the same state twice.  (Because of possible aliases.)
       if (state_name_map_.erase(i->second))
 	{
-	  tgba_explicit::state::iterator i2;
-	  for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	    delete *i2;
 	  delete i->second;
 	}
     }
@@ -314,7 +306,7 @@ namespace spot
   {
     const state_explicit* se = dynamic_cast<const state_explicit*>(s);
     assert(se);
-    sn_map::const_iterator i = state_name_map_.find(se->get_state());
+    sn_map::const_iterator i = state_name_map_.find(se);
     assert(i != state_name_map_.end());
     return i->second;
   }
@@ -324,9 +316,6 @@ namespace spot
     ns_map::iterator i = name_state_map_.begin();
     while (i != name_state_map_.end())
     {
-      tgba_explicit::state::iterator i2;
-      for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	delete *i2;
       // Advance the iterator before deleting the formula.
       const ltl::formula* s = i->first;
       delete i->second;
@@ -345,7 +334,7 @@ namespace spot
   {
     const state_explicit* se = dynamic_cast<const state_explicit*>(s);
     assert(se);
-    sn_map::const_iterator i = state_name_map_.find(se->get_state());
+    sn_map::const_iterator i = state_name_map_.find(se);
     assert(i != state_name_map_.end());
     return ltl::to_string(i->second);
   }
@@ -354,14 +343,10 @@ namespace spot
   {
     ns_map::iterator i = name_state_map_.begin();
     while (i != name_state_map_.end())
-    {
-      tgba_explicit::state::iterator i2;
-      for (i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-	delete *i2;
-      // Advance the iterator before deleting the state.
-      delete i->second;
-      ++i;
-    }
+      {
+	delete i->second;
+	++i;
+      }
   }
 
   tgba_explicit::state* tgba_explicit_number::add_default_init()
@@ -374,7 +359,7 @@ namespace spot
   {
     const state_explicit* se = dynamic_cast<const state_explicit*>(s);
     assert(se);
-    sn_map::const_iterator i = state_name_map_.find(se->get_state());
+    sn_map::const_iterator i = state_name_map_.find(se);
     assert(i != state_name_map_.end());
     std::stringstream ss;
     ss << i->second;
