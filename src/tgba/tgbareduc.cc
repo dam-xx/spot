@@ -126,17 +126,6 @@ namespace spot
     this->merge_transitions();
   }
 
-  std::string
-  tgba_reduc::format_state(const spot::state* s) const
-  {
-    std::ostringstream os;
-    const state_explicit* se = dynamic_cast<const state_explicit*>(s);
-    assert(se);
-    sn_map::const_iterator i = state_name_map_.find(se->get_state());
-    assert(i != state_name_map_.end());
-    return i->second;
-  }
-
   ////////////////////////////////////////////
   // for build tgba_reduc
 

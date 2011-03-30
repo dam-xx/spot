@@ -1,5 +1,13 @@
 2011-03-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Remove tgba_reduc::format_state().
+
+	* src/tgba/tgbareduc.cc, src/tgba/tgbareduc.hh (format_state):
+	Remove this useless copy of the tgba_explicit_string::format_state
+	method.
+
+2011-03-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Protect the state destructor.
 
 	Client code should always call the destroy() method instead.  (It

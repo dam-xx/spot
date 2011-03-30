@@ -1,4 +1,4 @@
-// Copyright (C) 2008, 2009 Laboratoire de Recherche et DÃ©veloppement
+// Copyright (C) 2008, 2009, 2011 Laboratoire de Recherche et DÃ©veloppement
 // de l'Epita (LRDE).
 // Copyright (C) 2004, 2005, 2006 Laboratoire d'Informatique de
 // Paris 6 (LIP6), département Systèmes Répartis Coopératifs (SRC),
@@ -69,9 +69,6 @@ namespace spot
     /// \brief Delete some transitions with help of a simulation
     /// relation.
     void delete_transitions(simulation_relation* rel);
-
-    /// Add the SCC index to the display of the state \a state.
-    virtual std::string format_state(const spot::state* state) const;
 
     // For Debug
     void display_rel_sim(simulation_relation* rel, std::ostream& os);
