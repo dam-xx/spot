@@ -75,44 +75,6 @@ namespace spot
   };
 
 
-  /// \brief Iterate over the successors of a product computed on the fly.
-  class tgba_succ_iterator_product: public tgba_succ_iterator
-  {
-  public:
-    tgba_succ_iterator_product(tgba_succ_iterator* left,
-			       tgba_succ_iterator* right,
-			       bdd left_neg, bdd right_neg,
-			       bddPair* right_common_acc);
-
-    virtual ~tgba_succ_iterator_product();
-
-    // iteration
-    void first();
-    void next();
-    bool done() const;
-
-    // inspection
-    state_product* current_state() const;
-    bdd current_condition() const;
-    bdd current_acceptance_conditions() const;
-
-  private:
-    //@{
-    /// Internal routines to advance to the next successor.
-    void step_();
-    void next_non_false_();
-    //@}
-
-  protected:
-    tgba_succ_iterator* left_;
-    tgba_succ_iterator* right_;
-    bdd current_cond_;
-    bdd left_neg_;
-    bdd right_neg_;
-    bddPair* right_common_acc_;
-    friend class tgba_product;
-  };
-
   /// \brief A lazy product.  (States are computed on the fly.)
   class tgba_product: public tgba
   {
@@ -127,7 +89,7 @@ namespace spot
 
     virtual state* get_init_state() const;
 
-    virtual tgba_succ_iterator_product*
+    virtual tgba_succ_iterator*
     succ_iter(const state* local_state,
 	      const state* global_state = 0,
 	      const tgba* global_automaton = 0) const;
@@ -148,15 +110,17 @@ namespace spot
     virtual bdd compute_support_conditions(const state* state) const;
     virtual bdd compute_support_variables(const state* state) const;
 
-  private:
+  protected:
     bdd_dict* dict_;
     const tgba* left_;
     const tgba* right_;
+    bool left_kripke_;
     bdd left_acc_complement_;
     bdd right_acc_complement_;
     bdd all_acceptance_conditions_;
     bdd neg_acceptance_conditions_;
     bddPair* right_common_acc_;
+  private:
     // Disallow copy.
     tgba_product(const tgba_product&);
     tgba_product& operator=(const tgba_product&);
@@ -169,7 +133,7 @@ namespace spot
     tgba_product_init(const tgba* left, const tgba* right,
 		      const state* left_init, const state* right_init);
     virtual state* get_init_state() const;
-  private:
+  protected:
     const state* left_init_;
     const state* right_init_;
   };

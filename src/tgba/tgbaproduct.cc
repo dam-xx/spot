@@ -25,6 +25,7 @@
 #include <string>
 #include <cassert>
 #include "misc/hashfunc.hh"
+#include "kripke/kripke.hh"
 
 namespace spot
 {
@@ -72,105 +73,196 @@ namespace spot
   ////////////////////////////////////////////////////////////
   // tgba_succ_iterator_product
 
-  tgba_succ_iterator_product::tgba_succ_iterator_product
-  (tgba_succ_iterator* left, tgba_succ_iterator* right,
-   bdd left_neg, bdd right_neg, bddPair* right_common_acc)
-    : left_(left), right_(right),
-      left_neg_(left_neg),
-      right_neg_(right_neg),
-      right_common_acc_(right_common_acc)
+  namespace
   {
-  }
 
-  tgba_succ_iterator_product::~tgba_succ_iterator_product()
-  {
-    delete left_;
-    delete right_;
-  }
-
-  void
-  tgba_succ_iterator_product::step_()
-  {
-    left_->next();
-    if (left_->done())
+    class tgba_succ_iterator_product_common: public tgba_succ_iterator
+    {
+    public:
+      tgba_succ_iterator_product_common(tgba_succ_iterator* left,
+					tgba_succ_iterator* right)
+	: left_(left), right_(right)
       {
-	left_->first();
-	right_->next();
       }
-  }
 
-  void
-  tgba_succ_iterator_product::next_non_false_()
-  {
-    while (!done())
+      virtual ~tgba_succ_iterator_product_common()
       {
-	bdd l = left_->current_condition();
-	bdd r = right_->current_condition();
-	bdd current_cond = l & r;
+	delete left_;
+	delete right_;
+      }
 
-	if (current_cond != bddfalse)
+      virtual void next_non_false_() = 0;
+
+    void first()
+      {
+	if (!right_)
+	  return;
+
+	left_->first();
+	right_->first();
+	// If one of the two successor sets is empty initially, we
+	// reset right_, so that done() can detect this situation
+	// easily.  (We choose to reset right_ because this variable
+	// is already used by done().)
+	if (left_->done() || right_->done())
 	  {
-	    current_cond_ = current_cond;
+	    delete right_;
+	    right_ = 0;
 	    return;
 	  }
-	step_();
+	next_non_false_();
       }
-  }
 
-  void
-  tgba_succ_iterator_product::first()
-  {
-    if (!right_)
-      return;
-
-    left_->first();
-    right_->first();
-    // If one of the two successor sets is empty initially, we reset
-    // right_, so that done() can detect this situation easily.  (We
-    // choose to reset right_ because this variable is already used by
-    // done().)
-    if (left_->done() || right_->done())
+      bool done() const
       {
-	delete right_;
-	right_ = 0;
-	return;
+	return !right_ || right_->done();
       }
-    next_non_false_();
-  }
 
-  void
-  tgba_succ_iterator_product::next()
-  {
-    step_();
-    next_non_false_();
-  }
+      state_product* current_state() const
+      {
+	return new state_product(left_->current_state(),
+				 right_->current_state());
+      }
 
-  bool
-  tgba_succ_iterator_product::done() const
-  {
-    return !right_ || right_->done();
-  }
+    protected:
+      tgba_succ_iterator* left_;
+      tgba_succ_iterator* right_;
+      friend class spot::tgba_product;
+    };
 
 
-  state_product*
-  tgba_succ_iterator_product::current_state() const
-  {
-    return new state_product(left_->current_state(),
-			     right_->current_state());
-  }
+    /// \brief Iterate over the successors of a product computed on the fly.
+    class tgba_succ_iterator_product: public tgba_succ_iterator_product_common
+    {
+    public:
+      tgba_succ_iterator_product(tgba_succ_iterator* left,
+				 tgba_succ_iterator* right,
+				 bdd left_neg, bdd right_neg,
+				 bddPair* right_common_acc)
+	: tgba_succ_iterator_product_common(left, right),
+	  left_neg_(left_neg),
+	  right_neg_(right_neg),
+	  right_common_acc_(right_common_acc)
+      {
+      }
 
-  bdd
-  tgba_succ_iterator_product::current_condition() const
-  {
-    return current_cond_;
-  }
+      virtual ~tgba_succ_iterator_product()
+      {
+      }
 
-  bdd tgba_succ_iterator_product::current_acceptance_conditions() const
-  {
-    return ((left_->current_acceptance_conditions() & right_neg_)
-	    | (bdd_replace(right_->current_acceptance_conditions(),
-			   right_common_acc_) & left_neg_));
-  }
+      void step_()
+      {
+	left_->next();
+	if (left_->done())
+	  {
+	    left_->first();
+	    right_->next();
+	  }
+      }
+
+      void next_non_false_()
+      {
+	while (!done())
+	  {
+	    bdd l = left_->current_condition();
+	    bdd r = right_->current_condition();
+	    bdd current_cond = l & r;
+
+	    if (current_cond != bddfalse)
+	      {
+		current_cond_ = current_cond;
+		return;
+	      }
+	    step_();
+	  }
+      }
+
+      void next()
+      {
+	step_();
+	next_non_false_();
+      }
+
+      bdd current_condition() const
+      {
+	return current_cond_;
+      }
+
+      bdd current_acceptance_conditions() const
+      {
+	return ((left_->current_acceptance_conditions() & right_neg_)
+		| (bdd_replace(right_->current_acceptance_conditions(),
+			       right_common_acc_) & left_neg_));
+      }
+
+    protected:
+      bdd current_cond_;
+      bdd left_neg_;
+      bdd right_neg_;
+      bddPair* right_common_acc_;
+    };
+
+    /// Iterate over the successors of a product computed on the fly.
+    /// This one assumes that LEFT is an iterator over a Kripke structure
+    class tgba_succ_iterator_product_kripke:
+      public tgba_succ_iterator_product_common
+    {
+    public:
+      tgba_succ_iterator_product_kripke(tgba_succ_iterator* left,
+					tgba_succ_iterator* right)
+	: tgba_succ_iterator_product_common(left, right)
+      {
+      }
+
+      virtual ~tgba_succ_iterator_product_kripke()
+      {
+      }
+
+      void next_non_false_()
+      {
+	// All the transitions of left_ iterator have the
+	// same label, because it is a Kripke structure.
+	bdd l = left_->current_condition();
+	while (!right_->done())
+	  {
+	    bdd r = right_->current_condition();
+	    bdd current_cond = l & r;
+
+	    if (current_cond != bddfalse)
+	      {
+		current_cond_ = current_cond;
+		return;
+	      }
+	    right_->next();
+	  }
+      }
+
+      void next()
+      {
+	left_->next();
+	if (left_->done())
+	  {
+	    left_->first();
+	    right_->next();
+	    next_non_false_();
+	  }
+      }
+
+      bdd current_condition() const
+      {
+	return current_cond_;
+      }
+
+      bdd current_acceptance_conditions() const
+      {
+	return right_->current_acceptance_conditions();
+      }
+
+    protected:
+      bdd current_cond_;
+    };
+
+  } // anonymous
 
   ////////////////////////////////////////////////////////////
   // tgba_product
@@ -178,7 +270,34 @@ namespace spot
   tgba_product::tgba_product(const tgba* left, const tgba* right)
     : dict_(left->get_dict()), left_(left), right_(right)
   {
-    assert(dict_ == right->get_dict());
+    assert(dict_ == right_->get_dict());
+
+    // If one of the side is a Kripke structure, it is easier to deal
+    // with (we don't have to fix the acceptance conditions, and
+    // computing the successors can be improved a bit).
+    if (dynamic_cast<const kripke*>(left_))
+      {
+	left_kripke_ = true;
+      }
+    else if (dynamic_cast<const kripke*>(right_))
+      {
+	std::swap(left_, right_);
+	left_kripke_ = true;
+      }
+    else
+      {
+	left_kripke_ = false;
+      }
+
+    dict_->register_all_variables_of(&left_, this);
+    dict_->register_all_variables_of(&right_, this);
+
+    if (left_kripke_)
+      {
+	all_acceptance_conditions_ = right_->all_acceptance_conditions();
+	neg_acceptance_conditions_ = right_->neg_acceptance_conditions();
+	return;
+      }
 
     bdd lna = left_->neg_acceptance_conditions();
     bdd rna = right_->neg_acceptance_conditions();
@@ -212,14 +331,12 @@ namespace spot
     all_acceptance_conditions_ = ((lac & right_acc_complement_)
 				  | (rac & left_acc_complement_));
     neg_acceptance_conditions_ = lna & rna;
-
-    dict_->register_all_variables_of(&left_, this);
-    dict_->register_all_variables_of(&right_, this);
   }
 
   tgba_product::~tgba_product()
   {
-    bdd_freepair(right_common_acc_);
+    if (!left_kripke_)
+      bdd_freepair(right_common_acc_);
     dict_->unregister_all_my_variables(this);
   }
 
@@ -230,7 +347,7 @@ namespace spot
 			     right_->get_init_state());
   }
 
-  tgba_succ_iterator_product*
+  tgba_succ_iterator*
   tgba_product::succ_iter(const state* local_state,
 			  const state* global_state,
 			  const tgba* global_automaton) const
@@ -251,10 +368,14 @@ namespace spot
 					      global_state, global_automaton);
     tgba_succ_iterator* ri = right_->succ_iter(s->right(),
 					       global_state, global_automaton);
-    return new tgba_succ_iterator_product(li, ri,
-					  left_acc_complement_,
-					  right_acc_complement_,
-					  right_common_acc_);
+
+    if (left_kripke_)
+      return new tgba_succ_iterator_product_kripke(li, ri);
+    else
+      return new tgba_succ_iterator_product(li, ri,
+					    left_acc_complement_,
+					    right_acc_complement_,
+					    right_common_acc_);
   }
 
   bdd
@@ -342,6 +463,8 @@ namespace spot
     : tgba_product(left, right),
       left_init_(left_init), right_init_(right_init)
   {
+    if (left_ != left)
+      std::swap(left_init_, right_init_);
   }
 
   state*

@@ -1,5 +1,23 @@
 2011-03-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Speedup tgba_product when one of the argument is a Kripke structure.
+
+	The gain is not very impressive.  The runtime of the first example
+	in iface/dve2/README (also in dve2check.test) is 15% faster.
+
+	* src/tgba/tgbaproduct.hh (tgba_succ_iterator_product): Move ...
+	* src/tgba/tgbaproduct.cc (tgba_succ_iterator_product,
+	tgba_succ_iterator_product_common): ... in these two classes.
+	(tgba_succ_iterator_product_kripke): New class to speedup
+	successor computation on Kripke structures.  We can assume that
+	all the transitions leaving the same state have the same label.
+	(tgba_product::tgba_product, tgba_product::succ_iter): Use
+	tgba_succ_iterator_product_kripke when appropriate.
+	(tgba_product_init::tgba_product_init): Adjust for the case
+	where tgba_product did reverse its operands.
+
+2011-03-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* iface/dve2/dve2check.cc: Remove stray debug output.
 
 2011-03-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
