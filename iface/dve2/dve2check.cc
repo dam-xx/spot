@@ -156,7 +156,6 @@ main(int argc, char **argv)
   if (dead == 0 || !strcasecmp(dead, "true"))
     {
       deadf = spot::ltl::constant::true_instance();
-      std::cerr << "true" << std::endl;
     }
   else if (!strcasecmp(dead, "false"))
     {
