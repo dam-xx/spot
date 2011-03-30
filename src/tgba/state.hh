@@ -88,9 +88,7 @@ namespace spot
       delete this;
     }
 
-    // FIXME: Make the destructor protected after Spot 0.7.
-    //protected:
-
+  protected:
     /// \brief Destructor.
     ///
     /// \deprecated Client code should now call

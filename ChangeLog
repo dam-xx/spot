@@ -1,5 +1,14 @@
 2011-03-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Protect the state destructor.
+
+	Client code should always call the destroy() method instead.  (It
+	was introduced in Spot 0.7.)
+
+	* src/tgba/state.hh (state::~state): Make it protected.
+
+2011-03-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Speedup tgba_product when one of the argument is a Kripke structure.
 
 	The gain is not very impressive.  The runtime of the first example
