@@ -469,7 +469,7 @@ namespace spot
               {
                 assert(c != CYAN);
                 int i = phc->erase(ps);
-                assert(i==1);
+                assert(i == 1);
                 (void)i;
                 ph->insert(std::make_pair(ps, c));
               }
@@ -480,7 +480,7 @@ namespace spot
           }
         bool is_white() const
           {
-            return !is_cyan && pc==0;
+            return !is_cyan && pc == 0;
           }
       private:
         bool is_cyan;
@@ -515,19 +515,19 @@ namespace spot
       color_ref get_color_ref(const state*& s)
         {
           hcyan_type::iterator ic = hc.find(s);
-          if (ic==hc.end())
+          if (ic == hc.end())
             {
               hash_type::iterator it = h.find(s);
-              if (it==h.end())
+              if (it == h.end())
                 return color_ref(0); // white state
-              if (s!=it->first)
+              if (s != it->first)
                 {
                   s->destroy();
                   s = it->first;
                 }
-              return color_ref(&(it->second)); // blue or red state
+              return color_ref(&it->second); // blue or red state
             }
-          if (s!=*ic)
+          if (s != *ic)
             {
               s->destroy();
               s = *ic;
@@ -537,7 +537,7 @@ namespace spot
 
       void add_new_state(const state* s, color c)
         {
-          assert(hc.find(s)==hc.end() && h.find(s)==h.end());
+          assert(hc.find(s) == hc.end() && h.find(s) == h.end());
           if (c == CYAN)
             hc.insert(s);
           else
@@ -599,17 +599,17 @@ namespace spot
           }
         void set_color(color c)
           {
-            if (is_cyan && c!=CYAN)
+            if (is_cyan && c != CYAN)
               {
                 int i = phc->erase(ps);
-                assert(i==1);
+                assert(i == 1);
                 (void)i;
               }
             *b =  (*b & ~(3U << o)) | (c << o);
           }
         bool is_white() const
           {
-            return get_color()==WHITE;
+            return get_color() == WHITE;
           }
       private:
         bool is_cyan;
@@ -634,7 +634,7 @@ namespace spot
         {
           size_t ha = s->hash();
           hcyan_type::iterator ic = hc.find(s);
-          if (ic!=hc.end())
+          if (ic != hc.end())
             return color_ref(&hc, *ic, &h[ha%size_], ha%4);
           return color_ref(&h[ha%size_], ha%4);
         }
@@ -642,7 +642,7 @@ namespace spot
       void add_new_state(const state* s, color c)
         {
           assert(get_color_ref(s).is_white());
-          if (c==CYAN)
+          if (c == CYAN)
             hc.insert(s);
           else
             {

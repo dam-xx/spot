@@ -121,10 +121,16 @@ for dir in "${INCDIR-..}" "${INCDIR-..}"/../iface; do
       grep ",[^ \t\"%']" $tmp &&
 	diag 'Space after coma.'
 
-      grep '[^	 ]&&[^	 ]' $tmp &&
+      # The 'r' allows operator&&
+      grep '[^	 r]&&[^	 ]' $tmp &&
 	diag 'Space arround binary operators.'
 
-      grep '[^	 ]||[^	 ]' $tmp &&
+      # The 'r' allows operator||
+      grep '[^	 r]||[^	 ]' $tmp &&
+	diag 'Space arround binary operators.'
+
+      # The 'r' allows operator==
+      grep '[^	 r][!<>=]=[^	 ]' $tmp &&
 	diag 'Space arround binary operators.'
 
       grep '[	 ]default:[^:].*;' $tmp &&

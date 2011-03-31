@@ -450,7 +450,7 @@ namespace spot
                 assert(p.second);
                 acc = &(p.first->second.second);
                 int i = phc->erase(ps);
-                assert(i==1);
+                assert(i == 1);
                 (void)i;
               }
             else
@@ -508,33 +508,33 @@ namespace spot
       color_ref get_color_ref(const state*& s)
         {
           hcyan_type::iterator ic = hc.find(s);
-          if (ic==hc.end())
+          if (ic == hc.end())
             {
               hash_type::iterator it = h.find(s);
-              if (it==h.end())
+              if (it == h.end())
                 // white state
                 return color_ref(0, 0);
-              if (s!=it->first)
+              if (s != it->first)
                 {
                   s->destroy();
                   s = it->first;
                 }
               // blue or red state
-              return color_ref(&(it->second.first), &(it->second.second));
+              return color_ref(&it->second.first, &it->second.second);
             }
-          if (s!=ic->first)
+          if (s != ic->first)
             {
               s->destroy();
               s = ic->first;
             }
           // cyan state
           return color_ref(&h, &hc, ic->first,
-                              &(ic->second.first), &(ic->second.second));
+			   &ic->second.first, &ic->second.second);
         }
 
       void add_new_state(const state* s, color c, const weight& w)
         {
-          assert(hc.find(s)==hc.end() && h.find(s)==h.end());
+          assert(hc.find(s) == hc.end() && h.find(s) == h.end());
           assert(c == CYAN);
           (void)c;
           hc.insert(std::make_pair(s, std::make_pair(w, bddfalse)));

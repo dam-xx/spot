@@ -447,7 +447,7 @@ namespace spot
           }
         bool is_white() const
           {
-            return p==0;
+            return p == 0;
           }
       private:
         color *p;
@@ -472,19 +472,19 @@ namespace spot
       color_ref get_color_ref(const state*& s)
         {
           hash_type::iterator it = h.find(s);
-          if (it==h.end())
+          if (it == h.end())
             return color_ref(0);
-          if (s!=it->first)
+          if (s != it->first)
             {
               s->destroy();
               s = it->first;
             }
-          return color_ref(&(it->second));
+          return color_ref(&it->second);
         }
 
       void add_new_state(const state* s, color c)
         {
-          assert(h.find(s)==h.end());
+          assert(h.find(s) == h.end());
           h.insert(std::make_pair(s, c));
         }
 
@@ -532,7 +532,7 @@ namespace spot
           }
         bool is_white() const
           {
-            return get_color()==WHITE;
+            return get_color() == WHITE;
           }
       private:
         unsigned char *base;

@@ -337,19 +337,19 @@ namespace spot
       color_ref get_color_ref(const state*& s)
         {
           hash_type::iterator it = h.find(s);
-          if (it==h.end())
+          if (it == h.end())
             return color_ref(0, 0);
-          if (s!=it->first)
+          if (s != it->first)
             {
               s->destroy();
               s = it->first;
             }
-          return color_ref(&(it->second.first), &(it->second.second));
+          return color_ref(&it->second.first, &it->second.second);
         }
 
       void add_new_state(const state* s, color c)
         {
-          assert(h.find(s)==h.end());
+          assert(h.find(s) == h.end());
           h.insert(std::make_pair(s, std::make_pair(c, bddfalse)));
         }
 

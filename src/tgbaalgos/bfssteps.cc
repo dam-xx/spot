@@ -52,7 +52,7 @@ namespace spot
           break;
         std::map<const state*, tgba_run::step,
             state_ptr_less_than>::const_iterator it = father.find(current.s);
-        assert(it!=father.end());
+        assert(it != father.end());
         current = it->second;
       }
     l.splice(l.end(), p);

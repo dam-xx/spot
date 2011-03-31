@@ -1,3 +1,13 @@
+2011-03-31  Alexandre Duret-Lutz  <adl@va-et-vient.net>
+
+	Cosmetics.
+
+	* src/sanity/style.test: Catch some binary operators not
+	delimited with spaces.
+	* src/tgbaalgos/bfssteps.cc, src/tgbaalgos/magic.cc,
+	src/tgbaalgos/reducerun.cc, src/tgbaalgos/se05.cc,
+	src/tgbaalgos/tau03.cc, src/tgbaalgos/tau03opt.cc: Fix these.
+
 2011-03-31  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Make state_explicit instances persistent objects.

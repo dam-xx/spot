@@ -68,7 +68,7 @@ namespace spot
       filter(const state* s)
       {
         state_set::const_iterator i = seen.find(s);
-        if (i==seen.end())
+        if (i == seen.end())
           seen.insert(s);
         else
           {
