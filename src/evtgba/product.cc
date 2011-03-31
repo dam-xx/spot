@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Développement de
+// l'Epita (LRDE)
 // Copyright (C) 2008, 2011 Laboratoire de Recherche et DÃ©veloppement
 // de l'Epita (LRDE).
 // Copyright (C) 2004 Laboratoire d'Informatique de Paris 6 (LIP6),
@@ -64,7 +66,7 @@ namespace spot
       compare(const state* other) const
       {
 	const evtgba_product_state* s =
-	  dynamic_cast<const evtgba_product_state*>(other);
+	  down_cast<const evtgba_product_state*>(other);
 	assert(s);
 	assert(s->n_ == n_);
 	for (int i = 0; i < n_; ++i)
@@ -404,7 +406,7 @@ namespace spot
   evtgba_product::succ_iter(const state* st) const
   {
     const evtgba_product_state* s =
-      dynamic_cast<const evtgba_product_state*>(st);
+      down_cast<const evtgba_product_state*>(st);
     assert(s);
 
     int n = op_.size();
@@ -420,7 +422,7 @@ namespace spot
   evtgba_product::pred_iter(const state* st) const
   {
     const evtgba_product_state* s =
-      dynamic_cast<const evtgba_product_state*>(st);
+      down_cast<const evtgba_product_state*>(st);
     assert(s);
 
     int n = op_.size();
@@ -436,7 +438,7 @@ namespace spot
   evtgba_product::format_state(const state* st) const
   {
     const evtgba_product_state* s =
-      dynamic_cast<const evtgba_product_state*>(st);
+      down_cast<const evtgba_product_state*>(st);
     int n = op_.size();
     std::string res = "<" + op_[0]->format_state(s->nth(0));
 

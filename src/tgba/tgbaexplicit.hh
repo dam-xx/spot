@@ -206,7 +206,7 @@ namespace spot
 
     const label& get_label(const spot::state* s) const
     {
-      const state_explicit* se = dynamic_cast<const state_explicit*>(s);
+      const state_explicit* se = down_cast<const state_explicit*>(s);
       assert(se);
       return get_label(se);
     }

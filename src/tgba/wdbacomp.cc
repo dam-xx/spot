@@ -58,7 +58,7 @@ namespace spot
       compare(const state* other) const
       {
 	const state_wdba_comp_proxy* o =
-	  dynamic_cast<const state_wdba_comp_proxy*>(other);
+	  down_cast<const state_wdba_comp_proxy*>(other);
 	assert(o);
 	const state* oo = o->real_state();
 	if (s_ == 0)
@@ -195,7 +195,7 @@ namespace spot
 		const tgba* global_automaton = 0) const
       {
 	const state_wdba_comp_proxy* s =
-	  dynamic_cast<const state_wdba_comp_proxy*>(local_state);
+	  down_cast<const state_wdba_comp_proxy*>(local_state);
 	assert(s);
 
 	const state* o = s->real_state();
@@ -216,7 +216,7 @@ namespace spot
       format_state(const state* ostate) const
       {
 	const state_wdba_comp_proxy* s =
-	  dynamic_cast<const state_wdba_comp_proxy*>(ostate);
+	  down_cast<const state_wdba_comp_proxy*>(ostate);
 	assert(s);
 	const state* rs = s->real_state();
 	if (rs)
@@ -229,7 +229,7 @@ namespace spot
       project_state(const state* s, const tgba* t) const
       {
 	const state_wdba_comp_proxy* s2 =
-	  dynamic_cast<const state_wdba_comp_proxy*>(s);
+	  down_cast<const state_wdba_comp_proxy*>(s);
 	assert(s2);
 	if (t == this)
 	  return s2->clone();
@@ -253,7 +253,7 @@ namespace spot
     compute_support_conditions(const state* ostate) const
       {
 	const state_wdba_comp_proxy* s =
-	  dynamic_cast<const state_wdba_comp_proxy*>(ostate);
+	  down_cast<const state_wdba_comp_proxy*>(ostate);
 	assert(s);
 	const state* rs = s->real_state();
 	if (rs)
@@ -265,7 +265,7 @@ namespace spot
       virtual bdd compute_support_variables(const state* ostate) const
       {
 	const state_wdba_comp_proxy* s =
-	  dynamic_cast<const state_wdba_comp_proxy*>(ostate);
+	  down_cast<const state_wdba_comp_proxy*>(ostate);
 	assert(s);
 	const state* rs = s->real_state();
 	if (rs)

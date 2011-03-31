@@ -1,4 +1,4 @@
-// Copyright (C) 2009 Laboratoire de Recherche et Développement
+// Copyright (C) 2009, 2011 Laboratoire de Recherche et Développement
 // de l'Epita (LRDE).
 //
 // This file is part of Spot, a model checking library.
@@ -227,7 +227,7 @@ namespace spot
     /// e.g. like {string_1,...,string_n}.
     virtual std::string format_state(const spot::state* s) const
     {
-      const spot::state_set* se = dynamic_cast<const spot::state_set*>(s);
+      const spot::state_set* se = down_cast<const spot::state_set*>(s);
       assert(se);
       const state_set* ss = se->get_state();
       return format_state_set(ss);

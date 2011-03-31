@@ -137,7 +137,7 @@ namespace spot
     state_kv_complement::compare(const state* o) const
     {
       const state_kv_complement* other =
-	dynamic_cast<const state_kv_complement*>(o);
+	down_cast<const state_kv_complement*>(o);
 
       if (other == 0)
         return 1;
@@ -632,7 +632,7 @@ namespace spot
                              const tgba*) const
   {
     const state_kv_complement* state =
-      dynamic_cast<const state_kv_complement*>(local_state);
+      down_cast<const state_kv_complement*>(local_state);
     assert(state);
 
     return new tgba_kv_complement_succ_iterator(automaton_,
@@ -650,7 +650,7 @@ namespace spot
   tgba_kv_complement::format_state(const state* state) const
   {
     const state_kv_complement* s =
-      dynamic_cast<const state_kv_complement*>(state);
+      down_cast<const state_kv_complement*>(state);
     assert(s);
     std::ostringstream ss;
     ss << "{ set: {" << std::endl;

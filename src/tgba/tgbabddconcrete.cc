@@ -98,7 +98,7 @@ namespace spot
 			       const state* global_state,
 			       const tgba* global_automaton) const
   {
-    const state_bdd* s = dynamic_cast<const state_bdd*>(local_state);
+    const state_bdd* s = down_cast<const state_bdd*>(local_state);
     assert(s);
     bdd succ_set = data_.relation & s->as_bdd();
     // If we are in a product, inject the local conditions of
@@ -115,7 +115,7 @@ namespace spot
   bdd
   tgba_bdd_concrete::compute_support_conditions(const state* st) const
   {
-    const state_bdd* s = dynamic_cast<const state_bdd*>(st);
+    const state_bdd* s = down_cast<const state_bdd*>(st);
     assert(s);
     return bdd_relprod(s->as_bdd(), data_.relation, data_.notvar_set);
   }
@@ -123,7 +123,7 @@ namespace spot
   bdd
   tgba_bdd_concrete::compute_support_variables(const state* st) const
   {
-    const state_bdd* s = dynamic_cast<const state_bdd*>(st);
+    const state_bdd* s = down_cast<const state_bdd*>(st);
     assert(s);
     bdd succ_set = data_.relation & s->as_bdd();
     // bdd_support must be called BEFORE bdd_exist
@@ -144,7 +144,7 @@ namespace spot
   std::string
   tgba_bdd_concrete::format_state(const state* state) const
   {
-    const state_bdd* s = dynamic_cast<const state_bdd*>(state);
+    const state_bdd* s = down_cast<const state_bdd*>(state);
     assert(s);
     return bdd_format_set(get_dict(), s->as_bdd());
   }

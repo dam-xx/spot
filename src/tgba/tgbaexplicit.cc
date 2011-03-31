@@ -88,7 +88,7 @@ namespace spot
   int
   state_explicit::compare(const spot::state* other) const
   {
-    const state_explicit* o = dynamic_cast<const state_explicit*>(other);
+    const state_explicit* o = down_cast<const state_explicit*>(other);
     assert(o);
     // Do not simply return "o - this", it might not fit in an int.
     if (o < this)
@@ -222,7 +222,7 @@ namespace spot
 			   const spot::state* global_state,
 			   const tgba* global_automaton) const
   {
-    const state_explicit* s = dynamic_cast<const state_explicit*>(state);
+    const state_explicit* s = down_cast<const state_explicit*>(state);
     assert(s);
     (void) global_state;
     (void) global_automaton;
@@ -233,7 +233,7 @@ namespace spot
   bdd
   tgba_explicit::compute_support_conditions(const spot::state* in) const
   {
-    const state_explicit* s = dynamic_cast<const state_explicit*>(in);
+    const state_explicit* s = down_cast<const state_explicit*>(in);
     assert(s);
     const state_explicit::transitions_t& st = s->successors;
 
@@ -247,7 +247,7 @@ namespace spot
   bdd
   tgba_explicit::compute_support_variables(const spot::state* in) const
   {
-    const state_explicit* s = dynamic_cast<const state_explicit*>(in);
+    const state_explicit* s = down_cast<const state_explicit*>(in);
     assert(s);
     const state_explicit::transitions_t& st = s->successors;
 
@@ -304,7 +304,7 @@ namespace spot
   std::string
   tgba_explicit_string::format_state(const spot::state* s) const
   {
-    const state_explicit* se = dynamic_cast<const state_explicit*>(s);
+    const state_explicit* se = down_cast<const state_explicit*>(s);
     assert(se);
     sn_map::const_iterator i = state_name_map_.find(se);
     assert(i != state_name_map_.end());
@@ -332,7 +332,7 @@ namespace spot
   std::string
   tgba_explicit_formula::format_state(const spot::state* s) const
   {
-    const state_explicit* se = dynamic_cast<const state_explicit*>(s);
+    const state_explicit* se = down_cast<const state_explicit*>(s);
     assert(se);
     sn_map::const_iterator i = state_name_map_.find(se);
     assert(i != state_name_map_.end());
@@ -357,7 +357,7 @@ namespace spot
   std::string
   tgba_explicit_number::format_state(const spot::state* s) const
   {
-    const state_explicit* se = dynamic_cast<const state_explicit*>(s);
+    const state_explicit* se = down_cast<const state_explicit*>(s);
     assert(se);
     sn_map::const_iterator i = state_name_map_.find(se);
     assert(i != state_name_map_.end());

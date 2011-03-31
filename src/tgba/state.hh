@@ -29,6 +29,7 @@
 #include <cassert>
 #include <functional>
 #include <boost/shared_ptr.hpp>
+#include "misc/casts.hh"
 
 namespace spot
 {

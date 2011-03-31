@@ -67,7 +67,7 @@ namespace spot
       compare(const state* other) const
       {
 	const state_sgba_proxy* o =
-          dynamic_cast<const state_sgba_proxy*>(other);
+          down_cast<const state_sgba_proxy*>(other);
 	assert(o);
 	int res = s_->compare(o->real_state());
 	if (res != 0)
@@ -198,7 +198,7 @@ namespace spot
 			    const tgba* global_automaton) const
   {
     const state_sgba_proxy* s =
-      dynamic_cast<const state_sgba_proxy*>(local_state);
+      down_cast<const state_sgba_proxy*>(local_state);
     assert(s);
 
     tgba_succ_iterator* it = a_->succ_iter(s->real_state(),
@@ -216,7 +216,7 @@ namespace spot
   std::string
   tgba_sgba_proxy::format_state(const state* state) const
   {
-    const state_sgba_proxy* s = dynamic_cast<const state_sgba_proxy*>(state);
+    const state_sgba_proxy* s = down_cast<const state_sgba_proxy*>(state);
     assert(s);
     std::string a;
     if (!emulate_acc_cond_)
@@ -248,7 +248,7 @@ namespace spot
   tgba_sgba_proxy::state_acceptance_conditions(const state* state) const
   {
     const state_sgba_proxy* s =
-      dynamic_cast<const state_sgba_proxy*>(state);
+      down_cast<const state_sgba_proxy*>(state);
     assert(s);
     if (emulate_acc_cond_)
       return acceptance_condition_;
@@ -259,7 +259,7 @@ namespace spot
   tgba_sgba_proxy::compute_support_conditions(const state* state) const
   {
     const state_sgba_proxy* s =
-      dynamic_cast<const state_sgba_proxy*>(state);
+      down_cast<const state_sgba_proxy*>(state);
     assert(s);
 
     if (emulate_acc_cond_)
@@ -271,7 +271,7 @@ namespace spot
   tgba_sgba_proxy::compute_support_variables(const state* state) const
   {
     const state_sgba_proxy* s =
-      dynamic_cast<const state_sgba_proxy*>(state);
+      down_cast<const state_sgba_proxy*>(state);
     assert(s);
 
     if (emulate_acc_cond_)

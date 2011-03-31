@@ -89,18 +89,18 @@ namespace spot
     if (i != lnode_succ->end())
       {
 	tmpmax =
-	  dynamic_cast<duplicator_node_delayed*>(*i)->get_progress_measure();
-	if (dynamic_cast<duplicator_node_delayed*>(*i)->get_lead_2_acc_all())
+	  static_cast<duplicator_node_delayed*>(*i)->get_progress_measure();
+	if (static_cast<duplicator_node_delayed*>(*i)->get_lead_2_acc_all())
 	  tmpmaxwin = tmpmax;
 	++i;
       }
     for (; i != lnode_succ->end(); ++i)
       {
 	tmp =
-	  dynamic_cast<duplicator_node_delayed*>(*i)->get_progress_measure();
+	  static_cast<duplicator_node_delayed*>(*i)->get_progress_measure();
 	if (tmp > tmpmax)
 	  tmpmax = tmp;
-	if (dynamic_cast<duplicator_node_delayed*>(*i)->get_lead_2_acc_all() &&
+	if (static_cast<duplicator_node_delayed*>(*i)->get_lead_2_acc_all() &&
 	    (tmp > tmpmaxwin))
 	  tmpmaxwin = tmp;
       }
@@ -126,7 +126,7 @@ namespace spot
   {
     return (this->spoiler_node::compare(n) &&
 	    (acceptance_condition_visited_ ==
-	     dynamic_cast<spoiler_node_delayed*>(n)->
+	     static_cast<spoiler_node_delayed*>(n)->
 	     get_acceptance_condition_visited()));
   }
 
@@ -193,7 +193,7 @@ namespace spot
 	seen_ = true;
 	for (sn_v::iterator i = lnode_succ->begin();
 	     i != lnode_succ->end(); ++i)
-	  dynamic_cast<duplicator_node_delayed*>(*i)->set_lead_2_acc_all(acc);
+	  static_cast<duplicator_node_delayed*>(*i)->set_lead_2_acc_all(acc);
       }
     else
       {
@@ -246,17 +246,17 @@ namespace spot
     if (i != lnode_succ->end())
       {
 	tmpmin =
-	  dynamic_cast<spoiler_node_delayed*>(*i)->get_progress_measure();
-	if (dynamic_cast<spoiler_node_delayed*>(*i)->get_lead_2_acc_all())
+	  static_cast<spoiler_node_delayed*>(*i)->get_progress_measure();
+	if (static_cast<spoiler_node_delayed*>(*i)->get_lead_2_acc_all())
 	  tmpminwin = tmpmin;
 	++i;
       }
     for (; i != lnode_succ->end(); ++i)
       {
-	tmp = dynamic_cast<spoiler_node_delayed*>(*i)->get_progress_measure();
+	tmp = static_cast<spoiler_node_delayed*>(*i)->get_progress_measure();
 	if (tmp < tmpmin)
 	  tmpmin = tmp;
-	if (dynamic_cast<spoiler_node_delayed*>(*i)->get_lead_2_acc_all() &&
+	if (static_cast<spoiler_node_delayed*>(*i)->get_lead_2_acc_all() &&
 	    (tmp > tmpminwin))
 	  tmpminwin = tmp;
       }
@@ -333,7 +333,7 @@ namespace spot
 	for (sn_v::iterator i = lnode_succ->begin();
 	     i != lnode_succ->end(); ++i)
 	  lead_2_acc_all_
-	    |= dynamic_cast<spoiler_node_delayed*>(*i)->set_lead_2_acc_all(acc);
+	    |= static_cast<spoiler_node_delayed*>(*i)->set_lead_2_acc_all(acc);
       }
     return lead_2_acc_all_;
   }
@@ -398,7 +398,7 @@ namespace spot
     for (si->first(); !si->done(); si->next())
       {
 	bdd btmp = si->current_acceptance_conditions() |
-	  dynamic_cast<spoiler_node_delayed*>(sn)->
+	  static_cast<spoiler_node_delayed*>(sn)->
 	  get_acceptance_condition_visited();
 
 	s_v::iterator i1;
@@ -505,7 +505,7 @@ namespace spot
 	  {
 	    exist = true;
 	    delete dn_n;
-	    dn_n = dynamic_cast<duplicator_node_delayed*>(*i);
+	    dn_n = static_cast<duplicator_node_delayed*>(*i);
 	    break;
 	  }
       }
@@ -536,7 +536,7 @@ namespace spot
 	  {
 	    exist = true;
 	    delete sn_n;
-	    sn_n = dynamic_cast<spoiler_node_delayed*>(*i);
+	    sn_n = static_cast<spoiler_node_delayed*>(*i);
 	    break;
 	  }
       }
@@ -590,9 +590,9 @@ namespace spot
 	   = spoiler_vertice_.begin();
 	 i != spoiler_vertice_.end(); ++i)
       {
-	if ((dynamic_cast<spoiler_node_delayed*>(*i)->get_progress_measure()
+	if ((static_cast<spoiler_node_delayed*>(*i)->get_progress_measure()
 	     < nb_spoiler_loose_ + 1) &&
-	    (dynamic_cast<spoiler_node_delayed*>(*i)
+	    (static_cast<spoiler_node_delayed*>(*i)
 	     ->get_acceptance_condition_visited() == bddfalse))
 	  {
 	    p = new state_couple((*i)->get_spoiler_node(),

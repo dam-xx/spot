@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Développement de
+// l'Epita (LRDE)
 // Copyright (C) 2004  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -35,7 +37,7 @@ namespace spot
   state_evtgba_explicit::compare(const spot::state* other) const
   {
     const state_evtgba_explicit* o =
-      dynamic_cast<const state_evtgba_explicit*>(other);
+      down_cast<const state_evtgba_explicit*>(other);
     assert(o);
     return o->get_state() - get_state();
   }
@@ -179,7 +181,7 @@ namespace spot
   evtgba_explicit::succ_iter(const spot::state* s) const
   {
     const state_evtgba_explicit* u =
-      dynamic_cast<const state_evtgba_explicit*>(s);
+      down_cast<const state_evtgba_explicit*>(s);
     assert(u);
     return new evtgba_explicit_iterator_fw(&u->get_state()->out);
   }
@@ -188,7 +190,7 @@ namespace spot
   evtgba_explicit::pred_iter(const spot::state* s) const
   {
     const state_evtgba_explicit* u =
-      dynamic_cast<const state_evtgba_explicit*>(s);
+      down_cast<const state_evtgba_explicit*>(s);
     assert(u);
     return new evtgba_explicit_iterator_fw(&u->get_state()->in);
   }
@@ -197,7 +199,7 @@ namespace spot
   evtgba_explicit::format_state(const spot::state* s) const
   {
     const state_evtgba_explicit* u =
-      dynamic_cast<const state_evtgba_explicit*>(s);
+      down_cast<const state_evtgba_explicit*>(s);
     assert(u);
     sn_map::const_iterator i = state_name_map_.find(u->get_state());
     assert(i != state_name_map_.end());

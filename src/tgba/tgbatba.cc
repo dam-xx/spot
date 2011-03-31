@@ -80,7 +80,7 @@ namespace spot
       virtual int
       compare(const state* other) const
       {
-	const state_tba_proxy* o = dynamic_cast<const state_tba_proxy*>(other);
+	const state_tba_proxy* o = down_cast<const state_tba_proxy*>(other);
 	assert(o);
 	int res = s_->compare(o->real_state());
 	if (res != 0)
@@ -334,7 +334,7 @@ namespace spot
 			    const tgba* global_automaton) const
   {
     const state_tba_proxy* s =
-      dynamic_cast<const state_tba_proxy*>(local_state);
+      down_cast<const state_tba_proxy*>(local_state);
     assert(s);
 
     tgba_succ_iterator* it = a_->succ_iter(s->real_state(),
@@ -374,7 +374,7 @@ namespace spot
   std::string
   tgba_tba_proxy::format_state(const state* state) const
   {
-    const state_tba_proxy* s = dynamic_cast<const state_tba_proxy*>(state);
+    const state_tba_proxy* s = down_cast<const state_tba_proxy*>(state);
     assert(s);
     std::string a = bdd_format_accset(get_dict(), s->acceptance_cond());
     if (a != "")
@@ -385,7 +385,7 @@ namespace spot
   state*
   tgba_tba_proxy::project_state(const state* s, const tgba* t) const
   {
-    const state_tba_proxy* s2 = dynamic_cast<const state_tba_proxy*>(s);
+    const state_tba_proxy* s2 = down_cast<const state_tba_proxy*>(s);
     assert(s2);
     if (t == this)
       return s2->clone();
@@ -409,7 +409,7 @@ namespace spot
   tgba_tba_proxy::compute_support_conditions(const state* state) const
   {
     const state_tba_proxy* s =
-      dynamic_cast<const state_tba_proxy*>(state);
+      down_cast<const state_tba_proxy*>(state);
     assert(s);
     return a_->support_conditions(s->real_state());
   }
@@ -418,7 +418,7 @@ namespace spot
   tgba_tba_proxy::compute_support_variables(const state* state) const
   {
     const state_tba_proxy* s =
-      dynamic_cast<const state_tba_proxy*>(state);
+      down_cast<const state_tba_proxy*>(state);
     assert(s);
     return a_->support_variables(s->real_state());
   }
@@ -481,7 +481,7 @@ namespace spot
   tgba_sba_proxy::state_is_accepting(const state* state) const
   {
     const state_tba_proxy* s =
-      dynamic_cast<const state_tba_proxy*>(state);
+      down_cast<const state_tba_proxy*>(state);
     assert(s);
     return bddtrue == s->acceptance_cond();
   }

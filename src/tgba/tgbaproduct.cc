@@ -49,7 +49,7 @@ namespace spot
   int
   state_product::compare(const state* other) const
   {
-    const state_product* o = dynamic_cast<const state_product*>(other);
+    const state_product* o = down_cast<const state_product*>(other);
     assert(o);
     int res = left_->compare(o->left());
     if (res != 0)
@@ -353,7 +353,7 @@ namespace spot
 			  const tgba* global_automaton) const
   {
     const state_product* s =
-      dynamic_cast<const state_product*>(local_state);
+      down_cast<const state_product*>(local_state);
     assert(s);
 
     // If global_automaton is not specified, THIS is the root of a
@@ -381,7 +381,7 @@ namespace spot
   bdd
   tgba_product::compute_support_conditions(const state* in) const
   {
-    const state_product* s = dynamic_cast<const state_product*>(in);
+    const state_product* s = down_cast<const state_product*>(in);
     assert(s);
     bdd lsc = left_->support_conditions(s->left());
     bdd rsc = right_->support_conditions(s->right());
@@ -391,7 +391,7 @@ namespace spot
   bdd
   tgba_product::compute_support_variables(const state* in) const
   {
-    const state_product* s = dynamic_cast<const state_product*>(in);
+    const state_product* s = down_cast<const state_product*>(in);
     assert(s);
     bdd lsc = left_->support_variables(s->left());
     bdd rsc = right_->support_variables(s->right());
@@ -407,7 +407,7 @@ namespace spot
   std::string
   tgba_product::format_state(const state* state) const
   {
-    const state_product* s = dynamic_cast<const state_product*>(state);
+    const state_product* s = down_cast<const state_product*>(state);
     assert(s);
     return (left_->format_state(s->left())
 	    + " * "
@@ -417,7 +417,7 @@ namespace spot
   state*
   tgba_product::project_state(const state* s, const tgba* t) const
   {
-    const state_product* s2 = dynamic_cast<const state_product*>(s);
+    const state_product* s2 = down_cast<const state_product*>(s);
     assert(s2);
     if (t == this)
       return s2->clone();
@@ -443,7 +443,7 @@ namespace spot
   tgba_product::transition_annotation(const tgba_succ_iterator* t) const
   {
     const tgba_succ_iterator_product* i =
-      dynamic_cast<const tgba_succ_iterator_product*>(t);
+      down_cast<const tgba_succ_iterator_product*>(t);
     assert(i);
     std::string left = left_->transition_annotation(i->left_);
     std::string right = right_->transition_annotation(i->right_);

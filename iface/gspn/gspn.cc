@@ -51,7 +51,7 @@ namespace spot
       virtual int
       compare(const state* other) const
       {
-	const state_gspn* o = dynamic_cast<const state_gspn*>(other);
+	const state_gspn* o = down_cast<const state_gspn*>(other);
 	assert(o);
 	return reinterpret_cast<char*>(o->get_state())
 	  - reinterpret_cast<char*>(get_state());
@@ -389,7 +389,7 @@ namespace spot
 			 const state* global_state,
 			 const tgba* global_automaton) const
     {
-      const state_gspn* s = dynamic_cast<const state_gspn*>(local_state);
+      const state_gspn* s = down_cast<const state_gspn*>(local_state);
       assert(s);
       (void) global_state;
       (void) global_automaton;
@@ -402,7 +402,7 @@ namespace spot
     bdd
     tgba_gspn::compute_support_conditions(const spot::state* state) const
     {
-      const state_gspn* s = dynamic_cast<const state_gspn*>(state);
+      const state_gspn* s = down_cast<const state_gspn*>(state);
       assert(s);
       return data_->state_conds(s);
     }
@@ -434,7 +434,7 @@ namespace spot
     std::string
     tgba_gspn::format_state(const state* state) const
     {
-      const state_gspn* s = dynamic_cast<const state_gspn*>(state);
+      const state_gspn* s = down_cast<const state_gspn*>(state);
       assert(s);
       char* str;
       int err = print_state(s->get_state(), &str);

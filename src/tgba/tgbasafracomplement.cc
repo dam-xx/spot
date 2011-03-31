@@ -917,7 +917,7 @@ namespace spot
     {
       if (other == this)
         return 0;
-      const state_complement* s = dynamic_cast<const state_complement*>(other);
+      const state_complement* s = down_cast<const state_complement*>(other);
       if (s == 0)
         return 1;
 #if TRANSFORM_TO_TBA
@@ -1189,7 +1189,7 @@ namespace spot
   {
     const safra_tree_automaton* a = static_cast<safra_tree_automaton*>(safra_);
     const state_complement* s =
-      dynamic_cast<const state_complement*>(local_state);
+      down_cast<const state_complement*>(local_state);
     assert(s);
     safra_tree_automaton::automaton_t::const_iterator tr =
       a->automaton.find(const_cast<safra_tree*>(s->get_safra()));
@@ -1282,7 +1282,7 @@ namespace spot
   tgba_safra_complement::format_state(const state* state) const
   {
     const state_complement* s =
-      dynamic_cast<const state_complement*>(state);
+      down_cast<const state_complement*>(state);
     assert(s);
     return s->to_string();
   }
@@ -1311,7 +1311,7 @@ namespace spot
   tgba_safra_complement::compute_support_conditions(const state* state) const
   {
     const safra_tree_automaton* a = static_cast<safra_tree_automaton*>(safra_);
-    const state_complement* s = dynamic_cast<const state_complement*>(state);
+    const state_complement* s = down_cast<const state_complement*>(state);
     assert(s);
     typedef safra_tree_automaton::automaton_t::const_iterator auto_it;
     typedef safra_tree_automaton::transition_list::const_iterator trans_it;
@@ -1331,7 +1331,7 @@ namespace spot
   tgba_safra_complement::compute_support_variables(const state* state) const
   {
     const safra_tree_automaton* a = static_cast<safra_tree_automaton*>(safra_);
-    const state_complement* s = dynamic_cast<const state_complement*>(state);
+    const state_complement* s = down_cast<const state_complement*>(state);
     assert(s);
     typedef safra_tree_automaton::automaton_t::const_iterator auto_it;
     typedef safra_tree_automaton::transition_list::const_iterator trans_it;

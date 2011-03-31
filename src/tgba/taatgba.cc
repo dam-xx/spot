@@ -70,7 +70,7 @@ namespace spot
                      const spot::state* global_state,
                      const tgba* global_automaton) const
   {
-    const spot::state_set* s = dynamic_cast<const spot::state_set*>(state);
+    const spot::state_set* s = down_cast<const spot::state_set*>(state);
     assert(s);
     (void) global_state;
     (void) global_automaton;
@@ -104,7 +104,7 @@ namespace spot
   bdd
   taa_tgba::compute_support_conditions(const spot::state* s) const
   {
-    const spot::state_set* se = dynamic_cast<const spot::state_set*>(s);
+    const spot::state_set* se = down_cast<const spot::state_set*>(s);
     assert(se);
     const state_set* ss = se->get_state();
 
@@ -120,7 +120,7 @@ namespace spot
   bdd
   taa_tgba::compute_support_variables(const spot::state* s) const
   {
-    const spot::state_set* se = dynamic_cast<const spot::state_set*>(s);
+    const spot::state_set* se = down_cast<const spot::state_set*>(s);
     assert(se);
     const state_set* ss = se->get_state();
 
@@ -146,7 +146,7 @@ namespace spot
   int
   state_set::compare(const spot::state* other) const
   {
-    const state_set* o = dynamic_cast<const state_set*>(other);
+    const state_set* o = down_cast<const state_set*>(other);
     assert(o);
 
     const taa_tgba::state_set* s1 = get_state();

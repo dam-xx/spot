@@ -74,13 +74,14 @@ namespace spot
     virtual int
     compare(const state* other) const
     {
-      const state_gspn_ssp* o = dynamic_cast<const state_gspn_ssp*>(other);
+      const state_gspn_ssp* o = down_cast<const state_gspn_ssp*>(other);
       assert(o);
-      int res = (reinterpret_cast<char*>(o->left())
-		 - reinterpret_cast<char*>(left()));
-      if (res != 0)
-	return res;
-      return right_->compare(o->right());
+      if (o->left() == left())
+	return right_->compare(o->right());
+      if (o->left() < left())
+	return -1;
+      else
+	return 1;
     }
 
     virtual size_t
@@ -349,7 +350,7 @@ namespace spot
 			   const state* global_state,
 			   const tgba* global_automaton) const
   {
-    const state_gspn_ssp* s = dynamic_cast<const state_gspn_ssp*>(state_);
+    const state_gspn_ssp* s = down_cast<const state_gspn_ssp*>(state_);
     assert(s);
     (void) global_state;
     (void) global_automaton;
@@ -485,7 +486,7 @@ namespace spot
   std::string
   tgba_gspn_ssp::format_state(const state* state) const
   {
-    const state_gspn_ssp* s = dynamic_cast<const state_gspn_ssp*>(state);
+    const state_gspn_ssp* s = down_cast<const state_gspn_ssp*>(state);
     assert(s);
     char* str;
     State gs = s->left();
@@ -512,7 +513,7 @@ namespace spot
   state*
   tgba_gspn_ssp::project_state(const state* s, const tgba* t) const
   {
-    const state_gspn_ssp* s2 = dynamic_cast<const state_gspn_ssp*>(s);
+    const state_gspn_ssp* s2 = down_cast<const state_gspn_ssp*>(s);
     assert(s2);
     if (t == this)
       return s2->clone();
@@ -681,7 +682,7 @@ namespace spot
     virtual numbered_state_heap::state_index
     find(const state* s) const
     {
-      const state_gspn_ssp* s_ = dynamic_cast<const state_gspn_ssp*>(s);
+      const state_gspn_ssp* s_ = down_cast<const state_gspn_ssp*>(s);
       const void* cont = container_(s_->left());
       contained_map::const_iterator i = contained.find(cont);
       if (i != contained.end())
@@ -695,9 +696,9 @@ namespace spot
 	      for (j = l.begin(); j != l.end(); ++j)
 		{
 		  const state_gspn_ssp* old_state =
-		    dynamic_cast<const state_gspn_ssp*>(*j);
+		    down_cast<const state_gspn_ssp*>(*j);
 		  const state_gspn_ssp* new_state =
-		    dynamic_cast<const state_gspn_ssp*>(s);
+		    down_cast<const state_gspn_ssp*>(s);
 		  assert(old_state);
 		  assert(new_state);
 
@@ -756,7 +757,7 @@ namespace spot
     virtual numbered_state_heap::state_index_p
     find(const state* s)
     {
-      const state_gspn_ssp* s_ = dynamic_cast<const state_gspn_ssp*>(s);
+      const state_gspn_ssp* s_ = down_cast<const state_gspn_ssp*>(s);
       const void* cont = container_(s_->left());
       contained_map::const_iterator i = contained.find(cont);
       if (i != contained.end())
@@ -770,9 +771,9 @@ namespace spot
 	      for (j = l.begin(); j != l.end(); ++j)
 		{
 		  const state_gspn_ssp* old_state =
-		    dynamic_cast<const state_gspn_ssp*>(*j);
+		    down_cast<const state_gspn_ssp*>(*j);
 		  const state_gspn_ssp* new_state =
-		    dynamic_cast<const state_gspn_ssp*>(s);
+		    down_cast<const state_gspn_ssp*>(s);
 		  assert(old_state);
 		  assert(new_state);
 
@@ -875,7 +876,7 @@ namespace spot
     {
       h[s] = index;
 
-      const state_gspn_ssp* s_ = dynamic_cast<const state_gspn_ssp*>(s);
+      const state_gspn_ssp* s_ = down_cast<const state_gspn_ssp*>(s);
       State sg = s_->left();
       if (sg)
 	{
@@ -1058,7 +1059,7 @@ namespace spot
     get_contained_map_size() const
     {
       return
-	dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->contained.size();
+	down_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->contained.size();
     }
 
     // If a new state includes an older state, we may have to add new
@@ -1069,14 +1070,14 @@ namespace spot
     find_state(const state* s)
     {
       typedef numbered_state_heap_ssp_semi::hash_type hash_type;
-      hash_type& h = dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->h;
+      hash_type& h = down_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->h;
       typedef numbered_state_heap_ssp_semi::contained_map contained_map;
       typedef numbered_state_heap_ssp_semi::f_map f_map;
       typedef numbered_state_heap_ssp_semi::state_list state_list;
       const contained_map& contained =
-	dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->contained;
+	down_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->contained;
 
-      const state_gspn_ssp* s_ = dynamic_cast<const state_gspn_ssp*>(s);
+      const state_gspn_ssp* s_ = down_cast<const state_gspn_ssp*>(s);
       const void* cont = container_(s_->left());
       contained_map::const_iterator i = contained.find(cont);
 
@@ -1092,9 +1093,9 @@ namespace spot
 	      for (j = l.begin(); j != l.end(); ++j)
 		{
 		  const state_gspn_ssp* old_state =
-		    dynamic_cast<const state_gspn_ssp*>(*j);
+		    down_cast<const state_gspn_ssp*>(*j);
 		  const state_gspn_ssp* new_state =
-		    dynamic_cast<const state_gspn_ssp*>(s);
+		    down_cast<const state_gspn_ssp*>(s);
 		  assert(old_state);
 		  assert(new_state);
 
@@ -1106,9 +1107,9 @@ namespace spot
 	      for (j = l.begin(); j != l.end(); ++j)
 		{
 		  const state_gspn_ssp* old_state =
-		    dynamic_cast<const state_gspn_ssp*>(*j);
+		    down_cast<const state_gspn_ssp*>(*j);
 		  const state_gspn_ssp* new_state =
-		    dynamic_cast<const state_gspn_ssp*>(s);
+		    down_cast<const state_gspn_ssp*>(s);
 		  assert(old_state);
 		  assert(new_state);
 
@@ -1279,7 +1280,7 @@ namespace spot
 	static_cast<spot::unsigned_statistics::unsigned_fun>
 	(&couvreur99_check_shy_semi_ssp::get_inclusion_count);
 
-      //dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->stats = this;
+      //down_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->stats = this;
     }
 
   private:
@@ -1296,7 +1297,7 @@ namespace spot
     get_inclusion_count() const
     {
       return
-	dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->inclusions;
+	down_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->inclusions;
 
     };
 
@@ -1304,7 +1305,7 @@ namespace spot
     get_contained_map_size() const
     {
       return
-	dynamic_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->contained.size();
+	down_cast<numbered_state_heap_ssp_semi*>(ecs_->h)->contained.size();
     }
 
     virtual numbered_state_heap::state_index_p

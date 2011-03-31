@@ -82,7 +82,7 @@ namespace spot
       acss_states() const
       {
 	// all visited states are in the state space search
-	return dynamic_cast<const T*>(this)->h_.size();
+	return static_cast<const T*>(this)->h_.size();
       }
     };
 

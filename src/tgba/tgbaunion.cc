@@ -45,7 +45,7 @@ namespace spot
   int
   state_union::compare(const state* other) const
   {
-    const state_union* o = dynamic_cast<const state_union*>(other);
+    const state_union* o = down_cast<const state_union*>(other);
     assert(o);
     // Initial state
     if (!o->left() && !o->right())
@@ -278,7 +278,7 @@ namespace spot
   {
     (void) global_state;
     (void) global_automaton;
-    const state_union* s = dynamic_cast<const state_union*>(local_state);
+    const state_union* s = down_cast<const state_union*>(local_state);
     assert(s);
     tgba_succ_iterator_union* res = 0;
     // Is it the initial state ?
@@ -323,7 +323,7 @@ namespace spot
   bdd
   tgba_union::compute_support_conditions(const state* in) const
   {
-    const state_union* s = dynamic_cast<const state_union*>(in);
+    const state_union* s = down_cast<const state_union*>(in);
     assert(s);
     if (!s->left() && !s->right())
       return (left_->support_conditions(left_->get_init_state())
@@ -337,7 +337,7 @@ namespace spot
   bdd
   tgba_union::compute_support_variables(const state* in) const
   {
-    const state_union* s = dynamic_cast<const state_union*>(in);
+    const state_union* s = down_cast<const state_union*>(in);
     assert(s);
     if (!s->left() && !s->right())
       return (left_->support_variables(left_->get_init_state())
@@ -357,7 +357,7 @@ namespace spot
   std::string
   tgba_union::format_state(const state* target_state) const
   {
-    const state_union* s = dynamic_cast<const state_union*>(target_state);
+    const state_union* s = down_cast<const state_union*>(target_state);
     assert(s);
     if (!s->left() && !s->right())
     {
@@ -375,7 +375,7 @@ namespace spot
   state*
   tgba_union::project_state(const state* s, const tgba* t) const
   {
-    const state_union* s2 = dynamic_cast<const state_union*>(s);
+    const state_union* s2 = down_cast<const state_union*>(s);
     assert(s2);
     // We can't project the initial state of our union.
     if (!s2->left() && !s2->right())

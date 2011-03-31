@@ -107,7 +107,7 @@ namespace spot
       {
 	if (this == other)
 	  return 0;
-	const dve2_state* o = dynamic_cast<const dve2_state*>(other);
+	const dve2_state* o = down_cast<const dve2_state*>(other);
 	assert(o);
 	if (hash_value < o->hash_value)
 	  return -1;
@@ -650,7 +650,7 @@ namespace spot
       succ_iter(const state* local_state,
 		const state*, const tgba*) const
       {
-	const dve2_state* s = dynamic_cast<const dve2_state*>(local_state);
+	const dve2_state* s = down_cast<const dve2_state*>(local_state);
 	assert(s);
 
 	// This may also compute successors in state_condition_last_cc
@@ -682,7 +682,7 @@ namespace spot
       bdd
       state_condition(const state* st) const
       {
-	const dve2_state* s = dynamic_cast<const dve2_state*>(st);
+	const dve2_state* s = down_cast<const dve2_state*>(st);
 	assert(s);
 	return compute_state_condition(s);
       }
@@ -690,7 +690,7 @@ namespace spot
       virtual
       std::string format_state(const state *st) const
       {
-	const dve2_state* s = dynamic_cast<const dve2_state*>(st);
+	const dve2_state* s = down_cast<const dve2_state*>(st);
 	assert(s);
 
 	std::stringstream res;

@@ -1,3 +1,21 @@
+2011-03-31  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Introduct a down_cast macro.
+
+	* src/misc/casts.hh: New file.
+	* src/misc/Makefile.am: Add it.
+	* iface/dve2/dve2.cc, iface/gspn/gspn.cc, iface/gspn/ssp.cc,
+	src/evtgba/explicit.cc, src/evtgba/product.cc, src/misc/casts.hh,
+	src/tgba/state.hh, src/tgba/statebdd.cc, src/tgba/taatgba.cc,
+	src/tgba/taatgba.hh, src/tgba/tgbabddconcrete.cc,
+	src/tgba/tgbaexplicit.cc, src/tgba/tgbaexplicit.hh,
+	src/tgba/tgbakvcomplement.cc, src/tgba/tgbaproduct.cc,
+	src/tgba/tgbasafracomplement.cc, src/tgba/tgbasgba.cc,
+	src/tgba/tgbatba.cc, src/tgba/tgbaunion.cc, src/tgba/wdbacomp.cc,
+	src/tgbaalgos/ndfs_result.hxx, src/tgbaalgos/reductgba_sim.cc,
+	src/tgbaalgos/reductgba_sim_del.cc: Use down_cast when
+	appropriate.
+
 2011-03-31  Alexandre Duret-Lutz  <adl@va-et-vient.net>
 
 	Cosmetics.

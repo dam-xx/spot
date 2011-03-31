@@ -234,8 +234,8 @@ namespace spot
   duplicator_node::compare(spoiler_node* n)
   {
     return (this->spoiler_node::compare(n) &&
-	    (label_ == dynamic_cast<duplicator_node*>(n)->get_label()) &&
-	    (acc_ == dynamic_cast<duplicator_node*>(n)->get_acc()));
+	    (label_ == static_cast<duplicator_node*>(n)->get_label()) &&
+	    (acc_ == static_cast<duplicator_node*>(n)->get_acc()));
   }
 
   bdd

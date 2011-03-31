@@ -1,3 +1,5 @@
+// Copyright (C) 2011 Laboratoire de Recherche et Développement
+// de l'Epita (LRDE).
 // Copyright (C) 2003  Laboratoire d'Informatique de Paris 6 (LIP6),
 // département Systèmes Répartis Coopératifs (SRC), Université Pierre
 // et Marie Curie.
@@ -32,7 +34,7 @@ namespace spot
     // This method should not be called to compare states from different
     // automata, and all states from the same automaton will use the same
     // state class.
-    const state_bdd* o = dynamic_cast<const state_bdd*>(other);
+    const state_bdd* o = down_cast<const state_bdd*>(other);
     assert(o);
     return o->as_bdd().id() - state_.id();
   }
