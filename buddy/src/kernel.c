@@ -1114,13 +1114,17 @@ RETURN  {* The BDD node {\tt r}. *}
 */
 BDD bdd_addref(BDD root)
 {
+#if NDEBUG
+   if (root < 2)
+      return root;
+#else
    if (root < 2  ||  !bddrunning)
       return root;
    if (root >= bddnodesize)
       return bdd_error(BDD_ILLBDD);
    if (LOW(root) == -1)
       return bdd_error(BDD_ILLBDD);
-
+#endif
    INCREF(root);
    return root;
 }
@@ -1140,6 +1144,10 @@ RETURN  {* The BDD node {\tt r}. *}
 */
 BDD bdd_delref(BDD root)
 {
+#if NDEBUG
+   if (root < 2)
+      return root;
+#else
    if (root < 2  ||  !bddrunning)
       return root;
    if (root >= bddnodesize)
@@ -1149,7 +1157,7 @@ BDD bdd_delref(BDD root)
 
    /* if the following line is present, fails there much earlier */
    if (!HASREF(root)) bdd_error(BDD_BREAK); /* distinctive */
-
+#endif
    DECREF(root);
    return root;
 }
