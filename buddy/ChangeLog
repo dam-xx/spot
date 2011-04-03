@@ -1,5 +1,12 @@
 2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix declaration of bddproduced.
+
+	* src/reorder.c (bddproduced): Declare a longint, to match
+	the definition in kerner.c.
+
+2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* buddy/src/kernel.c (bdd_addref, bdd_delref): Disable sanity
 	checks when compiled with NDEBUG.
 

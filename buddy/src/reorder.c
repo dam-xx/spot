@@ -104,7 +104,7 @@ static int usednum_after;
    /* Kernel variables needed for reordering */
 extern int bddfreepos;
 extern int bddfreenum;
-extern int bddproduced;
+extern long int bddproduced;
 
    /* Flag telling us when a node table resize is done */
 static int resizedInMakenode;
