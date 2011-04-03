@@ -33,6 +33,7 @@ misc_HEADERS = \
   bddop.hh \
   casts.hh \
   escape.hh \
+  fixpool.hh \
   freelist.hh \
   hash.hh \
   hashfunc.hh \

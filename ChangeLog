@@ -1,5 +1,12 @@
 2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Add a fixed-size memory pool implementation.
+
+	* src/misc/fixpool.hh: New file.
+	* src/misc/Makefile.am (misc_HEADERS): Add fixpool.hh.
+
+2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* HACKING (command): Some notes about link-time optimizations.
 
 2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
