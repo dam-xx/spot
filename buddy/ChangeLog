@@ -1,5 +1,9 @@
 2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* src/kernel.h (CHECK, CHECKa, CHECKn): Disable if NDEBUG is set.
+
+2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Fix declaration of bddproduced.
 
 	* src/reorder.c (bddproduced): Declare a longint, to match

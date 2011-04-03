@@ -54,7 +54,11 @@
 #error The compiler does not support 4 byte integers!
 #endif
 
-
+#ifdef NDEBUG
+#define CHECK(r) (void)(r);
+#define CHECKa(r,a) (void)(r); (void)(a);
+#define CHECKn(r) (void)(r);
+#else
    /* Sanity check argument and return eventual error code */
 #define CHECK(r)\
    if (!bddrunning) return bdd_error(BDD_RUNNING);\
@@ -75,7 +79,7 @@
      { bdd_error(BDD_ILLBDD); return; }\
    else if (r >= 2 && LOW(r) == -1)\
      { bdd_error(BDD_ILLBDD); return; }
-
+#endif
 
 /*=== SEMI-INTERNAL TYPES ==============================================*/
 
