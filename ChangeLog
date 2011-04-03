@@ -1,5 +1,9 @@
 2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* HACKING (command): Some notes about link-time optimizations.
+
+2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* configure.ac: Pass CXXFLAGS/CFLAGS/CPPFLAGS debug/optimization
 	settings to sub configure.
 

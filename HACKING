@@ -114,6 +114,34 @@ Finally generate a coverage report in HTML:
 This should create the directory html/.
 
 
+Link-time optimizations
+-----------------------
+
+This is currently (April 2011) tricky to setup, because the
+toolchain is not mature enough.
+
+You need:
+1) a version of GCC with gold and pluing linker enabled.
+2) a version of Libtool that knows how to deal with
+   -flto flags (Libtool 2.4 will not work -- currently only
+   the development version does.)
+3) use static libraries instead of shared libraries.
+
+Here are example options to pass to configure:
+
+./configure CC=gcc-4.6 CXX=g++-4.6 \
+            --disable-devel --disable-debug \
+            CFLAGS='-flto' CXXFLAGS='-flto' LDFLAGS='-fuse-linker-plugin' \
+            --disable-shared --enable-static
+
+Using --disable-debug prevents the '-g' flag to be passed to the
+compiler, which seems to help avoiding some internal compiler errors.
+
+Some binaries (like ltl2tgba) currently fail to compile (internal
+compiler error), while most others (like randtgba, dve2check, randltl,
+...) do fine.
+
+
 Coding conventions:
 ===================
 
