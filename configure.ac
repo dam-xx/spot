@@ -27,7 +27,7 @@ AC_CONFIG_AUX_DIR([tools])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.11 gnu nostdinc tar-ustar color-tests parallel-tests])
 
-# If the user didn't supplied a CFLAGS value,
+# If the user didn't supply a CFLAGS value,
 # set an empty one to prevent autoconf to stick -O2 -g here.
 test -z "$CFLAGS" && CFLAGS=
 test -z "$CXXFLAGS" && CXXFLAGS=
@@ -55,13 +55,18 @@ LT_CONFIG_LTDL_DIR([ltdl])
 LT_INIT([win32-dll])
 LTDL_INIT([subproject convenience])
 
+adl_ENABLE_DEBUG
+ad_GCC_OPTIM
+adl_NDEBUG
+
+# Make sure we pass debug/optimization flags to sub-libraries
+as_fn_append ac_configure_args \
+	     " 'CXXFLAGS=$CXXFLAGS' 'CFLAGS=$CFLAGS' 'CPPFLAGS=$CPPFLAGS'"
+
 spot_INTEL
 if test x$enable_warnings = xyes; then
   CF_GXX_WARNINGS
 fi
-adl_ENABLE_DEBUG
-ad_GCC_OPTIM
-adl_NDEBUG
 
 AM_CONDITIONAL([NEVER], [false])
 # We need the absolute path for dot in the "doc/dot" script. Other place
