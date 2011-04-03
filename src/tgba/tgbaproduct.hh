@@ -25,6 +25,7 @@
 # define SPOT_TGBA_TGBAPRODUCT_HH
 
 #include "tgba.hh"
+#include "misc/fixpool.hh"
 
 namespace spot
 {
@@ -40,18 +41,15 @@ namespace spot
     /// \brief Constructor
     /// \param left The state from the left automaton.
     /// \param right The state from the right automaton.
+    /// \param pool The pool from which the state was allocated.
     /// These states are acquired by spot::state_product, and will
     /// be destroyed on destruction.
-    state_product(state* left, state* right)
-      :	left_(left),
-	right_(right)
+    state_product(state* left, state* right, fixed_size_pool* pool)
+      :	left_(left), right_(right), count_(1), pool_(pool)
     {
     }
 
-    /// Copy constructor
-    state_product(const state_product& o);
-
-    virtual ~state_product();
+    virtual void destroy() const;
 
     state*
     left() const
@@ -72,6 +70,11 @@ namespace spot
   private:
     state* left_;		///< State from the left automaton.
     state* right_;		///< State from the right automaton.
+    mutable unsigned count_;
+    fixed_size_pool* pool_;
+
+    virtual ~state_product();
+    state_product(const state_product& o); // No implementation.
   };
 
 
@@ -120,6 +123,8 @@ namespace spot
     bdd all_acceptance_conditions_;
     bdd neg_acceptance_conditions_;
     bddPair* right_common_acc_;
+    fixed_size_pool pool_;
+
   private:
     // Disallow copy.
     tgba_product(const tgba_product&);

@@ -33,17 +33,20 @@ namespace spot
   ////////////////////////////////////////////////////////////
   // state_product
 
-  state_product::state_product(const state_product& o)
-    : state(),
-      left_(o.left()->clone()),
-      right_(o.right()->clone())
-  {
-  }
-
   state_product::~state_product()
   {
     left_->destroy();
     right_->destroy();
+  }
+
+  void
+  state_product::destroy() const
+  {
+    if (--count_)
+      return;
+    fixed_size_pool* p = pool_;
+    this->~state_product();
+    p->deallocate(this);
   }
 
   int
@@ -67,7 +70,8 @@ namespace spot
   state_product*
   state_product::clone() const
   {
-    return new state_product(*this);
+    ++count_;
+    return const_cast<state_product*>(this);
   }
 
   ////////////////////////////////////////////////////////////
@@ -80,8 +84,9 @@ namespace spot
     {
     public:
       tgba_succ_iterator_product_common(tgba_succ_iterator* left,
-					tgba_succ_iterator* right)
-	: left_(left), right_(right)
+					tgba_succ_iterator* right,
+					fixed_size_pool* pool)
+	: left_(left), right_(right), pool_(pool)
       {
       }
 
@@ -120,13 +125,15 @@ namespace spot
 
       state_product* current_state() const
       {
-	return new state_product(left_->current_state(),
-				 right_->current_state());
+	return new(pool_->allocate()) state_product(left_->current_state(),
+						    right_->current_state(),
+						    pool_);
       }
 
     protected:
       tgba_succ_iterator* left_;
       tgba_succ_iterator* right_;
+      fixed_size_pool* pool_;
       friend class spot::tgba_product;
     };
 
@@ -138,8 +145,9 @@ namespace spot
       tgba_succ_iterator_product(tgba_succ_iterator* left,
 				 tgba_succ_iterator* right,
 				 bdd left_neg, bdd right_neg,
-				 bddPair* right_common_acc)
-	: tgba_succ_iterator_product_common(left, right),
+				 bddPair* right_common_acc,
+				 fixed_size_pool* pool)
+	: tgba_succ_iterator_product_common(left, right, pool),
 	  left_neg_(left_neg),
 	  right_neg_(right_neg),
 	  right_common_acc_(right_common_acc)
@@ -209,8 +217,9 @@ namespace spot
     {
     public:
       tgba_succ_iterator_product_kripke(tgba_succ_iterator* left,
-					tgba_succ_iterator* right)
-	: tgba_succ_iterator_product_common(left, right)
+					tgba_succ_iterator* right,
+					fixed_size_pool* pool)
+	: tgba_succ_iterator_product_common(left, right, pool)
       {
       }
 
@@ -268,7 +277,8 @@ namespace spot
   // tgba_product
 
   tgba_product::tgba_product(const tgba* left, const tgba* right)
-    : dict_(left->get_dict()), left_(left), right_(right)
+    : dict_(left->get_dict()), left_(left), right_(right),
+      pool_(sizeof(state_product))
   {
     assert(dict_ == right_->get_dict());
 
@@ -338,13 +348,26 @@ namespace spot
     if (!left_kripke_)
       bdd_freepair(right_common_acc_);
     dict_->unregister_all_my_variables(this);
+    // Prevent these states from being destroyed by ~tgba(): they
+    // will be destroyed before when the pool is destructed.
+    if (last_support_conditions_input_)
+      {
+	last_support_conditions_input_->destroy();
+	last_support_conditions_input_ = 0;
+      }
+    if (last_support_variables_input_)
+      {
+	last_support_variables_input_->destroy();
+	last_support_variables_input_ = 0;
+      }
   }
 
   state*
   tgba_product::get_init_state() const
   {
-    return new state_product(left_->get_init_state(),
-			     right_->get_init_state());
+    fixed_size_pool* p = const_cast<fixed_size_pool*>(&pool_);
+    return new(p->allocate()) state_product(left_->get_init_state(),
+					    right_->get_init_state(), p);
   }
 
   tgba_succ_iterator*
@@ -369,13 +392,15 @@ namespace spot
     tgba_succ_iterator* ri = right_->succ_iter(s->right(),
 					       global_state, global_automaton);
 
+    fixed_size_pool* p = const_cast<fixed_size_pool*>(&pool_);
     if (left_kripke_)
-      return new tgba_succ_iterator_product_kripke(li, ri);
+      return new tgba_succ_iterator_product_kripke(li, ri, p);
     else
       return new tgba_succ_iterator_product(li, ri,
 					    left_acc_complement_,
 					    right_acc_complement_,
-					    right_common_acc_);
+					    right_common_acc_,
+					    p);
   }
 
   bdd
@@ -470,7 +495,9 @@ namespace spot
   state*
   tgba_product_init::get_init_state() const
   {
-    return new state_product(left_init_->clone(), right_init_->clone());
+    fixed_size_pool* p = const_cast<fixed_size_pool*>(&pool_);
+    return new(p->allocate()) state_product(left_init_->clone(),
+					    right_init_->clone(), p);
   }
 
 }
