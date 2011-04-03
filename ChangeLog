@@ -1,5 +1,10 @@
 2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	* iface/dve2/dve2.cc: Use a fixed-size memory pool for dve2_state
+	instances and their variables.
+
+2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add a fixed-size memory pool implementation.
 
 	* src/misc/fixpool.hh: New file.

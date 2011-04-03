@@ -27,7 +27,9 @@
 #include <unistd.h>
 
 #include "misc/hashfunc.hh"
+#include "misc/fixpool.hh"
 #include "dve2.hh"
+
 
 namespace spot
 {
@@ -68,13 +70,8 @@ namespace spot
 
     struct dve2_state: public state
     {
-      int* vars;
-      int size;
-      mutable int count;
-      size_t hash_value;
-
-      dve2_state(int s)
-	: vars(new int[s]), size(s), count(1)
+      dve2_state(int s, fixed_size_pool* p)
+	: size(s), count(1), pool(p)
       {
       }
 
@@ -95,7 +92,7 @@ namespace spot
       {
 	if (--count)
 	  return;
-	delete this;
+	pool->deallocate(this);
       }
 
       size_t hash() const
@@ -120,9 +117,14 @@ namespace spot
 
       ~dve2_state()
       {
-	delete[] vars;
       }
 
+    public:
+      int size;
+      mutable unsigned count;
+      size_t hash_value;
+      fixed_size_pool* pool;
+      int vars[0];
     };
 
     ////////////////////////////////////////////////////////////////////////
@@ -130,9 +132,10 @@ namespace spot
 
     struct callback_context
     {
-      typedef std::vector<dve2_state*> transitions_t;
+      typedef std::vector<dve2_state*> transitions_t; // FIXME: Vector->List
       transitions_t transitions;
       int state_size;
+      fixed_size_pool* pool;
 
       ~callback_context()
       {
@@ -145,7 +148,8 @@ namespace spot
     void transition_callback(void* arg, transition_info_t*, int *dst)
     {
       callback_context* ctx = static_cast<callback_context*>(arg);
-      dve2_state* out = new dve2_state(ctx->state_size);
+      dve2_state* out =
+	new(ctx->pool->allocate()) dve2_state(ctx->state_size, ctx->pool);
       memcpy(out->vars, dst, ctx->state_size * sizeof(int));
       out->compute_hash();
       ctx->transitions.push_back(out);
@@ -504,11 +508,12 @@ namespace spot
 
       dve2_kripke(const dve2_interface* d, bdd_dict* dict, const prop_set* ps,
 		  const ltl::formula* dead)
-	: d_(d), dict_(dict), ps_(ps), state_condition_last_state_(0),
-	  state_condition_last_cc_(0)
+	: d_(d),
+	  state_size_(d_->get_state_variable_count()),
+	  dict_(dict), ps_(ps),
+	  statepool_(sizeof(dve2_state) + state_size_ * sizeof(int)),
+	  state_condition_last_state_(0), state_condition_last_cc_(0)
       {
-	state_size_ = d_->get_state_variable_count();
-
 	vname_ = new const char*[state_size_];
 	for (int i = 0; i < state_size_; ++i)
 	  vname_[i] = d_->get_state_variable_name(i);
@@ -563,7 +568,8 @@ namespace spot
       virtual
       state* get_init_state() const
       {
-	dve2_state* res = new dve2_state(state_size_);
+	fixed_size_pool* p = const_cast<fixed_size_pool*>(&statepool_);
+	dve2_state* res = new(p->allocate()) dve2_state(state_size_, p);
 	d_->get_initial_state(res->vars);
 	res->compute_hash();
 	return res;
@@ -622,7 +628,9 @@ namespace spot
 
 	callback_context* cc = new callback_context;
 	cc->state_size = state_size_;
-	int t = d_->get_successors(0, s->vars, transition_callback, cc);
+	cc->pool = const_cast<fixed_size_pool*>(&statepool_);
+	int t = d_->get_successors(0, const_cast<int*>(s->vars),
+				   transition_callback, cc);
 	assert((unsigned)t == cc->transitions.size());
 	state_condition_last_cc_ = cc;
 
@@ -667,7 +675,9 @@ namespace spot
 	  {
 	    cc = new callback_context;
 	    cc->state_size = state_size_;
-	    int t = d_->get_successors(0, s->vars, transition_callback, cc);
+	    cc->pool = const_cast<fixed_size_pool*>(&statepool_);
+	    int t = d_->get_successors(0, const_cast<int*>(s->vars),
+				       transition_callback, cc);
 	    assert((unsigned)t == cc->transitions.size());
 
 	    // Add a self-loop to dead-states if we care about these.
@@ -724,6 +734,8 @@ namespace spot
       const prop_set* ps_;
       bdd alive_prop;
       bdd dead_prop;
+
+      fixed_size_pool statepool_;
 
       // This cache is used to speedup repeated calls to state_condition()
       // and get_succ().
