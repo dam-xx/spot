@@ -578,7 +578,7 @@ static void loadhash_add(int key, int data)
    lh_table[pos].data = data;
 }
 
-
+__purefn
 static int loadhash_get(int key)
 {
    int hash = lh_table[key % lh_nodenum].first;

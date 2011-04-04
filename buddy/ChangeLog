@@ -1,5 +1,15 @@
 2011-04-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Tag functions with attributes pure, const, or noreturn.
+
+	* src/bdd.h (__purefn, __constfn, __noreturnfn): Define
+	new macros.
+	* src/bdd.h, src/bddio.c, src/bvec.h, src/imatrix.h: Use them
+	to tag many functions as suggested by -Wsuggest-attribute=pure,
+	-Wsuggest-attribute=const, -Wsuggest-attribute=noreturn.
+
+2011-04-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Remove more sanity checks when NDEBUG is set.
 
 	* src/kernel.h (CHECKnc): New macro.

@@ -38,6 +38,16 @@
 #ifndef _BDD_H
 #define _BDD_H
 
+#if __GNUC__ >= 3
+#define __purefn __attribute__((__pure__))
+#define __constfn __attribute__((__const__))
+#define __noreturnfn __attribute__((__noreturn__))
+#else
+#define __purefn
+#define __constfn
+#define __noreturnfn
+#endif
+
    /* Allow this headerfile to define C++ constructs if requested */
 #ifdef __cplusplus
 #define CPLUSPLUS
@@ -231,33 +241,33 @@ extern int      bdd_init(int, int);
 extern void     bdd_done(void);
 extern int      bdd_setvarnum(int);
 extern int      bdd_extvarnum(int);
-extern int      bdd_isrunning(void);
+extern int      bdd_isrunning(void) __purefn;
 extern int      bdd_setmaxnodenum(int);
 extern int      bdd_setmaxincrease(int);
 extern int      bdd_setminfreenodes(int);
-extern int      bdd_getnodenum(void);
-extern int      bdd_getallocnum(void);
-extern char*    bdd_versionstr(void);
-extern int      bdd_versionnum(void);
+extern int      bdd_getnodenum(void) __purefn;
+extern int      bdd_getallocnum(void) __purefn;
+extern char*    bdd_versionstr(void) __purefn;
+extern int      bdd_versionnum(void) __constfn;
 extern void     bdd_stats(bddStat *);
 extern void     bdd_cachestats(bddCacheStat *);
 extern void     bdd_fprintstat(FILE *);
 extern void     bdd_printstat(void);
 extern void     bdd_default_gbchandler(int, bddGbcStat *);
-extern void     bdd_default_errhandler(int);
-extern const char *bdd_errstring(int);
+extern void     bdd_default_errhandler(int) __noreturnfn;
+extern const char *bdd_errstring(int) __constfn;
 extern void     bdd_clear_error(void);
 #ifndef CPLUSPLUS
-extern BDD      bdd_true(void);
-extern BDD      bdd_false(void);
+extern BDD      bdd_true(void) __constfn;
+extern BDD      bdd_false(void) __constfn;
 #endif
-extern int      bdd_varnum(void);
-extern BDD      bdd_ithvar(int);
-extern BDD      bdd_nithvar(int);
-extern int      bdd_var(BDD);
-extern BDD      bdd_low(BDD);
-extern BDD      bdd_high(BDD);
-extern int      bdd_varlevel(int);
+extern int      bdd_varnum(void) __purefn;
+extern BDD      bdd_ithvar(int) __purefn;
+extern BDD      bdd_nithvar(int) __purefn;
+extern int      bdd_var(BDD) __purefn;
+extern BDD      bdd_low(BDD) __purefn;
+extern BDD      bdd_high(BDD) __purefn;
+extern int      bdd_varlevel(int) __purefn;
 extern BDD      bdd_addref(BDD);
 extern BDD      bdd_delref(BDD);
 extern void     bdd_gbc(void);
@@ -342,7 +352,7 @@ extern int      bdd_load(FILE *ifile, BDD *);
 extern int      bdd_swapvar(int v1, int v2);
 extern void     bdd_default_reohandler(int);
 extern void     bdd_reorder(int);
-extern int      bdd_reorder_gain(void);
+extern int      bdd_reorder_gain(void) __purefn;
 extern bddsizehandler bdd_reorder_probe(bddsizehandler);
 extern void     bdd_clrvarblocks(void);
 extern int      bdd_addvarblock(BDD, int);
@@ -353,8 +363,8 @@ extern int      bdd_autoreorder(int);
 extern int      bdd_autoreorder_times(int, int);
 extern int      bdd_var2level(int);
 extern int      bdd_level2var(int);
-extern int      bdd_getreorder_times(void);
-extern int      bdd_getreorder_method(void);
+extern int      bdd_getreorder_times(void) __purefn;
+extern int      bdd_getreorder_method(void) __purefn;
 extern void     bdd_enable_reorder(void);
 extern void     bdd_disable_reorder(void);
 extern int      bdd_reorder_verbose(int);

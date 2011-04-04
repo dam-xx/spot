@@ -37,6 +37,8 @@
 #ifndef _IMATRIX_H
 #define _IMATRIX_H
 
+#include "bdd.h" /* for __purefn */
+
 typedef struct _imatrix
 {
    char **rows;
@@ -50,7 +52,7 @@ extern void     imatrixFPrint(imatrix*,FILE *);
 extern void     imatrixPrint(imatrix*);
 extern void     imatrixSet(imatrix*,int,int);
 extern void     imatrixClr(imatrix*,int,int);
-extern int      imatrixDepends(imatrix*,int,int);
+extern int      imatrixDepends(imatrix*,int,int) __purefn;
 
 
 #endif /* _IMATRIX_H */

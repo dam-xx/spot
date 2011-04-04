@@ -72,7 +72,7 @@ typedef BVEC bvec;
 #ifdef CPLUSPLUS
 extern "C" {
 #endif
-   
+
    /* Prototypes for bvec.c */
 extern BVEC bvec_copy(BVEC v);
 extern BVEC bvec_true(int bitnum);
@@ -82,8 +82,8 @@ extern BVEC bvec_var(int bitnum, int offset, int step);
 extern BVEC bvec_varfdd(int var);
 extern BVEC bvec_varvec(int bitnum, int *var);
 extern BVEC bvec_coerce(int bitnum, BVEC v);
-extern int  bvec_isconst(BVEC e);   
-extern int  bvec_val(BVEC e);   
+extern int  bvec_isconst(BVEC e) __purefn;
+extern int  bvec_val(BVEC e) __purefn;
 extern void bvec_free(BVEC v);
 extern BVEC bvec_addref(BVEC v);
 extern BVEC bvec_delref(BVEC v);
@@ -136,7 +136,7 @@ class bvec
    int bitnum(void) const       { return roots.bitnum; }
    int empty(void) const        { return roots.bitnum==0; }
    bvec operator=(const bvec &src);
-   
+
 private:
    BVEC roots;
 
@@ -149,8 +149,8 @@ private:
    friend bvec bvec_varfddpp(int var);
    friend bvec bvec_varvecpp(int bitnum, int *var);
    friend bvec bvec_coerce(int bitnum, const bvec &v);
-   friend int  bvec_isconst(const bvec &e);   
-   friend int  bvec_val(const bvec &e);   
+   friend int  bvec_isconst(const bvec &e);
+   friend int  bvec_val(const bvec &e);
    friend bvec bvec_copy(const bvec &v);
    friend bvec bvec_map1(const bvec &a,
 			 bdd (*fun)(const bdd &));
@@ -289,7 +289,7 @@ inline bdd  bvec_neq(const bvec &left, const bvec &right)
 #define bvec_false(a)    bvec_falsepp(a)
 #define bvec_con(a,b)    bvec_conpp((a),(b))
 
-   
+
 #endif /* CPLUSPLUS */
 
 #endif /* _BVEC_H */
