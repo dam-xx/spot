@@ -874,11 +874,13 @@ RETURN  {* The I'th variable on succes, otherwise the constant false bdd *}
 ALSO {* bdd\_setvarnum, bdd\_nithvar, bddtrue, bddfalse *} */
 BDD bdd_ithvar(int var)
 {
+#ifndef NDEBUG
    if (var < 0  ||  var >= bddvarnum)
    {
       bdd_error(BDD_VAR);
       return bddfalse;
    }
+#endif
 
    return bddvarset[var*2];
 }
@@ -900,11 +902,13 @@ ALSO    {* bdd\_setvarnum, bdd\_ithvar, bddtrue, bddfalse *}
 */
 BDD bdd_nithvar(int var)
 {
+#ifndef NDEBUG
    if (var < 0  ||  var >= bddvarnum)
    {
       bdd_error(BDD_VAR);
       return bddfalse;
    }
+#endif
 
    return bddvarset[var*2+1];
 }
@@ -937,10 +941,8 @@ RETURN  {* The variable number. *}
 int bdd_var(BDD root)
 {
    CHECK(root);
-   if (root < 2)
-      return bdd_error(BDD_ILLBDD);
-
-   return (bddlevel2var[LEVEL(root)]);
+   CHECKnc(root);
+   return bddlevel2var[LEVEL(root)];
 }
 
 
@@ -956,10 +958,8 @@ ALSO    {* bdd\_high *}
 BDD bdd_low(BDD root)
 {
    CHECK(root);
-   if (root < 2)
-      return bdd_error(BDD_ILLBDD);
-
-   return (LOW(root));
+   CHECKnc(root);
+   return LOW(root);
 }
 
 
@@ -975,10 +975,8 @@ ALSO    {* bdd\_low *}
 BDD bdd_high(BDD root)
 {
    CHECK(root);
-   if (root < 2)
-      return bdd_error(BDD_ILLBDD);
-
-   return (HIGH(root));
+   CHECKnc(root);
+   return HIGH(root);
 }
 
 

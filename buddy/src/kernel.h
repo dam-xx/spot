@@ -58,6 +58,7 @@
 #define CHECK(r) (void)(r);
 #define CHECKa(r,a) (void)(r); (void)(a);
 #define CHECKn(r) (void)(r);
+#define CHECKnc(r) (void)(r);
 #else
    /* Sanity check argument and return eventual error code */
 #define CHECK(r)\
@@ -79,6 +80,12 @@
      { bdd_error(BDD_ILLBDD); return; }\
    else if (r >= 2 && LOW(r) == -1)\
      { bdd_error(BDD_ILLBDD); return; }
+
+   /* r is non-constant */
+#define CHECKnc(r)\
+   if (root < 2) \
+      return bdd_error(BDD_ILLBDD)
+
 #endif
 
 /*=== SEMI-INTERNAL TYPES ==============================================*/
@@ -220,7 +227,7 @@ extern void   bdd_fdd_done(void);
 
 extern void   bdd_reorder_init(void);
 extern void   bdd_reorder_done(void);
-extern int    bdd_reorder_ready(void);
+extern int    bdd_reorder_ready(void) __purefn;
 extern void   bdd_reorder_auto(void);
 extern int    bdd_reorder_vardown(int);
 extern int    bdd_reorder_varup(int);

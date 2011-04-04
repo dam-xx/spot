@@ -1,3 +1,11 @@
+2011-04-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Remove more sanity checks when NDEBUG is set.
+
+	* src/kernel.h (CHECKnc): New macro.
+	* src/kernel.c (bdd_var, bdd_low, bdd_high, bdd_ithvar,
+	bdd_nithvar): Use it.
+
 2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/kernel.h (CHECK, CHECKa, CHECKn): Disable if NDEBUG is set.
