@@ -1,3 +1,8 @@
+2011-04-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* iface/dve2/dve2check.cc (main): Catch out-of-memory errors
+	during emptiness check or counterexample generation.
+
 2011-04-03  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/tgba/tgbaproduct.hh, src/tgba/tgbaproduct.cc: Use

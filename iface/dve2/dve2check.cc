@@ -29,9 +29,10 @@
 #include "tgbaalgos/reducerun.hh"
 #include "tgba/tgbaproduct.hh"
 #include "misc/timer.hh"
+#include "misc/memusage.hh"
 #include <cstring>
 
-void
+static void
 syntax(char* prog)
 {
   // Display the supplied name unless it appears to be a libtool wrapper.
@@ -256,7 +257,18 @@ main(int argc, char **argv)
     do
       {
 	tm.start("running emptiness check");
-	spot::emptiness_check_result* res = ec->check();
+	spot::emptiness_check_result* res;
+	try
+	  {
+	    res = ec->check();
+	  }
+	catch (std::bad_alloc)
+	  {
+	    std::cerr << "Out of memory during emptiness check."
+		      << std::endl;
+	    exit_code = 2;
+	    exit(exit_code);
+	  }
 	tm.stop("running emptiness check");
 
 	ec->print_stats(std::cout);
@@ -283,8 +295,19 @@ main(int argc, char **argv)
 	else if (accepting_run)
 	  {
 
+	    spot::tgba_run* run;
 	    tm.start("computing accepting run");
-	    spot::tgba_run* run = res->accepting_run();
+	    try
+	      {
+		run = res->accepting_run();
+	      }
+	    catch (std::bad_alloc)
+	      {
+		std::cerr << "Out of memory while looking for counterexample."
+			  << std::endl;
+		exit_code = 2;
+		exit(exit_code);
+	      }
 	    tm.stop("computing accepting run");
 
 	    if (!run)
