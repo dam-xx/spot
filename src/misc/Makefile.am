@@ -37,6 +37,7 @@ misc_HEADERS = \
   freelist.hh \
   hash.hh \
   hashfunc.hh \
+  intvcomp.hh \
   ltstr.hh \
   minato.hh \
   memusage.hh \

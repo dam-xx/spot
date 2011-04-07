@@ -1,0 +1,87 @@
+#include <iostream>
+#include "misc/intvcomp.hh"
+#include <cstring>
+
+int check(int* comp, int size, unsigned expected = 0)
+{
+  const std::vector<unsigned int>* v = spot::int_array_compress(comp, size);
+
+  std::cout << "C[" << v->size() << "] ";
+  for (size_t i = 0; i < v->size(); ++i)
+    std::cout << (*v)[i] << " ";
+  std::cout << std::endl;
+
+  int* decomp = new int[size];
+  spot::int_array_decompress(v, decomp, size);
+
+  std::cout << "D[" << size << "] ";
+  for (int i = 0; i < size; ++i)
+    std::cout << decomp[i] << " ";
+  std::cout << std::endl;
+
+  int res = memcmp(comp, decomp, size * sizeof(int));
+
+  if (res)
+    {
+      std::cout << "*** cmp error *** " << res << std::endl;
+      std::cout << "E[" << size << "] ";
+      for (int i = 0; i < size; ++i)
+	std::cout << comp[i] << " ";
+      std::cout << std::endl;
+    }
+
+  if (expected && (v->size() * sizeof(int) != expected))
+    {
+      std::cout << "*** size error *** (expected "
+		<< expected << " bytes, got " << v->size() * sizeof(int)
+		<< " bytes)" << std::endl;
+      res = 1;
+    }
+
+  std::cout << std::endl;
+
+  delete v;
+  delete[] decomp;
+  return !!res;
+}
+
+int main()
+{
+  int errors = 0;
+
+  int comp1[] = { 1, 0, 0, 0, 0, 0, 3, 3, 4, 0, 0, 0 };
+  errors += check(comp1, sizeof(comp1) / sizeof(*comp1));
+
+  int comp2[] = { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9, 3, 1 };
+  errors += check(comp2, sizeof(comp2) / sizeof(*comp2));
+
+  int comp3[] = { 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1,
+		  0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0,
+		  0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1,
+		  0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+		  0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1,
+		  0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0 };
+  errors += check(comp3, sizeof(comp3) / sizeof(*comp3));
+
+  int comp4[] = { 1, 2, 1, 2, 1, 2, 2, 0 }; // 32 bits
+  errors += check(comp4, sizeof(comp4) / sizeof(*comp4), 4);
+
+  int comp5[] = { 1, 2, 1, 2, 1, 2, 2, 0, 1, 2, 1, 2, 1, 2, 2, 0 }; // 64 bits
+  errors += check(comp5, sizeof(comp5) / sizeof(*comp5), 8);
+
+  int comp6[] = { 1, 2, 1, 2, 1, 2, 2, 0, 1, 2, 1, 2, 1, 2, 2, 0,
+                  1, 2, 1, 2, 1, 2, 2, 0, 1, 2, 1, 2, 1, 2, 2, 0 }; // 128 bits
+  errors += check(comp6, sizeof(comp6) / sizeof(*comp6), 16);
+
+  int comp7[] = { -4, -8, -10, 3, 49, 50, 0, 20, 13 };
+  errors += check(comp7, sizeof(comp7) / sizeof(*comp7));
+
+  int comp8[] = { 4959, 6754, 8133, 10985, 11121, 14413, 17335, 20754,
+		  21317, 30008, 30381, 33494, 34935, 41210, 41417 };
+  errors += check(comp8, sizeof(comp8) / sizeof(*comp8));
+
+  int comp9[] = { 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  errors += check(comp9, sizeof(comp9) / sizeof(*comp9));
+
+  return errors;
+}

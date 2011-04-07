@@ -37,6 +37,7 @@ check_PROGRAMS = \
   explicit \
   expldot \
   explprod \
+  intvcomp \
   ltlprod \
   mixprod \
   powerset \
@@ -54,6 +55,7 @@ explicit_SOURCES = explicit.cc
 expldot_SOURCES  = powerset.cc
 expldot_CXXFLAGS = -DDOTTY
 explprod_SOURCES = explprod.cc
+intvcomp_SOURCES = intvcomp.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
 ltlprod_SOURCES  = ltlprod.cc
 mixprod_SOURCES  = mixprod.cc
@@ -69,6 +71,7 @@ tripprod_SOURCES = tripprod.cc
 # Keep this sorted by STRENGTH.  Test basic things first,
 # because such failures will be easier to diagnose and fix.
 TESTS = \
+  intvcomp.test \
   eltl2tgba.test \
   explicit.test \
   taatgba.test \

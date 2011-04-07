@@ -1,3 +1,12 @@
+2011-04-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Preliminary implementation of an int array compressor.
+
+	* src/misc/intvcomp.hh: New file.
+	* src/misc/Makefile.am: Add it.
+	* src/tgbatest/intvcomp.cc, src/tgbatest/intvcomp.test: New files.
+	* src/tgbatest/Makefile.am: Add them.
+
 2011-04-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Fix two spurious segfaults in test cases for the Python interface.
