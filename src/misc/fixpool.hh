@@ -89,7 +89,7 @@ namespace spot
 
     /// \brief Recycle \a size bytes of memory.
     ///
-    /// Despite the name, the memory is not really deallocate in the
+    /// Despite the name, the memory is not really deallocated in the
     /// "delete" sense: it is still owned by the pool and will be
     /// reused by allocate as soon as possible.  The memory is only
     /// freed when the pool is destroyed.
