@@ -42,6 +42,7 @@ misc_HEADERS = \
   minato.hh \
   memusage.hh \
   modgray.hh \
+  mspool.hh \
   optionmap.hh \
   random.hh \
   timer.hh \

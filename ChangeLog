@@ -1,3 +1,10 @@
+2011-04-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add a multiple-size memory pool implementation.
+
+	* src/misc/mspool.hh: New file.
+	* src/misc/Makefile.am: Add it.
+
 2011-04-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/misc/fixpool.hh: Typo in comment.
