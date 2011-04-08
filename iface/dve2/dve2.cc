@@ -26,9 +26,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "dve2.hh"
 #include "misc/hashfunc.hh"
 #include "misc/fixpool.hh"
-#include "dve2.hh"
+#include "misc/intvcomp.hh"
 
 
 namespace spot
@@ -127,12 +128,87 @@ namespace spot
       int vars[0];
     };
 
+    struct dve2_compressed_state: public state
+    {
+      dve2_compressed_state(fixed_size_pool* p)
+	: count(1), pool(p)
+      {
+      }
+
+      void compute_hash()
+      {
+	hash_value = 0;
+	std::vector<unsigned int>::const_iterator i;
+	for (i = data->begin(); i != data->end(); ++i)
+	  hash_value = wang32_hash(hash_value ^ *i);
+      }
+
+      dve2_compressed_state* clone() const
+      {
+	++count;
+	return const_cast<dve2_compressed_state*>(this);
+      }
+
+      void destroy() const
+      {
+	if (--count)
+	  return;
+	delete data;
+	pool->deallocate(this);
+      }
+
+      size_t hash() const
+      {
+	return hash_value;
+      }
+
+      int compare(const state* other) const
+      {
+	if (this == other)
+	  return 0;
+	const dve2_compressed_state* o =
+	  down_cast<const dve2_compressed_state*>(other);
+	assert(o);
+	if (hash_value < o->hash_value)
+	  return -1;
+	if (hash_value > o->hash_value)
+	  return 1;
+
+	if (data->size() < o->data->size())
+	  return -1;
+	if (data->size() > o->data->size())
+	  return 1;
+
+	std::pair<std::vector<unsigned int>::const_iterator,
+		  std::vector<unsigned int>::const_iterator> r;
+	r = std::mismatch(data->begin(), data->end(), o->data->begin());
+	if (r.first == data->end())
+	  return 0;
+	if (*(r.first) < *(r.second))
+	  return -1;
+	else
+	  return 1;
+      }
+
+    private:
+
+      ~dve2_compressed_state()
+      {
+      }
+
+    public:
+      mutable unsigned count;
+      size_t hash_value;
+      fixed_size_pool* pool;
+      const std::vector<unsigned int>* data;
+    };
+
     ////////////////////////////////////////////////////////////////////////
     // CALLBACK FUNCTION for transitions.
 
     struct callback_context
     {
-      typedef std::vector<dve2_state*> transitions_t; // FIXME: Vector->List
+      typedef std::vector<state*> transitions_t; // FIXME: Vector->List
       transitions_t transitions;
       int state_size;
       fixed_size_pool* pool;
@@ -151,6 +227,18 @@ namespace spot
       dve2_state* out =
 	new(ctx->pool->allocate()) dve2_state(ctx->state_size, ctx->pool);
       memcpy(out->vars, dst, ctx->state_size * sizeof(int));
+      out->compute_hash();
+      ctx->transitions.push_back(out);
+    }
+
+    void transition_callback_compress(void* arg, transition_info_t*, int *dst)
+    {
+      callback_context* ctx = static_cast<callback_context*>(arg);
+
+      dve2_compressed_state* out =
+	new(ctx->pool->allocate()) dve2_compressed_state(ctx->pool);
+      out->data = int_array_compress(dst, ctx->state_size);
+      //      std::cerr << "dest " << out->data << std::endl;
       out->compute_hash();
       ctx->transitions.push_back(out);
     }
@@ -507,11 +595,15 @@ namespace spot
     public:
 
       dve2_kripke(const dve2_interface* d, bdd_dict* dict, const prop_set* ps,
-		  const ltl::formula* dead)
+		  const ltl::formula* dead, bool compress)
 	: d_(d),
 	  state_size_(d_->get_state_variable_count()),
 	  dict_(dict), ps_(ps),
-	  statepool_(sizeof(dve2_state) + state_size_ * sizeof(int)),
+	  compress_(compress),
+	  uncompressed_(compress ? new int[state_size_] :
+			0),
+	  statepool_(compress ? sizeof(dve2_compressed_state) :
+		     (sizeof(dve2_state) + state_size_ * sizeof(int))),
 	  state_condition_last_state_(0), state_condition_last_cc_(0)
       {
 	vname_ = new const char*[state_size_];
@@ -552,6 +644,8 @@ namespace spot
       ~dve2_kripke()
       {
 	delete[] vname_;
+	if (compress_)
+	  delete[] uncompressed_;
 	lt_dlclose(d_->handle);
 
 	dict_->unregister_all_my_variables(d_);
@@ -569,33 +663,34 @@ namespace spot
       state* get_init_state() const
       {
 	fixed_size_pool* p = const_cast<fixed_size_pool*>(&statepool_);
-	dve2_state* res = new(p->allocate()) dve2_state(state_size_, p);
-	d_->get_initial_state(res->vars);
-	res->compute_hash();
-	return res;
+	if (compress_)
+	  {
+	    dve2_compressed_state* res =
+	      new(p->allocate()) dve2_compressed_state(p);
+	    d_->get_initial_state(uncompressed_);
+	    res->data = int_array_compress(uncompressed_, state_size_);
+	    //	    std::cerr << "init " << res->data << std::endl;
+	    res->compute_hash();
+	    return res;
+	  }
+	else
+	  {
+	    dve2_state* res = new(p->allocate()) dve2_state(state_size_, p);
+	    d_->get_initial_state(res->vars);
+	    res->compute_hash();
+	    return res;
+	  }
       }
 
       bdd
-      compute_state_condition(const dve2_state* s) const
+      compute_state_condition_aux(const int* vars) const
       {
-	// If we just computed it, don't do it twice.
-	if (s == state_condition_last_state_)
-	  return state_condition_last_cond_;
-
-	if (state_condition_last_state_)
-	  {
-	    state_condition_last_state_->destroy();
-	    delete state_condition_last_cc_; // Might be 0 already.
-	    state_condition_last_cc_ = 0;
-	  }
-
 	bdd res = bddtrue;
 	for (prop_set::const_iterator i = ps_->begin();
 	     i != ps_->end(); ++i)
 	  {
-	    int l = s->vars[i->var_num];
+	    int l = vars[i->var_num];
 	    int r = i->val;
-
 
 	    bool cond = false;
 	    switch (i->op)
@@ -625,12 +720,35 @@ namespace spot
 	    else
 	      res &= bdd_nithvar(i->bddvar);
 	  }
+	return res;
+      }
+
+      bdd
+      compute_state_condition(const state* st) const
+      {
+	// If we just computed it, don't do it twice.
+	if (st == state_condition_last_state_)
+	  return state_condition_last_cond_;
+
+	if (state_condition_last_state_)
+	  {
+	    state_condition_last_state_->destroy();
+	    delete state_condition_last_cc_; // Might be 0 already.
+	    state_condition_last_cc_ = 0;
+	  }
+
+	const int* vars = get_vars(st);
+
+	bdd res = compute_state_condition_aux(vars);
 
 	callback_context* cc = new callback_context;
 	cc->state_size = state_size_;
 	cc->pool = const_cast<fixed_size_pool*>(&statepool_);
-	int t = d_->get_successors(0, const_cast<int*>(s->vars),
-				   transition_callback, cc);
+	int t = d_->get_successors(0, const_cast<int*>(vars),
+				   compress_
+				   ? transition_callback_compress
+				   : transition_callback,
+				   cc);
 	assert((unsigned)t == cc->transitions.size());
 	state_condition_last_cc_ = cc;
 
@@ -644,28 +762,47 @@ namespace spot
 
 	    // Add a self-loop to dead-states if we care about these.
 	    if (res != bddfalse)
-	      cc->transitions.push_back(s->clone());
+	      cc->transitions.push_back(st->clone());
 	  }
 
 	state_condition_last_cond_ = res;
-	state_condition_last_state_ = s->clone();
+	state_condition_last_state_ = st->clone();
 
 	return res;
       }
+
+      const int*
+      get_vars(const state* st) const
+      {
+	const int* vars;
+	if (compress_)
+	  {
+	    const dve2_compressed_state* s =
+	      down_cast<const dve2_compressed_state*>(st);
+	    assert(s);
+
+	    int_array_decompress(s->data, uncompressed_, state_size_);
+	    vars = uncompressed_;
+	  }
+	else
+	  {
+	    const dve2_state* s = down_cast<const dve2_state*>(st);
+	    assert(s);
+	    vars = s->vars;
+	  }
+	return vars;
+      }
+
 
       virtual
       dve2_succ_iterator*
       succ_iter(const state* local_state,
 		const state*, const tgba*) const
       {
-	const dve2_state* s = down_cast<const dve2_state*>(local_state);
-	assert(s);
-
 	// This may also compute successors in state_condition_last_cc
-	bdd scond = compute_state_condition(s);
+	bdd scond = compute_state_condition(local_state);
 
 	callback_context* cc;
-
 	if (state_condition_last_cc_)
 	  {
 	    cc = state_condition_last_cc_;
@@ -673,16 +810,21 @@ namespace spot
 	  }
 	else
 	  {
+	    const int* vars = get_vars(local_state);
+
 	    cc = new callback_context;
 	    cc->state_size = state_size_;
 	    cc->pool = const_cast<fixed_size_pool*>(&statepool_);
-	    int t = d_->get_successors(0, const_cast<int*>(s->vars),
-				       transition_callback, cc);
+	    int t = d_->get_successors(0, const_cast<int*>(vars),
+				       compress_
+				       ? transition_callback_compress
+				       : transition_callback,
+				       cc);
 	    assert((unsigned)t == cc->transitions.size());
 
 	    // Add a self-loop to dead-states if we care about these.
 	    if (t == 0 && scond != bddfalse)
-	      cc->transitions.push_back(s->clone());
+	      cc->transitions.push_back(local_state->clone());
 	  }
 
 	return new dve2_succ_iterator(cc, scond);
@@ -692,16 +834,13 @@ namespace spot
       bdd
       state_condition(const state* st) const
       {
-	const dve2_state* s = down_cast<const dve2_state*>(st);
-	assert(s);
-	return compute_state_condition(s);
+	return compute_state_condition(st);
       }
 
       virtual
       std::string format_state(const state *st) const
       {
-	const dve2_state* s = down_cast<const dve2_state*>(st);
-	assert(s);
+	const int* vars = get_vars(st);
 
 	std::stringstream res;
 
@@ -711,7 +850,7 @@ namespace spot
 	int i = 0;
 	for (;;)
 	  {
-	    res << vname_[i] << "=" << s->vars[i];
+	    res << vname_[i] << "=" << vars[i];
 	    ++i;
 	    if (i == state_size_)
 	      break;
@@ -734,7 +873,8 @@ namespace spot
       const prop_set* ps_;
       bdd alive_prop;
       bdd dead_prop;
-
+      bool compress_;
+      int* uncompressed_;
       fixed_size_pool statepool_;
 
       // This cache is used to speedup repeated calls to state_condition()
@@ -742,7 +882,7 @@ namespace spot
       // If state_condition_last_state_ != 0, then state_condition_last_cond_
       // contain its (recently computed) condition.  If additionally
       // state_condition_last_cc_ != 0, then it contains the successors.
-      mutable const dve2_state* state_condition_last_state_;
+      mutable const state* state_condition_last_state_;
       mutable bdd state_condition_last_cond_;
       mutable callback_context* state_condition_last_cc_;
     };
@@ -804,6 +944,7 @@ namespace spot
   load_dve2(const std::string& file_arg, bdd_dict* dict,
 	    const ltl::atomic_prop_set* to_observe,
 	    const ltl::formula* dead,
+	    bool compress,
 	    bool verbose)
   {
     std::string file;
@@ -914,6 +1055,6 @@ namespace spot
 	return 0;
       }
 
-    return new dve2_kripke(d, dict, ps, dead);
+    return new dve2_kripke(d, dict, ps, dead, compress);
   }
 }

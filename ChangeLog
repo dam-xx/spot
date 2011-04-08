@@ -1,5 +1,21 @@
 2011-04-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	DVE2: preliminary implementation of compressed states.
+
+	* iface/dve2/dve2.cc (dve2_compressed_state): New class.
+	(callback_context): Deal with general state*s, not dve2_state*s.
+	(transition_callback_compress): New function.
+	(dve2_kripke): Take a compress option.
+	(get_init_state, compute_state_condition, succ_iter,
+	format_state, state_condition): Handle compressed states.
+	(get_vars, compute_state_condition_aux): New helper methods.
+	* iface/dve2/dve2.hh (load_dve2): Add a compress option.
+	* iface/dve2/dve2check.cc: Add a -z option.
+	* iface/dve2/finite.test, iface/dve2/dve2check.test: Add more
+	tests.
+
+2011-04-08  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Preliminary implementation of an int array compressor.
 
 	* src/misc/intvcomp.hh: New file.

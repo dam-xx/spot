@@ -58,7 +58,9 @@ syntax(char* prog)
 	    << std::endl
 	    << "  -gp    output the product state-space in dot format"
 	    << std::endl
-            << "  -T    time the different phases of the execution"
+            << "  -T     time the different phases of the execution"
+	    << std::endl
+            << "  -z     compress states to handle larger models"
 	    << std::endl;
 
   exit(1);
@@ -76,6 +78,7 @@ main(int argc, char **argv)
   bool accepting_run = false;
   bool expect_counter_example = false;
   char *dead = 0;
+  bool compress_states = false;
 
   const char* echeck_algo = "Cou99";
 
@@ -123,6 +126,9 @@ main(int argc, char **argv)
 	      break;
 	    case 'T':
 	      use_timer = true;
+	      break;
+	    case 'z':
+	      compress_states = true;
 	      break;
 	    default:
 	    error:
@@ -198,7 +204,7 @@ main(int argc, char **argv)
   if (output != DotFormula)
     {
       tm.start("loading dve2");
-      model = spot::load_dve2(argv[1], dict, &ap, deadf, true);
+      model = spot::load_dve2(argv[1], dict, &ap, deadf, compress_states, true);
       tm.stop("loading dve2");
 
       if (!model)
@@ -256,6 +262,7 @@ main(int argc, char **argv)
     assert(ec);
     do
       {
+	int memused = spot::memusage();
 	tm.start("running emptiness check");
 	spot::emptiness_check_result* res;
 	try
@@ -266,12 +273,17 @@ main(int argc, char **argv)
 	  {
 	    std::cerr << "Out of memory during emptiness check."
 		      << std::endl;
+	    if (!compress_states)
+	      std::cerr << "Try option -z for state compression." << std::endl;
 	    exit_code = 2;
 	    exit(exit_code);
 	  }
 	tm.stop("running emptiness check");
+	memused = spot::memusage() - memused;
 
 	ec->print_stats(std::cout);
+	std::cout << memused << " pages allocated for emptiness check"
+		  << std::endl;
 
 	if (expect_counter_example == !res &&
 	    (!expect_counter_example || ec->safe()))
