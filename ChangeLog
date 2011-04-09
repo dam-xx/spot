@@ -1,5 +1,13 @@
 2011-04-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Move the compression routines into their own *.cc file.
+
+	* src/misc/intvcomp.hh: Move all code...
+	* src/misc/intvcomp.cc: ... in this new file.
+	* src/misc/Makefile.am: Add invcomp.cc
+
+2011-04-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	DVE2: Use mspool for compressed states.
 
 	* iface/dve2/dve2.cc: Adjust to use the new mspool allocator,

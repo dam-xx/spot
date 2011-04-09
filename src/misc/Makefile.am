@@ -55,6 +55,7 @@ libmisc_la_SOURCES = \
   bddop.cc \
   escape.cc \
   freelist.cc \
+  intvcomp.cc \
   memusage.cc \
   minato.cc \
   modgray.cc \
