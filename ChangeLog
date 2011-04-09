@@ -1,5 +1,15 @@
 2011-04-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	DVE2: Use mspool for compressed states.
+
+	* iface/dve2/dve2.cc: Adjust to use the new mspool allocator,
+	and get rid of the std::vector used to store compressed states.
+	* src/misc/intvcomp.hh: Add an "int* -> int*" interface
+	in addition to the "int* -> vector<unsigned>*" interface.
+	* src/tgbatest/intvcomp.cc: Test the two interfaces.
+
+2011-04-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add a multiple-size memory pool implementation.
 
 	* src/misc/mspool.hh: New file.

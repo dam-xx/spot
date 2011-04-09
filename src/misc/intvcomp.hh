@@ -183,11 +183,11 @@ namespace spot
     unsigned int bits_left_;
   };
 
-  class int_array_compression:
-    public stream_compression_base<int_array_compression>
+  class int_array_vector_compression:
+    public stream_compression_base<int_array_vector_compression>
   {
   public:
-    int_array_compression(int* array, size_t n)
+    int_array_vector_compression(const int* array, size_t n)
       : array_(array), n_(n), pos_(0), result_(new std::vector<unsigned int>)
     {
     }
@@ -226,18 +226,76 @@ namespace spot
     }
 
   protected:
-    int* array_;
+    const int* array_;
     size_t n_;
     size_t pos_;
     std::vector<unsigned int>* result_;
   };
 
-  const std::vector<unsigned int>*
-  int_array_compress(int* array, unsigned int n)
+  class int_array_array_compression:
+    public stream_compression_base<int_array_array_compression>
   {
-    int_array_compression c(array, n);
+  public:
+    int_array_array_compression(const int* array, size_t n,
+				int* dest, size_t& dest_n)
+      : array_(array), n_(n), pos_(0),
+	result_size_(dest_n), result_(dest), result_end_(dest + dest_n)
+    {
+      result_size_ = 0; // this resets dest_n.
+    }
+
+    void push_data(unsigned int i)
+    {
+      assert(result_ < result_end_);
+      ++result_size_;
+      *result_++ = static_cast<int>(i);
+    }
+
+    bool have_data() const
+    {
+      return pos_ < n_;
+    }
+
+    unsigned int next_data()
+    {
+      return static_cast<unsigned int>(array_[pos_++]);
+    }
+
+    bool skip_if(unsigned int val)
+    {
+      if (!have_data())
+	return false;
+
+      if (static_cast<unsigned int>(array_[pos_]) != val)
+	return false;
+
+      ++pos_;
+      return true;
+    }
+
+  protected:
+    const int* array_;
+    size_t n_;
+    size_t pos_;
+    size_t& result_size_;
+    int* result_;
+    int* result_end_;
+  };
+
+  const std::vector<unsigned int>*
+  int_array_vector_compress(const int* array, size_t n)
+  {
+    int_array_vector_compression c(array, n);
     c.run();
     return c.result();
+  }
+
+  void
+  int_array_array_compress(const int* array, size_t n,
+			    int* dest, size_t& dest_size)
+  {
+    int_array_array_compression c(array, n, dest, dest_size);
+    c.run();
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -394,12 +452,13 @@ namespace spot
     unsigned int buffer_mask_;
   };
 
-  class int_array_decompression:
-    public stream_decompression_base<int_array_decompression>
+  class int_vector_array_decompression:
+    public stream_decompression_base<int_vector_array_decompression>
   {
   public:
-    int_array_decompression(const std::vector<unsigned int>* array, int* res,
-			    size_t size)
+    int_vector_array_decompression(const std::vector<unsigned int>* array,
+				   int* res,
+				   size_t size)
       : prev_(0), array_(array), n_(array->size()), pos_(0), result_(res),
 	size_(size)
     {
@@ -443,11 +502,70 @@ namespace spot
     size_t size_;
   };
 
-  void
-  int_array_decompress(const std::vector<unsigned int>* array, int* res,
-		       size_t size)
+  class int_array_array_decompression:
+    public stream_decompression_base<int_array_array_decompression>
   {
-    int_array_decompression c(array, res, size);
+  public:
+    int_array_array_decompression(const int* array,
+				  size_t array_size,
+				  int* res,
+				  size_t size)
+      : prev_(0), array_(array), n_(array_size), pos_(0), result_(res),
+	size_(size)
+    {
+    }
+
+    bool complete() const
+    {
+      return size_ == 0;
+    }
+
+    void push_data(int i)
+    {
+      prev_ = i;
+      *result_++ = i;
+      --size_;
+    }
+
+    void repeat(unsigned int i)
+    {
+      size_ -= i;
+      while (i--)
+	*result_++ = prev_;
+    }
+
+    bool have_comp_data() const
+    {
+      return pos_ < n_;
+    }
+
+    unsigned int next_comp_data()
+    {
+      return array_[pos_++];
+    }
+
+  protected:
+    int prev_;
+    const int* array_;
+    size_t n_;
+    size_t pos_;
+    int* result_;
+    size_t size_;
+  };
+
+  void
+  int_vector_array_decompress(const std::vector<unsigned int>* array, int* res,
+			      size_t size)
+  {
+    int_vector_array_decompression c(array, res, size);
+    c.run();
+  }
+
+  void
+  int_array_array_decompress(const int* array, size_t array_size,
+			     int* res, size_t size)
+  {
+    int_array_array_decompression c(array, array_size, res, size);
     c.run();
   }
 

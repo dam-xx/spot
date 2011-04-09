@@ -29,6 +29,7 @@
 #include "dve2.hh"
 #include "misc/hashfunc.hh"
 #include "misc/fixpool.hh"
+#include "misc/mspool.hh"
 #include "misc/intvcomp.hh"
 
 
@@ -130,17 +131,16 @@ namespace spot
 
     struct dve2_compressed_state: public state
     {
-      dve2_compressed_state(fixed_size_pool* p)
-	: count(1), pool(p)
+      dve2_compressed_state(int s, multiple_size_pool* p)
+	: size(s), count(1), pool(p)
       {
       }
 
       void compute_hash()
       {
 	hash_value = 0;
-	std::vector<unsigned int>::const_iterator i;
-	for (i = data->begin(); i != data->end(); ++i)
-	  hash_value = wang32_hash(hash_value ^ *i);
+	for (int i = 0; i < size; ++i)
+	  hash_value = wang32_hash(hash_value ^ vars[i]);
       }
 
       dve2_compressed_state* clone() const
@@ -153,8 +153,7 @@ namespace spot
       {
 	if (--count)
 	  return;
-	delete data;
-	pool->deallocate(this);
+	pool->deallocate(this, sizeof(*this) + size * sizeof(int));
       }
 
       size_t hash() const
@@ -174,20 +173,12 @@ namespace spot
 	if (hash_value > o->hash_value)
 	  return 1;
 
-	if (data->size() < o->data->size())
+	if (size < o->size)
 	  return -1;
-	if (data->size() > o->data->size())
+	if (size > o->size)
 	  return 1;
 
-	std::pair<std::vector<unsigned int>::const_iterator,
-		  std::vector<unsigned int>::const_iterator> r;
-	r = std::mismatch(data->begin(), data->end(), o->data->begin());
-	if (r.first == data->end())
-	  return 0;
-	if (*(r.first) < *(r.second))
-	  return -1;
-	else
-	  return 1;
+	return memcmp(vars, o->vars, size * sizeof(*vars));
       }
 
     private:
@@ -197,10 +188,11 @@ namespace spot
       }
 
     public:
+      int size;
       mutable unsigned count;
       size_t hash_value;
-      fixed_size_pool* pool;
-      const std::vector<unsigned int>* data;
+      multiple_size_pool* pool;
+      int vars[0];
     };
 
     ////////////////////////////////////////////////////////////////////////
@@ -211,7 +203,8 @@ namespace spot
       typedef std::vector<state*> transitions_t; // FIXME: Vector->List
       transitions_t transitions;
       int state_size;
-      fixed_size_pool* pool;
+      void* pool;
+      int* compressed;
 
       ~callback_context()
       {
@@ -224,8 +217,9 @@ namespace spot
     void transition_callback(void* arg, transition_info_t*, int *dst)
     {
       callback_context* ctx = static_cast<callback_context*>(arg);
+      fixed_size_pool* p = static_cast<fixed_size_pool*>(ctx->pool);
       dve2_state* out =
-	new(ctx->pool->allocate()) dve2_state(ctx->state_size, ctx->pool);
+	new(p->allocate()) dve2_state(ctx->state_size, p);
       memcpy(out->vars, dst, ctx->state_size * sizeof(int));
       out->compute_hash();
       ctx->transitions.push_back(out);
@@ -234,11 +228,15 @@ namespace spot
     void transition_callback_compress(void* arg, transition_info_t*, int *dst)
     {
       callback_context* ctx = static_cast<callback_context*>(arg);
+      multiple_size_pool* p = static_cast<multiple_size_pool*>(ctx->pool);
 
-      dve2_compressed_state* out =
-	new(ctx->pool->allocate()) dve2_compressed_state(ctx->pool);
-      out->data = int_array_compress(dst, ctx->state_size);
-      //      std::cerr << "dest " << out->data << std::endl;
+      size_t csize = ctx->state_size * 2;
+      int_array_array_compress(dst, ctx->state_size, ctx->compressed, csize);
+
+      void* mem = p->allocate(sizeof(dve2_compressed_state)
+			      + sizeof(int) * csize);
+      dve2_compressed_state* out = new(mem) dve2_compressed_state(csize, p);
+      memcpy(out->vars, ctx->compressed, csize * sizeof(int));
       out->compute_hash();
       ctx->transitions.push_back(out);
     }
@@ -600,8 +598,8 @@ namespace spot
 	  state_size_(d_->get_state_variable_count()),
 	  dict_(dict), ps_(ps),
 	  compress_(compress),
-	  uncompressed_(compress ? new int[state_size_] :
-			0),
+	  uncompressed_(compress ? new int[state_size_] : 0),
+	  compressed_(compress ? new int[state_size_ * 2] : 0),
 	  statepool_(compress ? sizeof(dve2_compressed_state) :
 		     (sizeof(dve2_state) + state_size_ * sizeof(int))),
 	  state_condition_last_state_(0), state_condition_last_cc_(0)
@@ -645,7 +643,10 @@ namespace spot
       {
 	delete[] vname_;
 	if (compress_)
-	  delete[] uncompressed_;
+	  {
+	    delete[] uncompressed_;
+	    delete[] compressed_;
+	  }
 	lt_dlclose(d_->handle);
 
 	dict_->unregister_all_my_variables(d_);
@@ -662,19 +663,26 @@ namespace spot
       virtual
       state* get_init_state() const
       {
-	fixed_size_pool* p = const_cast<fixed_size_pool*>(&statepool_);
 	if (compress_)
 	  {
-	    dve2_compressed_state* res =
-	      new(p->allocate()) dve2_compressed_state(p);
 	    d_->get_initial_state(uncompressed_);
-	    res->data = int_array_compress(uncompressed_, state_size_);
-	    //	    std::cerr << "init " << res->data << std::endl;
+	    size_t csize = state_size_ * 2;
+	    int_array_array_compress(uncompressed_, state_size_,
+				     compressed_, csize);
+
+	    multiple_size_pool* p =
+	      const_cast<multiple_size_pool*>(&compstatepool_);
+	    void* mem = p->allocate(sizeof(dve2_compressed_state)
+				    + sizeof(int) * csize);
+	    dve2_compressed_state* res = new(mem)
+	      dve2_compressed_state(csize, p);
+	    memcpy(res->vars, compressed_, csize * sizeof(int));
 	    res->compute_hash();
 	    return res;
 	  }
 	else
 	  {
+	    fixed_size_pool* p = const_cast<fixed_size_pool*>(&statepool_);
 	    dve2_state* res = new(p->allocate()) dve2_state(state_size_, p);
 	    d_->get_initial_state(res->vars);
 	    res->compute_hash();
@@ -723,6 +731,24 @@ namespace spot
 	return res;
       }
 
+      callback_context* build_cc(const int* vars, int& t) const
+      {
+	callback_context* cc = new callback_context;
+	cc->state_size = state_size_;
+	cc->pool =
+	  const_cast<void*>(compress_
+			    ? static_cast<const void*>(&compstatepool_)
+			    : static_cast<const void*>(&statepool_));
+	cc->compressed = compressed_;
+	t = d_->get_successors(0, const_cast<int*>(vars),
+			       compress_
+			       ? transition_callback_compress
+			       : transition_callback,
+			       cc);
+	assert((unsigned)t == cc->transitions.size());
+	return cc;
+      }
+
       bdd
       compute_state_condition(const state* st) const
       {
@@ -740,17 +766,8 @@ namespace spot
 	const int* vars = get_vars(st);
 
 	bdd res = compute_state_condition_aux(vars);
-
-	callback_context* cc = new callback_context;
-	cc->state_size = state_size_;
-	cc->pool = const_cast<fixed_size_pool*>(&statepool_);
-	int t = d_->get_successors(0, const_cast<int*>(vars),
-				   compress_
-				   ? transition_callback_compress
-				   : transition_callback,
-				   cc);
-	assert((unsigned)t == cc->transitions.size());
-	state_condition_last_cc_ = cc;
+	int t;
+	callback_context* cc = build_cc(vars, t);
 
 	if (t)
 	  {
@@ -765,6 +782,7 @@ namespace spot
 	      cc->transitions.push_back(st->clone());
 	  }
 
+	state_condition_last_cc_ = cc;
 	state_condition_last_cond_ = res;
 	state_condition_last_state_ = st->clone();
 
@@ -781,7 +799,8 @@ namespace spot
 	      down_cast<const dve2_compressed_state*>(st);
 	    assert(s);
 
-	    int_array_decompress(s->data, uncompressed_, state_size_);
+	    int_array_array_decompress(s->vars, s->size,
+				       uncompressed_, state_size_);
 	    vars = uncompressed_;
 	  }
 	else
@@ -810,17 +829,8 @@ namespace spot
 	  }
 	else
 	  {
-	    const int* vars = get_vars(local_state);
-
-	    cc = new callback_context;
-	    cc->state_size = state_size_;
-	    cc->pool = const_cast<fixed_size_pool*>(&statepool_);
-	    int t = d_->get_successors(0, const_cast<int*>(vars),
-				       compress_
-				       ? transition_callback_compress
-				       : transition_callback,
-				       cc);
-	    assert((unsigned)t == cc->transitions.size());
+	    int t;
+	    cc = build_cc(get_vars(local_state), t);
 
 	    // Add a self-loop to dead-states if we care about these.
 	    if (t == 0 && scond != bddfalse)
@@ -875,7 +885,9 @@ namespace spot
       bdd dead_prop;
       bool compress_;
       int* uncompressed_;
+      int* compressed_;
       fixed_size_pool statepool_;
+      multiple_size_pool compstatepool_;
 
       // This cache is used to speedup repeated calls to state_condition()
       // and get_succ().

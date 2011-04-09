@@ -22,31 +22,32 @@
 #include "misc/intvcomp.hh"
 #include <cstring>
 
-int check(int* comp, int size, unsigned expected = 0)
+int check_av(int* data, int size, unsigned expected = 0)
 {
-  const std::vector<unsigned int>* v = spot::int_array_compress(comp, size);
+  const std::vector<unsigned int>* v =
+    spot::int_array_vector_compress(data, size);
 
-  std::cout << "C[" << v->size() << "] ";
+  std::cout << "VC[" << v->size() << "] ";
   for (size_t i = 0; i < v->size(); ++i)
     std::cout << (*v)[i] << " ";
   std::cout << std::endl;
 
   int* decomp = new int[size];
-  spot::int_array_decompress(v, decomp, size);
+  spot::int_vector_array_decompress(v, decomp, size);
 
-  std::cout << "D[" << size << "] ";
+  std::cout << "VD[" << size << "] ";
   for (int i = 0; i < size; ++i)
     std::cout << decomp[i] << " ";
   std::cout << std::endl;
 
-  int res = memcmp(comp, decomp, size * sizeof(int));
+  int res = memcmp(data, decomp, size * sizeof(int));
 
   if (res)
     {
       std::cout << "*** cmp error *** " << res << std::endl;
-      std::cout << "E[" << size << "] ";
+      std::cout << "VE[" << size << "] ";
       for (int i = 0; i < size; ++i)
-	std::cout << comp[i] << " ";
+	std::cout << data[i] << " ";
       std::cout << std::endl;
     }
 
@@ -63,6 +64,56 @@ int check(int* comp, int size, unsigned expected = 0)
   delete v;
   delete[] decomp;
   return !!res;
+}
+
+int check_aa(int* data, int size, unsigned expected = 0)
+{
+  int* comp = new int[size *2];
+  size_t csize = size * 2;
+  spot::int_array_array_compress(data, size, comp, csize);
+
+  std::cout << "AC[" << csize << "] ";
+  for (size_t i = 0; i < csize; ++i)
+    std::cout << comp[i] << " ";
+  std::cout << std::endl;
+
+  int* decomp = new int[size];
+  spot::int_array_array_decompress(comp, csize, decomp, size);
+
+  std::cout << "AD[" << size << "] ";
+  for (int i = 0; i < size; ++i)
+    std::cout << decomp[i] << " ";
+  std::cout << std::endl;
+
+  int res = memcmp(data, decomp, size * sizeof(int));
+
+  if (res)
+    {
+      std::cout << "*** cmp error *** " << res << std::endl;
+      std::cout << "AE[" << size << "] ";
+      for (int i = 0; i < size; ++i)
+	std::cout << data[i] << " ";
+      std::cout << std::endl;
+    }
+
+  if (expected && (csize * sizeof(int) != expected))
+    {
+      std::cout << "*** size error *** (expected "
+		<< expected << " bytes, got " << csize * sizeof(int)
+		<< " bytes)" << std::endl;
+      res = 1;
+    }
+
+  std::cout << std::endl;
+
+  delete[] comp;
+  delete[] decomp;
+  return !!res;
+}
+
+int check(int* comp, int size, unsigned expected = 0)
+{
+  return check_av(comp, size, expected) + check_aa(comp, size, expected);
 }
 
 int main()
