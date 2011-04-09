@@ -1,3 +1,7 @@
+2011-04-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* HACKING: Add an example for using callgrind.
+
 2011-04-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* iface/dve2/dve2check.cc (main): Catch out-of-memory errors

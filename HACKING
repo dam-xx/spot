@@ -1,5 +1,5 @@
-Bootstraping from GIT:
-======================
+Bootstraping from GIT
+=====================
 
 Some files in SPOT's source tree are generated.  They are distributed
 so that users do not need to tools to rebuild them, but we don't keep
@@ -8,6 +8,8 @@ conflicts.
 
 Here are the tools you need to bootstrap the GIT tree, or more
 generally if you plan to regenerate some of the generated files.
+(None of these tools are required by end users installing a tarball
+since the generated files they produce are distributed.)
 
   GNU Autoconf >= 2.61
   GNU Automake >= 1.11
@@ -19,12 +21,12 @@ generally if you plan to regenerate some of the generated files.
 
 Bootstrap the GIT tree by running
 
-  autoreconf -vfi
+  % autoreconf -vfi
 
 and then go on with the usual
 
-  ./configure
-  make
+  % ./configure
+  % make
 
 
 Tricks
@@ -90,6 +92,23 @@ shorthand "libtool --mode=execute" as "libtool execute" or even
 "libtool e".
 
 
+Profiling with callgrind
+------------------------
+
+Install valgrind and kcachegrind.
+
+Then run the command you want to profile through valgrind's callgrind
+tool.  For instance:
+
+  % libtool e valgrind --tool=callgrind ltl2tgba -f 'GFa & GFb'
+
+This will output a file called 'callgrind.PID' where PID is the
+process ID printed during valgrind's run.  Load this file with
+kcachegrind to get a graphical summary.
+
+  % kcachegrind ./callgrind.PID
+
+
 Running coverage tests
 ----------------------
 
@@ -121,18 +140,19 @@ This is currently (April 2011) tricky to setup, because the
 toolchain is not mature enough.
 
 You need:
-1) a version of GCC with gold and pluing linker enabled.
-2) a version of Libtool that knows how to deal with
-   -flto flags (Libtool 2.4 will not work -- currently only
-   the development version does.)
-3) use static libraries instead of shared libraries.
+  1. a version of GCC (>= 4.5) with gold and pluing linker enabled.
+  2. a version of Libtool that knows how to deal with
+     -flto flags (Libtool 2.4 will not work -- currently only
+     the development version does.)
+  3. to use static libraries instead of shared libraries
+     so that you get inter-libraries optimizations.
 
 Here are example options to pass to configure:
 
-./configure CC=gcc-4.6 CXX=g++-4.6 \
-            --disable-devel --disable-debug \
-            CFLAGS='-flto' CXXFLAGS='-flto' LDFLAGS='-fuse-linker-plugin' \
-            --disable-shared --enable-static
+  ./configure CC=gcc-4.6 CXX=g++-4.6 \
+              --disable-devel --disable-debug \
+              CFLAGS='-flto' CXXFLAGS='-flto' LDFLAGS='-fuse-linker-plugin' \
+              --disable-shared --enable-static
 
 Using --disable-debug prevents the '-g' flag to be passed to the
 compiler, which seems to help avoiding some internal compiler errors.
@@ -142,8 +162,8 @@ compiler error), while most others (like randtgba, dve2check, randltl,
 ...) do fine.
 
 
-Coding conventions:
-===================
+Coding conventions
+==================
 
 Here are the conventions we follow in Spot, so that the code looks
 homogeneous.  Please follow these strictly.  Since this is free
