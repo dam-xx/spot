@@ -1,5 +1,15 @@
 2011-04-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix two spurious segfaults in test cases for the Python interface.
+
+	* wrap/python/tests/setxor.py, wrap/python/tests/bddnqueen.py:
+	Clean all used bdd variables before calling bdd_done(), so that
+	bdd_delref() is never called after bdd_done().  In NDEBUG builds,
+	bdd_delref() does not check whether the BuDDy is running or not,
+	and calling it after bdd_done() will crash.
+
+2011-04-09  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* HACKING: Add an example for using callgrind.
 
 2011-04-06  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

@@ -1,7 +1,9 @@
-# -*- mode: python; coding: iso-8859-1 -*-
-# Copyright (C) 2003, 2004, 2010  Laboratoire d'Informatique de Paris 6 (LIP6),
-# département Systèmes Répartis Coopératifs (SRC), Université Pierre
-# et Marie Curie.
+# -*- mode: python; coding: utf-8 -*-
+# Copyright (C) 2010, 2011 Laboratoire de Recherche et DÃ©veloppement
+# de l'EPITA.
+# Copyright (C) 2003, 2004 Laboratoire d'Informatique de Paris 6
+# (LIP6), dÃ©partement SystÃ¨mes RÃ©partis CoopÃ©ratifs (SRC), UniversitÃ©
+# Pierre et Marie Curie.
 #
 # This file is part of Spot, a model checking library.
 #
@@ -97,4 +99,8 @@ solution = bdd_satone(queen)
 bdd_printset(solution)
 print
 
+# Cleanup all BDD variables before calling bdd_done(), otherwise
+# bdd_delref will be called after bdd_done() and this is unsafe in
+# optimized builds.
+X = e = queen = solution = 0
 bdd_done()

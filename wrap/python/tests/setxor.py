@@ -1,5 +1,6 @@
-# -*- mode: python; coding: iso-8859-1 -*-
-# Copyright (C) 2010  Laboratoire de Recherche et Développement de l'EPITA.
+# -*- mode: python; coding: utf-8 -*-
+# Copyright (C) 2010, 2011 Laboratoire de Recherche et DÃ©veloppement
+# de l'EPITA.
 #
 # This file is part of Spot, a model checking library.
 #
@@ -43,4 +44,8 @@ e =  V[0] &  V[1] & -V[2] & -V[3] & V[4]
 assert(e == bdd_setxor(a,d))
 assert(e == bdd_setxor(d,a))
 
+# Cleanup all BDD variables before calling bdd_done(), otherwise
+# bdd_delref will be called after bdd_done() and this is unsafe in
+# optimized builds.
+V = a = b = c = d = e = 0;
 bdd_done()
