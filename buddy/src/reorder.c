@@ -115,7 +115,7 @@ static int resizedInMakenode;
    /* Reordering prototypes */
 static void blockdown(BddTree *);
 static void addref_rec(int, char *);
-static void reorder_gbc();
+static void reorder_gbc(void);
 static void reorder_setLevellookup(void);
 static int  reorder_makenode(int, int, int);
 static int  reorder_varup(int);
@@ -614,8 +614,8 @@ static BddTree *reorder_sift_seq(BddTree *t, BddTree **seq, int num)
  */
 static int siftTestCmp(const void *aa, const void *bb)
 {
-   const sizePair *a = (sizePair*)aa;
-   const sizePair *b = (sizePair*)bb;
+   const sizePair *a = (const sizePair*)aa;
+   const sizePair *b = (const sizePair*)bb;
 
    if (a->val < b->val)
       return -1;
@@ -1626,7 +1626,7 @@ int bdd_reorder_ready(void)
 
 void bdd_reorder_auto(void)
 {
-   if (!bdd_reorder_ready)
+   if (!bdd_reorder_ready())
       return;
 
    if (reorder_handler != NULL)

@@ -1,5 +1,14 @@
 2011-04-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Fix some warnings reported by gcc.
+
+	* buddy/src/kernel.c (errorstrings): Mark these as const.
+	* buddy/src/reorder.c (reorder_gbc): Fix prototype.
+	(siftTestCmp): Add missing const in cast.
+	(bdd_reorder_auto): Actually call bdd_reorder_ready().
+
+2011-04-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Add support for --enable-devel and similar macros.
 
 	* m4/debug.m4: Rename to ...
