@@ -59,10 +59,6 @@ adl_ENABLE_DEBUG
 ad_GCC_OPTIM
 adl_NDEBUG
 
-# Make sure we pass debug/optimization flags to sub-libraries
-as_fn_append ac_configure_args \
-	     " 'CXXFLAGS=$CXXFLAGS' 'CFLAGS=$CFLAGS' 'CPPFLAGS=$CPPFLAGS'"
-
 spot_INTEL
 if test x$enable_warnings = xyes; then
   CF_GXX_WARNINGS

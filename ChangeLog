@@ -1,5 +1,14 @@
 2011-04-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Always pass --enable-devel or --disable-devel to BuDDy.
+
+	* configure.ac: Do not add CXXFLAGS and CFLAGS in ac_configure_args,
+	it causes problem when using config.cache.  Instead ...
+	* m4/devel.m4: Add --enable-devel or --disable-devel on
+	ac_configure_args, now that BuDDy understands that.
+
+2011-04-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/misc/escape.hh: Fix Doxygen documentation.
 	* src/misc/intvcomp.hh: Likewise.
 

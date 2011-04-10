@@ -7,7 +7,17 @@ AC_DEFUN([adl_ENABLE_DEVEL],
  # explicitely turned off.
  case $VERSION in
    *[[abcdefghijklmnopqrstuvwxyz]])
-     enable_devel=${enable_devel-yes} ;;
+     if test -z "${enable_devel}"; then
+       enable_devel=yes
+       # Pass this flag to sub-libraries
+       as_fn_append ac_configure_args " --enable-devel"
+     fi;;
+   *)
+     if test -z "${enable_devel}"; then
+       enable_devel=no
+       # Pass this flag to sub-libraries
+       as_fn_append ac_configure_args " --disable-devel"
+     fi;;
  esac
 
  if test x"$enable_devel" = xyes; then
