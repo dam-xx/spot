@@ -51,7 +51,7 @@ namespace spot
 			   int* dest, size_t& dest_size);
 
   /// \brief Uncompress an int array of size \a array_size into a int
-  ///        array of size \size.
+  ///        array of size \a size.
   ///
   /// \a size must be the exact expected size of uncompressed array.
   void

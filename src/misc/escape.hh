@@ -32,12 +32,12 @@ namespace spot
   /// \addtogroup misc_tools
   /// @{
 
-  /// Escape <code>"</code>, <code>\</code>, and <code>\n</code>
-  /// characters in \a str.
+  /// \brief Escape characters <code>"</code>, <code>\\</code>, and
+  /// <code>\\n</code> in \a str.
   std::ostream& escape_str(std::ostream& os, const std::string& str);
 
-  /// Escape <code>"</code>, <code>\</code>, and <code>\n</code>
-  /// characters in \a str.
+  /// \brief Escape characters <code>"</code>, <code>\\</code>, and
+  /// <code>\\n</code> in \a str.
   std::string escape_str(const std::string& str);
 
   /// @}
