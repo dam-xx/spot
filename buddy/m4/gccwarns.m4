@@ -14,7 +14,7 @@ dnl A few other options have been left out because they are annoying in C++.
 
 AC_DEFUN([CF_GCC_WARNINGS],
 [if test -n "$GCC"; then
-  AC_CACHE_CHECK([for $GCC warning options], ac_cv_prog_gxx_warn_flags,
+  AC_CACHE_CHECK([for $GCC warning options], ac_cv_prog_gcc_warn_flags,
   [
   cat > conftest.$ac_ext <<EOF
 #line __oline__ "configure"
@@ -23,7 +23,6 @@ EOF
   cf_save_CFLAGS="$CFLAGS"
   ac_cv_prog_gcc_warn_flags="-W -Wall"
   for cf_opt in \
-   Waggregate-return \
    Wbad-function-cast \
    Wcast-align \
    Winline \
@@ -34,7 +33,7 @@ EOF
    Wmissing-prototypes \
    Wstrict-prototypes \
    Wshadow \
-   Wcast-qual \
+   Wcast-qual
   do
     CFLAGS="$cf_save_CFLAGS $ac_cv_prog_gcc_warn_flags -$cf_opt"
     if AC_TRY_EVAL(ac_compile); then
@@ -43,9 +42,8 @@ EOF
     fi
   done
   rm -f conftest*
-dnl  CFLAGS="$cf_save_CFLAGS"
+  CFLAGS="$cf_save_CFLAGS"
   ])
 fi
-dnl AC_SUBST([WARNING_CFLAGS], ["${ac_cv_prog_gcc_warn_flags}"])
+CFLAGS="$CFLAGS ${ac_cv_prog_gcc_warn_flags}"
 ])
-

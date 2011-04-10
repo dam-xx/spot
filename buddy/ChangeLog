@@ -1,3 +1,15 @@
+2011-04-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Add support for --enable-devel and similar macros.
+
+	* m4/debug.m4: Rename to ...
+	* m4/bdebug.m4: ... this.
+	* m4/debug.m4, m4/devel.m4, m4/gccoptim.m4, m4/ndebug.m4: New file.
+	* m4/gccwarns.m4: Fix usage of cache variable.  Fix shell
+	syntax.  Do not check for -Waggregate-return.  Update CFLAGS.
+	* configure.ac: Adjust to handle --enable-devel and similar macros
+	in the same way as Spot.
+
 2011-04-04  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Tag functions with attributes pure, const, or noreturn.
