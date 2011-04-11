@@ -1,3 +1,7 @@
+2011-04-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	* iface/dve2/dve2.cc: Typo when handling dead==true.
+
 2011-04-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	Always pass --enable-devel or --disable-devel to BuDDy.

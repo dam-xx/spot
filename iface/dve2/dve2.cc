@@ -626,7 +626,7 @@ namespace spot
 	    alive_prop = bddtrue;
 	    dead_prop = bddfalse;
 	  }
-	else if (dead == ltl::constant::false_instance())
+	else if (dead == ltl::constant::true_instance())
 	  {
 	    alive_prop = bddtrue;
 	    dead_prop = bddtrue;
