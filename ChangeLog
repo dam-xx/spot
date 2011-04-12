@@ -1,3 +1,12 @@
+2011-04-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	More interfaces to the int array compression routines.
+
+	* src/misc/intvcomp.cc, src/misc/intvcomp.cc: Add interfaces to
+	compress vector<int> to vector<unsigned>.
+	* src/tgbatest/intvcomp.cc: Test them.
+	* src/sanity/style.test: Refine check to avoid a spurious report.
+
 2011-04-11  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* iface/dve2/dve2.cc: Typo when handling dead==true.

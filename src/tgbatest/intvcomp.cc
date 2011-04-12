@@ -22,6 +22,54 @@
 #include "misc/intvcomp.hh"
 #include <cstring>
 
+int check_vv(int* data, int size, unsigned expected = 0)
+{
+
+  std::vector<int> input;
+  input.reserve(size);
+  for (int i = 0; i < size; ++i)
+    input.push_back(data[i]);
+
+  std::vector<unsigned int> output;
+  spot::int_vector_vector_compress(input, output);
+
+  std::cout << "WC[" << output.size() << "] ";
+  for (size_t i = 0; i < output.size(); ++i)
+    std::cout << output[i] << " ";
+  std::cout << std::endl;
+
+  std::vector<int> decomp;
+  spot::int_vector_vector_decompress(output, decomp, size);
+
+  std::cout << "WD[" << decomp.size() << "] ";
+  for (size_t i = 0; i < decomp.size(); ++i)
+    std::cout << decomp[i] << " ";
+  std::cout << std::endl;
+
+  int res = (decomp != input);
+
+  if (res)
+    {
+      std::cout << "*** cmp error *** " << std::endl;
+      std::cout << "WE[" << size << "] ";
+      for (int i = 0; i < size; ++i)
+	std::cout << data[i] << " ";
+      std::cout << std::endl;
+    }
+
+  if (expected && (output.size() * sizeof(int) != expected))
+    {
+      std::cout << "*** size error *** (expected "
+		<< expected << " bytes, got " << output.size() * sizeof(int)
+		<< " bytes)" << std::endl;
+      res = 1;
+    }
+
+  std::cout << std::endl;
+
+  return !!res;
+}
+
 int check_av(int* data, int size, unsigned expected = 0)
 {
   const std::vector<unsigned int>* v =
@@ -113,7 +161,10 @@ int check_aa(int* data, int size, unsigned expected = 0)
 
 int check(int* comp, int size, unsigned expected = 0)
 {
-  return check_av(comp, size, expected) + check_aa(comp, size, expected);
+  return
+    check_vv(comp, size, expected) +
+    check_av(comp, size, expected) +
+    check_aa(comp, size, expected);
 }
 
 int main()

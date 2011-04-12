@@ -232,6 +232,50 @@ namespace spot
       std::vector<unsigned int>* result_;
     };
 
+    class int_vector_vector_compression:
+      public stream_compression_base<int_vector_vector_compression>
+    {
+    public:
+      int_vector_vector_compression(const std::vector<int>& input,
+				    std::vector<unsigned int>& output)
+	: input_(input), pos_(input.begin()), end_(input.end()), output_(output)
+      {
+      }
+
+      void push_data(unsigned int i)
+      {
+	output_.push_back(i);
+      }
+
+      bool have_data() const
+      {
+	return pos_ < end_;
+      }
+
+      unsigned int next_data()
+      {
+	return static_cast<unsigned int>(*pos_++);
+      }
+
+      bool skip_if(unsigned int val)
+      {
+	if (!have_data())
+	  return false;
+
+	if (static_cast<unsigned int>(*pos_) != val)
+	  return false;
+
+	++pos_;
+	return true;
+      }
+
+    protected:
+      const std::vector<int>& input_;
+      std::vector<int>::const_iterator pos_;
+      std::vector<int>::const_iterator end_;
+      std::vector<unsigned int>& output_;
+    };
+
     class int_array_array_compression:
       public stream_compression_base<int_array_array_compression>
     {
@@ -281,6 +325,14 @@ namespace spot
       int* result_;
       int* result_end_;
     };
+  }
+
+  void
+  int_vector_vector_compress(const std::vector<int>& input,
+			     std::vector<unsigned>& output)
+  {
+    int_vector_vector_compression c(input, output);
+    c.run();
   }
 
   const std::vector<unsigned int>*
@@ -456,6 +508,57 @@ namespace spot
       unsigned int buffer_mask_;
     };
 
+    class int_vector_vector_decompression:
+      public stream_decompression_base<int_vector_vector_decompression>
+    {
+    public:
+      int_vector_vector_decompression(const std::vector<unsigned int>& array,
+				      std::vector<int>& res, size_t size)
+	: prev_(0), array_(array),
+	  pos_(array.begin()), end_(array.end()),
+	  result_(res), size_(size)
+      {
+	result_.reserve(size);
+      }
+
+      bool complete() const
+      {
+	return size_ == 0;
+      }
+
+      void push_data(int i)
+      {
+	prev_ = i;
+	result_.push_back(i);
+	--size_;
+      }
+
+      void repeat(unsigned int i)
+      {
+	size_ -= i;
+	while (i--)
+	  result_.push_back(prev_);
+      }
+
+      bool have_comp_data() const
+      {
+	return pos_ != end_;
+      }
+
+      unsigned int next_comp_data()
+      {
+	return *pos_++;
+      }
+
+    protected:
+      int prev_;
+      const std::vector<unsigned int>& array_;
+      std::vector<unsigned int>::const_iterator pos_;
+      std::vector<unsigned int>::const_iterator end_;
+      std::vector<int>& result_;
+      size_t size_;
+    };
+
     class int_vector_array_decompression:
       public stream_decompression_base<int_vector_array_decompression>
     {
@@ -557,6 +660,14 @@ namespace spot
       size_t size_;
     };
 
+  }
+
+  void
+  int_vector_vector_decompress(const std::vector<unsigned int>& input,
+			       std::vector<int>& output, size_t size)
+  {
+    int_vector_vector_decompression c(input, output, size);
+    c.run();
   }
 
   void

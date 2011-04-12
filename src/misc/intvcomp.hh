@@ -28,11 +28,24 @@ namespace spot
   /// \addtogroup misc_tools
   /// @{
 
+  /// Compress an int vector into a vector of unsigned int.
+  void
+  int_vector_vector_compress(const std::vector<int>& input,
+			     std::vector<unsigned int>& output);
+
+  /// \brief Uncompress a vector of unsigned int into a vector of
+  ///        size \a size.
+  ///
+  /// \a size must be the exact expected size of uncompressed array.
+  void
+  int_vector_vector_decompress(const std::vector<unsigned int>& array,
+			       std::vector<int>& output, size_t size);
+
   /// Compress an int array if size \a n into a vector of unsigned int.
   const std::vector<unsigned int>*
   int_array_vector_compress(const int* array, size_t n);
 
-  /// \brief Uncompress a vector of unsigned int into an int array if
+  /// \brief Uncompress a vector of unsigned int into an int array of
   ///        size \a size.
   ///
   /// \a size must be the exact expected size of uncompressed array.
