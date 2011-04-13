@@ -97,7 +97,7 @@ namespace spot
 	    if (val == last_val)
 	      {
 		unsigned int count = 1;
-		while (count <= 41 && self().skip_if(val))
+		while (count < 40 && self().skip_if(val))
 		  ++count;
 
 		if ((val == 0 && count < 3) || (val == 1 && count == 1))
@@ -376,9 +376,10 @@ namespace spot
 	buffer_ &= buffer_mask_;
 	look_bits_ += fill_size;
 
-	if (buffer_bits_ == 0 && self().have_comp_data())
+	if (buffer_bits_ == 0)
 	  {
-	    buffer_ = self().next_comp_data();
+	    if (self().have_comp_data())
+	      buffer_ = self().next_comp_data();
 	    buffer_bits_ = max_bits;
 	    buffer_mask_ = -1U;
 	    if (look_bits_ != max_bits)
@@ -399,12 +400,11 @@ namespace spot
 	  }
       }
 
-      // 010 00 00 010 00 101:011 010 00 101:010 010
-      // 010 00010000001000010010000100000
       unsigned int look_n_bits(unsigned int n)
       {
 	if (look_bits_ < n)
 	  refill();
+	assert(n <= look_bits_);
 	return look_ >> (look_bits_ - n);
       }
 

@@ -1,3 +1,14 @@
+2011-04-13  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Fix compression of large repetitions
+
+	* src/misc/intvcomp.cc (stream_compression_base::run): Limit
+	repeatitions to 40, not 42.
+	(stream_decompression_base::refill): Refill the end of the stream
+	with 0.
+	(stream_decompression_base::look_n_bits): Add assertion.
+	* src/tgbatest/intvcomp.cc: Add a new test case.
+
 2011-04-12  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	More interfaces to the int array compression routines.
