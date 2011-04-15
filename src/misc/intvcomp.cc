@@ -22,6 +22,15 @@
 #include <cassert>
 #include "intvcomp.hh"
 
+#if __GNUC__ >= 3
+#  define likely(expr)   __builtin_expect(!!(expr), 1)
+#  define unlikely(expr) __builtin_expect(!!(expr), 0)
+#else
+#  define likely(expr) (expr)
+#  define unlikely(expr) (expr)
+#endif
+
+
 namespace spot
 {
 
@@ -90,7 +99,7 @@ namespace spot
       {
 	unsigned int last_val = 0;
 
-	while (self().have_data())
+	while (likely(self().have_data()))
 	  {
 	    unsigned int val = self().next_data();
 	    // Repeated value?  Try to find more.
@@ -135,7 +144,7 @@ namespace spot
       {
 	cur_ <<= n;
 	cur_ |= (bits & mask);
-	if (bits_left_ -= n)
+	if (likely(bits_left_ -= n))
 	  return;
 
 	self().push_data(cur_);
@@ -146,7 +155,7 @@ namespace spot
       void
       push_bits(unsigned int bits, unsigned int n, unsigned int mask)
       {
-	if (n <= bits_left_)
+	if (likely(n <= bits_left_))
 	  {
 	    push_bits_unchecked(bits, n, mask);
 	    return;
@@ -215,7 +224,7 @@ namespace spot
 
       bool skip_if(unsigned int val)
       {
-	if (!have_data())
+	if (unlikely(!have_data()))
 	  return false;
 
 	if (static_cast<unsigned int>(array_[pos_]) != val)
@@ -259,7 +268,7 @@ namespace spot
 
       bool skip_if(unsigned int val)
       {
-	if (!have_data())
+	if (unlikely(!have_data()))
 	  return false;
 
 	if (static_cast<unsigned int>(*pos_) != val)
@@ -307,7 +316,7 @@ namespace spot
 
       bool skip_if(unsigned int val)
       {
-	if (!have_data())
+	if (unlikely(!have_data()))
 	  return false;
 
 	if (static_cast<unsigned int>(array_[pos_]) != val)
@@ -364,91 +373,105 @@ namespace spot
     public:
       void refill()
       {
-      oncemore:
-	unsigned int fill_size = max_bits - look_bits_;
-	if (fill_size > buffer_bits_)
-	  fill_size = buffer_bits_;
-
-	look_ <<= fill_size;
-	look_ |= (buffer_ >> (buffer_bits_ - fill_size));
-	buffer_bits_ -= fill_size;
-	buffer_mask_ >>= fill_size;
-	buffer_ &= buffer_mask_;
-	look_bits_ += fill_size;
-
-	if (buffer_bits_ == 0)
+	if (unlikely(look_bits_ == 0))
 	  {
-	    if (self().have_comp_data())
+	    look_bits_ = max_bits;
+	    look_ = buffer_;
+
+	    if (likely(self().have_comp_data()))
 	      buffer_ = self().next_comp_data();
-	    buffer_bits_ = max_bits;
-	    buffer_mask_ = -1U;
-	    if (look_bits_ != max_bits)
-	      goto oncemore;
-	  }
 
-	// Do not fold these two cases, because we cannot write
-	// "x<<max_bits" safely.  (Intel "shl" instruction considers
-	// only the first 5 bits, in other words "shl 32" is similar to
-	// "shl 0": it has no effect.)
-	if (look_bits_ == max_bits)
-	  {
-	    look_mask_ = -1U;
+	    if (likely(buffer_bits_ != max_bits))
+	      {
+		unsigned int fill_size = max_bits - buffer_bits_;
+		look_ <<= fill_size;
+		look_ |= buffer_ >> buffer_bits_;
+	      }
 	  }
 	else
 	  {
-	    look_mask_ = (1U << look_bits_) - 1U;
+	    unsigned int fill_size = max_bits - look_bits_;
+	    if (fill_size > buffer_bits_)
+	      fill_size = buffer_bits_;
+
+	    look_ <<= fill_size;
+	    buffer_bits_ -= fill_size;
+	    look_ |= (buffer_ >> buffer_bits_) & ((1 << fill_size) - 1);
+	    look_bits_ += fill_size;
+
+	    if (buffer_bits_ == 0)
+	      {
+		if (likely(self().have_comp_data()))
+		  buffer_ = self().next_comp_data();
+
+		unsigned int left = max_bits - look_bits_;
+		if (left != 0)
+		  {
+		    look_ <<= left;
+		    look_ |= buffer_ >> look_bits_;
+		    buffer_bits_ = look_bits_;
+		    look_bits_ = max_bits;
+		  }
+		else
+		  {
+		    buffer_bits_ = max_bits;
+		  }
+	      }
 	  }
       }
 
       unsigned int look_n_bits(unsigned int n)
       {
-	if (look_bits_ < n)
+	if (unlikely(look_bits_ < n))
 	  refill();
 	assert(n <= look_bits_);
-	return look_ >> (look_bits_ - n);
+	return (look_ >> (look_bits_ - n)) & ((1 << n) - 1);
       }
 
       void skip_n_bits(unsigned int n)
       {
 	assert (n <= look_bits_);
 	look_bits_ -= n;
-	look_mask_ >>= n;
-	look_ &= look_mask_;
       }
 
       unsigned int get_n_bits(unsigned int n)
       {
-	if (look_bits_ < n)
+	if (unlikely(look_bits_ < n))
 	  refill();
 	look_bits_ -= n;
-	unsigned int val = look_ >> look_bits_;
-	look_mask_ >>= n;
-	look_ &= look_mask_;
+	return (look_ >> look_bits_) & ((1 << n) - 1);
+      }
+
+      unsigned int get_32_bits()
+      {
+	//	std::cerr << "get_32" << std::endl;
+	if (likely(look_bits_ < 32))
+	  refill();
+	unsigned int val = look_;
+	look_bits_ = 0;
+	refill();
 	return val;
       }
 
       void run()
       {
-	if (!self().have_comp_data())
+	if (unlikely(!self().have_comp_data()))
 	  return;
 
 	look_ = self().next_comp_data();
 	look_bits_ = max_bits;
-	look_mask_ = -1U;
-	if (self().have_comp_data())
+	if (likely(self().have_comp_data()))
 	  {
 	    buffer_ = self().next_comp_data();
 	    buffer_bits_ = max_bits;
-	    buffer_mask_ = -1U;
 	  }
 	else
 	  {
 	    buffer_ = 0;
 	    buffer_bits_ = 0;
-	    buffer_mask_ = 0;
 	  }
 
-	while (!self().complete())
+	while (likely(!self().complete()))
 	  {
 	    unsigned int token = look_n_bits(3);
 	    switch (token)
@@ -480,7 +503,7 @@ namespace spot
 		break;
 	      case 0x7: // 111
 		skip_n_bits(3);
-		self().push_data(get_n_bits(32));
+		self().push_data(get_32_bits());
 		break;
 	      default:
 		assert(0);
@@ -502,10 +525,8 @@ namespace spot
 
       unsigned int look_;
       unsigned int look_bits_;
-      unsigned int look_mask_;
       unsigned int buffer_;
       unsigned int buffer_bits_;
-      unsigned int buffer_mask_;
     };
 
     class int_vector_vector_decompression:
