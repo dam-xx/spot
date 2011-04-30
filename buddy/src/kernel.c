@@ -1102,6 +1102,20 @@ void bdd_gbc(void)
 }
 
 
+BDD bdd_addref_nc(BDD root)
+{
+#ifndef NDEBUG
+   if (!bddrunning)
+      return root;
+   if (root < 2 || root >= bddnodesize)
+      return bdd_error(BDD_ILLBDD);
+   if (LOW(root) == -1)
+      return bdd_error(BDD_ILLBDD);
+#endif
+   INCREF(root);
+   return root;
+}
+
 /*
 NAME    {* bdd\_addref *}
 SECTION {* kernel *}
@@ -1131,6 +1145,23 @@ BDD bdd_addref(BDD root)
    return root;
 }
 
+// Non constant version
+BDD bdd_delref_nc(BDD root)
+{
+#ifndef NDEBUG
+   if (root < 2  ||  !bddrunning)
+      return root;
+   if (root >= bddnodesize)
+      return bdd_error(BDD_ILLBDD);
+   if (LOW(root) == -1)
+      return bdd_error(BDD_ILLBDD);
+
+   /* if the following line is present, fails there much earlier */
+   if (!HASREF(root)) bdd_error(BDD_BREAK); /* distinctive */
+#endif
+   DECREF(root);
+   return root;
+}
 
 /*
 NAME    {* bdd\_delref *}

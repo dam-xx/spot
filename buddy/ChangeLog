@@ -1,5 +1,18 @@
 2011-04-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Inline the "is bdd constant" check performed in copies/constructors.
+
+	This avoids a library call to bdd_addref or bdd_delref.
+
+	* src/kernel.c (bdd_delref_nc, bdd_addref_nc): New function,
+	that work only on BDD that are not constant.
+	* src/cpext.cxx (bdd::operator=): Move...
+	* src/bdd.hh (bdd::operator=): ... here.
+	(bdd::bdd, bdd::~bdd, bdd::operator=): Inline the "is bdd constant"
+	check and call bdd_delref_nc/bdd_addref_nc only otherwise.
+
+2011-04-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Hint gcc about likely/unlikely branches.
 
 	* src/bdd.h (__likely, __unlikely): Introduce these two macros.

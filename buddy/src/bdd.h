@@ -272,7 +272,9 @@ extern int      bdd_var(BDD) __purefn;
 extern BDD      bdd_low(BDD) __purefn;
 extern BDD      bdd_high(BDD) __purefn;
 extern int      bdd_varlevel(int) __purefn;
+extern BDD      bdd_addref_nc(BDD);
 extern BDD      bdd_addref(BDD);
+extern BDD      bdd_delref_nc(BDD);
 extern BDD      bdd_delref(BDD);
 extern void     bdd_gbc(void);
 extern int      bdd_scanset(BDD, int**, int*);
@@ -453,8 +455,8 @@ class bdd
  public:
 
    bdd(void)         { root=0; }
-   bdd(const bdd &r) { bdd_addref(root=r.root); }
-   ~bdd(void)        { bdd_delref(root); }
+   bdd(const bdd &r) { root=r.root; if (root > 1) bdd_addref_nc(root); }
+   ~bdd(void)        { if (root > 1) bdd_delref_nc(root); }
 
    int id(void) const;
 
@@ -481,7 +483,7 @@ class bdd
 private:
    BDD root;
 
-   bdd(BDD r) { bdd_addref(root=r); }
+   bdd(BDD r) { root=r; if (root > 1) bdd_addref_nc(root); }
    bdd operator=(BDD r);
 
    friend int      bdd_init(int, int);
@@ -848,6 +850,32 @@ inline int bdd::operator==(const bdd &r) const
 
 inline int bdd::operator!=(const bdd &r) const
 { return r.root!=root; }
+
+inline bdd bdd::operator=(const bdd &r)
+{
+  if (__likely(root != r.root))
+    {
+      if (root > 1)
+	bdd_delref_nc(root);
+      root = r.root;
+      if (root > 1)
+	bdd_addref_nc(root);
+    }
+  return *this;
+}
+
+inline bdd bdd::operator=(int r)
+{
+  if (__likely(root != r))
+    {
+      if (root > 1)
+	bdd_delref_nc(root);
+      root = r;
+      if (root > 1)
+	bdd_addref_nc(root);
+    }
+  return *this;
+}
 
 inline bdd bdd_true(void)
 { return 1; }

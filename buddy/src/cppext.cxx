@@ -81,7 +81,7 @@ static bddstrmhandler strmhandler_fdd;
 int bdd_cpp_init(int n, int c)
 {
    int ok = bdd_init(n,c);
-   
+
    strmhandler_bdd = NULL;
    strmhandler_fdd = NULL;
 
@@ -115,11 +115,11 @@ int bdd_setbddpairs(bddPair *pair, int *oldvar, const bdd *newvar, int size)
 {
    if (pair == NULL)
       return 0;
-   
+
    for (int n=0,e=0 ; n<size ; n++)
       if ((e=bdd_setbddpair(pair, oldvar[n], newvar[n].root)) < 0)
 	 return e;
-   
+
    return 0;
 }
 
@@ -135,37 +135,10 @@ int bdd_anodecountpp(const bdd *r, int num)
       cpr[n] = r[n].root;
 
    cou = bdd_anodecount(cpr,num);
-   
+
    free(cpr);
 
    return cou;
-}
-
-/*************************************************************************
-  BDD class functions
-*************************************************************************/
-
-bdd bdd::operator=(const bdd &r)
-{
-   if (root != r.root)
-   {
-      bdd_delref(root);
-      root = r.root;
-      bdd_addref(root);
-   }
-   return *this;
-}
-
-
-bdd bdd::operator=(int r)
-{
-   if (root != r)
-   {
-      bdd_delref(root);
-      root = r;
-      bdd_addref(root);
-   }
-   return *this;
 }
 
 
@@ -216,14 +189,14 @@ ostream &operator<<(ostream &o, const bdd &r)
 	 o << (r.root == 0 ? "F" : "T");
 	 return o;
       }
-      
+
       int *set = new int[bddvarnum];
       if (set == NULL)
       {
 	 bdd_error(BDD_MEMORY);
 	 return o;
       }
-      
+
       memset(set, 0, sizeof(int) * bddvarnum);
       bdd_printset_rec(o, r.root, set);
       delete[] set;
@@ -234,7 +207,7 @@ ostream &operator<<(ostream &o, const bdd &r)
       o << "ROOT: " << r.root << "\n";
       if (r.root < 2)
 	 return o;
-      
+
       bdd_mark(r.root);
 
       for (int n=0 ; n<bddnodesize ; n++)
@@ -242,7 +215,7 @@ ostream &operator<<(ostream &o, const bdd &r)
 	 if (LEVEL(n) & MARKON)
 	 {
 	    BddNode *node = &bddnodes[n];
-	 
+
 	    LEVELp(node) &= MARKOFF;
 
 	    o << "[" << setw(5) << n << "] ";
@@ -263,9 +236,9 @@ ostream &operator<<(ostream &o, const bdd &r)
       o << "digraph G {\n";
       o << "0 [shape=box, label=\"0\", style=filled, shape=box, height=0.3, width=0.3];\n";
       o << "1 [shape=box, label=\"1\", style=filled, shape=box, height=0.3, width=0.3];\n";
-      
+
       bdd_printdot_rec(o, r.root);
-      
+
       o << "}\n";
 
       bdd_unmark(r.root);
@@ -278,19 +251,19 @@ ostream &operator<<(ostream &o, const bdd &r)
 	 o << (r == 0 ? "F" : "T");
 	 return o;
       }
-      
+
       int *set = new int[bddvarnum];
       if (set == NULL)
       {
 	 bdd_error(BDD_MEMORY);
 	 return o;
       }
-      
+
       memset(set, 0, sizeof(int) * bddvarnum);
       fdd_printset_rec(o, r.root, set);
       delete[] set;
    }
-   
+
    return o;
 }
 
@@ -333,7 +306,7 @@ ostream &operator<<(ostream &o, const bdd_ioformat &f)
       for (int n=0 ; n<bddnodesize ; n++)
       {
 	 const BddNode *node = &bddnodes[n];
-	 
+
 	 if (LOWp(node) != -1)
 	 {
 	    o << "[" << setw(5) << n << "] ";
@@ -347,7 +320,7 @@ ostream &operator<<(ostream &o, const bdd_ioformat &f)
 	 }
       }
    }
-   
+
    return o;
 }
 
@@ -356,7 +329,7 @@ static void bdd_printset_rec(ostream& o, int r, int* set)
 {
    int n;
    int first;
-   
+
    if (r == 0)
       return;
    else
@@ -364,7 +337,7 @@ static void bdd_printset_rec(ostream& o, int r, int* set)
    {
       o << "<";
       first = 1;
-      
+
       for (n=0 ; n<bddvarnum ; n++)
       {
 	 if (set[n] > 0)
@@ -386,10 +359,10 @@ static void bdd_printset_rec(ostream& o, int r, int* set)
    {
       set[LEVEL(r)] = 1;
       bdd_printset_rec(o, LOW(r), set);
-      
+
       set[LEVEL(r)] = 2;
       bdd_printset_rec(o, HIGH(r), set);
-      
+
       set[LEVEL(r)] = 0;
    }
 }
@@ -410,7 +383,7 @@ static void bdd_printdot_rec(ostream& o, int r)
    o << r << " -> " << HIGH(r) << "[style=filled];\n";
 
    SETMARK(r);
-   
+
    bdd_printdot_rec(o, LOW(r));
    bdd_printdot_rec(o, HIGH(r));
 }
@@ -422,7 +395,7 @@ static void fdd_printset_rec(ostream &o, int r, int *set)
    int used = 0;
    int *binval;
    int ok, first;
-   
+
    if (r == 0)
       return;
    else
@@ -431,18 +404,18 @@ static void fdd_printset_rec(ostream &o, int r, int *set)
       o << "<";
       first=1;
       int fdvarnum = fdd_domainnum();
-	 
+
       for (n=0 ; n<fdvarnum ; n++)
       {
 	 int firstval=1;
 	 used = 0;
 	 int binsize = fdd_varnum(n);
 	 int *vars = fdd_vars(n);
-	 
+
 	 for (m=0 ; m<binsize ; m++)
 	    if (set[vars[m]] != 0)
 	       used = 1;
-	 
+
 	 if (used)
 	 {
 	    if (!first)
@@ -458,7 +431,7 @@ static void fdd_printset_rec(ostream &o, int r, int *set)
 	    {
 	       binval = fdddec2bin(n, m);
 	       ok=1;
-	       
+
 	       for (i=0 ; i<binsize && ok ; i++)
 		  if (set[vars[i]] == 1  &&  binval[i] != 0)
 		     ok = 0;
@@ -486,10 +459,10 @@ static void fdd_printset_rec(ostream &o, int r, int *set)
    {
       set[bddlevel2var[LEVEL(r)]] = 1;
       fdd_printset_rec(o, LOW(r), set);
-      
+
       set[bddlevel2var[LEVEL(r)]] = 2;
       fdd_printset_rec(o, HIGH(r), set);
-      
+
       set[bddlevel2var[LEVEL(r)]] = 0;
    }
 }
@@ -581,7 +554,7 @@ bvec bvec_map2(const bvec &a, const bvec &b,
       bdd_error(BVEC_SIZE);
       return res;
    }
-   
+
    res = bvec_false(a.bitnum());
    for (n=0 ; n < a.bitnum() ; n++)
       res.set(n, fun(a[n], b[n]));
@@ -601,7 +574,7 @@ bvec bvec_map3(const bvec &a, const bvec &b, const bvec &c,
       bdd_error(BVEC_SIZE);
       return res;
    }
-   
+
    res = bvec_false(a.bitnum());
    for (n=0 ; n < a.bitnum() ; n++)
       res.set(n, fun(a[n], b[n], c[n]) );
