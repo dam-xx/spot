@@ -411,15 +411,20 @@ BDD bdd_not(BDD r)
    CHECKa(r, bddfalse);
 
  again:
-   if (setjmp(bddexception) == 0)
+   if (__likely(setjmp(bddexception) == 0))
    {
       INITREF;
 
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = not_rec(r);
-      if (!firstReorder)
-	 bdd_enable_reorder();
+      if (__likely(firstReorder))
+	{
+	  res = not_rec(r);
+	}
+      else
+	{
+	  bdd_disable_reorder();
+	  res = not_rec(r);
+	  bdd_enable_reorder();
+	}
    }
    else
    {
@@ -516,23 +521,30 @@ BDD bdd_apply(BDD l, BDD r, int op)
    CHECKa(l, bddfalse);
    CHECKa(r, bddfalse);
 
+#ifndef NDEBUG
    if (op<0 || op>bddop_invimp)
    {
       bdd_error(BDD_OP);
       return bddfalse;
    }
+#endif
 
  again:
-   if (setjmp(bddexception) == 0)
+   if (__likely(setjmp(bddexception) == 0))
    {
       INITREF;
       applyop = op;
 
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = apply_rec(l, r);
-      if (!firstReorder)
-	 bdd_enable_reorder();
+      if (__likely(firstReorder))
+	{
+	  res = apply_rec(l, r);
+	}
+      else
+	{
+	  bdd_disable_reorder();
+	  res = apply_rec(l, r);
+	  bdd_enable_reorder();
+	}
    }
    else
    {
@@ -855,15 +867,20 @@ BDD bdd_ite(BDD f, BDD g, BDD h)
    CHECKa(h, bddfalse);
 
  again:
-   if (setjmp(bddexception) == 0)
+   if (__likely(setjmp(bddexception) == 0))
    {
       INITREF;
 
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = ite_rec(f,g,h);
-      if (!firstReorder)
-	 bdd_enable_reorder();
+      if (__likely(firstReorder))
+	{
+	  res = ite_rec(f,g,h);
+	}
+      else
+	{
+	  bdd_disable_reorder();
+	  res = ite_rec(f,g,h);
+	  bdd_enable_reorder();
+	}
    }
    else
    {
@@ -1026,7 +1043,7 @@ BDD bdd_restrict(BDD r, BDD var)
       return r;
 
  again:
-   if (setjmp(bddexception) == 0)
+   if (__likely(setjmp(bddexception) == 0))
    {
       if (varset2svartable(var) < 0)
 	 return bddfalse;
@@ -1034,11 +1051,16 @@ BDD bdd_restrict(BDD r, BDD var)
       INITREF;
       miscid = (var << 3) | CACHEID_RESTRICT;
 
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = restrict_rec(r);
-      if (!firstReorder)
-	 bdd_enable_reorder();
+      if (__likely(firstReorder))
+	{
+	  res = restrict_rec(r);
+	}
+      else
+	{
+	  bdd_disable_reorder();
+	  res = restrict_rec(r);
+	  bdd_enable_reorder();
+	}
    }
    else
    {
@@ -1118,16 +1140,21 @@ BDD bdd_constrain(BDD f, BDD c)
    CHECKa(c,bddfalse);
 
  again:
-   if (setjmp(bddexception) == 0)
+   if (__likely(setjmp(bddexception) == 0))
    {
       INITREF;
       miscid = CACHEID_CONSTRAIN;
 
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = constrain_rec(f, c);
-      if (!firstReorder)
-	 bdd_enable_reorder();
+      if (__likely(firstReorder))
+	{
+	  res = constrain_rec(f, c);
+	}
+      else
+	{
+	  bdd_disable_reorder();
+	  res = constrain_rec(f, c);
+	  bdd_enable_reorder();
+	}
    }
    else
    {
@@ -1238,18 +1265,23 @@ BDD bdd_replace(BDD r, bddPair *pair)
    CHECKa(r, bddfalse);
 
  again:
-   if (setjmp(bddexception) == 0)
+   if (__likely(setjmp(bddexception) == 0))
    {
       INITREF;
       replacepair = pair->result;
       replacelast = pair->last;
       replaceid = (pair->id << 2) | CACHEID_REPLACE;
 
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = replace_rec(r);
-      if (!firstReorder)
-	 bdd_enable_reorder();
+      if (__likely(firstReorder))
+	{
+	  res = replace_rec(r);
+	}
+      else
+	{
+	  bdd_disable_reorder();
+	  res = replace_rec(r);
+	  bdd_enable_reorder();
+	}
    }
    else
    {
@@ -1306,11 +1338,13 @@ static BDD bdd_correctify(int level, BDD l, BDD r)
    if (level < LEVEL(l)  &&  level < LEVEL(r))
       return bdd_makenode(level, l, r);
 
+#ifndef NDEBUG
    if (level == LEVEL(l)  ||  level == LEVEL(r))
    {
       bdd_error(BDD_REPLACE);
       return 0;
    }
+#endif
 
    if (LEVEL(l) == LEVEL(r))
    {
@@ -1356,24 +1390,32 @@ BDD bdd_compose(BDD f, BDD g, int var)
 
    CHECKa(f, bddfalse);
    CHECKa(g, bddfalse);
+
+#ifndef NDEBUG
    if (var < 0 || var >= bddvarnum)
    {
       bdd_error(BDD_VAR);
       return bddfalse;
    }
+#endif
 
  again:
-   if (setjmp(bddexception) == 0)
+   if (__likely(setjmp(bddexception) == 0))
    {
       INITREF;
       composelevel = bddvar2level[var];
       replaceid = (composelevel << 2) | CACHEID_COMPOSE;
 
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = compose_rec(f, g);
-      if (!firstReorder)
-	 bdd_enable_reorder();
+      if (__likely(firstReorder))
+	{
+	  res = compose_rec(f, g);
+	}
+      else
+	{
+	  bdd_disable_reorder();
+	  res = compose_rec(f, g);
+	  bdd_enable_reorder();
+	}
    }
    else
    {
@@ -1475,18 +1517,23 @@ BDD bdd_veccompose(BDD f, bddPair *pair)
    CHECKa(f, bddfalse);
 
  again:
-   if (setjmp(bddexception) == 0)
+   if (__likely(setjmp(bddexception) == 0))
    {
       INITREF;
       replacepair = pair->result;
       replaceid = (pair->id << 2) | CACHEID_VECCOMPOSE;
       replacelast = pair->last;
 
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = veccompose_rec(f);
-      if (!firstReorder)
-	 bdd_enable_reorder();
+      if (__likely(firstReorder))
+	{
+	  res = veccompose_rec(f);
+	}
+      else
+	{
+	  bdd_disable_reorder();
+	  res = veccompose_rec(f);
+	  bdd_enable_reorder();
+	}
    }
    else
    {
@@ -1558,16 +1605,21 @@ BDD bdd_simplify(BDD f, BDD d)
    CHECKa(d, bddfalse);
 
  again:
-   if (setjmp(bddexception) == 0)
+   if (__likely(setjmp(bddexception) == 0))
    {
       INITREF;
       applyop = bddop_or;
 
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = simplify_rec(f, d);
-      if (!firstReorder)
-	 bdd_enable_reorder();
+      if (__likely(firstReorder))
+	{
+	  res = simplify_rec(f, d);
+	}
+      else
+	{
+	  bdd_disable_reorder();
+	  res = simplify_rec(f, d);
+	  bdd_enable_reorder();
+	}
    }
    else
    {
@@ -1661,7 +1713,7 @@ static BDD quantify(BDD r, BDD var, int op, int comp, int id)
       return r;
 
  again:
-   if (setjmp(bddexception) == 0)
+   if (__likely(setjmp(bddexception) == 0))
    {
       if (varset2vartable(var, comp) < 0)
 	 return bddfalse;
@@ -1670,11 +1722,16 @@ static BDD quantify(BDD r, BDD var, int op, int comp, int id)
       quantid = (var << 4) | id; /* FIXME: range */
       applyop = op;
 
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = quant_rec(r);
-      if (!firstReorder)
-	 bdd_enable_reorder();
+      if (__likely(firstReorder))
+	{
+	  res = quant_rec(r);
+	}
+      else
+	{
+	  bdd_disable_reorder();
+	  res = quant_rec(r);
+	  bdd_enable_reorder();
+	}
    }
    else
    {
@@ -1835,17 +1892,19 @@ static BDD appquantify(BDD l, BDD r, int opr, BDD var,
    CHECKa(r, bddfalse);
    CHECKa(var, bddfalse);
 
+#ifndef NDEBUG
    if (opr<0 || opr>bddop_invimp)
    {
       bdd_error(BDD_OP);
       return bddfalse;
    }
+#endif
 
    if (var < 2 && !comp)  /* Empty set */
       return bdd_apply(l,r,opr);
 
  again:
-   if (setjmp(bddexception) == 0)
+   if (__likely(setjmp(bddexception) == 0))
    {
       if (varset2vartable(var, comp) < 0)
 	 return bddfalse;
@@ -1856,11 +1915,16 @@ static BDD appquantify(BDD l, BDD r, int opr, BDD var,
       appexid = (var << 5) | (appexop << 1); /* FIXME: range! */
       quantid = (appexid << 4) | qid;
 
-      if (!firstReorder)
-	 bdd_disable_reorder();
-      res = appquant_rec(l, r);
-      if (!firstReorder)
-	 bdd_enable_reorder();
+      if (__likely(firstReorder))
+	{
+	  res = appquant_rec(l, r);
+	}
+      else
+	{
+	  bdd_disable_reorder();
+	  res = appquant_rec(l, r);
+	  bdd_enable_reorder();
+	}
    }
    else
    {
@@ -2148,11 +2212,11 @@ BDD bdd_support(BDD r)
       return bddtrue;
 
       /* On-demand allocation of support set */
-   if (supportSize < bddvarnum)
+   if (__unlikely(supportSize < bddvarnum))
    {
-     if (supportSet)
+     if (__likely(supportSet))
        free(supportSet);
-     if ((supportSet=(int*)malloc(bddvarnum*sizeof(int))) == NULL)
+     if (__unlikely((supportSet=(int*)malloc(bddvarnum*sizeof(int))) == NULL))
      {
        bdd_error(BDD_MEMORY);
        return bddfalse;
@@ -2168,7 +2232,7 @@ BDD bdd_support(BDD r)
        * - and instead of reading the whole array afterwards, we just
        *   look from 'min' to 'max' used BDD variables.
        */
-   if (supportID == 0x0FFFFFFF)
+   if (__unlikely(supportID == 0x0FFFFFFF))
    {
 	/* We probably don't get here -- but let's just be sure */
      memset(supportSet, 0, bddvarnum*sizeof(int));
@@ -2289,7 +2353,7 @@ BDD bdd_satprefix(BDD* r)
    BDD res;
 
    CHECKa(*r, bddfalse);
-   if (*r < 2)
+   if (__unlikely(*r < 2))
       return *r;
 
    bdd_disable_reorder();
@@ -2349,12 +2413,13 @@ BDD bdd_satoneset(BDD r, BDD var, BDD pol)
    CHECKa(r, bddfalse);
    if (ISZERO(r))
       return r;
+#ifndef NDEBUG
    if (!ISCONST(pol))
    {
       bdd_error(BDD_ILLBDD);
       return bddfalse;
    }
-
+#endif
    bdd_disable_reorder();
 
    INITREF;
@@ -2522,7 +2587,7 @@ void bdd_allsat(BDD r, bddallsathandler handler)
 
    CHECKn(r);
 
-   if ((allsatProfile=(char*)malloc(bddvarnum)) == NULL)
+   if (__unlikely((allsatProfile=(char*)malloc(bddvarnum)) == NULL))
    {
       bdd_error(BDD_MEMORY);
       return;
@@ -2826,7 +2891,7 @@ int *bdd_varprofile(BDD r)
 {
    CHECKa(r, NULL);
 
-   if ((varprofile=(int*)malloc(sizeof(int)*bddvarnum)) == NULL)
+   if (__unlikely((varprofile=(int*)malloc(sizeof(int)*bddvarnum)) == NULL))
    {
       bdd_error(BDD_MEMORY);
       return NULL;
@@ -2912,8 +2977,10 @@ static int varset2vartable(BDD r, int comp)
 {
    BDD n;
 
+#ifndef NDEBUG
    if (r < 2 && !comp)
       return bdd_error(BDD_VARSET);
+#endif
 
    quantvarsetID++;
    quantvarsetcomp = comp;
@@ -2943,8 +3010,10 @@ static int varset2svartable(BDD r)
 {
    BDD n;
 
+#ifndef NDEBUG
    if (r < 2)
       return bdd_error(BDD_VARSET);
+#endif
 
    quantvarsetID++;
 

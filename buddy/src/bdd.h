@@ -42,10 +42,14 @@
 #define __purefn __attribute__((__pure__))
 #define __constfn __attribute__((__const__))
 #define __noreturnfn __attribute__((__noreturn__))
+#define __likely(expr)   __builtin_expect(!!(expr), 1)
+#define __unlikely(expr) __builtin_expect(!!(expr), 0)
 #else
 #define __purefn
 #define __constfn
 #define __noreturnfn
+#define __likely(expr) (expr)
+#define __unlikely(expr) (expr)
 #endif
 
    /* Allow this headerfile to define C++ constructs if requested */

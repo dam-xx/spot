@@ -1,5 +1,12 @@
 2011-04-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	Hint gcc about likely/unlikely branches.
+
+	* src/bdd.h (__likely, __unlikely): Introduce these two macros.
+	* src/bddop.c, src/kerner.c: Use them in many situations.
+
+2011-04-30  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	* src/pairs.c (bdd_pairalloc): Fix prototype.
 
 2011-04-10  Alexandre Duret-Lutz  <adl@lrde.epita.fr>

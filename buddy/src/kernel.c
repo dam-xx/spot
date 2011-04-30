@@ -298,43 +298,47 @@ int bdd_setvarnum(int num)
 
    bdd_disable_reorder();
 
+#ifndef NDEBUG
    if (num < 1  ||  num > MAXVAR)
    {
-      bdd_error(BDD_RANGE);
-      return bddfalse;
+      return bdd_error(BDD_RANGE);
    }
 
    if (num < bddvarnum)
       return bdd_error(BDD_DECVNUM);
+#endif
    if (num == bddvarnum)
       return 0;
 
-   if (bddvarset == NULL)
+   if (__unlikely(bddvarset == NULL))
    {
-      if ((bddvarset=(BDD*)malloc(sizeof(BDD)*num*2)) == NULL)
-	 return bdd_error(BDD_MEMORY);
-      if ((bddlevel2var=(int*)malloc(sizeof(int)*(num+1))) == NULL)
-      {
+     if (__unlikely((bddvarset = (BDD*)malloc(sizeof(BDD)*num*2)) == NULL))
+       return bdd_error(BDD_MEMORY);
+     if (__unlikely((bddlevel2var = (int*)malloc(sizeof(int)*(num+1))) == NULL))
+       {
 	 free(bddvarset);
 	 return bdd_error(BDD_MEMORY);
-      }
-      if ((bddvar2level=(int*)malloc(sizeof(int)*(num+1))) == NULL)
-      {
+       }
+     if (__unlikely((bddvar2level = (int*)malloc(sizeof(int)*(num+1))) == NULL))
+       {
 	 free(bddvarset);
 	 free(bddlevel2var);
 	 return bdd_error(BDD_MEMORY);
-      }
+       }
    }
    else
    {
-      if ((bddvarset=(BDD*)realloc(bddvarset,sizeof(BDD)*num*2)) == NULL)
-	 return bdd_error(BDD_MEMORY);
-      if ((bddlevel2var=(int*)realloc(bddlevel2var,sizeof(int)*(num+1))) == NULL)
-      {
+     if (__unlikely((bddvarset =
+		     (BDD*)realloc(bddvarset,sizeof(BDD)*num*2)) == NULL))
+       return bdd_error(BDD_MEMORY);
+     if (__unlikely((bddlevel2var =
+		     (int*)realloc(bddlevel2var,sizeof(int)*(num+1))) == NULL))
+       {
 	 free(bddvarset);
 	 return bdd_error(BDD_MEMORY);
-      }
-      if ((bddvar2level=(int*)realloc(bddvar2level,sizeof(int)*(num+1))) == NULL)
+       }
+     if (__unlikely((bddvar2level =
+		     (int*)realloc(bddvar2level,sizeof(int)*(num+1))) == NULL))
       {
 	 free(bddvarset);
 	 free(bddlevel2var);
@@ -342,7 +346,7 @@ int bdd_setvarnum(int num)
       }
    }
 
-   if (bddrefstack != NULL)
+   if (__likely(bddrefstack != NULL))
       free(bddrefstack);
    bddrefstack = bddrefstacktop = (int*)malloc(sizeof(int)*(num*2+4));
 
@@ -352,7 +356,7 @@ int bdd_setvarnum(int num)
       bddvarset[bddvarnum*2+1] = bdd_makenode(bddvarnum, 1, 0);
       POPREF(1);
 
-      if (bdderrorcond)
+      if (__unlikely(bdderrorcond))
       {
 	 bddvarnum = bdv;
 	 return -bdderrorcond;
@@ -392,7 +396,7 @@ int bdd_extvarnum(int num)
 {
    int start = bddvarnum;
 
-   if (num < 0  ||  num > 0x3FFFFFFF)
+   if (__unlikely(num < 0  ||  num > 0x3FFFFFFF))
       return bdd_error(BDD_RANGE);
 
    bdd_setvarnum(bddvarnum+num);
@@ -1167,7 +1171,7 @@ void bdd_mark(int i)
 {
    BddNode *node;
 
-   if (i < 2)
+   if (__unlikely(i < 2))
       return;
 
    node = &bddnodes[i];
@@ -1185,7 +1189,7 @@ void bdd_mark_upto(int i, int level)
 {
    BddNode *node = &bddnodes[i];
 
-   if (i < 2)
+   if (__unlikely(i < 2))
       return;
 
    if (LEVELp(node) & MARKON  ||  LOWp(node) == -1)
@@ -1205,7 +1209,7 @@ void bdd_markcount(int i, int *cou)
 {
    BddNode *node;
 
-   if (i < 2)
+   if (__unlikely(i < 2))
       return;
 
    node = &bddnodes[i];
@@ -1242,7 +1246,7 @@ void bdd_unmark_upto(int i, int level)
 {
    BddNode *node = &bddnodes[i];
 
-   if (i < 2)
+   if (__unlikely(i < 2))
       return;
 
    if (!(LEVELp(node) & MARKON))
