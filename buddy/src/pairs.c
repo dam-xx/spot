@@ -114,7 +114,7 @@ void bdd_pairs_vardown(int level)
 }
 
 
-static bddPair *bdd_pairalloc()
+static bddPair *bdd_pairalloc(void)
 {
    bddPair *p;
    if ((p=(bddPair*)malloc(sizeof(bddPair))) == NULL)
