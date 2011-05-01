@@ -61,7 +61,7 @@ namespace spot
 		    bdd_dict* dict,
 		    const ltl::atomic_prop_set* to_observe,
 		    const ltl::formula* dead = ltl::constant::true_instance(),
-		    bool compress = false,
+		    int compress = 0,
 		    bool verbose = true);
 }
 

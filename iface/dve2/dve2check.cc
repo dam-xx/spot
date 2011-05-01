@@ -61,6 +61,9 @@ syntax(char* prog)
             << "  -T     time the different phases of the execution"
 	    << std::endl
             << "  -z     compress states to handle larger models"
+	    << std::endl
+            << "  -Z     compress states (faster) "
+	    << "assuming all values in [0 .. 2^28-1]"
 	    << std::endl;
 
   exit(1);
@@ -78,7 +81,7 @@ main(int argc, char **argv)
   bool accepting_run = false;
   bool expect_counter_example = false;
   char *dead = 0;
-  bool compress_states = false;
+  int compress_states = 0;
 
   const char* echeck_algo = "Cou99";
 
@@ -128,7 +131,10 @@ main(int argc, char **argv)
 	      use_timer = true;
 	      break;
 	    case 'z':
-	      compress_states = true;
+	      compress_states = 1;
+	      break;
+	    case 'Z':
+	      compress_states = 2;
 	      break;
 	    default:
 	    error:

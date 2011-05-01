@@ -1,5 +1,12 @@
 2011-05-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
+	DVE2: Optionally use the new compression.
+
+	* iface/dve2/dve2.cc, iface/dve2/dve2.hh, iface/dve2/dve2check.cc:
+	Add a -Z option and pass it through.
+
+2011-05-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
 	Implement a new compression inspired from simple-9.
 
 	* src/misc/intvcmp2.cc, src/misc/intvcmp2.hh: New files.

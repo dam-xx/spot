@@ -31,6 +31,7 @@
 #include "misc/fixpool.hh"
 #include "misc/mspool.hh"
 #include "misc/intvcomp.hh"
+#include "misc/intvcmp2.hh"
 
 
 namespace spot
@@ -200,11 +201,12 @@ namespace spot
 
     struct callback_context
     {
-      typedef std::vector<state*> transitions_t; // FIXME: Vector->List
+      typedef std::list<state*> transitions_t;
       transitions_t transitions;
       int state_size;
       void* pool;
       int* compressed;
+      void (*compress)(const int*, size_t, int*, size_t&);
 
       ~callback_context()
       {
@@ -231,7 +233,7 @@ namespace spot
       multiple_size_pool* p = static_cast<multiple_size_pool*>(ctx->pool);
 
       size_t csize = ctx->state_size * 2;
-      int_array_array_compress(dst, ctx->state_size, ctx->compressed, csize);
+      ctx->compress(dst, ctx->state_size, ctx->compressed, csize);
 
       void* mem = p->allocate(sizeof(dve2_compressed_state)
 			      + sizeof(int) * csize);
@@ -593,12 +595,17 @@ namespace spot
     public:
 
       dve2_kripke(const dve2_interface* d, bdd_dict* dict, const prop_set* ps,
-		  const ltl::formula* dead, bool compress)
+		  const ltl::formula* dead, int compress)
 	: d_(d),
 	  state_size_(d_->get_state_variable_count()),
 	  dict_(dict), ps_(ps),
-	  compress_(compress),
-	  uncompressed_(compress ? new int[state_size_] : 0),
+	  compress_(compress == 0 ? 0
+		    : compress == 1 ? int_array_array_compress
+		    : int_array_array_compress2),
+	  decompress_(compress == 0 ? 0
+		      : compress == 1 ? int_array_array_decompress
+		      : int_array_array_decompress2),
+	  uncompressed_(compress ? new int[state_size_ + 30] : 0),
 	  compressed_(compress ? new int[state_size_ * 2] : 0),
 	  statepool_(compress ? sizeof(dve2_compressed_state) :
 		     (sizeof(dve2_state) + state_size_ * sizeof(int))),
@@ -667,8 +674,7 @@ namespace spot
 	  {
 	    d_->get_initial_state(uncompressed_);
 	    size_t csize = state_size_ * 2;
-	    int_array_array_compress(uncompressed_, state_size_,
-				     compressed_, csize);
+	    compress_(uncompressed_, state_size_, compressed_, csize);
 
 	    multiple_size_pool* p =
 	      const_cast<multiple_size_pool*>(&compstatepool_);
@@ -739,6 +745,7 @@ namespace spot
 	  const_cast<void*>(compress_
 			    ? static_cast<const void*>(&compstatepool_)
 			    : static_cast<const void*>(&statepool_));
+	cc->compress = compress_;
 	cc->compressed = compressed_;
 	t = d_->get_successors(0, const_cast<int*>(vars),
 			       compress_
@@ -799,8 +806,7 @@ namespace spot
 	      down_cast<const dve2_compressed_state*>(st);
 	    assert(s);
 
-	    int_array_array_decompress(s->vars, s->size,
-				       uncompressed_, state_size_);
+	    decompress_(s->vars, s->size, uncompressed_, state_size_);
 	    vars = uncompressed_;
 	  }
 	else
@@ -883,7 +889,8 @@ namespace spot
       const prop_set* ps_;
       bdd alive_prop;
       bdd dead_prop;
-      bool compress_;
+      void (*compress_)(const int*, size_t, int*, size_t&);
+      void (*decompress_)(const int*, size_t, int*, size_t);
       int* uncompressed_;
       int* compressed_;
       fixed_size_pool statepool_;
@@ -956,7 +963,7 @@ namespace spot
   load_dve2(const std::string& file_arg, bdd_dict* dict,
 	    const ltl::atomic_prop_set* to_observe,
 	    const ltl::formula* dead,
-	    bool compress,
+	    int compress,
 	    bool verbose)
   {
     std::string file;
