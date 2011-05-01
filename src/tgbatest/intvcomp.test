@@ -25,3 +25,4 @@
 set -e
 
 run 0 ../intvcomp
+run 0 ../intvcmp2

@@ -1,3 +1,13 @@
+2011-05-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
+
+	Implement a new compression inspired from simple-9.
+
+	* src/misc/intvcmp2.cc, src/misc/intvcmp2.hh: New files.
+	* src/misc/Makefile.am: Add them.
+	* src/tgbatest/intvcmp2.cc: New test.
+	* src/tgbatest/Makefile.am: Add it.
+	* src/tgbatest/intvcomp.test: Call it.
+
 2011-04-15  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	* src/misc/intvcomp.cc: Low-level fine-tuning.

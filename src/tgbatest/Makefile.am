@@ -38,6 +38,7 @@ check_PROGRAMS = \
   expldot \
   explprod \
   intvcomp \
+  intvcmp2 \
   ltlprod \
   mixprod \
   powerset \
@@ -56,6 +57,7 @@ expldot_SOURCES  = powerset.cc
 expldot_CXXFLAGS = -DDOTTY
 explprod_SOURCES = explprod.cc
 intvcomp_SOURCES = intvcomp.cc
+intvcmp2_SOURCES = intvcmp2.cc
 ltl2tgba_SOURCES = ltl2tgba.cc
 ltlprod_SOURCES  = ltlprod.cc
 mixprod_SOURCES  = mixprod.cc

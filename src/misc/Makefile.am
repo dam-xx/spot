@@ -38,6 +38,7 @@ misc_HEADERS = \
   hash.hh \
   hashfunc.hh \
   intvcomp.hh \
+  intvcmp2.hh \
   ltstr.hh \
   minato.hh \
   memusage.hh \
@@ -56,6 +57,7 @@ libmisc_la_SOURCES = \
   escape.cc \
   freelist.cc \
   intvcomp.cc \
+  intvcmp2.cc \
   memusage.cc \
   minato.cc \
   modgray.cc \
