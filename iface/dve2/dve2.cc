@@ -74,7 +74,7 @@ namespace spot
     struct dve2_state: public state
     {
       dve2_state(int s, fixed_size_pool* p)
-	: size(s), count(1), pool(p)
+	: pool(p), size(s), count(1)
       {
       }
 
@@ -123,17 +123,17 @@ namespace spot
       }
 
     public:
-      int size;
-      mutable unsigned count;
-      size_t hash_value;
       fixed_size_pool* pool;
+      size_t hash_value: 32;
+      int size: 16;
+      mutable unsigned count: 16;
       int vars[0];
     };
 
     struct dve2_compressed_state: public state
     {
       dve2_compressed_state(int s, multiple_size_pool* p)
-	: size(s), count(1), pool(p)
+	: pool(p), size(s), count(1)
       {
       }
 
@@ -154,7 +154,7 @@ namespace spot
       {
 	if (--count)
 	  return;
-	pool->deallocate(this, sizeof(*this) + size * sizeof(int));
+	pool->deallocate(this, sizeof(*this) + size * sizeof(*vars));
       }
 
       size_t hash() const
@@ -189,10 +189,10 @@ namespace spot
       }
 
     public:
-      int size;
-      mutable unsigned count;
-      size_t hash_value;
       multiple_size_pool* pool;
+      size_t hash_value: 32;
+      int size: 16;
+      mutable unsigned count: 16;
       int vars[0];
     };
 

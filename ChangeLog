@@ -1,3 +1,11 @@
+2011-05-02  Alexandre Duret-Lutz  <adl@va-et-vient.net>
+
+	DVE2: Minor memory compaction.
+
+	* iface/dve2/dve2.cc (dve2_state, dve2_compressed_state): Store
+	size and count on 16 bits, and hash on 32 bits, to limit memory
+	wasted.
+
 2011-05-01  Alexandre Duret-Lutz  <adl@lrde.epita.fr>
 
 	DVE2: Optionally use the new compression.
