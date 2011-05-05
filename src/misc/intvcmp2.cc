@@ -268,7 +268,7 @@ namespace spot
     public:
       int_array_array_compression(const int* array, size_t n,
 				  int* dest, size_t& dest_n)
-	: stream_compression_base(n),
+	: stream_compression_base<int_array_array_compression>(n),
 	  array_(array), result_size_(dest_n),
 	  result_(dest), result_end_(dest + dest_n)
       {
